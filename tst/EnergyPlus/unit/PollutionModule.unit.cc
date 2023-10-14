@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,7 +66,7 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
         "      Monthly;                 !- Reporting Frequency",
         "",
         "    EnvironmentalImpactFactors,",
-        "      0.3,                     !- District Heating Efficiency",
+        "      0.3,                     !- District Heating Water Efficiency",
         "      3.0,                     !- District Cooling COP {W/W}",
         "      0.25,                    !- Steam Conversion Efficiency",
         "      80.7272,                 !- Total Carbon Equivalent Emission Factor From N2O {kg/kg}",
@@ -469,6 +469,7 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataPollutionModule->FuelType.FuelTypeNames.allocate(10);
+    state->dataPollutionModule->FuelType.FuelTypeNames = Constant::eFuel::Invalid;
     state->dataPollutionModule->GetInputFlagPollution = true;
     PollutionModule::SetupPollutionMeterReporting(*state);
 
@@ -583,5 +584,5 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestEnvironmentalImpactFactors)
 
     // The get routine should rest the steam conversion efficiency to the default value of 0.25.
     // Previously because of a typo, it would reset it to the input value of zero (or even a negative number).
-    ASSERT_NEAR(state->dataPollutionModule->Pollution.SteamConvEffic, ExpectedOutput, AllowedTolerance);
+    ASSERT_NEAR(state->dataPollutionModule->Pollution.PurchHeatSteamConvEffic, ExpectedOutput, AllowedTolerance);
 }

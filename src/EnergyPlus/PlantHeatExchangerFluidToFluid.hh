@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -219,11 +219,6 @@ namespace PlantHeatExchangerFluidToFluid {
         void control(EnergyPlusData &state, Real64 MyLoad, bool FirstHVACIteration);
 
         void findDemandSideLoopFlow(EnergyPlusData &state, Real64 TargetSupplySideLoopLeavingTemp, HXAction HXActionMode);
-
-        Real64 demandSideFlowResidual(EnergyPlusData &state,
-                                      Real64 DmdSideMassFlowRate,
-                                      Array1D<Real64> const &Par // Par(1) = HX index number
-        );
 
         void oneTimeInit(EnergyPlusData &state) override;
     };

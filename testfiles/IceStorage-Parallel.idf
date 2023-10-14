@@ -104,7 +104,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes
 
-  Version,22.2;
+  Version,24.1;
 
   Building,
     Building,                !- Name
@@ -3005,7 +3005,7 @@
     Main Boiler HW Outlet,   !- Boiler Water Outlet Node Name
     100,                     !- Water Outlet Upper Temperature Limit {C}
     ConstantFlow,            !- Boiler Flow Mode
-    0;                       !- Parasitic Electric Load {W}
+    0;                       !- On Cycle Parasitic Electric Load {W}
 
   Curve:Quadratic,
     BoilerEfficiency,        !- Name

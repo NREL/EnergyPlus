@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -161,10 +161,10 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
 {
     // setup environment state
     state->dataWeatherManager->Environment.allocate(4);
-    state->dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
-    state->dataWeatherManager->Environment(2).SkyTempModel = EmissivityCalcType::BruntModel;
-    state->dataWeatherManager->Environment(3).SkyTempModel = EmissivityCalcType::IdsoModel;
-    state->dataWeatherManager->Environment(4).SkyTempModel = EmissivityCalcType::BerdahlMartinModel;
+    state->dataWeatherManager->Environment(1).SkyTempModel = SkyTempCalcType::ClarkAllenModel;
+    state->dataWeatherManager->Environment(2).SkyTempModel = SkyTempCalcType::BruntModel;
+    state->dataWeatherManager->Environment(3).SkyTempModel = SkyTempCalcType::IdsoModel;
+    state->dataWeatherManager->Environment(4).SkyTempModel = SkyTempCalcType::BerdahlMartinModel;
 
     // init local variables
     Real64 OpaqueSkyCover(0.0);
@@ -826,13 +826,12 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_EQ(1, state->dataWeatherManager->NumOfEnvrn);
-    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobalConstants::KindOfSim::DesignDay));
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, Constant::KindOfSim::DesignDay));
 }
 
 // Test for https://github.com/NREL/EnergyPlus/issues/7550
 TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->WriteTabularFiles = true;
@@ -935,8 +934,6 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     // Close output files *after* the EIO has been written to
     SimulationManager::CloseOutputFiles(*state);
-
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     std::vector<std::tuple<std::string, std::string>> results_strings(
         {{"Hum Ind Value at Max Temp", "90500.00"}, {"Hum Ind Type", "Enthalpy"}, {"Hum Ind Units", "{J/kgDryAir}"}});
@@ -1175,7 +1172,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz)
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataWeatherManager->Environment.allocate(1);
-    state->dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    state->dataWeatherManager->Environment(1).SkyTempModel = SkyTempCalcType::ClarkAllenModel;
 
     AllocateWeatherData(*state);
     OpenWeatherFile(*state, ErrorsFound);
@@ -1267,7 +1264,7 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataWeatherManager->Environment.allocate(1);
-    state->dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    state->dataWeatherManager->Environment(1).SkyTempModel = SkyTempCalcType::ClarkAllenModel;
     state->dataWeatherManager->Environment(1).StartMonth = 1;
     state->dataWeatherManager->Environment(1).StartDay = 1;
 
@@ -1350,7 +1347,7 @@ TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
     WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
-    state->dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    state->dataWeatherManager->Environment(1).SkyTempModel = SkyTempCalcType::ClarkAllenModel;
     state->dataWeatherManager->Environment(1).StartMonth = 1;
     state->dataWeatherManager->Environment(1).StartDay = 1;
 
@@ -1487,7 +1484,7 @@ TEST_F(EnergyPlusFixture, Fix_OpaqueSkyCover_Test)
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataWeatherManager->Environment.allocate(1);
-    state->dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    state->dataWeatherManager->Environment(1).SkyTempModel = SkyTempCalcType::ClarkAllenModel;
     state->dataWeatherManager->Environment(1).StartMonth = 1;
     state->dataWeatherManager->Environment(1).StartDay = 1;
 
@@ -1572,167 +1569,16 @@ TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag)
         "    -104.87,                 !- Longitude {deg}",
         "    -7.00,                   !- Time Zone {hr}",
         "    1611.00;                 !- Elevation {m}",
-        "Material,",
-        "  Concrete Block,          !- Name",
-        "  MediumRough,             !- Roughness",
-        "  0.1014984,               !- Thickness {m}",
-        "  0.3805070,               !- Conductivity {W/m-K}",
-        "  608.7016,                !- Density {kg/m3}",
-        "  836.8000;                !- Specific Heat {J/kg-K}",
-        "Construction,",
-        "  WallConstruction,        !- Name",
-        "  Concrete Block;          !- Outside Layer",
-        "  WindowMaterial:Glazing,",
-        "    ELECTRO GLASS DARK STATE,!- Name",
-        "    SpectralAverage,         !- Optical Data Type",
-        "    ,                        !- Window Glass Spectral Data Set Name",
-        "    0.006,                   !- Thickness {m}",
-        "    0.111,                   !- Solar Transmittance at Normal Incidence",
-        "    0.179,                   !- Front Side Solar Reflectance at Normal Incidence",
-        "    0.179,                   !- Back Side Solar Reflectance at Normal Incidence",
-        "    0.128,                   !- Visible Transmittance at Normal Incidence",
-        "    0.081,                   !- Front Side Visible Reflectance at Normal Incidence",
-        "    0.081,                   !- Back Side Visible Reflectance at Normal Incidence",
-        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
-        "    0.0001,                    !- Front Side Infrared Hemispherical Emissivity",
-        "    0.0001,                    !- Back Side Infrared Hemispherical Emissivity",
-        "    0.9;                     !- Conductivity {W/m-K}",
-        "  WindowMaterial:Glazing,",
-        "    ELECTRO GLASS LIGHT STATE,!- Name",
-        "    SpectralAverage,         !- Optical Data Type",
-        "    ,                        !- Window Glass Spectral Data Set Name",
-        "    0.006,                   !- Thickness {m}",
-        "    0.9,                   !- Solar Transmittance at Normal Incidence",
-        "    0.1,                   !- Front Side Solar Reflectance at Normal Incidence",
-        "    0.1,                   !- Back Side Solar Reflectance at Normal Incidence",
-        "    0.9,                   !- Visible Transmittance at Normal Incidence",
-        "    0.1,                   !- Front Side Visible Reflectance at Normal Incidence",
-        "    0.1,                   !- Back Side Visible Reflectance at Normal Incidence",
-        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
-        "    0.0001,                    !- Front Side Infrared Hemispherical Emissivity",
-        "    0.0001,                    !- Back Side Infrared Hemispherical Emissivity",
-        "    0.9;                     !- Conductivity {W/m-K}",
-        "Construction,",
-        "  WindowConstruction1,      !- Name",
-        "  ELECTRO GLASS LIGHT STATE;          !- Outside Layer",
-        "Construction,",
-        "  WindowConstruction2,      !- Name",
-        "  ELECTRO GLASS DARK STATE;          !- Outside Layer",
-        "FenestrationSurface:Detailed,",
-        "  FenestrationSurface,     !- Name",
-        "  Window,                  !- Surface Type",
-        "  WindowConstruction1,      !- Construction Name",
-        "  Wall,                    !- Building Surface Name",
-        "  ,                        !- Outside Boundary Condition Object",
-        "  0.5000000,               !- View Factor to Ground",
-        "  ,                        !- Frame and Divider Name",
-        "  1.0,                     !- Multiplier",
-        "  4,                       !- Number of Vertices",
-        "  0.200000,0.000000,9.900000,  !- X,Y,Z ==> Vertex 1 {m}",
-        "  0.200000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}",
-        "  9.900000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}",
-        "  9.900000,0.000000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}",
-        "BuildingSurface:Detailed,"
-        "  Wall,                    !- Name",
-        "  Wall,                    !- Surface Type",
-        "  WallConstruction,        !- Construction Name",
-        "  Zone,                    !- Zone Name",
-        "    ,                        !- Space Name",
-        "  Outdoors,                !- Outside Boundary Condition",
-        "  ,                        !- Outside Boundary Condition Object",
-        "  SunExposed,              !- Sun Exposure",
-        "  WindExposed,             !- Wind Exposure",
-        "  0.5000000,               !- View Factor to Ground",
-        "  4,                       !- Number of Vertices",
-        "  0.000000,0.000000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}",
-        "  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "  10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "  10.00000,0.000000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}",
-        "BuildingSurface:Detailed,"
-        "  Floor,                   !- Name",
-        "  Floor,                   !- Surface Type",
-        "  WallConstruction,        !- Construction Name",
-        "  Zone,                    !- Zone Name",
-        "    ,                        !- Space Name",
-        "  Outdoors,                !- Outside Boundary Condition",
-        "  ,                        !- Outside Boundary Condition Object",
-        "  NoSun,                   !- Sun Exposure",
-        "  NoWind,                  !- Wind Exposure",
-        "  1.0,                     !- View Factor to Ground",
-        "  4,                       !- Number of Vertices",
-        "  0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
-        "  0.000000,10.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
-        "  10.00000,10.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
-        "  10.00000,0.000000,0;  !- X,Y,Z ==> Vertex 4 {m}",
-        "Zone,"
-        "  Zone,                    !- Name",
-        "  0,                       !- Direction of Relative North {deg}",
-        "  6.000000,                !- X Origin {m}",
-        "  6.000000,                !- Y Origin {m}",
-        "  0,                       !- Z Origin {m}",
-        "  1,                       !- Type",
-        "  1,                       !- Multiplier",
-        "  autocalculate,           !- Ceiling Height {m}",
-        "  autocalculate;           !- Volume {m3}",
-        "  Daylighting:Controls,",
-        "    Daylighting Control,!- Name",
-        "    Zone,          !- Zone Name",
-        "    SplitFlux,               !- Daylighting Method",
-        "    ,                        !- Availability Schedule Name",
-        "    Continuous,              !- Lighting Control Type",
-        "    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control",
-        "    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control",
-        "    1,                       !- Number of Stepped Control Steps",
-        "    1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control",
-        "    ,                        !- Glare Calculation Daylighting Reference Point Name",
-        "    ,                        !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}",
-        "    22,                      !- Maximum Allowable Discomfort Glare Index",
-        "    ,                        !- DElight Gridding Resolution {m2}",
-        "    Reference Point 1,  !- Daylighting Reference Point 1 Name",
-        "    1,                       !- Fraction of Zone Controlled by Reference Point 1",
-        "    500;                     !- Illuminance Setpoint at Reference Point 1 {lux}",
-        "",
-        "  Daylighting:ReferencePoint,",
-        "    Reference Point 1,  !- Name",
-        "    Zone,          !- Zone Name",
-        "    12,                      !- X-Coordinate of Reference Point {m}",
-        "    2.5,                     !- Y-Coordinate of Reference Point {m}",
-        "    0.8;                     !- Z-Coordinate of Reference Point {m}",
-        "  ShadowCalculation,",
-        "    PolygonClipping,         !- Shading Calculation Method",
-        "    Timestep,                !- Shading Calculation Update Frequency Method",
-        "    30,                       !- Shading Calculation Update Frequency",
-        "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
-        "EnergyManagementSystem:ConstructionIndexVariable, Win_1, WINDOWCONSTRUCTION1;",
-        "EnergyManagementSystem:ConstructionIndexVariable, Win_2, WINDOWCONSTRUCTION2;",
-        "  EnergyManagementSystem:Actuator,",
-        "    Win1_Construct,          !- Name",
-        "    FenestrationSurface,  !- Actuated Component Unique Name",
-        "    Surface,                 !- Actuated Component Type",
-        "    Construction State;      !- Actuated Component Control Type",
-        "",
-        "  EnergyManagementSystem:ProgramCallingManager,",
-        "    Window Switcher,  !- Name",
-        "    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point",
-        "    ZN_1_wall_south_Window_1_Control;  !- Program Name 1",
-        "",
-        "  EnergyManagementSystem:Program,",
-        "    ZN_1_wall_south_Window_1_Control,  !- Name",
-        "    IF Hour > 12,    !- Program Line 1",
-        "    Set Win1_Construct = Win_2,  !- Program Line 2",
-        "    ELSE,                    !- <none>",
-        "    SET Win1_Construct = Win_1,  !- <none>",
-        "    ENDIF;                   !- <none>",
 
         "Site:Precipitation,",
-        "ScheduleAndDesignLevel,  !- Precipitation Model Type",
-        "0.75,                    !- Design Level for Total Annual Precipitation {m/yr}",
-        "PrecipitationSchd,       !- Precipitation Rates Schedule Name",
-        "0.80771;                 !- Average Total Annual Precipitation {m/yr}",
+        "  ScheduleAndDesignLevel,  !- Precipitation Model Type",
+        "  0.75,                    !- Design Level for Total Annual Precipitation {m/yr}",
+        "  PrecipitationSchd,       !- Precipitation Rates Schedule Name",
+        "  0.80771;                 !- Average Total Annual Precipitation {m/yr}",
 
         "Schedule:Compact,",
         "  PrecipitationSchd,       !- Name",
-        "  Any Number,              !- Schedule Type Limits Name",
+        "  ,                        !- Schedule Type Limits Name",
         "  Through: 5/31,           !- Field 1",
         "  For: AllDays,            !- Field 2",
         "  Until: 24:00,            !- Field 3",
@@ -1757,7 +1603,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag)
     state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * Constant::SecInHour;
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
@@ -1768,11 +1614,16 @@ TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag)
     state->dataEnvrn->DayOfWeekTomorrow = 5;
     state->dataEnvrn->HolidayIndex = 0;
     state->dataGlobal->TimeStep = 1;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->DSTIndicator = 0; // DST IS OFF
     ScheduleManager::UpdateScheduleValues(*state);
 
     state->dataWeatherManager->Interpolation.allocate(state->dataGlobal->NumOfTimeStepInHour);
     state->dataWeatherManager->Interpolation = 0;
     // setting up end ------------------------------------------------------------------------------
+
+    // Need to instantiate some stuff to avoid a crash
+    // WeatherManager::ReadUserWeatherInput(*state);
 
     state->dataWeatherManager->TodayIsRain.allocate(state->dataGlobal->NumOfTimeStepInHour, 24);
     state->dataWeatherManager->TodayIsRain(1, 24) = false;
@@ -2018,7 +1869,7 @@ TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_OK)
 
     EXPECT_TRUE(compare_err_stream("", true));
     EXPECT_EQ(1, state->dataWeatherManager->NumOfEnvrn);
-    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobalConstants::KindOfSim::RunPeriodWeather));
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather));
 }
 
 TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_Missing)
@@ -2062,7 +1913,7 @@ TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_Missing)
 
     // We don't have an EPW
     state->dataWeatherManager->WeatherFileExists = false;
-    state->files.inputWeatherFilePath.filePath = "in.epw";
+    state->files.inputWeatherFilePath.filePath = "doesntnotexist.epw";
 
     state->dataGlobal->BeginSimFlag = false;
     state->dataGlobal->NumOfTimeStepInHour = 4;
@@ -2083,5 +1934,578 @@ TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_Missing)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_EQ(1, state->dataWeatherManager->NumOfEnvrn);
-    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobalConstants::KindOfSim::RunPeriodWeather));
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather));
+}
+
+TEST_F(EnergyPlusFixture, epwHeaderTest)
+{
+    // Test for #9743
+    bool errorsFound = false;
+    std::string location = "LOCATION,NADI,-,FJI,IWEC Data,916800,-17.75,177.45,12.0,18.0";
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::Location, location, errorsFound);
+    EXPECT_FALSE(errorsFound);
+    EXPECT_FALSE(has_err_output());
+    EXPECT_EQ(state->dataWeatherManager->EPWHeaderTitle, "NADI - FJI IWEC Data WMO#=916800");
+    EXPECT_EQ(state->dataWeatherManager->WeatherFileLatitude, -17.75);
+    EXPECT_EQ(state->dataWeatherManager->WeatherFileLongitude, 177.45);
+    EXPECT_EQ(state->dataWeatherManager->WeatherFileTimeZone, 12.0);
+    EXPECT_EQ(state->dataWeatherManager->WeatherFileElevation, 18.0);
+
+    std::string designConditions = "DESIGN CONDITIONS,1,Climate Design Data 2009 ASHRAE "
+                                   "Handbook,,Heating,7,16.3,17.3,12.5,9,21.2,13.4,9.6,21.2,9,25.8,8.2,25.8,2,120,Cooling,1,7.5,32.3,25.3,31.9,25.3,"
+                                   "31.2,25.2,26.9,30.5,26.5,30.1,26.2,29.7,5.2,300,26,21.4,28.8,25.6,20.8,28.5,25.2,20.3,28.2,84.8,30.6,83.2,30.3,"
+                                   "81.9,29.8,21,Extremes,8.4,7.4,6.6,30.4,14.3,34.6,1,1.7,13.5,35.8,12.9,36.9,12.4,37.8,11.6,39.1";
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::DesignConditions, designConditions, errorsFound);
+    EXPECT_FALSE(errorsFound);
+    EXPECT_FALSE(has_err_output());
+    // Design Conditions are skipped - nothing to check
+
+    std::string typicalExtreme = "TYPICAL/EXTREME PERIODS,3,No Dry Season - Week Near Average Annual,Typical,4/16,4/22,No Dry Season "
+                                 "- Week Near Annual Max,Extreme,2/ 5,2/11,No Dry Season - Week Near Annual Min,Extreme,July 16,Jul 22";
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::TypicalExtremePeriods, typicalExtreme, errorsFound);
+    EXPECT_FALSE(errorsFound);
+    EXPECT_FALSE(has_err_output());
+    EXPECT_EQ(state->dataWeatherManager->NumEPWTypExtSets, 3);
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(1).Title, "No Dry Season - Week Near Average Annual");
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(1).ShortTitle, "NoDrySeason");
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(1).TEType, "Typical");
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(1).StartMonth, 4);
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(1).StartDay, 16);
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(1).EndMonth, 4);
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(1).EndDay, 22);
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(2).Title, "No Dry Season - Week Near Annual Max");
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(2).ShortTitle, "NoDrySeasonMax");
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(2).TEType, "Extreme");
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(2).StartMonth, 2);
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(2).StartDay, 5);
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(2).EndMonth, 2);
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(2).EndDay, 11);
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(3).Title, "No Dry Season - Week Near Annual Min");
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(3).ShortTitle, "NoDrySeasonMin");
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(3).TEType, "Extreme");
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(3).StartMonth, 7);
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(3).StartDay, 16);
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(3).EndMonth, 7);
+    EXPECT_EQ(state->dataWeatherManager->TypicalExtremePeriods(3).EndDay, 22);
+
+    std::string groundTemps =
+        "GROUND "
+        "TEMPERATURES,3,.5,,,,26.85,26.98,26.68,26.23,25.09,24.22,23.64,23.49,23.82,24.51,25.43,26.27,2,,,,26.27,26.54,26.46,26.22,25.45,24.76,24.22,"
+        "23.94,24.02,24.42,25.06,25.72,4,,,,25.79,26.07,26.12,26.03,25.58,25.12,24.70,24.41,24.35,24.53,24.91,25.36";
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::GroundTemperatures, groundTemps, errorsFound);
+    EXPECT_FALSE(errorsFound);
+    EXPECT_FALSE(has_err_output());
+    // apparently only the first set of ground temps are used
+    EXPECT_EQ(state->dataWeatherManager->GroundTempsFCFromEPWHeader(1), 26.85);
+    EXPECT_EQ(state->dataWeatherManager->GroundTempsFCFromEPWHeader(2), 26.98);
+    EXPECT_EQ(state->dataWeatherManager->GroundTempsFCFromEPWHeader(3), 26.68);
+    EXPECT_EQ(state->dataWeatherManager->GroundTempsFCFromEPWHeader(4), 26.23);
+    EXPECT_EQ(state->dataWeatherManager->GroundTempsFCFromEPWHeader(5), 25.09);
+    EXPECT_EQ(state->dataWeatherManager->GroundTempsFCFromEPWHeader(6), 24.22);
+    EXPECT_EQ(state->dataWeatherManager->GroundTempsFCFromEPWHeader(7), 23.64);
+    EXPECT_EQ(state->dataWeatherManager->GroundTempsFCFromEPWHeader(8), 23.49);
+    EXPECT_EQ(state->dataWeatherManager->GroundTempsFCFromEPWHeader(9), 23.82);
+    EXPECT_EQ(state->dataWeatherManager->GroundTempsFCFromEPWHeader(10), 24.51);
+    EXPECT_EQ(state->dataWeatherManager->GroundTempsFCFromEPWHeader(11), 25.43);
+    EXPECT_EQ(state->dataWeatherManager->GroundTempsFCFromEPWHeader(12), 26.27);
+
+    std::string holidaysDST = "HOLIDAYS/DAYLIGHT SAVINGS,No,0,0,0";
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::HolidaysDST, holidaysDST, errorsFound);
+    EXPECT_FALSE(errorsFound);
+    EXPECT_FALSE(has_err_output());
+    EXPECT_FALSE(state->dataWeatherManager->WFAllowsLeapYears);
+    EXPECT_FALSE(state->dataWeatherManager->EPWDaylightSaving);
+    EXPECT_EQ(state->dataWeatherManager->NumSpecialDays, 0);
+
+    holidaysDST = "HOLIDAYS/DAYLIGHT SAVINGS,Yes,1st Monday in May,7/31,0";
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::HolidaysDST, holidaysDST, errorsFound);
+    EXPECT_FALSE(errorsFound);
+    EXPECT_FALSE(has_err_output());
+    EXPECT_TRUE(state->dataWeatherManager->WFAllowsLeapYears);
+    EXPECT_TRUE(state->dataWeatherManager->EPWDaylightSaving);
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->EPWDST.StDateType, WeatherManager::DateType::NthDayInMonth));
+    EXPECT_EQ(state->dataWeatherManager->EPWDST.StMon, 5);
+    EXPECT_EQ(state->dataWeatherManager->EPWDST.StDay, 1);
+    EXPECT_EQ(state->dataWeatherManager->EPWDST.StWeekDay, 2);
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->EPWDST.EnDateType, WeatherManager::DateType::MonthDay));
+    EXPECT_EQ(state->dataWeatherManager->EPWDST.EnMon, 7);
+    EXPECT_EQ(state->dataWeatherManager->EPWDST.EnDay, 31);
+    EXPECT_EQ(state->dataWeatherManager->EPWDST.EnWeekDay, 2);
+
+    std::string comments1 = "COMMENTS 1,IWEC- WMO#916800 - South-west Pacific -- Original Source Data (c) 2001 ASHRAE Inc.,";
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::Comments1, comments1, errorsFound);
+    EXPECT_FALSE(errorsFound);
+    EXPECT_FALSE(has_err_output());
+    // Comments are skipped - nothing to check
+
+    std::string comments2 = "COMMENTS 2, -- Ground temps produced with a standard soil diffusivity of 2.3225760E-03 {m**2/day}";
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::Comments2, comments2, errorsFound);
+    EXPECT_FALSE(errorsFound);
+    EXPECT_FALSE(has_err_output());
+    // Comments are skipped - nothing to check
+
+    std::string dataPeriods = "DATA PERIODS,2,10,Data1,Sunday, 1/ 1/1989,12/31/1990,Data2,Friday, FEBRUARY 1,Mar 15";
+    WeatherManager::ProcessEPWHeader(*state, WeatherManager::EpwHeaderType::DataPeriods, dataPeriods, errorsFound);
+    EXPECT_FALSE(errorsFound);
+    EXPECT_FALSE(has_err_output());
+    EXPECT_EQ(state->dataWeatherManager->NumDataPeriods, 2);
+    EXPECT_EQ(state->dataWeatherManager->NumIntervalsPerHour, 10);
+    EXPECT_EQ(state->dataWeatherManager->DataPeriods(1).StMon, 1);
+    EXPECT_EQ(state->dataWeatherManager->DataPeriods(1).StDay, 1);
+    EXPECT_EQ(state->dataWeatherManager->DataPeriods(1).StYear, 1989);
+    EXPECT_EQ(state->dataWeatherManager->DataPeriods(1).EnMon, 12);
+    EXPECT_EQ(state->dataWeatherManager->DataPeriods(1).EnDay, 31);
+    EXPECT_EQ(state->dataWeatherManager->DataPeriods(1).EnYear, 1990);
+    EXPECT_TRUE(state->dataWeatherManager->DataPeriods(1).HasYearData);
+    EXPECT_EQ(state->dataWeatherManager->DataPeriods(2).StMon, 2);
+    EXPECT_EQ(state->dataWeatherManager->DataPeriods(2).StDay, 1);
+    EXPECT_EQ(state->dataWeatherManager->DataPeriods(2).StYear, 0);
+    EXPECT_EQ(state->dataWeatherManager->DataPeriods(2).EnMon, 3);
+    EXPECT_EQ(state->dataWeatherManager->DataPeriods(2).EnDay, 15);
+    EXPECT_EQ(state->dataWeatherManager->DataPeriods(2).EnYear, 0);
+    EXPECT_FALSE(state->dataWeatherManager->DataPeriods(2).HasYearData);
+}
+
+TEST_F(EnergyPlusFixture, DisplayWeatherMissingDataWarnings_TMYx)
+{
+
+    // Test for #9709
+
+    {
+        int WYear = 0;
+        int WMonth = 0;
+        int WDay = 0;
+        int WHour = 0;
+        int WMinute = 0;
+        Real64 DryBulb = 0.0;
+        Real64 DewPoint = 0.0;
+        Real64 RelHum = 0.0;
+        Real64 AtmPress = 0.0;
+        Real64 ETHoriz = 0.0;
+        Real64 ETDirect = 0.0;
+        Real64 IRHoriz = 0.0;
+        Real64 GLBHoriz = 0.0;
+        Real64 DirectRad = 0.0;
+        Real64 DiffuseRad = 0.0;
+        Real64 GLBHorizIllum = 0.0;
+        Real64 DirectNrmIllum = 0.0;
+        Real64 DiffuseHorizIllum = 0.0;
+        Real64 ZenLum = 0.0;
+        Real64 WindDir = 0.0;
+        Real64 WindSpeed = 0.0;
+        Real64 TotalSkyCover = 0.0;
+        Real64 OpaqueSkyCover = 0.0;
+        Real64 Visibility = 0.0;
+        Real64 CeilHeight = 0.0;
+        Real64 PrecipWater = 0.0;
+        Real64 AerosolOptDepth = 0.0;
+        Real64 SnowDepth = 0.0;
+        Real64 DaysSinceLastSnow = 0.0;
+        Real64 Albedo = 0.0;
+        Real64 LiquidPrecip = 0.0;
+        int PresWeathObs = 0;
+        Array1D_int PresWeathConds(9);
+        bool ErrorFound = false;
+
+        // Weather codes are present, taken from PRT_Faro.085540_IWEC.epw
+        std::string WeatherDataLine =
+            "2018,1,5,15,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9*9?9?9?9,16.60,13.50,82,100997,588,1415,369,195,14,189,22230,1274,22230,"
+            "10584,320,10.00,9,9,777.7,1050,0,909999999,37,0.0840,0,88,0.200,0.0,0.0";
+
+        WeatherManager::InterpretWeatherDataLine(*state,
+                                                 WeatherDataLine,
+                                                 ErrorFound,
+                                                 WYear,
+                                                 WMonth,
+                                                 WDay,
+                                                 WHour,
+                                                 WMinute,
+                                                 DryBulb,
+                                                 DewPoint,
+                                                 RelHum,
+                                                 AtmPress,
+                                                 ETHoriz,
+                                                 ETDirect,
+                                                 IRHoriz,
+                                                 GLBHoriz,
+                                                 DirectRad,
+                                                 DiffuseRad,
+                                                 GLBHorizIllum,
+                                                 DirectNrmIllum,
+                                                 DiffuseHorizIllum,
+                                                 ZenLum,
+                                                 WindDir,
+                                                 WindSpeed,
+                                                 TotalSkyCover,
+                                                 OpaqueSkyCover,
+                                                 Visibility,
+                                                 CeilHeight,
+                                                 PresWeathObs,
+                                                 PresWeathConds,
+                                                 PrecipWater,
+                                                 AerosolOptDepth,
+                                                 SnowDepth,
+                                                 DaysSinceLastSnow,
+                                                 Albedo,
+                                                 LiquidPrecip);
+
+        EXPECT_FALSE(ErrorFound);
+        EXPECT_EQ(0, PresWeathObs);
+        EXPECT_EQ(0, state->dataWeatherManager->Missed.WeathCodes);
+        EXPECT_EQ(9, PresWeathConds(1));
+        EXPECT_EQ(0, PresWeathConds(2));
+        EXPECT_EQ(9, PresWeathConds(3));
+        EXPECT_EQ(9, PresWeathConds(4));
+        EXPECT_EQ(9, PresWeathConds(5));
+        EXPECT_EQ(9, PresWeathConds(6));
+        EXPECT_EQ(9, PresWeathConds(7));
+        EXPECT_EQ(9, PresWeathConds(8));
+        EXPECT_EQ(9, PresWeathConds(9));
+
+        EXPECT_EQ(2018, WYear);
+        EXPECT_EQ(1, WMonth);
+        EXPECT_EQ(5, WDay);
+        EXPECT_EQ(15, WHour);
+        EXPECT_EQ(0, WMinute);
+        EXPECT_EQ(16.60, DryBulb);
+        EXPECT_EQ(13.50, DewPoint);
+        EXPECT_EQ(82.0, RelHum);
+        EXPECT_EQ(100997.0, AtmPress);
+        EXPECT_EQ(588.0, ETHoriz);
+        EXPECT_EQ(1415.0, ETDirect);
+        EXPECT_EQ(369.0, IRHoriz);
+        EXPECT_EQ(195.0, GLBHoriz);
+        EXPECT_EQ(14.0, DirectRad);
+        EXPECT_EQ(189.0, DiffuseRad);
+        EXPECT_EQ(22230.0, GLBHorizIllum);
+        EXPECT_EQ(1274.0, DirectNrmIllum);
+        EXPECT_EQ(22230.0, DiffuseHorizIllum);
+        EXPECT_EQ(10584.0, ZenLum);
+        EXPECT_EQ(320.0, WindDir);
+        EXPECT_EQ(10.00, WindSpeed);
+        EXPECT_EQ(9.0, TotalSkyCover);
+        EXPECT_EQ(9.0, OpaqueSkyCover);
+        EXPECT_EQ(777.7, Visibility);
+        EXPECT_EQ(1050.0, CeilHeight);
+
+        EXPECT_EQ(37.0, PrecipWater);
+        EXPECT_EQ(0.0840, AerosolOptDepth);
+        EXPECT_EQ(0.0, SnowDepth);
+        EXPECT_EQ(88, DaysSinceLastSnow);
+        EXPECT_EQ(0.200, Albedo);
+        EXPECT_EQ(0.0, LiquidPrecip);
+    }
+
+    {
+        int WYear = 0;
+        int WMonth = 0;
+        int WDay = 0;
+        int WHour = 0;
+        int WMinute = 0;
+        Real64 DryBulb = 0.0;
+        Real64 DewPoint = 0.0;
+        Real64 RelHum = 0.0;
+        Real64 AtmPress = 0.0;
+        Real64 ETHoriz = 0.0;
+        Real64 ETDirect = 0.0;
+        Real64 IRHoriz = 0.0;
+        Real64 GLBHoriz = 0.0;
+        Real64 DirectRad = 0.0;
+        Real64 DiffuseRad = 0.0;
+        Real64 GLBHorizIllum = 0.0;
+        Real64 DirectNrmIllum = 0.0;
+        Real64 DiffuseHorizIllum = 0.0;
+        Real64 ZenLum = 0.0;
+        Real64 WindDir = 0.0;
+        Real64 WindSpeed = 0.0;
+        Real64 TotalSkyCover = 0.0;
+        Real64 OpaqueSkyCover = 0.0;
+        Real64 Visibility = 0.0;
+        Real64 CeilHeight = 0.0;
+        Real64 PrecipWater = 0.0;
+        Real64 AerosolOptDepth = 0.0;
+        Real64 SnowDepth = 0.0;
+        Real64 DaysSinceLastSnow = 0.0;
+        Real64 Albedo = 0.0;
+        Real64 LiquidPrecip = 0.0;
+        int PresWeathObs = 0;
+        Array1D_int PresWeathConds(9);
+        bool ErrorFound = false;
+
+        // Weather codes not present (taken from USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+        std::string WeatherDataLine = "1984,1,5,15,60,A7A7E8E8*0G9G9G9I9I9I9I9A7A7A7A7A7A7*0E8*0*0,14.4,2.2,44,103200,586,1415,307,357,581,115,37300,"
+                                      "54200,16400,2230,240,3.1,1,0,20.0,22000,9,999999999,0,0.1570,0,88,0.000,0.0,0.0";
+
+        WeatherManager::InterpretWeatherDataLine(*state,
+                                                 WeatherDataLine,
+                                                 ErrorFound,
+                                                 WYear,
+                                                 WMonth,
+                                                 WDay,
+                                                 WHour,
+                                                 WMinute,
+                                                 DryBulb,
+                                                 DewPoint,
+                                                 RelHum,
+                                                 AtmPress,
+                                                 ETHoriz,
+                                                 ETDirect,
+                                                 IRHoriz,
+                                                 GLBHoriz,
+                                                 DirectRad,
+                                                 DiffuseRad,
+                                                 GLBHorizIllum,
+                                                 DirectNrmIllum,
+                                                 DiffuseHorizIllum,
+                                                 ZenLum,
+                                                 WindDir,
+                                                 WindSpeed,
+                                                 TotalSkyCover,
+                                                 OpaqueSkyCover,
+                                                 Visibility,
+                                                 CeilHeight,
+                                                 PresWeathObs,
+                                                 PresWeathConds,
+                                                 PrecipWater,
+                                                 AerosolOptDepth,
+                                                 SnowDepth,
+                                                 DaysSinceLastSnow,
+                                                 Albedo,
+                                                 LiquidPrecip);
+
+        EXPECT_FALSE(ErrorFound);
+        EXPECT_EQ(9, PresWeathObs);
+        EXPECT_EQ(0, state->dataWeatherManager->Missed.WeathCodes);
+        EXPECT_EQ(9, PresWeathConds(1));
+        EXPECT_EQ(9, PresWeathConds(2));
+        EXPECT_EQ(9, PresWeathConds(3));
+        EXPECT_EQ(9, PresWeathConds(4));
+        EXPECT_EQ(9, PresWeathConds(5));
+        EXPECT_EQ(9, PresWeathConds(6));
+        EXPECT_EQ(9, PresWeathConds(7));
+        EXPECT_EQ(9, PresWeathConds(8));
+        EXPECT_EQ(9, PresWeathConds(9));
+
+        EXPECT_EQ(1984, WYear);
+        EXPECT_EQ(1, WMonth);
+        EXPECT_EQ(5, WDay);
+        EXPECT_EQ(15, WHour);
+        EXPECT_EQ(60, WMinute);
+        EXPECT_EQ(14.4, DryBulb);
+        EXPECT_EQ(2.2, DewPoint);
+        EXPECT_EQ(44, RelHum);
+        EXPECT_EQ(103200, AtmPress);
+        EXPECT_EQ(586, ETHoriz);
+        EXPECT_EQ(1415, ETDirect);
+        EXPECT_EQ(307, IRHoriz);
+        EXPECT_EQ(357, GLBHoriz);
+        EXPECT_EQ(581, DirectRad);
+        EXPECT_EQ(115, DiffuseRad);
+        EXPECT_EQ(37300, GLBHorizIllum);
+        EXPECT_EQ(54200, DirectNrmIllum);
+        EXPECT_EQ(16400, DiffuseHorizIllum);
+        EXPECT_EQ(2230, ZenLum);
+        EXPECT_EQ(240, WindDir);
+        EXPECT_EQ(3.1, WindSpeed);
+        EXPECT_EQ(1, TotalSkyCover);
+        EXPECT_EQ(0, OpaqueSkyCover);
+        EXPECT_EQ(20.0, Visibility);
+        EXPECT_EQ(22000, CeilHeight);
+
+        EXPECT_EQ(0, PrecipWater);
+        EXPECT_EQ(0.1570, AerosolOptDepth);
+        EXPECT_EQ(0, SnowDepth);
+        EXPECT_EQ(88, DaysSinceLastSnow);
+        EXPECT_EQ(0.0, Albedo);
+        EXPECT_EQ(0.0, LiquidPrecip);
+    }
+
+    {
+        int WYear = 0;
+        int WMonth = 0;
+        int WDay = 0;
+        int WHour = 0;
+        int WMinute = 0;
+        Real64 DryBulb = 0.0;
+        Real64 DewPoint = 0.0;
+        Real64 RelHum = 0.0;
+        Real64 AtmPress = 0.0;
+        Real64 ETHoriz = 0.0;
+        Real64 ETDirect = 0.0;
+        Real64 IRHoriz = 0.0;
+        Real64 GLBHoriz = 0.0;
+        Real64 DirectRad = 0.0;
+        Real64 DiffuseRad = 0.0;
+        Real64 GLBHorizIllum = 0.0;
+        Real64 DirectNrmIllum = 0.0;
+        Real64 DiffuseHorizIllum = 0.0;
+        Real64 ZenLum = 0.0;
+        Real64 WindDir = 0.0;
+        Real64 WindSpeed = 0.0;
+        Real64 TotalSkyCover = 0.0;
+        Real64 OpaqueSkyCover = 0.0;
+        Real64 Visibility = 0.0;
+        Real64 CeilHeight = 0.0;
+        Real64 PrecipWater = 0.0;
+        Real64 AerosolOptDepth = 0.0;
+        Real64 SnowDepth = 0.0;
+        Real64 DaysSinceLastSnow = 0.0;
+        Real64 Albedo = 0.0;
+        Real64 LiquidPrecip = 0.0;
+        int PresWeathObs = 0;
+        Array1D_int PresWeathConds(9);
+        bool ErrorFound = false;
+
+        // Not providing the 5 last records
+        std::string WeatherDataLine =
+            "2018,1,5,15,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9*9?9?9?9,16.60,13.50,82,100997,588,1415,369,195,14,189,22230,1274,22230,"
+            "10584,320,10.00,9,9,777.7,1050,0,909999999,37,0.0840";
+
+        WeatherManager::InterpretWeatherDataLine(*state,
+                                                 WeatherDataLine,
+                                                 ErrorFound,
+                                                 WYear,
+                                                 WMonth,
+                                                 WDay,
+                                                 WHour,
+                                                 WMinute,
+                                                 DryBulb,
+                                                 DewPoint,
+                                                 RelHum,
+                                                 AtmPress,
+                                                 ETHoriz,
+                                                 ETDirect,
+                                                 IRHoriz,
+                                                 GLBHoriz,
+                                                 DirectRad,
+                                                 DiffuseRad,
+                                                 GLBHorizIllum,
+                                                 DirectNrmIllum,
+                                                 DiffuseHorizIllum,
+                                                 ZenLum,
+                                                 WindDir,
+                                                 WindSpeed,
+                                                 TotalSkyCover,
+                                                 OpaqueSkyCover,
+                                                 Visibility,
+                                                 CeilHeight,
+                                                 PresWeathObs,
+                                                 PresWeathConds,
+                                                 PrecipWater,
+                                                 AerosolOptDepth,
+                                                 SnowDepth,
+                                                 DaysSinceLastSnow,
+                                                 Albedo,
+                                                 LiquidPrecip);
+
+        EXPECT_FALSE(ErrorFound);
+        EXPECT_EQ(0, PresWeathObs);
+        EXPECT_EQ(0, state->dataWeatherManager->Missed.WeathCodes);
+        EXPECT_EQ(9, PresWeathConds(1));
+        EXPECT_EQ(0, PresWeathConds(2));
+        EXPECT_EQ(9, PresWeathConds(3));
+        EXPECT_EQ(9, PresWeathConds(4));
+        EXPECT_EQ(9, PresWeathConds(5));
+        EXPECT_EQ(9, PresWeathConds(6));
+        EXPECT_EQ(9, PresWeathConds(7));
+        EXPECT_EQ(9, PresWeathConds(8));
+        EXPECT_EQ(9, PresWeathConds(9));
+
+        EXPECT_EQ(2018, WYear);
+        EXPECT_EQ(1, WMonth);
+        EXPECT_EQ(5, WDay);
+        EXPECT_EQ(15, WHour);
+        EXPECT_EQ(0, WMinute);
+        EXPECT_EQ(16.60, DryBulb);
+        EXPECT_EQ(13.50, DewPoint);
+        EXPECT_EQ(82.0, RelHum);
+        EXPECT_EQ(100997.0, AtmPress);
+        EXPECT_EQ(588.0, ETHoriz);
+        EXPECT_EQ(1415.0, ETDirect);
+        EXPECT_EQ(369.0, IRHoriz);
+        EXPECT_EQ(195.0, GLBHoriz);
+        EXPECT_EQ(14.0, DirectRad);
+        EXPECT_EQ(189.0, DiffuseRad);
+        EXPECT_EQ(22230.0, GLBHorizIllum);
+        EXPECT_EQ(1274.0, DirectNrmIllum);
+        EXPECT_EQ(22230.0, DiffuseHorizIllum);
+        EXPECT_EQ(10584.0, ZenLum);
+        EXPECT_EQ(320.0, WindDir);
+        EXPECT_EQ(10.00, WindSpeed);
+        EXPECT_EQ(9.0, TotalSkyCover);
+        EXPECT_EQ(9.0, OpaqueSkyCover);
+        EXPECT_EQ(777.7, Visibility);
+        EXPECT_EQ(1050.0, CeilHeight);
+
+        EXPECT_EQ(37.0, PrecipWater);
+        EXPECT_EQ(0.0840, AerosolOptDepth);
+        EXPECT_EQ(999.0, SnowDepth);
+        EXPECT_EQ(999.0, DaysSinceLastSnow);
+        EXPECT_EQ(999.0, Albedo);
+        EXPECT_EQ(999.0, LiquidPrecip);
+        // Liquid Precipitation Quantity is not read
+    }
+}
+
+TEST_F(EnergyPlusFixture, EPW_no_eol_at_end_of_file)
+{
+    // Test for #10064 - When the EPW does not have an EOL at the end of the file
+
+    std::string const idf_objects = delimited_string({
+        "Timestep,4;"
+
+        "SimulationControl,",
+        "  Yes,                     !- Do Zone Sizing Calculation",
+        "  Yes,                     !- Do System Sizing Calculation",
+        "  No,                      !- Do Plant Sizing Calculation",
+        "  No,                      !- Run Simulation for Sizing Periods",
+        "  Yes;                     !- Run Simulation for Weather File Run Periods",
+
+        "RunPeriod,",
+        "  January,                 !- Name",
+        "  12,                      !- Begin Month",
+        "  31,                      !- Begin Day of Month",
+        "  ,                        !- Begin Year",
+        "  12,                      !- End Month",
+        "  31,                      !- End Day of Month",
+        "  ,                        !- End Year",
+        "  Tuesday,                 !- Day of Week for Start Day",
+        "  Yes,                     !- Use Weather File Holidays and Special Days",
+        "  Yes,                     !- Use Weather File Daylight Saving Period",
+        "  No,                      !- Apply Weekend Holiday Rule",
+        "  Yes,                     !- Use Weather File Rain Indicators",
+        "  Yes,                     !- Use Weather File Snow Indicators",
+        "  No,                      !-Treat Weather as Actual",
+        "  Hour1;                   !-First Hour Interpolation Starting Values",
+
+        "Site:Location,",
+        "  CHICAGO_IL_USA TMY3-725300,  !- Name",
+        "  41.98,                   !- Latitude {deg}",
+        "  -87.92,                  !- Longitude {deg}",
+        "  -6.00,                   !- Time Zone {hr}",
+        "  201.00;                  !- Elevation {m}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // We do have an EPW
+    state->dataWeatherManager->WeatherFileExists = true;
+    // This is USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw, and did `truncate -s -1 chicago_no_eol_at_end_of_file.epw`
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/chicago_no_eol_at_end_of_file.epw";
+
+    state->dataGlobal->BeginSimFlag = false;
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataWeatherManager->LocationGathered = false;
+    state->dataGlobal->DoWeathSim = true;
+
+    bool Available = false;
+    bool ErrorsFound = false;
+    WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound); // Does not throw
+    ASSERT_FALSE(ErrorsFound);
+    EXPECT_TRUE(compare_err_stream("", true));
+    EXPECT_EQ(1, state->dataWeatherManager->NumOfEnvrn);
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather));
+
+    EXPECT_NO_THROW(ReadWeatherForDay(*state, 1, 1, true));
+    EXPECT_TRUE(compare_err_stream("", true));
 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,7 +67,6 @@ using namespace EnergyPlus::BoilerSteam;
 using namespace EnergyPlus::DataBranchAirLoopPlant;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::Psychrometrics;
 
 TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
@@ -95,7 +94,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
     GetBoilerInput(*state);
     auto &thisBoiler = state->dataBoilerSteam->Boiler((int)state->dataBoilerSteam->Boiler.size());
     EXPECT_EQ(thisBoiler.Name, "STEAM BOILER PLANT BOILER");
-    EXPECT_TRUE(compare_enums(thisBoiler.FuelType, AssignResourceTypeNum("NATURALGAS")));
+    EXPECT_TRUE(compare_enums(thisBoiler.FuelType, Constant::eFuel::NaturalGas));
     EXPECT_EQ(thisBoiler.BoilerMaxOperPress, 160000);
     EXPECT_EQ(thisBoiler.NomEffic, 0.8);
     EXPECT_EQ(thisBoiler.TempUpLimitBoilerOut, 115);
@@ -107,9 +106,6 @@ TEST_F(EnergyPlusFixture, BoilerSteam_GetInput)
     EXPECT_EQ(thisBoiler.FullLoadCoef[1], 0.1);
     EXPECT_EQ(thisBoiler.FullLoadCoef[2], 0.1);
     EXPECT_EQ(thisBoiler.SizFac, 1.0);
-
-    // Additional tests for fuel type input
-    EXPECT_EQ(thisBoiler.BoilerFuelTypeForOutputVariable, "NaturalGas");
 }
 
 TEST_F(EnergyPlusFixture, BoilerSteam_Simulate)

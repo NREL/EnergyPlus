@@ -679,7 +679,7 @@ There are three coil types available:
 \end{itemize}
 
 The default is \emph{ChilledWater}.
- 
+
 \paragraph{Field: Cooling Coil Availability Schedule Name}\label{field-cooling-coil-availability-schedule-name}
 
 Usually set to blank, which allows the cooling coil to be available anytime the system is operating. If a schedule name is specified, it defines when the coil is available. This is most often used when cooling is only available seasonally. A schedule value of one indicates that the cooling coil can be on during a given time period. A value of zero denotes that the cooling coil cannot be used during that time period.
@@ -733,7 +733,7 @@ This alpha field specifies the name of a \hyperref[designspecificationzoneairdis
 This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are:
 \begin{itemize}
 \item
-  \emph{ConstantFanVariableFlow}: The fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. 
+  \emph{ConstantFanVariableFlow}: The fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement.
 \item
   \emph{CyclingFan}: The fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load.
 \item
@@ -743,9 +743,9 @@ This input denotes how the unit's output is controlled in order to meet zone hea
 \item
   \emph{MultiSpeedFan}: The water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load.
 \item
-  \emph{ASHRAE90VariableFan}: The fan air flow rate is reduced according to the low speed supply air flow ratio when the zone sensible load is less than the zone sensible load multiplied by the low speed supply air flow ratio. 
+  \emph{ASHRAE90VariableFan}: The fan air flow rate is reduced according to the low speed supply air flow ratio when the zone sensible load is less than the zone sensible load multiplied by the low speed supply air flow ratio.
 \end{itemize}
-  
+
 The default is \emph{ConstantFanVariableFlow} except when a Dedicated Outdoor Air System is specified (see above) the default is  \emph{CyclingFan}.
 
 \paragraph{Field: Low Speed Supply Air Flow Ratio}\label{field-low-speed-supply-air-flow-ratio}
@@ -1184,7 +1184,7 @@ Usually set to blank, which allows the heat pump heating coil to be available an
 
 \paragraph{Field: Heat Pump Heating Coil Gross Rated Capacity}\label{field-heat-pump-heating-coil-gross-rated-capacity}
 
-Enter autosize to let the automatic sizing algorithm determine the heat pump heating coil gorss rated capacity based on the maximum heating loads during the heating design day. If a value is entered, it represents the full load gross heating capacity, in watts of the DX heat pump unit at rated conditions. Rated conditions are air entering the heat pump heating coil at the heating supply air flow rate at 21.11°C drybulb/15.55°C wetbulb with air entering the outdoor coil at 8.33°C drybulb/6.11C wetbulb. Capacity should be the ``gross'', i.e., the effect of supply air fan heat is not accounted for. The units are in W. The default is autosize.
+Enter autosize to let the automatic sizing algorithm determine the heat pump heating coil gross rated capacity based on the maximum heating loads during the heating design day. If a value is entered, it represents the full load gross heating capacity, in watts of the DX heat pump unit at rated conditions. Rated conditions are air entering the heat pump heating coil at the heating supply air flow rate at 21.11°C drybulb/15.55°C wetbulb with air entering the outdoor coil at 8.33°C drybulb/6.11C wetbulb. Capacity should be the ``gross'', i.e., the effect of supply air fan heat is not accounted for. The units are in W. The default is autosize.
 
 \paragraph{Field: Heat Pump Heating Coil Gross Rated COP}\label{field-heat-pump-heating-coil-gross-rated-cop}
 
@@ -1453,7 +1453,7 @@ Enter autosize to let the automatic sizing algorithm determine the cooling coil 
 
 \paragraph{Field: Cooling Coil Gross Rated Sensible Heat Ratio}\label{field-cooling-coil-gross-rated-sensible-heat-ratio-2}
 
-Enter Autosize to allow the sizing algorithm to determine the sensible heat ratio based on the rated capacity and air flow rate. Otherwise, enter the value of the ratio of the gross sensible capacity divided by gross total cooling capacity of the DX cooling coil at rated conditions (26.7C (80F) entering air dry-bulb temperature, 19.4C (67F) entering air wet-bulb temperature, and 29.4C (85F) entering water temperature). Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be ``gross'' , i.e., the effect of supply air fan heat is not accounted for. The default is autosize. If the Cooling Coil Rated Capacity is autosized, this field should also be autosized (any value specified for Cooling Coil Rate Sensibe Heat Ratio will be ignored). If the Cooling Coil Rated Capacity has a specified value, then this field should also have a specified value. This is because the \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit} object has fields for Rated Total Cooling Capacity and Rated Sensible Cooling Capacity. If this field is autosized, a specified value for Cooling Coil Rated Capacity will not be used when the coil object sensible capacity is autosized.
+Enter Autosize to allow the sizing algorithm to determine the sensible heat ratio based on the rated capacity and air flow rate. Otherwise, enter the value of the ratio of the gross sensible capacity divided by gross total cooling capacity of the DX cooling coil at rated conditions (26.7C (80F) entering air dry-bulb temperature, 19.4C (67F) entering air wet-bulb temperature, and 29.4C (85F) entering water temperature). Both the sensible and total cooling capacities used to define the Rated Sensible Heat Ratio (SHR) should be ``gross'' , i.e., the effect of supply air fan heat is not accounted for. The default is autosize. If the Cooling Coil Rated Capacity is autosized, this field should also be autosized (any value specified for Cooling Coil Rate Sensible Heat Ratio will be ignored). If the Cooling Coil Rated Capacity has a specified value, then this field should also have a specified value. This is because the \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit} object has fields for Rated Total Cooling Capacity and Rated Sensible Cooling Capacity. If this field is autosized, a specified value for Cooling Coil Rated Capacity will not be used when the coil object sensible capacity is autosized.
 
 \paragraph{Field: Cooling Coil Gross Rated COP}\label{field-cooling-coil-gross-rated-cop-1}
 
@@ -1489,7 +1489,7 @@ This numeric field contains the maximum on-off cycling rate for the compressor, 
 \caption{}
 \end{figure}
 
-\paragraph{Field: Heat Pump Time Constant}\label{field-heat-pump-time-constant}
+\paragraph{Field: Latent Capacity Time Constant}\label{field-heat-pump-time-constant}
 
 This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
 
@@ -1499,19 +1499,9 @@ This numeric field contains the time constant for the cooling coil's capacity to
 \caption{}
 \end{figure}
 
-\paragraph{Field: Fraction of On-Cycle Power Use}\label{field-fraction-of-on-cycle-power-use}
-
-This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are below (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image607.png}
-\caption{}
-\end{figure}
-
 \paragraph{Field: Heat Pump Fan Delay Time}\label{field-heat-pump-fan-delay-time}
 
-This numeric field contains the time delay in seconds for the heat pump supply air fan to shut off after compressor cycle off. This value can be obtained from the manufacturer or the heat pump catalog. Suggested value is 60 seconds. This value is disregared at times when the WaterToAirHeatPump's fan operating mode schedule value is greater than 0 (i.e., continuous fan mode).
+This numeric field contains the time delay in seconds for the heat pump supply air fan to shut off after compressor cycle off. This value can be obtained from the manufacturer or the heat pump catalog. Suggested value is 60 seconds. This value is disregarded at times when the WaterToAirHeatPump's fan operating mode schedule value is greater than 0 (i.e., continuous fan mode).
 
 \paragraph{Field: Dedicated Outdoor Air System Name}\label{field-dedicated-outdoor-air-system-name-4}
 
@@ -1567,7 +1557,7 @@ This field specifies the way in which water flow through the heat pump coils wil
   ConstantOnDemand
 \end{itemize}
 
-\textbf{Cycling} varies water flow through the coil based on the heat pump Part Load Ratio. This control method is appropriate for modeling heat pumps that are outfitted with a soleniod valve which allows water to flow through the coil only when the compressor is active. This is the \textbf{default} for EnergyPlus V8 and later.
+\textbf{Cycling} varies water flow through the coil based on the heat pump Part Load Ratio. This control method is appropriate for modeling heat pumps that are outfitted with a solenoid valve which allows water to flow through the coil only when the compressor is active. This is the \textbf{default} for EnergyPlus V8 and later.
 
 \textbf{Constant} provides a constant water flow regardless of heat pump operation. Remember that EnergyPlus has two coils (a heating coil and a cooling coil) to approximate the operation of one coil that can operate in either heating mode or cooling mode. Therefore, when the water flow mode is constant, there will be full flow through either the heating coil or the cooling coil, but not both at the same time.
 
@@ -1636,8 +1626,7 @@ HVACTemplate:Zone:WaterToAirHeatPump,
   ,                !- Supplemental Heating Coil Availability Schedule Name
   autosize,                !- Supplemental Heating Coil Capacity {W}
   2.5,                     !- Maximum Cycling Rate {cycles/hr}
-  60,                      !- Heat Pump Time Constant {s}
-  0.01,                    !- Fraction of On-Cycle Power Use
+  60,                      !- Latent Capacity Time Constant {s}
   60,                      !- Heat Pump Fan Delay Time {s}
   ,                        !- Dedicated Outdoor Air System Name
   Electric,                !- Supplemental Heating Coil Type
@@ -1783,7 +1772,7 @@ Usually set to blank, which allows the heat pump heating coil to be available an
 
 \paragraph{Field: Heat Pump Heating Coil Gross Rated Capacity}\label{field-heat-pump-heating-coil-gross-rated-capacity-2}
 
-Enter autosize to let the automatic sizing algorithm determine the heat pump heating coil gorss rated capacity based on the maximum heating loads during the heating design day. If a value is entered, it represents the full load gross heating capacity, in watts of the DX heat pump unit at rated conditions. Rated conditions are air entering the heat pump heating coil at the heating supply air flow rate at 21.11°C drybulb/15.55°C wetbulb with air entering the outdoor coil at 8.33°C drybulb/6.11C wetbulb. Capacity should be the ``gross'', i.e., the effect of supply air fan heat is not accounted for. The units are in W. The default is autosize.
+Enter autosize to let the automatic sizing algorithm determine the heat pump heating coil gross rated capacity based on the maximum heating loads during the heating design day. If a value is entered, it represents the full load gross heating capacity, in watts of the DX heat pump unit at rated conditions. Rated conditions are air entering the heat pump heating coil at the heating supply air flow rate at 21.11°C drybulb/15.55°C wetbulb with air entering the outdoor coil at 8.33°C drybulb/6.11C wetbulb. Capacity should be the ``gross'', i.e., the effect of supply air fan heat is not accounted for. The units are in W. The default is autosize.
 
 \paragraph{Field: Zone Terminal Unit On Parasitic Electricity Energy Use}\label{field-zone-terminal-unit-on-parasitic-electric-energy-use}
 
@@ -2085,7 +2074,7 @@ The minimum flow rate to the zone while the system is operating, specified as a 
 
 \paragraph{Field: Minimum Air Flow Fraction Schedule Name}\label{field-minimum-air-flow-fraction-schedule-name-000}
 
-The name of a schedule that determines the value of the minimum air flow fraction. The schedule should contain fractions from 0.0 to 1.0. These values will define the minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default). This field is used if the previous field is set to Scheduled. If the previous field is left blank (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then the air flow rate usedfor sizing normal-action reheat coils is the average of the minimum and maximum values in this schedule. The air flow rate used for reheat coil sizing is reported with other component sizing information as ``Reheat Coil Sizing Air Volume Flow Rate.''
+The name of a schedule that determines the value of the minimum air flow fraction. The schedule should contain fractions from 0.0 to 1.0. These values will define the minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default). This field is used if the previous field is set to Scheduled. If the previous field is left blank (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then the air flow rate used for sizing normal-action reheat coils is the average of the minimum and maximum values in this schedule. The air flow rate used for reheat coil sizing is reported with other component sizing information as ``Reheat Coil Sizing Air Volume Flow Rate.''
 
 \paragraph{Field: Outdoor Air Method}\label{field-outdoor-air-method-8}
 
@@ -2338,7 +2327,7 @@ This field specifies the type of fan powered unit (PIU). The choices for this fi
   ParallelFromPlenum -- Parallel configuration with recirculation from the return plenum
 \end{itemize}
 
-See descriptions of these configurations in the general description for this object, above. For all types, the secondary fan will run according to the Zone PIU Fan Schedule (see below) and any Night Cycle Control specified in the system which serves this terminal unit (see Template VAV System Name above). For Parallel PIU, there is an additional secondary fan control based on the primary air flow fraction (see Parallel Fan On Flow Fraction below). For recirculation from plenum, a Return Plenum Name must be specificed in this object or in the system object (\hyperref[hvactemplatesystemvav]{HVACTemplate:System:VAV} or \hyperref[hvactemplatesystempackagedvav]{HVACTemplate:System:PackagedVAV}) which serves this terminal unit. The default is Parallel.
+See descriptions of these configurations in the general description for this object, above. For all types, the secondary fan will run according to the Zone PIU Fan Schedule (see below) and any Night Cycle Control specified in the system which serves this terminal unit (see Template VAV System Name above). For Parallel PIU, there is an additional secondary fan control based on the primary air flow fraction (see Parallel Fan On Flow Fraction below). For recirculation from plenum, a Return Plenum Name must be specified in this object or in the system object (\hyperref[hvactemplatesystemvav]{HVACTemplate:System:VAV} or \hyperref[hvactemplatesystempackagedvav]{HVACTemplate:System:PackagedVAV}) which serves this terminal unit. The default is Parallel.
 
 \paragraph{Field: Parallel Fan On Flow Fraction}\label{field-parallel-fan-on-flow-fraction}
 
@@ -3127,7 +3116,7 @@ This numeric field defines the fraction of compressor runtime when the defrost c
 
 \paragraph{Field: Resistive Defrost Heater Capacity}\label{field-resistive-defrost-heater-capacity-000}
 
-This numeric field defines the capacity of the resistive defrost heating element in Watts. This input field is used only when the selected defrost strategy is `resistive' (see input field ``Defrost Strategy'' above). The value for this input field must be greater than or equal to 0 and it is auotsizable. If this input field is left blank, the default is autosize.
+This numeric field defines the capacity of the resistive defrost heating element in Watts. This input field is used only when the selected defrost strategy is `resistive' (see input field ``Defrost Strategy'' above). The value for this input field must be greater than or equal to 0 and it is autosizable. If this input field is left blank, the default is autosize.
 
 \paragraph{Field: Maximum Outdoor Dry-bulb Temperature for Defrost Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-defrost-operation-000}
 
@@ -3167,7 +3156,7 @@ If the user wishes to model an air-cooled condenser that has evaporative media p
 
 \paragraph{Field: Evaporative Condenser Air Flow Rate}\label{field-evaporative-condenser-air-flow-rate-000}
 
-The air volume flow rate, in m\(^{3}\) per second, entering the evaporative condenser. This value is used to calculate the amount of water used to evaporatively cool the condenser inlet air. The minimum value for this field must be greater than zero, and this input field is autosizable (equivalent to 0.000144 m\(^{3}\)/s per watt of rated total cooling capacity {[}850 cfm/ton{]}). This field is not used when Condenser Type = AirCooled.
+The air volume flow rate, in \si{\volumeFlowRate}, entering the evaporative condenser. This value is used to calculate the amount of water used to evaporatively cool the condenser inlet air. The minimum value for this field must be greater than zero, and this input field is autosizable (equivalent to 0.000144 m\(^{3}\)/s per watt of rated total cooling capacity {[}850 cfm/ton{]}). This field is not used when Condenser Type = AirCooled.
 
 \paragraph{Field: Evaporative Condenser Pump Rated Power Consumption}\label{field-evaporative-condenser-pump-rated-power-consumption-000}
 
@@ -3248,7 +3237,7 @@ HVACTemplate:System:VRF,
 
 \subsection{HVACTemplate:System:Unitary}\label{hvactemplatesystemunitary}
 
-This object simulates the system portion of a constant volume air handler with electric, gas, or hot water heating and optional direct-expansion (DX) cooling. This system may serve one or more \hyperref[hvactemplatezoneunitary]{HVACTemplate:Zone:Unitary} objects. If this system serves more than one zone, only one zone is specified as the control zone. Common names for this sytem type include packaged rooftop systems commonly seen in commercial buildings and split systems (furnace with air conditioner) commonly seen in residential buildings.
+This object simulates the system portion of a constant volume air handler with electric, gas, or hot water heating and optional direct-expansion (DX) cooling. This system may serve one or more \hyperref[hvactemplatezoneunitary]{HVACTemplate:Zone:Unitary} objects. If this system serves more than one zone, only one zone is specified as the control zone. Common names for this system type include packaged rooftop systems commonly seen in commercial buildings and split systems (furnace with air conditioner) commonly seen in residential buildings.
 
 \subsubsection{Inputs}\label{inputs-15-005}
 
@@ -3611,7 +3600,7 @@ HVACTemplate:System:Unitary,
 
 \subsection{HVACTemplate:System:UnitaryHeatPump:AirToAir}\label{hvactemplatesystemunitaryheatpumpairtoair}
 
-This object simulates the system portion of a constant volume air handler with a direct-expansion (DX) air-to-air heat pump and supplemental heating (electric, gas, or hot water). This system may serve one or more \hyperref[hvactemplatezoneunitary]{HVACTemplate:Zone:Unitary} objects. If this system serves more than one zone, only one zone is specified as the control zone. Common names for this sytem type include packaged rooftop heat pumps commonly seen in commercial buildings and split system heat pumps commonly seen in residential buildings.
+This object simulates the system portion of a constant volume air handler with a direct-expansion (DX) air-to-air heat pump and supplemental heating (electric, gas, or hot water). This system may serve one or more \hyperref[hvactemplatezoneunitary]{HVACTemplate:Zone:Unitary} objects. If this system serves more than one zone, only one zone is specified as the control zone. Common names for this system type include packaged rooftop heat pumps commonly seen in commercial buildings and split system heat pumps commonly seen in residential buildings.
 
 \subsubsection{Inputs}\label{inputs-16-004}
 
@@ -4004,7 +3993,7 @@ HVACTemplate:System:UnitaryHeatPump:AirToAir,
 
 \subsection{HVACTemplate:System:UnitarySystem}\label{hvactemplatesystemunitarysystem}
 
-This object simulates a unitary system with option cooling coil (air-cooled DX, water-cooled DX, and chilled water), options heating coil (gas, electric, hot water, air-to-air heat pump, and water-to-air heat pump) with cycling or continous fan controls. Often a single \hyperref[hvactemplatezoneunitary]{HVACTemplate:Zone:Unitary} object will be used with a single \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System object to simulate single zone system. In addition, multiple \hyperref[hvactemplatezoneunitary]{HVACTemplate:Zone:Unitary} objects may reference the same \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System object in a multiple zone version. For a multiple zone system, only one zone is specified as the control zone. The model can simulate chilled water or heat pump systems seen in commercial buildings and split systems commonly seen in residential buildings. \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System is similar to \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary} and \hyperref[hvactemplatesystemunitaryheatpumpairtoair]{HVACTemplate:System:UnitaryHeatPump:AirToAir}, but it offers more flexilbility by using the more general \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem} object instead of the more specific unitary furnace and heat pump objects.
+This object simulates a unitary system with option cooling coil (air-cooled DX, water-cooled DX, and chilled water), options heating coil (gas, electric, hot water, air-to-air heat pump, and water-to-air heat pump) with cycling or continuous fan controls. Often a single \hyperref[hvactemplatezoneunitary]{HVACTemplate:Zone:Unitary} object will be used with a single \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System object to simulate single zone system. In addition, multiple \hyperref[hvactemplatezoneunitary]{HVACTemplate:Zone:Unitary} objects may reference the same \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System object in a multiple zone version. For a multiple zone system, only one zone is specified as the control zone. The model can simulate chilled water or heat pump systems seen in commercial buildings and split systems commonly seen in residential buildings. \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary}System is similar to \hyperref[hvactemplatesystemunitary]{HVACTemplate:System:Unitary} and \hyperref[hvactemplatesystemunitaryheatpumpairtoair]{HVACTemplate:System:UnitaryHeatPump:AirToAir}, but it offers more flexibility by using the more general \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem} object instead of the more specific unitary furnace and heat pump objects.
 
 \subsubsection{Inputs}\label{inputs-2016-06-16-1621}
 
@@ -4111,7 +4100,7 @@ The default type is \emph{SingleSpeedDX}
 
 \paragraph{Field: Number of Speeds for Cooling}\label{field-number-of-speeds-for-cooling}
 
-This field defines the number of cooling speeds is a multi-speed cooling coil is specifiedl. The default is 1, and the maximum allowed is 10. This field only applies if Cooling Coil Type is MultiSpeedDX.
+This field defines the number of cooling speeds is a multi-speed cooling coil is specified. The default is 1, and the maximum allowed is 10. This field only applies if Cooling Coil Type is MultiSpeedDX.
 
 \paragraph{Field: Cooling Coil Availability Schedule Name}\label{field-cooling-coil-availability-schedule-name-6}
 
@@ -4131,7 +4120,7 @@ Enter Autosize to allow the sizing algorithm to determine the sensible heat rati
 
 For air-cooled DX coils the rated conditions are air entering the cooling coil at the maximum supply air flow rate at 26.7°C drybulb/19.4°C wetbulb with air entering the outdoor air-cooled condenser coil at 35°C drybulb.
 
-For water-cooled DX coilst the rated conditions are 26.7C (80F) entering air dry-bulb temperature, 19.4C (67F) entering air wet-bulb temperature, and 29.4C (85F) entering water temperature.
+For water-cooled DX coils the rated conditions are 26.7C (80F) entering air dry-bulb temperature, 19.4C (67F) entering air wet-bulb temperature, and 29.4C (85F) entering water temperature.
 
 For two-speed DX coils, the low-speed SHR is assumed to be equal to this value. For two-stage DX coils, the stage 1 SHR is assumed to be equal to this value. For two-stage DX coil with humidity control, the humidity control mode SHR is assumed to be 0.9 times this value (for both stage 1 and stage 2).
 
@@ -5326,7 +5315,7 @@ Select the type of automatic reset control for the cooling supply air temperatur
 \item
   Warmest -- reset the cooling supply air temperature to the highest supply air temperature that will meet the cooling requirements of all the zones at the maximum supply air flow rate. The minimum setpoint allowed is the Cooling Coil Design Setpoint. The maximum setpoint allowed is defaulted to the greater of 18C or the Heating Coil Design Setpoint plus 1.0C. (Reference \hyperref[setpointmanagerwarmest]{SetpointManager:Warmest})
 \item
-  OutdoorAirTemperatureReset -- reset the cooling supply air temperature based on the following default rules. When the outdoor dry-bulb temperature (ODB) is at or below 15.6C the setpoint isthe Cooling Coil Design Setpoint plus 5.2C. When the ODB is at or above 26.7C the setpoint is the Cooling Coil Design Setpoint. In between, the setpoint is varied linearly. (Reference \hyperref[setpointmanageroutdoorairreset]{SetpointManager:OutdoorAirReset})
+  OutdoorAirTemperatureReset -- reset the cooling supply air temperature based on the following default rules. When the outdoor dry-bulb temperature (ODB) is at or below 15.6C the setpoint is the Cooling Coil Design Setpoint plus 5.2C. When the ODB is at or above 26.7C the setpoint is the Cooling Coil Design Setpoint. In between, the setpoint is varied linearly. (Reference \hyperref[setpointmanageroutdoorairreset]{SetpointManager:OutdoorAirReset})
 \item
   WarmestTemperatureFirst -- find the highest setpoint temperature that will satisfy all the zone cooling loads at minimum supply air flow rate. If this setpoint temperature is less than the Cooling Coil Design Setpoint, the setpoint temperature is set to the minimum, and the supply air flow rate is increased to meet the loads. This option is appropriate when modeling a single-zone VAV system. The maximum setpoint allowed is defaulted to the greater of 18C or the Heating Coil Design Setpoint plus 1.0C. (Reference \hyperref[setpointmanagerwarmesttemperatureflow]{SetpointManager:WarmestTemperatureFlow})
 \end{itemize}
@@ -5341,7 +5330,7 @@ Select the type of automatic reset control for the central heating supply air te
 \item
   None -- no reset, use the Heating Coil Setpoint Schedule or Heating Coil Design Setpoint.
 \item
-  OutdoorAirTemperatureReset -- reset the heating supply air temperature based on the following default rules. When the outdoor dry-bulb temperature (ODB) is at or below --6.7C the setpoint is the Heating Coil Design Setpoint. When the ODB is at or above 10.0C the setpoint isthe Heating Coil Design Setpoint minus 5.2C. In between, the setpoint is varied linearly. (Reference \hyperref[setpointmanageroutdoorairreset]{SetpointManager:OutdoorAirReset}).
+  OutdoorAirTemperatureReset -- reset the heating supply air temperature based on the following default rules. When the outdoor dry-bulb temperature (ODB) is at or below --6.7C the setpoint is the Heating Coil Design Setpoint. When the ODB is at or above 10.0C the setpoint is the Heating Coil Design Setpoint minus 5.2C. In between, the setpoint is varied linearly. (Reference \hyperref[setpointmanageroutdoorairreset]{SetpointManager:OutdoorAirReset}).
 \end{itemize}
 
 The default is \emph{None}.
@@ -5960,7 +5949,7 @@ HVACTemplate:System:ConstantVolume,
   ChilledWater,            !- Cooling Coil Type
   ,                        !- Cooling Coil Availability Schedule Name
   ControlZone,             !- Cooling Coil Setpoint Control Type
-  SPACE 1-1,               !- Cooling Coil Conrol Zone
+  SPACE 1-1,               !- Cooling Coil Control Zone
   12.8,                        !- Cooling Coil Design Setpoint {C}
   ,                        !- Cooling Coil Setpoint Schedule Name
   ,                   !- Cooling Coil Setpoint at Outdoor Dry-Bulb Low {C}
@@ -5974,7 +5963,7 @@ HVACTemplate:System:ConstantVolume,
   50,                        !- Heating Coil Design Setpoint {C}
   ,                        !- Heating Coil Setpoint Schedule Name
   ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb Low {C}
-  ,                        !- Hedating Coil Reset Outdoor Dry-Bulb Low {C}
+  ,                        !- Heating Coil Reset Outdoor Dry-Bulb Low {C}
   ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb High {C}
   ,                        !- Heating Coil Reset Outdoor Dry-Bulb High {C}
   Autosize,                !- Heating Coil Capacity {W}
@@ -6650,7 +6639,7 @@ HVACTemplate:System:DualDuct,
   50,                     !- Heating Coil Design Setpoint {C}
   ,                       !- Heating Coil Setpoint Schedule Name
   ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb Low {C}
-  ,                       !- Hedating Coil Reset Outdoor Dry-Bulb Low {C}
+  ,                       !- Heating Coil Reset Outdoor Dry-Bulb Low {C}
   ,                   !- Heating Coil Setpoint at Outdoor Dry-Bulb High {C}
   ,                       !- Heating Coil Reset Outdoor Dry-Bulb High {C}
   Autosize,               !- Heating Coil Capacity {W}
@@ -7976,7 +7965,7 @@ While EnergyPlus has a variety of boiler options, the choices for this field are
   CondensingHotWaterBoiler -- Hot water boiler (condensing)
 \end{itemize}
 
-The EnergyPlus equipment object types which are used are \hyperref[districtheating]{DistrictHeating} or \hyperref[boilerhotwater]{Boiler:HotWater}. These equipment type keys must be used if setting up a user-defined boiler plant operation scheme.
+The EnergyPlus equipment object types which are used are \hyperref[districtheating]{DistrictHeatingWater} or \hyperref[boilerhotwater]{Boiler:HotWater}. These equipment type keys must be used if setting up a user-defined boiler plant operation scheme.
 
 \paragraph{Field: Capacity}\label{field-capacity-1}
 

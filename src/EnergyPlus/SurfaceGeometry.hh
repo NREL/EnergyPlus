@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -88,7 +88,9 @@ namespace SurfaceGeometry {
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void CreateMissingSpaces(EnergyPlusData &state, bool &ErrorsFound);
+    void CreateMissingSpaces(EnergyPlusData &state, Array1D<SurfaceGeometry::SurfaceData> &Surfaces);
+
+    void createSpaceSurfaceLists(EnergyPlusData &state, bool &ErrorsFound);
 
     void checkSubSurfAzTiltNorm(EnergyPlusData &state,
                                 SurfaceData &baseSurface, // Base surface data (in)
@@ -236,6 +238,28 @@ namespace SurfaceGeometry {
 
     void GetSurfaceGroundSurfsData(EnergyPlusData &state, bool &ErrorsFound); // Error flag indicator (true if errors found)
 
+    // Roof perimeter, Area, weighted-by-area average height azimuth
+    struct GeoSummary
+    {
+        // Members
+        Real64 Area = 0.0;      // Sum of all roof surface areas
+        Real64 Perimeter = 0.0; // Actual perimeter of all roof surfaces, after removing all edges that are used twice (and inserting vertices
+                                // to split surfaces as needed)
+        Real64 Height = 0.0;    // Weighted average mean vertical height: for each surface, take max - Zmin value,
+                                // then do a weighted average by surface area
+        Real64 Azimuth = 0.0;   // Weighted average azimuth
+        Real64 Tilt = 0.0;      // Weighted average tilt
+
+        Real64 Zmax = 0;
+        Real64 Zmin = 0;
+        Real64 Ymax = 0;
+        Real64 Ymin = 0;
+        Real64 Xmax = 0;
+        Real64 Xmin = 0;
+    };
+
+    void GetGeoSummaryRoof(EnergyPlusData &state, GeoSummary &geoSumRoof);
+
     class ExposedFoundationPerimeter
     {
     public:
@@ -286,7 +310,7 @@ namespace SurfaceGeometry {
 
     void GetMovableInsulationData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void CalculateZoneVolume(EnergyPlusData &state, const Array1D_bool &CeilingHeightEntered);
+    void CalculateZoneVolume(EnergyPlusData &state);
 
     struct EdgeOfSurf
     {
@@ -364,7 +388,7 @@ namespace SurfaceGeometry {
 
     void CreateStormWindowConstructions(EnergyPlusData &state);
 
-    int createAirMaterialFromDistance(EnergyPlusData &state, Real64 distance, std::string namePrefix); // return new material number
+    int createAirMaterialFromDistance(EnergyPlusData &state, Real64 distance, std::string_view namePrefix); // return new material number
 
     // create a new construction with storm based on an old construction and storm and gap materials
     int createConstructionWithStorm(EnergyPlusData &state, int oldConstruction, std::string name, int stormMaterial, int gapMaterial);

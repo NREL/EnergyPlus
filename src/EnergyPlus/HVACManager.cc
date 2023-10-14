@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -116,11 +117,6 @@ namespace EnergyPlus::HVACManager {
 // The basic solution technique is iteration with lagging.
 // The timestep is shortened using a bisection method.
 
-using namespace DataEnvironment;
-using namespace DataHVACGlobals;
-using namespace DataLoopNode;
-using namespace DataAirLoop;
-
 static constexpr std::array<Real64, DataPlant::NumConvergenceHistoryTerms> ConvergenceHistoryARR = {0.0, -1.0, -2.0, -3.0, -4.0};
 constexpr Real64 sum_ConvergenceHistoryARR(-10.0);
 constexpr Real64 square_sum_ConvergenceHistoryARR(100.0);
@@ -145,30 +141,6 @@ void ManageHVAC(EnergyPlusData &state)
     //  manage calls to Predictor and Corrector and other updates in ZoneTempPredictorCorrector
     //  manage variable time step and when zone air histories are updated.
 
-    // Using/Aliasing
-    using DemandManager::ManageDemand;
-    using DemandManager::UpdateDemandManagers;
-    using EMSManager::ManageEMS;
-    using InternalHeatGains::UpdateInternalGainValues;
-    using NodeInputManager::CalcMoreNodeInfo;
-    using OutAirNodeManager::SetOutAirNodes;
-    using OutputReportTabular::GatherComponentLoadsHVAC;
-    using OutputReportTabular::UpdateTabularReports; // added for writing tabular output reports
-    using PollutionModule::CalculatePollution;
-    using RefrigeratedCase::ManageRefrigeratedCaseRacks;
-    using ScheduleManager::GetCurrentScheduleValue;
-    using SizingManager::UpdateFacilitySizing;
-    using SystemAvailabilityManager::ManageHybridVentilation;
-    using SystemReports::InitEnergyReports;
-    using SystemReports::ReportSystemEnergyUse;
-    using WaterManager::ManageWater;
-    using WaterManager::ManageWaterInits;
-    using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
-    using ZoneEquipmentManager::CalcAirFlowSimple;
-    using ZoneEquipmentManager::UpdateZoneSizing;
-    using ZoneTempPredictorCorrector::DetectOscillatingZoneTemp;
-    using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view EndOfHeaderString("End of Data Dictionary");                          // End of data dictionary marker
     static constexpr std::string_view EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
@@ -176,22 +148,6 @@ void ManageHVAC(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 PriorTimeStep;       // magnitude of time step for previous history terms
     Real64 ZoneTempChange(0.0); // change in zone air temperature from timestep t-1 to t
-    int NodeNum;
-    bool ReportDebug;
-    int ZoneNum;
-
-    bool DummyLogical;
-
-    auto &AirLoopsSimOnce = state.dataHVACGlobal->AirLoopsSimOnce;
-    auto &NumOfSysTimeStepsLastZoneTimeStep = state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep;
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    auto &FirstTimeStepSysFlag = state.dataHVACGlobal->FirstTimeStepSysFlag;
-    auto &ShortenTimeStepSys = state.dataHVACGlobal->ShortenTimeStepSys;
-    auto &UseZoneTimeStepHistory = state.dataHVACGlobal->UseZoneTimeStepHistory;
-    auto &NumOfSysTimeSteps = state.dataHVACGlobal->NumOfSysTimeSteps;
-    auto &FracTimeStepZone = state.dataHVACGlobal->FracTimeStepZone;
-    auto &LimitNumSysSteps = state.dataHVACGlobal->LimitNumSysSteps;
 
     // SYSTEM INITIALIZATION
     if (state.dataHVACMgr->TriggerGetAFN) {
@@ -200,27 +156,36 @@ void ManageHVAC(EnergyPlusData &state)
         state.afn->manage_balance(); // first call only gets input and returns.
     }
 
-    state.dataHeatBalFanSys->ZT = state.dataHeatBalFanSys->MAT;
-    // save for use with thermal comfort control models (Fang, Pierce, and KSU)
-    state.dataHeatBalFanSys->ZTAV = 0.0;
+    for (auto &thisZoneHB : state.dataZoneTempPredictorCorrector->zoneHeatBalance) {
+        thisZoneHB.ZT = thisZoneHB.MAT;
+        // save for use with thermal comfort control models (Fang, Pierce, and KSU)
+        thisZoneHB.ZTAV = 0.0;
+        thisZoneHB.airHumRatAvg = 0.0;
+    }
+    for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
+        thisSpaceHB.ZT = thisSpaceHB.MAT;
+        // save for use with thermal comfort control models (Fang, Pierce, and KSU)
+        thisSpaceHB.ZTAV = 0.0;
+        thisSpaceHB.airHumRatAvg = 0.0;
+    }
     state.dataHeatBalFanSys->ZoneThermostatSetPointHiAver = 0.0;
     state.dataHeatBalFanSys->ZoneThermostatSetPointLoAver = 0.0;
-    state.dataHeatBalFanSys->ZoneAirHumRatAvg = 0.0;
     state.dataHVACMgr->PrintedWarmup = false;
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr);
+        state.dataContaminantBalance->OutdoorCO2 =
+            ScheduleManager::GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr);
         state.dataContaminantBalance->ZoneAirCO2Avg = 0.0;
     }
     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
         state.dataContaminantBalance->OutdoorGC =
-            GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr);
+            ScheduleManager::GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.GenericContamOutdoorSchedPtr);
         if (allocated(state.dataContaminantBalance->ZoneAirGCAvg)) state.dataContaminantBalance->ZoneAirGCAvg = 0.0;
     }
 
     if (state.dataGlobal->BeginEnvrnFlag && state.dataHVACMgr->MyEnvrnFlag) {
-        AirLoopsSimOnce = false;
+        state.dataHVACGlobal->AirLoopsSimOnce = false;
         state.dataHVACMgr->MyEnvrnFlag = false;
-        NumOfSysTimeStepsLastZoneTimeStep = 1;
+        state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep = 1;
         state.dataHVACGlobal->PreviousTimeStep = state.dataGlobal->TimeStepZone;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
@@ -228,36 +193,41 @@ void ManageHVAC(EnergyPlusData &state)
     }
 
     state.dataHeatBalFanSys->QRadSurfAFNDuct = 0.0;
-    SysTimeElapsed = 0.0;
-    TimeStepSys = state.dataGlobal->TimeStepZone;
-    FirstTimeStepSysFlag = true;
-    ShortenTimeStepSys = false;
-    UseZoneTimeStepHistory = true;
+
+    state.dataHVACGlobal->SysTimeElapsed = 0.0;
+    state.dataHVACGlobal->TimeStepSys = state.dataGlobal->TimeStepZone;
+    state.dataHVACGlobal->TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    state.dataHVACGlobal->FirstTimeStepSysFlag = true;
+    state.dataHVACGlobal->ShortenTimeStepSys = false;
+    state.dataHVACGlobal->UseZoneTimeStepHistory = true;
     PriorTimeStep = state.dataGlobal->TimeStepZone;
-    NumOfSysTimeSteps = 1;
-    FracTimeStepZone = TimeStepSys / state.dataGlobal->TimeStepZone;
+    state.dataHVACGlobal->NumOfSysTimeSteps = 1;
+    state.dataHVACGlobal->FracTimeStepZone = state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
 
     bool anyEMSRan;
-    ManageEMS(state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
-    SetOutAirNodes(state);
+    OutAirNodeManager::SetOutAirNodes(state);
 
-    ManageRefrigeratedCaseRacks(state);
+    RefrigeratedCase::ManageRefrigeratedCaseRacks(state);
 
     // ZONE INITIALIZATION  'Get Zone Setpoints'
-    ManageZoneAirUpdates(state,
-                         DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints,
-                         ZoneTempChange,
-                         ShortenTimeStepSys,
-                         UseZoneTimeStepHistory,
-                         PriorTimeStep);
+    ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
+                                                     DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints,
+                                                     ZoneTempChange,
+                                                     state.dataHVACGlobal->ShortenTimeStepSys,
+                                                     state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                     PriorTimeStep);
     if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-        ManageZoneContaminanUpdates(
-            state, DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates(state,
+                                                                       DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints,
+                                                                       state.dataHVACGlobal->ShortenTimeStepSys,
+                                                                       state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                                       PriorTimeStep);
 
-    ManageHybridVentilation(state);
+    SystemAvailabilityManager::ManageHybridVentilation(state);
 
-    CalcAirFlowSimple(state);
+    ZoneEquipmentManager::CalcAirFlowSimple(state);
     if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
         state.afn->RollBackFlag = false;
         state.afn->manage_balance(false);
@@ -265,16 +235,33 @@ void ManageHVAC(EnergyPlusData &state)
 
     SetHeatToReturnAirFlag(state);
 
-    state.dataHeatBalFanSys->SysDepZoneLoadsLagged = state.dataHeatBalFanSys->SysDepZoneLoads;
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum);
+        thisZoneHB.SysDepZoneLoadsLagged = thisZoneHB.SysDepZoneLoads;
+        if (state.dataHeatBal->doSpaceHeatBalance) {
+            for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+                // SpaceHB ToDo: For now allocate by space volume frac
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).SysDepZoneLoadsLagged =
+                    thisZoneHB.SysDepZoneLoads * state.dataHeatBal->space(spaceNum).fracZoneVolume;
+            }
+        }
+    }
 
-    UpdateInternalGainValues(state, true, true);
+    InternalHeatGains::UpdateInternalGainValues(state, true, true);
 
-    ManageZoneAirUpdates(
-        state, DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
+                                                     DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep,
+                                                     ZoneTempChange,
+                                                     state.dataHVACGlobal->ShortenTimeStepSys,
+                                                     state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                     PriorTimeStep);
 
     if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-        ManageZoneContaminanUpdates(
-            state, DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates(state,
+                                                                       DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep,
+                                                                       state.dataHVACGlobal->ShortenTimeStepSys,
+                                                                       state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                                       PriorTimeStep);
 
     SimHVAC(state);
 
@@ -285,61 +272,75 @@ void ManageHVAC(EnergyPlusData &state)
         }
     }
 
-    ManageWaterInits(state);
+    WaterManager::ManageWaterInits(state);
 
     // Only simulate once per zone timestep; must be after SimHVAC
-    if (FirstTimeStepSysFlag && state.dataGlobal->MetersHaveBeenInitialized) {
-        ManageDemand(state);
+    if (state.dataHVACGlobal->FirstTimeStepSysFlag && state.dataGlobal->MetersHaveBeenInitialized) {
+        DemandManager::ManageDemand(state);
     }
 
     state.dataGlobal->BeginTimeStepFlag = false; // At this point, we have been through the first pass through SimHVAC so this needs to be set
 
-    ManageZoneAirUpdates(
-        state, DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
+                                                     DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep,
+                                                     ZoneTempChange,
+                                                     state.dataHVACGlobal->ShortenTimeStepSys,
+                                                     state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                     PriorTimeStep);
     if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-        ManageZoneContaminanUpdates(
-            state, DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates(state,
+                                                                       DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep,
+                                                                       state.dataHVACGlobal->ShortenTimeStepSys,
+                                                                       state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                                       PriorTimeStep);
 
     if (ZoneTempChange > state.dataConvergeParams->MaxZoneTempDiff && !state.dataGlobal->KickOffSimulation) {
         // determine value of adaptive system time step
         // model how many system timesteps we want in zone timestep
         int ZTempTrendsNumSysSteps = int(ZoneTempChange / state.dataConvergeParams->MaxZoneTempDiff + 1.0); // add 1 for truncation
-        NumOfSysTimeSteps = min(ZTempTrendsNumSysSteps, LimitNumSysSteps);
+        state.dataHVACGlobal->NumOfSysTimeSteps = min(ZTempTrendsNumSysSteps, state.dataHVACGlobal->LimitNumSysSteps);
         // then determine timestep length for even distribution, protect div by zero
-        if (NumOfSysTimeSteps > 0) TimeStepSys = state.dataGlobal->TimeStepZone / NumOfSysTimeSteps;
-        TimeStepSys = max(TimeStepSys, state.dataConvergeParams->MinTimeStepSys);
-        UseZoneTimeStepHistory = false;
-        ShortenTimeStepSys = true;
+        if (state.dataHVACGlobal->NumOfSysTimeSteps > 0) {
+            state.dataHVACGlobal->TimeStepSys = state.dataGlobal->TimeStepZone / state.dataHVACGlobal->NumOfSysTimeSteps;
+        }
+        state.dataHVACGlobal->TimeStepSys = max(state.dataHVACGlobal->TimeStepSys, state.dataConvergeParams->MinTimeStepSys);
+        state.dataHVACGlobal->TimeStepSysSec = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+        state.dataHVACGlobal->UseZoneTimeStepHistory = false;
+        state.dataHVACGlobal->ShortenTimeStepSys = true;
+
     } else {
-        NumOfSysTimeSteps = 1;
-        UseZoneTimeStepHistory = true;
+        state.dataHVACGlobal->NumOfSysTimeSteps = 1;
+        state.dataHVACGlobal->UseZoneTimeStepHistory = true;
     }
 
-    if (UseZoneTimeStepHistory) state.dataHVACGlobal->PreviousTimeStep = state.dataGlobal->TimeStepZone;
-    for (int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
+    if (state.dataHVACGlobal->UseZoneTimeStepHistory) state.dataHVACGlobal->PreviousTimeStep = state.dataGlobal->TimeStepZone;
+    for (int SysTimestepLoop = 1; SysTimestepLoop <= state.dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
         if (state.dataGlobal->stopSimulation) break;
 
-        if (TimeStepSys < state.dataGlobal->TimeStepZone) {
+        if (state.dataHVACGlobal->TimeStepSys < state.dataGlobal->TimeStepZone) {
 
-            ManageHybridVentilation(state);
-            CalcAirFlowSimple(state, SysTimestepLoop);
+            SystemAvailabilityManager::ManageHybridVentilation(state);
+            ZoneEquipmentManager::CalcAirFlowSimple(state, SysTimestepLoop);
             if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 state.afn->RollBackFlag = false;
                 state.afn->manage_balance(false);
             }
 
-            UpdateInternalGainValues(state, true, true);
+            InternalHeatGains::UpdateInternalGainValues(state, true, true);
 
-            ManageZoneAirUpdates(state,
-                                 DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep,
-                                 ZoneTempChange,
-                                 ShortenTimeStepSys,
-                                 UseZoneTimeStepHistory,
-                                 PriorTimeStep);
+            ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
+                                                             DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep,
+                                                             ZoneTempChange,
+                                                             state.dataHVACGlobal->ShortenTimeStepSys,
+                                                             state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                             PriorTimeStep);
 
             if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-                ManageZoneContaminanUpdates(
-                    state, DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates(state,
+                                                                               DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep,
+                                                                               state.dataHVACGlobal->ShortenTimeStepSys,
+                                                                               state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                                               PriorTimeStep);
             SimHVAC(state);
 
             if (state.dataGlobal->AnyIdealCondEntSetPointInModel && state.dataGlobal->MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
@@ -349,59 +350,71 @@ void ManageHVAC(EnergyPlusData &state)
                 }
             }
 
-            ManageWaterInits(state);
+            WaterManager::ManageWaterInits(state);
 
             // Need to set the flag back since we do not need to shift the temps back again in the correct step.
-            ShortenTimeStepSys = false;
+            state.dataHVACGlobal->ShortenTimeStepSys = false;
 
-            ManageZoneAirUpdates(state,
-                                 DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep,
-                                 ZoneTempChange,
-                                 ShortenTimeStepSys,
-                                 UseZoneTimeStepHistory,
-                                 PriorTimeStep);
+            ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
+                                                             DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep,
+                                                             ZoneTempChange,
+                                                             state.dataHVACGlobal->ShortenTimeStepSys,
+                                                             state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                             PriorTimeStep);
             if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-                ManageZoneContaminanUpdates(
-                    state, DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates(state,
+                                                                               DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep,
+                                                                               state.dataHVACGlobal->ShortenTimeStepSys,
+                                                                               state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                                               PriorTimeStep);
 
-            ManageZoneAirUpdates(state,
-                                 DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories,
-                                 ZoneTempChange,
-                                 ShortenTimeStepSys,
-                                 UseZoneTimeStepHistory,
-                                 PriorTimeStep);
+            ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
+                                                             DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories,
+                                                             ZoneTempChange,
+                                                             state.dataHVACGlobal->ShortenTimeStepSys,
+                                                             state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                             PriorTimeStep);
             if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-                ManageZoneContaminanUpdates(state,
-                                            DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories,
-                                            ShortenTimeStepSys,
-                                            UseZoneTimeStepHistory,
-                                            PriorTimeStep);
-            state.dataHVACGlobal->PreviousTimeStep = TimeStepSys;
+                ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates(state,
+                                                                               DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories,
+                                                                               state.dataHVACGlobal->ShortenTimeStepSys,
+                                                                               state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                                               PriorTimeStep);
+            state.dataHVACGlobal->PreviousTimeStep = state.dataHVACGlobal->TimeStepSys;
         }
 
-        FracTimeStepZone = TimeStepSys / state.dataGlobal->TimeStepZone;
+        state.dataHVACGlobal->FracTimeStepZone = state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
 
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            state.dataHeatBalFanSys->ZTAV(ZoneNum) += state.dataHeatBalFanSys->ZT(ZoneNum) * FracTimeStepZone;
-            state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum) += state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum) * FracTimeStepZone;
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+            thisZoneHB.ZTAV += thisZoneHB.ZT * state.dataHVACGlobal->FracTimeStepZone;
+            thisZoneHB.airHumRatAvg += thisZoneHB.airHumRat * state.dataHVACGlobal->FracTimeStepZone;
+            // Space temps are always used, regardless of doSpaceHeatBalance setting
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
+                thisSpaceHB.ZTAV += thisSpaceHB.ZT * state.dataHVACGlobal->FracTimeStepZone;
+                thisSpaceHB.airHumRatAvg += thisSpaceHB.airHumRat * state.dataHVACGlobal->FracTimeStepZone;
+            }
             if (state.dataContaminantBalance->Contaminant.CO2Simulation)
-                state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum) += state.dataContaminantBalance->ZoneAirCO2(ZoneNum) * FracTimeStepZone;
+                state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum) +=
+                    state.dataContaminantBalance->ZoneAirCO2(ZoneNum) * state.dataHVACGlobal->FracTimeStepZone;
             if (state.dataContaminantBalance->Contaminant.GenericContamSimulation)
-                state.dataContaminantBalance->ZoneAirGCAvg(ZoneNum) += state.dataContaminantBalance->ZoneAirGC(ZoneNum) * FracTimeStepZone;
+                state.dataContaminantBalance->ZoneAirGCAvg(ZoneNum) +=
+                    state.dataContaminantBalance->ZoneAirGC(ZoneNum) * state.dataHVACGlobal->FracTimeStepZone;
             if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {
                 state.dataHeatBalFanSys->ZoneThermostatSetPointHiAver(ZoneNum) +=
-                    state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) * FracTimeStepZone;
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) * state.dataHVACGlobal->FracTimeStepZone;
                 state.dataHeatBalFanSys->ZoneThermostatSetPointLoAver(ZoneNum) +=
-                    state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) * FracTimeStepZone;
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) * state.dataHVACGlobal->FracTimeStepZone;
             }
         }
 
-        DetectOscillatingZoneTemp(state);
+        ZoneTempPredictorCorrector::DetectOscillatingZoneTemp(state);
         UpdateZoneListAndGroupLoads(state);           // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
         IceThermalStorage::UpdateIceFractions(state); // Update fraction of ice stored in TES
-        ManageWater(state);
+        WaterManager::ManageWater(state);
         // update electricity data for net, purchased, sold etc.
-        DummyLogical = false;
+        bool DummyLogical = false;
         state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, false, DummyLogical, true);
 
         // Update the plant and condenser loop capacitance model temperature history.
@@ -411,34 +424,34 @@ void ManageHVAC(EnergyPlusData &state)
             OutputReportTabular::CalcHeatEmissionReport(state);
         }
 
-        ManageEMS(
+        EMSManager::ManageEMS(
             state, EMSManager::EMSCallFrom::EndSystemTimestepBeforeHVACReporting, anyEMSRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // This is where output processor data is updated for System Timestep reporting
         if (!state.dataGlobal->WarmupFlag) {
             if (state.dataGlobal->DoOutputReporting && !state.dataGlobal->ZoneSizingCalc) {
-                CalcMoreNodeInfo(state);
-                CalculatePollution(state);
-                InitEnergyReports(state);
-                ReportSystemEnergyUse(state);
+                NodeInputManager::CalcMoreNodeInfo(state);
+                PollutionModule::CalculatePollution(state);
+                SystemReports::InitEnergyReports(state);
+                SystemReports::ReportSystemEnergyUse(state);
             }
             if (state.dataGlobal->DoOutputReporting || (state.dataGlobal->ZoneSizingCalc && state.dataGlobal->CompLoadReportIsReq)) {
                 ReportAirHeatBalance(state);
-                if (state.dataGlobal->ZoneSizingCalc) GatherComponentLoadsHVAC(state);
+                if (state.dataGlobal->ZoneSizingCalc) OutputReportTabular::GatherComponentLoadsHVAC(state);
             }
             if (state.dataGlobal->DoOutputReporting) {
                 SystemReports::ReportVentilationLoads(state);
                 UpdateDataandReport(state, OutputProcessor::TimeStepType::System);
-                if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
-                    state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
+                if (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeDesignDay ||
+                    state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeRunPeriodDesign) {
                     if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
                         state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
                 }
-                UpdateTabularReports(state, OutputProcessor::TimeStepType::System);
+                OutputReportTabular::UpdateTabularReports(state, OutputProcessor::TimeStepType::System);
             }
             if (state.dataGlobal->ZoneSizingCalc) {
-                UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::DuringDay);
-                UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::DuringDay);
+                ZoneEquipmentManager::UpdateZoneSizing(state, Constant::CallIndicator::DuringDay);
+                SizingManager::UpdateFacilitySizing(state, Constant::CallIndicator::DuringDay);
             }
             EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation(state);
         } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && state.dataSysVars->ReportDuringWarmup) {
@@ -476,11 +489,11 @@ void ManageHVAC(EnergyPlusData &state)
                 state.dataHVACMgr->PrintedWarmup = true;
             }
             if (!state.dataGlobal->DoingSizing) {
-                CalcMoreNodeInfo(state);
+                NodeInputManager::CalcMoreNodeInfo(state);
             }
             UpdateDataandReport(state, OutputProcessor::TimeStepType::System);
-            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
-                state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
+            if (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeDesignDay ||
+                state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeRunPeriodDesign) {
                 if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
                     state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
             }
@@ -519,34 +532,44 @@ void ManageHVAC(EnergyPlusData &state)
             }
             UpdateDataandReport(state, OutputProcessor::TimeStepType::System);
         }
-        ManageEMS(
+        EMSManager::ManageEMS(
             state, EMSManager::EMSCallFrom::EndSystemTimestepAfterHVACReporting, anyEMSRan, ObjexxFCL::Optional_int_const()); // EMS calling point
         // UPDATE SYSTEM CLOCKS
-        SysTimeElapsed += TimeStepSys;
+        state.dataHVACGlobal->SysTimeElapsed += state.dataHVACGlobal->TimeStepSys;
 
-        FirstTimeStepSysFlag = false;
+        state.dataHVACGlobal->FirstTimeStepSysFlag = false;
     } // system time step  loop (loops once if no downstepping)
 
-    state.dataHeatBalFanSys->ZTAVComf = state.dataHeatBalFanSys->ZTAV;
-    state.dataHeatBalFanSys->ZoneAirHumRatAvgComf = state.dataHeatBalFanSys->ZoneAirHumRatAvg;
+    for (auto &thisZoneHB : state.dataZoneTempPredictorCorrector->zoneHeatBalance) {
+        thisZoneHB.ZTAVComf = thisZoneHB.ZTAV;
+        thisZoneHB.airHumRatAvgComf = thisZoneHB.airHumRatAvg;
+    }
+    for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
+        thisSpaceHB.ZTAVComf = thisSpaceHB.ZTAV;
+        thisSpaceHB.airHumRatAvgComf = thisSpaceHB.airHumRatAvg;
+    }
 
-    ManageZoneAirUpdates(state,
-                         DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories,
-                         ZoneTempChange,
-                         ShortenTimeStepSys,
-                         UseZoneTimeStepHistory,
-                         PriorTimeStep);
+    ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
+                                                     DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories,
+                                                     ZoneTempChange,
+                                                     state.dataHVACGlobal->ShortenTimeStepSys,
+                                                     state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                     PriorTimeStep);
     if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-        ManageZoneContaminanUpdates(
-            state, DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+        ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates(state,
+                                                                       DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories,
+                                                                       state.dataHVACGlobal->ShortenTimeStepSys,
+                                                                       state.dataHVACGlobal->UseZoneTimeStepHistory,
+                                                                       PriorTimeStep);
 
-    NumOfSysTimeStepsLastZoneTimeStep = NumOfSysTimeSteps;
+    state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep = state.dataHVACGlobal->NumOfSysTimeSteps;
 
-    UpdateDemandManagers(state);
+    DemandManager::UpdateDemandManagers(state);
 
     // DO FINAL UPDATE OF RECORD KEEPING VARIABLES
     // Report the Node Data to Aid in Debugging
     if (state.dataReportFlag->DebugOutput) {
+        bool ReportDebug;
         if (state.dataReportFlag->EvenDuringWarmup) {
             ReportDebug = true;
         } else {
@@ -555,7 +578,7 @@ void ManageHVAC(EnergyPlusData &state)
         if ((ReportDebug) && (state.dataGlobal->DayOfSim > 0)) { // Report the node data
             if (size(state.dataLoopNodes->Node) > 0 && !state.dataHVACMgr->DebugNamesReported) {
                 print(state.files.debug, "{}\n", "node #   Name");
-                for (NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
+                for (int NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
                     print(state.files.debug, " {:3}     {}\n", NodeNum, state.dataLoopNodes->NodeID(NodeNum));
                 }
                 state.dataHVACMgr->DebugNamesReported = true;
@@ -572,7 +595,7 @@ void ManageHVAC(EnergyPlusData &state)
                       "node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       MassMax        MassSP    Press        "
                       "Enthal     HumRat Fluid Type");
             }
-            for (NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
+            for (int NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
                 static constexpr std::string_view Format_20{
                     " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#7.0F}  {:11.2F}  {:9.5F}  {}\n"};
 
@@ -616,50 +639,16 @@ void SimHVAC(EnergyPlusData &state)
     // selectable control schemes based on the logical flags used in
     // this default control algorithm.
 
-    // Using/Aliasing
-    using DataPlant::NumConvergenceHistoryTerms;
-    using EMSManager::ManageEMS;
-    using General::CreateSysTimeIntervalString;
-    using NonZoneEquipmentManager::ManageNonZoneEquipment;
-    using PlantCondLoopOperation::SetupPlantEMSActuators;
-    using PlantManager::GetPlantInput;
-    using PlantManager::GetPlantLoopData;
-    using PlantManager::InitOneTimePlantSizingInfo;
-    using PlantManager::ReInitPlantLoopsAtFirstHVACIteration;
-    using PlantManager::SetupBranchControlTypes;
-    using PlantManager::SetupInitialPlantCallingOrder;
-    using PlantManager::SetupReports;
-    using PlantUtilities::AnyPlantSplitterMixerLacksContinuity;
-    using PlantUtilities::CheckForRunawayPlantTemps;
-    using PlantUtilities::CheckPlantMixerSplitterConsistency;
-    using PlantUtilities::SetAllPlantSimFlagsToValue;
-    using SetPointManager::ManageSetPoints;
-    using SystemAvailabilityManager::ManageSystemAvailability;
-    using ZoneEquipmentManager::ManageZoneEquipment;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     bool constexpr SimWithPlantFlowUnlocked(false);
     bool constexpr SimWithPlantFlowLocked(true);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool FirstHVACIteration; // True when solution technique on first iteration
-    auto &ErrCount = state.dataHVACMgr->ErrCount;
-    auto &MaxErrCount = state.dataHVACMgr->MaxErrCount;
-    auto &ErrEnvironmentName = state.dataHVACMgr->ErrEnvironmentName;
-    int LoopNum;
-
-    int AirSysNum;
-    int StackDepth;
-    std::string HistoryTrace;
     Real64 SlopeHumRat;
     Real64 SlopeMdot;
     Real64 SlopeTemps;
     Real64 AvgValue;
-    bool FoundOscillationByDuplicate;
-    int ZoneNum;
-    int NodeIndex;
-    bool MonotonicIncreaseFound;
-    bool MonotonicDecreaseFound;
 
     static constexpr std::array<Real64, DataConvergParams::ConvergLogStackDepth> ConvergLogStackARR = {
         0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0};
@@ -667,21 +656,14 @@ void SimHVAC(EnergyPlusData &state)
     Real64 constexpr square_sum_ConvergLogStackARR(2025);
     Real64 constexpr sum_square_ConvergLogStackARR(285);
 
-    auto &SimZoneEquipmentFlag = state.dataHVACGlobal->SimZoneEquipmentFlag;
-    auto &SimNonZoneEquipmentFlag = state.dataHVACGlobal->SimNonZoneEquipmentFlag;
-    auto &SimAirLoopsFlag = state.dataHVACGlobal->SimAirLoopsFlag;
-    auto &SimPlantLoopsFlag = state.dataHVACGlobal->SimPlantLoopsFlag;
-    auto &SimElecCircuitsFlag = state.dataHVACGlobal->SimElecCircuitsFlag;
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
-    auto &DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
-    auto &SetPointErrorFlag = state.dataHVACGlobal->SetPointErrorFlag;
+    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     // Initialize all of the simulation flags to true for the first iteration
-    SimZoneEquipmentFlag = true;
-    SimNonZoneEquipmentFlag = true;
-    SimAirLoopsFlag = true;
-    SimPlantLoopsFlag = true;
-    SimElecCircuitsFlag = true;
+    state.dataHVACGlobal->SimZoneEquipmentFlag = true;
+    state.dataHVACGlobal->SimNonZoneEquipmentFlag = true;
+    state.dataHVACGlobal->SimAirLoopsFlag = true;
+    state.dataHVACGlobal->SimPlantLoopsFlag = true;
+    state.dataHVACGlobal->SimElecCircuitsFlag = true;
     FirstHVACIteration = true;
 
     if (state.dataAirLoop->AirLoopInputsFilled) {
@@ -712,7 +694,7 @@ void SimHVAC(EnergyPlusData &state)
     state.dataHVACMgr->HVACManageIteration = 0;
     state.dataPlnt->PlantManageSubIterations = 0;
     state.dataPlnt->PlantManageHalfLoopCalls = 0;
-    SetAllPlantSimFlagsToValue(state, true);
+    PlantUtilities::SetAllPlantSimFlagsToValue(state, true);
     if (!state.dataHVACMgr->SimHVACIterSetup) {
         SetupOutputVariable(state,
                             "HVAC System Solver Iteration Count",
@@ -742,15 +724,14 @@ void SimHVAC(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
                             "SimHVAC");
-        ManageSetPoints(state); // need to call this before getting plant loop data so setpoint checks can complete okay
-        GetPlantLoopData(state);
-        GetPlantInput(state);
-        SetupInitialPlantCallingOrder(state);
-        SetupBranchControlTypes(state); // new routine to do away with input for branch control type
-        //    CALL CheckPlantLoopData
-        SetupReports(state);
+        SetPointManager::ManageSetPoints(state); // need to call this before getting plant loop data so setpoint checks can complete okay
+        PlantManager::GetPlantLoopData(state);
+        PlantManager::GetPlantInput(state);
+        PlantManager::SetupInitialPlantCallingOrder(state);
+        PlantManager::SetupBranchControlTypes(state); // new routine to do away with input for branch control type
+        PlantManager::SetupReports(state);
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            SetupPlantEMSActuators(state);
+            PlantCondLoopOperation::SetupPlantEMSActuators(state);
         }
 
         if (state.dataPlnt->TotNumLoops > 0) {
@@ -768,19 +749,21 @@ void SimHVAC(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 "SimHVAC");
-            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+            for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 // init plant sizing numbers in main plant data structure
-                InitOneTimePlantSizingInfo(state, LoopNum);
+                PlantManager::InitOneTimePlantSizingInfo(state, LoopNum);
             }
         }
         state.dataHVACMgr->SimHVACIterSetup = true;
     }
 
     if (state.dataGlobal->ZoneSizingCalc) {
-        ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipmentFlag, SimAirLoopsFlag);
+        ZoneEquipmentManager::ManageZoneEquipment(
+            state, FirstHVACIteration, state.dataHVACGlobal->SimZoneEquipmentFlag, state.dataHVACGlobal->SimAirLoopsFlag);
         // need to call non zone equipment so water use zone gains can be included in sizing calcs
-        ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipmentFlag);
-        state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(state, FirstHVACIteration, SimElecCircuitsFlag, false);
+        NonZoneEquipmentManager::ManageNonZoneEquipment(state, FirstHVACIteration, state.dataHVACGlobal->SimNonZoneEquipmentFlag);
+        state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
+            state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
         return;
     }
 
@@ -790,40 +773,38 @@ void SimHVAC(EnergyPlusData &state)
 
     ResetHVACControl(state);
 
-    // Before the HVAC simulation, call ManageSetPoints to set all the HVAC
-    // node setpoints
+    // Before the HVAC simulation, call ManageSetPoints to set all the HVAC node setpoints
     bool anyEMSRan = false;
-    ManageEMS(state, EMSManager::EMSCallFrom::BeforeHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::BeforeHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
-    ManageSetPoints(state);
+    SetPointManager::ManageSetPoints(state);
 
     // re-initialize plant loop and nodes.
-    ReInitPlantLoopsAtFirstHVACIteration(state);
+    PlantManager::ReInitPlantLoopsAtFirstHVACIteration(state);
 
-    // Before the HVAC simulation, call ManageSystemAvailability to set
-    // the system on/off flags
-    ManageSystemAvailability(state);
+    // Before the HVAC simulation, call ManageSystemAvailability to set the system on/off flags
+    SystemAvailabilityManager::ManageSystemAvailability(state);
 
-    ManageEMS(state, EMSManager::EMSCallFrom::AfterHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
-    ManageEMS(state, EMSManager::EMSCallFrom::HVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::AfterHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+    EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::HVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
 
     // first explicitly call each system type with FirstHVACIteration,
 
     // Manages the various component simulations
     SimSelectedEquipment(state,
-                         SimAirLoopsFlag,
-                         SimZoneEquipmentFlag,
-                         SimNonZoneEquipmentFlag,
-                         SimPlantLoopsFlag,
-                         SimElecCircuitsFlag,
+                         state.dataHVACGlobal->SimAirLoopsFlag,
+                         state.dataHVACGlobal->SimZoneEquipmentFlag,
+                         state.dataHVACGlobal->SimNonZoneEquipmentFlag,
+                         state.dataHVACGlobal->SimPlantLoopsFlag,
+                         state.dataHVACGlobal->SimElecCircuitsFlag,
                          FirstHVACIteration,
                          SimWithPlantFlowUnlocked);
 
     // Eventually, when all of the flags are set to false, the
     // simulation has converged for this system time step.
 
-    SimPlantLoopsFlag = true;
-    SetAllPlantSimFlagsToValue(state, true); // set so loop to simulate at least once on non-first hvac
+    state.dataHVACGlobal->SimPlantLoopsFlag = true;
+    PlantUtilities::SetAllPlantSimFlagsToValue(state, true); // set so loop to simulate at least once on non-first hvac
 
     FirstHVACIteration = false;
 
@@ -831,20 +812,21 @@ void SimHVAC(EnergyPlusData &state)
 
     // Main iteration loop for HVAC.  If any of the simulation flags are
     // true, then specific components must be resimulated.
-    while ((SimAirLoopsFlag || SimZoneEquipmentFlag || SimNonZoneEquipmentFlag || SimPlantLoopsFlag || SimElecCircuitsFlag) &&
+    while ((state.dataHVACGlobal->SimAirLoopsFlag || state.dataHVACGlobal->SimZoneEquipmentFlag || state.dataHVACGlobal->SimNonZoneEquipmentFlag ||
+            state.dataHVACGlobal->SimPlantLoopsFlag || state.dataHVACGlobal->SimElecCircuitsFlag) &&
            (state.dataHVACMgr->HVACManageIteration <= state.dataConvergeParams->MaxIter)) {
 
         if (state.dataGlobal->stopSimulation) break;
 
-        ManageEMS(state, EMSManager::EMSCallFrom::HVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
+        EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::HVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
 
         // Manages the various component simulations
         SimSelectedEquipment(state,
-                             SimAirLoopsFlag,
-                             SimZoneEquipmentFlag,
-                             SimNonZoneEquipmentFlag,
-                             SimPlantLoopsFlag,
-                             SimElecCircuitsFlag,
+                             state.dataHVACGlobal->SimAirLoopsFlag,
+                             state.dataHVACGlobal->SimZoneEquipmentFlag,
+                             state.dataHVACGlobal->SimNonZoneEquipmentFlag,
+                             state.dataHVACGlobal->SimPlantLoopsFlag,
+                             state.dataHVACGlobal->SimElecCircuitsFlag,
                              FirstHVACIteration,
                              SimWithPlantFlowUnlocked);
 
@@ -857,72 +839,72 @@ void SimHVAC(EnergyPlusData &state)
 
         if (anyEMSRan && state.dataHVACMgr->HVACManageIteration <= 2) {
             // the calling point emsCallFromHVACIterationLoop is only effective for air loops if this while loop runs at least twice
-            SimAirLoopsFlag = true;
+            state.dataHVACGlobal->SimAirLoopsFlag = true;
         }
         if (state.dataHVACMgr->HVACManageIteration < state.dataHVACGlobal->MinAirLoopIterationsAfterFirst) {
             // sequenced zone loads for airloops may require extra iterations depending upon zone equipment order and load distribution type
-            SimAirLoopsFlag = true;
-            SimZoneEquipmentFlag = true;
+            state.dataHVACGlobal->SimAirLoopsFlag = true;
+            state.dataHVACGlobal->SimZoneEquipmentFlag = true;
         }
     }
     if (state.dataGlobal->AnyPlantInModel) {
-        if (AnyPlantSplitterMixerLacksContinuity(state)) {
+        if (PlantUtilities::AnyPlantSplitterMixerLacksContinuity(state)) {
             // rerun systems in a "Final flow lock/last iteration" mode
             // now call for one second to last plant simulation
-            SimAirLoopsFlag = false;
-            SimZoneEquipmentFlag = false;
-            SimNonZoneEquipmentFlag = false;
-            SimPlantLoopsFlag = true;
-            SimElecCircuitsFlag = false;
+            state.dataHVACGlobal->SimAirLoopsFlag = false;
+            state.dataHVACGlobal->SimZoneEquipmentFlag = false;
+            state.dataHVACGlobal->SimNonZoneEquipmentFlag = false;
+            state.dataHVACGlobal->SimPlantLoopsFlag = true;
+            state.dataHVACGlobal->SimElecCircuitsFlag = false;
             SimSelectedEquipment(state,
-                                 SimAirLoopsFlag,
-                                 SimZoneEquipmentFlag,
-                                 SimNonZoneEquipmentFlag,
-                                 SimPlantLoopsFlag,
-                                 SimElecCircuitsFlag,
+                                 state.dataHVACGlobal->SimAirLoopsFlag,
+                                 state.dataHVACGlobal->SimZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimNonZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimPlantLoopsFlag,
+                                 state.dataHVACGlobal->SimElecCircuitsFlag,
                                  FirstHVACIteration,
                                  SimWithPlantFlowUnlocked);
             // now call for all non-plant simulation, but with plant flow lock on
-            SimAirLoopsFlag = true;
-            SimZoneEquipmentFlag = true;
-            SimNonZoneEquipmentFlag = true;
-            SimPlantLoopsFlag = false;
-            SimElecCircuitsFlag = true;
+            state.dataHVACGlobal->SimAirLoopsFlag = true;
+            state.dataHVACGlobal->SimZoneEquipmentFlag = true;
+            state.dataHVACGlobal->SimNonZoneEquipmentFlag = true;
+            state.dataHVACGlobal->SimPlantLoopsFlag = false;
+            state.dataHVACGlobal->SimElecCircuitsFlag = true;
             SimSelectedEquipment(state,
-                                 SimAirLoopsFlag,
-                                 SimZoneEquipmentFlag,
-                                 SimNonZoneEquipmentFlag,
-                                 SimPlantLoopsFlag,
-                                 SimElecCircuitsFlag,
+                                 state.dataHVACGlobal->SimAirLoopsFlag,
+                                 state.dataHVACGlobal->SimZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimNonZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimPlantLoopsFlag,
+                                 state.dataHVACGlobal->SimElecCircuitsFlag,
                                  FirstHVACIteration,
                                  SimWithPlantFlowLocked);
             UpdateZoneInletConvergenceLog(state);
             // now call for a last plant simulation
-            SimAirLoopsFlag = false;
-            SimZoneEquipmentFlag = false;
-            SimNonZoneEquipmentFlag = false;
-            SimPlantLoopsFlag = true;
-            SimElecCircuitsFlag = false;
+            state.dataHVACGlobal->SimAirLoopsFlag = false;
+            state.dataHVACGlobal->SimZoneEquipmentFlag = false;
+            state.dataHVACGlobal->SimNonZoneEquipmentFlag = false;
+            state.dataHVACGlobal->SimPlantLoopsFlag = true;
+            state.dataHVACGlobal->SimElecCircuitsFlag = false;
             SimSelectedEquipment(state,
-                                 SimAirLoopsFlag,
-                                 SimZoneEquipmentFlag,
-                                 SimNonZoneEquipmentFlag,
-                                 SimPlantLoopsFlag,
-                                 SimElecCircuitsFlag,
+                                 state.dataHVACGlobal->SimAirLoopsFlag,
+                                 state.dataHVACGlobal->SimZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimNonZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimPlantLoopsFlag,
+                                 state.dataHVACGlobal->SimElecCircuitsFlag,
                                  FirstHVACIteration,
                                  SimWithPlantFlowUnlocked);
             // now call for a last all non-plant simulation, but with plant flow lock on
-            SimAirLoopsFlag = true;
-            SimZoneEquipmentFlag = true;
-            SimNonZoneEquipmentFlag = true;
-            SimPlantLoopsFlag = false;
-            SimElecCircuitsFlag = true;
+            state.dataHVACGlobal->SimAirLoopsFlag = true;
+            state.dataHVACGlobal->SimZoneEquipmentFlag = true;
+            state.dataHVACGlobal->SimNonZoneEquipmentFlag = true;
+            state.dataHVACGlobal->SimPlantLoopsFlag = false;
+            state.dataHVACGlobal->SimElecCircuitsFlag = true;
             SimSelectedEquipment(state,
-                                 SimAirLoopsFlag,
-                                 SimZoneEquipmentFlag,
-                                 SimNonZoneEquipmentFlag,
-                                 SimPlantLoopsFlag,
-                                 SimElecCircuitsFlag,
+                                 state.dataHVACGlobal->SimAirLoopsFlag,
+                                 state.dataHVACGlobal->SimZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimNonZoneEquipmentFlag,
+                                 state.dataHVACGlobal->SimPlantLoopsFlag,
+                                 state.dataHVACGlobal->SimElecCircuitsFlag,
                                  FirstHVACIteration,
                                  SimWithPlantFlowLocked);
             UpdateZoneInletConvergenceLog(state);
@@ -930,76 +912,78 @@ void SimHVAC(EnergyPlusData &state)
     }
 
     // Test plant loop for errors
-    for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+    for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
         for (DataPlant::LoopSideLocation LoopSide : DataPlant::LoopSideKeys) {
-            CheckPlantMixerSplitterConsistency(state, LoopNum, LoopSide, FirstHVACIteration);
-            CheckForRunawayPlantTemps(state, LoopNum, LoopSide);
+            PlantUtilities::CheckPlantMixerSplitterConsistency(state, LoopNum, LoopSide, FirstHVACIteration);
+            PlantUtilities::CheckForRunawayPlantTemps(state, LoopNum, LoopSide);
         }
     }
 
     if ((state.dataHVACMgr->HVACManageIteration > state.dataConvergeParams->MaxIter) && (!state.dataGlobal->WarmupFlag)) {
-        ++ErrCount;
-        if (ErrCount < 15) {
-            ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
+        ++state.dataHVACMgr->ErrCount;
+        if (state.dataHVACMgr->ErrCount < 15) {
+            state.dataHVACMgr->ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
             ShowWarningError(state,
                              format("SimHVAC: Maximum iterations ({}) exceeded for all HVAC loops, at {}, {} {}",
                                     state.dataConvergeParams->MaxIter,
                                     state.dataEnvrn->EnvironmentName,
                                     state.dataEnvrn->CurMnDy,
-                                    CreateSysTimeIntervalString(state)));
-            if (SimAirLoopsFlag) {
+                                    General::CreateSysTimeIntervalString(state)));
+            if (state.dataHVACGlobal->SimAirLoopsFlag) {
                 ShowContinueError(state, "The solution for one or more of the Air Loop HVAC systems did not appear to converge");
             }
-            if (SimZoneEquipmentFlag) {
+            if (state.dataHVACGlobal->SimZoneEquipmentFlag) {
                 ShowContinueError(state, "The solution for zone HVAC equipment did not appear to converge");
             }
-            if (SimNonZoneEquipmentFlag) {
+            if (state.dataHVACGlobal->SimNonZoneEquipmentFlag) {
                 ShowContinueError(state, "The solution for non-zone equipment did not appear to converge");
             }
-            if (SimPlantLoopsFlag) {
+            if (state.dataHVACGlobal->SimPlantLoopsFlag) {
                 ShowContinueError(state, "The solution for one or more plant systems did not appear to converge");
             }
-            if (SimElecCircuitsFlag) {
+            if (state.dataHVACGlobal->SimElecCircuitsFlag) {
                 ShowContinueError(state, "The solution for on-site electric generators did not appear to converge");
             }
-            if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+            if (state.dataHVACMgr->ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                 ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on each max iteration exceeded.");
             }
             if (state.dataGlobal->DisplayExtraWarnings) {
 
-                for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
+                for (int AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
 
                     auto &arrayRef = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACMassFlowNotConverged;
                     if (std::any_of(std::begin(arrayRef), std::end(arrayRef), [](bool i) { return i; })) {
 
                         ShowContinueError(state,
-                                          "Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName +
-                                              " did not converge for mass flow rate");
+                                          format("Air System Named = {} did not converge for mass flow rate",
+                                                 state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName));
                         ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
-                        HistoryTrace = "";
-                        for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                        std::string HistoryTrace = "";
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                             HistoryTrace +=
                                 format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACFlowDemandToSupplyTolValue[StackDepth]);
                         }
 
-                        ShowContinueError(state, "Demand-to-Supply interface mass flow rate check value iteration history trace: " + HistoryTrace);
+                        ShowContinueError(state,
+                                          format("Demand-to-Supply interface mass flow rate check value iteration history trace: {}", HistoryTrace));
                         HistoryTrace = "";
-                        for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                             HistoryTrace += format(
                                 "{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACFlowSupplyDeck1ToDemandTolValue[StackDepth]);
                         }
-                        ShowContinueError(state,
-                                          "Supply-to-demand interface deck 1 mass flow rate check value iteration history trace: " + HistoryTrace);
+                        ShowContinueError(
+                            state, format("Supply-to-demand interface deck 1 mass flow rate check value iteration history trace: {}", HistoryTrace));
 
                         if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
                             HistoryTrace = "";
-                            for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                            for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                 HistoryTrace +=
                                     format("{:.6R},",
                                            state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACFlowSupplyDeck2ToDemandTolValue[StackDepth]);
                             }
                             ShowContinueError(
-                                state, "Supply-to-demand interface deck 2 mass flow rate check value iteration history trace: " + HistoryTrace);
+                                state,
+                                format("Supply-to-demand interface deck 2 mass flow rate check value iteration history trace: {}", HistoryTrace));
                         }
                     } // mass flow rate not converged
 
@@ -1007,32 +991,34 @@ void SimHVAC(EnergyPlusData &state)
                     if (std::any_of(std::begin(arrayRef2), std::end(arrayRef2), [](bool i) { return i; })) {
 
                         ShowContinueError(state,
-                                          "Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName +
-                                              " did not converge for humidity ratio");
+                                          format("Air System Named = {} did not converge for humidity ratio",
+                                                 state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName));
                         ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
-                        HistoryTrace = "";
-                        for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                        std::string HistoryTrace = "";
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                             HistoryTrace +=
                                 format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACHumDemandToSupplyTolValue[StackDepth]);
                         }
-                        ShowContinueError(state, "Demand-to-Supply interface humidity ratio check value iteration history trace: " + HistoryTrace);
+                        ShowContinueError(state,
+                                          format("Demand-to-Supply interface humidity ratio check value iteration history trace: {}", HistoryTrace));
                         HistoryTrace = "";
-                        for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                             HistoryTrace += format(
                                 "{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACHumSupplyDeck1ToDemandTolValue[StackDepth]);
                         }
-                        ShowContinueError(state,
-                                          "Supply-to-demand interface deck 1 humidity ratio check value iteration history trace: " + HistoryTrace);
+                        ShowContinueError(
+                            state, format("Supply-to-demand interface deck 1 humidity ratio check value iteration history trace: {}", HistoryTrace));
 
                         if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
                             HistoryTrace = "";
-                            for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                            for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                 HistoryTrace +=
                                     format("{:.6R},",
                                            state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACHumSupplyDeck2ToDemandTolValue[StackDepth]);
                             }
                             ShowContinueError(
-                                state, "Supply-to-demand interface deck 2 humidity ratio check value iteration history trace: " + HistoryTrace);
+                                state,
+                                format("Supply-to-demand interface deck 2 humidity ratio check value iteration history trace: {}", HistoryTrace));
                         }
                     } // humidity ratio not converged
 
@@ -1040,81 +1026,84 @@ void SimHVAC(EnergyPlusData &state)
                     if (std::any_of(std::begin(arrayRef3), std::end(arrayRef3), [](bool i) { return i; })) {
 
                         ShowContinueError(state,
-                                          "Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName +
-                                              " did not converge for temperature");
+                                          format("Air System Named = {} did not converge for temperature",
+                                                 state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName));
                         ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
-                        HistoryTrace = "";
-                        for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                        std::string HistoryTrace = "";
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                             HistoryTrace +=
                                 format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACTempDemandToSupplyTolValue[StackDepth]);
                         }
-                        ShowContinueError(state, "Demand-to-Supply interface temperature check value iteration history trace: " + HistoryTrace);
+                        ShowContinueError(state,
+                                          format("Demand-to-Supply interface temperature check value iteration history trace: {}", HistoryTrace));
                         HistoryTrace = "";
-                        for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                             HistoryTrace += format(
                                 "{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACTempSupplyDeck1ToDemandTolValue[StackDepth]);
                         }
-                        ShowContinueError(state,
-                                          "Supply-to-demand interface deck 1 temperature check value iteration history trace: " + HistoryTrace);
+                        ShowContinueError(
+                            state, format("Supply-to-demand interface deck 1 temperature check value iteration history trace: {}", HistoryTrace));
 
                         if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
                             HistoryTrace = "";
-                            for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                            for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                 HistoryTrace +=
                                     format("{:.6R},",
                                            state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACTempSupplyDeck1ToDemandTolValue[StackDepth]);
                             }
-                            ShowContinueError(state,
-                                              "Supply-to-demand interface deck 2 temperature check value iteration history trace: " + HistoryTrace);
+                            ShowContinueError(
+                                state, format("Supply-to-demand interface deck 2 temperature check value iteration history trace: {}", HistoryTrace));
                         }
                     } // Temps not converged
 
                     auto &arrayRef4 = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACEnergyNotConverged;
                     if (std::any_of(std::begin(arrayRef4), std::end(arrayRef4), [](bool i) { return i; })) {
 
-                        ShowContinueError(state,
-                                          "Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName +
-                                              " did not converge for energy");
+                        ShowContinueError(
+                            state,
+                            format("Air System Named = {} did not converge for energy", state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName));
                         ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
-                        HistoryTrace = "";
-                        for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                        std::string HistoryTrace = "";
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                             HistoryTrace += format(
                                 "{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACEnergyDemandToSupplyTolValue[StackDepth]);
                         }
-                        ShowContinueError(state, "Demand-to-Supply interface energy check value iteration history trace: " + HistoryTrace);
+                        ShowContinueError(state, format("Demand-to-Supply interface energy check value iteration history trace: {}", HistoryTrace));
                         HistoryTrace = "";
-                        for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                             HistoryTrace += format(
                                 "{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACEnergySupplyDeck1ToDemandTolValue[StackDepth]);
                         }
-                        ShowContinueError(state, "Supply-to-demand interface deck 1 energy check value iteration history trace: " + HistoryTrace);
+                        ShowContinueError(state,
+                                          format("Supply-to-demand interface deck 1 energy check value iteration history trace: {}", HistoryTrace));
 
                         if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
                             HistoryTrace = "";
-                            for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                            for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                 HistoryTrace +=
                                     format("{:.6R},",
                                            state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACEnergySupplyDeck2ToDemandTolValue[StackDepth]);
                             }
-                            ShowContinueError(state, "Supply-to-demand interface deck 2 energy check value iteration history trace: " + HistoryTrace);
+                            ShowContinueError(
+                                state, format("Supply-to-demand interface deck 2 energy check value iteration history trace: {}", HistoryTrace));
                         }
                     } // energy not converged
 
                 } // loop over air loop systems
 
                 // loop over zones and check for issues with zone inlet nodes
-                for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+                for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
-                    for (NodeIndex = 1; NodeIndex <= state.dataConvergeParams->ZoneInletConvergence(ZoneNum).NumInletNodes; ++NodeIndex) {
+                    for (int NodeIndex = 1; NodeIndex <= state.dataConvergeParams->ZoneInletConvergence(ZoneNum).NumInletNodes; ++NodeIndex) {
 
                         auto &humRatInletNode = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio;
                         auto &mdotInletNode = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate;
                         auto &inletTemp = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature;
 
                         // Check humidity ratio
-                        FoundOscillationByDuplicate = false;
-                        MonotonicDecreaseFound = false;
-                        MonotonicIncreaseFound = false;
+                        bool FoundOscillationByDuplicate = false;
+                        bool MonotonicDecreaseFound = false;
+                        bool MonotonicIncreaseFound = false;
                         // check for evidence of oscillation by identifying duplicates when latest value not equal to average
                         Real64 summation = 0.0;
                         summation = std::accumulate(humRatInletNode.begin(), humRatInletNode.end(), 0.0);
@@ -1122,7 +1111,7 @@ void SimHVAC(EnergyPlusData &state)
                         if (std::abs(humRatInletNode[0] - AvgValue) >
                             DataConvergParams::HVACHumRatOscillationToler) { // last iterate differs from average
                             FoundOscillationByDuplicate = false;
-                            for (StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                            for (int StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                 if (std::abs(humRatInletNode[0] - humRatInletNode[StackDepth]) < DataConvergParams::HVACHumRatOscillationToler) {
                                     FoundOscillationByDuplicate = true;
                                     ShowContinueError(
@@ -1136,7 +1125,7 @@ void SimHVAC(EnergyPlusData &state)
                             }
                             if (!FoundOscillationByDuplicate) {
 
-                                auto humRatInletNodDotProd = std::inner_product(
+                                Real64 humRatInletNodDotProd = std::inner_product(
                                     std::begin(ConvergLogStackARR), std::end(ConvergLogStackARR), std::begin(humRatInletNode), 0.0);
                                 Real64 summation2 = 0.0;
                                 summation2 = std::accumulate(humRatInletNode.begin(), humRatInletNode.end(), 0.0);
@@ -1147,7 +1136,7 @@ void SimHVAC(EnergyPlusData &state)
 
                                     if (SlopeHumRat < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
-                                        for (StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                        for (int StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                             if (humRatInletNode[StackDepth - 1] > humRatInletNode[StackDepth]) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
@@ -1164,7 +1153,7 @@ void SimHVAC(EnergyPlusData &state)
                                         }
                                     } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
-                                        for (StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                        for (int StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                             if (humRatInletNode[StackDepth - 1] < humRatInletNode[StackDepth]) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
@@ -1185,16 +1174,16 @@ void SimHVAC(EnergyPlusData &state)
                         }         // last value does not equal average of stack.
 
                         if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
-                            HistoryTrace = "";
-                            for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                            std::string HistoryTrace = "";
+                            for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                 HistoryTrace += format("{:.6R},", humRatInletNode[StackDepth]);
                             }
                             ShowContinueError(
                                 state,
-                                "Node named " +
-                                    state.dataLoopNodes->NodeID(
-                                        state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
-                                    " humidity ratio [kg-water/kg-dryair] iteration history trace (most recent first): " + HistoryTrace);
+                                format(
+                                    "Node named {} humidity ratio [kg-water/kg-dryair] iteration history trace (most recent first): {}",
+                                    state.dataLoopNodes->NodeID(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                    HistoryTrace));
                         } // need to report trace
                         // end humidity ratio
 
@@ -1209,7 +1198,7 @@ void SimHVAC(EnergyPlusData &state)
                         if (std::abs(mdotInletNode[0] - AvgValue) >
                             DataConvergParams::HVACFlowRateOscillationToler) { // last iterate differs from average
                             FoundOscillationByDuplicate = false;
-                            for (StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                            for (int StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                 if (std::abs(mdotInletNode[0] - mdotInletNode[StackDepth]) < DataConvergParams::HVACFlowRateOscillationToler) {
                                     FoundOscillationByDuplicate = true;
                                     ShowContinueError(
@@ -1223,7 +1212,7 @@ void SimHVAC(EnergyPlusData &state)
                             }
                             if (!FoundOscillationByDuplicate) {
 
-                                auto humRatInletNodDotProd =
+                                Real64 humRatInletNodDotProd =
                                     std::inner_product(std::begin(ConvergLogStackARR), std::end(ConvergLogStackARR), std::begin(mdotInletNode), 0.0);
                                 Real64 summation3 = 0.0;
                                 summation3 = std::accumulate(mdotInletNode.begin(), mdotInletNode.end(), 0.0);
@@ -1233,7 +1222,7 @@ void SimHVAC(EnergyPlusData &state)
                                 if (std::abs(SlopeMdot) > DataConvergParams::HVACFlowRateSlopeToler) {
                                     if (SlopeMdot < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
-                                        for (StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                        for (int StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                             if (mdotInletNode[StackDepth - 1] > mdotInletNode[StackDepth]) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
@@ -1250,7 +1239,7 @@ void SimHVAC(EnergyPlusData &state)
                                         }
                                     } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
-                                        for (StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                        for (int StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                             if (mdotInletNode[StackDepth - 1] < mdotInletNode[StackDepth]) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
@@ -1271,15 +1260,15 @@ void SimHVAC(EnergyPlusData &state)
                         }         // last value does not equal average of stack.
 
                         if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
-                            HistoryTrace = "";
-                            for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                            std::string HistoryTrace = "";
+                            for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                 HistoryTrace += format("{:.6R},", mdotInletNode[StackDepth]);
                             }
                             ShowContinueError(state,
-                                              "Node named " +
-                                                  state.dataLoopNodes->NodeID(
-                                                      state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
-                                                  " mass flow rate [kg/s] iteration history trace (most recent first): " + HistoryTrace);
+                                              format("Node named {} mass flow rate [kg/s] iteration history trace (most recent first): {}",
+                                                     state.dataLoopNodes->NodeID(
+                                                         state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                     HistoryTrace));
                         } // need to report trace
                         // end mass flow rate
 
@@ -1294,7 +1283,7 @@ void SimHVAC(EnergyPlusData &state)
                         if (std::abs(inletTemp[0] - AvgValue) >
                             DataConvergParams::HVACTemperatureOscillationToler) { // last iterate differs from average
                             FoundOscillationByDuplicate = false;
-                            for (StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                            for (int StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                 if (std::abs(inletTemp[0] - inletTemp[StackDepth]) < DataConvergParams::HVACTemperatureOscillationToler) {
                                     FoundOscillationByDuplicate = true;
                                     ShowContinueError(
@@ -1308,7 +1297,7 @@ void SimHVAC(EnergyPlusData &state)
                             }
                             if (!FoundOscillationByDuplicate) {
 
-                                auto inletTempDotProd =
+                                Real64 inletTempDotProd =
                                     std::inner_product(std::begin(ConvergLogStackARR), std::end(ConvergLogStackARR), std::begin(inletTemp), 0.0);
 
                                 Real64 summation4 = 0.0;
@@ -1319,7 +1308,7 @@ void SimHVAC(EnergyPlusData &state)
                                 if (std::abs(SlopeTemps) > DataConvergParams::HVACTemperatureSlopeToler) {
                                     if (SlopeTemps < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
-                                        for (StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                        for (int StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                             if (inletTemp[StackDepth - 1] > inletTemp[StackDepth]) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
@@ -1336,7 +1325,7 @@ void SimHVAC(EnergyPlusData &state)
                                         }
                                     } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
-                                        for (StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                        for (int StackDepth = 1; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                             if (inletTemp[StackDepth - 1] < inletTemp[StackDepth]) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
@@ -1357,42 +1346,47 @@ void SimHVAC(EnergyPlusData &state)
                         }         // last value does not equal average of stack.
 
                         if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
-                            HistoryTrace = "";
-                            for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                            std::string HistoryTrace = "";
+                            for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                                 HistoryTrace += format("{:.6R},", inletTemp[StackDepth]);
                             }
                             ShowContinueError(state,
-                                              "Node named " +
-                                                  state.dataLoopNodes->NodeID(
-                                                      state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum) +
-                                                  " temperature [C] iteration history trace (most recent first): " + HistoryTrace);
+                                              format("Node named {} temperature [C] iteration history trace (most recent first): {}",
+                                                     state.dataLoopNodes->NodeID(
+                                                         state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
+                                                     HistoryTrace));
                         } // need to report trace
                           // end Temperature checks
 
                     } // loop over zone inlet nodes
                 }     // loop over zones
 
-                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+                for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+                    bool FoundOscillationByDuplicate;
+                    bool MonotonicIncreaseFound;
+                    bool MonotonicDecreaseFound;
 
                     if (state.dataConvergeParams->PlantConvergence(LoopNum).PlantMassFlowNotConverged) {
-                        ShowContinueError(state,
-                                          "Plant System Named = " + state.dataPlnt->PlantLoop(LoopNum).Name + " did not converge for mass flow rate");
+                        ShowContinueError(
+                            state, format("Plant System Named = {} did not converge for mass flow rate", state.dataPlnt->PlantLoop(LoopNum).Name));
                         ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
-                        HistoryTrace = "";
-                        for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                        std::string HistoryTrace = "";
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                             HistoryTrace +=
                                 format("{:.6R},", state.dataConvergeParams->PlantConvergence(LoopNum).PlantFlowDemandToSupplyTolValue[StackDepth]);
                         }
-                        ShowContinueError(state, "Demand-to-Supply interface mass flow rate check value iteration history trace: " + HistoryTrace);
+                        ShowContinueError(state,
+                                          format("Demand-to-Supply interface mass flow rate check value iteration history trace: {}", HistoryTrace));
                         HistoryTrace = "";
-                        for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                             HistoryTrace +=
                                 format("{:.6R},", state.dataConvergeParams->PlantConvergence(LoopNum).PlantFlowSupplyToDemandTolValue[StackDepth]);
                         }
-                        ShowContinueError(state, "Supply-to-Demand interface mass flow rate check value iteration history trace: " + HistoryTrace);
+                        ShowContinueError(state,
+                                          format("Supply-to-Demand interface mass flow rate check value iteration history trace: {}", HistoryTrace));
 
                         // now work with history logs for mass flow to detect issues
-                        for (auto ThisLoopSide : DataPlant::LoopSideKeys) {
+                        for (DataPlant::LoopSideLocation ThisLoopSide : DataPlant::LoopSideKeys) {
 
                             auto &mdotHistInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory;
                             auto &mdotHistOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory;
@@ -1401,10 +1395,10 @@ void SimHVAC(EnergyPlusData &state)
                             FoundOscillationByDuplicate = false;
                             MonotonicDecreaseFound = false;
                             MonotonicIncreaseFound = false;
-                            AvgValue = sum(mdotHistInletNode) / double(NumConvergenceHistoryTerms);
+                            AvgValue = sum(mdotHistInletNode) / double(DataPlant::NumConvergenceHistoryTerms);
                             if (std::abs(mdotHistInletNode(1) - AvgValue) > DataConvergParams::PlantFlowRateOscillationToler) {
                                 FoundOscillationByDuplicate = false;
-                                for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     if (std::abs(mdotHistInletNode(1) - mdotHistInletNode(StackDepth)) <
                                         DataConvergParams::PlantFlowRateOscillationToler) {
                                         FoundOscillationByDuplicate = true;
@@ -1422,14 +1416,14 @@ void SimHVAC(EnergyPlusData &state)
                                 Real64 mdotHistInletNodeDotProd = std::inner_product(
                                     std::begin(ConvergenceHistoryARR), std::end(ConvergenceHistoryARR), std::begin(mdotHistInletNode), 0.0);
 
-                                SlopeMdot =
-                                    (sum_ConvergenceHistoryARR * sum(mdotHistInletNode) -
-                                     double(NumConvergenceHistoryTerms) * mdotHistInletNodeDotProd) /
-                                    (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
+                                SlopeMdot = (sum_ConvergenceHistoryARR * sum(mdotHistInletNode) -
+                                             double(DataPlant::NumConvergenceHistoryTerms) * mdotHistInletNodeDotProd) /
+                                            (square_sum_ConvergenceHistoryARR -
+                                             double(DataPlant::NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
                                 if (std::abs(SlopeMdot) > DataConvergParams::PlantFlowRateSlopeToler) {
                                     if (SlopeMdot < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
-                                        for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (mdotHistInletNode(StackDepth - 1) > mdotHistInletNode(StackDepth)) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
@@ -1444,7 +1438,7 @@ void SimHVAC(EnergyPlusData &state)
                                         }
                                     } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
-                                        for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (mdotHistInletNode(StackDepth - 1) < mdotHistInletNode(StackDepth)) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
@@ -1463,12 +1457,13 @@ void SimHVAC(EnergyPlusData &state)
 
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
-                                for (StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 1; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     HistoryTrace += format("{:.7R},", mdotHistInletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
-                                                  "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn +
-                                                      " mass flow rate [kg/s] iteration history trace (most recent first): " + HistoryTrace);
+                                                  format("Node named {} mass flow rate [kg/s] iteration history trace (most recent first): {}",
+                                                         state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
+                                                         HistoryTrace));
                             } // need to report trace
                             // end of inlet node
 
@@ -1476,10 +1471,10 @@ void SimHVAC(EnergyPlusData &state)
                             FoundOscillationByDuplicate = false;
                             MonotonicDecreaseFound = false;
                             MonotonicIncreaseFound = false;
-                            AvgValue = sum(mdotHistOutletNode) / double(NumConvergenceHistoryTerms);
+                            AvgValue = sum(mdotHistOutletNode) / double(DataPlant::NumConvergenceHistoryTerms);
                             if (std::abs(mdotHistOutletNode(1) - AvgValue) > DataConvergParams::PlantFlowRateOscillationToler) {
                                 FoundOscillationByDuplicate = false;
-                                for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     if (std::abs(mdotHistOutletNode(1) - mdotHistOutletNode(StackDepth)) <
                                         DataConvergParams::PlantFlowRateOscillationToler) {
                                         FoundOscillationByDuplicate = true;
@@ -1497,14 +1492,14 @@ void SimHVAC(EnergyPlusData &state)
                                 Real64 mdotHistOutletNodeDotProd = std::inner_product(
                                     std::begin(ConvergenceHistoryARR), std::end(ConvergenceHistoryARR), std::begin(mdotHistOutletNode), 0.0);
 
-                                SlopeMdot =
-                                    (sum_ConvergenceHistoryARR * sum(mdotHistOutletNode) -
-                                     double(NumConvergenceHistoryTerms) * mdotHistOutletNodeDotProd) /
-                                    (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
+                                SlopeMdot = (sum_ConvergenceHistoryARR * sum(mdotHistOutletNode) -
+                                             double(DataPlant::NumConvergenceHistoryTerms) * mdotHistOutletNodeDotProd) /
+                                            (square_sum_ConvergenceHistoryARR -
+                                             double(DataPlant::NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
                                 if (std::abs(SlopeMdot) > DataConvergParams::PlantFlowRateSlopeToler) {
                                     if (SlopeMdot < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
-                                        for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (mdotHistOutletNode(StackDepth - 1) > mdotHistOutletNode(StackDepth)) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
@@ -1519,7 +1514,7 @@ void SimHVAC(EnergyPlusData &state)
                                         }
                                     } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
-                                        for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (mdotHistOutletNode(StackDepth - 1) < mdotHistOutletNode(StackDepth)) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
@@ -1538,12 +1533,13 @@ void SimHVAC(EnergyPlusData &state)
 
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
-                                for (StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 1; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     HistoryTrace += format("{:.7R},", mdotHistOutletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
-                                                  "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut +
-                                                      " mass flow rate [kg/s] iteration history trace (most recent first): " + HistoryTrace);
+                                                  format("Node named {} mass flow rate [kg/s] iteration history trace (most recent first): {}",
+                                                         state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
+                                                         HistoryTrace));
                             } // need to report trace
                               // end of Outlet node
 
@@ -1552,24 +1548,26 @@ void SimHVAC(EnergyPlusData &state)
                     } // mass flow not converged
 
                     if (state.dataConvergeParams->PlantConvergence(LoopNum).PlantTempNotConverged) {
-                        ShowContinueError(state,
-                                          "Plant System Named = " + state.dataPlnt->PlantLoop(LoopNum).Name + " did not converge for temperature");
+                        ShowContinueError(
+                            state, format("Plant System Named = {} did not converge for temperature", state.dataPlnt->PlantLoop(LoopNum).Name));
                         ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
-                        HistoryTrace = "";
-                        for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                        std::string HistoryTrace = "";
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                             HistoryTrace +=
                                 format("{:.6R},", state.dataConvergeParams->PlantConvergence(LoopNum).PlantTempDemandToSupplyTolValue[StackDepth]);
                         }
-                        ShowContinueError(state, "Demand-to-Supply interface temperature check value iteration history trace: " + HistoryTrace);
+                        ShowContinueError(state,
+                                          format("Demand-to-Supply interface temperature check value iteration history trace: {}", HistoryTrace));
                         HistoryTrace = "";
-                        for (StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
                             HistoryTrace +=
                                 format("{:.6R},", state.dataConvergeParams->PlantConvergence(LoopNum).PlantTempSupplyToDemandTolValue[StackDepth]);
                         }
-                        ShowContinueError(state, "Supply-to-Demand interface temperature check value iteration history trace: " + HistoryTrace);
+                        ShowContinueError(state,
+                                          format("Supply-to-Demand interface temperature check value iteration history trace: {}", HistoryTrace));
 
                         // now work with history logs for mass flow to detect issues
-                        for (auto ThisLoopSide : DataPlant::LoopSideKeys) {
+                        for (DataPlant::LoopSideLocation ThisLoopSide : DataPlant::LoopSideKeys) {
 
                             auto &tempHistInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory;
                             auto &tempHistOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory;
@@ -1578,10 +1576,10 @@ void SimHVAC(EnergyPlusData &state)
                             FoundOscillationByDuplicate = false;
                             MonotonicDecreaseFound = false;
                             MonotonicIncreaseFound = false;
-                            AvgValue = sum(tempHistInletNode) / double(NumConvergenceHistoryTerms);
+                            AvgValue = sum(tempHistInletNode) / double(DataPlant::NumConvergenceHistoryTerms);
                             if (std::abs(tempHistInletNode(1) - AvgValue) > DataConvergParams::PlantTemperatureOscillationToler) {
                                 FoundOscillationByDuplicate = false;
-                                for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     if (std::abs(tempHistInletNode(1) - tempHistInletNode(StackDepth)) <
                                         DataConvergParams::PlantTemperatureOscillationToler) {
                                         FoundOscillationByDuplicate = true;
@@ -1599,14 +1597,14 @@ void SimHVAC(EnergyPlusData &state)
                                 Real64 tempHistInletNodeDotProd = std::inner_product(
                                     std::begin(ConvergenceHistoryARR), std::end(ConvergenceHistoryARR), std::begin(tempHistInletNode), 0.0);
 
-                                SlopeTemps =
-                                    (sum_ConvergenceHistoryARR * sum(tempHistInletNode) -
-                                     double(NumConvergenceHistoryTerms) * tempHistInletNodeDotProd) /
-                                    (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
+                                SlopeTemps = (sum_ConvergenceHistoryARR * sum(tempHistInletNode) -
+                                              double(DataPlant::NumConvergenceHistoryTerms) * tempHistInletNodeDotProd) /
+                                             (square_sum_ConvergenceHistoryARR -
+                                              double(DataPlant::NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
                                 if (std::abs(SlopeTemps) > DataConvergParams::PlantTemperatureSlopeToler) {
                                     if (SlopeTemps < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
-                                        for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (tempHistInletNode(StackDepth - 1) > tempHistInletNode(StackDepth)) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
@@ -1621,7 +1619,7 @@ void SimHVAC(EnergyPlusData &state)
                                         }
                                     } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
-                                        for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (tempHistInletNode(StackDepth - 1) < tempHistInletNode(StackDepth)) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
@@ -1640,12 +1638,13 @@ void SimHVAC(EnergyPlusData &state)
 
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
-                                for (StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 1; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     HistoryTrace += format("{:.5R},", tempHistInletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
-                                                  "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn +
-                                                      " temperature [C] iteration history trace (most recent first): " + HistoryTrace);
+                                                  format("Node named {} temperature [C] iteration history trace (most recent first): {}",
+                                                         state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
+                                                         HistoryTrace));
                             } // need to report trace
                             // end of inlet node
 
@@ -1653,10 +1652,10 @@ void SimHVAC(EnergyPlusData &state)
                             FoundOscillationByDuplicate = false;
                             MonotonicDecreaseFound = false;
                             MonotonicIncreaseFound = false;
-                            AvgValue = sum(tempHistOutletNode) / double(NumConvergenceHistoryTerms);
+                            AvgValue = sum(tempHistOutletNode) / double(DataPlant::NumConvergenceHistoryTerms);
                             if (std::abs(tempHistOutletNode(1) - AvgValue) > DataConvergParams::PlantTemperatureOscillationToler) {
                                 FoundOscillationByDuplicate = false;
-                                for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     if (std::abs(tempHistOutletNode(1) - tempHistOutletNode(StackDepth)) <
                                         DataConvergParams::PlantTemperatureOscillationToler) {
                                         FoundOscillationByDuplicate = true;
@@ -1674,14 +1673,14 @@ void SimHVAC(EnergyPlusData &state)
                                 Real64 tempHistOutletNodeDotProd = std::inner_product(
                                     std::begin(ConvergenceHistoryARR), std::end(ConvergenceHistoryARR), std::begin(tempHistOutletNode), 0.0);
 
-                                SlopeTemps =
-                                    (sum_ConvergenceHistoryARR * sum(tempHistOutletNode) -
-                                     double(NumConvergenceHistoryTerms) * tempHistOutletNodeDotProd) /
-                                    (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
+                                SlopeTemps = (sum_ConvergenceHistoryARR * sum(tempHistOutletNode) -
+                                              double(DataPlant::NumConvergenceHistoryTerms) * tempHistOutletNodeDotProd) /
+                                             (square_sum_ConvergenceHistoryARR -
+                                              double(DataPlant::NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
                                 if (std::abs(SlopeTemps) > DataConvergParams::PlantFlowRateSlopeToler) {
                                     if (SlopeTemps < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
-                                        for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (state.dataPlnt->PlantLoop(LoopNum)
                                                     .LoopSide(ThisLoopSide)
                                                     .OutletNode.TemperatureHistory(StackDepth - 1) > tempHistOutletNode(StackDepth)) {
@@ -1698,7 +1697,7 @@ void SimHVAC(EnergyPlusData &state)
                                         }
                                     } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
-                                        for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                        for (int StackDepth = 2; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (state.dataPlnt->PlantLoop(LoopNum)
                                                     .LoopSide(ThisLoopSide)
                                                     .OutletNode.TemperatureHistory(StackDepth - 1) < tempHistOutletNode(StackDepth)) {
@@ -1719,12 +1718,13 @@ void SimHVAC(EnergyPlusData &state)
 
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
-                                for (StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
+                                for (int StackDepth = 1; StackDepth <= DataPlant::NumConvergenceHistoryTerms; ++StackDepth) {
                                     HistoryTrace += format("{:.5R},", tempHistOutletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
-                                                  "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut +
-                                                      " temperature [C] iteration history trace (most recent first): " + HistoryTrace);
+                                                  format("Node named {} temperature [C] iteration history trace (most recent first): {}",
+                                                         state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
+                                                         HistoryTrace));
                             } // need to report trace
                               // end of Outlet node
 
@@ -1734,18 +1734,18 @@ void SimHVAC(EnergyPlusData &state)
                 }     // loop over plant loop systems
             }
         } else {
-            if (state.dataEnvrn->EnvironmentName == ErrEnvironmentName) {
-                ShowRecurringWarningErrorAtEnd(state,
-                                               "SimHVAC: Exceeding Maximum iterations for all HVAC loops, during " +
-                                                   state.dataEnvrn->EnvironmentName + " continues",
-                                               MaxErrCount);
+            if (state.dataEnvrn->EnvironmentName == state.dataHVACMgr->ErrEnvironmentName) {
+                ShowRecurringWarningErrorAtEnd(
+                    state,
+                    format("SimHVAC: Exceeding Maximum iterations for all HVAC loops, during {} continues", state.dataEnvrn->EnvironmentName),
+                    state.dataHVACMgr->MaxErrCount);
             } else {
-                MaxErrCount = 0;
-                ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
-                ShowRecurringWarningErrorAtEnd(state,
-                                               "SimHVAC: Exceeding Maximum iterations for all HVAC loops, during " +
-                                                   state.dataEnvrn->EnvironmentName + " continues",
-                                               MaxErrCount);
+                state.dataHVACMgr->MaxErrCount = 0;
+                state.dataHVACMgr->ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
+                ShowRecurringWarningErrorAtEnd(
+                    state,
+                    format("SimHVAC: Exceeding Maximum iterations for all HVAC loops, during {} continues", state.dataEnvrn->EnvironmentName),
+                    state.dataHVACMgr->MaxErrCount);
             }
         }
     }
@@ -1758,32 +1758,32 @@ void SimHVAC(EnergyPlusData &state)
         if (state.dataHVACMgr->MySetPointInit) {
             if (state.dataLoopNodes->NumOfNodes > 0) {
                 for (auto &e : state.dataLoopNodes->Node) {
-                    e.TempSetPoint = SensedNodeFlagValue;
-                    e.HumRatSetPoint = SensedNodeFlagValue;
-                    e.HumRatMin = SensedNodeFlagValue;
-                    e.HumRatMax = SensedNodeFlagValue;
-                    e.MassFlowRateSetPoint = SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
+                    e.TempSetPoint = DataLoopNode::SensedNodeFlagValue;
+                    e.HumRatSetPoint = DataLoopNode::SensedNodeFlagValue;
+                    e.HumRatMin = DataLoopNode::SensedNodeFlagValue;
+                    e.HumRatMax = DataLoopNode::SensedNodeFlagValue;
+                    e.MassFlowRateSetPoint = DataLoopNode::SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
                 }
-                state.dataLoopNodes->DefaultNodeValues.TempSetPoint = SensedNodeFlagValue;
-                state.dataLoopNodes->DefaultNodeValues.HumRatSetPoint = SensedNodeFlagValue;
-                state.dataLoopNodes->DefaultNodeValues.HumRatMin = SensedNodeFlagValue;
-                state.dataLoopNodes->DefaultNodeValues.HumRatMax = SensedNodeFlagValue;
+                state.dataLoopNodes->DefaultNodeValues.TempSetPoint = DataLoopNode::SensedNodeFlagValue;
+                state.dataLoopNodes->DefaultNodeValues.HumRatSetPoint = DataLoopNode::SensedNodeFlagValue;
+                state.dataLoopNodes->DefaultNodeValues.HumRatMin = DataLoopNode::SensedNodeFlagValue;
+                state.dataLoopNodes->DefaultNodeValues.HumRatMax = DataLoopNode::SensedNodeFlagValue;
                 state.dataLoopNodes->DefaultNodeValues.MassFlowRateSetPoint =
-                    SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
+                    DataLoopNode::SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
             }
             state.dataHVACMgr->MySetPointInit = false;
-            DoSetPointTest = true;
+            state.dataHVACGlobal->DoSetPointTest = true;
         } else {
-            DoSetPointTest = false;
+            state.dataHVACGlobal->DoSetPointTest = false;
         }
 
         if (state.dataCoilCooingDX->stillNeedToReportStandardRatings) {
-            if (!state.dataGlobal->ZoneSizingCalc && !state.dataGlobal->SysSizingCalc && !state.dataGlobal->WarmupFlag) {
+            if (!state.dataGlobal->WarmupFlag) {
                 CoilCoolingDX::reportAllStandardRatings(state);
             }
         }
     }
-    if (SetPointErrorFlag) {
+    if (state.dataHVACGlobal->SetPointErrorFlag) {
         ShowFatalError(state, "Previous severe set point errors cause program termination");
     }
 }
@@ -1801,8 +1801,6 @@ void SimSelectedEquipment(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Russ Taylor, Rick Strand
     //       DATE WRITTEN   May 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine receives the flags from SimHVAC which determines
@@ -1811,36 +1809,18 @@ void SimSelectedEquipment(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Each flag is checked and the appropriate manager is then called.
 
-    // Using/Aliasing
-    using NonZoneEquipmentManager::ManageNonZoneEquipment;
-    using PlantManager::ManagePlantLoops;
-    using PlantUtilities::AnyPlantLoopSidesNeedSim;
-    using PlantUtilities::ResetAllPlantInterConnectFlags;
-    using PlantUtilities::SetAllFlowLocks;
-    using SimAirServingZones::ManageAirLoops;
-    using ZoneEquipmentManager::ManageZoneEquipment;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    bool ResimulateAirZone; // True when solution technique on third iteration used in AirflowNetwork
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr MaxAir(5); // Iteration Max for Air Simulation Iterations
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int IterAir; // counts iterations to enforce maximum iteration limit
-
-    IterAir = 0;
 
     // Set all plant flow locks to UNLOCKED to allow air side components to operate properly
     // This requires that the plant flow resolver carefully set the min/max avail limits on
     //  air side components to ensure they request within bounds.
     if (LockPlantFlows) {
-        SetAllFlowLocks(state, DataPlant::FlowLock::Locked);
+        PlantUtilities::SetAllFlowLocks(state, DataPlant::FlowLock::Locked);
     } else {
-        SetAllFlowLocks(state, DataPlant::FlowLock::Unlocked);
+        PlantUtilities::SetAllFlowLocks(state, DataPlant::FlowLock::Unlocked);
     }
-    ResetAllPlantInterConnectFlags(state);
+    PlantUtilities::ResetAllPlantInterConnectFlags(state);
 
     if (state.dataGlobal->BeginEnvrnFlag && state.dataHVACMgr->MyEnvrnFlag2) {
         // Following comment is incorrect!  (LKL) Even the first time through this does more than read in data.
@@ -1848,7 +1828,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
         // determination of which zones are connected to which air loops.
         // This call of ManageZoneEquipment does nothing except force the
         // zone equipment data to be read in.
-        ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+        ZoneEquipmentManager::ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
         state.dataHVACMgr->MyEnvrnFlag2 = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
@@ -1861,34 +1841,35 @@ void SimSelectedEquipment(EnergyPlusData &state,
         if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
             state.afn->manage_balance(FirstHVACIteration);
         }
-        ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
+        SimAirServingZones::ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
         state.dataAirLoop->AirLoopInputsFilled = true; // all air loop inputs have been read in
         SimAirLoops = true; // Need to make sure that SimAirLoop is simulated at min twice to calculate PLR in some air loop equipment
         state.dataHVACGlobal->AirLoopsSimOnce = true; // air loops simulated once for this environment
         ResetTerminalUnitFlowLimits(state);
         state.dataHVACMgr->FlowMaxAvailAlreadyReset = true;
-        ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+        ZoneEquipmentManager::ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
         SimZoneEquipment = true; // needs to be simulated at least twice for flow resolution to propagate to this routine
-        ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
+        NonZoneEquipmentManager::ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
         state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
             state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
 
-        ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
+        PlantManager::ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
 
         state.dataErrTracking->AskForPlantCheckOnAbort = true; // need to make a first pass through plant calcs before this check make sense
         state.dataElectPwrSvcMgr->facilityElectricServiceObj->manageElectricPowerService(
             state, FirstHVACIteration, state.dataHVACGlobal->SimElecCircuitsFlag, false);
     } else {
         state.dataHVACMgr->FlowResolutionNeeded = false;
+        int IterAir = 0;
         while ((SimAirLoops || SimZoneEquipment) && (IterAir <= MaxAir)) {
             ++IterAir; // Increment the iteration counter
             // Call AirflowNetwork simulation to calculate air flows and pressures
-            ResimulateAirZone = false;
+            bool ResimulateAirZone = false;
             if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 state.afn->manage_balance(FirstHVACIteration, IterAir, ResimulateAirZone);
             }
             if (SimAirLoops) {
-                ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
+                SimAirServingZones::ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
                 SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
             }
 
@@ -1904,7 +1885,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
                     ResolveAirLoopFlowLimits(state);
                     state.dataHVACMgr->FlowResolutionNeeded = false;
                 }
-                ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+                ZoneEquipmentManager::ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
                 SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
             }
             state.dataHVACMgr->FlowMaxAvailAlreadyReset = false;
@@ -1923,7 +1904,7 @@ void SimSelectedEquipment(EnergyPlusData &state,
         ResolveLockoutFlags(state, SimAirLoops);
 
         if (SimNonZoneEquipment) {
-            ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
+            NonZoneEquipmentManager::ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
             SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
         }
 
@@ -1934,13 +1915,14 @@ void SimSelectedEquipment(EnergyPlusData &state,
 
         if (!SimPlantLoops) {
             // check to see if any air side component may have requested plant resim
-            if (AnyPlantLoopSidesNeedSim(state)) {
+            if (PlantUtilities::AnyPlantLoopSidesNeedSim(state)) {
                 SimPlantLoops = true;
             }
         }
 
         if (SimPlantLoops) {
-            ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
+            PlantManager::ManagePlantLoops(
+                state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
         }
 
         if (SimElecCircuits) {
@@ -1956,8 +1938,6 @@ void ResetTerminalUnitFlowLimits(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   Feb 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Reset the max flow available limits at the inlet nodes of terminal units
@@ -1967,23 +1947,17 @@ void ResetTerminalUnitFlowLimits(EnergyPlusData &state)
     // served by each air loop, and resets the node MassFlowRateMaxAvail (and MinAvail) to
     // the hard max and mins.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int AirLoopIndex;
-    int ZonesCooledIndex;
-    int ZonesHeatedIndex;
-    int TermInletNode;
-
-    for (AirLoopIndex = 1; AirLoopIndex <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopIndex) { // loop over the primary air loops
-        for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled;
+    for (int AirLoopIndex = 1; AirLoopIndex <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopIndex) { // loop over the primary air loops
+        for (int ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled;
              ++ZonesCooledIndex) { // loop over the zones cooled by this air loop
-            TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
+            int TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
             // reset the max avail flow rate at the terminal unit cold air inlet to the max
             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRateMax;
             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRateMin;
         }
-        for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated;
+        for (int ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated;
              ++ZonesHeatedIndex) { // loop over the zones heated by this air loop
-            TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
+            int TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
             // reset the max avail flow rate at the terminal unit hot air inlet to the max
             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRateMax;
             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(TermInletNode).MassFlowRateMin;
@@ -1997,7 +1971,6 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   August 2003
-    //       MODIFIED       na
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -2009,31 +1982,23 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
     // Sets the MassFlowRateMaxAvail on the terminal unit inlet nodes to match the
     // maximum available from the primary air loop.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int AirLoopIndex;
-    int ZonesCooledIndex;
-    int ZonesHeatedIndex;
-    int TermInletNode;
-    int SupplyIndex;
-    int SupplyNode;
-    Real64 FlowRatio;
+    for (int AirLoopIndex = 1; AirLoopIndex <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopIndex) { // loop over the primary air loops
 
-    for (AirLoopIndex = 1; AirLoopIndex <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopIndex) { // loop over the primary air loops
+        auto &AirToZoneNodeInfo = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex);
 
-        auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex));
-
-        for (SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) {           // loop over the air loop supply outlets
+        for (int SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) {       // loop over the air loop supply outlets
             if (AirToZoneNodeInfo.SupplyDuctType(SupplyIndex) == DataHVACGlobals::AirDuctType::Cooling) { // check for cooling duct
                 // check if terminal units requesting more air than air loop can supply; if so, set terminal unit inlet
                 // node mass flow max avail to what air loop can supply
-                SupplyNode = AirToZoneNodeInfo.AirLoopSupplyNodeNum(SupplyIndex);
+                int SupplyNode = AirToZoneNodeInfo.AirLoopSupplyNodeNum(SupplyIndex);
                 if (state.dataLoopNodes->Node(SupplyNode).MassFlowRate > 0.0) {
                     // must include bypass flow for ChangeoverBypass system so that terminal units are not restricted (e.g., MaxAvail is lowered)
                     if ((state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint - state.dataLoopNodes->Node(SupplyNode).MassFlowRate -
                          state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) > DataConvergParams::HVACFlowRateToler * 0.01) {
-                        FlowRatio = state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
-                        for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo.NumZonesCooled; ++ZonesCooledIndex) {
-                            TermInletNode = AirToZoneNodeInfo.TermUnitCoolInletNodes(ZonesCooledIndex);
+                        Real64 FlowRatio =
+                            state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
+                        for (int ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo.NumZonesCooled; ++ZonesCooledIndex) {
+                            int TermInletNode = AirToZoneNodeInfo.TermUnitCoolInletNodes(ZonesCooledIndex);
                             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail =
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRate * FlowRatio;
                             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
@@ -2047,18 +2012,18 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
                             //               CALL ShowFatalError('ResolveAirLoopFlowLimits: Node MassFlowRateSetPoint = 0.0, Node='//  &
                             //                                   TRIM(state.dataLoopNodes->NodeID(SupplyNode))//  &
                             //                                   ', check for Node Connection Errors in the following messages.')
-                            for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo.NumZonesCooled; ++ZonesCooledIndex) {
-                                TermInletNode = AirToZoneNodeInfo.TermUnitCoolInletNodes(ZonesCooledIndex);
+                            for (int ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo.NumZonesCooled; ++ZonesCooledIndex) {
+                                int TermInletNode = AirToZoneNodeInfo.TermUnitCoolInletNodes(ZonesCooledIndex);
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail =
                                     state.dataLoopNodes->Node(TermInletNode).MassFlowRateMax;
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
                                     state.dataLoopNodes->Node(SupplyNode).MassFlowRate / double(AirToZoneNodeInfo.NumZonesCooled);
                             }
                         } else {
-                            FlowRatio =
+                            Real64 FlowRatio =
                                 state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
-                            for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo.NumZonesCooled; ++ZonesCooledIndex) {
-                                TermInletNode = AirToZoneNodeInfo.TermUnitCoolInletNodes(ZonesCooledIndex);
+                            for (int ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo.NumZonesCooled; ++ZonesCooledIndex) {
+                                int TermInletNode = AirToZoneNodeInfo.TermUnitCoolInletNodes(ZonesCooledIndex);
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
                                     state.dataLoopNodes->Node(TermInletNode).MassFlowRate * FlowRatio;
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail =
@@ -2070,18 +2035,19 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
                 }
             }
         }
-        for (SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) {           // loop over the air loop supply outlets
+        for (int SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) {       // loop over the air loop supply outlets
             if (AirToZoneNodeInfo.SupplyDuctType(SupplyIndex) == DataHVACGlobals::AirDuctType::Heating) { // check for heating duct
                 // check if terminal units requesting more air than air loop can supply; if so, set terminal unit inlet
                 // node mass flow max avail to what air loop can supply
-                SupplyNode = AirToZoneNodeInfo.AirLoopSupplyNodeNum(SupplyIndex);
+                int SupplyNode = AirToZoneNodeInfo.AirLoopSupplyNodeNum(SupplyIndex);
                 if (state.dataLoopNodes->Node(SupplyNode).MassFlowRate > 0.0) {
                     // must include bypass flow for ChangeoverBypass system so that terminal units are not restricted (e.g., MaxAvail is lowered)
                     if ((state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint - state.dataLoopNodes->Node(SupplyNode).MassFlowRate -
                          state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) > DataConvergParams::HVACFlowRateToler * 0.01) {
-                        FlowRatio = state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
-                        for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo.NumZonesHeated; ++ZonesHeatedIndex) {
-                            TermInletNode = AirToZoneNodeInfo.TermUnitHeatInletNodes(ZonesHeatedIndex);
+                        Real64 FlowRatio =
+                            state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
+                        for (int ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo.NumZonesHeated; ++ZonesHeatedIndex) {
+                            int TermInletNode = AirToZoneNodeInfo.TermUnitHeatInletNodes(ZonesHeatedIndex);
                             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail =
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRate * FlowRatio;
                             state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
@@ -2093,18 +2059,18 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
                          state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) < -DataConvergParams::HVACFlowRateToler * 0.01) {
                         if (state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint == 0.0) {
                             // ', check for Node Connection Errors in the following messages.')
-                            for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo.NumZonesHeated; ++ZonesHeatedIndex) {
-                                TermInletNode = AirToZoneNodeInfo.TermUnitHeatInletNodes(ZonesHeatedIndex);
+                            for (int ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo.NumZonesHeated; ++ZonesHeatedIndex) {
+                                int TermInletNode = AirToZoneNodeInfo.TermUnitHeatInletNodes(ZonesHeatedIndex);
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail =
                                     state.dataLoopNodes->Node(TermInletNode).MassFlowRateMax;
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
                                     state.dataLoopNodes->Node(SupplyNode).MassFlowRate / double(AirToZoneNodeInfo.NumZonesCooled);
                             }
                         } else {
-                            FlowRatio =
+                            Real64 FlowRatio =
                                 state.dataLoopNodes->Node(SupplyNode).MassFlowRate / state.dataLoopNodes->Node(SupplyNode).MassFlowRateSetPoint;
-                            for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo.NumZonesHeated; ++ZonesHeatedIndex) {
-                                TermInletNode = AirToZoneNodeInfo.TermUnitHeatInletNodes(ZonesHeatedIndex);
+                            for (int ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo.NumZonesHeated; ++ZonesHeatedIndex) {
+                                int TermInletNode = AirToZoneNodeInfo.TermUnitHeatInletNodes(ZonesHeatedIndex);
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMinAvail =
                                     state.dataLoopNodes->Node(TermInletNode).MassFlowRate * FlowRatio;
                                 state.dataLoopNodes->Node(TermInletNode).MassFlowRateMaxAvail =
@@ -2125,8 +2091,6 @@ void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir) // TRUE means air 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   December 2003
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine checks for components lockout flags and asks for air loop resimulation
@@ -2135,13 +2099,13 @@ void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir) // TRUE means air 
     // METHODOLOGY EMPLOYED:
     // Checks if loop lockout flags are .TRUE.; if so, sets SimAirLoops to .TRUE.
 
-    auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
-
     for (int AirLoopIndex = 1; AirLoopIndex <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopIndex) { // loop over the primary air loops
+        auto &airLoopControlInfo = state.dataAirLoop->AirLoopControlInfo(AirLoopIndex);
+
         // check if economizer ia active and if there is a request that it be locked out
-        if (AirLoopControlInfo(AirLoopIndex).EconoActive &&
-            (AirLoopControlInfo(AirLoopIndex).ReqstEconoLockoutWithCompressor || AirLoopControlInfo(AirLoopIndex).ReqstEconoLockoutWithHeating)) {
-            AirLoopControlInfo(AirLoopIndex).EconoLockout = true;
+        if (airLoopControlInfo.EconoActive &&
+            (airLoopControlInfo.ReqstEconoLockoutWithCompressor || airLoopControlInfo.ReqstEconoLockoutWithHeating)) {
+            airLoopControlInfo.EconoLockout = true;
             SimAir = true;
         }
     }
@@ -2153,8 +2117,6 @@ void ResetHVACControl(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   December 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine resets loop control flags and specified flow rates that may
@@ -2176,8 +2138,6 @@ void ResetNodeData(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   March 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine resets all node data to "initial" conditions.
@@ -2221,52 +2181,39 @@ void ResetNodeData(EnergyPlusData &state)
 void UpdateZoneListAndGroupLoads(EnergyPlusData &state)
 {
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Apparently someone who doesn't believe in documenting.
-    //       DATE WRITTEN   ???
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // Using/Aliasing
-    using namespace DataHeatBalance;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ZoneNum;
     int ListNum;
     int GroupNum;
     int Mult;
 
-    auto &ZoneList(state.dataHeatBal->ZoneList);
-    auto &ZoneGroup(state.dataHeatBal->ZoneGroup);
-    auto &ZoneListSNLoadHeatEnergy(state.dataHeatBal->ZoneListSNLoadHeatEnergy);
-    auto &ZoneListSNLoadCoolEnergy(state.dataHeatBal->ZoneListSNLoadCoolEnergy);
-    auto &ZoneListSNLoadHeatRate(state.dataHeatBal->ZoneListSNLoadHeatRate);
-    auto &ZoneListSNLoadCoolRate(state.dataHeatBal->ZoneListSNLoadCoolRate);
-
     // Sum ZONE LIST and ZONE GROUP report variables
     for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
-        ZoneListSNLoadHeatEnergy(ListNum) = 0.0;
-        ZoneListSNLoadCoolEnergy(ListNum) = 0.0;
-        ZoneListSNLoadHeatRate(ListNum) = 0.0;
-        ZoneListSNLoadCoolRate(ListNum) = 0.0;
+        state.dataHeatBal->ZoneListSNLoadHeatEnergy(ListNum) = 0.0;
+        state.dataHeatBal->ZoneListSNLoadCoolEnergy(ListNum) = 0.0;
+        state.dataHeatBal->ZoneListSNLoadHeatRate(ListNum) = 0.0;
+        state.dataHeatBal->ZoneListSNLoadCoolRate(ListNum) = 0.0;
     }
 
     for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
-        for (ZoneNum = 1; ZoneNum <= ZoneList(ListNum).NumOfZones; ++ZoneNum) {
+        auto &zoneList = state.dataHeatBal->ZoneList(ListNum);
+        for (ZoneNum = 1; ZoneNum <= zoneList.NumOfZones; ++ZoneNum) {
+            auto const &zoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneList.Zone(ZoneNum));
             Mult = state.dataHeatBal->Zone(ZoneNum).Multiplier;
-            ZoneListSNLoadHeatEnergy(ListNum) += state.dataHeatBal->ZoneSNLoadHeatEnergy(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
-            ZoneListSNLoadCoolEnergy(ListNum) += state.dataHeatBal->ZoneSNLoadCoolEnergy(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
-            ZoneListSNLoadHeatRate(ListNum) += state.dataHeatBal->ZoneSNLoadHeatRate(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
-            ZoneListSNLoadCoolRate(ListNum) += state.dataHeatBal->ZoneSNLoadCoolRate(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
+            state.dataHeatBal->ZoneListSNLoadHeatEnergy(ListNum) += zoneSysEnergyDemand.airSysHeatEnergy * Mult;
+            state.dataHeatBal->ZoneListSNLoadCoolEnergy(ListNum) += zoneSysEnergyDemand.airSysCoolEnergy * Mult;
+            state.dataHeatBal->ZoneListSNLoadHeatRate(ListNum) += zoneSysEnergyDemand.airSysHeatRate * Mult;
+            state.dataHeatBal->ZoneListSNLoadCoolRate(ListNum) += zoneSysEnergyDemand.airSysCoolRate * Mult;
         } // ZoneNum
     }     // ListNum
 
     for (GroupNum = 1; GroupNum <= state.dataHeatBal->NumOfZoneGroups; ++GroupNum) {
-        Mult = state.dataHeatBal->ZoneGroup(GroupNum).Multiplier;
-        state.dataHeatBal->ZoneGroupSNLoadHeatEnergy(GroupNum) = ZoneListSNLoadHeatEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
-        state.dataHeatBal->ZoneGroupSNLoadCoolEnergy(GroupNum) = ZoneListSNLoadCoolEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
-        state.dataHeatBal->ZoneGroupSNLoadHeatRate(GroupNum) = ZoneListSNLoadHeatRate(ZoneGroup(GroupNum).ZoneList) * Mult;
-        state.dataHeatBal->ZoneGroupSNLoadCoolRate(GroupNum) = ZoneListSNLoadCoolRate(ZoneGroup(GroupNum).ZoneList) * Mult;
+        auto &zoneGroup = state.dataHeatBal->ZoneGroup(GroupNum);
+        Mult = zoneGroup.Multiplier;
+        state.dataHeatBal->ZoneGroupSNLoadHeatEnergy(GroupNum) = state.dataHeatBal->ZoneListSNLoadHeatEnergy(zoneGroup.ZoneList) * Mult;
+        state.dataHeatBal->ZoneGroupSNLoadCoolEnergy(GroupNum) = state.dataHeatBal->ZoneListSNLoadCoolEnergy(zoneGroup.ZoneList) * Mult;
+        state.dataHeatBal->ZoneGroupSNLoadHeatRate(GroupNum) = state.dataHeatBal->ZoneListSNLoadHeatRate(zoneGroup.ZoneList) * Mult;
+        state.dataHeatBal->ZoneGroupSNLoadCoolRate(GroupNum) = state.dataHeatBal->ZoneListSNLoadCoolRate(zoneGroup.ZoneList) * Mult;
     } // GroupNum
 }
 
@@ -2279,19 +2226,8 @@ void ReportInfiltrations(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine currently creates the values for standard Infiltration object level reporting
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
-    using DataHVACGlobals::CycleOn;
-    using DataHVACGlobals::CycleOnZoneFansOnly;
-    using Psychrometrics::PsyCpAirFnW;
-    using Psychrometrics::PsyHgAirFnWTdb;
-    using Psychrometrics::PsyRhoAirFnPbTdbW;
-    int j;  // Loop Counter
-    int NZ; // A pointer
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("ReportInfiltrations");
+    static constexpr std::string_view RoutineName = "ReportInfiltrations";
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 AirDensity;          // Density of air (kg/m^3)
@@ -2299,72 +2235,75 @@ void ReportInfiltrations(EnergyPlusData &state)
     Real64 TotalLoad;           // Total loss or gain
     Real64 H2OHtOfVap;          // Heat of vaporization of air
     Real64 ADSCorrectionFactor; // Correction factor of air flow model values when ADS is simulated
-    auto &Zone(state.dataHeatBal->Zone);
-    auto &Infiltration(state.dataHeatBal->Infiltration);
-    auto &TimeStepSys(state.dataHVACGlobal->TimeStepSys);
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
-    for (j = 1; j <= state.dataHeatBal->TotInfiltration; ++j) {
+    for (auto &thisInfiltration : state.dataHeatBal->Infiltration) {
 
-        NZ = state.dataHeatBal->Infiltration(j).ZonePtr;
+        int spaceNum = thisInfiltration.spaceIndex;
+        auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
+        int NZ = thisInfiltration.ZonePtr;
+        auto const &thisZone = state.dataHeatBal->Zone(NZ);
         ADSCorrectionFactor = 1.0;
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
             // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(NZ)) ADSCorrectionFactor=0
-            if ((state.dataZoneEquip->ZoneEquipAvail(NZ) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(NZ) == CycleOnZoneFansOnly) &&
+            if ((state.dataZoneEquip->ZoneEquipAvail(NZ) == DataHVACGlobals::CycleOn ||
+                 state.dataZoneEquip->ZoneEquipAvail(NZ) == DataHVACGlobals::CycleOnZoneFansOnly) &&
                 state.afn->AirflowNetworkZoneFlag(NZ))
                 ADSCorrectionFactor = 0.0;
         }
 
-        CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
-        Infiltration(j).InfilMdot = Infiltration(j).MCpI_temp / CpAir * ADSCorrectionFactor;
-        Infiltration(j).InfilMass = Infiltration(j).InfilMdot * TimeStepSys * DataGlobalConstants::SecInHour;
+        CpAir = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+        thisInfiltration.InfilMdot = thisInfiltration.MCpI_temp / CpAir * ADSCorrectionFactor;
+        thisInfiltration.InfilMass = thisInfiltration.InfilMdot * TimeStepSysSec;
 
-        if (state.dataHeatBalFanSys->MAT(NZ) > Zone(NZ).OutDryBulbTemp) {
+        if (thisSpaceHB.MAT > thisZone.OutDryBulbTemp) {
 
-            Infiltration(j).InfilHeatLoss = Infiltration(j).MCpI_temp * (state.dataHeatBalFanSys->MAT(NZ) - Zone(NZ).OutDryBulbTemp) * TimeStepSys *
-                                            DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-            Infiltration(j).InfilHeatGain = 0.0;
+            thisInfiltration.InfilHeatLoss =
+                thisInfiltration.MCpI_temp * (thisSpaceHB.MAT - thisZone.OutDryBulbTemp) * TimeStepSysSec * ADSCorrectionFactor;
+            thisInfiltration.InfilHeatGain = 0.0;
 
-        } else if (state.dataHeatBalFanSys->MAT(NZ) <= Zone(NZ).OutDryBulbTemp) {
+        } else {
 
-            Infiltration(j).InfilHeatGain = Infiltration(j).MCpI_temp * (Zone(NZ).OutDryBulbTemp - state.dataHeatBalFanSys->MAT(NZ)) * TimeStepSys *
-                                            DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-            Infiltration(j).InfilHeatLoss = 0.0;
+            thisInfiltration.InfilHeatGain =
+                thisInfiltration.MCpI_temp * (thisZone.OutDryBulbTemp - thisSpaceHB.MAT) * TimeStepSysSec * ADSCorrectionFactor;
+            thisInfiltration.InfilHeatLoss = 0.0;
         }
 
         // Report infiltration latent gains and losses
-        H2OHtOfVap = PsyHgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(NZ), state.dataHeatBalFanSys->MAT(NZ));
-        if (state.dataHeatBalFanSys->ZoneAirHumRat(NZ) > state.dataEnvrn->OutHumRat) {
+        H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(thisSpaceHB.airHumRat, thisSpaceHB.MAT);
+        if (thisSpaceHB.airHumRat > state.dataEnvrn->OutHumRat) {
 
-            Infiltration(j).InfilLatentLoss = Infiltration(j).InfilMdot * (state.dataHeatBalFanSys->ZoneAirHumRat(NZ) - state.dataEnvrn->OutHumRat) *
-                                              H2OHtOfVap * TimeStepSys * DataGlobalConstants::SecInHour;
-            Infiltration(j).InfilLatentGain = 0.0;
+            thisInfiltration.InfilLatentLoss =
+                thisInfiltration.InfilMdot * (thisSpaceHB.airHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec;
+            thisInfiltration.InfilLatentGain = 0.0;
 
-        } else if (state.dataHeatBalFanSys->ZoneAirHumRat(NZ) <= state.dataEnvrn->OutHumRat) {
+        } else {
 
-            Infiltration(j).InfilLatentGain = Infiltration(j).InfilMdot * (state.dataEnvrn->OutHumRat - state.dataHeatBalFanSys->ZoneAirHumRat(NZ)) *
-                                              H2OHtOfVap * TimeStepSys * DataGlobalConstants::SecInHour;
-            Infiltration(j).InfilLatentLoss = 0.0;
+            thisInfiltration.InfilLatentGain =
+                thisInfiltration.InfilMdot * (state.dataEnvrn->OutHumRat - thisSpaceHB.airHumRat) * H2OHtOfVap * TimeStepSysSec;
+            thisInfiltration.InfilLatentLoss = 0.0;
         }
         // Total infiltration losses and gains
-        TotalLoad = Infiltration(j).InfilHeatGain + Infiltration(j).InfilLatentGain - Infiltration(j).InfilHeatLoss - Infiltration(j).InfilLatentLoss;
+        TotalLoad =
+            thisInfiltration.InfilHeatGain + thisInfiltration.InfilLatentGain - thisInfiltration.InfilHeatLoss - thisInfiltration.InfilLatentLoss;
         if (TotalLoad > 0) {
-            Infiltration(j).InfilTotalGain = TotalLoad;
-            Infiltration(j).InfilTotalLoss = 0.0;
+            thisInfiltration.InfilTotalGain = TotalLoad;
+            thisInfiltration.InfilTotalLoss = 0.0;
         } else {
-            Infiltration(j).InfilTotalGain = 0.0;
-            Infiltration(j).InfilTotalLoss = -TotalLoad;
+            thisInfiltration.InfilTotalGain = 0.0;
+            thisInfiltration.InfilTotalLoss = -TotalLoad;
         }
         // CR7751  second, calculate using indoor conditions for density property
-        AirDensity = PsyRhoAirFnPbTdbW(
-            state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(NZ), state.dataHeatBalFanSys->ZoneAirHumRatAvg(NZ), RoutineName);
-        Infiltration(j).InfilVdotCurDensity = Infiltration(j).InfilMdot / AirDensity;
-        Infiltration(j).InfilVolumeCurDensity = Infiltration(j).InfilVdotCurDensity * TimeStepSys * DataGlobalConstants::SecInHour;
-        Infiltration(j).InfilAirChangeRate = Infiltration(j).InfilVolumeCurDensity / (TimeStepSys * Zone(NZ).Volume);
+        AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisSpaceHB.MAT, thisSpaceHB.airHumRatAvg, RoutineName);
+        thisInfiltration.InfilVdotCurDensity = thisInfiltration.InfilMdot / AirDensity;
+        thisInfiltration.InfilVolumeCurDensity = thisInfiltration.InfilVdotCurDensity * TimeStepSysSec;
+        thisInfiltration.InfilAirChangeRate = thisInfiltration.InfilVolumeCurDensity / (TimeStepSys * thisZone.Volume);
 
         // CR7751 third, calculate using standard dry air at nominal elevation
         AirDensity = state.dataEnvrn->StdRhoAir;
-        Infiltration(j).InfilVdotStdDensity = Infiltration(j).InfilMdot / AirDensity;
-        Infiltration(j).InfilVolumeStdDensity = Infiltration(j).InfilVdotStdDensity * TimeStepSys * DataGlobalConstants::SecInHour;
+        thisInfiltration.InfilVdotStdDensity = thisInfiltration.InfilMdot / AirDensity;
+        thisInfiltration.InfilVolumeStdDensity = thisInfiltration.InfilVdotStdDensity * TimeStepSysSec;
     }
 }
 
@@ -2375,89 +2314,65 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   July 2000
     //       MODIFIED       Shirey, Jan 2008 (MIXING/CROSS MIXING outputs)
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the report variables for the AirHeatBalance.
 
-    // Using/Aliasing
-    using DataHVACGlobals::CycleOn;
-    using DataHVACGlobals::CycleOnZoneFansOnly;
-    using DataHVACGlobals::FanType_ZoneExhaust;
-    using Psychrometrics::PsyCpAirFnW;
-    using Psychrometrics::PsyHgAirFnWTdb;
-    using Psychrometrics::PsyRhoAirFnPbTdbW;
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName3("ReportAirHeatBalance:3");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneLoop;                                     // Counter for the # of zones (nz)
-    int ZoneA;                                        // Mated zone number for pair pf zones sharing refrigeration door opening
-    int ZoneB;                                        // Mated zone number for pair pf zones sharing refrigeration door opening
-    int VentNum;                                      // Counter for ventilation statements
-    int FanNum;                                       // Counter for exhaust fans
-    Real64 AirDensity;                                // Density of air (kg/m^3)
-    Real64 CpAir;                                     // Heat capacity of air (J/kg-C)
-    Real64 ADSCorrectionFactor;                       // Correction factor of air flow model values when ADS is simulated
-    Real64 H2OHtOfVap;                                // Heat of vaporization of air
-    Real64 TotalLoad;                                 // Total loss or gain
-    int MixNum;                                       // Counter for MIXING and Cross Mixing statements
-    auto &MixSenLoad = state.dataHVACMgr->MixSenLoad; // Mixing sensible loss or gain
-    auto &MixLatLoad = state.dataHVACMgr->MixLatLoad; // Mixing latent loss or gain
-    int j;                                            // Index in a do-loop
-    int VentZoneNum;                                  // Number of ventilation object per zone
-    Real64 VentZoneMassflow;                          // Total mass flow rate per zone
-    Real64 VentZoneAirTemp;                           // Average Zone inlet temperature
+    Real64 AirDensity;          // Density of air (kg/m^3)
+    Real64 CpAir;               // Heat capacity of air (J/kg-C)
+    Real64 ADSCorrectionFactor; // Correction factor of air flow model values when ADS is simulated
+    Real64 H2OHtOfVap;          // Heat of vaporization of air
+    Real64 TotalLoad;           // Total loss or gain
 
     state.dataHeatBal->ZoneTotalExfiltrationHeatLoss = 0.0;
     state.dataHeatBal->ZoneTotalExhaustHeatLoss = 0.0;
 
-    auto &Zone(state.dataHeatBal->Zone);
-    auto &ZnAirRpt(state.dataHeatBal->ZnAirRpt);
-    auto &Ventilation(state.dataHeatBal->Ventilation);
-    auto &Mixing(state.dataHeatBal->Mixing);
-    auto &CrossMixing(state.dataHeatBal->CrossMixing);
-    auto &RefDoorMixing(state.dataHeatBal->RefDoorMixing);
-    auto &ZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig);
-    auto &Fan(state.dataFans->Fan);
-    auto &TimeStepSys(state.dataHVACGlobal->TimeStepSys);
+    Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
         state.afn->report();
     }
 
     // Reports zone exhaust loss by exhaust fans
-    for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
-        CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
-        H2OHtOfVap = PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
+    for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
+        auto &zone = state.dataHeatBal->Zone(ZoneLoop);
+        auto &znAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
+        auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneLoop);
+        CpAir = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+        H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, zone.OutDryBulbTemp);
         ADSCorrectionFactor = 1.0;
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
-            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
+            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == DataHVACGlobals::CycleOn ||
+                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == DataHVACGlobals::CycleOnZoneFansOnly) &&
                 state.afn->AirflowNetworkZoneFlag(ZoneLoop)) {
                 ADSCorrectionFactor = 0.0;
             }
         }
 
-        ZnAirRpt(ZoneLoop).ExhTotalLoss = 0;
-        ZnAirRpt(ZoneLoop).ExhSensiLoss = 0;
+        znAirRpt.ExhTotalLoss = 0;
+        znAirRpt.ExhSensiLoss = 0;
 
-        for (FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
+        for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
+            auto const &thisFan = state.dataFans->Fan(FanNum);
             //  Add reportable vars
-            if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
-                for (int ExhNum = 1; ExhNum <= ZoneEquipConfig(ZoneLoop).NumExhaustNodes; ExhNum++) {
-                    if (Fan(FanNum).InletNodeNum == ZoneEquipConfig(ZoneLoop).ExhaustNode(ExhNum)) {
-                        ZnAirRpt(ZoneLoop).ExhTotalLoss +=
-                            Fan(FanNum).OutletAirMassFlowRate * (Fan(FanNum).OutletAirEnthalpy - state.dataEnvrn->OutEnthalpy) * ADSCorrectionFactor;
-                        ZnAirRpt(ZoneLoop).ExhSensiLoss += Fan(FanNum).OutletAirMassFlowRate * CpAir *
-                                                           (Fan(FanNum).OutletAirTemp - Zone(ZoneLoop).OutDryBulbTemp) * ADSCorrectionFactor;
+            if (thisFan.FanType_Num == DataHVACGlobals::FanType_ZoneExhaust) {
+                for (int ExhNum = 1; ExhNum <= zoneEquipConfig.NumExhaustNodes; ExhNum++) {
+                    if (thisFan.InletNodeNum == zoneEquipConfig.ExhaustNode(ExhNum)) {
+                        znAirRpt.ExhTotalLoss +=
+                            thisFan.OutletAirMassFlowRate * (thisFan.OutletAirEnthalpy - state.dataEnvrn->OutEnthalpy) * ADSCorrectionFactor;
+                        znAirRpt.ExhSensiLoss +=
+                            thisFan.OutletAirMassFlowRate * CpAir * (thisFan.OutletAirTemp - zone.OutDryBulbTemp) * ADSCorrectionFactor;
                         break;
                     }
                 }
             }
         }
 
-        ZnAirRpt(ZoneLoop).ExhLatentLoss = ZnAirRpt(ZoneLoop).ExhTotalLoss - ZnAirRpt(ZoneLoop).ExhSensiLoss;
+        znAirRpt.ExhLatentLoss = znAirRpt.ExhTotalLoss - znAirRpt.ExhSensiLoss;
     }
 
     // Report results for SIMPLE option only
@@ -2467,267 +2382,228 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     }
 
     if (state.dataHVACMgr->ReportAirHeatBalanceFirstTimeFlag) {
-        MixSenLoad.allocate(state.dataGlobal->NumOfZones);
-        MixLatLoad.allocate(state.dataGlobal->NumOfZones);
+        state.dataHVACMgr->MixSenLoad.allocate(state.dataGlobal->NumOfZones);
+        state.dataHVACMgr->MixLatLoad.allocate(state.dataGlobal->NumOfZones);
         state.dataHVACMgr->ReportAirHeatBalanceFirstTimeFlag = false;
     }
 
     ReportInfiltrations(state);
 
-    for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
+    for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
+        auto &zone = state.dataHeatBal->Zone(ZoneLoop);
+        auto &znAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
+        auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneLoop);
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
+        auto &mixSenLoad = state.dataHVACMgr->MixSenLoad(ZoneLoop); // Mixing sensible loss or gain
+        auto &mixLatLoad = state.dataHVACMgr->MixLatLoad(ZoneLoop); // Mixing latent loss or gain
 
         // Break the infiltration load into heat gain and loss components
         ADSCorrectionFactor = 1.0;
 
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
             // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(ZoneLoop)) ADSCorrectionFactor=0
-            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
+            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == DataHVACGlobals::CycleOn ||
+                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == DataHVACGlobals::CycleOnZoneFansOnly) &&
                 state.afn->AirflowNetworkZoneFlag(ZoneLoop))
                 ADSCorrectionFactor = 0.0;
         }
 
-        if (state.dataHeatBalFanSys->MAT(ZoneLoop) > Zone(ZoneLoop).OutDryBulbTemp) {
+        if (thisZoneHB.MAT > zone.OutDryBulbTemp) {
 
-            ZnAirRpt(ZoneLoop).InfilHeatLoss = state.dataHeatBalFanSys->MCPI(ZoneLoop) *
-                                               (state.dataHeatBalFanSys->MAT(ZoneLoop) - Zone(ZoneLoop).OutDryBulbTemp) * TimeStepSys *
-                                               DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-            ZnAirRpt(ZoneLoop).InfilHeatGain = 0.0;
+            znAirRpt.InfilHeatLoss = thisZoneHB.MCPI * (thisZoneHB.MAT - zone.OutDryBulbTemp) * TimeStepSysSec * ADSCorrectionFactor;
+            znAirRpt.InfilHeatGain = 0.0;
 
-        } else if (state.dataHeatBalFanSys->MAT(ZoneLoop) <= Zone(ZoneLoop).OutDryBulbTemp) {
+        } else {
 
-            ZnAirRpt(ZoneLoop).InfilHeatGain = state.dataHeatBalFanSys->MCPI(ZoneLoop) *
-                                               (Zone(ZoneLoop).OutDryBulbTemp - state.dataHeatBalFanSys->MAT(ZoneLoop)) * TimeStepSys *
-                                               DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-            ZnAirRpt(ZoneLoop).InfilHeatLoss = 0.0;
+            znAirRpt.InfilHeatGain = thisZoneHB.MCPI * (zone.OutDryBulbTemp - thisZoneHB.MAT) * TimeStepSysSec * ADSCorrectionFactor;
+            znAirRpt.InfilHeatLoss = 0.0;
         }
         // Report infiltration latent gains and losses
-        CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
-        H2OHtOfVap = PsyHgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop), state.dataHeatBalFanSys->MAT(ZoneLoop));
-        if (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) > state.dataEnvrn->OutHumRat) {
+        CpAir = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+        H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(thisZoneHB.airHumRat, thisZoneHB.MAT);
+        if (thisZoneHB.airHumRat > state.dataEnvrn->OutHumRat) {
 
-            ZnAirRpt(ZoneLoop).InfilLatentLoss = state.dataHeatBalFanSys->MCPI(ZoneLoop) / CpAir *
-                                                 (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) - state.dataEnvrn->OutHumRat) * H2OHtOfVap *
-                                                 TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-            ZnAirRpt(ZoneLoop).InfilLatentGain = 0.0;
+            znAirRpt.InfilLatentLoss =
+                thisZoneHB.MCPI / CpAir * (thisZoneHB.airHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec * ADSCorrectionFactor;
+            znAirRpt.InfilLatentGain = 0.0;
 
-        } else if (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) <= state.dataEnvrn->OutHumRat) {
+        } else {
 
-            ZnAirRpt(ZoneLoop).InfilLatentGain = state.dataHeatBalFanSys->MCPI(ZoneLoop) / CpAir *
-                                                 (state.dataEnvrn->OutHumRat - state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop)) * H2OHtOfVap *
-                                                 TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-            ZnAirRpt(ZoneLoop).InfilLatentLoss = 0.0;
+            znAirRpt.InfilLatentGain =
+                thisZoneHB.MCPI / CpAir * (state.dataEnvrn->OutHumRat - thisZoneHB.airHumRat) * H2OHtOfVap * TimeStepSysSec * ADSCorrectionFactor;
+            znAirRpt.InfilLatentLoss = 0.0;
         }
         // Total infiltration losses and gains
-        TotalLoad = ZnAirRpt(ZoneLoop).InfilHeatGain + ZnAirRpt(ZoneLoop).InfilLatentGain - ZnAirRpt(ZoneLoop).InfilHeatLoss -
-                    ZnAirRpt(ZoneLoop).InfilLatentLoss;
+        TotalLoad = znAirRpt.InfilHeatGain + znAirRpt.InfilLatentGain - znAirRpt.InfilHeatLoss - znAirRpt.InfilLatentLoss;
         if (TotalLoad > 0) {
-            ZnAirRpt(ZoneLoop).InfilTotalGain = TotalLoad * ADSCorrectionFactor;
-            ZnAirRpt(ZoneLoop).InfilTotalLoss = 0.0;
+            znAirRpt.InfilTotalGain = TotalLoad * ADSCorrectionFactor;
+            znAirRpt.InfilTotalLoss = 0.0;
         } else {
-            ZnAirRpt(ZoneLoop).InfilTotalGain = 0.0;
-            ZnAirRpt(ZoneLoop).InfilTotalLoss = -TotalLoad * ADSCorrectionFactor;
+            znAirRpt.InfilTotalGain = 0.0;
+            znAirRpt.InfilTotalLoss = -TotalLoad * ADSCorrectionFactor;
         }
 
         // first calculate mass flows using outside air heat capacity for consistency with input to heat balance
-        ZnAirRpt(ZoneLoop).InfilMdot = (state.dataHeatBalFanSys->MCPI(ZoneLoop) / CpAir) * ADSCorrectionFactor;
-        ZnAirRpt(ZoneLoop).InfilMass = ZnAirRpt(ZoneLoop).InfilMdot * TimeStepSys * DataGlobalConstants::SecInHour;
-        ZnAirRpt(ZoneLoop).VentilMdot = (state.dataHeatBalFanSys->MCPV(ZoneLoop) / CpAir) * ADSCorrectionFactor;
-        ZnAirRpt(ZoneLoop).VentilMass = ZnAirRpt(ZoneLoop).VentilMdot * TimeStepSys * DataGlobalConstants::SecInHour;
+        znAirRpt.InfilMdot = (thisZoneHB.MCPI / CpAir) * ADSCorrectionFactor;
+        znAirRpt.InfilMass = znAirRpt.InfilMdot * TimeStepSysSec;
+        znAirRpt.VentilMdot = (thisZoneHB.MCPV / CpAir) * ADSCorrectionFactor;
+        znAirRpt.VentilMass = znAirRpt.VentilMdot * TimeStepSysSec;
 
         // CR7751  second, calculate using indoor conditions for density property
-        AirDensity = PsyRhoAirFnPbTdbW(state,
-                                       state.dataEnvrn->OutBaroPress,
-                                       state.dataHeatBalFanSys->MAT(ZoneLoop),
-                                       state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneLoop),
-                                       RoutineName3);
-        ZnAirRpt(ZoneLoop).InfilVdotCurDensity = ZnAirRpt(ZoneLoop).InfilMdot / AirDensity;
-        ZnAirRpt(ZoneLoop).InfilVolumeCurDensity = ZnAirRpt(ZoneLoop).InfilVdotCurDensity * TimeStepSys * DataGlobalConstants::SecInHour;
-        ZnAirRpt(ZoneLoop).InfilAirChangeRate = ZnAirRpt(ZoneLoop).InfilVolumeCurDensity / (TimeStepSys * Zone(ZoneLoop).Volume);
-        ZnAirRpt(ZoneLoop).VentilVdotCurDensity = ZnAirRpt(ZoneLoop).VentilMdot / AirDensity;
-        ZnAirRpt(ZoneLoop).VentilVolumeCurDensity = ZnAirRpt(ZoneLoop).VentilVdotCurDensity * TimeStepSys * DataGlobalConstants::SecInHour;
-        ZnAirRpt(ZoneLoop).VentilAirChangeRate = ZnAirRpt(ZoneLoop).VentilVolumeCurDensity / (TimeStepSys * Zone(ZoneLoop).Volume);
+        AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.airHumRatAvg, RoutineName3);
+        znAirRpt.InfilVdotCurDensity = znAirRpt.InfilMdot / AirDensity;
+        znAirRpt.InfilVolumeCurDensity = znAirRpt.InfilVdotCurDensity * TimeStepSysSec;
+        znAirRpt.InfilAirChangeRate = znAirRpt.InfilVolumeCurDensity / (TimeStepSys * zone.Volume);
+        znAirRpt.VentilVdotCurDensity = znAirRpt.VentilMdot / AirDensity;
+        znAirRpt.VentilVolumeCurDensity = znAirRpt.VentilVdotCurDensity * TimeStepSysSec;
+        znAirRpt.VentilAirChangeRate = znAirRpt.VentilVolumeCurDensity / (TimeStepSys * zone.Volume);
 
         // CR7751 third, calculate using standard dry air at nominal elevation
         AirDensity = state.dataEnvrn->StdRhoAir;
-        ZnAirRpt(ZoneLoop).InfilVdotStdDensity = ZnAirRpt(ZoneLoop).InfilMdot / AirDensity;
-        ZnAirRpt(ZoneLoop).InfilVolumeStdDensity = ZnAirRpt(ZoneLoop).InfilVdotStdDensity * TimeStepSys * DataGlobalConstants::SecInHour;
-        ZnAirRpt(ZoneLoop).VentilVdotStdDensity = ZnAirRpt(ZoneLoop).VentilMdot / AirDensity;
-        ZnAirRpt(ZoneLoop).VentilVolumeStdDensity = ZnAirRpt(ZoneLoop).VentilVdotStdDensity * TimeStepSys * DataGlobalConstants::SecInHour;
+        znAirRpt.InfilVdotStdDensity = znAirRpt.InfilMdot / AirDensity;
+        znAirRpt.InfilVolumeStdDensity = znAirRpt.InfilVdotStdDensity * TimeStepSysSec;
+        znAirRpt.VentilVdotStdDensity = znAirRpt.VentilMdot / AirDensity;
+        znAirRpt.VentilVolumeStdDensity = znAirRpt.VentilVdotStdDensity * TimeStepSysSec;
 
-        //    ZnAirRpt(ZoneLoop)%VentilFanElec = 0.0
-        ZnAirRpt(ZoneLoop).VentilAirTemp = 0.0;
-        ZnAirRpt(ZoneLoop).VentilHeatLoss = 0.0;
-        ZnAirRpt(ZoneLoop).VentilHeatGain = 0.0;
-        VentZoneNum = 0;
-        VentZoneMassflow = 0.0;
-        VentZoneAirTemp = 0.0;
+        //    znAirRpt%VentilFanElec = 0.0
+        znAirRpt.VentilAirTemp = 0.0;
+        znAirRpt.VentilHeatLoss = 0.0;
+        znAirRpt.VentilHeatGain = 0.0;
+        int VentZoneNum = 0;           // Number of ventilation object per zone
+        Real64 VentZoneMassflow = 0.0; // Total mass flow rate per zone
+        Real64 VentZoneAirTemp = 0.0;  // Average Zone inlet temperature
 
-        for (VentNum = 1; VentNum <= state.dataHeatBal->TotVentilation; ++VentNum) {
-            if (Ventilation(VentNum).ZonePtr == ZoneLoop) {
-                // moved into CalcAirFlowSimple
-                //        ZnAirRpt(ZoneLoop)%VentilFanElec  =
-                //        ZnAirRpt(ZoneLoop)%VentilFanElec+Ventilation(VentNum)%FanPower*TimeStepSys*DataGlobalConstants::SecInHour()
-                //        &
-                //          *ADSCorrectionFactor
+        for (int VentNum = 1; VentNum <= state.dataHeatBal->TotVentilation; ++VentNum) {
+            auto const &ventilation = state.dataHeatBal->Ventilation(VentNum);
+            if (ventilation.ZonePtr == ZoneLoop) {
                 if (ADSCorrectionFactor > 0) {
-                    ZnAirRpt(ZoneLoop).VentilAirTemp += Ventilation(VentNum).AirTemp * state.dataZoneEquip->VentMCP(VentNum);
-                    VentZoneMassflow += state.dataZoneEquip->VentMCP(VentNum);
-                    VentZoneAirTemp += Ventilation(VentNum).AirTemp;
+                    znAirRpt.VentilAirTemp += ventilation.AirTemp * ventilation.MCP;
+                    VentZoneMassflow += ventilation.MCP;
+                    VentZoneAirTemp += ventilation.AirTemp;
                 } else {
-                    ZnAirRpt(ZoneLoop).VentilAirTemp = Zone(ZoneLoop).OutDryBulbTemp;
+                    znAirRpt.VentilAirTemp = zone.OutDryBulbTemp;
                 }
                 // Break the ventilation load into heat gain and loss components
-                if (state.dataHeatBalFanSys->MAT(ZoneLoop) > Ventilation(VentNum).AirTemp) {
-                    ZnAirRpt(ZoneLoop).VentilHeatLoss += state.dataZoneEquip->VentMCP(VentNum) *
-                                                         (state.dataHeatBalFanSys->MAT(ZoneLoop) - Ventilation(VentNum).AirTemp) * TimeStepSys *
-                                                         DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                } else if (state.dataHeatBalFanSys->MAT(ZoneLoop) <= Ventilation(VentNum).AirTemp) {
-                    ZnAirRpt(ZoneLoop).VentilHeatGain += state.dataZoneEquip->VentMCP(VentNum) *
-                                                         (Ventilation(VentNum).AirTemp - state.dataHeatBalFanSys->MAT(ZoneLoop)) * TimeStepSys *
-                                                         DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+                if (thisZoneHB.MAT > ventilation.AirTemp) {
+                    znAirRpt.VentilHeatLoss += ventilation.MCP * (thisZoneHB.MAT - ventilation.AirTemp) * TimeStepSysSec * ADSCorrectionFactor;
+                } else {
+                    znAirRpt.VentilHeatGain += ventilation.MCP * (ventilation.AirTemp - thisZoneHB.MAT) * TimeStepSysSec * ADSCorrectionFactor;
                 }
 
                 ++VentZoneNum;
                 if (VentZoneNum > 1) continue;
 
                 // Report ventilation latent gains and losses
-                H2OHtOfVap = PsyHgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop), state.dataHeatBalFanSys->MAT(ZoneLoop));
-                if (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) > state.dataEnvrn->OutHumRat) {
-                    ZnAirRpt(ZoneLoop).VentilLatentLoss = ZnAirRpt(ZoneLoop).VentilMdot *
-                                                          (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) - state.dataEnvrn->OutHumRat) *
-                                                          H2OHtOfVap * TimeStepSys * DataGlobalConstants::SecInHour;
-                    ZnAirRpt(ZoneLoop).VentilLatentGain = 0.0;
-                } else if (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) <= state.dataEnvrn->OutHumRat) {
-                    ZnAirRpt(ZoneLoop).VentilLatentGain = ZnAirRpt(ZoneLoop).VentilMdot *
-                                                          (state.dataEnvrn->OutHumRat - state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop)) *
-                                                          H2OHtOfVap * TimeStepSys * DataGlobalConstants::SecInHour;
-                    ZnAirRpt(ZoneLoop).VentilLatentLoss = 0.0;
+                H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(thisZoneHB.airHumRat, thisZoneHB.MAT);
+                if (thisZoneHB.airHumRat > state.dataEnvrn->OutHumRat) {
+                    znAirRpt.VentilLatentLoss =
+                        znAirRpt.VentilMdot * (thisZoneHB.airHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec;
+                    znAirRpt.VentilLatentGain = 0.0;
+                } else {
+                    znAirRpt.VentilLatentGain =
+                        znAirRpt.VentilMdot * (state.dataEnvrn->OutHumRat - thisZoneHB.airHumRat) * H2OHtOfVap * TimeStepSysSec;
+                    znAirRpt.VentilLatentLoss = 0.0;
                 }
                 // Total ventilation losses and gains
-                TotalLoad = ZnAirRpt(ZoneLoop).VentilHeatGain + ZnAirRpt(ZoneLoop).VentilLatentGain - ZnAirRpt(ZoneLoop).VentilHeatLoss -
-                            ZnAirRpt(ZoneLoop).VentilLatentLoss;
+                TotalLoad = znAirRpt.VentilHeatGain + znAirRpt.VentilLatentGain - znAirRpt.VentilHeatLoss - znAirRpt.VentilLatentLoss;
                 if (TotalLoad > 0) {
-                    ZnAirRpt(ZoneLoop).VentilTotalGain = TotalLoad * ADSCorrectionFactor;
-                    ZnAirRpt(ZoneLoop).VentilTotalLoss = 0.0;
+                    znAirRpt.VentilTotalGain = TotalLoad * ADSCorrectionFactor;
+                    znAirRpt.VentilTotalLoss = 0.0;
                 } else {
-                    ZnAirRpt(ZoneLoop).VentilTotalGain = 0.0;
-                    ZnAirRpt(ZoneLoop).VentilTotalLoss = -TotalLoad * ADSCorrectionFactor;
+                    znAirRpt.VentilTotalGain = 0.0;
+                    znAirRpt.VentilTotalLoss = -TotalLoad * ADSCorrectionFactor;
                 }
             }
         }
 
         if (ADSCorrectionFactor > 0 && VentZoneNum > 1 && VentZoneMassflow > 0.0) {
-            ZnAirRpt(ZoneLoop).VentilAirTemp /= VentZoneMassflow;
+            znAirRpt.VentilAirTemp /= VentZoneMassflow;
         } else if (ADSCorrectionFactor > 0 && VentZoneNum == 1) {
-            ZnAirRpt(ZoneLoop).VentilAirTemp = VentZoneAirTemp;
+            znAirRpt.VentilAirTemp = VentZoneAirTemp;
         } else { // Just in case
-            ZnAirRpt(ZoneLoop).VentilAirTemp = Zone(ZoneLoop).OutDryBulbTemp;
+            znAirRpt.VentilAirTemp = zone.OutDryBulbTemp;
         }
 
         // Report mixing sensible and latent loads
-        MixSenLoad(ZoneLoop) = 0.0; // Initialize arrays to zero before starting to sum
-        MixLatLoad(ZoneLoop) = 0.0;
-        ZnAirRpt(ZoneLoop).MixVolume = 0.0;         // zero reported volume prior to summations below
-        ZnAirRpt(ZoneLoop).MixVdotCurDensity = 0.0; // zero reported volume flow rate prior to summations below
-        ZnAirRpt(ZoneLoop).MixVdotStdDensity = 0.0; // zero reported volume flow rate prior to summations below
-        ZnAirRpt(ZoneLoop).MixMass = 0.0;           // ! zero reported mass prior to summations below
-        ZnAirRpt(ZoneLoop).MixMdot = 0.0;           // ! zero reported mass flow rate prior to summations below
+        mixSenLoad = 0.0; // Initialize arrays to zero before starting to sum
+        mixLatLoad = 0.0;
+        znAirRpt.MixVolume = 0.0;         // zero reported volume prior to summations below
+        znAirRpt.MixVdotCurDensity = 0.0; // zero reported volume flow rate prior to summations below
+        znAirRpt.MixVdotStdDensity = 0.0; // zero reported volume flow rate prior to summations below
+        znAirRpt.MixMass = 0.0;           // ! zero reported mass prior to summations below
+        znAirRpt.MixMdot = 0.0;           // ! zero reported mass flow rate prior to summations below
         //    MixingLoad = 0.0d0
 
-        for (MixNum = 1; MixNum <= state.dataHeatBal->TotMixing; ++MixNum) {
-            if ((Mixing(MixNum).ZonePtr == ZoneLoop) && state.dataZoneEquip->MixingReportFlag(MixNum)) {
-                //        MixSenLoad(ZoneLoop) = MixSenLoad(ZoneLoop)+MCPM(ZoneLoop)*MAT(Mixing(MixNum)%FromZone)
-                //        H2OHtOfVap = PsyHgAirFnWTdb(ZoneAirHumRat(ZoneLoop), MAT(ZoneLoop))
+        for (int MixNum = 1; MixNum <= state.dataHeatBal->TotMixing; ++MixNum) {
+            auto &mixing = state.dataHeatBal->Mixing(MixNum);
+            if ((mixing.ZonePtr == ZoneLoop) && mixing.ReportFlag) {
+                auto const &fromZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(mixing.FromZone);
+                //        MixSenLoad(ZoneLoop) = MixSenLoad(ZoneLoop)+MCPM(ZoneLoop)*MAT(mixing%FromZone)
+                //        H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(ZoneAirHumRat(ZoneLoop), MAT(ZoneLoop))
                 //        Per Jan 17, 2008 conference call, agreed to use average conditions for Rho, Cp and Hfg
                 //           and to recalculate the report variable using end of time step temps and humrats
-                AirDensity = PsyRhoAirFnPbTdbW(
-                    state,
-                    state.dataEnvrn->OutBaroPress,
-                    (state.dataHeatBalFanSys->MAT(ZoneLoop) + state.dataHeatBalFanSys->MAT(Mixing(MixNum).FromZone)) / 2.0,
-                    (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) + state.dataHeatBalFanSys->ZoneAirHumRat(Mixing(MixNum).FromZone)) / 2.0,
-                    std::string());
-                CpAir = PsyCpAirFnW(
-                    (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) + state.dataHeatBalFanSys->ZoneAirHumRat(Mixing(MixNum).FromZone)) / 2.0);
-                ZnAirRpt(ZoneLoop).MixVolume +=
-                    Mixing(MixNum).DesiredAirFlowRate * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).MixVdotCurDensity += Mixing(MixNum).DesiredAirFlowRate * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).MixMass +=
-                    Mixing(MixNum).DesiredAirFlowRate * AirDensity * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).MixMdot += Mixing(MixNum).DesiredAirFlowRate * AirDensity * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).MixVdotStdDensity +=
-                    Mixing(MixNum).DesiredAirFlowRate * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
-                MixSenLoad(ZoneLoop) += Mixing(MixNum).DesiredAirFlowRate * AirDensity * CpAir *
-                                        (state.dataHeatBalFanSys->MAT(ZoneLoop) - state.dataHeatBalFanSys->MAT(Mixing(MixNum).FromZone));
-                H2OHtOfVap = PsyHgAirFnWTdb(
-                    (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) + state.dataHeatBalFanSys->ZoneAirHumRat(Mixing(MixNum).FromZone)) / 2.0,
-                    (state.dataHeatBalFanSys->MAT(ZoneLoop) + state.dataHeatBalFanSys->MAT(Mixing(MixNum).FromZone)) / 2.0);
-                //        MixLatLoad(ZoneLoop) = MixLatLoad(ZoneLoop)+MixingMassFlowZone(ZoneLoop)*(ZoneAirHumRat(ZoneLoop)- &
-                //                     ZoneAirHumRat(Mixing(MixNum)%FromZone))*H2OHtOfVap
-                MixLatLoad(ZoneLoop) +=
-                    Mixing(MixNum).DesiredAirFlowRate * AirDensity *
-                    (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) - state.dataHeatBalFanSys->ZoneAirHumRat(Mixing(MixNum).FromZone)) * H2OHtOfVap;
+                AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
+                                                               state.dataEnvrn->OutBaroPress,
+                                                               (thisZoneHB.MAT + fromZoneHB.MAT) / 2.0,
+                                                               (thisZoneHB.airHumRat + fromZoneHB.airHumRat) / 2.0,
+                                                               std::string());
+                CpAir = Psychrometrics::PsyCpAirFnW((thisZoneHB.airHumRat + fromZoneHB.airHumRat) / 2.0);
+                znAirRpt.MixVolume += mixing.DesiredAirFlowRate * TimeStepSysSec * ADSCorrectionFactor;
+                znAirRpt.MixVdotCurDensity += mixing.DesiredAirFlowRate * ADSCorrectionFactor;
+                znAirRpt.MixMass += mixing.DesiredAirFlowRate * AirDensity * TimeStepSysSec * ADSCorrectionFactor;
+                znAirRpt.MixMdot += mixing.DesiredAirFlowRate * AirDensity * ADSCorrectionFactor;
+                znAirRpt.MixVdotStdDensity += mixing.DesiredAirFlowRate * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
+                mixSenLoad += mixing.DesiredAirFlowRate * AirDensity * CpAir * (thisZoneHB.MAT - fromZoneHB.MAT);
+                H2OHtOfVap =
+                    Psychrometrics::PsyHgAirFnWTdb((thisZoneHB.airHumRat + fromZoneHB.airHumRat) / 2.0, (thisZoneHB.MAT + fromZoneHB.MAT) / 2.0);
+                //        MixLatLoad(ZoneLoop) = MixLatLoad(ZoneLoop)+MixingMassFlowzone*(ZoneAirHumRat(ZoneLoop)- &
+                //                     ZoneAirHumRat(mixing%FromZone))*H2OHtOfVap
+                mixLatLoad += mixing.DesiredAirFlowRate * AirDensity * (thisZoneHB.airHumRat - fromZoneHB.airHumRat) * H2OHtOfVap;
             }
         }
 
-        for (MixNum = 1; MixNum <= state.dataHeatBal->TotCrossMixing; ++MixNum) {
-            if ((CrossMixing(MixNum).ZonePtr == ZoneLoop) && state.dataZoneEquip->CrossMixingReportFlag(MixNum)) {
-                //        MixSenLoad(ZoneLoop) = MixSenLoad(ZoneLoop)+MCPM(ZoneLoop)*MAT(CrossMixing(MixNum)%FromZone)
+        for (int MixNum = 1; MixNum <= state.dataHeatBal->TotCrossMixing; ++MixNum) {
+            auto &crossMixing = state.dataHeatBal->CrossMixing(MixNum);
+            if ((crossMixing.ZonePtr == ZoneLoop) && crossMixing.ReportFlag) {
+                auto const &fromZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(crossMixing.FromZone);
+                //        MixSenLoad(ZoneLoop) = MixSenLoad(ZoneLoop)+MCPM(ZoneLoop)*MAT(crossMixing%FromZone)
                 //        Per Jan 17, 2008 conference call, agreed to use average conditions for Rho, Cp and Hfg
                 //           and to recalculate the report variable using end of time step temps and humrats
-                AirDensity = PsyRhoAirFnPbTdbW(
-                    state,
-                    state.dataEnvrn->OutBaroPress,
-                    (state.dataHeatBalFanSys->MAT(ZoneLoop) + state.dataHeatBalFanSys->MAT(CrossMixing(MixNum).FromZone)) / 2.0,
-                    (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) + state.dataHeatBalFanSys->ZoneAirHumRat(CrossMixing(MixNum).FromZone)) / 2.0,
-                    std::string());
-                CpAir = PsyCpAirFnW(
-                    (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) + state.dataHeatBalFanSys->ZoneAirHumRat(CrossMixing(MixNum).FromZone)) / 2.0);
-                ZnAirRpt(ZoneLoop).MixVolume +=
-                    CrossMixing(MixNum).DesiredAirFlowRate * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).MixVdotCurDensity += CrossMixing(MixNum).DesiredAirFlowRate * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).MixMass +=
-                    CrossMixing(MixNum).DesiredAirFlowRate * AirDensity * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).MixMdot += CrossMixing(MixNum).DesiredAirFlowRate * AirDensity * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).MixVdotStdDensity +=
-                    CrossMixing(MixNum).DesiredAirFlowRate * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
-                MixSenLoad(ZoneLoop) += CrossMixing(MixNum).DesiredAirFlowRate * AirDensity * CpAir *
-                                        (state.dataHeatBalFanSys->MAT(ZoneLoop) - state.dataHeatBalFanSys->MAT(CrossMixing(MixNum).FromZone));
-                H2OHtOfVap = PsyHgAirFnWTdb(
-                    (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) + state.dataHeatBalFanSys->ZoneAirHumRat(CrossMixing(MixNum).FromZone)) / 2.0,
-                    (state.dataHeatBalFanSys->MAT(ZoneLoop) + state.dataHeatBalFanSys->MAT(CrossMixing(MixNum).FromZone)) / 2.0);
-                //       MixLatLoad(ZoneLoop) = MixLatLoad(ZoneLoop)+MixingMassFlowZone(ZoneLoop)*(ZoneAirHumRat(ZoneLoop)- &
-                //                     ZoneAirHumRat(CrossMixing(MixNum)%FromZone))*H2OHtOfVap
-                MixLatLoad(ZoneLoop) +=
-                    CrossMixing(MixNum).DesiredAirFlowRate * AirDensity *
-                    (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) - state.dataHeatBalFanSys->ZoneAirHumRat(CrossMixing(MixNum).FromZone)) *
-                    H2OHtOfVap;
+                AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
+                                                               state.dataEnvrn->OutBaroPress,
+                                                               (thisZoneHB.MAT + fromZoneHB.MAT) / 2.0,
+                                                               (thisZoneHB.airHumRat + fromZoneHB.airHumRat) / 2.0,
+                                                               std::string());
+                CpAir = Psychrometrics::PsyCpAirFnW((thisZoneHB.airHumRat + fromZoneHB.airHumRat) / 2.0);
+                znAirRpt.MixVolume += crossMixing.DesiredAirFlowRate * TimeStepSysSec * ADSCorrectionFactor;
+                znAirRpt.MixVdotCurDensity += crossMixing.DesiredAirFlowRate * ADSCorrectionFactor;
+                znAirRpt.MixMass += crossMixing.DesiredAirFlowRate * AirDensity * TimeStepSysSec * ADSCorrectionFactor;
+                znAirRpt.MixMdot += crossMixing.DesiredAirFlowRate * AirDensity * ADSCorrectionFactor;
+                znAirRpt.MixVdotStdDensity += crossMixing.DesiredAirFlowRate * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
+                mixSenLoad += crossMixing.DesiredAirFlowRate * AirDensity * CpAir * (thisZoneHB.MAT - fromZoneHB.MAT);
+                H2OHtOfVap =
+                    Psychrometrics::PsyHgAirFnWTdb((thisZoneHB.airHumRat + fromZoneHB.airHumRat) / 2.0, (thisZoneHB.MAT + fromZoneHB.MAT) / 2.0);
+                //       MixLatLoad(ZoneLoop) = MixLatLoad(ZoneLoop)+MixingMassFlowzone*(ZoneAirHumRat(ZoneLoop)- &
+                //                     ZoneAirHumRat(crossMixing%FromZone))*H2OHtOfVap
+                mixLatLoad += crossMixing.DesiredAirFlowRate * AirDensity * (thisZoneHB.airHumRat - fromZoneHB.airHumRat) * H2OHtOfVap;
             }
-            if ((CrossMixing(MixNum).FromZone == ZoneLoop) && state.dataZoneEquip->CrossMixingReportFlag(MixNum)) {
-                AirDensity = PsyRhoAirFnPbTdbW(
-                    state,
-                    state.dataEnvrn->OutBaroPress,
-                    (state.dataHeatBalFanSys->MAT(ZoneLoop) + state.dataHeatBalFanSys->MAT(CrossMixing(MixNum).ZonePtr)) / 2.0,
-                    (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) + state.dataHeatBalFanSys->ZoneAirHumRat(CrossMixing(MixNum).ZonePtr)) / 2.0,
-                    std::string());
-                CpAir = PsyCpAirFnW(
-                    (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) + state.dataHeatBalFanSys->ZoneAirHumRat(CrossMixing(MixNum).ZonePtr)) / 2.0);
-                ZnAirRpt(ZoneLoop).MixVolume +=
-                    CrossMixing(MixNum).DesiredAirFlowRate * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).MixVdotCurDensity += CrossMixing(MixNum).DesiredAirFlowRate * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).MixMass +=
-                    CrossMixing(MixNum).DesiredAirFlowRate * AirDensity * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).MixMdot += CrossMixing(MixNum).DesiredAirFlowRate * AirDensity * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).MixVdotStdDensity +=
-                    CrossMixing(MixNum).DesiredAirFlowRate * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
-                MixSenLoad(ZoneLoop) += CrossMixing(MixNum).DesiredAirFlowRate * AirDensity * CpAir *
-                                        (state.dataHeatBalFanSys->MAT(ZoneLoop) - state.dataHeatBalFanSys->MAT(CrossMixing(MixNum).ZonePtr));
-                H2OHtOfVap = PsyHgAirFnWTdb(
-                    (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) + state.dataHeatBalFanSys->ZoneAirHumRat(CrossMixing(MixNum).ZonePtr)) / 2.0,
-                    (state.dataHeatBalFanSys->MAT(ZoneLoop) + state.dataHeatBalFanSys->MAT(CrossMixing(MixNum).ZonePtr)) / 2.0);
-                MixLatLoad(ZoneLoop) +=
-                    CrossMixing(MixNum).DesiredAirFlowRate * AirDensity *
-                    (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) - state.dataHeatBalFanSys->ZoneAirHumRat(CrossMixing(MixNum).ZonePtr)) *
-                    H2OHtOfVap;
+            if ((crossMixing.FromZone == ZoneLoop) && crossMixing.ReportFlag) {
+                auto const &mixingZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(crossMixing.ZonePtr);
+                AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
+                                                               state.dataEnvrn->OutBaroPress,
+                                                               (thisZoneHB.MAT + mixingZoneHB.MAT) / 2.0,
+                                                               (thisZoneHB.airHumRat + mixingZoneHB.airHumRat) / 2.0,
+                                                               std::string());
+                CpAir = Psychrometrics::PsyCpAirFnW((thisZoneHB.airHumRat + mixingZoneHB.airHumRat) / 2.0);
+                znAirRpt.MixVolume += crossMixing.DesiredAirFlowRate * TimeStepSysSec * ADSCorrectionFactor;
+                znAirRpt.MixVdotCurDensity += crossMixing.DesiredAirFlowRate * ADSCorrectionFactor;
+                znAirRpt.MixMass += crossMixing.DesiredAirFlowRate * AirDensity * TimeStepSysSec * ADSCorrectionFactor;
+                znAirRpt.MixMdot += crossMixing.DesiredAirFlowRate * AirDensity * ADSCorrectionFactor;
+                znAirRpt.MixVdotStdDensity += crossMixing.DesiredAirFlowRate * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
+                mixSenLoad += crossMixing.DesiredAirFlowRate * AirDensity * CpAir * (thisZoneHB.MAT - mixingZoneHB.MAT);
+                H2OHtOfVap =
+                    Psychrometrics::PsyHgAirFnWTdb((thisZoneHB.airHumRat + mixingZoneHB.airHumRat) / 2.0, (thisZoneHB.MAT + mixingZoneHB.MAT) / 2.0);
+                mixLatLoad += crossMixing.DesiredAirFlowRate * AirDensity * (thisZoneHB.airHumRat - mixingZoneHB.airHumRat) * H2OHtOfVap;
             }
         }
 
@@ -2736,72 +2612,60 @@ void ReportAirHeatBalance(EnergyPlusData &state)
             // Note - do each Pair a Single time, so must do increment reports for both zones
             //       Can't have a pair that has ZoneA zone number = NumOfZones because organized
             //       in input with lowest zone # first no matter how input in idf
-            if (RefDoorMixing(ZoneLoop).RefDoorMixFlag) { // .TRUE. for both zoneA and zoneB
-                if (RefDoorMixing(ZoneLoop).ZonePtr == ZoneLoop) {
-                    for (j = 1; j <= RefDoorMixing(ZoneLoop).NumRefDoorConnections; ++j) {
+            auto &refDoorMixing = state.dataHeatBal->RefDoorMixing(ZoneLoop);
+            if (refDoorMixing.RefDoorMixFlag) { // .TRUE. for both zoneA and zoneB
+                if (refDoorMixing.ZonePtr == ZoneLoop) {
+                    for (int j = 1; j <= refDoorMixing.NumRefDoorConnections; ++j) {
                         //    Capture impact when zoneloop is the 'primary zone'
                         //    that is, the zone of a pair with the lower zone number
-                        if (RefDoorMixing(ZoneLoop).VolRefDoorFlowRate(j) > 0.0) {
-                            ZoneB = RefDoorMixing(ZoneLoop).MateZonePtr(j);
-                            AirDensity = PsyRhoAirFnPbTdbW(
-                                state,
-                                state.dataEnvrn->OutBaroPress,
-                                (state.dataHeatBalFanSys->MAT(ZoneLoop) + state.dataHeatBalFanSys->MAT(ZoneB)) / 2.0,
-                                (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) + state.dataHeatBalFanSys->ZoneAirHumRat(ZoneB)) / 2.0,
-                                std::string());
-                            CpAir =
-                                PsyCpAirFnW((state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) + state.dataHeatBalFanSys->ZoneAirHumRat(ZoneB)) / 2.0);
-                            H2OHtOfVap = PsyHgAirFnWTdb(
-                                (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) + state.dataHeatBalFanSys->ZoneAirHumRat(ZoneB)) / 2.0,
-                                (state.dataHeatBalFanSys->MAT(ZoneLoop) + state.dataHeatBalFanSys->MAT(ZoneB)) / 2.0);
-                            ZnAirRpt(ZoneLoop).MixVolume +=
-                                RefDoorMixing(ZoneLoop).VolRefDoorFlowRate(j) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                            ZnAirRpt(ZoneLoop).MixVdotCurDensity += RefDoorMixing(ZoneLoop).VolRefDoorFlowRate(j) * ADSCorrectionFactor;
-                            ZnAirRpt(ZoneLoop).MixMass += RefDoorMixing(ZoneLoop).VolRefDoorFlowRate(j) * AirDensity * TimeStepSys *
-                                                          DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                            ZnAirRpt(ZoneLoop).MixMdot += RefDoorMixing(ZoneLoop).VolRefDoorFlowRate(j) * AirDensity * ADSCorrectionFactor;
-                            ZnAirRpt(ZoneLoop).MixVdotStdDensity +=
-                                RefDoorMixing(ZoneLoop).VolRefDoorFlowRate(j) * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
-                            MixSenLoad(ZoneLoop) += RefDoorMixing(ZoneLoop).VolRefDoorFlowRate(j) * AirDensity * CpAir *
-                                                    (state.dataHeatBalFanSys->MAT(ZoneLoop) - state.dataHeatBalFanSys->MAT(ZoneB));
-                            MixLatLoad(ZoneLoop) +=
-                                RefDoorMixing(ZoneLoop).VolRefDoorFlowRate(j) * AirDensity *
-                                (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) - state.dataHeatBalFanSys->ZoneAirHumRat(ZoneB)) * H2OHtOfVap;
+                        if (refDoorMixing.VolRefDoorFlowRate(j) > 0.0) {
+                            int ZoneB = refDoorMixing.MateZonePtr(j);
+                            auto const &zoneBHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneB);
+                            AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
+                                                                           state.dataEnvrn->OutBaroPress,
+                                                                           (thisZoneHB.MAT + zoneBHB.MAT) / 2.0,
+                                                                           (thisZoneHB.airHumRat + zoneBHB.airHumRat) / 2.0,
+                                                                           std::string());
+                            CpAir = Psychrometrics::PsyCpAirFnW((thisZoneHB.airHumRat + zoneBHB.airHumRat) / 2.0);
+                            H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb((thisZoneHB.airHumRat + zoneBHB.airHumRat) / 2.0,
+                                                                        (thisZoneHB.MAT + zoneBHB.MAT) / 2.0);
+                            znAirRpt.MixVolume += refDoorMixing.VolRefDoorFlowRate(j) * TimeStepSysSec * ADSCorrectionFactor;
+                            znAirRpt.MixVdotCurDensity += refDoorMixing.VolRefDoorFlowRate(j) * ADSCorrectionFactor;
+                            znAirRpt.MixMass += refDoorMixing.VolRefDoorFlowRate(j) * AirDensity * TimeStepSysSec * ADSCorrectionFactor;
+                            znAirRpt.MixMdot += refDoorMixing.VolRefDoorFlowRate(j) * AirDensity * ADSCorrectionFactor;
+                            znAirRpt.MixVdotStdDensity +=
+                                refDoorMixing.VolRefDoorFlowRate(j) * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
+                            mixSenLoad += refDoorMixing.VolRefDoorFlowRate(j) * AirDensity * CpAir * (thisZoneHB.MAT - zoneBHB.MAT);
+                            mixLatLoad += refDoorMixing.VolRefDoorFlowRate(j) * AirDensity * (thisZoneHB.airHumRat - zoneBHB.airHumRat) * H2OHtOfVap;
                         } // flow > 0
                     }     // J-1, numref connections
                 }         // zone A (zoneptr = zoneloop)
-                for (ZoneA = 1; ZoneA <= (ZoneLoop - 1); ++ZoneA) {
+                for (int ZoneA = 1; ZoneA <= (ZoneLoop - 1); ++ZoneA) {
+                    auto &refDoorMixingA = state.dataHeatBal->RefDoorMixing(ZoneA);
+                    auto const &zoneAHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneA);
                     //    Capture impact when zoneloop is the 'mating zone'
                     //    that is, the zone of a pair with the higher zone number(matezoneptr = zoneloop)
-                    if (RefDoorMixing(ZoneA).RefDoorMixFlag) {
-                        for (j = 1; j <= RefDoorMixing(ZoneA).NumRefDoorConnections; ++j) {
-                            if (RefDoorMixing(ZoneA).MateZonePtr(j) == ZoneLoop) {
-                                if (RefDoorMixing(ZoneA).VolRefDoorFlowRate(j) > 0.0) {
-                                    AirDensity = PsyRhoAirFnPbTdbW(
-                                        state,
-                                        state.dataEnvrn->OutBaroPress,
-                                        (state.dataHeatBalFanSys->MAT(ZoneLoop) + state.dataHeatBalFanSys->MAT(ZoneA)) / 2.0,
-                                        (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) + state.dataHeatBalFanSys->ZoneAirHumRat(ZoneA)) / 2.0,
-                                        std::string());
-                                    CpAir = PsyCpAirFnW(
-                                        (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) + state.dataHeatBalFanSys->ZoneAirHumRat(ZoneA)) / 2.0);
-                                    H2OHtOfVap = PsyHgAirFnWTdb(
-                                        (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) + state.dataHeatBalFanSys->ZoneAirHumRat(ZoneA)) / 2.0,
-                                        (state.dataHeatBalFanSys->MAT(ZoneLoop) + state.dataHeatBalFanSys->MAT(ZoneA)) / 2.0);
-                                    ZnAirRpt(ZoneLoop).MixVolume += RefDoorMixing(ZoneA).VolRefDoorFlowRate(j) * TimeStepSys *
-                                                                    DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                                    ZnAirRpt(ZoneLoop).MixVdotCurDensity += RefDoorMixing(ZoneA).VolRefDoorFlowRate(j) * ADSCorrectionFactor;
-                                    ZnAirRpt(ZoneLoop).MixMass += RefDoorMixing(ZoneA).VolRefDoorFlowRate(j) * AirDensity * TimeStepSys *
-                                                                  DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                                    ZnAirRpt(ZoneLoop).MixMdot += RefDoorMixing(ZoneA).VolRefDoorFlowRate(j) * AirDensity * ADSCorrectionFactor;
-                                    ZnAirRpt(ZoneLoop).MixVdotStdDensity +=
-                                        RefDoorMixing(ZoneA).VolRefDoorFlowRate(j) * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
-                                    MixSenLoad(ZoneLoop) += RefDoorMixing(ZoneA).VolRefDoorFlowRate(j) * AirDensity * CpAir *
-                                                            (state.dataHeatBalFanSys->MAT(ZoneLoop) - state.dataHeatBalFanSys->MAT(ZoneA));
-                                    MixLatLoad(ZoneLoop) +=
-                                        RefDoorMixing(ZoneA).VolRefDoorFlowRate(j) * AirDensity *
-                                        (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) - state.dataHeatBalFanSys->ZoneAirHumRat(ZoneA)) *
-                                        H2OHtOfVap;
+                    if (refDoorMixingA.RefDoorMixFlag) {
+                        for (int j = 1; j <= refDoorMixingA.NumRefDoorConnections; ++j) {
+                            if (refDoorMixingA.MateZonePtr(j) == ZoneLoop) {
+                                if (refDoorMixingA.VolRefDoorFlowRate(j) > 0.0) {
+                                    AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
+                                                                                   state.dataEnvrn->OutBaroPress,
+                                                                                   (thisZoneHB.MAT + zoneAHB.MAT) / 2.0,
+                                                                                   (thisZoneHB.airHumRat + zoneAHB.airHumRat) / 2.0,
+                                                                                   std::string());
+                                    CpAir = Psychrometrics::PsyCpAirFnW((thisZoneHB.airHumRat + zoneAHB.airHumRat) / 2.0);
+                                    H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb((thisZoneHB.airHumRat + zoneAHB.airHumRat) / 2.0,
+                                                                                (thisZoneHB.MAT + zoneAHB.MAT) / 2.0);
+                                    znAirRpt.MixVolume += refDoorMixingA.VolRefDoorFlowRate(j) * TimeStepSysSec * ADSCorrectionFactor;
+                                    znAirRpt.MixVdotCurDensity += refDoorMixingA.VolRefDoorFlowRate(j) * ADSCorrectionFactor;
+                                    znAirRpt.MixMass += refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity * TimeStepSysSec * ADSCorrectionFactor;
+                                    znAirRpt.MixMdot += refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity * ADSCorrectionFactor;
+                                    znAirRpt.MixVdotStdDensity +=
+                                        refDoorMixingA.VolRefDoorFlowRate(j) * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
+                                    mixSenLoad += refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity * CpAir * (thisZoneHB.MAT - zoneAHB.MAT);
+                                    mixLatLoad +=
+                                        refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity * (thisZoneHB.airHumRat - zoneAHB.airHumRat) * H2OHtOfVap;
                                 } // volflowrate > 0
                             }     // matezoneptr (zoneB) = Zonelooop
                         }         // NumRefDoorConnections
@@ -2812,118 +2676,102 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         // end refrigeration door mixing reports
 
         //    MixingLoad(ZoneLoop) = MCPM(ZoneLoop)*MAT(ZoneLoop) - MixSenLoad(ZoneLoop)
-        if (MixSenLoad(ZoneLoop) > 0.0) {
-            ZnAirRpt(ZoneLoop).MixHeatLoss = MixSenLoad(ZoneLoop) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-            ZnAirRpt(ZoneLoop).MixHeatGain = 0.0;
+        if (mixSenLoad > 0.0) {
+            znAirRpt.MixHeatLoss = mixSenLoad * TimeStepSysSec * ADSCorrectionFactor;
+            znAirRpt.MixHeatGain = 0.0;
         } else {
-            ZnAirRpt(ZoneLoop).MixHeatLoss = 0.0;
-            ZnAirRpt(ZoneLoop).MixHeatGain = -MixSenLoad(ZoneLoop) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+            znAirRpt.MixHeatLoss = 0.0;
+            znAirRpt.MixHeatGain = -mixSenLoad * TimeStepSysSec * ADSCorrectionFactor;
         }
         // Report mixing latent loads
         //    MixingLoad(ZoneLoop) = MixLatLoad(ZoneLoop)
-        if (MixLatLoad(ZoneLoop) > 0.0) {
-            ZnAirRpt(ZoneLoop).MixLatentLoss = MixLatLoad(ZoneLoop) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-            ZnAirRpt(ZoneLoop).MixLatentGain = 0.0;
+        if (mixLatLoad > 0.0) {
+            znAirRpt.MixLatentLoss = mixLatLoad * TimeStepSysSec * ADSCorrectionFactor;
+            znAirRpt.MixLatentGain = 0.0;
         } else {
-            ZnAirRpt(ZoneLoop).MixLatentLoss = 0.0;
-            ZnAirRpt(ZoneLoop).MixLatentGain = -MixLatLoad(ZoneLoop) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+            znAirRpt.MixLatentLoss = 0.0;
+            znAirRpt.MixLatentGain = -mixLatLoad * TimeStepSysSec * ADSCorrectionFactor;
         }
         // Total Mixing losses and gains
-        TotalLoad =
-            ZnAirRpt(ZoneLoop).MixHeatGain + ZnAirRpt(ZoneLoop).MixLatentGain - ZnAirRpt(ZoneLoop).MixHeatLoss - ZnAirRpt(ZoneLoop).MixLatentLoss;
+        TotalLoad = znAirRpt.MixHeatGain + znAirRpt.MixLatentGain - znAirRpt.MixHeatLoss - znAirRpt.MixLatentLoss;
         if (TotalLoad > 0) {
-            ZnAirRpt(ZoneLoop).MixTotalGain = TotalLoad * ADSCorrectionFactor;
-            ZnAirRpt(ZoneLoop).MixTotalLoss = 0.0;
+            znAirRpt.MixTotalGain = TotalLoad * ADSCorrectionFactor;
+            znAirRpt.MixTotalLoss = 0.0;
         } else {
-            ZnAirRpt(ZoneLoop).MixTotalGain = 0.0;
-            ZnAirRpt(ZoneLoop).MixTotalLoss = -TotalLoad * ADSCorrectionFactor;
+            znAirRpt.MixTotalGain = 0.0;
+            znAirRpt.MixTotalLoss = -TotalLoad * ADSCorrectionFactor;
         }
 
         // Reporting combined outdoor air flows
-        for (j = 1; j <= state.dataHeatBal->TotZoneAirBalance; ++j) {
+        for (int j = 1; j <= state.dataHeatBal->TotZoneAirBalance; ++j) {
             if (state.dataHeatBal->ZoneAirBalance(j).BalanceMethod == DataHeatBalance::AirBalance::Quadrature &&
                 ZoneLoop == state.dataHeatBal->ZoneAirBalance(j).ZonePtr) {
-                if (state.dataHeatBalFanSys->MAT(ZoneLoop) > Zone(ZoneLoop).OutDryBulbTemp) {
-                    ZnAirRpt(ZoneLoop).OABalanceHeatLoss = state.dataHeatBalFanSys->MDotCPOA(ZoneLoop) *
-                                                           (state.dataHeatBalFanSys->MAT(ZoneLoop) - Zone(ZoneLoop).OutDryBulbTemp) * TimeStepSys *
-                                                           DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                    ZnAirRpt(ZoneLoop).OABalanceHeatGain = 0.0;
+                if (thisZoneHB.MAT > zone.OutDryBulbTemp) {
+                    znAirRpt.OABalanceHeatLoss = thisZoneHB.MDotCPOA * (thisZoneHB.MAT - zone.OutDryBulbTemp) * TimeStepSysSec * ADSCorrectionFactor;
+                    znAirRpt.OABalanceHeatGain = 0.0;
                 } else {
-                    ZnAirRpt(ZoneLoop).OABalanceHeatLoss = 0.0;
-                    ZnAirRpt(ZoneLoop).OABalanceHeatGain = -state.dataHeatBalFanSys->MDotCPOA(ZoneLoop) *
-                                                           (state.dataHeatBalFanSys->MAT(ZoneLoop) - Zone(ZoneLoop).OutDryBulbTemp) * TimeStepSys *
-                                                           DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+                    znAirRpt.OABalanceHeatLoss = 0.0;
+                    znAirRpt.OABalanceHeatGain = -thisZoneHB.MDotCPOA * (thisZoneHB.MAT - zone.OutDryBulbTemp) * TimeStepSysSec * ADSCorrectionFactor;
                 }
-                H2OHtOfVap = PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
-                if (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) > state.dataEnvrn->OutHumRat) {
-                    ZnAirRpt(ZoneLoop).OABalanceLatentLoss = state.dataHeatBalFanSys->MDotOA(ZoneLoop) *
-                                                             (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) - state.dataEnvrn->OutHumRat) *
-                                                             H2OHtOfVap * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                    ZnAirRpt(ZoneLoop).OABalanceLatentGain = 0.0;
-                } else if (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) <= state.dataEnvrn->OutHumRat) {
-                    ZnAirRpt(ZoneLoop).OABalanceLatentGain = state.dataHeatBalFanSys->MDotOA(ZoneLoop) *
-                                                             (state.dataEnvrn->OutHumRat - state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop)) *
-                                                             H2OHtOfVap * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                    ZnAirRpt(ZoneLoop).OABalanceLatentLoss = 0.0;
+                H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, zone.OutDryBulbTemp);
+                if (thisZoneHB.airHumRat > state.dataEnvrn->OutHumRat) {
+                    znAirRpt.OABalanceLatentLoss =
+                        thisZoneHB.MDotOA * (thisZoneHB.airHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec * ADSCorrectionFactor;
+                    znAirRpt.OABalanceLatentGain = 0.0;
+                } else {
+                    znAirRpt.OABalanceLatentGain =
+                        thisZoneHB.MDotOA * (state.dataEnvrn->OutHumRat - thisZoneHB.airHumRat) * H2OHtOfVap * TimeStepSysSec * ADSCorrectionFactor;
+                    znAirRpt.OABalanceLatentLoss = 0.0;
                 }
                 // Total ventilation losses and gains
-                TotalLoad = ZnAirRpt(ZoneLoop).OABalanceHeatGain + ZnAirRpt(ZoneLoop).OABalanceLatentGain - ZnAirRpt(ZoneLoop).OABalanceHeatLoss -
-                            ZnAirRpt(ZoneLoop).OABalanceLatentLoss;
+                TotalLoad = znAirRpt.OABalanceHeatGain + znAirRpt.OABalanceLatentGain - znAirRpt.OABalanceHeatLoss - znAirRpt.OABalanceLatentLoss;
                 if (TotalLoad > 0) {
-                    ZnAirRpt(ZoneLoop).OABalanceTotalGain = TotalLoad * ADSCorrectionFactor;
-                    ZnAirRpt(ZoneLoop).OABalanceTotalLoss = 0.0;
+                    znAirRpt.OABalanceTotalGain = TotalLoad * ADSCorrectionFactor;
+                    znAirRpt.OABalanceTotalLoss = 0.0;
                 } else {
-                    ZnAirRpt(ZoneLoop).OABalanceTotalGain = 0.0;
-                    ZnAirRpt(ZoneLoop).OABalanceTotalLoss = -TotalLoad * ADSCorrectionFactor;
+                    znAirRpt.OABalanceTotalGain = 0.0;
+                    znAirRpt.OABalanceTotalLoss = -TotalLoad * ADSCorrectionFactor;
                 }
-                ZnAirRpt(ZoneLoop).OABalanceMass =
-                    (state.dataHeatBalFanSys->MDotOA(ZoneLoop)) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).OABalanceMdot = (state.dataHeatBalFanSys->MDotOA(ZoneLoop)) * ADSCorrectionFactor;
-                AirDensity = PsyRhoAirFnPbTdbW(state,
-                                               state.dataEnvrn->OutBaroPress,
-                                               state.dataHeatBalFanSys->MAT(ZoneLoop),
-                                               state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneLoop),
-                                               std::string());
-                ZnAirRpt(ZoneLoop).OABalanceVolumeCurDensity =
-                    (state.dataHeatBalFanSys->MDotOA(ZoneLoop) / AirDensity) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).OABalanceAirChangeRate = ZnAirRpt(ZoneLoop).OABalanceVolumeCurDensity / (TimeStepSys * Zone(ZoneLoop).Volume);
-                ZnAirRpt(ZoneLoop).OABalanceVdotCurDensity = (state.dataHeatBalFanSys->MDotOA(ZoneLoop) / AirDensity) * ADSCorrectionFactor;
+                znAirRpt.OABalanceMass = (thisZoneHB.MDotOA) * TimeStepSysSec * ADSCorrectionFactor;
+                znAirRpt.OABalanceMdot = (thisZoneHB.MDotOA) * ADSCorrectionFactor;
+                AirDensity =
+                    Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.airHumRatAvg, std::string());
+                znAirRpt.OABalanceVolumeCurDensity = (thisZoneHB.MDotOA / AirDensity) * TimeStepSysSec * ADSCorrectionFactor;
+                znAirRpt.OABalanceAirChangeRate = znAirRpt.OABalanceVolumeCurDensity / (TimeStepSys * zone.Volume);
+                znAirRpt.OABalanceVdotCurDensity = (thisZoneHB.MDotOA / AirDensity) * ADSCorrectionFactor;
                 AirDensity = state.dataEnvrn->StdRhoAir;
-                ZnAirRpt(ZoneLoop).OABalanceVolumeStdDensity =
-                    (state.dataHeatBalFanSys->MDotOA(ZoneLoop) / AirDensity) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).OABalanceVdotStdDensity = (state.dataHeatBalFanSys->MDotOA(ZoneLoop) / AirDensity) * ADSCorrectionFactor;
-                ZnAirRpt(ZoneLoop).OABalanceFanElec = ZnAirRpt(ZoneLoop).VentilFanElec;
+                znAirRpt.OABalanceVolumeStdDensity = (thisZoneHB.MDotOA / AirDensity) * TimeStepSysSec * ADSCorrectionFactor;
+                znAirRpt.OABalanceVdotStdDensity = (thisZoneHB.MDotOA / AirDensity) * ADSCorrectionFactor;
+                znAirRpt.OABalanceFanElec = znAirRpt.VentilFanElec;
             }
         }
         // Reports exfiltration loss
-        H2OHtOfVap = PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
-        ZnAirRpt(ZoneLoop).SysInletMass = 0;
-        ZnAirRpt(ZoneLoop).SysOutletMass = 0;
-        if (!ZoneEquipConfig(ZoneLoop).IsControlled) {
-            for (int k = 1; k <= ZoneEquipConfig(ZoneLoop).NumInletNodes; ++k) {
-                ZnAirRpt(ZoneLoop).SysInletMass += state.dataLoopNodes->Node(ZoneEquipConfig(ZoneLoop).InletNode(k)).MassFlowRate * TimeStepSys *
-                                                   DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+        H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, zone.OutDryBulbTemp);
+        znAirRpt.SysInletMass = 0;
+        znAirRpt.SysOutletMass = 0;
+        if (!zoneEquipConfig.IsControlled) {
+            for (int k = 1; k <= zoneEquipConfig.NumInletNodes; ++k) {
+                znAirRpt.SysInletMass += state.dataLoopNodes->Node(zoneEquipConfig.InletNode(k)).MassFlowRate * TimeStepSysSec * ADSCorrectionFactor;
             }
-            for (int k = 1; k <= ZoneEquipConfig(ZoneLoop).NumExhaustNodes; ++k) {
-                ZnAirRpt(ZoneLoop).SysOutletMass += state.dataLoopNodes->Node(ZoneEquipConfig(ZoneLoop).ExhaustNode(k)).MassFlowRate * TimeStepSys *
-                                                    DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+            for (int k = 1; k <= zoneEquipConfig.NumExhaustNodes; ++k) {
+                znAirRpt.SysOutletMass +=
+                    state.dataLoopNodes->Node(zoneEquipConfig.ExhaustNode(k)).MassFlowRate * TimeStepSysSec * ADSCorrectionFactor;
             }
-            for (int k = 1; k <= ZoneEquipConfig(ZoneLoop).NumReturnNodes; ++k) {
-                ZnAirRpt(ZoneLoop).SysOutletMass += state.dataLoopNodes->Node(ZoneEquipConfig(ZoneLoop).ReturnNode(k)).MassFlowRate * TimeStepSys *
-                                                    DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+            for (int k = 1; k <= zoneEquipConfig.NumReturnNodes; ++k) {
+                znAirRpt.SysOutletMass +=
+                    state.dataLoopNodes->Node(zoneEquipConfig.ReturnNode(k)).MassFlowRate * TimeStepSysSec * ADSCorrectionFactor;
             }
         }
 
-        ZnAirRpt(ZoneLoop).ExfilMass = ZnAirRpt(ZoneLoop).InfilMass + ZnAirRpt(ZoneLoop).VentilMass + ZnAirRpt(ZoneLoop).MixMass +
-                                       ZnAirRpt(ZoneLoop).OABalanceMass + ZnAirRpt(ZoneLoop).SysInletMass - ZnAirRpt(ZoneLoop).SysOutletMass; // kg
-        ZnAirRpt(ZoneLoop).ExfilSensiLoss = ZnAirRpt(ZoneLoop).ExfilMass / (TimeStepSys * DataGlobalConstants::SecInHour) *
-                                            (state.dataHeatBalFanSys->MAT(ZoneLoop) - Zone(ZoneLoop).OutDryBulbTemp) * CpAir; // W
-        ZnAirRpt(ZoneLoop).ExfilLatentLoss = ZnAirRpt(ZoneLoop).ExfilMass / (TimeStepSys * DataGlobalConstants::SecInHour) *
-                                             (state.dataHeatBalFanSys->ZoneAirHumRat(ZoneLoop) - state.dataEnvrn->OutHumRat) * H2OHtOfVap;
-        ZnAirRpt(ZoneLoop).ExfilTotalLoss = ZnAirRpt(ZoneLoop).ExfilLatentLoss + ZnAirRpt(ZoneLoop).ExfilSensiLoss;
+        znAirRpt.ExfilMass = znAirRpt.InfilMass + znAirRpt.VentilMass + znAirRpt.MixMass + znAirRpt.OABalanceMass + znAirRpt.SysInletMass -
+                             znAirRpt.SysOutletMass; // kg
+        // I am not happy with these un-parenthesized divisions and multiplications.  Someone clean this up.
+        znAirRpt.ExfilSensiLoss = znAirRpt.ExfilMass / TimeStepSysSec * (thisZoneHB.MAT - zone.OutDryBulbTemp) * CpAir; // W
+        znAirRpt.ExfilLatentLoss = znAirRpt.ExfilMass / TimeStepSysSec * (thisZoneHB.airHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap;
+        znAirRpt.ExfilTotalLoss = znAirRpt.ExfilLatentLoss + znAirRpt.ExfilSensiLoss;
 
-        state.dataHeatBal->ZoneTotalExfiltrationHeatLoss += ZnAirRpt(ZoneLoop).ExfilTotalLoss * TimeStepSys * DataGlobalConstants::SecInHour;
-        state.dataHeatBal->ZoneTotalExhaustHeatLoss += ZnAirRpt(ZoneLoop).ExhTotalLoss * TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataHeatBal->ZoneTotalExfiltrationHeatLoss += znAirRpt.ExfilTotalLoss * TimeStepSysSec;
+        state.dataHeatBal->ZoneTotalExhaustHeatLoss += znAirRpt.ExhTotalLoss * TimeStepSysSec;
     }
 }
 
@@ -2945,85 +2793,83 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Uses program data structures AirLoopControlInfo and ZoneEquipInfo
 
-    // Using/Aliasing
-    auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
-    using ScheduleManager::CheckScheduleValue;
-    using ScheduleManager::GetCurrentScheduleValue;
-    using ScheduleManager::GetScheduleMaxValue;
-
-    bool CyclingFan(false); // TRUE means air loop operates in cycling fan mode at some point
-
-    auto &Zone(state.dataHeatBal->Zone);
-    auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
-    auto &ZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig);
-
     if (!state.dataHVACGlobal->AirLoopsSimOnce) return;
+
+    int NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
     if (state.dataHVACMgr->MyOneTimeFlag) {
         // set the air loop Any Continuous Fan flag
         for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            if (AirLoopControlInfo(AirLoopNum).UnitarySys) { // for unitary systems check the cycling fan schedule
-                if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
-                    Real64 CycFanMaxVal = GetScheduleMaxValue(state, AirLoopControlInfo(AirLoopNum).CycFanSchedPtr);
+            auto &airLoopControlInfo = state.dataAirLoop->AirLoopControlInfo(AirLoopNum);
+
+            if (airLoopControlInfo.UnitarySys) { // for unitary systems check the cycling fan schedule
+                if (airLoopControlInfo.CycFanSchedPtr > 0) {
+                    Real64 CycFanMaxVal = ScheduleManager::GetScheduleMaxValue(state, airLoopControlInfo.CycFanSchedPtr);
                     if (CycFanMaxVal > 0.0) {
-                        AirLoopControlInfo(AirLoopNum).AnyContFan = true;
+                        airLoopControlInfo.AnyContFan = true;
                     } else {
-                        AirLoopControlInfo(AirLoopNum).AnyContFan = false;
+                        airLoopControlInfo.AnyContFan = false;
                     }
                 } else { // no schedule means always cycling fan
-                    AirLoopControlInfo(AirLoopNum).AnyContFan = false;
+                    airLoopControlInfo.AnyContFan = false;
                 }
             } else { // for nonunitary (central) all systems are continuous fan
-                AirLoopControlInfo(AirLoopNum).AnyContFan = true;
+                airLoopControlInfo.AnyContFan = true;
             }
         }
         // check to see if a controlled zone is served exclusively by a zonal system
         for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
+            auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum);
             bool airLoopFound = false;
-            for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                if (ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode) > 0) {
+            for (int zoneInNode = 1; zoneInNode <= zoneEquipConfig.NumInletNodes; ++zoneInNode) {
+                if (zoneEquipConfig.InletNodeAirLoopNum(zoneInNode) > 0) {
                     airLoopFound = true;
                 }
             }
-            if (!airLoopFound && ZoneEquipConfig(ControlledZoneNum).NumInletNodes == ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes) {
-                ZoneEquipConfig(ControlledZoneNum).ZonalSystemOnly = true;
+            if (!airLoopFound && zoneEquipConfig.NumInletNodes == zoneEquipConfig.NumExhaustNodes) {
+                zoneEquipConfig.ZonalSystemOnly = true;
             }
         }
         // issue warning messages if zone is served by a zonal system or a cycling system and the input calls for
         // heat gain to return air
         for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-            if (!ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
-            CyclingFan = false;
-            for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                int AirLoopNum = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+            auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum);
+            if (!zoneEquipConfig.IsControlled) continue;
+            bool CyclingFan = false; // TRUE means air loop operates in cycling fan mode at some point
+            for (int zoneInNode = 1; zoneInNode <= zoneEquipConfig.NumInletNodes; ++zoneInNode) {
+                int AirLoopNum = zoneEquipConfig.InletNodeAirLoopNum(zoneInNode);
                 if (AirLoopNum > 0) {
-                    if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
-                        CyclingFan = CheckScheduleValue(state, AirLoopControlInfo(AirLoopNum).CycFanSchedPtr, 0.0);
+                    if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
+                        CyclingFan =
+                            ScheduleManager::CheckScheduleValue(state, state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr, 0.0);
                     }
                 }
             }
-            if (ZoneEquipConfig(ControlledZoneNum).ZonalSystemOnly || CyclingFan) {
-                if (Zone(ControlledZoneNum).RefrigCaseRA) {
+            if (zoneEquipConfig.ZonalSystemOnly || CyclingFan) {
+                auto const &thisZone = state.dataHeatBal->Zone(ControlledZoneNum);
+                if (thisZone.RefrigCaseRA) {
                     ShowWarningError(state,
-                                     "For zone=" + Zone(ControlledZoneNum).Name +
-                                         " return air cooling by refrigerated cases will be applied to the zone air.");
+                                     format("For zone={} return air cooling by refrigerated cases will be applied to the zone air.", thisZone.Name));
                     ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");
                 }
                 for (int LightNum = 1; LightNum <= state.dataHeatBal->TotLights; ++LightNum) {
                     if (state.dataHeatBal->Lights(LightNum).ZonePtr != ControlledZoneNum) continue;
                     if (state.dataHeatBal->Lights(LightNum).FractionReturnAir > 0.0) {
-                        ShowWarningError(
-                            state, "For zone=" + Zone(ControlledZoneNum).Name + " return air heat gain from lights will be applied to the zone air.");
+                        ShowWarningError(state,
+                                         format("For zone={} return air heat gain from lights will be applied to the zone air.", thisZone.Name));
                         ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");
                         break;
                     }
                 }
-                for (int SurfNum = Zone(ControlledZoneNum).HTSurfaceFirst; SurfNum <= Zone(ControlledZoneNum).HTSurfaceLast; ++SurfNum) {
-                    if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == DataSurfaces::WindowAirFlowDestination::Return) {
-                        ShowWarningError(state,
-                                         "For zone=" + Zone(ControlledZoneNum).Name +
-                                             " return air heat gain from air flow windows will be applied to the zone air.");
-                        ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");
+                for (int spaceNum : thisZone.spaceIndexes) {
+                    auto const &thisSpace = state.dataHeatBal->space(spaceNum);
+                    for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                        if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == DataSurfaces::WindowAirFlowDestination::Return) {
+                            ShowWarningError(
+                                state,
+                                format("For zone={} return air heat gain from air flow windows will be applied to the zone air.", thisZone.Name));
+                            ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");
+                        }
                     }
                 }
             }
@@ -3033,25 +2879,28 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
 
     // set the air loop fan operation mode
     for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-        if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
-            if (GetCurrentScheduleValue(state, AirLoopControlInfo(AirLoopNum).CycFanSchedPtr) == 0.0) {
-                AirLoopControlInfo(AirLoopNum).FanOpMode = CycFanCycCoil;
+        auto &airLoopControlInfo = state.dataAirLoop->AirLoopControlInfo(AirLoopNum);
+        if (airLoopControlInfo.CycFanSchedPtr > 0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, airLoopControlInfo.CycFanSchedPtr) == 0.0) {
+                airLoopControlInfo.FanOpMode = DataHVACGlobals::CycFanCycCoil;
             } else {
-                AirLoopControlInfo(AirLoopNum).FanOpMode = ContFanCycCoil;
+                airLoopControlInfo.FanOpMode = DataHVACGlobals::ContFanCycCoil;
             }
         }
     }
     // set the zone level NoHeatToReturnAir flag
     // if any air loop in the zone is continuous fan, then set NoHeatToReturnAir = false and sort it out node-by-node
     for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-        if (!ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
-        Zone(ControlledZoneNum).NoHeatToReturnAir = true;
-        if (!ZoneEquipConfig(ControlledZoneNum).ZonalSystemOnly) {
-            for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                int AirLoopNum = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+        auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum);
+        auto &thisZone = state.dataHeatBal->Zone(ControlledZoneNum);
+        if (!zoneEquipConfig.IsControlled) continue;
+        thisZone.NoHeatToReturnAir = true;
+        if (!zoneEquipConfig.ZonalSystemOnly) {
+            for (int zoneInNode = 1; zoneInNode <= zoneEquipConfig.NumInletNodes; ++zoneInNode) {
+                int AirLoopNum = zoneEquipConfig.InletNodeAirLoopNum(zoneInNode);
                 if (AirLoopNum > 0) {
-                    if (AirLoopControlInfo(AirLoopNum).FanOpMode == ContFanCycCoil) {
-                        Zone(ControlledZoneNum).NoHeatToReturnAir = false;
+                    if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode == DataHVACGlobals::ContFanCycCoil) {
+                        thisZone.NoHeatToReturnAir = false;
                         break;
                     }
                 }
@@ -3063,7 +2912,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
 void UpdateZoneInletConvergenceLog(EnergyPlusData &state)
 {
 
-    std::array<Real64, DataConvergParams::ConvergLogStackDepth> tmpRealARR = {0};
+    std::array<Real64, DataConvergParams::ConvergLogStackDepth> tmpRealARR;
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
@@ -3097,13 +2946,13 @@ void CheckAirLoopFlowBalance(EnergyPlusData &state)
     // Check for unbalanced airloop
     if (!state.dataGlobal->WarmupFlag && state.dataHVACGlobal->AirLoopsSimOnce) {
         for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
-            auto &thisAirLoopFlow(state.dataAirLoop->AirLoopFlow(AirLoopNum));
+            auto &thisAirLoopFlow = state.dataAirLoop->AirLoopFlow(AirLoopNum);
             if (!thisAirLoopFlow.FlowError) {
                 Real64 unbalancedExhaustDelta = thisAirLoopFlow.SupFlow - thisAirLoopFlow.OAFlow - thisAirLoopFlow.SysRetFlow;
-                if (unbalancedExhaustDelta > SmallMassFlow) {
+                if (unbalancedExhaustDelta > DataHVACGlobals::SmallMassFlow) {
                     ShowSevereError(state,
-                                    "CheckAirLoopFlowBalance: AirLoopHVAC " + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name +
-                                        " is unbalanced. Supply is > return plus outdoor air.");
+                                    format("CheckAirLoopFlowBalance: AirLoopHVAC {} is unbalanced. Supply is > return plus outdoor air.",
+                                           state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name));
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state,
                                       format("  Flows [m3/s at standard density]: Supply={:.6R}  Return={:.6R}  Outdoor Air={:.6R}",

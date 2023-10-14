@@ -98,7 +98,7 @@
 ! Utility Tariffs:                None
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,22.2;
+  Version,24.1;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -3623,7 +3623,7 @@
     Main Boiler HW Outlet,   !- Boiler Water Outlet Node Name
     100,                     !- Water Outlet Upper Temperature Limit {C}
     ConstantFlow,            !- Boiler Flow Mode
-    0,                       !- Parasitic Electric Load {W}
+    0,                       !- On Cycle Parasitic Electric Load {W}
     1.0;                     !- Sizing Factor
 
 !-   ===========  ALL OBJECTS IN CLASS: CHILLER:ELECTRIC:EIR ===========

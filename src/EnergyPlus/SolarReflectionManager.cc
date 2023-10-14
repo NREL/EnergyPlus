@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -248,7 +248,8 @@ namespace SolarReflectionManager {
                 for (loop = 1; loop <= state.dataSurface->Surface(SurfNum).Sides; ++loop) {
                     if (state.dataSurface->Surface(SurfNum).Vertex(loop).z < state.dataSurface->GroundLevelZ) {
                         ShowWarningError(
-                            state, "Calculation of reflected solar onto surface=" + state.dataSurface->Surface(SurfNum).Name + " may be inaccurate");
+                            state,
+                            format("Calculation of reflected solar onto surface={} may be inaccurate", state.dataSurface->Surface(SurfNum).Name));
                         ShowContinueError(state, "because it has one or more vertices below ground level.");
                         break;
                     }
@@ -387,8 +388,8 @@ namespace SolarReflectionManager {
             }
             state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).PhiNormVec = PhiSurf;
             state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).ThetaNormVec = ThetaSurf;
-            PhiMin = max(-DataGlobalConstants::PiOvr2, PhiSurf - DataGlobalConstants::PiOvr2);
-            PhiMax = min(DataGlobalConstants::PiOvr2, PhiSurf + DataGlobalConstants::PiOvr2);
+            PhiMin = max(-Constant::PiOvr2, PhiSurf - Constant::PiOvr2);
+            PhiMax = min(Constant::PiOvr2, PhiSurf + Constant::PiOvr2);
             DPhi = (PhiMax - PhiMin) / AltAngStepsForSolReflCalc;
             RayNum = 0;
 
@@ -401,9 +402,9 @@ namespace SolarReflectionManager {
                 URay(3) = SPhi;
 
                 if (PhiSurf >= 0.0) {
-                    if (Phi >= DataGlobalConstants::PiOvr2 - PhiSurf) {
-                        ThetaMin = -DataGlobalConstants::Pi;
-                        ThetaMax = DataGlobalConstants::Pi;
+                    if (Phi >= Constant::PiOvr2 - PhiSurf) {
+                        ThetaMin = -Constant::Pi;
+                        ThetaMax = Constant::Pi;
                     } else {
                         ACosTanTan = std::acos(-std::tan(Phi) * tan_PhiSurf);
                         ThetaMin = ThetaSurf - std::abs(ACosTanTan);
@@ -411,9 +412,9 @@ namespace SolarReflectionManager {
                     }
 
                 } else { // PhiSurf < 0.0
-                    if (Phi <= -PhiSurf - DataGlobalConstants::PiOvr2) {
-                        ThetaMin = -DataGlobalConstants::Pi;
-                        ThetaMax = DataGlobalConstants::Pi;
+                    if (Phi <= -PhiSurf - Constant::PiOvr2) {
+                        ThetaMin = -Constant::Pi;
+                        ThetaMax = Constant::Pi;
                     } else {
                         ACosTanTan = std::acos(-std::tan(Phi) * tan_PhiSurf);
                         ThetaMin = ThetaSurf - std::abs(ACosTanTan);
@@ -784,7 +785,7 @@ namespace SolarReflectionManager {
                                     .dOmegaRay(state.dataSolarReflectionManager->RayNum) *
                                 state.dataSolarReflectionManager->SolReflRecSurf(state.dataSolarReflectionManager->RecSurfNum)
                                     .CosIncAngRay(state.dataSolarReflectionManager->RayNum) /
-                                DataGlobalConstants::Pi;
+                                Constant::Pi;
                             ReflBmToDiffSolObs(state.dataSolarReflectionManager->RecPtNum) += state.dataSolarReflectionManager->dReflBeamToDiffSol;
                         } else {
                             // Ray hits ground (in this case we do not multiply by BmReflSolRadiance since
@@ -795,7 +796,7 @@ namespace SolarReflectionManager {
                                     .dOmegaRay(state.dataSolarReflectionManager->RayNum) *
                                 state.dataSolarReflectionManager->SolReflRecSurf(state.dataSolarReflectionManager->RecSurfNum)
                                     .CosIncAngRay(state.dataSolarReflectionManager->RayNum) /
-                                DataGlobalConstants::Pi;
+                                Constant::Pi;
                             ReflBmToDiffSolGnd(state.dataSolarReflectionManager->RecPtNum) += state.dataSolarReflectionManager->dReflBeamToDiffSol;
                         }
                     }
@@ -1108,8 +1109,8 @@ namespace SolarReflectionManager {
         // sky diffuse horizontal irradiance
         bool hitObs; // True iff obstruction is hit
 
-        Real64 const DPhi(DataGlobalConstants::PiOvr2 / (AltAngStepsForSolReflCalc / 2.0));      // Altitude angle and increment (radians)
-        Real64 const DTheta(2.0 * DataGlobalConstants::Pi / (2.0 * AzimAngStepsForSolReflCalc)); // Azimuth increment (radians)
+        Real64 const DPhi(Constant::PiOvr2 / (AltAngStepsForSolReflCalc / 2.0));      // Altitude angle and increment (radians)
+        Real64 const DTheta(2.0 * Constant::Pi / (2.0 * AzimAngStepsForSolReflCalc)); // Azimuth increment (radians)
 
         // Pre-compute these constants
         // Initialize the 0 index with dummy value so the iterators line up below
@@ -1203,7 +1204,7 @@ namespace SolarReflectionManager {
                                 .dOmegaRay(state.dataSolarReflectionManager->iRayNum) *
                             state.dataSolarReflectionManager->SolReflRecSurf(state.dataSolarReflectionManager->iRecSurfNum)
                                 .CosIncAngRay(state.dataSolarReflectionManager->iRayNum) /
-                            DataGlobalConstants::Pi;
+                            Constant::Pi;
                         ReflSkySolObs(state.dataSolarReflectionManager->iRecPtNum) += state.dataSolarReflectionManager->dReflSkySol;
                     } else {
                         // Ray hits ground;
@@ -1258,7 +1259,7 @@ namespace SolarReflectionManager {
                                 }
                                 if (hitObs) continue; // Obstruction hit
                                 // Sky is hit
-                                dReflSkyGnd += CosIncAngRayToSky * dOmega / DataGlobalConstants::Pi;
+                                dReflSkyGnd += CosIncAngRayToSky * dOmega / Constant::Pi;
                             } // End of azimuth loop
                         }     // End of altitude loop
                         ReflSkySolGnd(state.dataSolarReflectionManager->iRecPtNum) +=
@@ -1267,7 +1268,7 @@ namespace SolarReflectionManager {
                                 .dOmegaRay(state.dataSolarReflectionManager->iRayNum) *
                             state.dataSolarReflectionManager->SolReflRecSurf(state.dataSolarReflectionManager->iRecSurfNum)
                                 .CosIncAngRay(state.dataSolarReflectionManager->iRayNum) /
-                            DataGlobalConstants::Pi;
+                            Constant::Pi;
                     } // End of check if ray from receiving point hits obstruction or ground
                 }     // End of loop over rays from receiving point
             }         // End of loop over receiving points

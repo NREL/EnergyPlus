@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
@@ -1966,7 +1967,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "  Branch,",
         "    Heating Purchased Hot Water Branch,  !- Name",
         "    ,                        !- Pressure Drop Curve Name",
-        "    DistrictHeating,         !- Component 1 Object Type",
+        "    DistrictHeating:Water,         !- Component 1 Object Type",
         "    Purchased Heating,       !- Component 1 Name",
         "    Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name",
         "    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name",
@@ -2188,7 +2189,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    Purchased Cooling Outlet Node,  !- Chilled Water Outlet Node Name",
         "    1000000;                 !- Nominal Capacity {W}",
 
-        "  DistrictHeating,",
+        "  DistrictHeating:Water,",
         "    Purchased Heating,       !- Name",
         "    Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name",
         "    Purchased Heat Outlet Node,  !- Hot Water Outlet Node Name",
@@ -2303,7 +2304,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
 
         "  PlantEquipmentList,",
         "    heating plant,           !- Name",
-        "    DistrictHeating,         !- Equipment 1 Object Type",
+        "    DistrictHeating:Water,         !- Equipment 1 Object Type",
         "    Purchased Heating;       !- Equipment 1 Name",
 
         "  PlantEquipmentOperation:CoolingLoad,",
@@ -2359,7 +2360,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    GetMaterialData(*state, ErrorsFound); // read construction material data
+    Material::GetMaterialData(*state, ErrorsFound); // read construction material data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;

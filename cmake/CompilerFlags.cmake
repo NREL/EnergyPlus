@@ -8,7 +8,7 @@ endif()
 
 # Make sure expat is compiled as a static library
 target_compile_definitions(project_options INTERFACE -DXML_STATIC)
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
   option(BUILD_TIME_TRACE "Enable -ftime-trace for investigating build times on clang" OFF)
   mark_as_advanced(BUILD_TIME_TRACE)
   if (BUILD_TIME_TRACE)
@@ -24,6 +24,7 @@ if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 
   target_compile_options(project_options INTERFACE /EHsc)
   target_compile_options(project_options INTERFACE /MP) # Enables multi-processor compilation of source within a single project
   target_compile_options(project_options INTERFACE /Zc:externConstexpr)  # allows constexpr to be extern'd in headers, which is part of the standard, and supported by default on non-vs compilers
+  target_compile_options(project_options INTERFACE /utf-8)  # Specifies both the source character set and the execution character set as UTF-8
 
   # string(REGEX REPLACE "/W3" "/W1" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}"
   # )# Increase to /W2 then /W3 as more serious warnings are addressed (using regex to avoid VC override warnings)
@@ -55,7 +56,21 @@ if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 
   #    ADD_CXX_DEFINITIONS("-d2SSAOptimizer-") # this disables this optimizer which has known major issues
 
   # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/GS->) # Disable buffer overrun checks for performance in release mode
+  if (ENABLE_HARDENED_RUNTIME)
+    message(AUTHOR_WARNING "Enabling /GS and /guard:cf for hardened runtime")
+    # Enable Control Flow Guard (default: off)
+    # This is both a compiler and a linker flag
+    target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/guard:cf>)
+    target_link_options(project_options INTERFACE $<$<CONFIG:Release>:/guard:cf>)
+
+    target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/GS>) # Explicitly enable buffer overrun checks in release mode (default: on)
+    target_link_options(project_options INTERFACE $<$<CONFIG:Release>:/FIXED:NO>) # Explicitly generate a relocation section in the program (default: /FIXED:NO for DLL, /FIXED for others)
+    target_link_options(project_options INTERFACE $<$<CONFIG:Release>:/DYNAMICBASE>) # Explicitly enable Address Space Layout Randomization (default: on)
+    target_link_options(project_options INTERFACE $<$<CONFIG:Release>:/HIGHENTROPYVA>) # Explicitly enable 64-bit ASLR (default: on)
+    target_link_options(project_options INTERFACE $<$<CONFIG:Release>:/NXCOMPAT>) # Explicitly indicate that an executable is compatible with the Windows Data Execution Prevention feature (default: on)
+  else()
+    target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:/GS->) # Disable buffer overrun checks for performance in release mode
+  endif()
 
   # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/Ob0>) # Disable inlining
@@ -63,6 +78,11 @@ if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 
   target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:/fp:strict>) # Floating point model
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/DMSVC_DEBUG>) # Triggers code in main.cc to catch floating point NaNs
 elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") # g++/Clang
+
+  # TODO: after we fix all test, enable this by default on Debug builds
+  # option(FORCE_DEBUG_ARITHM_GCC_OR_CLANG "Enable trapping floating point exceptions in non Debug mode" OFF)
+  option(FORCE_DEBUG_ARITHM_GCC_OR_CLANG "Enable trapping floating point exceptions" OFF)
+  mark_as_advanced(FORCE_DEBUG_ARITHM_GCC_OR_CLANG)
 
   # COMPILER FLAGS
   target_compile_options(project_options INTERFACE -pipe) # Faster compiler processing
@@ -90,12 +110,30 @@ elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" O
     target_compile_options(project_warnings INTERFACE -Wno-invalid-source-encoding)
   endif()
 
+  set(need_arithm_debug_genex "$<OR:$<BOOL:${FORCE_DEBUG_ARITHM_GCC_OR_CLANG}>,$<CONFIG:Debug>>")
+
+  # TODO: after we fix all tests, remove this if statement (keeping the block to always execute) to enable this by default on Debug builds
+  if (FORCE_DEBUG_ARITHM_GCC_OR_CLANG)
+    # in main.cc for E+ and gtest: feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW)
+    target_compile_definitions(project_fp_options INTERFACE $<${need_arithm_debug_genex}:DEBUG_ARITHM_GCC_OR_CLANG>)
+    include(CheckCXXSymbolExists)
+    check_cxx_symbol_exists(feenableexcept "fenv.h" HAVE_FEENABLEEXCEPT)
+    message(VERBOSE "HAVE_FEENABLEEXCEPT=${HAVE_FEENABLEEXCEPT}")
+    if(HAVE_FEENABLEEXCEPT)
+      target_compile_definitions(project_fp_options INTERFACE HAVE_FEENABLEEXCEPT)
+    endif()
+  endif()
+
   # ADDITIONAL GCC-SPECIFIC FLAGS
   if(CMAKE_COMPILER_IS_GNUCXX) # g++
-    target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-ffloat-store>) # Improve debug run solution stability
-    target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-fsignaling-nans>) # Disable optimizations that may have concealed NaN behavior
-    target_compile_definitions(project_options INTERFACE $<$<CONFIG:Debug>:_GLIBCXX_DEBUG>) # Standard container debug mode (bounds checking, ...>)
+    target_compile_options(project_options INTERFACE $<${need_arithm_debug_genex}:-ffloat-store>) # Improve debug run solution stability
+    target_compile_options(project_options INTERFACE $<${need_arithm_debug_genex}:-fsignaling-nans>) # Disable optimizations that may have concealed NaN behavior
+    target_compile_definitions(project_options INTERFACE $<${need_arithm_debug_genex}:_GLIBCXX_DEBUG>) # Standard container debug mode (bounds checking, ...>)
     # ADD_CXX_RELEASE_DEFINITIONS("-finline-limit=2000") # More aggressive inlining   This is causing unit test failures on Ubuntu 14.04
+  else()
+    #check_cxx_compiler_flag(<flag> <var>)
+    #target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-ffp-exception-behavior=strict>) # Disable optimizations that may have concealed NaN behavior
+    #target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-ftrapping-math>) # Disable optimizations that may have concealed NaN behavior
   endif()
 
   target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:-fno-stack-protector>)

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -82,7 +82,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataCondenserLoopTowers = std::make_unique<CondenserLoopTowersData>();
     this->dataConstruction = std::make_unique<ConstructionData>();
     this->dataContaminantBalance = std::make_unique<ContaminantBalanceData>();
-    this->dataConvectionCoefficient = std::make_unique<ConvectionCoefficientsData>();
+    this->dataConvect = std::make_unique<ConvectionCoefficientsData>();
     this->dataConvergeParams = std::make_unique<ConvergParamsData>();
     this->dataCoolTower = std::make_unique<CoolTowerData>();
     this->dataCostEstimateManager = std::make_unique<CostEstimateManagerData>();
@@ -99,6 +99,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataDesiccantDehumidifiers = std::make_unique<DesiccantDehumidifiersData>();
     this->dataDispVentMgr = std::make_unique<DisplacementVentMgrData>();
     this->dataDualDuct = std::make_unique<DualDuctData>();
+    this->dataEIRFuelFiredHeatPump = std::make_unique<EIRFuelFiredHeatPumpsData>();
     this->dataEIRPlantLoopHeatPump = std::make_unique<EIRPlantLoopHeatPumpsData>();
     this->dataEMSMgr = std::make_unique<EMSManagerData>();
     this->dataEarthTube = std::make_unique<EarthTubeData>();
@@ -126,7 +127,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataGenerator = std::make_unique<GeneratorsData>();
     this->dataGeneratorFuelSupply = std::make_unique<GeneratorFuelSupplyData>();
     this->dataGlobal = std::make_unique<DataGlobal>();
-    this->dataGlobalConst = std::make_unique<DataGlobalConstantsData>();
     this->dataGlobalNames = std::make_unique<GlobalNamesData>();
     this->dataGrndTempModelMgr = std::make_unique<GroundTemperatureManagerData>();
     this->dataGroundHeatExchanger = std::make_unique<GroundHeatExchangerData>();
@@ -226,8 +226,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataRetAirPathMrg = std::make_unique<ReturnAirPathMgr>();
     this->dataExhAirSystemMrg = std::make_unique<ExhaustAirSystemMgr>();
     this->dataExhCtrlSystemMrg = std::make_unique<ExhaustControlSystemMgr>();
-    this->dataRoomAirMod = std::make_unique<RoomAirModelData>();
-    this->dataRoomAirModelMgr = std::make_unique<RoomAirModelManagerData>();
+    this->dataRoomAir = std::make_unique<RoomAirModelData>();
     this->dataRoomAirModelTempPattern = std::make_unique<RoomAirModelUserTempPatternData>();
     this->dataRoomAirflowNetModel = std::make_unique<RoomAirModelAirflowNetworkData>();
     this->dataRootFinder = std::make_unique<RootFindingData>();
@@ -270,7 +269,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataTarcogShading = std::make_unique<TarcogShadingData>();
     this->dataTimingsData = std::make_unique<DataTimingsData>();
     this->dataTranspiredCollector = std::make_unique<TranspiredCollectorData>();
-    this->dataUCSDShared = std::make_unique<UCSDSharedData>();
     this->dataUFADManager = std::make_unique<UFADManagerData>();
     this->dataUnitHeaters = std::make_unique<UnitHeatersData>();
     this->dataUnitVentilators = std::make_unique<UnitVentilatorsData>();
@@ -295,6 +293,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataWindowEquivLayer = std::make_unique<WindowEquivLayerData>();
     this->dataWindowEquivalentLayer = std::make_unique<WindowEquivalentLayerData>();
     this->dataWindowManager = std::make_unique<WindowManagerData>();
+    this->dataWindowManagerExterior = std::make_unique<WindowManagerExteriorData>();
     this->dataZoneAirLoopEquipmentManager = std::make_unique<ZoneAirLoopEquipmentManagerData>();
     this->dataZoneContaminantPredictorCorrector = std::make_unique<ZoneContaminantPredictorCorrectorData>();
     this->dataZoneCtrls = std::make_unique<DataZoneControlsData>();
@@ -339,7 +338,7 @@ void EnergyPlusData::clear_state()
     this->dataCondenserLoopTowers->clear_state();
     this->dataConstruction->clear_state();
     this->dataContaminantBalance->clear_state();
-    this->dataConvectionCoefficient->clear_state();
+    this->dataConvect->clear_state();
     this->dataConvergeParams->clear_state();
     this->dataCoolTower->clear_state();
     this->dataCostEstimateManager->clear_state();
@@ -356,6 +355,7 @@ void EnergyPlusData::clear_state()
     this->dataDesiccantDehumidifiers->clear_state();
     this->dataDispVentMgr->clear_state();
     this->dataDualDuct->clear_state();
+    this->dataEIRFuelFiredHeatPump->clear_state();
     this->dataEIRPlantLoopHeatPump->clear_state();
     this->dataEMSMgr->clear_state();
     this->dataEarthTube->clear_state();
@@ -383,7 +383,6 @@ void EnergyPlusData::clear_state()
     this->dataGenerator->clear_state();
     this->dataGeneratorFuelSupply->clear_state();
     this->dataGlobal->clear_state();
-    this->dataGlobalConst->clear_state();
     this->dataGlobalNames->clear_state();
     this->dataGrndTempModelMgr->clear_state();
     this->dataGroundHeatExchanger->clear_state();
@@ -483,8 +482,7 @@ void EnergyPlusData::clear_state()
     this->dataRetAirPathMrg->clear_state();
     this->dataExhAirSystemMrg->clear_state();
     this->dataExhCtrlSystemMrg->clear_state();
-    this->dataRoomAirMod->clear_state();
-    this->dataRoomAirModelMgr->clear_state();
+    this->dataRoomAir->clear_state();
     this->dataRoomAirModelTempPattern->clear_state();
     this->dataRoomAirflowNetModel->clear_state();
     this->dataRootFinder->clear_state();
@@ -527,7 +525,6 @@ void EnergyPlusData::clear_state()
     this->dataTarcogShading->clear_state();
     this->dataTimingsData->clear_state();
     this->dataTranspiredCollector->clear_state();
-    this->dataUCSDShared->clear_state();
     this->dataUFADManager->clear_state();
     this->dataUnitHeaters->clear_state();
     this->dataUnitVentilators->clear_state();
@@ -552,6 +549,7 @@ void EnergyPlusData::clear_state()
     this->dataWindowEquivLayer->clear_state();
     this->dataWindowEquivalentLayer->clear_state();
     this->dataWindowManager->clear_state();
+    this->dataWindowManagerExterior->clear_state();
     this->dataZoneAirLoopEquipmentManager->clear_state();
     this->dataZoneContaminantPredictorCorrector->clear_state();
     this->dataZoneCtrls->clear_state();

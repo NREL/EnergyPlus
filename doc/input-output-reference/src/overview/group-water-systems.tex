@@ -77,7 +77,7 @@ Reference to the schedule object specifying the flow rate fraction relative to t
 
 \paragraph{Field: Target Temperature Schedule Name}\label{field-target-temperature-schedule-name}
 
-Reference to the schedule object specifying the target water temperature {[}C{]}. Hot and cold water are mixed at the tap to attain the target temperature. If insufficient hot water is available to reach the target temperature, the result is cooler water at the tap. If blank, the target temperature defaults to the hot water supply temperature.
+Reference to the schedule object specifying the target water temperature {[}C{]}. Hot and cold water are mixed at the tap to attain the target temperature. If insufficient hot water is available to reach the target temperature, the result is cooler water at the tap. If this field is left blank, the target water temperature can take either the cold water temperature or the hot water temperature depending on a couple of other settings: if no water connection is used, and if the hot water schedule is not set, the target temperature will default to the cold water supply temperature; if there is water connection used for the water use equipment, or there is a hot water schedule present, the target water temperature will default to the hot water supply temperature.
 
 \paragraph{Field: Hot Water Supply Temperature Schedule Name}\label{field-hot-water-supply-temperature-schedule-name}
 
@@ -249,7 +249,7 @@ The heating rate defined by the hot water flow and the temperature difference be
 
 \paragraph{Water Use Equipment Heating Energy {[}J{]}}\label{water-use-equipment-heating-energy-j}
 
-The heating energy accumulated by the heating rate above, in units of Joules (J). This output is also added to a meter with End Use Key = WaterSystems, Group Key = Plant. If the WaterUse:Equipment object is not included in WaterUse:Connections or modeled as stand-alone, then this output is reported with Resource Type = DistrictHeating, or else if the WaterUse:Equipment object is included in WaterUse:Connections (e.g., as part of plant loop), then this output is reported with Resource Type = EnergyTransfer. The sub-categories may be entered as any type (e.g., Laundry, Dish Washing, etc. defined in WaterUse:Equipment object input for End-Use Subcategory) with General being the default sub-category (ref. Output Meter).
+The heating energy accumulated by the heating rate above, in units of Joules (J). This output is also added to a meter with End Use Key = WaterSystems, Group Key = Plant. If the WaterUse:Equipment object is not included in WaterUse:Connections or modeled as stand-alone, then this output is reported with Resource Type = DistrictHeatingWater, or else if the WaterUse:Equipment object is included in WaterUse:Connections (e.g., as part of plant loop), then this output is reported with Resource Type = EnergyTransfer. The sub-categories may be entered as any type (e.g., Laundry, Dish Washing, etc. defined in WaterUse:Equipment object input for End-Use Subcategory) with General being the default sub-category (ref. Output Meter).
 
 \paragraph{Water Use Equipment Zone Sensible Heat Gain Rate {[}W{]}}\label{water-use-equipment-zone-sensible-heat-gain-rate-w}
 

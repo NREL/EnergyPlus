@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,7 +63,6 @@ namespace EcoRoofManager {
 
     void CalcEcoRoof(EnergyPlusData &state,
                      int const SurfNum,   // Indicator of Surface Number for the current surface
-                     int const ZoneNum,   // Indicator for zone number where the current surface
                      int const ConstrNum, // Indicator for construction index for the current surface
                      Real64 &TempExt      // Exterior temperature boundary condition
     );

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,7 +74,7 @@ void SetupZoneInternalGain(EnergyPlusData &state,
     Real64 gainFrac = 1.0;
     for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
         if (state.dataHeatBal->Zone(ZoneNum).numSpaces > 1) {
-            gainFrac = state.dataHeatBal->space(spaceNum).floorArea / state.dataHeatBal->Zone(ZoneNum).FloorArea;
+            gainFrac = state.dataHeatBal->space(spaceNum).FloorArea / state.dataHeatBal->Zone(ZoneNum).FloorArea;
         }
         SetupSpaceInternalGain(state,
                                spaceNum,
@@ -119,26 +119,15 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     // devices are internal gains like people, lights, electric equipment
     // and HVAC components with skin loss models like thermal tanks, and power conditioning.
 
-    using namespace DataHeatBalance;
-
     int constexpr DeviceAllocInc(100);
 
-    int IntGainsNum;
-    bool FoundIntGainsType;
-    bool FoundDuplicate;
-    std::string UpperCaseObjectName;
-
-    // Object Data
-
-    FoundIntGainsType = false;
-    FoundDuplicate = false;
-    UpperCaseObjectName = UtilityRoutines::MakeUPPERCase(cComponentName);
+    bool FoundDuplicate = false;
+    std::string UpperCaseObjectName = UtilityRoutines::makeUPPER(cComponentName);
 
     auto &thisIntGain = state.dataHeatBal->spaceIntGainDevices(spaceNum);
-    for (IntGainsNum = 1; IntGainsNum <= thisIntGain.numberOfDevices; ++IntGainsNum) {
+    for (int IntGainsNum = 1; IntGainsNum <= thisIntGain.numberOfDevices; ++IntGainsNum) {
         if ((thisIntGain.device(IntGainsNum).CompObjectType == DataHeatBalance::IntGainTypeNamesUC[static_cast<int>(IntGainCompType)]) &&
             (thisIntGain.device(IntGainsNum).CompType == IntGainCompType)) {
-            FoundIntGainsType = true;
             if (thisIntGain.device(IntGainsNum).CompObjectName == UpperCaseObjectName) {
                 FoundDuplicate = true;
                 break;
@@ -148,8 +137,9 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
 
     if (FoundDuplicate) {
         ShowSevereError(state, "SetupZoneInternalGain: developer error, trapped duplicate internal gains sent to SetupZoneInternalGain");
-        ShowContinueError(state, "The duplicate object user name =" + format(cComponentName));
-        ShowContinueError(state, "The duplicate object type = " + format(DataHeatBalance::IntGainTypeNamesCC[static_cast<int>(IntGainCompType)]));
+        ShowContinueError(state, format("The duplicate object user name ={}", format(cComponentName)));
+        ShowContinueError(state,
+                          format("The duplicate object type = {}", format(DataHeatBalance::IntGainTypeNamesCC[static_cast<int>(IntGainCompType)])));
         ShowContinueError(state, "This internal gain will not be modeled, and the simulation continues");
         return;
     }

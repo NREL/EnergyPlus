@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -86,7 +86,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "MyFan"));
     state->dataLoopNodes->Node(1).Press = 101325.0;
     state->dataLoopNodes->Node(1).Temp = 24.0;
-    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);
+    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _);
 
     // this global state is what would be set up by E+ currently
     static constexpr std::string_view routineName("CoolingCapacitySizingGauntlet");

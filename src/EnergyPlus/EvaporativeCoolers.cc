@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -125,8 +125,6 @@ void SimEvapCooler(EnergyPlusData &state, std::string_view CompName, int &CompIn
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   October 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine manages EvapCooler component simulation.
@@ -148,7 +146,7 @@ void SimEvapCooler(EnergyPlusData &state, std::string_view CompName, int &CompIn
     if (CompIndex == 0) {
         EvapCoolNum = UtilityRoutines::FindItemInList(CompName, EvapCond, &EvapConditions::Name);
         if (EvapCoolNum == 0) {
-            ShowFatalError(state, "SimEvapCooler: Unit not found=" + std::string{CompName});
+            ShowFatalError(state, format("SimEvapCooler: Unit not found={}", CompName));
         }
         CompIndex = EvapCoolNum;
     } else {
@@ -210,7 +208,6 @@ void GetEvapInput(EnergyPlusData &state)
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   Oct 2000
     //       MODIFIED       BTG,  adding in EVAPCOOLER:INDIRECT:RDDSPECIAL
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is the main routine to call other input routines and Get routines
@@ -279,12 +276,12 @@ void GetEvapInput(EnergyPlusData &state)
 
         thisEvapCooler.Schedule = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisEvapCooler.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            thisEvapCooler.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisEvapCooler.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (thisEvapCooler.SchedPtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         }
@@ -378,12 +375,12 @@ void GetEvapInput(EnergyPlusData &state)
 
         thisEvapCooler.Schedule = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisEvapCooler.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            thisEvapCooler.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisEvapCooler.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (thisEvapCooler.SchedPtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         }
@@ -470,8 +467,8 @@ void GetEvapInput(EnergyPlusData &state)
                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                   DataLoopNode::ObjectIsNotParent);
             if (!OutAirNodeManager::CheckOutAirNodeNumber(state, thisEvapCooler.SecondaryInletNode)) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 // TODO rename point
                 ShowContinueError(state, "Node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                 ErrorsFound = true;
@@ -509,12 +506,12 @@ void GetEvapInput(EnergyPlusData &state)
 
         thisEvapCooler.Schedule = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisEvapCooler.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            thisEvapCooler.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisEvapCooler.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (thisEvapCooler.SchedPtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         }
@@ -593,8 +590,8 @@ void GetEvapInput(EnergyPlusData &state)
                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                   DataLoopNode::ObjectIsNotParent);
             if (!OutAirNodeManager::CheckOutAirNodeNumber(state, thisEvapCooler.SecondaryInletNode)) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 // TODO rename point
                 ShowContinueError(state, "Node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                 ErrorsFound = true;
@@ -631,12 +628,12 @@ void GetEvapInput(EnergyPlusData &state)
 
         thisEvapCooler.Schedule = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisEvapCooler.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            thisEvapCooler.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisEvapCooler.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (thisEvapCooler.SchedPtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         }
@@ -769,10 +766,10 @@ void GetEvapInput(EnergyPlusData &state)
                 thisEvapCooler.EvapCoolerOperationControlFlag = false;
             }
         }
-        thisEvapCooler.WetbulbEffecCurveIndex = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(3));
-        thisEvapCooler.DrybulbEffecCurveIndex = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
-        thisEvapCooler.PumpPowerModifierCurveIndex = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5));
-        thisEvapCooler.FanPowerModifierCurveIndex = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
+        thisEvapCooler.WetbulbEffecCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(3));
+        thisEvapCooler.DrybulbEffecCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
+        thisEvapCooler.PumpPowerModifierCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(5));
+        thisEvapCooler.FanPowerModifierCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
 
         SetupOutputVariable(state,
                             "Evaporative Cooler Total Stage Effectiveness",
@@ -833,12 +830,12 @@ void GetEvapInput(EnergyPlusData &state)
 
         thisEvapCooler.Schedule = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            thisEvapCooler.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            thisEvapCooler.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
             thisEvapCooler.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (thisEvapCooler.SchedPtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
+                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
         }
@@ -923,8 +920,8 @@ void GetEvapInput(EnergyPlusData &state)
                 thisEvapCooler.EvapCoolerOperationControlFlag = false;
             }
         }
-        thisEvapCooler.WetbulbEffecCurveIndex = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(3));
-        thisEvapCooler.PumpPowerModifierCurveIndex = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
+        thisEvapCooler.WetbulbEffecCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(3));
+        thisEvapCooler.PumpPowerModifierCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
 
         SetupOutputVariable(state,
                             "Evaporative Cooler Stage Effectiveness",
@@ -949,10 +946,10 @@ void GetEvapInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisEvapCooler.Name,
-                            _,
+                            {},
                             "Electricity",
                             "Cooling",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Evaporative Cooler Electricity Rate",
@@ -970,10 +967,10 @@ void GetEvapInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
-                                _,
+                                {},
                                 "Water",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Evaporative Cooler Mains Water Volume",
@@ -982,10 +979,10 @@ void GetEvapInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
 
         } else if (thisEvapCooler.EvapWaterSupplyMode == WaterSupply::FromTank) {
@@ -996,10 +993,10 @@ void GetEvapInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
-                                _,
+                                {},
                                 "Water",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Evaporative Cooler Starved Water Volume",
@@ -1008,10 +1005,10 @@ void GetEvapInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
-                                _,
+                                {},
                                 "Water",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Evaporative Cooler Starved Mains Water Volume",
@@ -1020,10 +1017,10 @@ void GetEvapInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
-                                _,
+                                {},
                                 "MainsWater",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
         }
     }
@@ -1036,7 +1033,6 @@ void InitEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   October 2000
     //       MODIFIED       B. Griffith, May 2009, added EMS setpoint check
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for  initializations of the EvapCooler Components.
@@ -1045,35 +1041,29 @@ void InitEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     // Uses the status flags to trigger events.
 
     // Using/Aliasing
-    auto &DoSetPointTest = state.dataHVACGlobal->DoSetPointTest;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool localSetPointCheck(false);
-
-    auto &EvapCond(state.dataEvapCoolers->EvapCond);
+    auto &evapCond = state.dataEvapCoolers->EvapCond(EvapCoolNum);
 
     // Check that setpoint is active
-    if (!state.dataGlobal->SysSizingCalc && state.dataEvapCoolers->MySetPointCheckFlag && DoSetPointTest) {
+    if (!state.dataGlobal->SysSizingCalc && state.dataEvapCoolers->MySetPointCheckFlag && state.dataHVACGlobal->DoSetPointTest) {
         for (int EvapUnitNum = 1; EvapUnitNum <= state.dataEvapCoolers->NumEvapCool; ++EvapUnitNum) {
 
             // only check evap coolers that are supposed to have a control node
-            if ((EvapCond(EvapCoolNum).evapCoolerType != EvapCoolerType::IndirectRDDSpecial) &&
-                (EvapCond(EvapCoolNum).evapCoolerType != EvapCoolerType::DirectResearchSpecial))
+            if ((evapCond.evapCoolerType != EvapCoolerType::IndirectRDDSpecial) && (evapCond.evapCoolerType != EvapCoolerType::DirectResearchSpecial))
                 continue;
 
-            int ControlNode = EvapCond(EvapUnitNum).EvapControlNodeNum;
+            int ControlNode = state.dataEvapCoolers->EvapCond(EvapUnitNum).EvapControlNodeNum;
             if (ControlNode > 0) {
                 if (state.dataLoopNodes->Node(ControlNode).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        ShowSevereError(state, "Missing temperature setpoint for Evap Cooler unit " + EvapCond(EvapCoolNum).Name);
+                        ShowSevereError(state, format("Missing temperature setpoint for Evap Cooler unit {}", evapCond.Name));
                         ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
                     } else {
-                        localSetPointCheck = false;
+                        bool localSetPointCheck = false;
                         CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::TemperatureSetPoint, localSetPointCheck);
                         state.dataLoopNodes->NodeSetpointCheck(ControlNode).needsSetpointChecking = false;
                         // Let it slide apparently
                         if (localSetPointCheck) {
-                            ShowSevereError(state, "Missing temperature setpoint for Evap Cooler unit " + EvapCond(EvapCoolNum).Name);
+                            ShowSevereError(state, format("Missing temperature setpoint for Evap Cooler unit {}", evapCond.Name));
                             ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
                             ShowContinueError(state, " or use an EMS actuator to establish a setpoint at the unit control node.");
                         }
@@ -1084,92 +1074,90 @@ void InitEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
         state.dataEvapCoolers->MySetPointCheckFlag = false;
     }
 
-    auto &thisEvapCond = EvapCond(EvapCoolNum);
-    if (!state.dataGlobal->SysSizingCalc && thisEvapCond.MySizeFlag) {
+    if (!state.dataGlobal->SysSizingCalc && evapCond.MySizeFlag) {
         // for each cooler, do the sizing once.
         SizeEvapCooler(state, EvapCoolNum);
-
-        thisEvapCond.MySizeFlag = false;
+        evapCond.MySizeFlag = false;
     }
 
     // Do the following initializations (every time step): This should be the info from
     // the previous components outlets or the node data in this section.
 
     // Transfer the node data to EvapCond data structure
-    auto &thisInletNode = state.dataLoopNodes->Node(thisEvapCond.InletNode);
+    auto &thisInletNode = state.dataLoopNodes->Node(evapCond.InletNode);
 
     Real64 const RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisInletNode.Temp, thisInletNode.HumRat);
 
     // set the volume flow rates from the input mass flow rates
-    thisEvapCond.VolFlowRate = thisInletNode.MassFlowRate / RhoAir;
+    evapCond.VolFlowRate = thisInletNode.MassFlowRate / RhoAir;
 
     // Calculate the entering wet bulb temperature for inlet conditions
-    thisEvapCond.InletWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(state, thisInletNode.Temp, thisInletNode.HumRat, state.dataEnvrn->OutBaroPress);
+    evapCond.InletWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(state, thisInletNode.Temp, thisInletNode.HumRat, state.dataEnvrn->OutBaroPress);
 
     // Set all of the inlet mass flow variables from the nodes
-    thisEvapCond.InletMassFlowRate = thisInletNode.MassFlowRate;
-    thisEvapCond.InletMassFlowRateMaxAvail = thisInletNode.MassFlowRateMaxAvail;
-    thisEvapCond.InletMassFlowRateMinAvail = thisInletNode.MassFlowRateMinAvail;
+    evapCond.InletMassFlowRate = thisInletNode.MassFlowRate;
+    evapCond.InletMassFlowRateMaxAvail = thisInletNode.MassFlowRateMaxAvail;
+    evapCond.InletMassFlowRateMinAvail = thisInletNode.MassFlowRateMinAvail;
     // Set all of the inlet state variables from the inlet nodes
-    thisEvapCond.InletTemp = thisInletNode.Temp;
-    thisEvapCond.InletHumRat = thisInletNode.HumRat;
-    thisEvapCond.InletEnthalpy = thisInletNode.Enthalpy;
-    thisEvapCond.InletPressure = thisInletNode.Press;
+    evapCond.InletTemp = thisInletNode.Temp;
+    evapCond.InletHumRat = thisInletNode.HumRat;
+    evapCond.InletEnthalpy = thisInletNode.Enthalpy;
+    evapCond.InletPressure = thisInletNode.Press;
     // Set default outlet state to inlet states(?)
-    thisEvapCond.OutletTemp = thisEvapCond.InletTemp;
-    thisEvapCond.OutletHumRat = thisEvapCond.InletHumRat;
-    thisEvapCond.OutletEnthalpy = thisEvapCond.InletEnthalpy;
-    thisEvapCond.OutletPressure = thisEvapCond.InletPressure;
+    evapCond.OutletTemp = evapCond.InletTemp;
+    evapCond.OutletHumRat = evapCond.InletHumRat;
+    evapCond.OutletEnthalpy = evapCond.InletEnthalpy;
+    evapCond.OutletPressure = evapCond.InletPressure;
 
-    thisEvapCond.OutletMassFlowRate = thisEvapCond.InletMassFlowRate;
-    thisEvapCond.OutletMassFlowRateMaxAvail = thisEvapCond.InletMassFlowRateMaxAvail;
-    thisEvapCond.OutletMassFlowRateMinAvail = thisEvapCond.InletMassFlowRateMinAvail;
+    evapCond.OutletMassFlowRate = evapCond.InletMassFlowRate;
+    evapCond.OutletMassFlowRateMaxAvail = evapCond.InletMassFlowRateMaxAvail;
+    evapCond.OutletMassFlowRateMinAvail = evapCond.InletMassFlowRateMinAvail;
 
     // Set all of the secondary inlet mass flow variables from the nodes
-    if (thisEvapCond.SecondaryInletNode != 0) {
-        auto &thisSecInletNode = state.dataLoopNodes->Node(thisEvapCond.SecondaryInletNode);
-        thisEvapCond.SecInletMassFlowRate = thisSecInletNode.MassFlowRate;
-        thisEvapCond.SecInletMassFlowRateMaxAvail = thisSecInletNode.MassFlowRateMaxAvail;
-        thisEvapCond.SecInletMassFlowRateMinAvail = thisSecInletNode.MassFlowRateMinAvail;
-        thisEvapCond.SecInletTemp = thisSecInletNode.Temp;
-        thisEvapCond.SecInletHumRat = thisSecInletNode.HumRat;
-        thisEvapCond.SecInletEnthalpy = thisSecInletNode.Enthalpy;
-        thisEvapCond.SecInletPressure = thisSecInletNode.Press;
+    if (evapCond.SecondaryInletNode != 0) {
+        auto const &thisSecInletNode = state.dataLoopNodes->Node(evapCond.SecondaryInletNode);
+        evapCond.SecInletMassFlowRate = thisSecInletNode.MassFlowRate;
+        evapCond.SecInletMassFlowRateMaxAvail = thisSecInletNode.MassFlowRateMaxAvail;
+        evapCond.SecInletMassFlowRateMinAvail = thisSecInletNode.MassFlowRateMinAvail;
+        evapCond.SecInletTemp = thisSecInletNode.Temp;
+        evapCond.SecInletHumRat = thisSecInletNode.HumRat;
+        evapCond.SecInletEnthalpy = thisSecInletNode.Enthalpy;
+        evapCond.SecInletPressure = thisSecInletNode.Press;
     } else {
-        thisEvapCond.SecInletMassFlowRate = thisEvapCond.IndirectVolFlowRate * state.dataEnvrn->OutAirDensity;
-        thisEvapCond.SecInletMassFlowRateMaxAvail = thisEvapCond.IndirectVolFlowRate * state.dataEnvrn->OutAirDensity;
-        thisEvapCond.SecInletMassFlowRateMinAvail = 0.0;
-        thisEvapCond.SecInletTemp = state.dataEnvrn->OutDryBulbTemp;
-        thisEvapCond.SecInletHumRat =
+        evapCond.SecInletMassFlowRate = evapCond.IndirectVolFlowRate * state.dataEnvrn->OutAirDensity;
+        evapCond.SecInletMassFlowRateMaxAvail = evapCond.IndirectVolFlowRate * state.dataEnvrn->OutAirDensity;
+        evapCond.SecInletMassFlowRateMinAvail = 0.0;
+        evapCond.SecInletTemp = state.dataEnvrn->OutDryBulbTemp;
+        evapCond.SecInletHumRat =
             Psychrometrics::PsyWFnTdbTwbPb(state, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutWetBulbTemp, state.dataEnvrn->OutBaroPress);
-        thisEvapCond.SecInletEnthalpy = state.dataEnvrn->OutEnthalpy;
-        thisEvapCond.SecInletPressure = state.dataEnvrn->OutBaroPress;
+        evapCond.SecInletEnthalpy = state.dataEnvrn->OutEnthalpy;
+        evapCond.SecInletPressure = state.dataEnvrn->OutBaroPress;
     }
     // Set the energy consumption to zero each time through for reporting
-    thisEvapCond.EvapCoolerEnergy = 0.0;
-    thisEvapCond.EvapCoolerPower = 0.0;
-    thisEvapCond.DewPointBoundFlag = 0;
+    evapCond.EvapCoolerEnergy = 0.0;
+    evapCond.EvapCoolerPower = 0.0;
+    evapCond.DewPointBoundFlag = 0;
     // Set the water consumption to zero each time through for reporting
-    thisEvapCond.EvapWaterConsumpRate = 0.0;
-    thisEvapCond.EvapWaterConsump = 0.0;
-    thisEvapCond.EvapWaterStarvMakup = 0.0;
+    evapCond.EvapWaterConsumpRate = 0.0;
+    evapCond.EvapWaterConsump = 0.0;
+    evapCond.EvapWaterStarvMakup = 0.0;
 
     // Set the Saturation and Stage Efficiency to zero each time through for reporting
-    thisEvapCond.StageEff = 0.0;
-    thisEvapCond.SatEff = 0.0;
+    evapCond.StageEff = 0.0;
+    evapCond.SatEff = 0.0;
 
     // These initializations are done every iteration
-    int OutNode = thisEvapCond.OutletNode;
-    int ControlNode = thisEvapCond.EvapControlNodeNum;
-    thisEvapCond.IECOperatingStatus = 0;
+    int OutNode = evapCond.OutletNode;
+    int ControlNode = evapCond.EvapControlNodeNum;
+    evapCond.IECOperatingStatus = 0;
 
     if (ControlNode == 0) {
-        thisEvapCond.DesiredOutletTemp = 0.0;
+        evapCond.DesiredOutletTemp = 0.0;
     } else if (ControlNode == OutNode) {
-        thisEvapCond.DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint;
+        evapCond.DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint;
     } else {
-        thisEvapCond.DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint -
-                                         (state.dataLoopNodes->Node(ControlNode).Temp - state.dataLoopNodes->Node(OutNode).Temp);
+        evapCond.DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint -
+                                     (state.dataLoopNodes->Node(ControlNode).Temp - state.dataLoopNodes->Node(OutNode).Temp);
     }
 }
 
@@ -1180,40 +1168,26 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   March 2009
     //       MODIFIED       March 2014 Daeho Kang, Add sizing additional fields
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Size calculations for Evap coolers
     //  currently just for secondary side of Research Special Indirect evap cooler
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool CoolerOnOApath(false);
-    bool CoolerOnMainAirLoop(false);
-    int AirSysBranchLoop(0);
-    int BranchComp(0);
-    bool HardSizeNoDesRun;          // Indicator to a hard-sized field with no design sizing data
-    bool IsAutoSize;                // Indicator to autosize
-    Real64 IndirectVolFlowRateDes;  // Autosized volume flow rate for reporting
-    Real64 IndirectVolFlowRateUser; // Hardsized volume flow rate for reporting
-    bool SizingDesRunThisAirSys;    // true if a particular air system had a Sizing:System object and system sizing done
-    bool SizingDesRunThisZone;      // true if a particular zone had a Sizing:Zone object and zone sizing was done
-    Real64 PadAreaDes;              // Autosized celdek pad area for reporting
-    Real64 PadAreaUser;             // Hardsized celdek pad area for reporting
-    Real64 PadDepthDes;             // Autosized celdek pad depth for reporting
-    Real64 PadDepthUser;            // Hardsized celdek pad depth for reporting
+    bool IsAutoSize; // Indicator to autosize
 
     Real64 volFlowRateDes; // Autosized volume flow rate for reporting
     std::string CompType;  // for ease in getting objects
 
     // inits
-    CoolerOnOApath = false;
-    CoolerOnMainAirLoop = false;
-    IndirectVolFlowRateDes = 0.0;
-    IndirectVolFlowRateUser = 0.0;
-    PadAreaDes = 0.0;
-    PadAreaUser = 0.0;
-    PadDepthDes = 0.0;
-    PadDepthUser = 0.0;
+    bool CoolerOnOApath = false;
+    bool CoolerOnMainAirLoop = false;
+    Real64 IndirectVolFlowRateDes = 0.0;  // Autosized volume flow rate for reporting
+    Real64 IndirectVolFlowRateUser = 0.0; // Hardsized volume flow rate for reporting
+    Real64 PadAreaDes = 0.0;              // Autosized celdek pad area for reporting
+    Real64 PadAreaUser = 0.0;             // Hardsized celdek pad area for reporting
+    Real64 PadDepthDes = 0.0;             // Autosized celdek pad depth for reporting
+    Real64 PadDepthUser = 0.0;            // Hardsized celdek pad depth for reporting
 
     auto &CurSysNum(state.dataSize->CurSysNum);
     auto &CurZoneEqNum(state.dataSize->CurZoneEqNum);
@@ -1221,21 +1195,28 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     auto &EvapCond(state.dataEvapCoolers->EvapCond);
     auto &thisEvapCond(EvapCond(EvapCoolNum));
 
-    HardSizeNoDesRun = !((state.dataSize->SysSizingRunDone || state.dataSize->ZoneSizingRunDone));
+    bool HardSizeNoDesRun = !((state.dataSize->SysSizingRunDone || state.dataSize->ZoneSizingRunDone));
+    bool SizingDesRunThisAirSys = false; // true if a particular air system had a Sizing:System object and system sizing done
+    bool SizingDesRunThisZone = false;   // true if a particular zone had a Sizing:Zone object and zone sizing was done
 
     if (CurSysNum > 0) {
         CheckThisAirSystemForSizing(state, CurSysNum, SizingDesRunThisAirSys);
-    } else {
-        SizingDesRunThisAirSys = false;
+        if (SizingDesRunThisAirSys) {
+            HardSizeNoDesRun = false; // Check if design infomation is available
+        }
     }
     if (CurZoneEqNum > 0) {
         CheckThisZoneForSizing(state, CurZoneEqNum, SizingDesRunThisZone);
-    } else {
-        SizingDesRunThisZone = false;
+        // This next check was added during CppCheck corrections. This does not cause diffs
+        // because SizingDesRunThisZone is not used below this point.
+        // This check was commented to get back to original code and an issue is needed to correct.
+        // Why no check for zone equipment?
+        // if (SizingDesRunThisZone) {
+        //    HardSizeNoDesRun = false; // Check if design infomation is available
+        //}
     }
-    if (SizingDesRunThisAirSys) {
-        HardSizeNoDesRun = false; // Check if design infomation is available
-    }
+    // I don't think the sizing logic is correct when it comes to autosized vs hard-sized inputs
+    // or input files that use Sizing:Zone or Sizing:System with autosized and/or hard-sized inputs
 
     CompType = evapCoolerTypeNames[static_cast<int>(thisEvapCond.evapCoolerType)];
 
@@ -1243,8 +1224,8 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     if (CurSysNum > 0) { // central system
         // where is this cooler located, is it on OA system or main loop?
         // search for this component in Air loop branches.
-        for (AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumBranches; ++AirSysBranchLoop) {
-            for (BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents;
+        for (int AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumBranches; ++AirSysBranchLoop) {
+            for (int BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents;
                  ++BranchComp) {
 
                 if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
@@ -1286,8 +1267,8 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                 IndirectVolFlowRateDes = IndirectVolFlowRateDes * thisEvapCond.IndirectVolFlowScalingFactor;
             }
         }
-    } else if (CurZoneEqNum > 0) { // zone equipment
-        if (!IsAutoSize && !SizingDesRunThisAirSys) {
+    } else if (CurZoneEqNum > 0) {                    // zone equipment
+        if (!IsAutoSize && !SizingDesRunThisAirSys) { // this should be SizingDesRunThisZone
             if (thisEvapCond.IndirectVolFlowRate > 0.0) {
                 // report for the indirect evap cooler types only
                 if (thisEvapCond.evapCoolerType == EvapCoolerType::IndirectCELDEKPAD ||
@@ -1305,8 +1286,6 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                 IndirectVolFlowRateDes = IndirectVolFlowRateDes * thisEvapCond.IndirectVolFlowScalingFactor;
             }
         }
-
-    } else {
     }
     if (!HardSizeNoDesRun) {
         if (IsAutoSize) {
@@ -1330,7 +1309,8 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                     if ((std::abs(IndirectVolFlowRateDes - IndirectVolFlowRateUser) / IndirectVolFlowRateUser) >
                         state.dataSize->AutoVsHardSizingThreshold) {
                         ShowMessage(state,
-                                    "SizeEvaporativeCooler:Indirect:ResearchSpecial: Potential issue with equipment sizing for " + thisEvapCond.Name);
+                                    format("SizeEvaporativeCooler:Indirect:ResearchSpecial: Potential issue with equipment sizing for {}",
+                                           thisEvapCond.Name));
                         ShowContinueError(state, format("User-Specified Secondary Fan Flow Rate of {:.5R} [m3/s]", IndirectVolFlowRateUser));
                         ShowContinueError(state, format("differs from Design Size Secondary Fan Flow Rate of {:.5R} [m3/s]", IndirectVolFlowRateDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1368,6 +1348,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     } else if (CurZoneEqNum > 0) { // zone equipment
         // zone equip evap coolers
 
+        // this should be SizingDesRunThisZone
         if (!IsAutoSize && !SizingDesRunThisAirSys) {
             // the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
             // if ( EvapCond( EvapCoolNum ).VolFlowRate > 0.0 ) {
@@ -1379,7 +1360,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
         }
 
     } else { // zone equipment
-             // can't do zone equip evap coolers yet
+        // can't do zone equip evap coolers yet
     }
     if (!HardSizeNoDesRun) {
         if (IsAutoSize) {
@@ -1412,10 +1393,10 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
             //"User-Specified Secondary Fan Flow Rate [m3/s]", IndirectVolFlowRateUser );
             // if ( DisplayExtraWarnings ) {
             // if ( ( std::abs( IndirectVolFlowRateDes - IndirectVolFlowRateUser ) / IndirectVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
-            // ShowMessage(state,  "SizeEvaporativeCooler:Indirect:ResearchSpecial: \nPotential issue with equipment sizing for " + EvapCond(
+            // ShowMessage(state, format("SizeEvaporativeCooler:Indirect:ResearchSpecial: \nPotential issue with equipment sizing for {}", EvapCond(
             // EvapCoolNum
-            // ).Name );  ShowContinueError(state,  "User-Specified Secondary Fan Flow Rate of " +  RoundSigDigits(
-            // IndirectVolFlowRateUser, 5 ) + " [m3/s]" ); ShowContinueError(state,  format("differs from Design Size Secondary Fan Flow Rate of
+            // ).Name));  ShowContinueError(state, format("User-Specified Secondary Fan Flow Rate of {} [m3/s]", RoundSigDigits(
+            // IndirectVolFlowRateUser, 5 ))); ShowContinueError(state,  format("differs from Design Size Secondary Fan Flow Rate of
             // {:.5R}", IndirectVolFlowRateDes) + " [m3/s]" ); ShowContinueError(state,  "This may, or may not, indicate mismatched component
             // sizes." ); ShowContinueError(state,  "Verify that the value entered is intended and is consistent with other components." );
             //}
@@ -1453,17 +1434,14 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
             }
         } else if (CurZoneEqNum > 0) { // zone equipment
             // zone equip evap coolers
+
+            // this should be SizingDesRunThisZone
             if (!IsAutoSize && !SizingDesRunThisAirSys) {
                 HardSizeNoDesRun = true;
                 if (thisEvapCond.PadArea > 0.0) {
                     // report for the indirect evap cooler types only
-                    if (thisEvapCond.PadArea > 0.0) {
-                        BaseSizer::reportSizerOutput(state,
-                                                     "EvaporativeCooler:Direct:CelDekPad",
-                                                     thisEvapCond.Name,
-                                                     "User-Specified Celdek Pad Area [m2]",
-                                                     thisEvapCond.PadArea);
-                    }
+                    BaseSizer::reportSizerOutput(
+                        state, "EvaporativeCooler:Direct:CelDekPad", thisEvapCond.Name, "User-Specified Celdek Pad Area [m2]", thisEvapCond.PadArea);
                 }
             } else { // Autosize or hardsize with design data
                 // zone equip evap coolers
@@ -1491,8 +1469,9 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                                                  PadAreaUser);
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(PadAreaDes - PadAreaUser) / PadAreaUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                            ShowMessage(state,
-                                        "SizeEvaporativeCooler:Direct:CelDekPad: Potential issue with equipment sizing for " + thisEvapCond.Name);
+                            ShowMessage(
+                                state,
+                                format("SizeEvaporativeCooler:Direct:CelDekPad: Potential issue with equipment sizing for {}", thisEvapCond.Name));
                             ShowContinueError(state, format("User-Specified Celdek Pad Area of{:.2R} [m2]", PadAreaUser));
                             ShowContinueError(state, format("differs from Design Size Celdek Pad Area of {:.2R} [m2]", PadAreaDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1531,7 +1510,8 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                                              PadDepthUser);
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(PadDepthDes - PadDepthUser) / PadDepthUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                        ShowMessage(state, "SizeEvaporativeCooler:Direct:CelDekPad: Potential issue with equipment sizing for " + thisEvapCond.Name);
+                        ShowMessage(
+                            state, format("SizeEvaporativeCooler:Direct:CelDekPad: Potential issue with equipment sizing for {}", thisEvapCond.Name));
                         ShowContinueError(state, format("User-Specified Celdek Pad Depth of {:.2R} [m]", PadDepthUser));
                         ShowContinueError(state, format("differs from Design Size Celdek Pad Depth of {:.2R} [m]", PadDepthDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1555,8 +1535,10 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
         if (CurSysNum > 0) { // central system
             // where is this cooler located, is it on OA system or main loop?
             // search for this component in Air loop branches.
-            for (AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumBranches; ++AirSysBranchLoop) {
-                for (BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents;
+            for (int AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumBranches;
+                 ++AirSysBranchLoop) {
+                for (int BranchComp = 1;
+                     BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents;
                      ++BranchComp) {
                     if (UtilityRoutines::SameString(
                             state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
@@ -1589,7 +1571,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
             }
         } else if (CurZoneEqNum > 0) { // zone equipment
             // zone equip evap coolers
-            if (!IsAutoSize && !SizingDesRunThisAirSys) {
+            if (!IsAutoSize && !SizingDesRunThisAirSys) { // this should be SizingDesRunThisZone
                 HardSizeNoDesRun = true;
                 if (thisEvapCond.IndirectPadArea > 0.0) {
                     // report for the indirect evap cooler types only
@@ -1627,8 +1609,9 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                                                  PadAreaUser);
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(PadAreaDes - PadAreaUser) / PadAreaUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                            ShowMessage(state,
-                                        "SizeEvaporativeCooler:Indirect:CelDekPad: Potential issue with equipment sizing for " + thisEvapCond.Name);
+                            ShowMessage(
+                                state,
+                                format("SizeEvaporativeCooler:Indirect:CelDekPad: Potential issue with equipment sizing for {}", thisEvapCond.Name));
                             ShowContinueError(state, format("User-Specified Celdek Pad Area {:.2R} [m2]", PadAreaUser));
                             ShowContinueError(state, format("differs from Design Size Celdek Pad Area of {:.2R} [m2]", PadAreaDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1662,8 +1645,9 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                                              PadDepthUser);
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(PadDepthDes - PadDepthUser) / PadDepthUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                        ShowMessage(state,
-                                    "SizeEvaporativeCooler:Indirect:CelDekPad: Potential issue with equipment sizing for " + thisEvapCond.Name);
+                        ShowMessage(
+                            state,
+                            format("SizeEvaporativeCooler:Indirect:CelDekPad: Potential issue with equipment sizing for {}", thisEvapCond.Name));
                         ShowContinueError(state, format("User-Specified Celdek Pad Depth of {:.2R} [m]", PadDepthUser));
                         ShowContinueError(state, format("differs from Design Size Celdek Pad Depth of {:.2R} [m]", PadDepthDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1708,8 +1692,6 @@ void CalcDirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 const P
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   October 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 PadDepth; // EvapCooler Pad Depth in Meters as input by the User
@@ -1743,7 +1725,7 @@ void CalcDirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 const P
 
         if (SatEff >= 1.0) SatEff = 1.0;
         if (SatEff < 0.0) { // we have a serious problem.  Pad Area and/or depth not suitable for system air flow rates
-            ShowSevereError(state, "EVAPCOOLER:DIRECT:CELDEKPAD: " + thisEvapCond.Name + " has a problem");
+            ShowSevereError(state, format("EVAPCOOLER:DIRECT:CELDEKPAD: {} has a problem", thisEvapCond.Name));
             ShowContinueError(state, "Check size of Pad Area and/or Pad Depth in input");
             ShowContinueError(state, format("Cooler Effectiveness calculated as: {:.2R}", SatEff));
             ShowContinueError(state, format("Air velocity (m/s) through pads calculated as: {:.2R}", AirVel));
@@ -1809,7 +1791,6 @@ void CalcDryIndirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 co
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   October 2000
     //       MODIFIED       BG Feb. 2007 secondary air inlet node
-    //       RE-ENGINEERED  na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 PadDepth;  // EvapCooler Pad Depth in Meters as input by the User
@@ -1949,7 +1930,6 @@ void CalcWetIndirectEvapCooler(EnergyPlusData &state, int EvapCoolNum, Real64 co
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   October 2000
-    //       MODIFIED       na
     //       RE-ENGINEERED  Jan. 2017, Rongpeng Zhang, added fouling fault for evaporative coolers
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2077,8 +2057,6 @@ void CalcResearchSpecialPartLoad(EnergyPlusData &state, int EvapCoolNum)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   July 2003
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // REFERENCES:
     // copied CalcWetIndirectEvapCooler as template for new cooler
@@ -2086,28 +2064,24 @@ void CalcResearchSpecialPartLoad(EnergyPlusData &state, int EvapCoolNum)
     Real64 constexpr MinAirMassFlow(0.001);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 FullOutput(0.0);
-    Real64 ReqOutput(0.0);
-    int InletNode;
-    int OutletNode;
-    int ControlNode;
-    Real64 PartLoadFrac;
-    Real64 DesOutTemp;
+    Real64 FullOutput = 0.0;
+    Real64 ReqOutput = 0.0;
     // Set local variables
 
-    auto &thisEvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
-    auto &Node(state.dataLoopNodes->Node);
+    auto &thisEvapCond = state.dataEvapCoolers->EvapCond(EvapCoolNum);
 
     // Retrieve the load on the controlled zone
-    OutletNode = thisEvapCond.OutletNode;
-    InletNode = thisEvapCond.InletNode;
-    ControlNode = thisEvapCond.EvapControlNodeNum;
-    DesOutTemp = thisEvapCond.DesiredOutletTemp;
-    PartLoadFrac = 0.0;
+    int OutletNode = thisEvapCond.OutletNode;
+    int InletNode = thisEvapCond.InletNode;
+    int ControlNode = thisEvapCond.EvapControlNodeNum;
+    Real64 DesOutTemp = thisEvapCond.DesiredOutletTemp;
+    Real64 PartLoadFrac = 0.0;
 
     // If Evap Cooler runs with a cooling load then set PartLoadFrac on Cooling System and the Mass Flow
-    if ((ScheduleManager::GetCurrentScheduleValue(state, thisEvapCond.SchedPtr) > 0.0) && (Node(InletNode).MassFlowRate > MinAirMassFlow) &&
-        (Node(InletNode).Temp > Node(ControlNode).TempSetPoint) && (std::abs(Node(InletNode).Temp - DesOutTemp) > DataHVACGlobals::TempControlTol)) {
+    if ((ScheduleManager::GetCurrentScheduleValue(state, thisEvapCond.SchedPtr) > 0.0) &&
+        (state.dataLoopNodes->Node(InletNode).MassFlowRate > MinAirMassFlow) &&
+        (state.dataLoopNodes->Node(InletNode).Temp > state.dataLoopNodes->Node(ControlNode).TempSetPoint) &&
+        (std::abs(state.dataLoopNodes->Node(InletNode).Temp - DesOutTemp) > DataHVACGlobals::TempControlTol)) {
 
         // Get full load result, depending on model
         thisEvapCond.PartLoadFract = 1.0;
@@ -2115,11 +2089,13 @@ void CalcResearchSpecialPartLoad(EnergyPlusData &state, int EvapCoolNum)
         case EvapCoolerType::IndirectRDDSpecial: {
             CalcIndirectResearchSpecialEvapCooler(state, EvapCoolNum);
             UpdateEvapCooler(state, EvapCoolNum);
-            FullOutput = Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) -
-                                                         Psychrometrics::PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
+            FullOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
+                         (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -
+                          Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
-            ReqOutput = Node(InletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(thisEvapCond.DesiredOutletTemp, Node(InletNode).HumRat) -
-                                                        Psychrometrics::PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
+            ReqOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
+                        (Psychrometrics::PsyHFnTdbW(thisEvapCond.DesiredOutletTemp, state.dataLoopNodes->Node(InletNode).HumRat) -
+                         Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat));
 
             // now reinit after test call
             InitEvapCooler(state, EvapCoolNum);
@@ -2128,8 +2104,8 @@ void CalcResearchSpecialPartLoad(EnergyPlusData &state, int EvapCoolNum)
         case EvapCoolerType::DirectResearchSpecial: {
             CalcDirectResearchSpecialEvapCooler(state, EvapCoolNum);
             UpdateEvapCooler(state, EvapCoolNum);
-            FullOutput = Node(OutletNode).Temp - Node(InletNode).Temp;
-            ReqOutput = thisEvapCond.DesiredOutletTemp - Node(InletNode).Temp;
+            FullOutput = state.dataLoopNodes->Node(OutletNode).Temp - state.dataLoopNodes->Node(InletNode).Temp;
+            ReqOutput = thisEvapCond.DesiredOutletTemp - state.dataLoopNodes->Node(InletNode).Temp;
 
             // now reinit after test call
             InitEvapCooler(state, EvapCoolNum);
@@ -2167,7 +2143,6 @@ void CalcIndirectResearchSpecialEvapCooler(EnergyPlusData &state, int const Evap
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   July 2003
-    //       MODIFIED       na
     //       RE-ENGINEERED  October 2014, B Nigusse, added dry and wet operating modes
     //                      and secondary air flow control
 
@@ -2189,7 +2164,6 @@ void CalcIndirectResearchSpecialEvapCooler(EnergyPlusData &state, int const Evap
     Real64 RhoWater;
     Real64 RhoAir; // Density of the primary side air
     Real64 CFMAir;
-    int TertNode;     // inlet node for relief (from bulding) to mix for purge
     Real64 BoundTemp; // temperature limit for outlet
     Real64 PartLoad;
     Real64 TotalVolFlow;
@@ -2234,7 +2208,7 @@ void CalcIndirectResearchSpecialEvapCooler(EnergyPlusData &state, int const Evap
         //  and the remainder will be made up with outside air from the secondary node
         //*********************************************
 
-        TertNode = thisEvapCond.TertiaryInletNode;
+        int TertNode = thisEvapCond.TertiaryInletNode;
         if (TertNode == 0) {
             SecondaryInletDryBulbTemp = thisEvapCond.SecInletTemp;
             SecondaryInletWetBulbTemp =
@@ -2402,8 +2376,6 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Bigusse
     //       DATE WRITTEN   October 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Subroutine models indirect evaporative cooler with variable effectiveness for wet and dry
@@ -2414,25 +2386,16 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     Real64 constexpr TempTol(0.01); // convergence tollerance
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 TEDB;      // Entering Dry Bulb Temperature
-    Real64 TEWB;      // Entering Wet Bulb Temperature
     Real64 BoundTemp; // temperature limit for outlet
     Real64 PartLoad;
-    Real64 SecRho;
     Real64 TdbOutSysWetMin;                 // system( primary ) air drybulb outlet temperature minimum based on wet coil
     Real64 TdbOutSysDryMin;                 // system (primary) air drybulb outlet temperature minimum based on dry coil
-    Real64 SysTempSetPoint;                 // evaporative cooler outlet setpoint temperature, drybulb
-    Real64 MassFlowRateSecMax;              // Design secondary air mass flow rate
     Real64 AirMassFlowSec;                  // current secondary air mass flow rate
     Real64 AirMassFlowSecDry;               // current secondary air mass flow rate in dry mode
     Real64 AirMassFlowSecWet;               // current secondary air mass flow rate in wet mode
     Real64 FlowRatioSec;                    // secondary air flow ratio in dry and wet mode
-    Real64 FlowRatioSecDry;                 // current secondary air mass flow ratio in dry mode
-    Real64 FlowRatioSecWet;                 // current secondary air mass flow ratio in wet mode
     Real64 EvapCoolerTotalElectricPowerDry; // evaporative cooler current total electric power drawn
     Real64 EvapCoolerTotalElectricPowerWet; // evaporative cooler current total electric power drawn
-    int SolFla;                             // Flag of solver
-    std::array<Real64, 6> Par = {0.0};      // Parameter array passed to solver
     Real64 QHXLatent;                       // evaporative cooler latent heat transfer rate
     Real64 hfg;                             // latent heat of vaporization of water at the secondary air inlet condition
 
@@ -2446,14 +2409,13 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
 
     auto &thisEvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
 
-    FlowRatioSecDry = 0.0;
-    FlowRatioSecWet = 0.0;
+    Real64 FlowRatioSecDry = 0.0; // current secondary air mass flow ratio in dry mode
+    Real64 FlowRatioSecWet = 0.0; // current secondary air mass flow ratio in wet mode
     thisEvapCond.EvapCoolerRDDOperatingMode = OperatingMode::None;
-    TEDB = thisEvapCond.InletTemp;
-    TEWB = thisEvapCond.InletWetBulbTemp;
-    SysTempSetPoint = thisEvapCond.DesiredOutletTemp;
-    SecRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, InletDryBulbTempSec, InletHumRatioSec);
-    MassFlowRateSecMax = SecRho * thisEvapCond.IndirectVolFlowRate;
+    Real64 TEDB = thisEvapCond.InletTemp;                    // Entering Dry Bulb Temperature
+    Real64 SysTempSetPoint = thisEvapCond.DesiredOutletTemp; // evaporative cooler outlet setpoint temperature, drybulb
+    Real64 SecRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, InletDryBulbTempSec, InletHumRatioSec);
+    Real64 MassFlowRateSecMax = SecRho * thisEvapCond.IndirectVolFlowRate; // Design secondary air mass flow rate
     CalcIndirectRDDEvapCoolerOutletTemp(
         state, EvapCoolNum, OperatingMode::WetFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
     TdbOutSysWetMin = thisEvapCond.OutletTemp;
@@ -2470,22 +2432,24 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     PartLoad = thisEvapCond.PartLoadFract;
     {
         if (thisEvapCond.EvapCoolerRDDOperatingMode == OperatingMode::DryModulated) {
-            Par[0] = double(EvapCoolNum);
-            Par[1] = double(OperatingMode::DryModulated);
-            Par[2] = SysTempSetPoint;
-            Par[3] = InletDryBulbTempSec;
-            Par[4] = InletWetBulbTempSec;
-            Par[5] = InletHumRatioSec;
-            General::SolveRoot(
-                state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
+            auto f = [&state, EvapCoolNum, SysTempSetPoint, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec](Real64 AirMassFlowSec) {
+                auto &EvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
+                EvapCond.SecInletMassFlowRate = AirMassFlowSec;
+                CalcIndirectRDDEvapCoolerOutletTemp(
+                    state, EvapCoolNum, OperatingMode::DryModulated, AirMassFlowSec, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+                Real64 const OutletAirTemp = EvapCond.OutletTemp; // evap Coler outlet air temperature
+                return SysTempSetPoint - OutletAirTemp;
+            };
+            int SolFla = 0; // Flag of solver
+            General::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, f, MassFlowRateSecMin, MassFlowRateSecMax);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
                     if (thisEvapCond.IterationLimit == 0) {
                         ShowSevereError(state,
-                                        "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
-                                        "Evaporative Cooler Research Special = " +
-                                            thisEvapCond.Name);
+                                        format("CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
+                                               "Evaporative Cooler Research Special = {}",
+                                               thisEvapCond.Name));
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state, format("  Iteration limit [{}] exceeded in calculating secondary air mass flow rate", MaxIte));
                         ShowContinueError(state, "  Simulation continues");
@@ -2499,9 +2463,9 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
                 if (!state.dataGlobal->WarmupFlag) {
                     if (thisEvapCond.IterationFailed == 0) {
                         ShowSevereError(state,
-                                        "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
-                                        "Evaporative Cooler Research Special = " +
-                                            thisEvapCond.Name);
+                                        format("CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
+                                               "Evaporative Cooler Research Special = {}",
+                                               thisEvapCond.Name));
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state, "...Bad secondary air mass flow rate limits");
                         ShowContinueError(state, format("...Given minimum secondary air mass flow rate={:.3R} kg/s", MassFlowRateSecMin));
@@ -2534,23 +2498,24 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
             thisEvapCond.EvapCoolerPower = IndEvapCoolerPower(state, EvapCoolNum, OperatingMode::DryFull, FlowRatioSec);
             thisEvapCond.IECOperatingStatus = 1;
         } else if (thisEvapCond.EvapCoolerRDDOperatingMode == OperatingMode::DryWetModulated) {
-            Par[0] = double(EvapCoolNum);
-            Par[2] = SysTempSetPoint;
-            Par[3] = InletDryBulbTempSec;
-            Par[4] = InletWetBulbTempSec;
-            Par[5] = InletHumRatioSec;
-            // get dry operation performance first
-            Par[1] = double(OperatingMode::DryModulated);
-            General::SolveRoot(
-                state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
+            auto f = [&state, EvapCoolNum, SysTempSetPoint, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec](Real64 AirMassFlowSec) {
+                auto &EvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
+                EvapCond.SecInletMassFlowRate = AirMassFlowSec;
+                CalcIndirectRDDEvapCoolerOutletTemp(
+                    state, EvapCoolNum, OperatingMode::DryModulated, AirMassFlowSec, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+                Real64 const OutletAirTemp = EvapCond.OutletTemp; // evap Coler outlet air temperature
+                return SysTempSetPoint - OutletAirTemp;
+            };
+            int SolFla = 0; // Flag of solver
+            General::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, f, MassFlowRateSecMin, MassFlowRateSecMax);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
                     if (thisEvapCond.IterationLimit == 0) {
                         ShowSevereError(state,
-                                        "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
-                                        "Evaporative Cooler Research Special = " +
-                                            thisEvapCond.Name);
+                                        format("CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
+                                               "Evaporative Cooler Research Special = {}",
+                                               thisEvapCond.Name));
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state, format("  Iteration limit [{}] exceeded in calculating secondary air mass flow rate", MaxIte));
                         ShowContinueError(state, "  Simulation continues");
@@ -2564,9 +2529,9 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
                 if (!state.dataGlobal->WarmupFlag) {
                     if (thisEvapCond.IterationFailed == 0) {
                         ShowSevereError(state,
-                                        "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
-                                        "Evaporative Cooler Research Special = " +
-                                            thisEvapCond.Name);
+                                        format("CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
+                                               "Evaporative Cooler Research Special = {}",
+                                               thisEvapCond.Name));
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state, "...Bad secondary air mass flow rate limits");
                         ShowContinueError(state, format("...Given minimum secondary air mass flow rate={:.3R} kg/s", MassFlowRateSecMin));
@@ -2592,17 +2557,23 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
             AirMassFlowSecDry = AirMassFlowSec;
             EvapCoolerTotalElectricPowerDry = IndEvapCoolerPower(state, EvapCoolNum, OperatingMode::DryModulated, FlowRatioSecDry);
             // get wet operation performance
-            Par[1] = double(OperatingMode::WetModulated);
-            General::SolveRoot(
-                state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
+            auto f2 = [&state, EvapCoolNum, SysTempSetPoint, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec](Real64 AirMassFlowSec) {
+                auto &EvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
+                EvapCond.SecInletMassFlowRate = AirMassFlowSec;
+                CalcIndirectRDDEvapCoolerOutletTemp(
+                    state, EvapCoolNum, OperatingMode::WetModulated, AirMassFlowSec, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+                Real64 const OutletAirTemp = EvapCond.OutletTemp; // evap Coler outlet air temperature
+                return SysTempSetPoint - OutletAirTemp;
+            };
+            General::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, f2, MassFlowRateSecMin, MassFlowRateSecMax);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
                     if (thisEvapCond.IterationLimit == 0) {
                         ShowSevereError(state,
-                                        "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
-                                        "Evaporative Cooler Research Special = " +
-                                            thisEvapCond.Name);
+                                        format("CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
+                                               "Evaporative Cooler Research Special = {}",
+                                               thisEvapCond.Name));
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state, format("  Iteration limit [{}] exceeded in calculating secondary air mass flow rate", MaxIte));
                         ShowContinueError(state, "  Simulation continues");
@@ -2616,9 +2587,9 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
                 if (!state.dataGlobal->WarmupFlag) {
                     if (thisEvapCond.IterationFailed == 0) {
                         ShowSevereError(state,
-                                        "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
-                                        "Evaporative Cooler Research Special = " +
-                                            thisEvapCond.Name);
+                                        format("CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
+                                               "Evaporative Cooler Research Special = {}",
+                                               thisEvapCond.Name));
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state, "...Bad secondary air mass flow rate limits");
                         ShowContinueError(state, format("...Given minimum secondary air mass flow rate={:.3R} kg/s", MassFlowRateSecMin));
@@ -2662,22 +2633,24 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
                 thisEvapCond.IECOperatingStatus = 2;
             }
         } else if (thisEvapCond.EvapCoolerRDDOperatingMode == OperatingMode::WetModulated) {
-            Par[0] = double(EvapCoolNum);
-            Par[1] = double(OperatingMode::WetModulated);
-            Par[2] = SysTempSetPoint;
-            Par[3] = InletDryBulbTempSec;
-            Par[4] = InletWetBulbTempSec;
-            Par[5] = InletHumRatioSec;
-            General::SolveRoot(
-                state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
+            auto f = [&state, EvapCoolNum, SysTempSetPoint, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec](Real64 AirMassFlowSec) {
+                auto &EvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
+                EvapCond.SecInletMassFlowRate = AirMassFlowSec;
+                CalcIndirectRDDEvapCoolerOutletTemp(
+                    state, EvapCoolNum, OperatingMode::WetModulated, AirMassFlowSec, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+                Real64 const OutletAirTemp = EvapCond.OutletTemp; // evap Coler outlet air temperature
+                return SysTempSetPoint - OutletAirTemp;
+            };
+            int SolFla = 0; // Flag of solver
+            General::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, f, MassFlowRateSecMin, MassFlowRateSecMax);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
                     if (thisEvapCond.IterationLimit == 0) {
                         ShowSevereError(state,
-                                        "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
-                                        "Evaporative Cooler Research Special = " +
-                                            thisEvapCond.Name);
+                                        format("CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
+                                               "Evaporative Cooler Research Special = {}",
+                                               thisEvapCond.Name));
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state, format("  Iteration limit [{}] exceeded in calculating secondary air mass flow rate", MaxIte));
                         ShowContinueError(state, "  Simulation continues");
@@ -2691,9 +2664,9 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
                 if (!state.dataGlobal->WarmupFlag) {
                     if (thisEvapCond.IterationFailed == 0) {
                         ShowSevereError(state,
-                                        "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
-                                        "Evaporative Cooler Research Special = " +
-                                            thisEvapCond.Name);
+                                        format("CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect "
+                                               "Evaporative Cooler Research Special = {}",
+                                               thisEvapCond.Name));
                         ShowContinueErrorTimeStamp(state, "");
                         ShowContinueError(state, "...Bad secondary air mass flow rate limits");
                         ShowContinueError(state, format("...Given minimum secondary air mass flow rate={:.3R} kg/s", MassFlowRateSecMin));
@@ -2838,7 +2811,7 @@ OperatingMode IndirectResearchSpecialEvapCoolerOperatingMode(EnergyPlusData &sta
     Real64 SysTempSetPoint;      // evaporative cooler outlet setpoint temperature, drybulb
     OperatingMode OperatingMode; // current operating mode of indrect evaporative cooler
 
-    auto &thisEvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
+    auto const &thisEvapCond = state.dataEvapCoolers->EvapCond(EvapCoolNum);
 
     InletDryBulbTempPri = thisEvapCond.InletTemp;
     SysTempSetPoint = thisEvapCond.DesiredOutletTemp;
@@ -2867,52 +2840,6 @@ OperatingMode IndirectResearchSpecialEvapCoolerOperatingMode(EnergyPlusData &sta
     return OperatingMode;
 }
 
-Real64 CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state,
-                                      Real64 const AirMassFlowSec,     // secondary air mass flow rate in kg/s
-                                      std::array<Real64, 6> const &Par // Par(2) is desired outlet temperature of Evap Cooler
-)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         B. Nigusse
-    //       DATE WRITTEN   Sep 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Indirect research special evaporative cooler part load operation:
-    // determines the secondary air flow rate
-
-    // METHODOLOGY EMPLOYED:
-    // Uses regula falsi to minimize setpoint temperature residual to by varying the
-    // secondary air flow rate.
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int EvapCoolIndex;                   // evaporative cooler index
-    OperatingMode DryOrWetOperatingMode; // provides index for dry mode and wet mode operation
-    Real64 EDBTSecAirSide;               // current entering dry bulb temperature of the secondary side
-    Real64 EWBTSecAirSide;               // current entering wet bulb temperature of the secondary side
-    Real64 EHumRatSecAirSide;            // current entering humidity ratio of the secondary side
-    Real64 OutletAirTemp;                // evap Coler outlet air temperature
-    Real64 SysTempSetPoint;              // evaporative cooler outlet setpoint temperature, drybulb
-    Real64 Residuum;                     // Residual to be minimized to zero
-
-    auto &EvapCond(state.dataEvapCoolers->EvapCond);
-
-    EvapCoolIndex = int(Par[0]);
-    DryOrWetOperatingMode = OperatingMode(int(Par[1]));
-    SysTempSetPoint = Par[2];
-    EDBTSecAirSide = Par[3];
-    EWBTSecAirSide = Par[4];
-    EHumRatSecAirSide = Par[5];
-    state.dataEvapCoolers->EvapCond(EvapCoolIndex).SecInletMassFlowRate = AirMassFlowSec;
-    CalcIndirectRDDEvapCoolerOutletTemp(
-        state, EvapCoolIndex, DryOrWetOperatingMode, AirMassFlowSec, EDBTSecAirSide, EWBTSecAirSide, EHumRatSecAirSide);
-    OutletAirTemp = EvapCond(EvapCoolIndex).OutletTemp;
-    Residuum = SysTempSetPoint - OutletAirTemp;
-
-    return Residuum;
-}
-
 void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,
                                          int const EvapCoolNum,
                                          OperatingMode DryOrWetOperatingMode,
@@ -2924,8 +2851,6 @@ void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Nigusse
     //       DATE WRITTEN   Sep 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Indirect research special evaporative cooler perfomance:
@@ -2967,7 +2892,7 @@ void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,
         RhoAirSys = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisEvapCond.InletTemp, thisEvapCond.InletHumRat);
         if (DryOrWetOperatingMode == OperatingMode::DryModulated || DryOrWetOperatingMode == OperatingMode::DryFull) {
             if (thisEvapCond.DrybulbEffecCurveIndex > 0) {
-                EffModDryMode = CurveManager::CurveValue(state, thisEvapCond.DrybulbEffecCurveIndex, FlowRatio);
+                EffModDryMode = Curve::CurveValue(state, thisEvapCond.DrybulbEffecCurveIndex, FlowRatio);
             } else {
                 EffModDryMode = 1.0;
             }
@@ -2991,7 +2916,7 @@ void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,
             thisEvapCond.SecOutletTemp = OutletTempSec;
         } else if (DryOrWetOperatingMode == OperatingMode::WetModulated || DryOrWetOperatingMode == OperatingMode::WetFull) {
             if (thisEvapCond.WetbulbEffecCurveIndex > 0) {
-                EffModWetMode = CurveManager::CurveValue(state, thisEvapCond.WetbulbEffecCurveIndex, FlowRatio);
+                EffModWetMode = Curve::CurveValue(state, thisEvapCond.WetbulbEffecCurveIndex, FlowRatio);
             } else {
                 EffModWetMode = 1.0;
             }
@@ -3005,7 +2930,8 @@ void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,
             CapFlowSys = thisEvapCond.InletMassFlowRate * CpAirSys;
             QHXRate = CapFlowSys * (thisEvapCond.InletTemp - OutletTemp);
             SecOutletEnthalpy = thisEvapCond.SecInletEnthalpy + QHXRate / AirMassFlowSec;
-            SecOutletAirHumRat = Psychrometrics::PsyWFnTdbH(state, EDBTSec, SecOutletEnthalpy); // assumes constant temperature moisture addition
+            SecOutletAirHumRat = Psychrometrics::PsyWFnTdbH(state, EDBTSec,
+                                                            SecOutletEnthalpy); // assumes constant temperature moisture addition
             // we may need check based on maximum allowed humidity ratio
             thisEvapCond.SecOutletTemp = EDBTSec;
             thisEvapCond.SecOutletHumRat = SecOutletAirHumRat;
@@ -3035,8 +2961,6 @@ void CalcSecondaryAirOutletCondition(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Nigusse
     //       DATE WRITTEN   Oct 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Indirect research special evaporative cooler: determines the secondary air outlet conditions
@@ -3068,7 +2992,8 @@ void CalcSecondaryAirOutletCondition(EnergyPlusData &state,
                 Psychrometrics::PsyTwbFnTdbWPb(state, thisEvapCond.SecOutletTemp, EHumRatSec, state.dataEnvrn->OutBaroPress);
         } else if ((OperatingMode == OperatingMode::WetModulated || OperatingMode == OperatingMode::WetFull)) {
             SecOutletEnthalpy = thisEvapCond.SecInletEnthalpy + QHXTotal / AirMassFlowSec;
-            SecOutletAirHumRat = Psychrometrics::PsyWFnTdbH(state, EDBTSec, SecOutletEnthalpy); // assumes a constant temperature moisture addition
+            SecOutletAirHumRat = Psychrometrics::PsyWFnTdbH(state, EDBTSec,
+                                                            SecOutletEnthalpy); // assumes a constant temperature moisture addition
             thisEvapCond.SecOutletTemp = EDBTSec;
             thisEvapCond.SecOutletHumRat = SecOutletAirHumRat;
             thisEvapCond.SecOutletEnthalpy = SecOutletEnthalpy;
@@ -3101,8 +3026,6 @@ Real64 IndEvapCoolerPower(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Nigusse
     //       DATE WRITTEN   Sep 2014
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculates the Indirect Evaporative Cooler Total Electric Power
@@ -3121,7 +3044,7 @@ Real64 IndEvapCoolerPower(EnergyPlusData &state,
     EvapCoolertotalPower = 0.0;
     if (FlowRatio > 0.0) {
         if (thisEvapCond.FanPowerModifierCurveIndex > 0) {
-            FanPowerModCurveValue = CurveManager::CurveValue(state, thisEvapCond.FanPowerModifierCurveIndex, FlowRatio);
+            FanPowerModCurveValue = Curve::CurveValue(state, thisEvapCond.FanPowerModifierCurveIndex, FlowRatio);
         } else {
             FanPowerModCurveValue = thisEvapCond.PartLoadFract * FlowRatio;
         }
@@ -3129,7 +3052,7 @@ Real64 IndEvapCoolerPower(EnergyPlusData &state,
         if (DryWetMode == OperatingMode::WetModulated || DryWetMode == OperatingMode::WetFull) {
             // Add the pump power to the total Evap Cooler power for wet operating mode
             if (thisEvapCond.PumpPowerModifierCurveIndex > 0) {
-                PumpPowerModCurveValue = CurveManager::CurveValue(state, thisEvapCond.PumpPowerModifierCurveIndex, FlowRatio);
+                PumpPowerModCurveValue = Curve::CurveValue(state, thisEvapCond.PumpPowerModifierCurveIndex, FlowRatio);
             } else {
                 // linearly scale pump power using part-load-fraction when pump power modifier curve is not specified
                 PumpPowerModCurveValue = thisEvapCond.PartLoadFract * FlowRatio;
@@ -3148,8 +3071,6 @@ void CalcDirectResearchSpecialEvapCooler(EnergyPlusData &state, int const EvapCo
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   March 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // calculate model for direct evaporative cooler that is simple and controllable
@@ -3165,7 +3086,6 @@ void CalcDirectResearchSpecialEvapCooler(EnergyPlusData &state, int const EvapCo
     Real64 FlowRatio(0);           // primary air flow frcation (current flow divided by the design flow rate)
     Real64 MassFlowRateSysDesign;  // primary air design mass flow rate
     Real64 MassFlowRateSys;        // primary air current mass flow rate
-    int InletNode;                 // inlet node number
     Real64 BlowDownVdot(0.0);
     Real64 DriftVdot(0.0);
     Real64 EvapVdot(0.0);
@@ -3195,10 +3115,9 @@ void CalcDirectResearchSpecialEvapCooler(EnergyPlusData &state, int const EvapCo
         //   ACROSS A DIRECT EVAPORATION COOLER.
         TEWB = thisEvapCond.InletWetBulbTemp;
         TEDB = thisEvapCond.InletTemp;
-        InletNode = thisEvapCond.InletNode;
 
         MassFlowRateSys = thisEvapCond.InletMassFlowRate;
-        MassFlowRateSysDesign = state.dataLoopNodes->Node(InletNode).MassFlowRateMax;
+        MassFlowRateSysDesign = state.dataLoopNodes->Node(thisEvapCond.InletNode).MassFlowRateMax;
         if (MassFlowRateSysDesign > 0.0) {
             if (MassFlowRateSys > 0.0) {
                 FlowRatio = MassFlowRateSys / MassFlowRateSysDesign;
@@ -3207,7 +3126,7 @@ void CalcDirectResearchSpecialEvapCooler(EnergyPlusData &state, int const EvapCo
             }
         }
         if (thisEvapCond.WetbulbEffecCurveIndex > 0) {
-            EffModCurveValue = CurveManager::CurveValue(state, thisEvapCond.WetbulbEffecCurveIndex, FlowRatio);
+            EffModCurveValue = Curve::CurveValue(state, thisEvapCond.WetbulbEffecCurveIndex, FlowRatio);
         } else {
             // if no curve specified assume constant effectiveness
             EffModCurveValue = 1.0;
@@ -3246,7 +3165,7 @@ void CalcDirectResearchSpecialEvapCooler(EnergyPlusData &state, int const EvapCo
         //                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
         // Add the pump energy to the total Evap Cooler energy comsumption
         if (thisEvapCond.PumpPowerModifierCurveIndex > 0) {
-            PumpPowerModCurveValue = CurveManager::CurveValue(state, thisEvapCond.PumpPowerModifierCurveIndex, FlowRatio);
+            PumpPowerModCurveValue = Curve::CurveValue(state, thisEvapCond.PumpPowerModifierCurveIndex, FlowRatio);
         } else {
             // if no pump power modifier curve specified, then assume linear variation with part-load and primary fan PLR
             PumpPowerModCurveValue = PartLoad * FanPLR;
@@ -3302,12 +3221,10 @@ void UpdateEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   October 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     auto &thisEvapCond = state.dataEvapCoolers->EvapCond(EvapCoolNum);
     auto &thisOutletNode = state.dataLoopNodes->Node(thisEvapCond.OutletNode);
-    auto &thisInletNode = state.dataLoopNodes->Node(thisEvapCond.InletNode);
+    auto const &thisInletNode = state.dataLoopNodes->Node(thisEvapCond.InletNode);
 
     // Set the outlet air nodes of the EvapCooler
     thisOutletNode.MassFlowRate = thisEvapCond.OutletMassFlowRate;
@@ -3365,19 +3282,17 @@ void ReportEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   Oct 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     auto &thisEvapCond(state.dataEvapCoolers->EvapCond(EvapCoolNum));
 
     // report the Evap Cooler energy from this component
     thisEvapCond.EvapCoolerPower = thisEvapCond.EvapCoolerPower;
-    thisEvapCond.EvapCoolerEnergy = thisEvapCond.EvapCoolerPower * TimeStepSys * DataGlobalConstants::SecInHour;
+    thisEvapCond.EvapCoolerEnergy = thisEvapCond.EvapCoolerPower * TimeStepSysSec;
 
     // Report Water comsumption in cubic meters per timestep
-    thisEvapCond.EvapWaterConsump = thisEvapCond.EvapWaterConsumpRate * TimeStepSys * DataGlobalConstants::SecInHour;
-    thisEvapCond.EvapWaterStarvMakup = thisEvapCond.EvapWaterStarvMakupRate * TimeStepSys * DataGlobalConstants::SecInHour;
+    thisEvapCond.EvapWaterConsump = thisEvapCond.EvapWaterConsumpRate * TimeStepSysSec;
+    thisEvapCond.EvapWaterStarvMakup = thisEvapCond.EvapWaterStarvMakupRate * TimeStepSysSec;
 }
 
 void SimZoneEvaporativeCoolerUnit(EnergyPlusData &state,
@@ -3449,8 +3364,6 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   July 2013
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // get input for zone evap cooler unit
@@ -3468,16 +3381,9 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
     int NumAlphas;                   // Number of Alphas for each GetObjectItem call
     int NumNumbers;                  // Number of Numbers for each GetObjectItem call
-    int MaxAlphas;                   // Maximum number of alpha fields in all objects
-    int MaxNumbers;                  // Maximum number of numeric fields in all objects
     int NumFields;                   // Total number of fields in object
-    int IOStatus;                    // Used in GetObjectItem
     bool ErrorsFound(false);         // Set to true if errors in input, fatal at end of routine
-    bool errFlag;
     Real64 FanVolFlow;
-    int UnitLoop;
-    int CtrlZone; // index to loop counter
-    int NodeNum;  // index to loop counter
 
     auto &EvapCond(state.dataEvapCoolers->EvapCond);
     auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
@@ -3488,8 +3394,8 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     }
 
     state.dataEvapCoolers->GetInputZoneEvapUnit = false;
-    MaxNumbers = 0;
-    MaxAlphas = 0;
+    int MaxNumbers = 0;
+    int MaxAlphas = 0;
 
     CurrentModuleObject = "ZoneHVAC:EvaporativeCoolerUnit";
     state.dataEvapCoolers->NumZoneEvapUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
@@ -3504,10 +3410,11 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     lNumericBlanks.dimension(MaxNumbers, true);
 
     if (state.dataEvapCoolers->NumZoneEvapUnits > 0) {
+        int IOStatus; // Used in GetObjectItem
         state.dataEvapCoolers->CheckZoneEvapUnitName.dimension(state.dataEvapCoolers->NumZoneEvapUnits, true);
         ZoneEvapUnit.allocate(state.dataEvapCoolers->NumZoneEvapUnits);
 
-        for (UnitLoop = 1; UnitLoop <= state.dataEvapCoolers->NumZoneEvapUnits; ++UnitLoop) {
+        for (int UnitLoop = 1; UnitLoop <= state.dataEvapCoolers->NumZoneEvapUnits; ++UnitLoop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
                                                                      UnitLoop,
@@ -3521,18 +3428,16 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                                                                      cAlphaFields,
                                                                      cNumericFields);
 
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
-
             auto &thisZoneEvapUnit = ZoneEvapUnit(UnitLoop);
             thisZoneEvapUnit.Name = Alphas(1);
             if (lAlphaBlanks(2)) {
-                thisZoneEvapUnit.AvailSchedIndex = DataGlobalConstants::ScheduleAlwaysOn;
+                thisZoneEvapUnit.AvailSchedIndex = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                thisZoneEvapUnit.AvailSchedIndex =
-                    ScheduleManager::GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
+                thisZoneEvapUnit.AvailSchedIndex = ScheduleManager::GetScheduleIndex(state,
+                                                                                     Alphas(2)); // convert schedule name to pointer (index number)
                 if (thisZoneEvapUnit.AvailSchedIndex == 0) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + thisZoneEvapUnit.Name + "\" invalid data.");
-                    ShowContinueError(state, "invalid-not found " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
+                    ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
+                    ShowContinueError(state, format("invalid-not found {}=\"{}\".", cAlphaFields(2), Alphas(2)));
                     ErrorsFound = true;
                 }
             }
@@ -3575,7 +3480,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
 
             thisZoneEvapUnit.FanObjectClassName = Alphas(7);
             thisZoneEvapUnit.FanName = Alphas(8);
-            errFlag = false;
+            bool errFlag = false;
             if (!UtilityRoutines::SameString(thisZoneEvapUnit.FanObjectClassName, "Fan:SystemModel")) {
                 Fans::GetFanType(state, thisZoneEvapUnit.FanName, thisZoneEvapUnit.FanType_Num, errFlag, CurrentModuleObject, thisZoneEvapUnit.Name);
                 Fans::GetFanIndex(state, thisZoneEvapUnit.FanName, thisZoneEvapUnit.FanIndex, errFlag, CurrentModuleObject);
@@ -3589,7 +3494,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                 thisZoneEvapUnit.FanAvailSchedPtr =
                     Fans::GetFanAvailSchPtr(state, thisZoneEvapUnit.FanObjectClassName, thisZoneEvapUnit.FanName, errFlag);
                 if (errFlag) {
-                    ShowContinueError(state, "...specified in " + CurrentModuleObject + " = " + thisZoneEvapUnit.Name);
+                    ShowContinueError(state, format("...specified in {} = {}", CurrentModuleObject, thisZoneEvapUnit.Name));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(thisZoneEvapUnit.FanObjectClassName, "Fan:SystemModel")) {
@@ -3609,24 +3514,24 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
 
             FanVolFlow = 0.0;
             if (errFlag) {
-                ShowContinueError(state, "specified in " + CurrentModuleObject + " = " + thisZoneEvapUnit.Name);
+                ShowContinueError(state, format("specified in {} = {}", CurrentModuleObject, thisZoneEvapUnit.Name));
                 ErrorsFound = true;
             }
 
             thisZoneEvapUnit.DesignAirVolumeFlowRate = Numbers(1);
 
             constexpr std::array<std::string_view, static_cast<int>(FanPlacement::Num)> fanPlacementNamesUC = {"BLOWTHROUGH", "DRAWTHROUGH"};
-            thisZoneEvapUnit.FanLocation = static_cast<FanPlacement>(getEnumerationValue(fanPlacementNamesUC, Alphas(9)));
+            thisZoneEvapUnit.FanLocation = static_cast<FanPlacement>(getEnumValue(fanPlacementNamesUC, Alphas(9)));
             if (thisZoneEvapUnit.FanLocation == FanPlacement::Invalid) {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + thisZoneEvapUnit.Name + "\" invalid data.");
-                ShowContinueError(state, "invalid choice found " + cAlphaFields(9) + "=\"" + Alphas(9) + "\".");
+                ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
+                ShowContinueError(state, format("invalid choice found {}=\"{}\".", cAlphaFields(9), Alphas(9)));
                 ErrorsFound = true;
             }
 
             // get the zone numer served by the zoneHVAC evaporative cooler
-            for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
+            for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                     if (thisZoneEvapUnit.UnitOutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
                         thisZoneEvapUnit.ZonePtr = CtrlZone;
                         break;
@@ -3636,40 +3541,40 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
 
             constexpr std::array<std::string_view, static_cast<int>(ControlType::Num)> controlTypeNamesUC = {
                 "ZONETEMPERATUREDEADBANDONOFFCYCLING", "ZONECOOLINGLOADONOFFCYCLING", "ZONECOOLINGLOADVARIABLESPEEDFAN"};
-            thisZoneEvapUnit.ControlSchemeType = static_cast<ControlType>(getEnumerationValue(controlTypeNamesUC, Alphas(10)));
+            thisZoneEvapUnit.ControlSchemeType = static_cast<ControlType>(getEnumValue(controlTypeNamesUC, Alphas(10)));
             if (thisZoneEvapUnit.ControlSchemeType == ControlType::Invalid) {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + thisZoneEvapUnit.Name + "\" invalid data.");
-                ShowContinueError(state, "invalid choice found " + cAlphaFields(10) + "=\"" + Alphas(10) + "\".");
+                ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
+                ShowContinueError(state, format("invalid choice found {}=\"{}\".", cAlphaFields(10), Alphas(10)));
                 ErrorsFound = true;
             }
 
             thisZoneEvapUnit.ThrottlingRange = Numbers(2);
             thisZoneEvapUnit.ThresholdCoolingLoad = Numbers(3);
 
-            thisZoneEvapUnit.EvapCooler_1_Type_Num = static_cast<EvapCoolerType>(getEnumerationValue(evapCoolerTypeNamesUC, Alphas(11)));
+            thisZoneEvapUnit.EvapCooler_1_Type_Num = static_cast<EvapCoolerType>(getEnumValue(evapCoolerTypeNamesUC, Alphas(11)));
             if (thisZoneEvapUnit.EvapCooler_1_Type_Num != EvapCoolerType::Invalid) {
                 thisZoneEvapUnit.EvapCooler_1_ObjectClassName = evapCoolerTypeNames[static_cast<int>(thisZoneEvapUnit.EvapCooler_1_Type_Num)];
             } else {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + thisZoneEvapUnit.Name + "\" invalid data.");
-                ShowContinueError(state, "invalid choice found " + cAlphaFields(11) + "=\"" + Alphas(11) + "\".");
+                ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
+                ShowContinueError(state, format("invalid choice found {}=\"{}\".", cAlphaFields(11), Alphas(11)));
                 ErrorsFound = true;
             }
 
             thisZoneEvapUnit.EvapCooler_1_Name = Alphas(12);
             thisZoneEvapUnit.EvapCooler_1_Index = UtilityRoutines::FindItemInList(Alphas(12), state.dataEvapCoolers->EvapCond, &EvapConditions::Name);
             if (thisZoneEvapUnit.EvapCooler_1_Index == 0) {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + thisZoneEvapUnit.Name + "\" invalid data.");
-                ShowContinueError(state, "invalid, not found " + cAlphaFields(12) + "=\"" + Alphas(12) + "\".");
+                ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
+                ShowContinueError(state, format("invalid, not found {}=\"{}\".", cAlphaFields(12), Alphas(12)));
                 ErrorsFound = true;
             }
 
             if (!lAlphaBlanks(13)) {
-                thisZoneEvapUnit.EvapCooler_2_Type_Num = static_cast<EvapCoolerType>(getEnumerationValue(evapCoolerTypeNamesUC, Alphas(13)));
+                thisZoneEvapUnit.EvapCooler_2_Type_Num = static_cast<EvapCoolerType>(getEnumValue(evapCoolerTypeNamesUC, Alphas(13)));
                 if (thisZoneEvapUnit.EvapCooler_2_Type_Num != EvapCoolerType::Invalid) {
                     thisZoneEvapUnit.EvapCooler_2_ObjectClassName = evapCoolerTypeNames[static_cast<int>(thisZoneEvapUnit.EvapCooler_2_Type_Num)];
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + thisZoneEvapUnit.Name + "\" invalid data.");
-                    ShowContinueError(state, "invalid choice found " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
+                    ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
+                    ShowContinueError(state, format("invalid choice found {}=\"{}\".", cAlphaFields(13), Alphas(13)));
                     ErrorsFound = true;
                 }
 
@@ -3678,13 +3583,13 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                     thisZoneEvapUnit.EvapCooler_2_Index =
                         UtilityRoutines::FindItemInList(Alphas(14), state.dataEvapCoolers->EvapCond, &EvapConditions::Name);
                     if (thisZoneEvapUnit.EvapCooler_2_Index == 0) {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + thisZoneEvapUnit.Name + "\" invalid data.");
-                        ShowContinueError(state, "invalid, not found " + cAlphaFields(14) + "=\"" + Alphas(14) + "\".");
+                        ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
+                        ShowContinueError(state, format("invalid, not found {}=\"{}\".", cAlphaFields(14), Alphas(14)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + thisZoneEvapUnit.Name + "\" invalid data.");
-                    ShowContinueError(state, "missing input for " + cAlphaFields(14));
+                    ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
+                    ShowContinueError(state, format("missing input for {}", cAlphaFields(14)));
                     ErrorsFound = true;
                 }
             }
@@ -3693,10 +3598,15 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             if (!lAlphaBlanks(15)) {
                 thisZoneEvapUnit.HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(15), state.dataSize->ZoneHVACSizing);
                 if (thisZoneEvapUnit.HVACSizingIndex == 0) {
-                    ShowSevereError(state, cAlphaFields(15) + " = " + Alphas(15) + " not found.");
-                    ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + thisZoneEvapUnit.Name);
+                    ShowSevereError(state, format("{} = {} not found.", cAlphaFields(15), Alphas(15)));
+                    ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisZoneEvapUnit.Name));
                     ErrorsFound = true;
                 }
+            }
+
+            if (!lNumericBlanks(4)) {
+                // Shut Off Relative Humidity
+                thisZoneEvapUnit.ShutOffRelativeHumidity = Numbers(4);
             }
 
             // Add fan to component sets array
@@ -3731,12 +3641,12 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             // check that fan type is consistent with control method
             if (thisZoneEvapUnit.ControlSchemeType == ControlType::ZoneCoolingLoadVariableSpeedFan) { // must have a VS fan type
                 if (thisZoneEvapUnit.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + thisZoneEvapUnit.Name + "\" invalid data.");
+                    ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
                     ShowContinueError(state, "Fan:ConstantVolume is not consistent with control method ZoneCoolingLoadVariableSpeedFan.");
                     ShowContinueError(state, "Change to a variable speed fan object type");
                     ErrorsFound = true;
                 } else if (thisZoneEvapUnit.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + thisZoneEvapUnit.Name + "\" invalid data.");
+                    ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
                     ShowContinueError(state, "Fan:OnOff is not consistent with control method ZoneCoolingLoadVariableSpeedFan.");
                     ShowContinueError(state, "Change to a variable speed fan object type");
                     ErrorsFound = true;
@@ -3756,12 +3666,12 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     lNumericBlanks.deallocate();
 
     if (ErrorsFound) {
-        ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.");
+        ShowFatalError(state, format("{}Errors found in getting input.", RoutineName));
         ShowContinueError(state, "... Preceding condition causes termination.");
     }
 
     // setup output variables
-    for (UnitLoop = 1; UnitLoop <= state.dataEvapCoolers->NumZoneEvapUnits; ++UnitLoop) {
+    for (int UnitLoop = 1; UnitLoop <= state.dataEvapCoolers->NumZoneEvapUnits; ++UnitLoop) {
         auto &thisZoneEvapUnit = ZoneEvapUnit(UnitLoop);
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Total Cooling Rate",
@@ -3777,10 +3687,10 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisZoneEvapUnit.Name,
-                            _,
+                            {},
                             "ENERGYTRANSFER",
                             "COOLINGCOILS",
-                            _,
+                            {},
                             "System");
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Sensible Cooling Rate",
@@ -3859,148 +3769,137 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   July 2013
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // Using/Aliasing
-    auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-    auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 TimeElapsed;
+    auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
-    auto &EvapCond(state.dataEvapCoolers->EvapCond);
-    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
-
-    if (allocated(ZoneComp)) {
-        if (ZoneEvapUnit(UnitNum).MyZoneEq) { // initialize the name of each availability manager list and zone number
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
-                ZoneEvapUnit(UnitNum).AvailManagerListName;
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
-            ZoneEvapUnit(UnitNum).MyZoneEq = false;
+    if (allocated(state.dataHVACGlobal->ZoneComp)) {
+        if (zoneEvapUnit.MyZoneEq) { // initialize the name of each availability manager list and zone number
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
+                zoneEvapUnit.AvailManagerListName;
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EvaporativeCooler).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
+            zoneEvapUnit.MyZoneEq = false;
         }
-        ZoneEvapUnit(UnitNum).FanAvailStatus =
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailStatus;
+        zoneEvapUnit.FanAvailStatus =
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailStatus;
     }
 
     if (!state.dataEvapCoolers->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         state.dataEvapCoolers->ZoneEquipmentListChecked = true;
         for (int Loop = 1; Loop <= state.dataEvapCoolers->NumZoneEvapUnits; ++Loop) {
-            if (DataZoneEquipment::CheckZoneEquipmentList(state, "ZoneHVAC:EvaporativeCoolerUnit", ZoneEvapUnit(Loop).Name)) {
-                ZoneEvapUnit(Loop).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
+            if (DataZoneEquipment::CheckZoneEquipmentList(state, "ZoneHVAC:EvaporativeCoolerUnit", state.dataEvapCoolers->ZoneEvapUnit(Loop).Name)) {
+                state.dataEvapCoolers->ZoneEvapUnit(Loop).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
             } else {
                 ShowSevereError(state,
-                                "InitZoneEvaporativeCoolerUnit: ZoneHVAC:EvaporativeCoolerUnit = " + ZoneEvapUnit(Loop).Name +
-                                    ", is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
+                                format("InitZoneEvaporativeCoolerUnit: ZoneHVAC:EvaporativeCoolerUnit = {}, is not on any ZoneHVAC:EquipmentList.  "
+                                       "It will not be simulated.",
+                                       state.dataEvapCoolers->ZoneEvapUnit(Loop).Name));
             }
         }
     }
 
-    if (!state.dataGlobal->SysSizingCalc && ZoneEvapUnit(UnitNum).MySize) {
+    if (!state.dataGlobal->SysSizingCalc && zoneEvapUnit.MySize) {
         SizeZoneEvaporativeCoolerUnit(state, UnitNum);
-        ZoneEvapUnit(UnitNum).MySize = false;
+        zoneEvapUnit.MySize = false;
     }
 
-    if (ZoneEvapUnit(UnitNum).MyFan) {
-        if (ZoneEvapUnit(UnitNum).ActualFanVolFlowRate != DataSizing::AutoSize) {
+    if (zoneEvapUnit.MyFan) {
+        if (zoneEvapUnit.ActualFanVolFlowRate != DataSizing::AutoSize) {
 
-            if (ZoneEvapUnit(UnitNum).ActualFanVolFlowRate < ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate) {
-                ShowSevereError(state, "InitZoneEvaporativeCoolerUnit: ZoneHVAC:EvaporativeCoolerUnit = " + ZoneEvapUnit(UnitNum).Name);
+            if (zoneEvapUnit.ActualFanVolFlowRate < zoneEvapUnit.DesignAirVolumeFlowRate) {
+                ShowSevereError(state, format("InitZoneEvaporativeCoolerUnit: ZoneHVAC:EvaporativeCoolerUnit = {}", zoneEvapUnit.Name));
                 ShowContinueError(state, "...unit fan volumetric flow rate less than evaporative cooler unit design supply air flow rate.");
-                ShowContinueError(state, format("...fan volumetric flow rate = {:.5T} m3/s.", ZoneEvapUnit(UnitNum).ActualFanVolFlowRate));
-                ShowContinueError(state,
-                                  format("...evap cooler unit volumetric flow rate = {:.5T} m3/s.", ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate));
-                ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = ZoneEvapUnit(UnitNum).ActualFanVolFlowRate;
+                ShowContinueError(state, format("...fan volumetric flow rate = {:.5T} m3/s.", zoneEvapUnit.ActualFanVolFlowRate));
+                ShowContinueError(state, format("...evap cooler unit volumetric flow rate = {:.5T} m3/s.", zoneEvapUnit.DesignAirVolumeFlowRate));
+                zoneEvapUnit.DesignAirVolumeFlowRate = zoneEvapUnit.ActualFanVolFlowRate;
                 ShowContinueError(state, "...evaporative cooler unit design supply air flow rate will match fan flow rate and simulation continues.");
-                ZoneEvapUnit(UnitNum).MyEnvrn = true; // re-initialize to set mass flow rate and max mass flow rate
+                zoneEvapUnit.MyEnvrn = true; // re-initialize to set mass flow rate and max mass flow rate
             }
 
-            if (ZoneEvapUnit(UnitNum).ActualFanVolFlowRate > 0.0) {
-                ZoneEvapUnit(UnitNum).DesignFanSpeedRatio =
-                    ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate / ZoneEvapUnit(UnitNum).ActualFanVolFlowRate;
+            if (zoneEvapUnit.ActualFanVolFlowRate > 0.0) {
+                zoneEvapUnit.DesignFanSpeedRatio = zoneEvapUnit.DesignAirVolumeFlowRate / zoneEvapUnit.ActualFanVolFlowRate;
             }
 
-            ZoneEvapUnit(UnitNum).MyFan = false;
+            zoneEvapUnit.MyFan = false;
         } else {
-            if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::GetFanVolFlow(state, ZoneEvapUnit(UnitNum).FanIndex, ZoneEvapUnit(UnitNum).ActualFanVolFlowRate);
+            if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                Fans::GetFanVolFlow(state, zoneEvapUnit.FanIndex, zoneEvapUnit.ActualFanVolFlowRate);
             } else {
-                ZoneEvapUnit(UnitNum).ActualFanVolFlowRate = state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->designAirVolFlowRate;
+                zoneEvapUnit.ActualFanVolFlowRate = state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->designAirVolFlowRate;
             }
         }
     }
 
-    if (ZoneEvapUnit(UnitNum).FanAvailSchedPtr > 0) {
+    if (zoneEvapUnit.FanAvailSchedPtr > 0) {
         // include fan is not available, then unit is not available
-        ZoneEvapUnit(UnitNum).UnitIsAvailable = ((ScheduleManager::GetCurrentScheduleValue(state, ZoneEvapUnit(UnitNum).FanAvailSchedPtr) > 0.0) &&
-                                                 (ScheduleManager::GetCurrentScheduleValue(state, ZoneEvapUnit(UnitNum).AvailSchedIndex) > 0.0));
+        zoneEvapUnit.UnitIsAvailable = ((ScheduleManager::GetCurrentScheduleValue(state, zoneEvapUnit.FanAvailSchedPtr) > 0.0) &&
+                                        (ScheduleManager::GetCurrentScheduleValue(state, zoneEvapUnit.AvailSchedIndex) > 0.0));
     } else {
-        ZoneEvapUnit(UnitNum).UnitIsAvailable = (ScheduleManager::GetCurrentScheduleValue(state, ZoneEvapUnit(UnitNum).AvailSchedIndex) > 0.0);
+        zoneEvapUnit.UnitIsAvailable = (ScheduleManager::GetCurrentScheduleValue(state, zoneEvapUnit.AvailSchedIndex) > 0.0);
     }
 
-    ZoneEvapUnit(UnitNum).EvapCooler_1_AvailStatus =
-        (ScheduleManager::GetCurrentScheduleValue(state, EvapCond(ZoneEvapUnit(UnitNum).EvapCooler_1_Index).SchedPtr) > 0.0);
+    zoneEvapUnit.EvapCooler_1_AvailStatus =
+        (ScheduleManager::GetCurrentScheduleValue(state, state.dataEvapCoolers->EvapCond(zoneEvapUnit.EvapCooler_1_Index).SchedPtr) > 0.0);
 
-    if (ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) {
-        ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus =
-            (ScheduleManager::GetCurrentScheduleValue(state, EvapCond(ZoneEvapUnit(UnitNum).EvapCooler_2_Index).SchedPtr) > 0.0);
+    if (zoneEvapUnit.EvapCooler_2_Index > 0) {
+        zoneEvapUnit.EvapCooler_2_AvailStatus =
+            (ScheduleManager::GetCurrentScheduleValue(state, state.dataEvapCoolers->EvapCond(zoneEvapUnit.EvapCooler_2_Index).SchedPtr) > 0.0);
     }
     // Do the Begin Environment initializations
-    if (state.dataGlobal->BeginEnvrnFlag && ZoneEvapUnit(UnitNum).MyEnvrn) {
+    if (state.dataGlobal->BeginEnvrnFlag && zoneEvapUnit.MyEnvrn) {
+        zoneEvapUnit.DesignAirMassFlowRate = state.dataEnvrn->StdRhoAir * zoneEvapUnit.DesignAirVolumeFlowRate;
+        state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRateMax = zoneEvapUnit.DesignAirMassFlowRate;
+        state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRateMin = 0.0;
+        state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRateMinAvail = 0.0;
 
-        ZoneEvapUnit(UnitNum).DesignAirMassFlowRate = state.dataEnvrn->StdRhoAir * ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate;
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMax = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate;
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMin = 0.0;
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMinAvail = 0.0;
+        state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).MassFlowRateMax = zoneEvapUnit.DesignAirMassFlowRate;
+        state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).MassFlowRateMin = 0.0;
+        state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).MassFlowRateMinAvail = 0.0;
 
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRateMax = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate;
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRateMin = 0.0;
-        state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRateMinAvail = 0.0;
-
-        if (ZoneEvapUnit(UnitNum).UnitReliefNodeNum > 0) {
-            state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRateMax = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate;
-            state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRateMin = 0.0;
-            state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRateMinAvail = 0.0;
+        if (zoneEvapUnit.UnitReliefNodeNum > 0) {
+            state.dataLoopNodes->Node(zoneEvapUnit.UnitReliefNodeNum).MassFlowRateMax = zoneEvapUnit.DesignAirMassFlowRate;
+            state.dataLoopNodes->Node(zoneEvapUnit.UnitReliefNodeNum).MassFlowRateMin = 0.0;
+            state.dataLoopNodes->Node(zoneEvapUnit.UnitReliefNodeNum).MassFlowRateMinAvail = 0.0;
         }
-        ZoneEvapUnit(UnitNum).WasOnLastTimestep = false;
-        ZoneEvapUnit(UnitNum).IsOnThisTimestep = false;
-        ZoneEvapUnit(UnitNum).FanSpeedRatio = 0.0;
-        ZoneEvapUnit(UnitNum).UnitFanSpeedRatio = 0.0;
-        ZoneEvapUnit(UnitNum).UnitTotalCoolingRate = 0.0;
-        ZoneEvapUnit(UnitNum).UnitTotalCoolingEnergy = 0.0;
-        ZoneEvapUnit(UnitNum).UnitSensibleCoolingRate = 0.0;
-        ZoneEvapUnit(UnitNum).UnitSensibleCoolingEnergy = 0.0;
-        ZoneEvapUnit(UnitNum).UnitLatentHeatingRate = 0.0;
-        ZoneEvapUnit(UnitNum).UnitLatentHeatingEnergy = 0.0;
-        ZoneEvapUnit(UnitNum).UnitLatentCoolingRate = 0.0;
-        ZoneEvapUnit(UnitNum).UnitLatentCoolingEnergy = 0.0;
-        ZoneEvapUnit(UnitNum).FanAvailStatus = 0.0;
+        zoneEvapUnit.WasOnLastTimestep = false;
+        zoneEvapUnit.IsOnThisTimestep = false;
+        zoneEvapUnit.FanSpeedRatio = 0.0;
+        zoneEvapUnit.UnitFanSpeedRatio = 0.0;
+        zoneEvapUnit.UnitTotalCoolingRate = 0.0;
+        zoneEvapUnit.UnitTotalCoolingEnergy = 0.0;
+        zoneEvapUnit.UnitSensibleCoolingRate = 0.0;
+        zoneEvapUnit.UnitSensibleCoolingEnergy = 0.0;
+        zoneEvapUnit.UnitLatentHeatingRate = 0.0;
+        zoneEvapUnit.UnitLatentHeatingEnergy = 0.0;
+        zoneEvapUnit.UnitLatentCoolingRate = 0.0;
+        zoneEvapUnit.UnitLatentCoolingEnergy = 0.0;
+        zoneEvapUnit.FanAvailStatus = 0.0;
 
         // place default cold setpoints on control nodes of select evap coolers
-        if ((ZoneEvapUnit(UnitNum).EvapCooler_1_Type_Num == EvapCoolerType::DirectResearchSpecial) ||
-            (ZoneEvapUnit(UnitNum).EvapCooler_1_Type_Num == EvapCoolerType::IndirectRDDSpecial)) {
-            if (EvapCond(ZoneEvapUnit(UnitNum).EvapCooler_1_Index).EvapControlNodeNum > 0) {
-                state.dataLoopNodes->Node(EvapCond(ZoneEvapUnit(UnitNum).EvapCooler_1_Index).EvapControlNodeNum).TempSetPoint = -20.0;
+        if ((zoneEvapUnit.EvapCooler_1_Type_Num == EvapCoolerType::DirectResearchSpecial) ||
+            (zoneEvapUnit.EvapCooler_1_Type_Num == EvapCoolerType::IndirectRDDSpecial)) {
+            if (state.dataEvapCoolers->EvapCond(zoneEvapUnit.EvapCooler_1_Index).EvapControlNodeNum > 0) {
+                state.dataLoopNodes->Node(state.dataEvapCoolers->EvapCond(zoneEvapUnit.EvapCooler_1_Index).EvapControlNodeNum).TempSetPoint = -20.0;
             }
         }
-        if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Type_Num == EvapCoolerType::DirectResearchSpecial) ||
-            (ZoneEvapUnit(UnitNum).EvapCooler_2_Type_Num == EvapCoolerType::IndirectRDDSpecial)) {
-            if (EvapCond(ZoneEvapUnit(UnitNum).EvapCooler_2_Index).EvapControlNodeNum > 0) {
-                state.dataLoopNodes->Node(EvapCond(ZoneEvapUnit(UnitNum).EvapCooler_2_Index).EvapControlNodeNum).TempSetPoint = -20.0;
+        if ((zoneEvapUnit.EvapCooler_2_Type_Num == EvapCoolerType::DirectResearchSpecial) ||
+            (zoneEvapUnit.EvapCooler_2_Type_Num == EvapCoolerType::IndirectRDDSpecial)) {
+            if (state.dataEvapCoolers->EvapCond(zoneEvapUnit.EvapCooler_2_Index).EvapControlNodeNum > 0) {
+                state.dataLoopNodes->Node(state.dataEvapCoolers->EvapCond(zoneEvapUnit.EvapCooler_2_Index).EvapControlNodeNum).TempSetPoint = -20.0;
             }
         }
 
-        ZoneEvapUnit(UnitNum).MyEnvrn = false;
+        zoneEvapUnit.MyEnvrn = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        ZoneEvapUnit(UnitNum).MyEnvrn = true;
+        zoneEvapUnit.MyEnvrn = true;
     }
 
-    TimeElapsed = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
-    if (ZoneEvapUnit(UnitNum).TimeElapsed != TimeElapsed) {
-        ZoneEvapUnit(UnitNum).WasOnLastTimestep = ZoneEvapUnit(UnitNum).IsOnThisTimestep;
-
-        ZoneEvapUnit(UnitNum).TimeElapsed = TimeElapsed;
+    Real64 TimeElapsed =
+        state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
+    if (zoneEvapUnit.TimeElapsed != TimeElapsed) {
+        zoneEvapUnit.WasOnLastTimestep = zoneEvapUnit.IsOnThisTimestep;
+        zoneEvapUnit.TimeElapsed = TimeElapsed;
     }
 }
 
@@ -4012,53 +3911,46 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
     //       DATE WRITTEN   July 2013
     //       MODIFIED       August 2014 Bereket Nigusse, added scalable sizing
     //       MODIFIED       January 2013 Daeho Kang, add component sizing table entries
-    //       RE-ENGINEERED  na
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("SizeZoneEvaporativeCoolerUnit: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string CompName;     // component name
-    std::string CompType;     // component type
-    std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
-    Real64 TempSize;          // autosized value of coil input field
-    int SizingMethod;         // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing,
-                              // CoolingCapacitySizing, HeatingCapacitySizing, etc.)
-    bool PrintFlag;           // TRUE when sizing information is reported in the eio file
-    int zoneHVACIndex;        // index of zoneHVAC equipment sizing specification
-    int SAFMethod(0);         // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
-                              // FractionOfAutosizedHeatingAirflow ...)
+    Real64 TempSize; // autosized value of coil input field
 
-    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+    auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
     state.dataSize->DataScalableSizingON = false;
     state.dataSize->ZoneHeatingOnlyFan = false;
     state.dataSize->ZoneCoolingOnlyFan = false;
 
-    CompType = "ZoneHVAC:EvaporativeCoolerUnit";
-    CompName = ZoneEvapUnit(UnitNum).Name;
-    state.dataSize->DataZoneNumber = ZoneEvapUnit(UnitNum).ZonePtr;
-    PrintFlag = true;
-    bool errorsFound = false;
+    state.dataSize->DataZoneNumber = zoneEvapUnit.ZonePtr;
 
-    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
-    auto &CurZoneEqNum(state.dataSize->CurZoneEqNum);
+    if (state.dataSize->CurZoneEqNum > 0) {
+        std::string CompName = zoneEvapUnit.Name;
+        std::string CompType = "ZoneHVAC:EvaporativeCoolerUnit";
+        bool errorsFound = false;
+        auto &zoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
+        bool PrintFlag = true; // TRUE when sizing information is reported in the eio file
 
-    if (CurZoneEqNum > 0) {
-
-        if (ZoneEvapUnit(UnitNum).HVACSizingIndex > 0) {
+        if (zoneEvapUnit.HVACSizingIndex > 0) {
             state.dataSize->ZoneCoolingOnlyFan = true;
-            zoneHVACIndex = ZoneEvapUnit(UnitNum).HVACSizingIndex;
-            SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
-            SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
-            ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
+            // index of zoneHVAC equipment sizing specification
+            int zoneHVACIndex = zoneEvapUnit.HVACSizingIndex;
+            // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing,
+            // CoolingCapacitySizing, HeatingCapacitySizing, etc.)
+            int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+            // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
+            // FractionOfAutosizedHeatingAirflow ...)
+            int SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
+            zoneEqSizing.SizingMethod(SizingMethod) = SAFMethod;
             if (SAFMethod == DataSizing::None || SAFMethod == DataSizing::SupplyAirFlowRate || SAFMethod == DataSizing::FlowPerFloorArea ||
                 SAFMethod == DataSizing::FractionOfAutosizedCoolingAirflow) {
                 switch (SAFMethod) {
                 case DataSizing::SupplyAirFlowRate:
                     if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
-                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-                        ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
+                        zoneEqSizing.AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                        zoneEqSizing.SystemAirFlow = true;
                     }
                     TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
@@ -4066,10 +3958,10 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
                     }
                     break;
                 case DataSizing::FlowPerFloorArea:
-                    ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                    ZoneEqSizing(CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow *
-                                                            state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
-                    TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
+                    zoneEqSizing.SystemAirFlow = true;
+                    zoneEqSizing.AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow *
+                                              state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                    TempSize = zoneEqSizing.AirVolFlow;
                     state.dataSize->DataScalableSizingON = true;
                     break;
                 case DataSizing::FractionOfAutosizedCoolingAirflow:
@@ -4086,19 +3978,18 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
                 if (state.dataGlobal->isEpJSON) stringOverride = "design_supply_air_flow_rate [m3/s]";
                 sizingCoolingAirFlow.overrideSizingString(stringOverride);
                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
+                zoneEvapUnit.DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
             } else if (SAFMethod == DataSizing::FlowPerCoolingCapacity) {
                 SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
                 TempSize = DataSizing::AutoSize;
                 PrintFlag = false;
                 state.dataSize->DataScalableSizingON = true;
-                state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
+                state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                 if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == DataSizing::FractionOfAutosizedCoolingCapacity) {
                     state.dataSize->DataFracOfAutosizedCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                 }
                 CoolingCapacitySizer sizerCoolingCapacity;
-                sizerCoolingCapacity.overrideSizingString(SizingString);
                 sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 state.dataSize->DataCapacityUsedForSizing = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                 state.dataSize->DataFlowPerCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
@@ -4110,7 +4001,7 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
                 if (state.dataGlobal->isEpJSON) stringOverride = "design_supply_air_flow_rate [m3/s]";
                 sizingCoolingAirFlow.overrideSizingString(stringOverride);
                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
+                zoneEvapUnit.DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
             }
             state.dataSize->DataScalableSizingON = false;
             state.dataSize->ZoneCoolingOnlyFan = false;
@@ -4119,16 +4010,16 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
             // specified in the zoneHVAC object
             // N1 , \field Maximum Supply Air Flow Rate
             state.dataSize->ZoneCoolingOnlyFan = true;
-            if (ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate > 0.0) {
+            if (zoneEvapUnit.DesignAirVolumeFlowRate > 0.0) {
                 PrintFlag = false;
             }
-            TempSize = ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate;
+            TempSize = zoneEvapUnit.DesignAirVolumeFlowRate;
             CoolingAirFlowSizer sizingCoolingAirFlow;
             std::string stringOverride = "Design Supply Air Flow Rate [m3/s]";
             if (state.dataGlobal->isEpJSON) stringOverride = "design_supply_air_flow_rate [m3/s]";
             sizingCoolingAirFlow.overrideSizingString(stringOverride);
             sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-            ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
+            zoneEvapUnit.DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
             state.dataSize->ZoneCoolingOnlyFan = false;
         }
     }
@@ -4145,8 +4036,6 @@ void CalcZoneEvaporativeCoolerUnit(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   July 2013
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneCoolingLoad;
@@ -4157,82 +4046,96 @@ void CalcZoneEvaporativeCoolerUnit(EnergyPlusData &state,
     Real64 PartLoadRatio;
 
     {
-        auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+        auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
-        if (ZoneEvapUnit(UnitNum).ControlSchemeType == ControlType::ZoneTemperatureDeadBandOnOffCycling) {
-            ZoneTemp = state.dataLoopNodes->Node(ZoneEvapUnit(UnitNum).ZoneNodeNum).Temp;
-            CoolSetLowThrottle = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) - (0.5 * ZoneEvapUnit(UnitNum).ThrottlingRange);
-            CoolSetHiThrottle = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + (0.5 * ZoneEvapUnit(UnitNum).ThrottlingRange);
+        Real64 relativeHumidity = 100.0 * Psychrometrics::PsyRhFnTdbWPb(state,
+                                                                        state.dataLoopNodes->Node(zoneEvapUnit.ZoneNodeNum).Temp,
+                                                                        state.dataLoopNodes->Node(zoneEvapUnit.ZoneNodeNum).HumRat,
+                                                                        state.dataEnvrn->OutBaroPress,
+                                                                        "CalcZoneEvaporativeCoolerUnit");
+        if (relativeHumidity > zoneEvapUnit.ShutOffRelativeHumidity) {
+            // unit is off when humidity is too high
+            PartLoadRatio = 0.0;
+            zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
+            CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
+            zoneEvapUnit.IsOnThisTimestep = false;
+            return;
+        }
 
-            if ((ZoneTemp < CoolSetLowThrottle) || !ZoneEvapUnit(UnitNum).UnitIsAvailable) {
-                ZoneEvapUnit(UnitNum).IsOnThisTimestep = false;
+        if (zoneEvapUnit.ControlSchemeType == ControlType::ZoneTemperatureDeadBandOnOffCycling) {
+            ZoneTemp = state.dataLoopNodes->Node(zoneEvapUnit.ZoneNodeNum).Temp;
+            CoolSetLowThrottle = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) - (0.5 * zoneEvapUnit.ThrottlingRange);
+            CoolSetHiThrottle = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + (0.5 * zoneEvapUnit.ThrottlingRange);
+
+            if ((ZoneTemp < CoolSetLowThrottle) || !zoneEvapUnit.UnitIsAvailable) {
+                zoneEvapUnit.IsOnThisTimestep = false;
             } else if (ZoneTemp > CoolSetHiThrottle) {
-                ZoneEvapUnit(UnitNum).IsOnThisTimestep = true;
+                zoneEvapUnit.IsOnThisTimestep = true;
             } else {
-                if (ZoneEvapUnit(UnitNum).WasOnLastTimestep) {
-                    ZoneEvapUnit(UnitNum).IsOnThisTimestep = true;
+                if (zoneEvapUnit.WasOnLastTimestep) {
+                    zoneEvapUnit.IsOnThisTimestep = true;
                 } else {
-                    ZoneEvapUnit(UnitNum).IsOnThisTimestep = false;
+                    zoneEvapUnit.IsOnThisTimestep = false;
                 }
             }
 
-            if (ZoneEvapUnit(UnitNum).IsOnThisTimestep) {
+            if (zoneEvapUnit.IsOnThisTimestep) {
 
-                if (ZoneEvapUnit(UnitNum).OpMode == DataHVACGlobals::ContFanCycCoil) {
+                if (zoneEvapUnit.OpMode == DataHVACGlobals::ContFanCycCoil) {
                     PartLoadRatio = 1.0;
-                    ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
+                    zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                 } else {
                     ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                     // calculate part load ratio for cycling fan/unit first
                     ControlZoneEvapUnitOutput(state, UnitNum, ZoneCoolingLoad);
-                    PartLoadRatio = ZoneEvapUnit(UnitNum).UnitPartLoadRatio;
+                    PartLoadRatio = zoneEvapUnit.UnitPartLoadRatio;
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                 }
 
             } else { // not running
 
                 PartLoadRatio = 0.0;
-                ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
+                zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
                 CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
             }
 
-        } else if (ZoneEvapUnit(UnitNum).ControlSchemeType == ControlType::ZoneCoolingLoadOnOffCycling) {
+        } else if (zoneEvapUnit.ControlSchemeType == ControlType::ZoneCoolingLoadOnOffCycling) {
 
             // get zone loads
             ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
-            CoolingLoadThreashold = -1.0 * ZoneEvapUnit(UnitNum).ThresholdCoolingLoad;
+            CoolingLoadThreashold = -1.0 * zoneEvapUnit.ThresholdCoolingLoad;
 
-            if ((ZoneCoolingLoad < CoolingLoadThreashold) && ZoneEvapUnit(UnitNum).UnitIsAvailable) {
+            if ((ZoneCoolingLoad < CoolingLoadThreashold) && zoneEvapUnit.UnitIsAvailable) {
 
-                if (ZoneEvapUnit(UnitNum).OpMode == DataHVACGlobals::ContFanCycCoil) {
+                if (zoneEvapUnit.OpMode == DataHVACGlobals::ContFanCycCoil) {
                     PartLoadRatio = 1.0;
-                    ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
+                    zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                 } else {
                     // calculate part load ratio for cycling fan/unit first
                     ControlZoneEvapUnitOutput(state, UnitNum, ZoneCoolingLoad);
-                    PartLoadRatio = ZoneEvapUnit(UnitNum).UnitPartLoadRatio;
+                    PartLoadRatio = zoneEvapUnit.UnitPartLoadRatio;
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                 }
 
             } else {
                 // unit is off
                 PartLoadRatio = 0.0;
-                ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
+                zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
                 CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
             }
 
-        } else if (ZoneEvapUnit(UnitNum).ControlSchemeType == ControlType::ZoneCoolingLoadVariableSpeedFan) {
+        } else if (zoneEvapUnit.ControlSchemeType == ControlType::ZoneCoolingLoadVariableSpeedFan) {
             // get zone loads
             ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
-            CoolingLoadThreashold = -1.0 * ZoneEvapUnit(UnitNum).ThresholdCoolingLoad;
-            if ((ZoneCoolingLoad < CoolingLoadThreashold) && ZoneEvapUnit(UnitNum).UnitIsAvailable) {
+            CoolingLoadThreashold = -1.0 * zoneEvapUnit.ThresholdCoolingLoad;
+            if ((ZoneCoolingLoad < CoolingLoadThreashold) && zoneEvapUnit.UnitIsAvailable) {
 
                 // determine fan speed to meet load
-                ControlVSEvapUnitToMeetLoad(state, UnitNum, ZoneNum, ZoneCoolingLoad);
+                ControlVSEvapUnitToMeetLoad(state, UnitNum, ZoneCoolingLoad);
                 // variable speed fan used fan speed ratio instead of partload ratio
-                CalcZoneEvapUnitOutput(state, UnitNum, ZoneEvapUnit(UnitNum).FanSpeedRatio, SensibleOutputProvided, LatentOutputProvided);
+                CalcZoneEvapUnitOutput(state, UnitNum, zoneEvapUnit.FanSpeedRatio, SensibleOutputProvided, LatentOutputProvided);
 
             } else {
                 // unit is off
@@ -4254,96 +4157,81 @@ void CalcZoneEvapUnitOutput(EnergyPlusData &state,
 
     Real64 MinHumRat; // minimum humidity ratio
 
-    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
-    auto &Node(state.dataLoopNodes->Node);
+    auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
-    int const ZoneNodeNum = ZoneEvapUnit(UnitNum).ZoneNodeNum;
-    int const OAInletNodeNum = ZoneEvapUnit(UnitNum).OAInletNodeNum;
-    int const OutletNodeNum = ZoneEvapUnit(UnitNum).UnitOutletNodeNum;
-    int const ReliefNodeNum = ZoneEvapUnit(UnitNum).UnitReliefNodeNum;
-    int const FanInletNodeNum = ZoneEvapUnit(UnitNum).FanInletNodeNum;
-    int const FanOutletNodeNum = ZoneEvapUnit(UnitNum).FanOutletNodeNum;
-    int const EvapCooler_1_Index = ZoneEvapUnit(UnitNum).EvapCooler_1_Index;
-    int const EvapCooler_2_Index = ZoneEvapUnit(UnitNum).EvapCooler_2_Index;
-
-    auto &EvapCond(state.dataEvapCoolers->EvapCond);
+    int const ZoneNodeNum = zoneEvapUnit.ZoneNodeNum;
+    int const OAInletNodeNum = zoneEvapUnit.OAInletNodeNum;
+    int const OutletNodeNum = zoneEvapUnit.UnitOutletNodeNum;
+    int const ReliefNodeNum = zoneEvapUnit.UnitReliefNodeNum;
+    int const FanInletNodeNum = zoneEvapUnit.FanInletNodeNum;
+    int const FanOutletNodeNum = zoneEvapUnit.FanOutletNodeNum;
+    int const EvapCooler_1_Index = zoneEvapUnit.EvapCooler_1_Index;
+    int const EvapCooler_2_Index = zoneEvapUnit.EvapCooler_2_Index;
 
     // calculate unit sensible cooling output
     if (PartLoadRatio > 0) {
-        Node(OAInletNodeNum).MassFlowRate = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate * PartLoadRatio;
-        Node(OAInletNodeNum).MassFlowRateMaxAvail = Node(OAInletNodeNum).MassFlowRate;
-        Node(OutletNodeNum).MassFlowRate = Node(OAInletNodeNum).MassFlowRate;
-        Node(OutletNodeNum).MassFlowRateMaxAvail = Node(OutletNodeNum).MassFlowRate;
+        state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRate = zoneEvapUnit.DesignAirMassFlowRate * PartLoadRatio;
+        state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRate;
+        state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRate;
+        state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate;
     } else { // not running
-        Node(OAInletNodeNum).MassFlowRate = 0.0;
-        Node(OAInletNodeNum).MassFlowRateMaxAvail = 0.0;
-        Node(FanInletNodeNum).MassFlowRate = 0.0;
-        Node(FanInletNodeNum).MassFlowRateMaxAvail = 0.0;
-        Node(FanOutletNodeNum).MassFlowRate = 0.0;
-        Node(FanOutletNodeNum).MassFlowRateMaxAvail = 0.0;
-        Node(OutletNodeNum).MassFlowRate = 0.0;
-        Node(OutletNodeNum).MassFlowRateMaxAvail = 0.0;
+        state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRate = 0.0;
+        state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRateMaxAvail = 0.0;
+        state.dataLoopNodes->Node(FanInletNodeNum).MassFlowRate = 0.0;
+        state.dataLoopNodes->Node(FanInletNodeNum).MassFlowRateMaxAvail = 0.0;
+        state.dataLoopNodes->Node(FanOutletNodeNum).MassFlowRate = 0.0;
+        state.dataLoopNodes->Node(FanOutletNodeNum).MassFlowRateMaxAvail = 0.0;
+        state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate = 0.0;
+        state.dataLoopNodes->Node(OutletNodeNum).MassFlowRateMaxAvail = 0.0;
 
-        Node(EvapCond(EvapCooler_1_Index).InletNode).MassFlowRate = 0.0;
-        Node(EvapCond(EvapCooler_1_Index).InletNode).MassFlowRateMaxAvail = 0.0;
-        Node(EvapCond(EvapCooler_1_Index).OutletNode).MassFlowRate = 0.0;
-        Node(EvapCond(EvapCooler_1_Index).OutletNode).MassFlowRateMaxAvail = 0.0;
+        state.dataLoopNodes->Node(state.dataEvapCoolers->EvapCond(EvapCooler_1_Index).InletNode).MassFlowRate = 0.0;
+        state.dataLoopNodes->Node(state.dataEvapCoolers->EvapCond(EvapCooler_1_Index).InletNode).MassFlowRateMaxAvail = 0.0;
+        state.dataLoopNodes->Node(state.dataEvapCoolers->EvapCond(EvapCooler_1_Index).OutletNode).MassFlowRate = 0.0;
+        state.dataLoopNodes->Node(state.dataEvapCoolers->EvapCond(EvapCooler_1_Index).OutletNode).MassFlowRateMaxAvail = 0.0;
 
         if (EvapCooler_2_Index > 0) {
-            Node(EvapCond(EvapCooler_2_Index).InletNode).MassFlowRate = 0.0;
-            Node(EvapCond(EvapCooler_2_Index).InletNode).MassFlowRateMaxAvail = 0.0;
-            Node(EvapCond(EvapCooler_2_Index).OutletNode).MassFlowRate = 0.0;
-            Node(EvapCond(EvapCooler_2_Index).OutletNode).MassFlowRateMaxAvail = 0.0;
+            state.dataLoopNodes->Node(state.dataEvapCoolers->EvapCond(EvapCooler_2_Index).InletNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(state.dataEvapCoolers->EvapCond(EvapCooler_2_Index).InletNode).MassFlowRateMaxAvail = 0.0;
+            state.dataLoopNodes->Node(state.dataEvapCoolers->EvapCond(EvapCooler_2_Index).OutletNode).MassFlowRate = 0.0;
+            state.dataLoopNodes->Node(state.dataEvapCoolers->EvapCond(EvapCooler_2_Index).OutletNode).MassFlowRateMaxAvail = 0.0;
         }
     }
     if (ReliefNodeNum > 0) {
-        Node(ReliefNodeNum).MassFlowRate = Node(OAInletNodeNum).MassFlowRate;
-        Node(ReliefNodeNum).MassFlowRateMaxAvail = Node(OAInletNodeNum).MassFlowRate;
+        state.dataLoopNodes->Node(ReliefNodeNum).MassFlowRate = state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRate;
+        state.dataLoopNodes->Node(ReliefNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRate;
     }
-    if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::BlowThruFan) {
-        Node(FanOutletNodeNum).MassFlowRate = Node(OAInletNodeNum).MassFlowRate;
-        Node(FanOutletNodeNum).MassFlowRateMaxAvail = Node(OAInletNodeNum).MassFlowRate;
-        if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(state,
-                                        ZoneEvapUnit(UnitNum).FanName,
-                                        false,
-                                        ZoneEvapUnit(UnitNum).FanIndex,
-                                        _,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOff);
+    if (zoneEvapUnit.FanLocation == FanPlacement::BlowThruFan) {
+        state.dataLoopNodes->Node(FanOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRate;
+        state.dataLoopNodes->Node(FanOutletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRate;
+        if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _);
         } else {
-            state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(
-                state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+            state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
         }
     }
 
-    if (ZoneEvapUnit(UnitNum).EvapCooler_1_AvailStatus) {
-        SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index, PartLoadRatio);
+    if (zoneEvapUnit.EvapCooler_1_AvailStatus) {
+        SimEvapCooler(state, zoneEvapUnit.EvapCooler_1_Name, zoneEvapUnit.EvapCooler_1_Index, PartLoadRatio);
     }
 
-    if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) && ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus) {
-        SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index, PartLoadRatio);
+    if ((zoneEvapUnit.EvapCooler_2_Index > 0) && zoneEvapUnit.EvapCooler_2_AvailStatus) {
+        SimEvapCooler(state, zoneEvapUnit.EvapCooler_2_Name, zoneEvapUnit.EvapCooler_2_Index, PartLoadRatio);
     }
-    if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::DrawThruFan) {
-        if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(state,
-                                        ZoneEvapUnit(UnitNum).FanName,
-                                        false,
-                                        ZoneEvapUnit(UnitNum).FanIndex,
-                                        _,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                        state.dataHVACGlobal->ZoneCompTurnFansOff);
+    if (zoneEvapUnit.FanLocation == FanPlacement::DrawThruFan) {
+        if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _);
         } else {
-            state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(
-                state, _, state.dataHVACGlobal->ZoneCompTurnFansOn, state.dataHVACGlobal->ZoneCompTurnFansOff, _);
+            state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
         }
     }
 
     // calculate sensible and latent outputs delivered
-    MinHumRat = min(Node(ZoneNodeNum).HumRat, Node(OutletNodeNum).HumRat);
-    SensibleOutputProvided = Node(OutletNodeNum).MassFlowRate * (Psychrometrics::PsyHFnTdbW(Node(OutletNodeNum).Temp, MinHumRat) -
-                                                                 Psychrometrics::PsyHFnTdbW(Node(ZoneNodeNum).Temp, MinHumRat));
-    LatentOutputProvided = Node(OutletNodeNum).MassFlowRate * (Node(OutletNodeNum).HumRat - Node(ZoneNodeNum).HumRat);
+    MinHumRat = min(state.dataLoopNodes->Node(ZoneNodeNum).HumRat, state.dataLoopNodes->Node(OutletNodeNum).HumRat);
+    SensibleOutputProvided = state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate *
+                             (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(OutletNodeNum).Temp, MinHumRat) -
+                              Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNodeNum).Temp, MinHumRat));
+    LatentOutputProvided = state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate *
+                           (state.dataLoopNodes->Node(OutletNodeNum).HumRat - state.dataLoopNodes->Node(ZoneNodeNum).HumRat);
 }
 
 void ControlZoneEvapUnitOutput(EnergyPlusData &state,
@@ -4357,12 +4245,11 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
     // local variables
     int constexpr MaxIte(50);      // maximum number of iterations
     Real64 constexpr Tol(0.01);    // error tolerance
-    int SolFla;                    // Flag of root solver
     Real64 PartLoadRatio;          // cooling part load ratio
     Real64 FullFlowSensibleOutput; // full flow sensible cooling output
     Real64 FullFlowLatentOutput;   // full flow sensible cooling output
 
-    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+    auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
     // get full flow sensible cooling output
     PartLoadRatio = 1.0;
@@ -4370,12 +4257,18 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
 
     // calculate part load ratio
     if (FullFlowSensibleOutput < ZoneCoolingLoad) {
-        std::array<Real64, 2> Par = {Real64(UnitNum), ZoneCoolingLoad}; // Parameters passed to root solver
-
-        General::SolveRoot(state, Tol, MaxIte, SolFla, PartLoadRatio, ZoneEvapUnitLoadResidual, 0.0, 1.0, Par);
+        auto f = [&state, UnitNum, ZoneCoolingLoad](Real64 PartLoadRatio) {
+            // calculates cooling load residual by varying part load ratio
+            Real64 QSensOutputProvided; // sensible output at a given PLR
+            Real64 QLatOutputProvided;  // latent output at a given PLR
+            CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, QSensOutputProvided, QLatOutputProvided);
+            return QSensOutputProvided - ZoneCoolingLoad;
+        };
+        int SolFla; // Flag of root solver
+        General::SolveRoot(state, Tol, MaxIte, SolFla, PartLoadRatio, f, 0.0, 1.0);
         if (SolFla == -1) {
-            if (ZoneEvapUnit(UnitNum).UnitLoadControlMaxIterErrorIndex == 0) {
-                ShowWarningError(state, "Iteration limit exceeded calculating evap unit part load ratio, for unit=" + ZoneEvapUnit(UnitNum).Name);
+            if (zoneEvapUnit.UnitLoadControlMaxIterErrorIndex == 0) {
+                ShowWarningError(state, format("Iteration limit exceeded calculating evap unit part load ratio, for unit={}", zoneEvapUnit.Name));
                 ShowContinueErrorTimeStamp(state, "");
                 ShowContinueError(state, format("Unit part load ratio returned={:.2R}", PartLoadRatio));
                 ShowContinueError(state, "Check input for Fan Placement.");
@@ -4384,14 +4277,14 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
                 state,
                 format("Zone Evaporative Cooler unit part load ratio control failed (iteration limit [{}]) for ZoneHVAC:EvaporativeCoolerUnit =\"{}",
                        MaxIte,
-                       ZoneEvapUnit(UnitNum).Name),
-                ZoneEvapUnit(UnitNum).UnitLoadControlMaxIterErrorIndex);
+                       zoneEvapUnit.Name),
+                zoneEvapUnit.UnitLoadControlMaxIterErrorIndex);
 
         } else if (SolFla == -2) {
-            if (ZoneEvapUnit(UnitNum).UnitLoadControlLimitsErrorIndex == 0) {
+            if (zoneEvapUnit.UnitLoadControlLimitsErrorIndex == 0) {
                 ShowWarningError(state,
-                                 "Zone Evaporative Cooler unit calculation failed: unit part load ratio limits exceeded, for unit = " +
-                                     ZoneEvapUnit(UnitNum).Name);
+                                 format("Zone Evaporative Cooler unit calculation failed: unit part load ratio limits exceeded, for unit = {}",
+                                        zoneEvapUnit.Name));
                 ShowContinueError(state, "Check input for Fan Placement.");
                 ShowContinueErrorTimeStamp(state, "");
                 if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
@@ -4399,117 +4292,125 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
             ShowRecurringWarningErrorAtEnd(
                 state,
                 "Zone Evaporative Cooler unit part load ratio control failed (limits exceeded) for ZoneHVAC:EvaporativeCoolerUnit =\"" +
-                    ZoneEvapUnit(UnitNum).Name,
-                ZoneEvapUnit(UnitNum).UnitLoadControlLimitsErrorIndex);
+                    zoneEvapUnit.Name,
+                zoneEvapUnit.UnitLoadControlLimitsErrorIndex);
         }
 
     } else {
         PartLoadRatio = 1.0;
     }
-    ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
-}
-
-Real64 ZoneEvapUnitLoadResidual(EnergyPlusData &state, Real64 const PartLoadRatio, std::array<Real64, 2> const &Par // parameters
-)
-{
-    // calculates cooling load residual by varying part load ratio
-    int UnitNum = int(Par[0]);
-    Real64 LoadToBeMet = Par[1];
-    Real64 QSensOutputProvided; // sensible output at a given PLR
-    Real64 QLatOutputProvided;  // latent output at a given PLR
-    CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, QSensOutputProvided, QLatOutputProvided);
-    return QSensOutputProvided - LoadToBeMet;
+    zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
 }
 
 void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
                                  int const UnitNum,           // unit number
-                                 int const ZoneNum,           // number of zone being served
                                  Real64 const ZoneCoolingLoad // target cooling load
 )
 {
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         <author>
-    //       DATE WRITTEN   <date_written>
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // Using/Aliasing
-    auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-    auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr MaxIte(500); // maximum number of iterations
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 MinHumRat;
-    Real64 FanSpeedRatio;
-    Real64 ErrorToler(0.001); // error tolerance
-    int SolFla;               // Flag of RegulaFalsi solver
-    Real64 FullFlowSensibleOutputProvided;
-
-    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
-    auto &Node(state.dataLoopNodes->Node);
+    auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
     // first get full load result
-    ErrorToler = 0.01;
+    zoneEvapUnit.FanSpeedRatio = 1.0;
+    state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate = zoneEvapUnit.DesignAirMassFlowRate;
+    state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
+    state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
+    state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).MassFlowRateMaxAvail =
+        state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).MassFlowRate;
 
-    ZoneEvapUnit(UnitNum).FanSpeedRatio = 1.0;
-    Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate;
-    Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-    Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRate = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-    Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRate;
-
-    if (ZoneEvapUnit(UnitNum).UnitReliefNodeNum > 0) {
-        Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRate = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-        Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
+    if (zoneEvapUnit.UnitReliefNodeNum > 0) {
+        state.dataLoopNodes->Node(zoneEvapUnit.UnitReliefNodeNum).MassFlowRate = state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
+        state.dataLoopNodes->Node(zoneEvapUnit.UnitReliefNodeNum).MassFlowRateMaxAvail =
+            state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
     }
-    if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::BlowThruFan) {
-        Node(ZoneEvapUnit(UnitNum).FanOutletNodeNum).MassFlowRate = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-        Node(ZoneEvapUnit(UnitNum).FanOutletNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-        if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(
-                state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+    if (zoneEvapUnit.FanLocation == FanPlacement::BlowThruFan) {
+        state.dataLoopNodes->Node(zoneEvapUnit.FanOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
+        state.dataLoopNodes->Node(zoneEvapUnit.FanOutletNodeNum).MassFlowRateMaxAvail =
+            state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
+        if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _);
         } else {
-            state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+            state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
         }
     }
 
-    if (ZoneEvapUnit(UnitNum).EvapCooler_1_AvailStatus) {
-        SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index);
+    if (zoneEvapUnit.EvapCooler_1_AvailStatus) {
+        SimEvapCooler(state, zoneEvapUnit.EvapCooler_1_Name, zoneEvapUnit.EvapCooler_1_Index);
     }
 
-    if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) && ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus) {
-        SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index);
+    if ((zoneEvapUnit.EvapCooler_2_Index > 0) && zoneEvapUnit.EvapCooler_2_AvailStatus) {
+        SimEvapCooler(state, zoneEvapUnit.EvapCooler_2_Name, zoneEvapUnit.EvapCooler_2_Index);
     }
-    if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::DrawThruFan) {
-        if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(
-                state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+    if (zoneEvapUnit.FanLocation == FanPlacement::DrawThruFan) {
+        if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _);
         } else {
-            state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+            state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
         }
     }
 
     // calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio)
-    MinHumRat = min(Node(ZoneEvapUnit(UnitNum).ZoneNodeNum).HumRat, Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).HumRat);
-    FullFlowSensibleOutputProvided = Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRate *
-                                     (Psychrometrics::PsyHFnTdbW(Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).Temp, MinHumRat) -
-                                      Psychrometrics::PsyHFnTdbW(Node(ZoneEvapUnit(UnitNum).ZoneNodeNum).Temp, MinHumRat));
+    Real64 MinHumRat =
+        min(state.dataLoopNodes->Node(zoneEvapUnit.ZoneNodeNum).HumRat, state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).HumRat);
+    Real64 FullFlowSensibleOutputProvided = state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).MassFlowRate *
+                                            (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(zoneEvapUnit.UnitOutletNodeNum).Temp, MinHumRat) -
+                                             Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(zoneEvapUnit.ZoneNodeNum).Temp, MinHumRat));
 
     if (FullFlowSensibleOutputProvided < ZoneCoolingLoad) { // find speed ratio by regula falsi numerical method
-        std::array<Real64, 5> Par = {0.0};                  // Parameters passed to RegulaFalsi
-        Par[0] = UnitNum;
-        Par[1] = ZoneNum;
-        Par[2] = ZoneEvapUnit(UnitNum).ZoneNodeNum;
-        Par[4] = ZoneCoolingLoad;
-        FanSpeedRatio = 1.0;
+        Real64 FanSpeedRatio = 1.0;
+        auto f = [&state, UnitNum, ZoneCoolingLoad](Real64 FanSpeedRatio) {
+            auto &unit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
+            state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRate = unit.DesignAirMassFlowRate * FanSpeedRatio;
+            state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRate;
+            state.dataLoopNodes->Node(unit.UnitOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRate;
+            state.dataLoopNodes->Node(unit.UnitOutletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(unit.UnitOutletNodeNum).MassFlowRate;
 
-        General::SolveRoot(state, ErrorToler, MaxIte, SolFla, FanSpeedRatio, VSEvapUnitLoadResidual, 0.0, 1.0, Par);
+            if (unit.UnitReliefNodeNum > 0) {
+                state.dataLoopNodes->Node(unit.UnitReliefNodeNum).MassFlowRate = state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRate;
+                state.dataLoopNodes->Node(unit.UnitReliefNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRate;
+            }
+            if (unit.FanLocation == FanPlacement::BlowThruFan) {
+                state.dataLoopNodes->Node(unit.FanOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRate;
+                state.dataLoopNodes->Node(unit.FanOutletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRate;
+                if (unit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                    Fans::SimulateFanComponents(state, unit.FanName, false, unit.FanIndex, _);
+                } else {
+                    state.dataHVACFan->fanObjs[unit.FanIndex]->simulate(state, _, _);
+                }
+            }
+
+            if (unit.EvapCooler_1_AvailStatus) {
+                SimEvapCooler(state, unit.EvapCooler_1_Name, unit.EvapCooler_1_Index, FanSpeedRatio);
+            }
+
+            if ((unit.EvapCooler_2_Index > 0) && unit.EvapCooler_2_AvailStatus) {
+                SimEvapCooler(state, unit.EvapCooler_2_Name, unit.EvapCooler_2_Index, FanSpeedRatio);
+            }
+            if (unit.FanLocation == FanPlacement::DrawThruFan) {
+                if (unit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                    Fans::SimulateFanComponents(state, unit.FanName, false, unit.FanIndex, _);
+                } else {
+                    state.dataHVACFan->fanObjs[unit.FanIndex]->simulate(state, _, _);
+                }
+            }
+
+            Real64 const MinHumRat =
+                min(state.dataLoopNodes->Node(unit.ZoneNodeNum).HumRat, state.dataLoopNodes->Node(unit.UnitOutletNodeNum).HumRat);
+            Real64 const SensibleOutputProvided = state.dataLoopNodes->Node(unit.UnitOutletNodeNum).MassFlowRate *
+                                                  (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(unit.UnitOutletNodeNum).Temp, MinHumRat) -
+                                                   Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(unit.ZoneNodeNum).Temp, MinHumRat));
+
+            return SensibleOutputProvided - ZoneCoolingLoad;
+        };
+        int SolFla = 0; // Flag of RegulaFalsi solver
+        Real64 ErrorToler = 0.01;
+        General::SolveRoot(state, ErrorToler, MaxIte, SolFla, FanSpeedRatio, f, 0.0, 1.0);
         if (SolFla == -1) {
-            if (ZoneEvapUnit(UnitNum).UnitVSControlMaxIterErrorIndex == 0) {
+            if (zoneEvapUnit.UnitVSControlMaxIterErrorIndex == 0) {
                 ShowWarningError(
-                    state, "Iteration limit exceeded calculating variable speed evap unit fan speed ratio, for unit=" + ZoneEvapUnit(UnitNum).Name);
+                    state, format("Iteration limit exceeded calculating variable speed evap unit fan speed ratio, for unit={}", zoneEvapUnit.Name));
                 ShowContinueErrorTimeStamp(state, "");
                 ShowContinueError(state, format("Fan speed ratio returned={:.2R}", FanSpeedRatio));
                 ShowContinueError(state, "Check input for Fan Placement.");
@@ -4518,104 +4419,25 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
                 state,
                 format("Zone Evaporative Cooler unit control failed (iteration limit [{}]) for ZoneHVAC:EvaporativeCoolerUnit =\"{}",
                        MaxIte,
-                       ZoneEvapUnit(UnitNum).Name),
-                ZoneEvapUnit(UnitNum).UnitVSControlMaxIterErrorIndex);
+                       zoneEvapUnit.Name),
+                zoneEvapUnit.UnitVSControlMaxIterErrorIndex);
 
         } else if (SolFla == -2) {
-            if (ZoneEvapUnit(UnitNum).UnitVSControlLimitsErrorIndex == 0) {
+            if (zoneEvapUnit.UnitVSControlLimitsErrorIndex == 0) {
                 ShowWarningError(state,
-                                 "Variable speed evaporative cooler unit calculation failed: fan speed ratio limits exceeded, for unit = " +
-                                     ZoneEvapUnit(UnitNum).Name);
+                                 format("Variable speed evaporative cooler unit calculation failed: fan speed ratio limits exceeded, for unit = {}",
+                                        zoneEvapUnit.Name));
                 ShowContinueError(state, "Check input for Fan Placement.");
                 ShowContinueErrorTimeStamp(state, "");
                 if (state.dataGlobal->WarmupFlag) ShowContinueError(state, "Error occurred during warmup days.");
             }
             ShowRecurringWarningErrorAtEnd(state,
                                            "Zone Evaporative Cooler unit control failed (limits exceeded) for ZoneHVAC:EvaporativeCoolerUnit =\"" +
-                                               ZoneEvapUnit(UnitNum).Name,
-                                           ZoneEvapUnit(UnitNum).UnitVSControlLimitsErrorIndex);
+                                               zoneEvapUnit.Name,
+                                           zoneEvapUnit.UnitVSControlLimitsErrorIndex);
         }
-        ZoneEvapUnit(UnitNum).FanSpeedRatio = FanSpeedRatio;
+        zoneEvapUnit.FanSpeedRatio = FanSpeedRatio;
     }
-}
-
-Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 const FanSpeedRatio, std::array<Real64, 5> const &Par // parameters
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         <author>
-    //       DATE WRITTEN   <date_written>
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // Using/Aliasing
-    auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-    auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-
-    // Return value
-    Real64 Residual;
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int UnitNum;
-    int ZoneNum;
-    int ZoneNodeNum;
-    Real64 LoadToBeMet; // sensible load to be met
-    Real64 MinHumRat;
-    Real64 SensibleOutputProvided;
-
-    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
-    auto &Node(state.dataLoopNodes->Node);
-
-    UnitNum = int(Par[0]);
-    ZoneNum = int(Par[1]);
-    ZoneNodeNum = int(Par[2]);
-    LoadToBeMet = Par[4];
-
-    Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate * FanSpeedRatio;
-    Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-    Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRate = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-    Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRate;
-
-    if (ZoneEvapUnit(UnitNum).UnitReliefNodeNum > 0) {
-        Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRate = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-        Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-    }
-    if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::BlowThruFan) {
-        Node(ZoneEvapUnit(UnitNum).FanOutletNodeNum).MassFlowRate = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-        Node(ZoneEvapUnit(UnitNum).FanOutletNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
-        if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(
-                state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
-        } else {
-            state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
-        }
-    }
-
-    if (ZoneEvapUnit(UnitNum).EvapCooler_1_AvailStatus) {
-        SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index, FanSpeedRatio);
-    }
-
-    if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) && ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus) {
-        SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index, FanSpeedRatio);
-    }
-    if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::DrawThruFan) {
-        if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::SimulateFanComponents(
-                state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
-        } else {
-            state.dataHVACFan->fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
-        }
-    }
-
-    MinHumRat = min(Node(ZoneEvapUnit(UnitNum).ZoneNodeNum).HumRat, Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).HumRat);
-    SensibleOutputProvided = Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).MassFlowRate *
-                             (Psychrometrics::PsyHFnTdbW(Node(ZoneEvapUnit(UnitNum).UnitOutletNodeNum).Temp, MinHumRat) -
-                              Psychrometrics::PsyHFnTdbW(Node(ZoneEvapUnit(UnitNum).ZoneNodeNum).Temp, MinHumRat));
-
-    Residual = SensibleOutputProvided - LoadToBeMet;
-
-    return Residual;
 }
 
 void ReportZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // unit number
@@ -4624,42 +4446,32 @@ void ReportZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) /
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   July 2013
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // update output variables for the zone evap unit
 
     // Using/Aliasing
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneNodeNum;
-    int UnitOutletNodeNum;
-    Real64 AirMassFlow;
-    Real64 MinHumRat;
-    Real64 QTotUnitOut;
-    Real64 QSensUnitOut;
+    auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
-    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+    int ZoneNodeNum = zoneEvapUnit.ZoneNodeNum;
+    int UnitOutletNodeNum = zoneEvapUnit.UnitOutletNodeNum;
+    Real64 AirMassFlow = state.dataLoopNodes->Node(UnitOutletNodeNum).MassFlowRate;
+    Real64 QTotUnitOut = AirMassFlow * (state.dataLoopNodes->Node(UnitOutletNodeNum).Enthalpy - state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy);
+    Real64 MinHumRat = min(state.dataLoopNodes->Node(ZoneNodeNum).HumRat, state.dataLoopNodes->Node(UnitOutletNodeNum).HumRat);
+    Real64 QSensUnitOut = AirMassFlow * (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(UnitOutletNodeNum).Temp, MinHumRat) -
+                                         Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNodeNum).Temp, MinHumRat));
 
-    ZoneNodeNum = ZoneEvapUnit(UnitNum).ZoneNodeNum;
-    UnitOutletNodeNum = ZoneEvapUnit(UnitNum).UnitOutletNodeNum;
-    AirMassFlow = state.dataLoopNodes->Node(UnitOutletNodeNum).MassFlowRate;
-    QTotUnitOut = AirMassFlow * (state.dataLoopNodes->Node(UnitOutletNodeNum).Enthalpy - state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy);
-    MinHumRat = min(state.dataLoopNodes->Node(ZoneNodeNum).HumRat, state.dataLoopNodes->Node(UnitOutletNodeNum).HumRat);
-    QSensUnitOut = AirMassFlow * (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(UnitOutletNodeNum).Temp, MinHumRat) -
-                                  Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNodeNum).Temp, MinHumRat));
-
-    ZoneEvapUnit(UnitNum).UnitTotalCoolingRate = std::abs(min(0.0, QTotUnitOut));
-    ZoneEvapUnit(UnitNum).UnitTotalCoolingEnergy = ZoneEvapUnit(UnitNum).UnitTotalCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour;
-    ZoneEvapUnit(UnitNum).UnitSensibleCoolingRate = std::abs(min(0.0, QSensUnitOut));
-    ZoneEvapUnit(UnitNum).UnitSensibleCoolingEnergy = ZoneEvapUnit(UnitNum).UnitSensibleCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour;
-    ZoneEvapUnit(UnitNum).UnitLatentHeatingRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
-    ZoneEvapUnit(UnitNum).UnitLatentHeatingEnergy = ZoneEvapUnit(UnitNum).UnitLatentHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour;
-    ZoneEvapUnit(UnitNum).UnitLatentCoolingRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
-    ZoneEvapUnit(UnitNum).UnitLatentCoolingEnergy = ZoneEvapUnit(UnitNum).UnitLatentCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour;
-    ZoneEvapUnit(UnitNum).UnitFanSpeedRatio = ZoneEvapUnit(UnitNum).FanSpeedRatio;
+    zoneEvapUnit.UnitTotalCoolingRate = std::abs(min(0.0, QTotUnitOut));
+    zoneEvapUnit.UnitTotalCoolingEnergy = zoneEvapUnit.UnitTotalCoolingRate * TimeStepSysSec;
+    zoneEvapUnit.UnitSensibleCoolingRate = std::abs(min(0.0, QSensUnitOut));
+    zoneEvapUnit.UnitSensibleCoolingEnergy = zoneEvapUnit.UnitSensibleCoolingRate * TimeStepSysSec;
+    zoneEvapUnit.UnitLatentHeatingRate = std::abs(max(0.0, (QTotUnitOut - QSensUnitOut)));
+    zoneEvapUnit.UnitLatentHeatingEnergy = zoneEvapUnit.UnitLatentHeatingRate * TimeStepSysSec;
+    zoneEvapUnit.UnitLatentCoolingRate = std::abs(min(0.0, (QTotUnitOut - QSensUnitOut)));
+    zoneEvapUnit.UnitLatentCoolingEnergy = zoneEvapUnit.UnitLatentCoolingRate * TimeStepSysSec;
+    zoneEvapUnit.UnitFanSpeedRatio = zoneEvapUnit.FanSpeedRatio;
 }
 
 int GetInletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, bool &ErrorsFound)
@@ -4667,8 +4479,6 @@ int GetInletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, bool
     // FUNCTION INFORMATION:
     //       AUTHOR         Lixing Gu
     //       DATE WRITTEN   May 2019
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the given EvapCond and returns the air inlet node number.
@@ -4684,7 +4494,7 @@ int GetInletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, bool
     if (WhichEvapCond != 0) {
         return state.dataEvapCoolers->EvapCond(WhichEvapCond).InletNode;
     } else {
-        ShowSevereError(state, "GetInletNodeNum: Could not find EvaporativeCooler = \"" + EvapCondName + "\"");
+        ShowSevereError(state, format("GetInletNodeNum: Could not find EvaporativeCooler = \"{}\"", EvapCondName));
         ErrorsFound = true;
         return 0;
     }
@@ -4695,8 +4505,6 @@ int GetOutletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, boo
     // FUNCTION INFORMATION:
     //       AUTHOR         Lixing Gu
     //       DATE WRITTEN   May 2019
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the given EvapCond and returns the air outlet node number.
@@ -4711,7 +4519,7 @@ int GetOutletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, boo
     if (WhichEvapCond != 0) {
         return state.dataEvapCoolers->EvapCond(WhichEvapCond).OutletNode;
     } else {
-        ShowSevereError(state, "GetOutletNodeNum: Could not find EvaporativeCooler = \"" + EvapCondName + "\"");
+        ShowSevereError(state, format("GetOutletNodeNum: Could not find EvaporativeCooler = \"{}\"", EvapCondName));
         ErrorsFound = true;
         return 0;
     }

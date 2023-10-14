@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -87,7 +87,7 @@ namespace DataOutputs {
     };
 
     // Check if a KeyValue/VariableName is inside the map OutputVariablesForSimulation
-    bool FindItemInVariableList(EnergyPlusData &state, std::string_view const KeyedValue, std::string_view const VariableName);
+    bool FindItemInVariableList(const EnergyPlusData &state, std::string_view const KeyedValue, std::string_view const VariableName);
 
 } // namespace DataOutputs
 

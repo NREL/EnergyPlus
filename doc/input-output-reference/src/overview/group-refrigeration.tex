@@ -143,7 +143,7 @@ If the two function-of-temperature curves (i.e., Compressor Rack COP as a Functi
 
 \paragraph{Field: Evaporative Condenser Air Flow Rate}\label{field-evaporative-condenser-air-flow-rate-001}
 
-When the condenser type is ``EvaporativelyCooled'', the air volume flow rate, in m\(^{3}\)per second, entering the evaporative condenser. This value is used to calculate the amount of water evaporated when evaporatively cooling the condenser inlet air. The value for this field must be greater than zero. This input field is also autocalculatable, equivalent to 0.000144 m\(^{3}\)/s per watt of total cooling capacity {[}850 cfm/ton{]} where the total cooling capacity is the sum of the rated total cooling capacities for the refrigerated cases connected to this compressor rack (Ref. \hyperref[refrigerationcase]{Refrigeration:Case}).
+When the condenser type is ``EvaporativelyCooled'', the air volume flow rate, in \si{\volumeFlowRate}, entering the evaporative condenser. This value is used to calculate the amount of water evaporated when evaporatively cooling the condenser inlet air. The value for this field must be greater than zero. This input field is also autocalculatable, equivalent to 0.000144 m\(^{3}\)/s per watt of total cooling capacity {[}850 cfm/ton{]} where the total cooling capacity is the sum of the rated total cooling capacities for the refrigerated cases connected to this compressor rack (Ref. \hyperref[refrigerationcase]{Refrigeration:Case}).
 
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-003}
 
@@ -548,7 +548,7 @@ This alpha field defines the form of the curve used to modify the latent case cr
   CaseTemperatureMethod
 \end{itemize}
 
-This method defines the variation in latent case credits as a cubic function of Case Operating Temperature. The result from the cubic curve is multiplied by the difference between the rated ambient relative humidity and the actual zone relative humidity, and one minus this value is multiplied by the Rated LHR to give the operating LHR at the actual zone humidity condition. (Representative cooefficient values for single-shelf horizontal and multi-shelf vertical display cases are given in the EnergyPlus Engineering Reference.)
+This method defines the variation in latent case credits as a cubic function of Case Operating Temperature. The result from the cubic curve is multiplied by the difference between the rated ambient relative humidity and the actual zone relative humidity, and one minus this value is multiplied by the Rated LHR to give the operating LHR at the actual zone humidity condition. (Representative coefficient values for single-shelf horizontal and multi-shelf vertical display cases are given in the EnergyPlus Engineering Reference.)
 
 \begin{itemize}
 \tightlist
@@ -656,7 +656,7 @@ This choice specifies that a defrost energy correction curve will not be used.
   CaseTemperatureMethod
 \end{itemize}
 
-This method defines the variation in defrost energy as a cubic function of Case Operating Temperature. The result from the cubic curve is multiplied by the difference between the rated ambient relative humidity and the actual zone relative humidity, and one minus this value is multiplied by the Case Defrost Power to give the (average) operating defrost power at the actual zone humidity condition. (Representative cooefficient values for single-shelf horizontal and multi-shelf vertical display cases are given in the EnergyPlus Engineering Reference.)
+This method defines the variation in defrost energy as a cubic function of Case Operating Temperature. The result from the cubic curve is multiplied by the difference between the rated ambient relative humidity and the actual zone relative humidity, and one minus this value is multiplied by the Case Defrost Power to give the (average) operating defrost power at the actual zone humidity condition. (Representative coefficient values for single-shelf horizontal and multi-shelf vertical display cases are given in the EnergyPlus Engineering Reference.)
 
 \begin{itemize}
 \tightlist
@@ -935,7 +935,7 @@ This field is the total electricity consumption of the refrigerated case electri
 
 \subsection{Refrigeration:CaseAndWalkInList}\label{refrigerationcaseandwalkinlist}
 
-This object provides a list of all the refrigerated cases and/or walk in coolers cooled by a single refrigeration system (ref: Refrigeraion:CompressorRack and \hyperref[refrigerationsystem]{Refrigeration:System}). This list is extensible. Note that the names of all cases, walk-ins,air chillers, and caseandwalkinlists must be unique.~ That is, you cannot give a list the same name as one of the cases.~ Similarly, a walkin cannot have the same name as a case.This list may contain a combination of case and walk-in names OR a list of air chiller names.~ Air chillers may not be included in any list that also includes cases or walk-ins.
+This object provides a list of all the refrigerated cases and/or walk in coolers cooled by a single refrigeration system (ref: Refrigeration:CompressorRack and \hyperref[refrigerationsystem]{Refrigeration:System}). This list is extensible. Note that the names of all cases, walk-ins,air chillers, and caseandwalkinlists must be unique.~ That is, you cannot give a list the same name as one of the cases.~ Similarly, a walkin cannot have the same name as a case.This list may contain a combination of case and walk-in names OR a list of air chiller names.~ Air chillers may not be included in any list that also includes cases or walk-ins.
 
 \subsubsection{Inputs}\label{inputs-2-033}
 
@@ -1053,7 +1053,7 @@ The floor area in square meters. This value is required and has no default value
 
 \subsubsection{Field: Insulated Floor U-Value}\label{field-insulated-floor-u-value}
 
-The floor themal transmittance (in W/m\(^{2}\)-K). This value has a default value of 0.3154. (This corresponds to R18 in Archaic American Insulation Units.~ To convert other R-values to thermal transmittance, divide 5.678 by the R-value.~ For example, R15 is 0.3785 W/m\(^{2}\)-K and R5 is 1.136 W/m\(^{2}\)-K.)
+The floor thermal transmittance (in W/m\(^{2}\)-K). This value has a default value of 0.3154. (This corresponds to R18 in Archaic American Insulation Units.~ To convert other R-values to thermal transmittance, divide 5.678 by the R-value.~ For example, R15 is 0.3785 W/m\(^{2}\)-K and R5 is 1.136 W/m\(^{2}\)-K.)
 
 \textbf{\emph{THE REMAINING 12 FIELDS FOR THE WALK-IN COOLER MUST BE REPEATED FOR EACH ZONE WHICH IS IN CONTACT WITH A WALK-IN WALL, CEILING, OR DOOR.  This object is extensible, so additional fields of this type can be added to the end of this object by repeating the last 12 fields in the object.}}
 
@@ -1067,7 +1067,7 @@ The total surface area (walls and ceilings) facing this particular zone in squar
 
 \subsubsection{Field: Insulated Surface U-Value Facing Zone \textless{}x\textgreater{}}\label{field-insulated-surface-u-value-facing-zone-x}
 
-The surface (walls and ceilings) themal transmittance (in W/m\(^{2}\)-K). This value has a default value of 0.3154. (This corresponds to R18 in Archaic American Insulation Units.~ To convert other R-values to thermal transmittance, divide 5.678 by the R-value.~ For example, R15 is 0.3785 W/m\(^{2}\)-K and R5 is 1.136 W/m\(^{2}\)-K.)
+The surface (walls and ceilings) thermal transmittance (in W/m\(^{2}\)-K). This value has a default value of 0.3154. (This corresponds to R18 in Archaic American Insulation Units.~ To convert other R-values to thermal transmittance, divide 5.678 by the R-value.~ For example, R15 is 0.3785 W/m\(^{2}\)-K and R5 is 1.136 W/m\(^{2}\)-K.)
 
 \subsubsection{Field: Area of Glass Reach In Doors Facing Zone \textless{}x\textgreater{}}\label{field-area-of-glass-reach-in-doors-facing-zone-x}
 
@@ -1079,7 +1079,7 @@ The glass reach in door height in meters. The default is 1.5.
 
 \subsubsection{Field: Glass Reach In Door U-Value Facing Zone \textless{}x\textgreater{}}\label{field-glass-reach-in-door-u-value-facing-zone-x}
 
-The glass door themal transmittance (in W/m\(^{2}\)-K). This field has a default value of 1.136. (This corresponds to R5 in Archaic American Insulation Units.)
+The glass door thermal transmittance (in W/m\(^{2}\)-K). This field has a default value of 1.136. (This corresponds to R5 in Archaic American Insulation Units.)
 
 \subsubsection{Field: Glass Reach In Door Opening Schedule Name Facing Zone \textless{}x\textgreater{}}\label{field-glass-reach-in-door-opening-schedule-name-facing-zone-x}
 
@@ -1095,7 +1095,7 @@ The stocking door height in meters. The default is 2.0.
 
 \subsubsection{Field: Stocking Door U-Value Facing Zone \textless{}x\textgreater{}}\label{field-stocking-door-u-value-facing-zone-x}
 
-The stocking door themal transmittance (in W/m\(^{2}\)-K). This value has a default value of 0.3785. (This corresponds to R15 in Archaic American Insulation Units.)
+The stocking door thermal transmittance (in W/m\(^{2}\)-K). This value has a default value of 0.3785. (This corresponds to R15 in Archaic American Insulation Units.)
 
 \subsubsection{Field: Stocking Door Opening Schedule Name Facing Zone \textless{}x\textgreater{}}\label{field-stocking-door-opening-schedule-name-facing-zone-x}
 
@@ -1390,7 +1390,7 @@ The following is an example input for a single-stage compression refrigeration s
       ,                        !- Refrigeration Transfer Load or TransferLoad List Name
       AirCooledCondenserA,     !- Refrigeration Condenser Name
       MediumTempCompressorlist, !- Refrigeration Compressor or CompressorList Name
-      25.0,                    !- Minimum Condensing Temperture {C}
+      25.0,                    !- Minimum Condensing Temperature {C}
       R134a,                   !- Refrigeration System Working Fluid
       ConstantSuctionTemperature,  !- Suction Temperature Control Type
       ,                        !- Optional mechanical subcooler name
@@ -1410,7 +1410,7 @@ The following is an example input for a two-stage compression refrigeration syst
       ,                        !- Refrigeration Transfer Load or TransferLoad List Name
       AirCooledCondenserB,     !- Refrigeration Condenser Name
       LowStageCompressorList,  !- Refrigeration Compressor or CompressorList Name
-      25.0,                    !- Minimum Condensing Temperture {C}
+      25.0,                    !- Minimum Condensing Temperature {C}
       R404A,                   !- Refrigeration System Working Fluid
       ConstantSuctionTemperature,  !- Suction Temperature Control
       ,                        !- Optional mechanical subcooler name
@@ -1634,7 +1634,7 @@ This output is the total heat transfer rate from the refrigerated cases and walk
 
 \paragraph{Refrigeration System Total Cases and Walk Ins Heat Transfer Energy {[}J{]}}\label{refrigeration-system-total-cases-and-walk-ins-heat-transfer-energy-j}
 
-This output is the total heat transfer energy from the refrigerated cases and walk-ins served directly by this system in Joules. It is the sum of all of the heat transfered for the refrigerated cases and walk-ins that are connected directly to this system. This value does not include compressor or condenser fan heat or the heat transfer for cases and walk-ins served by any connected secondary systems.
+This output is the total heat transfer energy from the refrigerated cases and walk-ins served directly by this system in Joules. It is the sum of all of the heat transferred for the refrigerated cases and walk-ins that are connected directly to this system. This value does not include compressor or condenser fan heat or the heat transfer for cases and walk-ins served by any connected secondary systems.
 
 \paragraph{Refrigeration System Total Transferred Load Heat Transfer Rate {[}W{]}}\label{refrigeration-system-total-transferred-load-heat-transfer-rate-w}
 
@@ -1642,7 +1642,7 @@ This output is the sum of the heat transfer rates for any secondary loops, casca
 
 \paragraph{Refrigeration System Total Transferred Load Heat Transfer Energy {[}J{]}}\label{refrigeration-system-total-transferred-load-heat-transfer-energy-j}
 
-This output is the sum of the heat transfered for any secondary loops, cascade condensers, and mechanical subcoolers cooled by this system, minus the benefit of any mechanical subcooler providing cooling to this system in Joules. Therefore, if the only transfer load between two systems is a mechanical subcooler, the same amount will show as a negative value for the system receiving the cooling effect and as a positive number for the system serving that cooling load. It also includes the pump energy for any secondary loops and the compressor energy for any cascade condenser systems that are cooled by this system. (See the Engineering Reference for more details about the loads placed by secondary systems upon the primary system.)
+This output is the sum of the heat transferred for any secondary loops, cascade condensers, and mechanical subcoolers cooled by this system, minus the benefit of any mechanical subcooler providing cooling to this system in Joules. Therefore, if the only transfer load between two systems is a mechanical subcooler, the same amount will show as a negative value for the system receiving the cooling effect and as a positive number for the system serving that cooling load. It also includes the pump energy for any secondary loops and the compressor energy for any cascade condenser systems that are cooled by this system. (See the Engineering Reference for more details about the loads placed by secondary systems upon the primary system.)
 
 \paragraph{Refrigeration System Total Suction Pipe Heat Gain Rate {[}W{]}}\label{refrigeration-system-total-suction-pipe-heat-gain-rate-w}
 
@@ -1772,7 +1772,7 @@ This output is the total heat transfer rate from the refrigerated cases and walk
 
 \paragraph{Refrigeration Air Chiller System Total Case and Walk In Heat Transfer Energy {[}J{]}}\label{refrigeration-air-chiller-system-total-case-and-walk-in-heat-transfer-energy-j}
 
-This output is the total heat transfer energy from the refrigerated cases and walk-ins served directly by this system in Joules. It is the sum of all of the heat transfered for the refrigerated cases and walk-ins that are connected directly to this system. This value does not include compressor or condenser fan heat or the heat transfer for cases and walk-ins served by any connected secondary systems.
+This output is the total heat transfer energy from the refrigerated cases and walk-ins served directly by this system in Joules. It is the sum of all of the heat transferred for the refrigerated cases and walk-ins that are connected directly to this system. This value does not include compressor or condenser fan heat or the heat transfer for cases and walk-ins served by any connected secondary systems.
 
 \paragraph{Refrigeration Air Chiller System Total Transferred Load Heat Transfer Rate {[}W{]}}\label{refrigeration-air-chiller-system-total-transferred-load-heat-transfer-rate-w}
 
@@ -1780,7 +1780,7 @@ This output is the sum of the heat transfer rates for any secondary loops, casca
 
 \paragraph{Refrigeration Air Chiller System Total Transferred Load Heat Transfer Energy {[}J{]}}\label{refrigeration-air-chiller-system-total-transferred-load-heat-transfer-energy-j}
 
-This output is the sum of the heat transfered for any secondary loops, cascade condensers, and mechanical subcoolers cooled by this system, minus the benefit of any mechanical subcooler providing cooling to this system in Joules. Therefore, if the only transfer load between two systems is a mechanical subcooler, the same amount will show as a negative value for the system receiving the cooling effect and as a positive number for the system serving that cooling load. It also includes the pump energy for any secondary loops and the compressor energy for any cascade condenser systems that are cooled by this system. (See the Engineering Reference for more details about the loads placed by secondary systems upon the primary system.)
+This output is the sum of the heat transferred for any secondary loops, cascade condensers, and mechanical subcoolers cooled by this system, minus the benefit of any mechanical subcooler providing cooling to this system in Joules. Therefore, if the only transfer load between two systems is a mechanical subcooler, the same amount will show as a negative value for the system receiving the cooling effect and as a positive number for the system serving that cooling load. It also includes the pump energy for any secondary loops and the compressor energy for any cascade condenser systems that are cooled by this system. (See the Engineering Reference for more details about the loads placed by secondary systems upon the primary system.)
 
 \paragraph{Refrigeration Air Chiller System Total Suction Pipe Heat Gain Rate {[}W{]}}\label{refrigeration-air-chiller-system-total-suction-pipe-heat-gain-rate-w}
 
@@ -2745,7 +2745,7 @@ This optional alpha field contains the name of the node from which the condenser
 
 \paragraph{Field: Rated Air Flow Rate}\label{field-rated-air-flow-rate-000}
 
-The air volume flow rate, in m\(^{3}\)per second, entering the evaporative condenser. This value is used to calculate the amount of water evaporated when evaporatively cooling the condenser inlet air. The value for this field must be greater than zero. This input field is also autocalculatable, equivalent to 0.000144 m\(^{3}\)/s per watt of total cooling capacity {[}850 cfm/ton{]} where the total cooling capacity is the total heat of rejection.
+The air volume flow rate, in \si{\volumeFlowRate}, entering the evaporative condenser. This value is used to calculate the amount of water evaporated when evaporatively cooling the condenser inlet air. The value for this field must be greater than zero. This input field is also autocalculatable, equivalent to 0.000144 m\(^{3}\)/s per watt of total cooling capacity {[}850 cfm/ton{]} where the total cooling capacity is the total heat of rejection.
 
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-1-002}
 
@@ -2795,7 +2795,7 @@ Refrigeration:Condenser:EvaporativeCooled,
       746.,                       !- Rated Condenser Fan Power
       0.25,                       !- Minimum air flow fraction through condenser fan {dimensionless}
       6.63  ,                     !- Evaporative Condenser Approach Temp Const, {C}
-      0.468 ,                     !- Evaporative Condenser Approach Temp HRCF Cooefficient
+      0.468 ,                     !- Evaporative Condenser Approach Temp HRCF Coefficient
       17.93 ,                     !- Evaporative Condenser Approach Temp 1/hrcf coefficient
       -0.322,                     !- Evaporative Condenser Approach Temp Twb coefficient {1/C}
       0.6  ,                      !- Minimum Condenser Capacity Factor
@@ -3524,7 +3524,7 @@ The name of the secondary circulating fluid.
 
 For ``FluidAlwaysLiquid'', this name must correspond to either an ethylene or propylene glycol (ref: \hyperref[fluidpropertiesglycolconcentration]{FluidProperties:GlycolConcentration}) or to a user-defined glycol (ref: \hyperref[fluidpropertiesname]{FluidProperties:Name} and FluidProperties: GlycolConcentration) in the input file. Note that the corresponding property data, including \hyperref[fluidpropertiesconcentration]{FluidProperties:Concentration}, \hyperref[fluidpropertiestemperatures]{FluidProperties:Temperatures}, and \hyperref[fluidpropertiesglycolconcentration]{FluidProperties:GlycolConcentration} must also be included in the input file and are provided in GlycolPropertiesRefData.idf for typical ethylene and propylene glycols.
 
-For ``FluidPhaseChange'', the refrigerant used by the secondary system must be listed in the \hyperref[fluidpropertiesname]{FluidProperties:Name} object.~ The corresponding property data must also be supplied in the input file. Property data for many refrigererants, including R11, R123, R134A, R12, R22, R404A, R507A, R410A, and R744, are available in FluidPropertiesRefData.idf.
+For ``FluidPhaseChange'', the refrigerant used by the secondary system must be listed in the \hyperref[fluidpropertiesname]{FluidProperties:Name} object.~ The corresponding property data must also be supplied in the input file. Property data for many refrigerants, including R11, R123, R134A, R12, R22, R404A, R507A, R410A, and R744, are available in FluidPropertiesRefData.idf.
 
 \paragraph{Field: Evaporator Capacity}\label{field-evaporator-capacity}
 
@@ -3536,7 +3536,7 @@ For ``FluidPhaseChange'', this numeric field should be the evaporator capacity (
 
 For ``FluidAlwaysLiquid'' systems, this is the rated evaporator secondary fluid flow rate in m\(^{3}\)/s.~ If this variable is specified and the rated evaporator capacity in watts is not, then the rated capacity will be calculated. At least one of these two input variables is required.
 
-For ``FluidPhaseChange'', this field is not used (see ``Phase Cange Circulating Rate'').
+For ``FluidPhaseChange'', this field is not used (see ``Phase Change Circulating Rate'').
 
 \paragraph{Field:Evaporator Evaporating Temperature}\label{fieldevaporator-evaporating-temperature}
 
@@ -3596,7 +3596,7 @@ This optional field is used when trying to determine the impact of pipe heat gai
 
 \paragraph{Field: Sum UA Receiver/Separator Shell}\label{field-sum-ua-receiverseparator-shell}
 
-This optional field is typically used when trying to compare the impact of refrigeration component heat gains on system performance, particularly in comparing a conventional primary DX system to a secondary system. Enter the value for receiver/separator heat gain (in W/C).~ That is, sum up the product of the tank insulaton conductance times the outer tank insulation surface area. Please see the Engineering Reference for guidance in calculating this value.
+This optional field is typically used when trying to compare the impact of refrigeration component heat gains on system performance, particularly in comparing a conventional primary DX system to a secondary system. Enter the value for receiver/separator heat gain (in W/C).~ That is, sum up the product of the tank insulation conductance times the outer tank insulation surface area. Please see the Engineering Reference for guidance in calculating this value.
 
 \paragraph{Field: Receiver/Separator Zone Name}\label{field-receiverseparator-zone-name}
 

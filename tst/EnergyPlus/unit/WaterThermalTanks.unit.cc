@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,14 +50,10 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Optional.hh>
-
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Fans.hh>
@@ -73,6 +69,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace OutputReportPredefined;
@@ -222,6 +219,7 @@ TEST_F(EnergyPlusFixture, HPWHZoneEquipSeqenceNumberWarning)
         "    Zone4WaterInletNode,     !- Condenser Water Inlet Node Name",
         "    Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
@@ -413,6 +411,7 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
         idf_lines.push_back("    HPWH Air Inlet " + i_str + ",          !- Evaporator Air Inlet Node Name");
         idf_lines.push_back("    HPWH Coil Outlet Fan Inlet " + i_str + ",  !- Evaporator Air Outlet Node Name");
         idf_lines.push_back("    0,                       !- Crankcase Heater Capacity {W}");
+        idf_lines.push_back("    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name");
         idf_lines.push_back("    10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}");
         idf_lines.push_back("    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects");
         idf_lines.push_back("    HPWH-Htg-Cap-fT,         !- Heating Capacity Function of Temperature Curve Name");
@@ -542,8 +541,6 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
 
 TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 {
-    auto &SysTimeElapsed = state->dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state->dataHVACGlobal->TimeStepSys;
     using FluidProperties::GetSpecificHeatGlycol;
     using FluidProperties::Water;
 
@@ -676,6 +673,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
         "    HPWH Air Inlet Node_1,   !- Evaporator Air Inlet Node Name",
         "    HPWH CoilAirOutlet FanAirInlet_1,  !- Evaporator Air Outlet Node Name",
         "    0,                       !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    0,                       !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWH-Cap-fT,             !- Heating Capacity Function of Temperature Curve Name",
@@ -760,9 +758,12 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     state->dataGlobal->HourOfDay = 0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 10. / 60.;
-    TimeStepSys = state->dataGlobal->TimeStepZone;
-    SysTimeElapsed = 0.0;
-    Tank.TimeElapsed = state->dataGlobal->HourOfDay + state->dataGlobal->TimeStep * state->dataGlobal->TimeStepZone + SysTimeElapsed;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    state->dataHVACGlobal->SysTimeElapsed = 0.0;
+
+    Tank.TimeElapsed =
+        state->dataGlobal->HourOfDay + state->dataGlobal->TimeStep * state->dataGlobal->TimeStepZone + state->dataHVACGlobal->SysTimeElapsed;
 
     state->dataHVACGlobal->HPWHInletDBTemp = 21.666666666666668;
     state->dataHVACGlobal->HPWHInletWBTemp = 14.963459972723468;
@@ -775,7 +776,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 
     Tank.CalcHeatPumpWaterHeater(*state, false);
 
-    const Real64 HeatFromCoil = Coil.TotalHeatingEnergyRate * TimeStepSys * 3600; // J
+    const Real64 HeatFromCoil = Coil.TotalHeatingEnergyRate * state->dataHVACGlobal->TimeStepSysSec; // J
     Real64 TankEnergySum = 0;
     for (int i = 1; i <= Tank.Nodes; ++i) {
         const WaterThermalTanks::StratifiedNodeData &Node = Tank.Node(i);
@@ -789,16 +790,16 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     }
 
     // Add back in the energy that was lost to ambient
-    TankEnergySum -= Tank.LossRate * TimeStepSys * 3600;
+    TankEnergySum -= Tank.LossRate * state->dataHVACGlobal->TimeStepSysSec;
 
     const Real64 ErrorBound = HeatFromCoil * 0.0001; // Within 0.01% of each other
     EXPECT_NEAR(HeatFromCoil, TankEnergySum, ErrorBound);
 
     // ValidateFuelType tests for WaterHeater:Stratified
     WaterThermalTanks::getWaterHeaterStratifiedInput(*state);
-    EXPECT_TRUE(compare_enums(Tank.FuelType, WaterThermalTanks::Fuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.FuelType, Constant::eFuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, Constant::eFuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, Constant::eFuel::Electricity));
 }
 
 TEST_F(EnergyPlusFixture, HPWHSizing)
@@ -895,6 +896,7 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
         "    Zone4WaterInletNode,     !- Condenser Water Inlet Node Name",
         "    Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
@@ -1036,9 +1038,11 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     state->dataHVACGlobal->TimeStepSys = 1;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+
     SetPredefinedTables(*state);
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->MAT(1) = 20.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 20.0;
     WaterThermalTanks::SimHeatPumpWaterHeater(*state, "Zone4HeatPumpWaterHeater", true, SenseLoadMet, LatLoadMet, CompIndex);
     EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, state->dataWaterThermalTanks->HPWaterHeater(1).OperatingAirFlowRate);
     EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1));
@@ -1175,6 +1179,7 @@ TEST_F(EnergyPlusFixture, HPWHOutdoorAirMissingNodeNameWarning)
         "    Zone4WaterInletNode,     !- Condenser Water Inlet Node Name",
         "    Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
@@ -1341,6 +1346,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
         "    HPWHWaterInletNode,      !- Condenser Water Inlet Node Name",
         "    HPWHWaterOutletNode,     !- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
@@ -1394,6 +1400,8 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     state->dataEnvrn->StdRhoAir = 1.0;
 
     state->dataHVACGlobal->TimeStepSys = 1;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
     state->dataGlobal->TimeStep = 1;
@@ -1522,16 +1530,13 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
     // ValidateFuelType tests for WaterHeater:Mixed
     WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-    EXPECT_TRUE(compare_enums(Tank.FuelType, WaterThermalTanks::Fuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.FuelType, Constant::eFuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, Constant::eFuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, Constant::eFuel::Electricity));
 }
 
 TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 {
-    auto &SysTimeElapsed = state->dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state->dataHVACGlobal->TimeStepSys;
-
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
         "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
@@ -1610,9 +1615,11 @@ TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
     state->dataGlobal->HourOfDay = 0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 10. / 60.;
-    TimeStepSys = state->dataGlobal->TimeStepZone;
-    SysTimeElapsed = 0.0;
-    Tank.TimeElapsed = state->dataGlobal->HourOfDay + state->dataGlobal->TimeStep * state->dataGlobal->TimeStepZone + SysTimeElapsed;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    state->dataHVACGlobal->SysTimeElapsed = 0.0;
+    Tank.TimeElapsed =
+        state->dataGlobal->HourOfDay + state->dataGlobal->TimeStep * state->dataGlobal->TimeStepZone + state->dataHVACGlobal->SysTimeElapsed;
     Tank.AmbientTemp = 20.0;
     Tank.UseInletTemp = 10.0;
     Tank.SetPointTemp = 48.89;
@@ -1627,9 +1634,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 
 TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 {
-    auto &SysTimeElapsed = state->dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state->dataHVACGlobal->TimeStepSys;
-
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
         "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
@@ -1741,8 +1745,9 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
     state->dataGlobal->HourOfDay = 0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 15. / 60.;
-    TimeStepSys = state->dataGlobal->TimeStepZone;
-    SysTimeElapsed = 0.0;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    state->dataHVACGlobal->SysTimeElapsed = 0.0;
 
     Tank.CalcWaterThermalTankStratified(*state);
 
@@ -1753,8 +1758,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 
 TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
 {
-    auto &TimeStepSys = state->dataHVACGlobal->TimeStepSys;
-
     std::string const idf_objects = delimited_string({
         "  Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
         "  Schedule:Constant, Inlet Water Temperature, , 10.0;",
@@ -1824,7 +1827,8 @@ TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
     state->dataGlobal->HourOfDay = 0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1.0 / 60.0; // one-minute system time step
-    TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     Tank.TankTemp = 60.0;
     Tank.AmbientTempZone = 20.0;
     Tank.AmbientTemp = 20.0;
@@ -1850,8 +1854,6 @@ TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
 
 TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 {
-    auto &TimeStepSys = state->dataHVACGlobal->TimeStepSys;
-
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Setpoint Temp Schedule, , 60.0;",
         "Schedule:Constant, Ambient Temp Schedule, , 22.0;",
@@ -1934,7 +1936,8 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     state->dataGlobal->HourOfDay = 0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 20.0 / 60.0;
-    TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     constexpr int TankNum = 1;
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
     for (auto &node : Tank.Node) {
@@ -2007,7 +2010,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     for (int i = 0; i < Tank.Nodes - 1; ++i) {
         EXPECT_GE(NodeTemps[i], NodeTemps[i + 1]);
     }
-    const Real64 SecInTimeStep = TimeStepSys * DataGlobalConstants::SecInHour;
+
     int DummyIndex = 1;
     Real64 TankNodeEnergy = 0;
     for (int i = 0; i < Tank.Nodes; ++i) {
@@ -2016,7 +2019,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     }
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(*state, "WATER", 60.0, DummyIndex, "StratifiedTankCalcNoDraw");
     TankNodeEnergy *= Cp;
-    EXPECT_NEAR(Tank.NetHeatTransferRate * SecInTimeStep, TankNodeEnergy, fabs(TankNodeEnergy * 0.0001));
+    EXPECT_NEAR(Tank.NetHeatTransferRate * state->dataHVACGlobal->TimeStepSysSec, TankNodeEnergy, fabs(TankNodeEnergy * 0.0001));
 
     EXPECT_TRUE(Tank.HeaterOn1);
     EXPECT_FALSE(Tank.HeaterOn2);
@@ -2040,14 +2043,12 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
         EXPECT_LE(node.Temp, Tank.TankTempLimit);
     }
     EXPECT_LT(Tank.VentRate, 0.0);
-    const Real64 ExpectedVentedEnergy = Tank.Node[0].Mass * Cp * 5.0 / SecInTimeStep;
+    const Real64 ExpectedVentedEnergy = Tank.Node[0].Mass * Cp * 5.0 / state->dataHVACGlobal->TimeStepSysSec;
     EXPECT_NEAR(ExpectedVentedEnergy, -Tank.VentRate, fabs(ExpectedVentedEnergy) * 0.05);
 }
 
 TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
 {
-    auto &TimeStepSys = state->dataHVACGlobal->TimeStepSys;
-
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Setpoint Temp Schedule, , 60.0;",
         "Schedule:Constant, Ambient Temp Schedule, , 22.0;",
@@ -2136,7 +2137,8 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
     state->dataGlobal->HourOfDay = 0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 20.0 / 60.0;
-    TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
     // Test a constant temperature source flow rate
     for (auto &node : Tank.Node) {
@@ -2164,15 +2166,12 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
         EnergySum += node.Mass * Cp * (node.Temp - 60.0);
     }
     Real64 Esource = Tank.SourceEffectiveness * Tank.SourceMassFlowRate * Cp *
-                     (Tank.SourceInletTemp - Tank.Node(Tank.SourceOutletStratNode).TempAvg) * TimeStepSys * DataGlobalConstants::SecInHour;
+                     (Tank.SourceInletTemp - Tank.Node(Tank.SourceOutletStratNode).TempAvg) * state->dataHVACGlobal->TimeStepSysSec;
     EXPECT_NEAR(Esource, EnergySum, EnergySum * 0.001);
 }
 
 TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 {
-    auto &SysTimeElapsed = state->dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state->dataHVACGlobal->TimeStepSys;
-
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
         "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
@@ -2290,8 +2289,9 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
         "  Autosize,                !- Evaporative Condenser Air Flow Rate {m3/s}",
         "  Autosize,                !- Evaporative Condenser Pump Rated Power Consumption {W}"
         "  50,                      !- Crankcase Heater Capacity {W}",
-        "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         ",",
+        "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  ,                        !- Supply Water Storage Tank Name",
         "  ,                        !- Condensate Collection Water Storage Tank Name",
         "  0,                       !- Basin Heater Capacity {W/K}",
@@ -2390,8 +2390,9 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     state->dataGlobal->HourOfDay = 0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
-    TimeStepSys = state->dataGlobal->TimeStepZone;
-    SysTimeElapsed = 0.0;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    state->dataHVACGlobal->SysTimeElapsed = 0.0;
 
     // First iteration condition set (extreme)
     Tank.TankTemp = 50;
@@ -2449,9 +2450,6 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 
 TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 {
-    auto &SysTimeElapsed = state->dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state->dataHVACGlobal->TimeStepSys;
-
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
         "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
@@ -2570,6 +2568,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "    TotCoolCapCurve,         !- Total Cooling Capacity Curve Name",
         "    SensCoolCapCurve,        !- Sensible Cooling Name",
         "    CoolPowCurve,            !- Cooling Power Consumption Curve Name",
+        "    CoolPLFCurve,            !- Cooling Power Consumption Curve Name",
         "    1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
         "    1.5;                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 
@@ -2629,6 +2628,9 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "  100,                  ! Maximum Value of z",
         "  0.,                   ! Minimum Curve Output",
         "  38.;                  ! Maximum Curve Output",
+
+        "Curve:Quadratic, CoolPLFCurve, 0.85, 0.83, 0.0, 0.0, 0.3, 0.85, 1.0, Dimensionless, Dimensionless; ",
+
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2650,6 +2652,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataPlnt->TotNumLoops = 1;
@@ -2686,13 +2689,13 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     CoilBranch.Comp(CompNum).Name = "GSHP_COIL1";
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(*state, HPNum, 10.0, 1.0, 0.0, 10.0, 10.0, CyclingScheme, 1.0, 1);
-    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, DataHVACGlobals::CompressorOperation::On, PLR, 1.0);
+    WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(*state, HPNum, 10.0, 10.0, CyclingScheme, 1.0, 1);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 10.0, 10.0, DataHVACGlobals::CompressorOperation::On, PLR, 1.0);
     // Coil source side heat successfully passed to HeatReclaimSimple_WAHPCoil(1).AvailCapacity
     EXPECT_EQ(state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).AvailCapacity, state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource);
     // Reclaimed heat successfully returned to reflect the plant impact
     state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).WaterHeatingDesuperheaterReclaimedHeat(1) = 100.0;
-    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, DataHVACGlobals::CompressorOperation::On, PLR, 1.0);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 10.0, 10.0, DataHVACGlobals::CompressorOperation::On, PLR, 1.0);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource,
               state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).AvailCapacity - 100.0);
 
@@ -2719,8 +2722,9 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     state->dataGlobal->HourOfDay = 0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1. / 60.;
-    TimeStepSys = state->dataGlobal->TimeStepZone;
-    SysTimeElapsed = 0.0;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    state->dataHVACGlobal->SysTimeElapsed = 0.0;
     state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).AvailCapacity = 1000;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).PartLoadRatio = 0.0;
     Tank.initialize(*state, true);
@@ -2755,9 +2759,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 
 TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 {
-    auto &SysTimeElapsed = state->dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state->dataHVACGlobal->TimeStepSys;
-
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
         "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
@@ -2861,6 +2862,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
         "  No,                                     !- Apply Part Load Fraction to Speeds Greater than 1",
         "  No,                                     !- Apply Latent Degradation to Speeds Greater than 1",
         "  0,                                      !- Crankcase Heater Capacity {W}",
+        "  ,                                       !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  12.7777777777778,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  0,                                      !- Basin Heater Capacity {W/K}",
         "  2,                                      !- Basin Heater Setpoint Temperature {C}",
@@ -3088,8 +3090,9 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     state->dataGlobal->HourOfDay = 0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
-    TimeStepSys = state->dataGlobal->TimeStepZone;
-    SysTimeElapsed = 0.0;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    state->dataHVACGlobal->SysTimeElapsed = 0.0;
     Tank.TankTemp = 45.0;
     Tank.AmbientTemp = 20.0;
     Tank.UseInletTemp = 10.0;
@@ -3301,7 +3304,7 @@ TEST_F(EnergyPlusFixture, MixedTank_WarnPotentialFreeze)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1.0 / 60.0; // one-minute system time step
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
-
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     Tank.TankTemp = 2.0;
     Tank.AmbientTemp = -40;
     Tank.UseInletTemp = 3.0;
@@ -3401,7 +3404,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1.0 / 60.0; // one-minute system time step
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
-
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     Tank.TankTemp = 2.0;
     for (auto &node : Tank.Node) {
         node.Temp = 2.0;
@@ -3440,9 +3443,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
 
 TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 {
-    auto &SysTimeElapsed = state->dataHVACGlobal->SysTimeElapsed;
-    auto &TimeStepSys = state->dataHVACGlobal->TimeStepSys;
-
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
         "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
@@ -3612,8 +3612,9 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
         "  Autosize,                !- Evaporative Condenser Air Flow Rate {m3/s}",
         "  Autosize,                !- Evaporative Condenser Pump Rated Power Consumption {W}"
         "  50,                      !- Crankcase Heater Capacity {W}",
-        "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         ",",
+        "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  ,                        !- Supply Water Storage Tank Name",
         "  ,                        !- Condensate Collection Water Storage Tank Name",
         "  0,                       !- Basin Heater Capacity {W/K}",
@@ -3699,8 +3700,9 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     state->dataGlobal->HourOfDay = 0;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
-    TimeStepSys = state->dataGlobal->TimeStepZone;
-    SysTimeElapsed = 0.0;
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    state->dataHVACGlobal->SysTimeElapsed = 0.0;
 
     int DXNum = 1;
     bool FirstHVAC = true;
@@ -3817,14 +3819,14 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         "  ,                        !- Heater Minimum Capacity {W}",
         "  0,                       !- Heater Ignition Minimum Flow Rate {m3/s}",
         "  0,                       !- Heater Ignition Delay {s}",
-        "  Steam,              !- Heater Fuel Type",
+        "  DistrictHeatingSteam,              !- Heater Fuel Type",
         "  0.8,                     !- Heater Thermal Efficiency",
         "  ,                        !- Part Load Factor Curve Name",
         "  20,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}",
-        "  Steam,              !- Off Cycle Parasitic Fuel Type",
+        "  DistrictHeatingSteam,              !- Off Cycle Parasitic Fuel Type",
         "  0.8,                     !- Off Cycle Parasitic Heat Fraction to Tank",
         "  0,                       !- On Cycle Parasitic Fuel Consumption Rate {W}",
-        "  Steam,              !- On Cycle Parasitic Fuel Type",
+        "  DistrictHeatingSteam,              !- On Cycle Parasitic Fuel Type",
         "  0,                       !- On Cycle Parasitic Heat Fraction to Tank",
         "  Zone,                    !- Ambient Temperature Indicator",
         "  ,                        !- Ambient Temperature Schedule Name",
@@ -3872,6 +3874,7 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         "  HPWHPumped Tank Outlet - Condenser Inlet,  !- Condenser Water Inlet Node Name",
         "  HPWHPumped Condenser Outlet - Tank Inlet,  !- Condenser Water Outlet Node Name",
         "  100,                     !- Crankcase Heater Capacity {W}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  5,                       !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "  WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "  HPWHPumped DXCoil HeatingCapFT,  !- Heating Capacity Function of Temperature Curve Name",
@@ -4111,6 +4114,7 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         "  HPWHWrapped Air Inlet Node,  !- Evaporator Air Inlet Node Name",
         "  HPWHWrapped Evap Outlet - Fan Inlet,  !- Evaporator Air Outlet Node Name",
         "  0,                       !- Crankcase Heater Capacity {W}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "  WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "  HPWHWrapped DXCoil HeatingCapFT,  !- Heating Capacity Function of Temperature Curve Name",
@@ -4219,9 +4223,9 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
 
         // ValidateFuelType tests for WaterHeater:Mixed
         WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-        EXPECT_TRUE(compare_enums(HPWHTank.FuelType, WaterThermalTanks::Fuel::Steam));
-        EXPECT_TRUE(compare_enums(HPWHTank.OffCycParaFuelType, WaterThermalTanks::Fuel::Steam));
-        EXPECT_TRUE(compare_enums(HPWHTank.OnCycParaFuelType, WaterThermalTanks::Fuel::Steam));
+        EXPECT_TRUE(compare_enums(HPWHTank.FuelType, Constant::eFuel::DistrictHeatingSteam));
+        EXPECT_TRUE(compare_enums(HPWHTank.OffCycParaFuelType, Constant::eFuel::DistrictHeatingSteam));
+        EXPECT_TRUE(compare_enums(HPWHTank.OnCycParaFuelType, Constant::eFuel::DistrictHeatingSteam));
     }
 
     ++HPWaterHeaterNum;
@@ -4338,6 +4342,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         "    HPWHWaterInletNode,      !- Condenser Water Inlet Node Name",
         "    HPWHWaterOutletNode,     !- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
@@ -4428,6 +4433,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
     state->dataEnvrn->StdRhoAir = 1.0;
 
     state->dataHVACGlobal->TimeStepSys = 1;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
     state->dataGlobal->TimeStep = 1;
@@ -4628,6 +4634,7 @@ TEST_F(EnergyPlusFixture, HPWH_Wrapped_Stratified_Simultaneous)
         "  HPWHWrapped Air Inlet Node,  !- Evaporator Air Inlet Node Name",
         "  HPWHWrapped Evap Outlet - Fan Inlet,  !- Evaporator Air Outlet Node Name",
         "  0,                       !- Crankcase Heater Capacity {W}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "  WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "  HPWHWrapped DXCoil HeatingCapFT,  !- Heating Capacity Function of Temperature Curve Name",
@@ -4877,6 +4884,7 @@ TEST_F(EnergyPlusFixture, HPWH_Pumped_Stratified_Simultaneous)
         "  HPWHPumped Tank Outlet - Condenser Inlet,  !- Condenser Water Inlet Node Name",
         "  HPWHPumped Condenser Outlet - Tank Inlet,  !- Condenser Water Outlet Node Name",
         "  100,                     !- Crankcase Heater Capacity {W}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  5,                       !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "  WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "  HPWHPumped DXCoil HeatingCapFT,  !- Heating Capacity Function of Temperature Curve Name",

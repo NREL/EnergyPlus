@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,10 +53,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -75,7 +77,7 @@ namespace ICEngineElectricGenerator {
         std::string Name;   // user identifier
         std::string TypeOf; // Type of Generator
         GeneratorType CompType_Num;
-        std::string FuelType;       // Type of Fuel - DIESEL, GASOLINE, GAS
+        Constant::eFuel FuelType;   // Type of Fuel - DIESEL, GASOLINE, GAS
         Real64 RatedPowerOutput;    // W - design nominal capacity of Generator
         int ElectricCircuitNode;    // Electric Circuit Node
         Real64 MinPartLoadRat;      // (IC ENGINE MIN) min allowed operating frac full load

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -109,6 +109,16 @@ namespace SteamBaseboardRadiator {
         int BBLoadReSimIndex;
         int BBMassFlowReSimIndex;
         int BBInletTempFlowReSimIndex;
+        Real64 QBBSteamRadSource;           // Need to keep the last value in case we are still iterating
+        Real64 QBBSteamRadSrcAvg;           // Need to keep the last value in case we are still iterating
+        Real64 ZeroBBSteamSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone
+                                            // with no source
+
+        // Record keeping variables used to calculate QBBRadSrcAvg locally
+        Real64 LastQBBSteamRadSrc; // Need to keep the last value in case we are still iterating
+        Real64 LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+        Real64 LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+
         Real64 ScaledHeatingCapacity; // -  steam baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC
                                       // equipment, {-}, or {W/m2}
 
@@ -120,7 +130,8 @@ namespace SteamBaseboardRadiator {
               SteamOutletEnthalpy(0.0), SteamInletPress(0.0), SteamOutletPress(0.0), SteamInletQuality(0.0), SteamOutletQuality(0.0),
               FracRadiant(0.0), FracConvect(0.0), FracDistribPerson(0.0), TotPower(0.0), Power(0.0), ConvPower(0.0), RadPower(0.0), TotEnergy(0.0),
               Energy(0.0), ConvEnergy(0.0), RadEnergy(0.0), plantLoc{}, BBLoadReSimIndex(0), BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0),
-              ScaledHeatingCapacity(0.0)
+              QBBSteamRadSource(0.0), QBBSteamRadSrcAvg(0.0), ZeroBBSteamSourceSumHATsurf(0.0), LastQBBSteamRadSrc(0.0), LastSysTimeElapsed(0.0),
+              LastTimeStepSys(0.0), ScaledHeatingCapacity(0.0)
         {
         }
     };
@@ -187,8 +198,6 @@ namespace SteamBaseboardRadiator {
 
     void ReportSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
-
     void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state,
                                              DataPlant::PlantEquipmentType BaseboardType, // type index
                                              std::string const &BaseboardName,            // component name
@@ -211,15 +220,6 @@ struct SteamBaseboardRadiatorData : BaseGlobalStruct
     int NumSteamBaseboardsDesign = 0;
     int SteamIndex = 0;
 
-    Array1D<Real64> QBBSteamRadSource;    // Need to keep the last value in case we are still iterating
-    Array1D<Real64> QBBSteamRadSrcAvg;    // Need to keep the last value in case we are still iterating
-    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone
-                                          // with no source
-
-    // Record keeping variables used to calculate QBBRadSrcAvg locally
-    Array1D<Real64> LastQBBSteamRadSrc; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
     Array1D_bool CheckDesignObjectName;
@@ -240,12 +240,6 @@ struct SteamBaseboardRadiatorData : BaseGlobalStruct
     {
         NumSteamBaseboards = 0;
         SteamIndex = 0;
-        QBBSteamRadSource.clear();
-        QBBSteamRadSrcAvg.clear();
-        ZeroSourceSumHATsurf.clear();
-        LastQBBSteamRadSrc.clear();
-        LastSysTimeElapsed.clear();
-        LastTimeStepSys.clear();
         MySizeFlag.clear();
         MyEnvrnFlag.clear();
         CheckEquipName.clear();

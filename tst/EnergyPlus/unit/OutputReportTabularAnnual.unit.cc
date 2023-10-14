@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -140,7 +140,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -151,7 +151,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -162,7 +162,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -232,7 +232,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -243,7 +243,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -254,7 +254,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
-                        _,
+                        {},
                         "Electricity",
                         "Exterior Lights",
                         "General");
@@ -302,6 +302,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
 {
     state->dataGlobal->TimeStepZone = 1.0;
     state->dataHVACGlobal->TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
     state->dataOutputProcessor->NumEnergyMeters = 2;
     state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
@@ -378,7 +379,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
-                        _,
+                        {},
                         "Electricity",
                         "Facility",
                         "General"); // create an electric meter
@@ -436,7 +437,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
-                        _,
+                        {},
                         "Electricity",
                         "Facility",
                         "General"); // create an electric meter
@@ -461,7 +462,6 @@ TEST_F(SQLiteFixture, OutputReportTabularAnnual_CurlyBraces)
 {
     // Test for #8921
 
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     std::string const idf_objects = delimited_string({
@@ -538,7 +538,6 @@ TEST_F(SQLiteFixture, OutputReportTabularAnnual_CurlyBraces)
         R"(SELECT DISTINCT(ColumnName) FROM TabularDataWithStrings
              WHERE ReportName LIKE "ANNUAL EXAMPLE%")",
         "TabularDataWithStrings");
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     // 17 agg types for the same variable requested above + the {TIMESTAMP} ones (but distinct, so counts as 1)
     // + the BIN A TO BIN J ones
@@ -549,7 +548,6 @@ TEST_F(SQLiteFixture, OutputReportTabularAnnual_CurlyBraces)
              WHERE ReportName LIKE "ANNUAL EXAMPLE%"
              AND ColumnName LIKE "%{%" AND ColumnName NOT LIKE "%}%")",
         "TabularDataWithStrings");
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     // Should be none!
     for (auto &col : missingBracesHeaders) {

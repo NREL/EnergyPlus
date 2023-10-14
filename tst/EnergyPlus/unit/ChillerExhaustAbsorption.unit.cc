@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,7 +55,8 @@
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-// #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -637,29 +638,60 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_calcHeater_Fix_Test)
 
     auto &thisChillerHeater = state->dataChillerExhaustAbsorption->ExhaustAbsorber(1);
 
-    Real64 loadinput = 5000.0;
-    bool runflaginput = true;
-
-    thisChillerHeater.CoolingLoad = 100000.0;
+    thisChillerHeater.CoolingLoad = 100'000.0;
     thisChillerHeater.CoolPartLoadRatio = 1.0;
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
     thisChillerHeater.HWPlantLoc.loopNum = 1;
     thisChillerHeater.HWPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
-    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).FlowLock = DataPlant::FlowLock::Locked;
-    state->dataLoopNodes->Node(3).Temp = 60.0;
-    state->dataLoopNodes->Node(3).MassFlowRate = 0.5;
-    state->dataLoopNodes->Node(4).TempSetPoint = 70.0;
-    state->dataLoopNodes->Node(7).Temp = 350.0;
-    state->dataLoopNodes->Node(7).MassFlowRate = 0.5;
+    auto &hwPlantLoop = state->dataPlnt->PlantLoop(1);
+    hwPlantLoop.FluidName = "WATER";
+    hwPlantLoop.FluidIndex = 1;
+    hwPlantLoop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
+    hwPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).FlowLock = DataPlant::FlowLock::Locked;
 
+    EXPECT_EQ(1, thisChillerHeater.ChillReturnNodeNum);
+    EXPECT_EQ("EXH CHILLER INLET NODE", state->dataLoopNodes->NodeID(1));
+    EXPECT_EQ(2, thisChillerHeater.ChillSupplyNodeNum);
+    EXPECT_EQ("EXH CHILLER OUTLET NODE", state->dataLoopNodes->NodeID(2));
+    EXPECT_EQ(3, thisChillerHeater.HeatReturnNodeNum);
+    EXPECT_EQ("EXH CHILLER HEATING INLET NODE", state->dataLoopNodes->NodeID(3));
+    EXPECT_EQ(4, thisChillerHeater.HeatSupplyNodeNum);
+    EXPECT_EQ("EXH CHILLER HEATING OUTLET NODE", state->dataLoopNodes->NodeID(4));
+    EXPECT_EQ(5, thisChillerHeater.CondReturnNodeNum);
+    EXPECT_EQ("EXH CHILLER CONDENSER INLET NODE", state->dataLoopNodes->NodeID(5));
+    EXPECT_EQ("CAPSTONE C65 COMBUSTION AIR INLET NODE", state->dataLoopNodes->NodeID(6));
+    EXPECT_EQ(7, thisChillerHeater.ExhaustAirInletNodeNum);
+    EXPECT_EQ("CAPSTONE C65 COMBUSTION AIR OUTLET NODE", state->dataLoopNodes->NodeID(7));
+
+    constexpr Real64 hwSupplySetpoint = 70.0;
+    constexpr Real64 hwReturnTemp = 60.0;
+    constexpr Real64 hwMassFlow = 0.5;
+    state->dataLoopNodes->Node(thisChillerHeater.HeatReturnNodeNum).Temp = hwReturnTemp;
+    state->dataLoopNodes->Node(thisChillerHeater.HeatReturnNodeNum).MassFlowRate = hwMassFlow;
+    state->dataLoopNodes->Node(thisChillerHeater.HeatSupplyNodeNum).TempSetPoint = hwSupplySetpoint;
+
+    // Minimum temperature leaving the Chiller absorber is 176.6 C (350 F)
+    constexpr Real64 exhaustInTemp = 350.0;
+    constexpr Real64 absLeavingTemp = 176.667;
+    constexpr Real64 exhaustInMassFlowRate = 0.5;
+    constexpr Real64 exhaustInHumRate = 0.005;
+    state->dataLoopNodes->Node(thisChillerHeater.ExhaustAirInletNodeNum).Temp = exhaustInTemp;
+    state->dataLoopNodes->Node(thisChillerHeater.ExhaustAirInletNodeNum).MassFlowRate = exhaustInMassFlowRate;
+    state->dataLoopNodes->Node(thisChillerHeater.ExhaustAirInletNodeNum).HumRat = exhaustInHumRate;
+
+    Real64 loadinput = 5000.0;
+    bool const runflaginput = true;
     thisChillerHeater.calcHeater(*state, loadinput, runflaginput);
 
-    EXPECT_NEAR(thisChillerHeater.HeatingLoad, 21085.0, 1e-6);
+    const Real64 CpHW = FluidProperties::GetSpecificHeatGlycol(*state, hwPlantLoop.FluidName, hwReturnTemp, hwPlantLoop.FluidIndex, "UnitTest");
+    EXPECT_EQ(4185.0, CpHW);
+    const Real64 expectedHeatingLoad = (hwSupplySetpoint - hwReturnTemp) * hwMassFlow * CpHW;
+
+    EXPECT_NEAR(20925.0, expectedHeatingLoad, 1e-6);
+
+    EXPECT_NEAR(thisChillerHeater.HeatingLoad, expectedHeatingLoad, 1e-6);
     EXPECT_NEAR(thisChillerHeater.HeatElectricPower, 400.0, 1e-6);
     EXPECT_NEAR(thisChillerHeater.HotWaterReturnTemp, 60.0, 1e-6);
     EXPECT_NEAR(thisChillerHeater.HotWaterSupplyTemp, 70.0, 1e-6);
@@ -669,7 +701,11 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_calcHeater_Fix_Test)
     EXPECT_NEAR(thisChillerHeater.ElectricPower, 400.0, 1e-6);
     EXPECT_NEAR(thisChillerHeater.ExhaustInTemp, 350.0, 1e-6);
     EXPECT_NEAR(thisChillerHeater.ExhaustInFlow, 0.5, 1e-6);
-    EXPECT_NEAR(thisChillerHeater.ExhHeatRecPotentialHeat, 87087.5769469, 1e-6);
+
+    Real64 const CpAir = Psychrometrics::PsyCpAirFnW(exhaustInHumRate);
+    Real64 const expectedExhHeatRecPotentialHeat = exhaustInMassFlowRate * CpAir * (exhaustInTemp - absLeavingTemp);
+    EXPECT_NEAR(87891.51, expectedExhHeatRecPotentialHeat, 0.01);
+    EXPECT_NEAR(expectedExhHeatRecPotentialHeat, thisChillerHeater.ExhHeatRecPotentialHeat, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, ExhAbsorption_GetInput_Multiple_Objects_Test)

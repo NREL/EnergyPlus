@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -71,7 +71,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace CurveManager;
+using namespace Curve;
 using namespace DataLoopNode;
 using namespace Fans;
 using namespace FaultsManager;
@@ -86,31 +86,28 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     //     covers the rated operational point of the corresponding fan
     //     Return true if the curve covers the fan rated operational point
 
-    int CurveNum;
     int FanNum;
     bool TestResult;
 
     // Allocate
-    state->dataCurveManager->NumCurves = 1;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(1);
 
     state->dataFans->NumFans = 2;
     state->dataFans->Fan.allocate(state->dataFans->NumFans);
     state->dataFaultsMgr->FaultsFouledAirFilters.allocate(state->dataFans->NumFans);
 
     // Inputs: fan curve
-    CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1151.1;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 13.509;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -0.9105;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = -0.0129;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 21.0;
+    auto *curve = state->dataCurveManager->PerfCurve(1);
+    curve->curveType = CurveType::Cubic;
+    curve->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve->coeff[0] = 1151.1;
+    curve->coeff[1] = 13.509;
+    curve->coeff[2] = -0.9105;
+    curve->coeff[3] = -0.0129;
+    curve->coeff[4] = 0.0;
+    curve->coeff[5] = 0.0;
+    curve->inputLimits[0].min = 7.0;
+    curve->inputLimits[0].max = 21.0;
 
     // Inputs:
     FanNum = 1;
@@ -119,7 +116,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
     state->dataFans->Fan(FanNum).DeltaPress = 1017.59;
     state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_1";
-    state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = CurveNum;
+    state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = 1;
 
     FanNum = 2;
     state->dataFans->Fan(FanNum).FanName = "Fan_2";
@@ -127,7 +124,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
     state->dataFans->Fan(FanNum).DeltaPress = 1017.59 * 1.2;
     state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_2";
-    state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = CurveNum;
+    state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = 1;
 
     // Run and Check
     // (1)The rated operational point of Fan_1 falls on the fan curve
@@ -337,31 +334,28 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     //     Calculate the decrease of the fan air flow rate, given the fan curve
     //     and the increase of fan pressure rise due to fouling air filters
 
-    int CurveNum;
     int FanNum;
     double FanDesignFlowRateDec;
     double FanFaultyDeltaPressInc = 0.10; // Increase by 10%
 
     // Allocate
-    state->dataCurveManager->NumCurves = 1;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(1);
 
     state->dataFans->NumFans = 1;
     state->dataFans->Fan.allocate(state->dataFans->NumFans);
 
     // Inputs: fan curve
-    CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1151.1;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 13.509;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -0.9105;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = -0.0129;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 21.0;
+    auto *curve = state->dataCurveManager->PerfCurve(1);
+    curve->curveType = CurveType::Cubic;
+    curve->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve->coeff[0] = 1151.1;
+    curve->coeff[1] = 13.509;
+    curve->coeff[2] = -0.9105;
+    curve->coeff[3] = -0.0129;
+    curve->coeff[4] = 0.0;
+    curve->coeff[5] = 0.0;
+    curve->inputLimits[0].min = 7.0;
+    curve->inputLimits[0].max = 21.0;
 
     // Inputs: fans
     FanNum = 1;
@@ -376,7 +370,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
                                                         state->dataFans->Fan(FanNum).MaxAirFlowRate,
                                                         state->dataFans->Fan(FanNum).DeltaPress,
                                                         FanFaultyDeltaPressInc * state->dataFans->Fan(FanNum).DeltaPress,
-                                                        CurveNum);
+                                                        1);
 
     EXPECT_NEAR(3.845, FanDesignFlowRateDec, 0.005);
 
@@ -844,6 +838,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataHVACGlobal->TimeStepSys = 1;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
 

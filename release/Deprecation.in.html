@@ -113,13 +113,6 @@
 
     <h2>Level 1 Deprecation Status</h2>
 
-    <h3>Outdated Mac and Linux Builds</h3>
-    <p>
-        Mac 10.15 and Ubuntu 18.04 builds will not be provided much longer.  This could be the last release with them,
-        but it's possible they are built for one more release in March 2023.  They will definitely be removed
-        after that though.
-    </p>
-
     <h3>DElight</h3>
     <p>
         DElight daylighting capabilities provides an alternative to the split-flux method.  The DElight library has not
@@ -142,8 +135,22 @@
     </p>
 
     <h2>Level 2 Deprecation Status</h2>
+
+    <h3>32-bit Windows Builds</h3>
     <p>
-        At this time, no objects have advanced to level 2 deprecation status.
+        EnergyPlus has provided 32-bit Windows builds since the very early days of development, and 64-bit Windows
+        builds since version 6.0.0 (Fall 2010).  Microsoft has begun the process of stopping 32-bit development and
+        invoked new requirements on system memory that effectively eliminate 32-bit systems except in the most niche
+        circumstances.  As of 2020, Steam software reported that 32-bit Windows usage was down to 0.2% of users.
+        All of this would be sufficient for us to justify eliminating 32-bit builds, however some EnergyPlus interfaces
+        are still built as 32-bit binaries, and we try hard to provide interfaces with everything they need from
+        EnergyPlus.  Our CI systems are no longer able to build 32-bit Windows packages, but we still have dev
+        machines that can do it, so for now we will provide 32-bit builds, but they won't be around much longer.
+    </p>
+
+    <h3>Outdated Mac Builds</h3>
+    <p>
+        Mac 10.15 builds will not be provided after the release of 23.2.
     </p>
 
     <h2>Level 3 Deprecation Status</h2>
@@ -151,11 +158,17 @@
     <h3>Version Numbering Scheme</h3>
     <p>
         EnergyPlus historically used version numbers that varied the major number and sometimes the minor
-        number. Starting with the March 2022 release, we are moving forward with a more modern version numbering scheme.
-        The EnergyPlus version will be based on the year and the release number. The March 2022 release is
-        EnergyPlus 22.1 and the Fall release will be EnergyPlus 22.2. If additional major releases are created
+        number. Starting with the March 2022 release, we moved forward with a more modern version numbering scheme.
+        The EnergyPlus version is now based on the year and the release number. The March 2022 release was
+        EnergyPlus 22.1 and the Fall release was be EnergyPlus 22.2. If additional major releases are created
         for some reason, they would increment the release number further. Rare intermediate releases may be numbered
         with a patch number such as 22.1.1.
+    </p>
+
+    <h3>Outdated Linux Builds</h3>
+    <p>
+        Ubuntu 18.04 builds are no longer provided.  This version reached end of life in April, and we have instead
+        added 22.04.
     </p>
 
     <hr>

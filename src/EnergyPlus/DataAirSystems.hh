@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -235,6 +235,7 @@ namespace DataAirSystems {
         int RetFanNum = 0;           // index of the return fan in the Fan data structure when model type is StructArrayLegacyFanModels
         int retFanVecIndex = -1;     // index in fan object vector for return fan when model type is ObjectVectorOOFanSystemModel, zero-based index
         Real64 FanDesCoolLoad = 0.0; // design fan heat gain for the air loop [W]
+        bool EconomizerStagingCheckFlag = false; // flag to indicate that the applicability of the selected economizer staging operation mode is valid
     };
 
     struct ConnectionPoint

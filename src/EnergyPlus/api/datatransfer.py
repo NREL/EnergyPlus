@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -53,9 +53,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from ctypes import cdll, c_int, c_char_p, c_void_p
+from ctypes import cdll, c_int, c_char_p, c_void_p, POINTER, Structure, byref
 from pyenergyplus.common import RealEP, EnergyPlusException, is_number
-from typing import Union
+from typing import List, Union
 
 
 class DataExchange:
@@ -71,7 +71,7 @@ class DataExchange:
 
     This data transfer class is used in one of two workflows:
 
-    - When a outside tool is already running EnergyPlus using the Runtime API, and data transfer is to be made during
+    - When an outside tool is already running EnergyPlus using the Runtime API, and data transfer is to be made during
       callback functions. In this case, the script should create a DataTransfer API class by calling the `data_transfer`
       method on the main API class, never trying to create this class directly.
     - When a Python script is used in the EnergyPlus Python Plugin System, and the user runs the EnergyPlus binary.  In
@@ -84,6 +84,33 @@ class DataExchange:
     outside calling code.
     """
 
+    class _APIDataEntry(Structure):
+        _fields_ = [("what", c_char_p),("name", c_char_p),("key", c_char_p),("type", c_char_p),]
+
+    class APIDataExchangePoint:
+        """
+        A class of string members that describe a single API exchange point.  The exchange described in this
+        class could represent output variables, output meters, actuators, and more.  The "type" member variable
+        can be used to filter a specific type.
+        """
+        def __init__(self, _what: str, _name: str, _key: str, _type: str):
+            #: This variable will hold the basic type of API data point, in string form.
+            #: This can be one of the following: "Actuator", "InternalVariable", "PluginGlobalVariable",
+            #: "PluginTrendVariable", "OutputMeter", or "OutputVariable".  Once the full list of data exchange points
+            #: are returned from a call to get_api_data, this can be used to quickly filter down to a specific type.
+            self.what: str = _what
+            #: This represents the name of the entry point, not the name of the specific instance of the entry point.
+            #: Some examples of this name could be "Chiller Heat Transfer Rate" -- which could be available for multiple
+            #: chillers.
+            self.name: str = _name
+            #: This represents the unique ID for this exchange point.  In the example of the chiller output variable,
+            #: this could be "Chiller 1". This is not used for meters
+            self.key: str = _key
+            #: This represents the "type" of exchange for this exchange point.  This is only used for actuators,
+            #: and represents the control actuation.  For a node setpoint actuation, this could be "temperature" or
+            #: "humidity", for example.
+            self.type: str = _type
+
     def __init__(self, api: cdll, running_as_python_plugin: bool = False):
         """
         Creates a new DataExchange API class instance
@@ -93,8 +120,16 @@ class DataExchange:
         """
         self.api = api
         self.running_as_python_plugin = running_as_python_plugin
+        self.api.getAPIData.argtypes = [c_void_p, POINTER(c_int)]
+        self.api.getAPIData.restype = POINTER(DataExchange._APIDataEntry)
         self.api.listAllAPIDataCSV.argtypes = [c_void_p]
         self.api.listAllAPIDataCSV.restype = c_char_p
+        self.api.freeAPIData.argtypes = [POINTER(DataExchange._APIDataEntry), c_int]
+        self.api.freeAPIData.restype = c_void_p
+        self.api.getObjectNames.argtypes = [c_void_p, c_char_p, POINTER(c_int)]
+        self.api.getObjectNames.restype = POINTER(c_char_p)
+        self.api.freeObjectNames.argtypes = [POINTER(c_char_p), c_int]
+        self.api.freeObjectNames.restype = c_void_p
         self.api.apiDataFullyReady.argtypes = [c_void_p]
         self.api.apiDataFullyReady.restype = c_int
         self.api.apiErrorFlag.argtypes = [c_void_p]
@@ -127,6 +162,8 @@ class DataExchange:
         # some simulation data values are available for plugins or regular runtime calls
         self.api.year.argtypes = [c_void_p]
         self.api.year.restype = c_int
+        self.api.calendarYear.argtypes = [c_void_p]
+        self.api.calendarYear.restype = c_int
         self.api.month.argtypes = [c_void_p]
         self.api.month.restype = c_int
         self.api.dayOfMonth.argtypes = [c_void_p]
@@ -248,6 +285,25 @@ class DataExchange:
         self.api.currentSimTime.argtypes = [c_void_p]
         self.api.currentSimTime.restype = RealEP
 
+    def get_api_data(self, state: c_void_p) -> List[APIDataExchangePoint]:
+        """
+        Returns a nicely formed list of API data exchange points available in the current simulation.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :return: Returns a Python list of APIDataExchangePoint instances, which can be filtered to inspect exchanges.
+        """
+        count = c_int()
+        r = self.api.getAPIData(state, byref(count))
+        list_response = [
+            DataExchange.APIDataExchangePoint(
+                r[i].what.decode('utf-8'),
+                r[i].name.decode('utf-8'),
+                r[i].key.decode('utf-8'),
+                r[i].type.decode('utf-8')) for i in range(count.value)
+        ]
+        self.api.freeAPIData(r, count)  # free the underlying C memory now that we have a Python copy
+        return list_response
+
     def list_available_api_data_csv(self, state: c_void_p) -> bytes:
         """
         Lists out all API data stuff in an easily parseable CSV form
@@ -265,8 +321,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: Returns a boolean value to indicate whether variables, actuators, and other data are ready for access.
         """
-        success = self.api.apiDataFullyReady(state)
-        if success == 0:
+        if self.api.apiDataFullyReady(state) == 1:
             return True
         return False
 
@@ -293,6 +348,28 @@ class DataExchange:
         """
         self.api.resetErrorFlag(state)
 
+    def get_object_names(self, state: c_void_p, object_type_name: Union[str, bytes]) -> List[str]:
+        """
+        Gets the instance names for a given object type in the current input file
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param object_type_name: The object type name as defined in the schema, such as "Zone" or "Chiller:Electric"
+        :return: A list of strings represented the names of the objects in the input file
+        """
+
+        if isinstance(object_type_name, str):
+            object_type_name = object_type_name.encode('utf-8')
+        elif not isinstance(object_type_name, bytes):
+            raise EnergyPlusException(
+                "`get_object_names` expects `object_type_name` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(object_type_name))
+        count = c_int()
+        r = self.api.getObjectNames(state, object_type_name, byref(count))
+        if not r:
+            return []
+        list_response = [r[i].decode('utf-8', errors='ignore') for i in range(count.value)]
+        self.api.freeObjectNames(r, count)  # free the underlying C memory now that we have a Python copy
+        return list_response
+
     def get_num_nodes_in_cond_fd_surf_layer(self, state: c_void_p, surface_name: Union[str, bytes],
                                             material_name: Union[str, bytes]) -> None:
         """
@@ -309,14 +386,14 @@ class DataExchange:
             surface_name = surface_name.encode('utf-8')
         elif not isinstance(surface_name, bytes):
             raise EnergyPlusException(
-                "`request_variable` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
-                "'{}'".format(surface_name))
+                "`get_num_nodes_in_cond_fd_surf_layer` expects `surface_name` as a `str` or UTF-8 encoded `bytes`, not"
+                " '{}'".format(surface_name))
         if isinstance(material_name, str):
             material_name = material_name.encode('utf-8')
         elif not isinstance(material_name, bytes):
             raise EnergyPlusException(
-                "`request_variable` expects `component_type` as a `str` or UTF-8 encoded `bytes`, not "
-                "'{}'".format(material_name))
+                "`get_num_nodes_in_cond_fd_surf_layer` expects `material_name` as a `str` or UTF-8 encoded `bytes`, not"
+                " '{}'".format(material_name))
         return self.api.getNumNodesInCondFDSurfaceLayer(state, surface_name, material_name)
 
     def request_variable(self, state: c_void_p, variable_name: Union[str, bytes],
@@ -593,7 +670,7 @@ class DataExchange:
 
     def get_construction_handle(self, state: c_void_p, var_name: Union[str, bytes]) -> int:
         """
-        Get a handle to a constructions in a running simulation.  This is only used for Python Plugin applications!
+        Get a handle to a constructions in a running simulation.
 
         Some actuators allow specifying different constructions to allow switchable construction control.
         This function returns an index that can be used in those functions.  The construction is specified by name.
@@ -608,8 +685,6 @@ class DataExchange:
         :param var_name: Name of the construction to look up
         :return: An integer ID for this construction, or -1 if one could not be found.
         """
-        if not self.running_as_python_plugin:
-            raise EnergyPlusException("get_construction_handle is only available as part of a Python Plugin workflow")
         if isinstance(var_name, str):
             var_name = var_name.encode('utf-8')
         elif not isinstance(var_name, bytes):
@@ -919,13 +994,27 @@ class DataExchange:
 
     def year(self, state: c_void_p) -> int:
         """
-        Get the "current" calendar year of the simulation.  All simulations operate at a real year, either user
+        Get the "current" year of the simulation, read from the EPW. All simulations operate at a real year, either user
         specified or automatically selected by EnergyPlus based on other data (start day of week + leap year option).
 
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: An integer year (2020, for example)
         """
         return self.api.year(state)
+
+    def calendar_year(self, state: c_void_p) -> int:
+        """
+        Get the "current" calendar year of the simulation.
+
+        Only valid for weather file run periods.
+
+        All simulations operate at a real year, either user
+        specified or automatically selected by EnergyPlus based on other data (start day of week + leap year option).
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :return: An integer year (2020, for example)
+        """
+        return self.api.calendarYear(state)
 
     def month(self, state: c_void_p) -> int:
         """
@@ -1025,7 +1114,10 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: An integer indicator for current day holiday type.
         """
-        return self.api.holidayIndex(state)
+        if self.api.holidayIndex(state) == 0:
+            return 0
+        else:
+            return self.api.holidayIndex(state) - 7
 
     def sun_is_up(self, state: c_void_p) -> bool:
         """

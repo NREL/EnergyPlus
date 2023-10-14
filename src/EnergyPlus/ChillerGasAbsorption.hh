@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,11 +53,13 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -76,7 +78,7 @@ namespace ChillerGasAbsorption {
         bool InHeatingMode = false;
         // Part of Type that directly corresponds with IDD definition
         std::string Name;                         // user identifier
-        std::string FuelType;                     // Type of Fuel - DIESEL, GASOLINE, GAS
+        Constant::eFuel FuelType;                 // Type of Fuel - DIESEL, GASOLINE, GAS
         Real64 NomCoolingCap = 0.0;               // W - design nominal capacity of Absorber
         bool NomCoolingCapWasAutoSized = false;   // true if nominal capacity was autosize on input
         Real64 NomHeatCoolRatio = 0.0;            // ratio of heating to cooling capacity
@@ -172,7 +174,7 @@ namespace ChillerGasAbsorption {
         Real64 FractionOfPeriodRunning = 0.0; // fraction of the time period that the unit is operating
         Real64 FuelCOP = 0.0;                 // reporting: cooling output/fuel input = CoolingLoad/CoolFuelUseRate
 
-        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+        static GasAbsorberSpecs *factory(EnergyPlusData &state, std::string const &objectName);
 
         void
         simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;

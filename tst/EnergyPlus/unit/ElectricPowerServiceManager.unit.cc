@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -692,6 +692,9 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_CheckOutputReporting)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    state->dataHVACGlobal->TimeStepSys = 1.0;
+    state->dataGlobal->TimeStepZoneSec = 3600.0;
+
     createFacilityElectricPowerServiceObject(*state);
     bool SimElecCircuitsFlag = false;
     // GetInput and other code will be executed and SimElectricCircuits will be true
@@ -787,6 +790,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_TransformerLossTest)
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataHVACGlobal->TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfWeek = 2;
     state->dataEnvrn->HolidayIndex = 0;
@@ -1119,6 +1123,7 @@ TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Simulate)
     ElectricStorage battery{*state, "Battery1"};
 
     state->dataHVACGlobal->TimeStepSys = 0.25;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     state->dataEnvrn->OutDryBulbTemp = 23.0;
     Real64 socMin = 0.1;
     Real64 socMax = 0.95;
@@ -1224,4 +1229,104 @@ TEST_F(EnergyPlusFixture, Battery_checkUserEfficiencyInputTest)
     functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyDischarge, "DISCHARGING", "Tatooine", errorsFound);
     EXPECT_NEAR(functionResult, expectedResult, 0.00001);
     EXPECT_FALSE(errorsFound);
+}
+
+TEST_F(EnergyPlusFixture, Battery_checkChargeDischargeVoltageCurves)
+{
+    Real64 e0c;
+    Real64 e0d;
+    int chaCurveIndex;
+    int disCurveIndex;
+
+    std::string const idf_objects = delimited_string({
+        "Curve:RectangularHyperbola2,",
+        "  charging1,               !- Name",
+        "  0.25,                    !- Coefficient1 C1",
+        "  4.0,                     !- Coefficient2 C2",
+        "  2.0,                     !- Coefficient3 C3",
+        "  0,                       !- Minimum Value of x",
+        "  1,                       !- Maximum Value of x",
+        "  -100,                    !- Minimum Curve Output",
+        "  100,                     !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for x",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:RectangularHyperbola2,",
+        "  discharging1,            !- Name",
+        "  0.25,                    !- Coefficient1 C1",
+        "  -4.0,                    !- Coefficient2 C2",
+        "  -2.0,                    !- Coefficient3 C3",
+        "  0,                       !- Minimum Value of x",
+        "  1,                       !- Maximum Value of x",
+        "  -100,                    !- Minimum Curve Output",
+        "  100,                     !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for x",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:RectangularHyperbola2,",
+        "  charging2,               !- Name",
+        "  -.2765,                  !- Coefficient1 C1",
+        "  -93.27,                  !- Coefficient2 C2",
+        "  0.0068,                  !- Coefficient3 C3",
+        "  0,                       !- Minimum Value of x",
+        "  1,                       !- Maximum Value of x",
+        "  -100,                    !- Minimum Curve Output",
+        "  100,                     !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for x",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:RectangularHyperbola2,",
+        "  discharging2,            !- Name",
+        "  0.0899,                  !- Coefficient1 C1",
+        "  -98.24,                  !- Coefficient2 C2",
+        "  -.0082,                  !- Coefficient3 C3",
+        "  0,                       !- Minimum Value of x",
+        "  1,                       !- Maximum Value of x",
+        "  -100,                    !- Minimum Curve Output",
+        "  100,                     !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for x",
+        "  Dimensionless;           !- Output Unit Type",
+
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Curve::GetCurveInput(*state);
+    state->dataCurveManager->GetCurvesInputFlag = false;
+
+    // Test 1: Curves which do not produce errors
+    e0c = 13.0;
+    e0d = 11.0;
+    chaCurveIndex = 1;
+    disCurveIndex = 2;
+
+    checkChargeDischargeVoltageCurves(*state, "Battery for Test 1", e0c, e0d, chaCurveIndex, disCurveIndex);
+
+    EXPECT_TRUE(compare_err_stream(""));
+
+    // Test 2: Curves from ShopwithPVBattery.idf as of 7/2023
+    e0c = 12.6;
+    e0d = 12.4;
+    chaCurveIndex = 3;
+    disCurveIndex = 4;
+
+    checkChargeDischargeVoltageCurves(*state, "Battery for Test 2", e0c, e0d, chaCurveIndex, disCurveIndex);
+
+    std::string const error_string2 = delimited_string({
+        "   ** Warning ** Kinetic Battery Model: Battery for Test 2 has a charging/discharging voltage curve conflict.",
+        "   **   ~~~   ** Discharging voltage is higher than charging voltage which may potentially lead to an imbalance in the stored energy.",
+        "   **   ~~~   ** Check the charging and discharging curves to make sure that the charging voltage is greater than discharging.",
+        "   **   ~~~   ** Also check the charging and discharging energy outputs to find any discrepancies.",
+        "   **   ~~~   ** Charged fraction = 0.0, Charging voltage = 12.400 V, Discharging voltage = 12.591 V",
+        "   **   ~~~   ** Charged fraction = 0.1, Charging voltage = 12.401 V, Discharging voltage = 12.592 V",
+        "   **   ~~~   ** Charged fraction = 0.2, Charging voltage = 12.402 V, Discharging voltage = 12.593 V",
+        "   **   ~~~   ** Charged fraction = 0.3, Charging voltage = 12.403 V, Discharging voltage = 12.594 V",
+        "   **   ~~~   ** Charged fraction = 0.4, Charging voltage = 12.404 V, Discharging voltage = 12.595 V",
+        "   **   ~~~   ** Charged fraction = 0.5, Charging voltage = 12.405 V, Discharging voltage = 12.595 V",
+        "   **   ~~~   ** Charged fraction = 0.6, Charging voltage = 12.406 V, Discharging voltage = 12.596 V",
+        "   **   ~~~   ** Charged fraction = 0.7, Charging voltage = 12.407 V, Discharging voltage = 12.597 V",
+        "   **   ~~~   ** Charged fraction = 0.8, Charging voltage = 12.408 V, Discharging voltage = 12.598 V",
+        "   **   ~~~   ** Charged fraction = 0.9, Charging voltage = 12.409 V, Discharging voltage = 12.599 V",
+        "   **   ~~~   ** Charged fraction = 1.0, Charging voltage = 12.410 V, Discharging voltage = 12.600 V",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string2, true));
 }

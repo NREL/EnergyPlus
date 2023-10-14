@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,22.2;
+  Version,24.1;
 
   Building,
     Building,                !- Name
@@ -2111,11 +2111,7 @@
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
     50,                      !- Maximum Supply Air Temperature {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
-    Outside Air Inlet Node,  !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60;                      !- Heat Pump Fan Delay Time {s}
+    Outside Air Inlet Node;  !- Outdoor Dry-Bulb Temperature Sensor Node Name
 
   OutdoorAir:Node,
     Outside Air Inlet Node;  !- Name
@@ -2164,7 +2160,11 @@
     2.06530E-02,             !- Leak Rate Coefficient
     1.92757E+03,             !- Source Side Heat Transfer Coefficient {W/K}
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
-    ;                        !- Source Side Heat Transfer Resistance2 {W/K}
+    ,                        !- Source Side Heat Transfer Resistance2 {W/K}
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
     Heat Pump HEATING Mode AHU1,  !- Name
@@ -2190,7 +2190,8 @@
     2.07750E-06,             !- Leak Rate Coefficient {dimensionless}
     4.00322E+03,             !- Source Side Heat Transfer Coefficient {W/K}
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
-    ;                        !- Source Side Heat Transfer Resistance2 {W/K}
+    ,                        !- Source Side Heat Transfer Resistance2 {W/K}
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU1,  !- Name
@@ -2414,11 +2415,7 @@
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
     50,                      !- Maximum Supply Air Temperature {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
-    Outside Air Inlet Node,  !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60;                      !- Heat Pump Fan Delay Time {s}
+    Outside Air Inlet Node;  !- Outdoor Dry-Bulb Temperature Sensor Node Name
 
   Fan:OnOff,
     AHU 2 Supply Fan,        !- Name
@@ -2458,7 +2455,11 @@
     2.06530E-02,             !- Leak Rate Coefficient
     1.92757E+03,             !- Source Side Heat Transfer Coefficient {W/K}
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
-    ;                        !- Source Side Heat Transfer Resistance2 {W/K}
+    ,                        !- Source Side Heat Transfer Resistance2 {W/K}
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
     Heat Pump HEATING Mode AHU2,  !- Name
@@ -2484,7 +2485,8 @@
     2.07750E-06,             !- Leak Rate Coefficient {dimensionless}
     4.00322E+03,             !- Source Side Heat Transfer Coefficient {W/K}
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
-    ;                        !- Source Side Heat Transfer Resistance2 {W/K}
+    ,                        !- Source Side Heat Transfer Resistance2 {W/K}
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU2,  !- Name
@@ -2708,11 +2710,7 @@
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
     50,                      !- Maximum Supply Air Temperature {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
-    Outside Air Inlet Node,  !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60;                      !- Heat Pump Fan Delay Time {s}
+    Outside Air Inlet Node;  !- Outdoor Dry-Bulb Temperature Sensor Node Name
 
   Fan:OnOff,
     AHU 3 Supply Fan,        !- Name
@@ -2752,7 +2750,11 @@
     2.06530E-02,             !- Leak Rate Coefficient
     1.92757E+03,             !- Source Side Heat Transfer Coefficient {W/K}
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
-    ;                        !- Source Side Heat Transfer Resistance2 {W/K}
+    ,                        !- Source Side Heat Transfer Resistance2 {W/K}
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
     Heat Pump HEATING Mode AHU3,  !- Name
@@ -2778,7 +2780,8 @@
     2.07750E-06,             !- Leak Rate Coefficient {dimensionless}
     4.00322E+03,             !- Source Side Heat Transfer Coefficient {W/K}
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
-    ;                        !- Source Side Heat Transfer Resistance2 {W/K}
+    ,                        !- Source Side Heat Transfer Resistance2 {W/K}
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU3,  !- Name
@@ -3002,11 +3005,7 @@
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
     50,                      !- Maximum Supply Air Temperature {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
-    Outside Air Inlet Node,  !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60;                      !- Heat Pump Fan Delay Time {s}
+    Outside Air Inlet Node;  !- Outdoor Dry-Bulb Temperature Sensor Node Name
 
   Fan:OnOff,
     AHU 4 Supply Fan,        !- Name
@@ -3046,7 +3045,11 @@
     2.06530E-02,             !- Leak Rate Coefficient
     1.92757E+03,             !- Source Side Heat Transfer Coefficient {W/K}
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
-    ;                        !- Source Side Heat Transfer Resistance2 {W/K}
+    ,                        !- Source Side Heat Transfer Resistance2 {W/K}
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
     Heat Pump HEATING Mode AHU4,  !- Name
@@ -3072,7 +3075,8 @@
     2.07750E-06,             !- Leak Rate Coefficient {dimensionless}
     4.00322E+03,             !- Source Side Heat Transfer Coefficient {W/K}
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
-    ;                        !- Source Side Heat Transfer Resistance2 {W/K}
+    ,                        !- Source Side Heat Transfer Resistance2 {W/K}
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU4,  !- Name
@@ -3296,11 +3300,7 @@
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
     50,                      !- Maximum Supply Air Temperature {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
-    Outside Air Inlet Node,  !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60;                      !- Heat Pump Fan Delay Time {s}
+    Outside Air Inlet Node;  !- Outdoor Dry-Bulb Temperature Sensor Node Name
 
   Fan:OnOff,
     AHU 5 Supply Fan,        !- Name
@@ -3340,7 +3340,11 @@
     2.06530E-02,             !- Leak Rate Coefficient
     1.92757E+03,             !- Source Side Heat Transfer Coefficient {W/K}
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
-    ;                        !- Source Side Heat Transfer Resistance2 {W/K}
+    ,                        !- Source Side Heat Transfer Resistance2 {W/K}
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
     Heat Pump HEATING Mode AHU5,  !- Name
@@ -3366,7 +3370,8 @@
     2.07750E-06,             !- Leak Rate Coefficient {dimensionless}
     4.00322E+03,             !- Source Side Heat Transfer Coefficient {W/K}
     ,                        !- Source Side Heat Transfer Resistance1 {dimensionless}
-    ;                        !- Source Side Heat Transfer Resistance2 {W/K}
+    ,                        !- Source Side Heat Transfer Resistance2 {W/K}
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Coil:Heating:Fuel,
     Heat Pump DX Supp Heating Coil AHU5,  !- Name

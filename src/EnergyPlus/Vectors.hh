@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -91,13 +91,11 @@ namespace Vectors {
     void VecRound(Vector &vec, Real64 const roundto);
 
     void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf, // Surface Definition
-                                 int const NSides,            // Number of sides to surface
                                  Real64 &Azimuth,             // Outward Normal Azimuth Angle
                                  Real64 &Tilt,                // Tilt angle of surface
                                  Vector &lcsx,
                                  Vector &lcsy,
                                  Vector &lcsz,
-                                 Real64 const surfaceArea,
                                  Vector const &NewellSurfaceNormalVector);
 
     void PlaneEquation(Array1D<Vector> &verts, // Structure of the surface

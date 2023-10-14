@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -127,8 +127,8 @@ TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
     thisFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     thisFan.EMSFanPressureOverrideOn = false;
     thisFan.EMSFanPressureValue = 0.0;
-    state->dataFans->LocalTurnFansOn = true;
-    state->dataFans->LocalTurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
     // simulate the fan
     Fans::SimSimpleFan(*state, FanNum);
     // fan power = MassFlow * DeltaPress / (FanEff * RhoAir)
@@ -174,8 +174,8 @@ TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
     thisFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     thisFan.EMSFanPressureOverrideOn = false;
     thisFan.EMSFanPressureValue = 0.0;
-    state->dataFans->LocalTurnFansOn = true;
-    state->dataFans->LocalTurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
     // simulate the fan
     Fans::SimOnOffFan(*state, FanNum);
     // fan power = MassFlow * DeltaPress / (FanEff * RhoAir)
@@ -227,8 +227,8 @@ TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
     thisFan.FanCoeff(5) = 0.000;
     thisFan.EMSFanPressureOverrideOn = false;
     thisFan.EMSFanPressureValue = 0.0;
-    state->dataFans->LocalTurnFansOn = true;
-    state->dataFans->LocalTurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
     // simulate the fan
     Fans::SimVariableVolumeFan(*state, FanNum);
     // fan power = PartLoadFrac * MassFlow * DeltaPress / (FanEff * RhoAir)

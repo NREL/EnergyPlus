@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -385,9 +385,9 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     state->dataLoopNodes->Node(condInletNodeNum).Temp = 10;
 
     SetPointManager::DefineCondEntSetPointManager thisSPM;
-    thisSPM.MinTwrWbCurve = CurveManager::GetCurveIndex(*state, "MINDSNWBCURVENAME");
-    thisSPM.MinOaWbCurve = CurveManager::GetCurveIndex(*state, "MINACTWBCURVENAME");
-    thisSPM.OptCondEntCurve = CurveManager::GetCurveIndex(*state, "OPTCONDENTCURVENAME");
+    thisSPM.MinTwrWbCurve = Curve::GetCurveIndex(*state, "MINDSNWBCURVENAME");
+    thisSPM.MinOaWbCurve = Curve::GetCurveIndex(*state, "MINACTWBCURVENAME");
+    thisSPM.OptCondEntCurve = Curve::GetCurveIndex(*state, "OPTCONDENTCURVENAME");
     thisSPM.CondEntTempSchedPtr = ScheduleManager::GetScheduleIndex(*state, "CONDENSER LOOP TEMP SCHEDULE");
     thisSPM.LoopIndexPlantSide = chwLoopIndex;
     thisSPM.ChillerIndexPlantSide = chillerBranchChW;
@@ -1241,30 +1241,34 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 10000.0;
 
-    EXPECT_EQ(state->dataLoopNodes->NodeID(2), "SPACE1-1 IN NODE");
-    EXPECT_EQ(state->dataLoopNodes->NodeID(5), "SPACE1-1 NODE");
+    int ZoneNodeNum = UtilityRoutines::FindItemInList("SPACE1-1 NODE", state->dataLoopNodes->NodeID);
+    int InletNodeNum = UtilityRoutines::FindItemInList("SPACE1-1 IN NODE", state->dataLoopNodes->NodeID);
+    EXPECT_EQ(state->dataLoopNodes->NodeID(InletNodeNum), "SPACE1-1 IN NODE");
+    EXPECT_EQ(state->dataLoopNodes->NodeID(ZoneNodeNum), "SPACE1-1 NODE");
 
-    state->dataLoopNodes->Node(2).MassFlowRateMax = 1.0; // zone inlet node air flow rate, kg/s
-    state->dataLoopNodes->Node(2).HumRat = 0.075;        // zone inlet node air hum ratio, kg/kg
-    state->dataLoopNodes->Node(2).Temp = 40.0;           // zone inlet node air temperature, deg C
-    state->dataLoopNodes->Node(5).Temp = 21.0;           // zone air node temperature set to 21.0 deg C
+    state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMax = 1.0; // zone inlet node air flow rate, kg/s
+    state->dataLoopNodes->Node(InletNodeNum).HumRat = 0.075;        // zone inlet node air hum ratio, kg/kg
+    state->dataLoopNodes->Node(InletNodeNum).Temp = 40.0;           // zone inlet node air temperature, deg C
+    state->dataLoopNodes->Node(ZoneNodeNum).Temp = 21.0;            // zone air node temperature set to 21.0 deg C
 
     SetPointManager::SimSetPointManagers(*state);
     SetPointManager::UpdateSetPointManagers(*state);
 
-    EXPECT_EQ(state->dataLoopNodes->NodeID(13), "VAV SYS 1 OUTLET NODE");
+    int OutletNodeNum = UtilityRoutines::FindItemInList("VAV SYS 1 OUTLET NODE", state->dataLoopNodes->NodeID);
+    EXPECT_EQ(state->dataLoopNodes->NodeID(OutletNodeNum), "VAV SYS 1 OUTLET NODE");
     EXPECT_DOUBLE_EQ(16.0, state->dataSetPointManager->WarmestSetPtMgr(1).SetPt); // no cooling load, sets to maximum limit value
 
     Real64 CpAir(0.0);
     Real64 ZoneSetPointTemp(0.0);
 
-    CpAir = Psychrometrics::PsyCpAirFnW(state->dataLoopNodes->Node(2).HumRat);
-    ZoneSetPointTemp = state->dataLoopNodes->Node(5).Temp + state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired /
-                                                                (CpAir * state->dataLoopNodes->Node(2).MassFlowRateMax);
+    CpAir = Psychrometrics::PsyCpAirFnW(state->dataLoopNodes->Node(InletNodeNum).HumRat);
+    ZoneSetPointTemp = state->dataLoopNodes->Node(ZoneNodeNum).Temp + state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired /
+                                                                          (CpAir * state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMax);
     // check the value of ZoneSetPointTemp matches to the value calculated by ColdestSetPtMgr
-    EXPECT_EQ(state->dataLoopNodes->NodeID(12), "HCOIL OUTLET NODE");
-    EXPECT_DOUBLE_EQ(ZoneSetPointTemp, state->dataSetPointManager->ColdestSetPtMgr(1).SetPt); // 29.74 deg C
-    EXPECT_DOUBLE_EQ(ZoneSetPointTemp, state->dataLoopNodes->Node(12).TempSetPoint);          // 29.74 deg C
+    int HCOutletNodeNum = UtilityRoutines::FindItemInList("HCOIL OUTLET NODE", state->dataLoopNodes->NodeID);
+    EXPECT_EQ(state->dataLoopNodes->NodeID(HCOutletNodeNum), "HCOIL OUTLET NODE");
+    EXPECT_DOUBLE_EQ(ZoneSetPointTemp, state->dataSetPointManager->ColdestSetPtMgr(1).SetPt);     // 29.74 deg C
+    EXPECT_DOUBLE_EQ(ZoneSetPointTemp, state->dataLoopNodes->Node(HCOutletNodeNum).TempSetPoint); // 29.74 deg C
 }
 
 TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)

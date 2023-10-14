@@ -69,7 +69,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 18
 
-  Version,22.2;
+  Version,24.1;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -4605,6 +4605,8 @@
     AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
     3.23372055845678,        !- High Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     450,                     !- Unit Internal Static Air Pressure {Pa}
     VAV_1_OA-VAV_1_CoolCNode,!- Air Inlet Node Name
     VAV_1_CoolC-VAV_1_HeatCNode,  !- Air Outlet Node Name
@@ -4617,6 +4619,8 @@
     AUTOSIZE,                !- Low Speed Gross Rated Sensible Heat Ratio
     3.28186528141147,        !- Low Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Measured_LowSpeedCoolCapLSFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     Measured_LowSpeedCoolEIRLSFT;  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
 
@@ -4627,6 +4631,8 @@
     AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
     3.23372055845678,        !- High Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     450,                     !- Unit Internal Static Air Pressure {Pa}
     VAV_2_OA-VAV_2_CoolCNode,!- Air Inlet Node Name
     VAV_2_CoolC-VAV_2_HeatCNode,  !- Air Outlet Node Name
@@ -4639,6 +4645,8 @@
     AUTOSIZE,                !- Low Speed Gross Rated Sensible Heat Ratio
     3.28186528141147,        !- Low Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Measured_LowSpeedCoolCapLSFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     Measured_LowSpeedCoolEIRLSFT;  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
 
@@ -4649,6 +4657,8 @@
     AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
     3.23372055845678,        !- High Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     450,                     !- Unit Internal Static Air Pressure {Pa}
     VAV_3_OA-VAV_3_CoolCNode,!- Air Inlet Node Name
     VAV_3_CoolC-VAV_3_HeatCNode,  !- Air Outlet Node Name
@@ -4661,6 +4671,8 @@
     AUTOSIZE,                !- Low Speed Gross Rated Sensible Heat Ratio
     3.28186528141147,        !- Low Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Measured_LowSpeedCoolCapLSFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     Measured_LowSpeedCoolEIRLSFT;  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,57 +67,45 @@ namespace EnergyPlus {
 
 namespace GroundTemperatureManager {
 
+    constexpr std::array<std::string_view, static_cast<int>(GroundTempObjType::Num)> groundTempModelNamesUC = {
+        "SITE:GROUNDTEMPERATURE:UNDISTURBED:KUSUDAACHENBACH",
+        "SITE:GROUNDTEMPERATURE:UNDISTURBED:FINITEDIFFERENCE",
+        "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE",
+        "SITE:GROUNDTEMPERATURE:SHALLOW",
+        "SITE:GROUNDTEMPERATURE:DEEP",
+        "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD",
+        "SITE:GROUNDTEMPERATURE:UNDISTURBED:XING"};
+
+    constexpr std::array<std::string_view, static_cast<int>(GroundTempObjType::Num)> groundTempModelNames = {
+        "Site:GroundTemperature:Undisturbed:KusudaAchenbach",
+        "Site:GroundTemperature:Undisturbed:FiniteDifference",
+        "Site:GroundTemperature:BuildingSurface",
+        "Site:GroundTemperature:Shallow",
+        "Site:GroundTemperature:Deep",
+        "Site:GroundTemperature:FCfactorMethod",
+        "Site:GroundTemperature:Undisturbed:Xing"};
+
     std::shared_ptr<BaseGroundTempsModel>
-    GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &objectType_str, std::string const &objectName)
+    GetGroundTempModelAndInit(EnergyPlusData &state, std::string_view const objectType_str, std::string const &objectName)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Matt Mitchell
         //       DATE WRITTEN   Summer 2015
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Called by objects requiring ground temperature models. Determines type and calls appropriate factory method.
 
-        // Locals
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        GroundTempObjType objectType(GroundTempObjType::Invalid);
-
-        auto &CurrentModuleObjects = state.dataGrndTempModelMgr->CurrentModuleObjects;
-
-        std::string objectType_str_UPPERCase = UtilityRoutines::MakeUPPERCase(objectType_str);
-
         // Set object type
-        if (objectType_str_UPPERCase == UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::KusudaGroundTemp)))) {
-            objectType = GroundTempObjType::KusudaGroundTemp;
-        } else if (objectType_str_UPPERCase ==
-                   UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::FiniteDiffGroundTemp)))) {
-            objectType = GroundTempObjType::FiniteDiffGroundTemp;
-        } else if (objectType_str_UPPERCase ==
-                   UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteBuildingSurfaceGroundTemp)))) {
-            objectType = GroundTempObjType::SiteBuildingSurfaceGroundTemp;
-        } else if (objectType_str_UPPERCase ==
-                   UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteShallowGroundTemp)))) {
-            objectType = GroundTempObjType::SiteShallowGroundTemp;
-        } else if (objectType_str_UPPERCase ==
-                   UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteDeepGroundTemp)))) {
-            objectType = GroundTempObjType::SiteDeepGroundTemp;
-        } else if (objectType_str_UPPERCase ==
-                   UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteFCFactorMethodGroundTemp)))) {
-            objectType = GroundTempObjType::SiteFCFactorMethodGroundTemp;
-        } else if (objectType_str_UPPERCase ==
-                   UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(static_cast<int>(GroundTempObjType::XingGroundTemp)))) {
-            objectType = GroundTempObjType::XingGroundTemp;
-        } else {
-            // Error out if no ground temperature object types recognized
-            ShowFatalError(state, "GetGroundTempsModelAndInit: Ground temperature object " + objectType_str + " not recognized.");
-        }
+        GroundTempObjType objectType =
+            static_cast<GroundTempObjType>(getEnumValue(groundTempModelNamesUC, UtilityRoutines::makeUPPER(objectType_str)));
+
+        assert(objectType != GroundTempObjType::Invalid);
 
         int numGTMs = state.dataGrndTempModelMgr->groundTempModels.size();
 
         // Check if this instance of this model has already been retrieved
         for (int i = 0; i < numGTMs; ++i) {
-            auto currentModel(state.dataGrndTempModelMgr->groundTempModels[i]);
+            auto currentModel = state.dataGrndTempModelMgr->groundTempModels[i]; // (AUTO_OK_UNIQUE_PTR)
             // Check if the type and name match
             if (objectType == currentModel->objectType && objectName == currentModel->objectName) {
                 return state.dataGrndTempModelMgr->groundTempModels[i];
@@ -126,21 +114,21 @@ namespace GroundTemperatureManager {
 
         // If not found, create new instance of the model
         if (objectType == GroundTempObjType::KusudaGroundTemp) {
-            return KusudaGroundTempsModel::KusudaGTMFactory(state, objectType, objectName);
+            return KusudaGroundTempsModel::KusudaGTMFactory(state, objectName);
         } else if (objectType == GroundTempObjType::FiniteDiffGroundTemp) {
-            return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(state, objectType, objectName);
+            return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(state, objectName);
         } else if (objectType == GroundTempObjType::SiteBuildingSurfaceGroundTemp) {
-            return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(state, objectType, objectName);
+            return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(state, objectName);
         } else if (objectType == GroundTempObjType::SiteShallowGroundTemp) {
-            return SiteShallowGroundTemps::ShallowGTMFactory(state, objectType, objectName);
+            return SiteShallowGroundTemps::ShallowGTMFactory(state, objectName);
         } else if (objectType == GroundTempObjType::SiteDeepGroundTemp) {
-            return SiteDeepGroundTemps::DeepGTMFactory(state, objectType, objectName);
+            return SiteDeepGroundTemps::DeepGTMFactory(state, objectName);
         } else if (objectType == GroundTempObjType::SiteFCFactorMethodGroundTemp) {
-            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(state, objectType, objectName);
+            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(state, objectName);
         } else if (objectType == GroundTempObjType::XingGroundTemp) {
-            return XingGroundTempsModel::XingGTMFactory(state, objectType, objectName);
+            return XingGroundTempsModel::XingGTMFactory(state, objectName);
         } else {
-            // Error
+            assert(false);
             return nullptr;
         }
     }

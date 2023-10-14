@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,47 +64,44 @@ namespace EnergyPlus {
 //******************************************************************************
 
 // Site:GroundTemperature:FCFactorMethod factory
-std::shared_ptr<SiteFCFactorMethodGroundTemps>
-SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName)
+std::shared_ptr<SiteFCFactorMethodGroundTemps> SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Reads input and creates instance of Site:GroundTemperature:FCfactorMethod object
 
-    // USE STATEMENTS:
-    using namespace GroundTemperatureManager;
-
-    // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool found = false;
-    int NumNums;
-    int NumAlphas;
-    int IOStat;
+    bool errorsFound = false;
 
     // New shared pointer for this model object
     std::shared_ptr<SiteFCFactorMethodGroundTemps> thisModel(new SiteFCFactorMethodGroundTemps());
 
-    std::string const cCurrentModuleObject =
-        state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::SiteFCFactorMethodGroundTemp));
+    GroundTempObjType objType = GroundTempObjType::SiteFCFactorMethodGroundTemp;
+
+    std::string_view const cCurrentModuleObject = GroundTemperatureManager::groundTempModelNamesUC[static_cast<int>(objType)];
     int numCurrObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-    thisModel->objectType = objectType;
+    thisModel->objectType = objType;
     thisModel->objectName = objectName;
 
     if (numCurrObjects == 1) {
+
+        int NumNums;
+        int NumAlphas;
+        int IOStat;
 
         // Get the object names for each construction from the input processor
         state.dataInputProcessing->inputProcessor->getObjectItem(
             state, cCurrentModuleObject, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
 
         if (NumNums < 12) {
-            ShowSevereError(state, cCurrentModuleObject + ": Less than 12 values entered.");
-            thisModel->errorsFound = true;
+            ShowSevereError(
+                state, fmt::format("{}: Less than 12 values entered.", GroundTemperatureManager::groundTempModelNames[static_cast<int>(objType)]));
+            errorsFound = true;
         }
 
         // overwrite values read from weather file for the 0.5m set ground temperatures
@@ -116,8 +113,10 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, GroundT
         found = true;
 
     } else if (numCurrObjects > 1) {
-        ShowSevereError(state, cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
-        thisModel->errorsFound = true;
+        ShowSevereError(state,
+                        fmt::format("{}: Too many objects entered. Only one allowed.",
+                                    GroundTemperatureManager::groundTempModelNames[static_cast<int>(objType)]));
+        errorsFound = true;
 
     } else if (state.dataWeatherManager->wthFCGroundTemps) {
 
@@ -138,11 +137,13 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, GroundT
         write_ground_temps(state.files.eio, "FCfactorMethod", thisModel->fcFactorGroundTemps);
     }
 
-    if (found && !thisModel->errorsFound) {
+    if (found && !errorsFound) {
         state.dataGrndTempModelMgr->groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowContinueError(state, "Site:GroundTemperature:FCFactorMethod--Errors getting input for ground temperature model");
+        ShowFatalError(state,
+                       fmt::format("{}--Errors getting input for ground temperature model",
+                                   GroundTemperatureManager::groundTempModelNames[static_cast<int>(objType)]));
         return nullptr;
     }
 }
@@ -154,8 +155,6 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusD
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Returns the ground temperature for Site:GroundTemperature:FCFactorMethod
@@ -170,15 +169,12 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusDat
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Returns the ground temperature when input time is in seconds
 
-    // USE STATEMENTS:
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * DataGlobalConstants::SecsInDay / 12;
+    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * Constant::SecsInDay / 12;
 
     // Convert secs to months
     int month = ceil(_seconds / secPerMonth);
@@ -200,8 +196,6 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
     //       DATE WRITTEN   Summer 2015
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Returns the ground temperature when input time is in months

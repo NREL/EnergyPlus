@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,7 +78,7 @@
 #include <EnergyPlus/WaterCoils.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::CurveManager;
+using namespace EnergyPlus::Curve;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataHeatBalFanSys;
@@ -622,7 +622,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     state->dataSize->PlantSizData(1).PlantLoopName = "ChilledWaterLoop";
     state->dataSize->PlantSizData(1).ExitTemp = 6.7;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
-    state->dataSize->PlantSizData(1).LoopType = DataSizing::CoolingLoop;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Cooling;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
@@ -691,9 +691,9 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     Real64 DesWaterCoolingCoilLoad = DesAirMassFlow * (EnthalpyAirIn - EnthalpyAirOut) + FanCoolLoad;
     Real64 CoilDesWaterDeltaT = state->dataSize->PlantSizData(1).DeltaT;
     Real64 Cp = GetSpecificHeatGlycol(
-        *state, state->dataPlnt->PlantLoop(1).FluidName, DataGlobalConstants::CWInitConvTemp, state->dataPlnt->PlantLoop(1).FluidIndex, " ");
-    Real64 rho = GetDensityGlycol(
-        *state, state->dataPlnt->PlantLoop(1).FluidName, DataGlobalConstants::CWInitConvTemp, state->dataPlnt->PlantLoop(1).FluidIndex, " ");
+        *state, state->dataPlnt->PlantLoop(1).FluidName, Constant::CWInitConvTemp, state->dataPlnt->PlantLoop(1).FluidIndex, " ");
+    Real64 rho =
+        GetDensityGlycol(*state, state->dataPlnt->PlantLoop(1).FluidName, Constant::CWInitConvTemp, state->dataPlnt->PlantLoop(1).FluidIndex, " ");
     Real64 DesCoolingCoilWaterVolFlowRate = DesWaterCoolingCoilLoad / (CoilDesWaterDeltaT * Cp * rho);
     // check water coil water flow rate calc
     EXPECT_EQ(DesWaterCoolingCoilLoad, state->dataWaterCoils->WaterCoil(1).DesWaterCoolingCoilRate);
@@ -937,7 +937,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     state->dataSize->PlantSizData(1).PlantLoopName = "SteamLoop";
     state->dataSize->PlantSizData(1).ExitTemp = 100.0;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
-    state->dataSize->PlantSizData(1).LoopType = DataSizing::SteamLoop;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Steam;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
@@ -997,14 +997,11 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     Real64 DesSteamCoilLoad = DesAirMassFlow * CpAirAvg * (DesCoilOutTemp - DesCoilInTemp);
 
     // do steam flow rate sizing calculation
-    Real64 EnthSteamIn =
-        GetSatEnthalpyRefrig(*state, "STEAM", DataGlobalConstants::SteamInitConvTemp, 1.0, state->dataSteamCoils->SteamCoil(1).FluidIndex, "");
-    Real64 EnthSteamOut =
-        GetSatEnthalpyRefrig(*state, "STEAM", DataGlobalConstants::SteamInitConvTemp, 0.0, state->dataSteamCoils->SteamCoil(1).FluidIndex, "");
-    Real64 SteamDensity =
-        GetSatDensityRefrig(*state, "STEAM", DataGlobalConstants::SteamInitConvTemp, 1.0, state->dataSteamCoils->SteamCoil(1).FluidIndex, "");
+    Real64 EnthSteamIn = GetSatEnthalpyRefrig(*state, "STEAM", Constant::SteamInitConvTemp, 1.0, state->dataSteamCoils->SteamCoil(1).FluidIndex, "");
+    Real64 EnthSteamOut = GetSatEnthalpyRefrig(*state, "STEAM", Constant::SteamInitConvTemp, 0.0, state->dataSteamCoils->SteamCoil(1).FluidIndex, "");
+    Real64 SteamDensity = GetSatDensityRefrig(*state, "STEAM", Constant::SteamInitConvTemp, 1.0, state->dataSteamCoils->SteamCoil(1).FluidIndex, "");
     Real64 CpOfCondensate =
-        GetSatSpecificHeatRefrig(*state, "STEAM", DataGlobalConstants::SteamInitConvTemp, 0.0, state->dataSteamCoils->SteamCoil(1).FluidIndex, "");
+        GetSatSpecificHeatRefrig(*state, "STEAM", Constant::SteamInitConvTemp, 0.0, state->dataSteamCoils->SteamCoil(1).FluidIndex, "");
     Real64 LatentHeatChange = EnthSteamIn - EnthSteamOut;
     Real64 DesMaxSteamVolFlowRate =
         DesSteamCoilLoad / (SteamDensity * (LatentHeatChange + state->dataSteamCoils->SteamCoil(1).DegOfSubcooling * CpOfCondensate));

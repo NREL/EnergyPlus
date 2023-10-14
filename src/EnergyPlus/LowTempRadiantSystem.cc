@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -142,12 +142,11 @@ namespace LowTempRadiantSystem {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     // System types:
-    auto constexpr cHydronicSystem("ZoneHVAC:LowTemperatureRadiant:VariableFlow");
-    auto constexpr cConstantFlowSystem("ZoneHVAC:LowTemperatureRadiant:ConstantFlow");
-    auto constexpr OnePerSurf("OnePerSurface");
-    auto constexpr CalcFromLength("CalculateFromCircuitLength");
-
-    auto constexpr fluidNameWater("WATER");
+    constexpr std::string_view cHydronicSystem("ZoneHVAC:LowTemperatureRadiant:VariableFlow");
+    constexpr std::string_view cConstantFlowSystem("ZoneHVAC:LowTemperatureRadiant:ConstantFlow");
+    constexpr std::string_view OnePerSurf("OnePerSurface");
+    constexpr std::string_view CalcFromLength("CalculateFromCircuitLength");
+    constexpr std::string_view fluidNameWater("WATER");
 
     // DERIVED TYPE DEFINITIONS:
 
@@ -183,7 +182,7 @@ namespace LowTempRadiantSystem {
         if (CompIndex == 0) {
             RadSysNum = UtilityRoutines::FindItemInList(CompName, state.dataLowTempRadSys->RadSysTypes);
             if (RadSysNum == 0) {
-                ShowFatalError(state, "SimLowTempRadiantSystem: Unit not found=" + std::string{CompName});
+                ShowFatalError(state, format("SimLowTempRadiantSystem: Unit not found={}", CompName));
             }
             CompIndex = RadSysNum;
             SystemType = state.dataLowTempRadSys->RadSysTypes(RadSysNum).SystemType;
@@ -241,7 +240,7 @@ namespace LowTempRadiantSystem {
             } else if (SystemType == LowTempRadiantSystem::SystemType::ElectricSystem) {
                 baseSystem = &state.dataLowTempRadSys->ElecRadSys(state.dataLowTempRadSys->RadSysTypes(RadSysNum).CompIndex);
             } else {
-                ShowFatalError(state, "SimLowTempRadiantSystem: Illegal system type for system " + std::string{CompName});
+                ShowFatalError(state, format("SimLowTempRadiantSystem: Illegal system type for system {}", CompName));
             }
 
             if ((SystemType == LowTempRadiantSystem::SystemType::HydronicSystem) ||
@@ -284,10 +283,10 @@ namespace LowTempRadiantSystem {
         using namespace DataSurfaceLists;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        auto constexpr RoutineName("GetLowTempRadiantSystem: "); // include trailing blank space
-        auto constexpr Off("Off");
-        auto constexpr SimpleOff("SimpleOff");
-        auto constexpr VariableOff("VariableOff");
+        constexpr std::string_view RoutineName("GetLowTempRadiantSystem: "); // include trailing blank space
+        constexpr std::string_view Off("Off");
+        constexpr std::string_view SimpleOff("SimpleOff");
+        constexpr std::string_view VariableOff("VariableOff");
         int constexpr iHeatCAPMAlphaNum(5);             // get input index to Low Temperature Radiant system heating capacity sizing method
         int constexpr iHeatDesignCapacityNumericNum(1); // get input index to Low Temperature Radiant system electric heating capacity
         int constexpr iHeatCapacityPerFloorAreaNumericNum(
@@ -318,8 +317,8 @@ namespace LowTempRadiantSystem {
         Array1D_bool lAlphaBlanks;             // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;           // Logical array, numeric field input BLANK = .TRUE.
 
-        auto &Zone(state.dataHeatBal->Zone);
-        auto &Surface(state.dataSurface->Surface);
+        auto &Zone = state.dataHeatBal->Zone;
+        auto &Surface = state.dataSurface->Surface;
 
         Array1D_string VarFlowRadDesignNames;
         Array1D_string CFlowRadDesignNames;
@@ -442,7 +441,7 @@ namespace LowTempRadiantSystem {
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataLowTempRadSys->LowTempRadUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
-            auto &thisRadSysDesign(state.dataLowTempRadSys->HydronicRadiantSysDesign(Item));
+            auto &thisRadSysDesign = state.dataLowTempRadSys->HydronicRadiantSysDesign(Item);
 
             // General user input data
             thisRadSysDesign.designName = Alphas(1);
@@ -472,20 +471,20 @@ namespace LowTempRadiantSystem {
                 if (!lNumericBlanks(4)) {
                     thisRadSysDesign.DesignScaledHeatingCapacity = Numbers(4);
                     if (thisRadSysDesign.DesignScaledHeatingCapacity <= 0.0) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
-                        ShowContinueError(state, "Input for " + cAlphaFields(5) + " = " + thisRadSysDesign.DesignHeatingCapMethodInput);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSysDesign.designName));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(5), thisRadSysDesign.DesignHeatingCapMethodInput));
                         ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(4), Numbers(4)));
                         ErrorsFound = true;
                     } else if (thisRadSysDesign.DesignScaledHeatingCapacity == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
-                        ShowContinueError(state, "Input for " + cAlphaFields(5) + " = " + thisRadSysDesign.DesignHeatingCapMethodInput);
-                        ShowContinueError(state, "Illegal " + cNumericFields(4) + " = Autosize");
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSysDesign.designName));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(5), thisRadSysDesign.DesignHeatingCapMethodInput));
+                        ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(4)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(5) + " = " + thisRadSysDesign.DesignHeatingCapMethodInput);
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(4));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSysDesign.Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(5), thisRadSysDesign.DesignHeatingCapMethodInput));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(4)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(thisRadSysDesign.DesignHeatingCapMethodInput, "FractionOfAutosizedHeatingCapacity")) {
@@ -493,19 +492,19 @@ namespace LowTempRadiantSystem {
                 if (!lNumericBlanks(5)) {
                     thisRadSysDesign.DesignScaledHeatingCapacity = Numbers(5);
                     if (thisRadSysDesign.DesignScaledHeatingCapacity < 0.0) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSysDesign.designName));
                         ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(5), Numbers(5)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
-                    ShowContinueError(state, "Input for " + cAlphaFields(5) + " = " + thisRadSysDesign.DesignHeatingCapMethodInput);
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(5));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSysDesign.designName));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(5), thisRadSysDesign.DesignHeatingCapMethodInput));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(5)));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
-                ShowContinueError(state, "Illegal " + cAlphaFields(5) + " = " + thisRadSysDesign.DesignHeatingCapMethodInput);
+                ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSysDesign.designName));
+                ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(5), thisRadSysDesign.DesignHeatingCapMethodInput));
                 ErrorsFound = true;
             }
 
@@ -514,8 +513,8 @@ namespace LowTempRadiantSystem {
             thisRadSysDesign.HotSetptSched = Alphas(6);
             thisRadSysDesign.HotSetptSchedPtr = GetScheduleIndex(state, thisRadSysDesign.HotSetptSched);
             if ((thisRadSysDesign.HotSetptSchedPtr == 0) && (!lAlphaBlanks(6))) {
-                ShowSevereError(state, cAlphaFields(6) + " not found: " + Alphas(6));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ShowSevereError(state, format("{} not found: {}", cAlphaFields(6), Alphas(6)));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
 
@@ -529,20 +528,20 @@ namespace LowTempRadiantSystem {
                     thisRadSysDesign.DesignScaledCoolingCapacity = Numbers(7);
                     std::string a = cNumericFields(4);
                     if (thisRadSysDesign.DesignScaledCoolingCapacity <= 0.0) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
-                        ShowContinueError(state, "Input for " + cAlphaFields(7) + " = " + thisRadSysDesign.DesignCoolingCapMethodInput);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSysDesign.designName));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(7), thisRadSysDesign.DesignCoolingCapMethodInput));
                         ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(7), thisRadSysDesign.DesignScaledCoolingCapacity));
                         ErrorsFound = true;
                     } else if (thisRadSysDesign.DesignScaledCoolingCapacity == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
-                        ShowContinueError(state, "Input for " + cAlphaFields(7) + " = " + thisRadSysDesign.DesignCoolingCapMethodInput);
-                        ShowContinueError(state, "Illegal " + cNumericFields(7) + " = Autosize");
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSysDesign.designName));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(7), thisRadSysDesign.DesignCoolingCapMethodInput));
+                        ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(7)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
-                    ShowContinueError(state, "Input for " + cAlphaFields(7) + " = " + thisRadSysDesign.DesignCoolingCapMethodInput);
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(7));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSysDesign.designName));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(7), thisRadSysDesign.DesignCoolingCapMethodInput));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(7)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(thisRadSysDesign.DesignCoolingCapMethodInput, "FractionOfAutosizedCoolingCapacity")) {
@@ -550,19 +549,19 @@ namespace LowTempRadiantSystem {
                 if (!lNumericBlanks(8)) {
                     thisRadSysDesign.DesignScaledCoolingCapacity = Numbers(8);
                     if (thisRadSysDesign.DesignScaledCoolingCapacity < 0.0) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSysDesign.designName));
                         ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(8), Numbers(8)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
-                    ShowContinueError(state, "Input for " + cAlphaFields(7) + " = " + thisRadSysDesign.DesignCoolingCapMethodInput);
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(8));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSysDesign.designName));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(7), thisRadSysDesign.DesignCoolingCapMethodInput));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(8)));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
-                ShowContinueError(state, "Illegal " + cAlphaFields(7) + " = " + thisRadSysDesign.DesignCoolingCapMethodInput);
+                ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSysDesign.designName));
+                ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(7), thisRadSysDesign.DesignCoolingCapMethodInput));
                 ErrorsFound = true;
             }
 
@@ -571,8 +570,8 @@ namespace LowTempRadiantSystem {
             thisRadSysDesign.ColdSetptSched = Alphas(8);
             thisRadSysDesign.ColdSetptSchedPtr = GetScheduleIndex(state, Alphas(8));
             if ((thisRadSysDesign.ColdSetptSchedPtr == 0) && (!lAlphaBlanks(8))) {
-                ShowSevereError(state, cAlphaFields(8) + " not found: " + Alphas(8));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ShowSevereError(state, format("{} not found: {}", cAlphaFields(8), Alphas(8)));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
 
@@ -592,8 +591,8 @@ namespace LowTempRadiantSystem {
             if (!lAlphaBlanks(10)) {
                 thisRadSysDesign.schedPtrChangeoverDelay = GetScheduleIndex(state, thisRadSysDesign.schedNameChangeoverDelay);
                 if (thisRadSysDesign.schedPtrChangeoverDelay == 0) {
-                    ShowWarningError(state, cAlphaFields(10) + " not found for " + thisRadSysDesign.schedNameChangeoverDelay);
-                    ShowContinueError(state, "This occurs for " + cAlphaFields(1) + " = " + Alphas(1));
+                    ShowWarningError(state, format("{} not found for {}", cAlphaFields(10), thisRadSysDesign.schedNameChangeoverDelay));
+                    ShowContinueError(state, format("This occurs for {} = {}", cAlphaFields(1), Alphas(1)));
                     ShowContinueError(state, "As a result, no changeover delay will be used for this radiant system.");
                 }
             }
@@ -629,7 +628,7 @@ namespace LowTempRadiantSystem {
             state.dataLowTempRadSys->RadSysTypes(BaseNum).Name = Alphas(1);
             state.dataLowTempRadSys->RadSysTypes(BaseNum).SystemType = LowTempRadiantSystem::SystemType::HydronicSystem;
 
-            auto &thisRadSys(state.dataLowTempRadSys->HydrRadSys(Item));
+            auto &thisRadSys = state.dataLowTempRadSys->HydrRadSys(Item);
 
             // General user input data
             thisRadSys.Name = Alphas(1);
@@ -641,12 +640,12 @@ namespace LowTempRadiantSystem {
 
             thisRadSys.SchedName = Alphas(3);
             if (lAlphaBlanks(3)) {
-                thisRadSys.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                thisRadSys.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 thisRadSys.SchedPtr = GetScheduleIndex(state, Alphas(3));
                 if (thisRadSys.SchedPtr == 0) {
-                    ShowSevereError(state, cAlphaFields(2) + " not found for " + Alphas(1));
-                    ShowContinueError(state, "Missing " + cAlphaFields(3) + " is " + Alphas(3));
+                    ShowSevereError(state, format("{} not found for {}", cAlphaFields(2), Alphas(1)));
+                    ShowContinueError(state, format("Missing {} is {}", cAlphaFields(3), Alphas(3)));
                     ErrorsFound = true;
                 }
             }
@@ -655,7 +654,7 @@ namespace LowTempRadiantSystem {
             thisRadSys.ZonePtr = UtilityRoutines::FindItemInList(Alphas(4), Zone);
             if (thisRadSys.ZonePtr == 0) {
                 ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaFields(3), Alphas(4)));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
 
@@ -674,7 +673,7 @@ namespace LowTempRadiantSystem {
                     thisRadSys.SurfaceName(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfName(SurfNum);
                     thisRadSys.SurfaceFrac(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfFlowFrac(SurfNum);
                     if (thisRadSys.SurfacePtr(SurfNum) > 0) {
-                        state.dataSurface->SurfIntConvSurfHasActiveInIt(thisRadSys.SurfacePtr(SurfNum)) = true;
+                        state.dataSurface->surfIntConv(thisRadSys.SurfacePtr(SurfNum)).hasActiveInIt = true;
                     }
                 }
             } else { // User entered a single surface name rather than a surface list
@@ -690,16 +689,17 @@ namespace LowTempRadiantSystem {
                 // Error checking for single surfaces
                 if (thisRadSys.SurfacePtr(1) == 0) {
                     ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaFields(5), Alphas(5)));
-                    ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                    ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                     ErrorsFound = true;
                 } else if (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(thisRadSys.SurfacePtr(1))) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
-                    ShowContinueError(state, cAlphaFields(5) + "=\"" + Alphas(5) + "\" has been used in another radiant system or ventilated slab.");
+                    ShowSevereError(state, format("{}{}=\"{}\", Invalid Surface", RoutineName, CurrentModuleObject, Alphas(1)));
+                    ShowContinueError(state,
+                                      format("{}=\"{}\" has been used in another radiant system or ventilated slab.", cAlphaFields(5), Alphas(5)));
                     ErrorsFound = true;
                 }
                 if (thisRadSys.SurfacePtr(1) != 0) {
-                    state.dataSurface->SurfIntConvSurfHasActiveInIt(thisRadSys.SurfacePtr(1)) = true;
-                    state.dataSurface->SurfIntConvSurfHasActiveInIt(thisRadSys.SurfacePtr(1)) = true;
+                    state.dataSurface->surfIntConv(thisRadSys.SurfacePtr(1)).hasActiveInIt = true;
+                    state.dataSurface->surfIntConv(thisRadSys.SurfacePtr(1)).hasActiveInIt = true; // Ummmm ... what?
                 }
             }
 
@@ -714,15 +714,15 @@ namespace LowTempRadiantSystem {
                 if (!lNumericBlanks(2)) {
                     thisRadSys.ScaledHeatingCapacity = Numbers(2);
                     if (thisRadSys.ScaledHeatingCapacity < 0.0 && thisRadSys.ScaledHeatingCapacity != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSys.Name);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSys.Name));
                         ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(2), Numbers(2)));
                         ErrorsFound = true;
                     }
                 } else {
                     if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSys.Name);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSys.Name));
                         ShowContinueError(state, "Input for Heating Design Capacity Method = HeatingDesignCapacity");
-                        ShowContinueError(state, "Blank field not allowed for " + cNumericFields(2));
+                        ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(2)));
                         ErrorsFound = true;
                     }
                 }
@@ -764,7 +764,7 @@ namespace LowTempRadiantSystem {
                 (lAlphaBlanks(6) || lAlphaBlanks(7) || (thisRadSys.HotWaterInNode <= 0) || (thisRadSys.HotWaterOutNode <= 0) ||
                  (variableFlowDesignDataObject.HotSetptSchedPtr == 0))) {
                 ShowSevereError(state, "Hydronic radiant systems may not be autosized without specification of nodes or schedules.");
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " (heating input) = " + Alphas(1));
+                ShowContinueError(state, format("Occurs in {} (heating input) = {}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
 
@@ -774,15 +774,15 @@ namespace LowTempRadiantSystem {
                 if (!lNumericBlanks(4)) {
                     thisRadSys.ScaledCoolingCapacity = Numbers(4);
                     if (thisRadSys.ScaledCoolingCapacity < 0.0 && thisRadSys.ScaledCoolingCapacity != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSys.Name);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSys.Name));
                         ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(4), Numbers(4)));
                         ErrorsFound = true;
                     }
                 } else {
                     if ((!lAlphaBlanks(8)) || (!lAlphaBlanks(9))) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSys.Name);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisRadSys.Name));
                         ShowContinueError(state, "Input for Cooling Design Capacity Method = CoolingDesignCapacity");
-                        ShowContinueError(state, "Blank field not allowed for " + cNumericFields(4));
+                        ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(4)));
                         ErrorsFound = true;
                     }
                 }
@@ -837,7 +837,7 @@ namespace LowTempRadiantSystem {
                 (variableFlowDesignDataObject.DesignCoolingCapMethod == 0 || lAlphaBlanks(8) || lAlphaBlanks(9) ||
                  (thisRadSys.ColdWaterInNode <= 0) || (thisRadSys.ColdWaterOutNode <= 0) || (variableFlowDesignDataObject.ColdSetptSchedPtr == 0))) {
                 ShowSevereError(state, "Hydronic radiant systems may not be autosized without specification of nodes or schedules");
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " (cooling input) =" + Alphas(1));
+                ShowContinueError(state, format("Occurs in {} (cooling input) ={}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
         }
@@ -865,7 +865,7 @@ namespace LowTempRadiantSystem {
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataLowTempRadSys->LowTempRadUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
-            auto &thisRadSysDesign(state.dataLowTempRadSys->CflowRadiantSysDesign(Item));
+            auto &thisRadSysDesign = state.dataLowTempRadSys->CflowRadiantSysDesign(Item);
 
             // General user input data
             thisRadSysDesign.designName = Alphas(1);
@@ -898,8 +898,8 @@ namespace LowTempRadiantSystem {
             if (!lAlphaBlanks(5)) {
                 thisRadSysDesign.schedPtrChangeoverDelay = GetScheduleIndex(state, thisRadSysDesign.schedNameChangeoverDelay);
                 if (thisRadSysDesign.schedPtrChangeoverDelay == 0) {
-                    ShowWarningError(state, cAlphaFields(5) + " not found for " + thisRadSysDesign.schedNameChangeoverDelay);
-                    ShowContinueError(state, "This occurs for " + cAlphaFields(1) + " = " + Alphas(1));
+                    ShowWarningError(state, format("{} not found for {}", cAlphaFields(5), thisRadSysDesign.schedNameChangeoverDelay));
+                    ShowContinueError(state, format("This occurs for {} = {}", cAlphaFields(1), Alphas(1)));
                     ShowContinueError(state, "As a result, no changeover delay will be used for this radiant system.");
                 }
             }
@@ -929,7 +929,7 @@ namespace LowTempRadiantSystem {
             state.dataLowTempRadSys->RadSysTypes(BaseNum).SystemType = LowTempRadiantSystem::SystemType::ConstantFlowSystem;
 
             // General user input data
-            auto &thisCFloSys(state.dataLowTempRadSys->CFloRadSys(Item));
+            auto &thisCFloSys = state.dataLowTempRadSys->CFloRadSys(Item);
 
             thisCFloSys.Name = Alphas(1);
             thisCFloSys.designObjectName = Alphas(2);
@@ -939,12 +939,12 @@ namespace LowTempRadiantSystem {
 
             thisCFloSys.SchedName = Alphas(3);
             if (lAlphaBlanks(3)) {
-                thisCFloSys.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                thisCFloSys.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 thisCFloSys.SchedPtr = GetScheduleIndex(state, Alphas(3));
                 if (thisCFloSys.SchedPtr == 0) {
-                    ShowSevereError(state, cAlphaFields(3) + " not found for " + Alphas(1));
-                    ShowContinueError(state, "Missing " + cAlphaFields(3) + " is " + Alphas(3));
+                    ShowSevereError(state, format("{} not found for {}", cAlphaFields(3), Alphas(1)));
+                    ShowContinueError(state, format("Missing {} is {}", cAlphaFields(3), Alphas(3)));
                     ErrorsFound = true;
                 }
             }
@@ -953,7 +953,7 @@ namespace LowTempRadiantSystem {
             thisCFloSys.ZonePtr = UtilityRoutines::FindItemInList(Alphas(4), Zone);
             if (thisCFloSys.ZonePtr == 0) {
                 ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaFields(4), Alphas(4)));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
 
@@ -974,7 +974,7 @@ namespace LowTempRadiantSystem {
                     thisCFloSys.SurfaceFrac(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfFlowFrac(SurfNum);
                     thisCFloSys.NumCircuits(SurfNum) = 0.0;
                     if (thisCFloSys.SurfacePtr(SurfNum) != 0) {
-                        state.dataSurface->SurfIntConvSurfHasActiveInIt(thisCFloSys.SurfacePtr(SurfNum)) = true;
+                        state.dataSurface->surfIntConv(thisCFloSys.SurfacePtr(SurfNum)).hasActiveInIt = true;
                     }
                 }
             } else { // User entered a single surface name rather than a surface list
@@ -991,15 +991,16 @@ namespace LowTempRadiantSystem {
                 // Error checking for single surfaces
                 if (thisCFloSys.SurfacePtr(1) == 0) {
                     ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaFields(4), Alphas(4)));
-                    ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                    ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                     ErrorsFound = true;
                 } else if (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(thisCFloSys.SurfacePtr(1))) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
-                    ShowContinueError(state, cAlphaFields(5) + "=\"" + Alphas(5) + "\" has been used in another radiant system or ventilated slab.");
+                    ShowSevereError(state, format("{}{}=\"{}\", Invalid Surface", RoutineName, CurrentModuleObject, Alphas(1)));
+                    ShowContinueError(state,
+                                      format("{}=\"{}\" has been used in another radiant system or ventilated slab.", cAlphaFields(5), Alphas(5)));
                     ErrorsFound = true;
                 }
                 if (thisCFloSys.SurfacePtr(1) != 0) {
-                    state.dataSurface->SurfIntConvSurfHasActiveInIt(thisCFloSys.SurfacePtr(1)) = true;
+                    state.dataSurface->surfIntConv(thisCFloSys.SurfacePtr(1)).hasActiveInIt = true;
                     state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(thisCFloSys.SurfacePtr(1)) = true;
                 }
             }
@@ -1014,8 +1015,8 @@ namespace LowTempRadiantSystem {
             thisCFloSys.VolFlowSched = Alphas(6);
             thisCFloSys.VolFlowSchedPtr = GetScheduleIndex(state, thisCFloSys.VolFlowSched);
             if ((thisCFloSys.VolFlowSchedPtr == 0) && (!lAlphaBlanks(6))) {
-                ShowSevereError(state, cAlphaFields(6) + " not found: " + Alphas(6));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ShowSevereError(state, format("{} not found: {}", cAlphaFields(6), Alphas(6)));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
             thisCFloSys.NomPumpHead = Numbers(3);
@@ -1049,32 +1050,32 @@ namespace LowTempRadiantSystem {
             thisCFloSys.HotWaterHiTempSched = Alphas(9);
             thisCFloSys.HotWaterHiTempSchedPtr = GetScheduleIndex(state, Alphas(9));
             if ((thisCFloSys.HotWaterHiTempSchedPtr == 0) && (!lAlphaBlanks(9))) {
-                ShowSevereError(state, cAlphaFields(9) + " not found: " + Alphas(9));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ShowSevereError(state, format("{} not found: {}", cAlphaFields(9), Alphas(9)));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
 
             thisCFloSys.HotWaterLoTempSched = Alphas(10);
             thisCFloSys.HotWaterLoTempSchedPtr = GetScheduleIndex(state, Alphas(10));
             if ((thisCFloSys.HotWaterLoTempSchedPtr == 0) && (!lAlphaBlanks(10))) {
-                ShowSevereError(state, cAlphaFields(10) + " not found: " + Alphas(10));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ShowSevereError(state, format("{} not found: {}", cAlphaFields(10), Alphas(10)));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
 
             thisCFloSys.HotCtrlHiTempSched = Alphas(11);
             thisCFloSys.HotCtrlHiTempSchedPtr = GetScheduleIndex(state, Alphas(11));
             if ((thisCFloSys.HotCtrlHiTempSchedPtr == 0) && (!lAlphaBlanks(11))) {
-                ShowSevereError(state, cAlphaFields(11) + " not found: " + Alphas(11));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ShowSevereError(state, format("{} not found: {}", cAlphaFields(11), Alphas(11)));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
 
             thisCFloSys.HotCtrlLoTempSched = Alphas(12);
             thisCFloSys.HotCtrlLoTempSchedPtr = GetScheduleIndex(state, Alphas(12));
             if ((thisCFloSys.HotCtrlLoTempSchedPtr == 0) && (!lAlphaBlanks(12))) {
-                ShowSevereError(state, cAlphaFields(12) + " not found: " + Alphas(12));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ShowSevereError(state, format("{} not found: {}", cAlphaFields(12), Alphas(12)));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
 
@@ -1106,32 +1107,32 @@ namespace LowTempRadiantSystem {
             thisCFloSys.ColdWaterHiTempSched = Alphas(15);
             thisCFloSys.ColdWaterHiTempSchedPtr = GetScheduleIndex(state, Alphas(15));
             if ((thisCFloSys.ColdWaterHiTempSchedPtr == 0) && (!lAlphaBlanks(15))) {
-                ShowSevereError(state, cAlphaFields(15) + " not found: " + Alphas(15));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ShowSevereError(state, format("{} not found: {}", cAlphaFields(15), Alphas(15)));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
 
             thisCFloSys.ColdWaterLoTempSched = Alphas(16);
             thisCFloSys.ColdWaterLoTempSchedPtr = GetScheduleIndex(state, Alphas(16));
             if ((thisCFloSys.ColdWaterLoTempSchedPtr == 0) && (!lAlphaBlanks(16))) {
-                ShowSevereError(state, cAlphaFields(16) + " not found: " + Alphas(16));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ShowSevereError(state, format("{} not found: {}", cAlphaFields(16), Alphas(16)));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
 
             thisCFloSys.ColdCtrlHiTempSched = Alphas(17);
             thisCFloSys.ColdCtrlHiTempSchedPtr = GetScheduleIndex(state, Alphas(17));
             if ((thisCFloSys.ColdCtrlHiTempSchedPtr == 0) && (!lAlphaBlanks(17))) {
-                ShowSevereError(state, cAlphaFields(17) + " not found: " + Alphas(17));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ShowSevereError(state, format("{} not found: {}", cAlphaFields(17), Alphas(17)));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
 
             thisCFloSys.ColdCtrlLoTempSched = Alphas(18);
             thisCFloSys.ColdCtrlLoTempSchedPtr = GetScheduleIndex(state, Alphas(18));
             if ((thisCFloSys.ColdCtrlLoTempSchedPtr == 0) && (!lAlphaBlanks(18))) {
-                ShowSevereError(state, cAlphaFields(19) + " not found: " + Alphas(18));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ShowSevereError(state, format("{} not found: {}", cAlphaFields(19), Alphas(18)));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
 
@@ -1177,18 +1178,18 @@ namespace LowTempRadiantSystem {
             state.dataLowTempRadSys->RadSysTypes(BaseNum).SystemType = LowTempRadiantSystem::SystemType::ElectricSystem;
 
             // General user input data
-            auto &thisElecSys(state.dataLowTempRadSys->ElecRadSys(Item));
+            auto &thisElecSys = state.dataLowTempRadSys->ElecRadSys(Item);
 
             thisElecSys.Name = Alphas(1);
 
             thisElecSys.SchedName = Alphas(2);
             if (lAlphaBlanks(2)) {
-                thisElecSys.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                thisElecSys.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
                 thisElecSys.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (thisElecSys.SchedPtr == 0) {
-                    ShowSevereError(state, cAlphaFields(2) + " not found for" + Alphas(1));
-                    ShowContinueError(state, "Incorrect " + cAlphaFields(2) + " = " + Alphas(2));
+                    ShowSevereError(state, format("{} not found for{}", cAlphaFields(2), Alphas(1)));
+                    ShowContinueError(state, format("Incorrect {} = {}", cAlphaFields(2), Alphas(2)));
                     ErrorsFound = true;
                 }
             }
@@ -1197,7 +1198,7 @@ namespace LowTempRadiantSystem {
             thisElecSys.ZonePtr = UtilityRoutines::FindItemInList(Alphas(3), Zone);
             if (thisElecSys.ZonePtr == 0) {
                 ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaFields(3), Alphas(3)));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                 ErrorsFound = true;
             }
 
@@ -1226,11 +1227,12 @@ namespace LowTempRadiantSystem {
                 // Error checking for single surfaces
                 if (thisElecSys.SurfacePtr(1) == 0) {
                     ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaFields(4), Alphas(4)));
-                    ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                    ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
                     ErrorsFound = true;
                 } else if (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(thisElecSys.SurfacePtr(1))) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
-                    ShowContinueError(state, cAlphaFields(4) + "=\"" + Alphas(4) + "\" has been used in another radiant system or ventilated slab.");
+                    ShowSevereError(state, format("{}{}=\"{}\", Invalid Surface", RoutineName, CurrentModuleObject, Alphas(1)));
+                    ShowContinueError(state,
+                                      format("{}=\"{}\" has been used in another radiant system or ventilated slab.", cAlphaFields(4), Alphas(4)));
                     ErrorsFound = true;
                 }
                 if (thisElecSys.SurfacePtr(1) != 0) {
@@ -1249,16 +1251,16 @@ namespace LowTempRadiantSystem {
                     thisElecSys.ScaledHeatingCapacity = Numbers(iHeatDesignCapacityNumericNum);
                     thisElecSys.MaxElecPower = thisElecSys.ScaledHeatingCapacity;
                     if (thisElecSys.ScaledHeatingCapacity < 0.0 && thisElecSys.ScaledHeatingCapacity != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisElecSys.Name);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisElecSys.Name));
                         ShowContinueError(
                             state,
                             format("Illegal {} = {:.7T}", cNumericFields(iHeatDesignCapacityNumericNum), Numbers(iHeatDesignCapacityNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + thisElecSys.Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iHeatCAPMAlphaNum) + " = " + Alphas(iHeatCAPMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iHeatDesignCapacityNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisElecSys.Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatCAPMAlphaNum), Alphas(iHeatCAPMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iHeatDesignCapacityNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
@@ -1267,23 +1269,23 @@ namespace LowTempRadiantSystem {
                     thisElecSys.ScaledHeatingCapacity = Numbers(iHeatCapacityPerFloorAreaNumericNum);
                     thisElecSys.MaxElecPower = thisElecSys.ScaledHeatingCapacity;
                     if (thisElecSys.ScaledHeatingCapacity <= 0.0) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisElecSys.Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iHeatCAPMAlphaNum) + " = " + Alphas(iHeatCAPMAlphaNum));
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisElecSys.Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatCAPMAlphaNum), Alphas(iHeatCAPMAlphaNum)));
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
                                                  cNumericFields(iHeatCapacityPerFloorAreaNumericNum),
                                                  Numbers(iHeatCapacityPerFloorAreaNumericNum)));
                         ErrorsFound = true;
                     } else if (thisElecSys.ScaledHeatingCapacity == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisElecSys.Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iHeatCAPMAlphaNum) + " = " + Alphas(iHeatCAPMAlphaNum));
-                        ShowContinueError(state, "Illegal " + cNumericFields(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisElecSys.Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatCAPMAlphaNum), Alphas(iHeatCAPMAlphaNum)));
+                        ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(iHeatCapacityPerFloorAreaNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + thisElecSys.Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iHeatCAPMAlphaNum) + " = " + Alphas(iHeatCAPMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iHeatCapacityPerFloorAreaNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisElecSys.Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatCAPMAlphaNum), Alphas(iHeatCAPMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iHeatCapacityPerFloorAreaNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
@@ -1292,7 +1294,7 @@ namespace LowTempRadiantSystem {
                     thisElecSys.ScaledHeatingCapacity = Numbers(iHeatFracOfAutosizedCapacityNumericNum);
                     thisElecSys.MaxElecPower = thisElecSys.ScaledHeatingCapacity;
                     if (thisElecSys.ScaledHeatingCapacity < 0.0) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisElecSys.Name);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisElecSys.Name));
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
                                                  cNumericFields(iHeatFracOfAutosizedCapacityNumericNum),
@@ -1300,14 +1302,14 @@ namespace LowTempRadiantSystem {
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + thisElecSys.Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iHeatCAPMAlphaNum) + " = " + Alphas(iHeatCAPMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iHeatFracOfAutosizedCapacityNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisElecSys.Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatCAPMAlphaNum), Alphas(iHeatCAPMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iHeatFracOfAutosizedCapacityNumericNum)));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + thisElecSys.Name);
-                ShowContinueError(state, "Illegal " + cAlphaFields(iHeatCAPMAlphaNum) + " = " + Alphas(iHeatCAPMAlphaNum));
+                ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisElecSys.Name));
+                ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(iHeatCAPMAlphaNum), Alphas(iHeatCAPMAlphaNum)));
                 ErrorsFound = true;
             }
 
@@ -1324,10 +1326,10 @@ namespace LowTempRadiantSystem {
             thisElecSys.SetptSchedPtr = GetScheduleIndex(state, Alphas(8));
             if (thisElecSys.SetptSchedPtr == 0) {
                 if (lAlphaBlanks(8)) {
-                    ShowSevereError(state, cAlphaFields(8) + " must be input, missing for " + Alphas(1));
+                    ShowSevereError(state, format("{} must be input, missing for {}", cAlphaFields(8), Alphas(1)));
                 } else {
-                    ShowSevereError(state, cAlphaFields(8) + " not found for " + Alphas(8));
-                    ShowContinueError(state, "Incorrect " + cAlphaFields(8) + " = " + Alphas(8));
+                    ShowSevereError(state, format("{} not found for {}", cAlphaFields(8), Alphas(8)));
+                    ShowContinueError(state, format("Incorrect {} = {}", cAlphaFields(8), Alphas(8)));
                 }
                 ErrorsFound = true;
             }
@@ -1344,8 +1346,8 @@ namespace LowTempRadiantSystem {
                 CheckSurfNum = state.dataLowTempRadSys->HydrRadSys(Item).SurfacePtr(SurfNum);
                 if (CheckSurfNum == 0) continue;
                 if (AssignedAsRadiantSurface(CheckSurfNum)) {
-                    ShowSevereError(state,
-                                    "Surface " + Surface(CheckSurfNum).Name + " is referenced by more than one radiant system--this is not allowed");
+                    ShowSevereError(
+                        state, format("Surface {} is referenced by more than one radiant system--this is not allowed", Surface(CheckSurfNum).Name));
                     ErrorsFound = true;
                 } else {
                     AssignedAsRadiantSurface(CheckSurfNum) = true;
@@ -1354,8 +1356,8 @@ namespace LowTempRadiantSystem {
                 if ((Surface(CheckSurfNum).ExtBoundCond > 0) && (Surface(CheckSurfNum).ExtBoundCond != CheckSurfNum)) {
                     if (AssignedAsRadiantSurface(Surface(CheckSurfNum).ExtBoundCond)) {
                         ShowSevereError(state,
-                                        "Interzone surface " + Surface(Surface(CheckSurfNum).ExtBoundCond).Name +
-                                            " is referenced by more than one radiant system--this is not allowed");
+                                        format("Interzone surface {} is referenced by more than one radiant system--this is not allowed",
+                                               Surface(Surface(CheckSurfNum).ExtBoundCond).Name));
                         ErrorsFound = true;
                     } else {
                         AssignedAsRadiantSurface(Surface(CheckSurfNum).ExtBoundCond) = true;
@@ -1369,8 +1371,8 @@ namespace LowTempRadiantSystem {
                 CheckSurfNum = state.dataLowTempRadSys->CFloRadSys(Item).SurfacePtr(SurfNum);
                 if (CheckSurfNum == 0) continue;
                 if (AssignedAsRadiantSurface(CheckSurfNum)) {
-                    ShowSevereError(state,
-                                    "Surface " + Surface(CheckSurfNum).Name + " is referenced by more than one radiant system--this is not allowed");
+                    ShowSevereError(
+                        state, format("Surface {} is referenced by more than one radiant system--this is not allowed", Surface(CheckSurfNum).Name));
                     ErrorsFound = true;
                 } else {
                     AssignedAsRadiantSurface(CheckSurfNum) = true;
@@ -1379,8 +1381,8 @@ namespace LowTempRadiantSystem {
                 if ((Surface(CheckSurfNum).ExtBoundCond > 0) && (Surface(CheckSurfNum).ExtBoundCond != CheckSurfNum)) {
                     if (AssignedAsRadiantSurface(Surface(CheckSurfNum).ExtBoundCond)) {
                         ShowSevereError(state,
-                                        "Interzone surface " + Surface(Surface(CheckSurfNum).ExtBoundCond).Name +
-                                            " is referenced by more than one radiant system--this is not allowed");
+                                        format("Interzone surface {} is referenced by more than one radiant system--this is not allowed",
+                                               Surface(Surface(CheckSurfNum).ExtBoundCond).Name));
                         ErrorsFound = true;
                     } else {
                         AssignedAsRadiantSurface(Surface(CheckSurfNum).ExtBoundCond) = true;
@@ -1394,8 +1396,8 @@ namespace LowTempRadiantSystem {
                 CheckSurfNum = state.dataLowTempRadSys->ElecRadSys(Item).SurfacePtr(SurfNum);
                 if (CheckSurfNum == 0) continue;
                 if (AssignedAsRadiantSurface(CheckSurfNum)) {
-                    ShowSevereError(state,
-                                    "Surface " + Surface(CheckSurfNum).Name + " is referenced by more than one radiant system--this is not allowed");
+                    ShowSevereError(
+                        state, format("Surface {} is referenced by more than one radiant system--this is not allowed", Surface(CheckSurfNum).Name));
                     ErrorsFound = true;
                 } else {
                     AssignedAsRadiantSurface(CheckSurfNum) = true;
@@ -1404,8 +1406,8 @@ namespace LowTempRadiantSystem {
                 if ((Surface(CheckSurfNum).ExtBoundCond > 0) && (Surface(CheckSurfNum).ExtBoundCond != CheckSurfNum)) {
                     if (AssignedAsRadiantSurface(Surface(CheckSurfNum).ExtBoundCond)) {
                         ShowSevereError(state,
-                                        "Interzone surface " + Surface(Surface(CheckSurfNum).ExtBoundCond).Name +
-                                            " is referenced by more than one radiant system--this is not allowed");
+                                        format("Interzone surface {} is referenced by more than one radiant system--this is not allowed",
+                                               Surface(Surface(CheckSurfNum).ExtBoundCond).Name));
                         ErrorsFound = true;
                     } else {
                         AssignedAsRadiantSurface(Surface(CheckSurfNum).ExtBoundCond) = true;
@@ -1430,7 +1432,7 @@ namespace LowTempRadiantSystem {
         // ZoneHVAC:LowTemperatureRadiant:VariableFlow (HydrRadSys)
         for (Item = 1; Item <= state.dataLowTempRadSys->NumOfHydrLowTempRadSys; ++Item) {
 
-            auto &thisHydrSys(state.dataLowTempRadSys->HydrRadSys(Item));
+            auto &thisHydrSys = state.dataLowTempRadSys->HydrRadSys(Item);
 
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Rate",
@@ -1446,10 +1448,10 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisHydrSys.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Fluid Energy",
@@ -1458,10 +1460,10 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisHydrSys.Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Cooling Rate",
@@ -1478,10 +1480,10 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisHydrSys.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Cooling Fluid Energy",
@@ -1490,10 +1492,10 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisHydrSys.Name,
-                                _,
+                                {},
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Mass Flow Rate",
@@ -1555,7 +1557,7 @@ namespace LowTempRadiantSystem {
         // ZoneHVAC:LowTemperatureRadiant:ConstantFlow (CFloRadSys)
         for (Item = 1; Item <= state.dataLowTempRadSys->NumOfCFloLowTempRadSys; ++Item) {
 
-            auto &thisCFloSys(state.dataLowTempRadSys->CFloRadSys(Item));
+            auto &thisCFloSys = state.dataLowTempRadSys->CFloRadSys(Item);
 
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Rate",
@@ -1571,10 +1573,10 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Fluid Heat Transfer Energy",
@@ -1583,10 +1585,10 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Cooling Rate",
@@ -1602,10 +1604,10 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Cooling Fluid Heat Transfer Energy",
@@ -1614,10 +1616,10 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name,
-                                _,
+                                {},
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Mass Flow Rate",
@@ -1675,10 +1677,10 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Pumps",
-                                _,
+                                {},
                                 "Plant");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Pump Mass Flow Rate",
@@ -1755,7 +1757,7 @@ namespace LowTempRadiantSystem {
             // Set up the output variables for low temperature radiant systems
             // ZoneHVAC:LowTemperatureRadiant:Electric (ElecRadSys)
 
-            auto &thisElecSys(state.dataLowTempRadSys->ElecRadSys(Item));
+            auto &thisElecSys = state.dataLowTempRadSys->ElecRadSys(Item);
 
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Electricity Rate",
@@ -1771,10 +1773,10 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisElecSys.Name,
-                                _,
+                                {},
                                 "ELECTRICITY",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Rate",
@@ -1790,10 +1792,10 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisElecSys.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
         }
     }
@@ -1805,8 +1807,8 @@ namespace LowTempRadiantSystem {
         } else if (UtilityRoutines::SameString(userInput, "ISOStandard")) {
             return FluidToSlabHeatTransferTypes::ISOStandard;
         } else {
-            ShowWarningError(state, "Invalid Fluid to Slab Heat Transfer Model Input = " + userInput);
-            ShowContinueError(state, "Occurs in Low Temperature Radiant System = " + this->Name);
+            ShowWarningError(state, format("Invalid Fluid to Slab Heat Transfer Model Input = {}", userInput));
+            ShowContinueError(state, format("Occurs in Low Temperature Radiant System = {}", this->Name));
             ShowContinueError(state, "Heat transfer model reset to convection only for this Low Temperature Radiant System.");
             return FluidToSlabHeatTransferTypes::ConvectionOnly;
         }
@@ -1836,8 +1838,8 @@ namespace LowTempRadiantSystem {
             state.dataLowTempRadSys->anyRadiantSystemUsingRunningMeanAverage = true;
             return LowTempRadiantControlTypes::RunningMeanODBControl;
         } else {
-            ShowWarningError(state, "Invalid " + controlInputField + " = " + controlInput);
-            ShowContinueError(state, "Occurs in Low Temperature Radiant System = " + this->Name);
+            ShowWarningError(state, format("Invalid {} = {}", controlInputField, controlInput));
+            ShowContinueError(state, format("Occurs in Low Temperature Radiant System = {}", this->Name));
             ShowContinueError(state, "Control reset to MAT control for this Low Temperature Radiant System.");
             return LowTempRadiantControlTypes::MATControl;
         }
@@ -1852,8 +1854,8 @@ namespace LowTempRadiantSystem {
         } else if (UtilityRoutines::SameString(controlInput, "ZeroFlowPower")) {
             return LowTempRadiantSetpointTypes::ZeroFlowPower;
         } else {
-            ShowWarningError(state, "Invalid " + controlInputField + " = " + controlInput);
-            ShowContinueError(state, "Occurs in Low Temperature Radiant System = " + this->Name);
+            ShowWarningError(state, format("Invalid {} = {}", controlInputField, controlInput));
+            ShowContinueError(state, format("Occurs in Low Temperature Radiant System = {}", this->Name));
             ShowContinueError(state, "Setpoint type reset to HalfFlowPower for this Low Temperature Radiant System.");
             return LowTempRadiantSetpointTypes::HalfFlowPower;
         }
@@ -1861,8 +1863,8 @@ namespace LowTempRadiantSystem {
 
     void RadiantSystemBaseData::errorCheckZonesAndConstructions(EnergyPlusData &state, bool &errorsFound)
     {
-        auto &Zone(state.dataHeatBal->Zone);
-        auto &Surface(state.dataSurface->Surface);
+        auto &Zone = state.dataHeatBal->Zone;
+        auto &Surface = state.dataSurface->Surface;
 
         Real64 zoneMultipliers = 0.0;
         Real64 zoneMultipliersSurface = 0.0;
@@ -1877,11 +1879,12 @@ namespace LowTempRadiantSystem {
                 if (Surface(this->SurfacePtr(SurfNum)).Zone != this->ZonePtr) {
                     ShowWarningError(state,
                                      "A surface referenced in a Low Temperature Radiant System is not in same zone as the radiant system itself");
-                    ShowContinueError(state, "Surface = " + Surface(this->SurfacePtr(SurfNum)).Name);
+                    ShowContinueError(state, format("Surface = {}", Surface(this->SurfacePtr(SurfNum)).Name));
                     ShowContinueError(state,
-                                      "Surface in Zone = " + Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Name +
-                                          ". Radiant System in Zone = " + this->ZoneName);
-                    ShowContinueError(state, "Occurs in Low Temperature Radiant System = " + this->Name);
+                                      format("Surface in Zone = {}. Radiant System in Zone = {}",
+                                             Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Name,
+                                             this->ZoneName));
+                    ShowContinueError(state, format("Occurs in Low Temperature Radiant System = {}", this->Name));
                     ShowContinueError(state, "If this is intentionally a radiant system with surfaces in more than one thermal zone,");
                     ShowContinueError(state, "then ignore this warning message.  Otherwise, check the surfaces in this radiant system.");
                 }
@@ -1894,7 +1897,7 @@ namespace LowTempRadiantSystem {
             if (std::abs(zoneMultipliers - zoneMultipliersSurface) > zoneMultiplersTolerance) {
                 ShowSevereError(state, "The zone multipliers are not the same for all surfaces contained in this radiant system");
                 ShowContinueError(state, "This is not allowed and must be fixed for the simulation to run.");
-                ShowContinueError(state, "Occurs in Low Temperature Radiant System = " + this->Name);
+                ShowContinueError(state, format("Occurs in Low Temperature Radiant System = {}", this->Name));
                 errorsFound = true;
             }
 
@@ -1902,8 +1905,9 @@ namespace LowTempRadiantSystem {
             if (!state.dataConstruction->Construct(Surface(this->SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
                 ShowSevereError(state, "Construction referenced in Radiant System Surface does not have a source/sink present");
                 ShowContinueError(state,
-                                  "Surface name= " + Surface(this->SurfacePtr(SurfNum)).Name + "  Construction name = " +
-                                      state.dataConstruction->Construct(Surface(this->SurfacePtr(SurfNum)).Construction).Name);
+                                  format("Surface name= {}  Construction name = {}",
+                                         Surface(this->SurfacePtr(SurfNum)).Name,
+                                         state.dataConstruction->Construct(Surface(this->SurfacePtr(SurfNum)).Construction).Name));
                 ShowContinueError(state, "Construction needs to be referenced by a \"ConstructionProperty:InternalHeatSource\" object.");
                 errorsFound = true;
             }
@@ -1934,23 +1938,20 @@ namespace LowTempRadiantSystem {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr ZeroTol(0.0000001); // Smallest non-zero value allowed
-        auto constexpr RoutineName("InitLowTempRadiantSystem");
+        constexpr std::string_view RoutineName("InitLowTempRadiantSystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CurrentFlowSchedule; // Schedule value for flow fraction in a constant flow radiant system
-        int RadNum;                 // Number of the radiant system (DO loop counter)
-        int RadSurfNum;             // Number of the radiant system surface (DO loop counter)
         int SurfNum;                // Intermediate variable for keeping track of the surface number
         Real64 TotalEffic;          // Intermediate calculation variable for total pump efficiency
         int ZoneNum;                // Intermediate variable for keeping track of the zone number
-        int Loop;
-        Real64 mdot; // local fluid mass flow rate
-        Real64 rho;  // local fluid density
+        Real64 mdot;                // local fluid mass flow rate
+        Real64 rho;                 // local fluid density
         bool errFlag;
 
         InitErrorsFound = false;
 
-        auto &Surface(state.dataSurface->Surface);
+        auto const &Surface = state.dataSurface->Surface;
 
         if (state.dataLowTempRadSys->MyOneTimeFlag) {
             state.dataLowTempRadSys->MyEnvrnFlagHydr.allocate(state.dataLowTempRadSys->NumOfHydrLowTempRadSys);
@@ -1968,11 +1969,24 @@ namespace LowTempRadiantSystem {
 
         if (state.dataLowTempRadSys->FirstTimeInit) {
 
-            state.dataLowTempRadSys->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
-            state.dataLowTempRadSys->QRadSysSrcAvg.dimension(state.dataSurface->TotSurfaces, 0.0);
-            state.dataLowTempRadSys->LastQRadSysSrc.dimension(state.dataSurface->TotSurfaces, 0.0);
-            state.dataLowTempRadSys->LastSysTimeElapsed.dimension(state.dataSurface->TotSurfaces, 0.0);
-            state.dataLowTempRadSys->LastTimeStepSys.dimension(state.dataSurface->TotSurfaces, 0.0);
+            for (auto &thisLTRSys : state.dataLowTempRadSys->HydrRadSys) {
+                thisLTRSys.QRadSysSrcAvg.dimension(thisLTRSys.NumOfSurfaces, 0.0);
+                thisLTRSys.LastQRadSysSrc.dimension(thisLTRSys.NumOfSurfaces, 0.0);
+                thisLTRSys.LastSysTimeElapsed = 0.0;
+                thisLTRSys.LastTimeStepSys = 0.0;
+            }
+            for (auto &thisCFLTRSys : state.dataLowTempRadSys->CFloRadSys) {
+                thisCFLTRSys.QRadSysSrcAvg.dimension(thisCFLTRSys.NumOfSurfaces, 0.0);
+                thisCFLTRSys.LastQRadSysSrc.dimension(thisCFLTRSys.NumOfSurfaces, 0.0);
+                thisCFLTRSys.LastSysTimeElapsed = 0.0;
+                thisCFLTRSys.LastTimeStepSys = 0.0;
+            }
+            for (auto &thisELTRSys : state.dataLowTempRadSys->ElecRadSys) {
+                thisELTRSys.QRadSysSrcAvg.dimension(thisELTRSys.NumOfSurfaces, 0.0);
+                thisELTRSys.LastQRadSysSrc.dimension(thisELTRSys.NumOfSurfaces, 0.0);
+                thisELTRSys.LastSysTimeElapsed = 0.0;
+                thisELTRSys.LastTimeStepSys = 0.0;
+            }
             state.dataLowTempRadSys->MySizeFlagHydr.allocate(state.dataLowTempRadSys->NumOfHydrLowTempRadSys);
             state.dataLowTempRadSys->MySizeFlagCFlo.allocate(state.dataLowTempRadSys->NumOfCFloLowTempRadSys);
             state.dataLowTempRadSys->MySizeFlagElec.allocate(state.dataLowTempRadSys->NumOfElecLowTempRadSys);
@@ -1980,26 +1994,26 @@ namespace LowTempRadiantSystem {
             state.dataLowTempRadSys->MySizeFlagCFlo = true;
             state.dataLowTempRadSys->MySizeFlagElec = true;
 
-            // Initialize total areas for all radiant systems
-            for (RadNum = 1; RadNum <= state.dataLowTempRadSys->NumOfHydrLowTempRadSys; ++RadNum) {
-                state.dataLowTempRadSys->HydrRadSys(RadNum).TotalSurfaceArea = 0.0;
-                for (SurfNum = 1; SurfNum <= state.dataLowTempRadSys->HydrRadSys(RadNum).NumOfSurfaces; ++SurfNum) {
-                    state.dataLowTempRadSys->HydrRadSys(RadNum).TotalSurfaceArea +=
-                        Surface(state.dataLowTempRadSys->HydrRadSys(RadNum).SurfacePtr(SurfNum)).Area;
+            // Initialize total areas and ZeroLTRSource for all radiant systems
+            for (auto &thisHRadSys : state.dataLowTempRadSys->HydrRadSys) {
+                thisHRadSys.ZeroLTRSourceSumHATsurf = 0.0;
+                thisHRadSys.TotalSurfaceArea = 0.0;
+                for (SurfNum = 1; SurfNum <= thisHRadSys.NumOfSurfaces; ++SurfNum) {
+                    thisHRadSys.TotalSurfaceArea += Surface(thisHRadSys.SurfacePtr(SurfNum)).Area;
                 }
             }
-            for (RadNum = 1; RadNum <= state.dataLowTempRadSys->NumOfCFloLowTempRadSys; ++RadNum) {
-                state.dataLowTempRadSys->CFloRadSys(RadNum).TotalSurfaceArea = 0.0;
-                for (SurfNum = 1; SurfNum <= state.dataLowTempRadSys->CFloRadSys(RadNum).NumOfSurfaces; ++SurfNum) {
-                    state.dataLowTempRadSys->CFloRadSys(RadNum).TotalSurfaceArea +=
-                        Surface(state.dataLowTempRadSys->CFloRadSys(RadNum).SurfacePtr(SurfNum)).Area;
+            for (auto &thisCFLRadSys : state.dataLowTempRadSys->CFloRadSys) {
+                thisCFLRadSys.ZeroLTRSourceSumHATsurf = 0.0;
+                thisCFLRadSys.TotalSurfaceArea = 0.0;
+                for (SurfNum = 1; SurfNum <= thisCFLRadSys.NumOfSurfaces; ++SurfNum) {
+                    thisCFLRadSys.TotalSurfaceArea += Surface(thisCFLRadSys.SurfacePtr(SurfNum)).Area;
                 }
             }
-            for (RadNum = 1; RadNum <= state.dataLowTempRadSys->NumOfElecLowTempRadSys; ++RadNum) {
-                state.dataLowTempRadSys->ElecRadSys(RadNum).TotalSurfaceArea = 0.0;
-                for (SurfNum = 1; SurfNum <= state.dataLowTempRadSys->ElecRadSys(RadNum).NumOfSurfaces; ++SurfNum) {
-                    state.dataLowTempRadSys->ElecRadSys(RadNum).TotalSurfaceArea +=
-                        Surface(state.dataLowTempRadSys->ElecRadSys(RadNum).SurfacePtr(SurfNum)).Area;
+            for (auto &thisERadSys : state.dataLowTempRadSys->ElecRadSys) {
+                thisERadSys.ZeroLTRSourceSumHATsurf = 0.0;
+                thisERadSys.TotalSurfaceArea = 0.0;
+                for (SurfNum = 1; SurfNum <= thisERadSys.NumOfSurfaces; ++SurfNum) {
+                    thisERadSys.TotalSurfaceArea += Surface(thisERadSys.SurfacePtr(SurfNum)).Area;
                 }
             }
 
@@ -2011,36 +2025,27 @@ namespace LowTempRadiantSystem {
             }
 
             // Check pump parameters for constant flow hydronic radiant systems
-            for (RadNum = 1; RadNum <= state.dataLowTempRadSys->NumOfCFloLowTempRadSys; ++RadNum) {
+            for (auto &thisCFLRadSys : state.dataLowTempRadSys->CFloRadSys) {
                 // Calculate the efficiency for each pump: The calculation
                 // is based on the PMPSIM code in the ASHRAE Secondary Toolkit
-                Real64 PEC = state.dataLowTempRadSys->CFloRadSys(RadNum).PumpEffic;
-                if ((state.dataLowTempRadSys->CFloRadSys(RadNum).NomPowerUse > ZeroTol) && (MotorEffic > ZeroTol) &&
-                    (state.dataLowTempRadSys->CFloRadSys(RadNum).WaterVolFlowMax != AutoSize)) {
-                    TotalEffic = state.dataLowTempRadSys->CFloRadSys(RadNum).WaterVolFlowMax *
-                                 state.dataLowTempRadSys->CFloRadSys(RadNum).NomPumpHead / state.dataLowTempRadSys->CFloRadSys(RadNum).NomPowerUse;
-                    state.dataLowTempRadSys->CFloRadSys(RadNum).PumpEffic = TotalEffic / MotorEffic;
-                    PEC = state.dataLowTempRadSys->CFloRadSys(RadNum).PumpEffic;
-                    auto constexpr fmt = "Check input.  Calc Pump Efficiency={:.5R}% {}, for pump in radiant system {}";
-                    Real64 pumpEfficiency = state.dataLowTempRadSys->CFloRadSys(RadNum).PumpEffic * 100.0;
-                    PEC = state.dataLowTempRadSys->CFloRadSys(RadNum).PumpEffic;
-                    if (state.dataLowTempRadSys->CFloRadSys(RadNum).PumpEffic < 0.50) {
-                        ShowWarningError(state,
-                                         format(fmt, pumpEfficiency, "which is less than 50%", state.dataLowTempRadSys->CFloRadSys(RadNum).Name));
-                    } else if ((state.dataLowTempRadSys->CFloRadSys(RadNum).PumpEffic > 0.95) &&
-                               (state.dataLowTempRadSys->CFloRadSys(RadNum).PumpEffic <= 1.0)) {
-                        ShowWarningError(state, format(fmt, pumpEfficiency, "is approaching 100%", state.dataLowTempRadSys->CFloRadSys(RadNum).Name));
-                    } else if (state.dataLowTempRadSys->CFloRadSys(RadNum).PumpEffic > 1.0) {
-                        ShowSevereError(state,
-                                        format(fmt, pumpEfficiency, "which is bigger than 100%", state.dataLowTempRadSys->CFloRadSys(RadNum).Name));
+                if ((thisCFLRadSys.NomPowerUse > ZeroTol) && (MotorEffic > ZeroTol) && (thisCFLRadSys.WaterVolFlowMax != AutoSize)) {
+                    TotalEffic = thisCFLRadSys.WaterVolFlowMax * thisCFLRadSys.NomPumpHead / thisCFLRadSys.NomPowerUse;
+                    thisCFLRadSys.PumpEffic = TotalEffic / MotorEffic;
+                    constexpr std::string_view fmt = "Check input.  Calc Pump Efficiency={:.5R}% {}, for pump in radiant system {}";
+                    Real64 pumpEfficiency = thisCFLRadSys.PumpEffic * 100.0;
+                    if (thisCFLRadSys.PumpEffic < 0.50) {
+                        ShowWarningError(state, format(fmt, pumpEfficiency, "which is less than 50%", thisCFLRadSys.Name));
+                    } else if ((thisCFLRadSys.PumpEffic > 0.95) && (thisCFLRadSys.PumpEffic <= 1.0)) {
+                        ShowWarningError(state, format(fmt, pumpEfficiency, "is approaching 100%", thisCFLRadSys.Name));
+                    } else if (thisCFLRadSys.PumpEffic > 1.0) {
+                        ShowSevereError(state, format(fmt, pumpEfficiency, "which is bigger than 100%", thisCFLRadSys.Name));
                         InitErrorsFound = true;
                     }
                 } else {
-                    if (state.dataLowTempRadSys->CFloRadSys(RadNum).WaterVolFlowMax !=
-                        AutoSize) { // Autosize is not an error but it does not need to check pump efficiency here
+                    // Autosize is not an error but it does not need to check pump efficiency here
+                    if (thisCFLRadSys.WaterVolFlowMax != AutoSize) {
                         ShowSevereError(state,
-                                        "Check input.  Pump nominal power and motor efficiency cannot be 0, for pump=" +
-                                            state.dataLowTempRadSys->CFloRadSys(RadNum).Name);
+                                        format("Check input.  Pump nominal power and motor efficiency cannot be 0, for pump={}", thisCFLRadSys.Name));
                         InitErrorsFound = true;
                     }
                 }
@@ -2130,31 +2135,28 @@ namespace LowTempRadiantSystem {
         // need to check all units to see if they are on Zone Equipment List or issue warning
         if (!state.dataLowTempRadSys->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataLowTempRadSys->ZoneEquipmentListChecked = true;
-            for (Loop = 1; Loop <= state.dataLowTempRadSys->TotalNumOfRadSystems; ++Loop) {
-                switch (state.dataLowTempRadSys->RadSysTypes(Loop).SystemType) {
+            for (auto &thisRadSys : state.dataLowTempRadSys->RadSysTypes) {
+                switch (thisRadSys.SystemType) {
                 case LowTempRadiantSystem::SystemType::HydronicSystem: {
-                    if (CheckZoneEquipmentList(state, "ZoneHVAC:LowTemperatureRadiant:VariableFlow", state.dataLowTempRadSys->RadSysTypes(Loop).Name))
-                        continue;
+                    if (CheckZoneEquipmentList(state, "ZoneHVAC:LowTemperatureRadiant:VariableFlow", thisRadSys.Name)) continue;
                     ShowSevereError(state,
-                                    "InitLowTempRadiantSystem: Unit=[ZoneHVAC:LowTemperatureRadiant:VariableFlow," +
-                                        state.dataLowTempRadSys->RadSysTypes(Loop).Name +
-                                        "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
+                                    format("InitLowTempRadiantSystem: Unit=[ZoneHVAC:LowTemperatureRadiant:VariableFlow,{}] is not on any "
+                                           "ZoneHVAC:EquipmentList.  It will not be simulated.",
+                                           thisRadSys.Name));
                 } break;
                 case LowTempRadiantSystem::SystemType::ConstantFlowSystem: {
-                    if (CheckZoneEquipmentList(state, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", state.dataLowTempRadSys->RadSysTypes(Loop).Name))
-                        continue;
+                    if (CheckZoneEquipmentList(state, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", thisRadSys.Name)) continue;
                     ShowSevereError(state,
-                                    "InitLowTempRadiantSystem: Unit=[ZoneHVAC:LowTemperatureRadiant:ConstantFlow," +
-                                        state.dataLowTempRadSys->RadSysTypes(Loop).Name +
-                                        "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
+                                    format("InitLowTempRadiantSystem: Unit=[ZoneHVAC:LowTemperatureRadiant:ConstantFlow,{}] is not on any "
+                                           "ZoneHVAC:EquipmentList.  It will not be simulated.",
+                                           thisRadSys.Name));
                 } break;
                 case LowTempRadiantSystem::SystemType::ElectricSystem: {
-                    if (CheckZoneEquipmentList(state, "ZoneHVAC:LowTemperatureRadiant:Electric", state.dataLowTempRadSys->RadSysTypes(Loop).Name))
-                        continue;
+                    if (CheckZoneEquipmentList(state, "ZoneHVAC:LowTemperatureRadiant:Electric", thisRadSys.Name)) continue;
                     ShowSevereError(state,
-                                    "InitLowTempRadiantSystem: Unit=[ZoneHVAC:LowTemperatureRadiant:Electric," +
-                                        state.dataLowTempRadSys->RadSysTypes(Loop).Name +
-                                        "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
+                                    format("InitLowTempRadiantSystem: Unit=[ZoneHVAC:LowTemperatureRadiant:Electric,{}] is not on any "
+                                           "ZoneHVAC:EquipmentList.  It will not be simulated.",
+                                           thisRadSys.Name));
                 } break;
                 default: { // Illegal system, but checked earlier
                 } break;
@@ -2194,7 +2196,7 @@ namespace LowTempRadiantSystem {
                 if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode > 0) {
                     rho = GetDensityGlycol(state,
                                            state.dataPlnt->PlantLoop(state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWPlantLoc.loopNum).FluidName,
-                                           DataGlobalConstants::HWInitConvTemp,
+                                           Constant::HWInitConvTemp,
                                            state.dataPlnt->PlantLoop(state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWPlantLoc.loopNum).FluidIndex,
                                            RoutineName);
                     state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterFlowMaxHeat =
@@ -2208,7 +2210,7 @@ namespace LowTempRadiantSystem {
                 if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode > 0) {
                     rho = GetDensityGlycol(state,
                                            state.dataPlnt->PlantLoop(state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.loopNum).FluidName,
-                                           DataGlobalConstants::CWInitConvTemp,
+                                           Constant::CWInitConvTemp,
                                            state.dataPlnt->PlantLoop(state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.loopNum).FluidIndex,
                                            RoutineName);
                     state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterFlowMaxCool =
@@ -2231,7 +2233,7 @@ namespace LowTempRadiantSystem {
                 if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode > 0) {
                     rho = GetDensityGlycol(state,
                                            state.dataPlnt->PlantLoop(state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWPlantLoc.loopNum).FluidName,
-                                           DataGlobalConstants::HWInitConvTemp,
+                                           Constant::HWInitConvTemp,
                                            state.dataPlnt->PlantLoop(state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWPlantLoc.loopNum).FluidIndex,
                                            RoutineName);
                     state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotDesignWaterMassFlowRate =
@@ -2245,7 +2247,7 @@ namespace LowTempRadiantSystem {
                 if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode > 0) {
                     rho = GetDensityGlycol(state,
                                            state.dataPlnt->PlantLoop(state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum).FluidName,
-                                           DataGlobalConstants::CWInitConvTemp,
+                                           Constant::CWInitConvTemp,
                                            state.dataPlnt->PlantLoop(state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum).FluidIndex,
                                            RoutineName);
                     state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdDesignWaterMassFlowRate =
@@ -2269,11 +2271,28 @@ namespace LowTempRadiantSystem {
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataLowTempRadSys->MyEnvrnFlagGeneral) {
-            state.dataLowTempRadSys->ZeroSourceSumHATsurf = 0.0;
-            state.dataLowTempRadSys->QRadSysSrcAvg = 0.0;
-            state.dataLowTempRadSys->LastQRadSysSrc = 0.0;
-            state.dataLowTempRadSys->LastSysTimeElapsed = 0.0;
-            state.dataLowTempRadSys->LastTimeStepSys = 0.0;
+            if (SystemType == LowTempRadiantSystem::SystemType::HydronicSystem) {
+                auto &thisLTR = state.dataLowTempRadSys->HydrRadSys(RadSysNum);
+                thisLTR.ZeroLTRSourceSumHATsurf = 0.0;
+                thisLTR.QRadSysSrcAvg = 0.0;
+                thisLTR.LastQRadSysSrc = 0.0;
+                thisLTR.LastSysTimeElapsed = 0.0;
+                thisLTR.LastTimeStepSys = 0.0;
+            } else if (SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
+                auto &thisLTR = state.dataLowTempRadSys->CFloRadSys(RadSysNum);
+                thisLTR.ZeroLTRSourceSumHATsurf = 0.0;
+                thisLTR.QRadSysSrcAvg = 0.0;
+                thisLTR.LastQRadSysSrc = 0.0;
+                thisLTR.LastSysTimeElapsed = 0.0;
+                thisLTR.LastTimeStepSys = 0.0;
+            } else if (SystemType == LowTempRadiantSystem::SystemType::ElectricSystem) {
+                auto &thisLTR = state.dataLowTempRadSys->ElecRadSys(RadSysNum);
+                thisLTR.ZeroLTRSourceSumHATsurf = 0.0;
+                thisLTR.QRadSysSrcAvg = 0.0;
+                thisLTR.LastQRadSysSrc = 0.0;
+                thisLTR.LastSysTimeElapsed = 0.0;
+                thisLTR.LastTimeStepSys = 0.0;
+            }
             state.dataLowTempRadSys->MyEnvrnFlagGeneral = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) state.dataLowTempRadSys->MyEnvrnFlagGeneral = true;
@@ -2420,52 +2439,37 @@ namespace LowTempRadiantSystem {
             switch (SystemType) {
             case LowTempRadiantSystem::SystemType::HydronicSystem: {
                 ZoneNum = state.dataLowTempRadSys->HydrRadSys(RadSysNum).ZonePtr;
-                state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum) =
-                    SumHATsurf(state, ZoneNum); // Set this to figure what part of the load the radiant system meets
-                for (RadSurfNum = 1; RadSurfNum <= state.dataLowTempRadSys->HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
-                    SurfNum = state.dataLowTempRadSys->HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum);
-                    state.dataLowTempRadSys->QRadSysSrcAvg(SurfNum) = 0.0; // Initialize this variable to zero (radiant system defaults to off)
-                    state.dataLowTempRadSys->LastQRadSysSrc(SurfNum) =
-                        0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                    state.dataLowTempRadSys->LastSysTimeElapsed(SurfNum) =
-                        0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                    state.dataLowTempRadSys->LastTimeStepSys(SurfNum) =
-                        0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                }
+                auto &thisLTR = state.dataLowTempRadSys->HydrRadSys(RadSysNum);
+                thisLTR.ZeroLTRSourceSumHATsurf =
+                    state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure what part of the load the radiant system meets
+                thisLTR.QRadSysSrcAvg = 0.0;                            // Initialize this variable to zero (radiant system defaults to off)
+                thisLTR.LastQRadSysSrc = 0.0;     // At the start of a time step, reset to zero so average calculation can begin again
+                thisLTR.LastSysTimeElapsed = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
+                thisLTR.LastTimeStepSys = 0.0; // At the start of a time step, reset to zero so average calculation can begin again                }
             } break;
             case LowTempRadiantSystem::SystemType::ConstantFlowSystem: {
                 ZoneNum = state.dataLowTempRadSys->CFloRadSys(RadSysNum).ZonePtr;
-                state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum) =
-                    SumHATsurf(state, ZoneNum); // Set this to figure what part of the load the radiant system meets
-                for (RadSurfNum = 1; RadSurfNum <= state.dataLowTempRadSys->CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
-                    SurfNum = state.dataLowTempRadSys->CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum);
-                    state.dataLowTempRadSys->QRadSysSrcAvg(SurfNum) = 0.0; // Initialize this variable to zero (radiant system defaults to off)
-                    state.dataLowTempRadSys->LastQRadSysSrc(SurfNum) =
-                        0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                    state.dataLowTempRadSys->LastSysTimeElapsed(SurfNum) =
-                        0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                    state.dataLowTempRadSys->LastTimeStepSys(SurfNum) =
-                        0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                }
+                auto &thisLTR = state.dataLowTempRadSys->CFloRadSys(RadSysNum);
+                thisLTR.ZeroLTRSourceSumHATsurf =
+                    state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure what part of the load the radiant system meets
+                thisLTR.QRadSysSrcAvg = 0.0;                            // Initialize this variable to zero (radiant system defaults to off)
+                thisLTR.LastQRadSysSrc = 0.0;     // At the start of a time step, reset to zero so average calculation can begin again
+                thisLTR.LastSysTimeElapsed = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
+                thisLTR.LastTimeStepSys = 0.0; // At the start of a time step, reset to zero so average calculation can begin again                }
             } break;
             case LowTempRadiantSystem::SystemType::ElectricSystem: {
                 ZoneNum = state.dataLowTempRadSys->ElecRadSys(RadSysNum).ZonePtr;
-                state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum) =
-                    SumHATsurf(state, ZoneNum); // Set this to figure what part of the load the radiant system meets
-                for (RadSurfNum = 1; RadSurfNum <= state.dataLowTempRadSys->ElecRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
-                    SurfNum = state.dataLowTempRadSys->ElecRadSys(RadSysNum).SurfacePtr(RadSurfNum);
-                    state.dataLowTempRadSys->QRadSysSrcAvg(SurfNum) = 0.0; // Initialize this variable to zero (radiant system defaults to off)
-                    state.dataLowTempRadSys->LastQRadSysSrc(SurfNum) =
-                        0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                    state.dataLowTempRadSys->LastSysTimeElapsed(SurfNum) =
-                        0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                    state.dataLowTempRadSys->LastTimeStepSys(SurfNum) =
-                        0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                }
+                auto &thisLTR = state.dataLowTempRadSys->ElecRadSys(RadSysNum);
+                thisLTR.ZeroLTRSourceSumHATsurf =
+                    state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure what part of the load the radiant system meets
+                thisLTR.QRadSysSrcAvg = 0.0;                            // Initialize this variable to zero (radiant system defaults to off)
+                thisLTR.LastQRadSysSrc = 0.0;     // At the start of a time step, reset to zero so average calculation can begin again
+                thisLTR.LastSysTimeElapsed = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
+                thisLTR.LastTimeStepSys = 0.0; // At the start of a time step, reset to zero so average calculation can begin again                }
             } break;
             default: {
                 ShowSevereError(state, "Radiant system entered without specification of type: electric, constant flow, or hydronic?");
-                ShowContinueError(state, "Occurs in Radiant System=" + state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name);
+                ShowContinueError(state, format("Occurs in Radiant System={}", state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name));
                 ShowFatalError(state, "Preceding condition causes termination.");
             } break;
             }
@@ -2570,7 +2574,7 @@ namespace LowTempRadiantSystem {
             // So, the day should be the previous day, the hour should bethe last hour of the
             // day, and the time step should be the last time step.
             this->lastDayOfSim = state.dataGlobal->DayOfSim - 1;
-            this->lastHourOfDay = int(DataGlobalConstants::HoursInDay);
+            this->lastHourOfDay = int(Constant::HoursInDay);
             this->lastTimeStep = state.dataGlobal->NumOfTimeStepInHour;
         } else if (state.dataGlobal->BeginHourFlag) {
             // It's not the beginning of the day but it is the beginning of an hour other than
@@ -2664,7 +2668,7 @@ namespace LowTempRadiantSystem {
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        auto constexpr RoutineName("SizeLowTempRadiantSystem");
+        constexpr std::string_view RoutineName("SizeLowTempRadiantSystem");
 
         enum class OperatingMode
         {
@@ -2706,13 +2710,13 @@ namespace LowTempRadiantSystem {
         Real64 WaterVolFlowMaxDes;                   // Design water volume flow rate for reproting
         Real64 WaterVolFlowMaxUser;                  // User hard-sized water volume flow rate for reproting
 
-        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+        auto &ZoneEqSizing = state.dataSize->ZoneEqSizing;
 
         DesCoilLoad = 0.0;
         state.dataSize->DataScalableCapSizingON = false;
         state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
 
-        auto &Zone(state.dataHeatBal->Zone);
+        auto const &Zone = state.dataHeatBal->Zone;
 
         if (SystemType == LowTempRadiantSystem::SystemType::ElectricSystem) {
 
@@ -2940,13 +2944,13 @@ namespace LowTempRadiantSystem {
                                 rho = GetDensityGlycol(
                                     state,
                                     state.dataPlnt->PlantLoop(state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWPlantLoc.loopNum).FluidName,
-                                    DataGlobalConstants::HWInitConvTemp,
+                                    Constant::HWInitConvTemp,
                                     state.dataPlnt->PlantLoop(state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWPlantLoc.loopNum).FluidIndex,
                                     RoutineName);
                                 Cp = GetSpecificHeatGlycol(
                                     state,
                                     state.dataPlnt->PlantLoop(state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWPlantLoc.loopNum).FluidName,
-                                    DataGlobalConstants::HWInitConvTemp,
+                                    Constant::HWInitConvTemp,
                                     state.dataPlnt->PlantLoop(state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWPlantLoc.loopNum).FluidIndex,
                                     RoutineName);
                                 WaterVolFlowMaxHeatDes = DesCoilLoad / (state.dataSize->PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
@@ -2956,8 +2960,8 @@ namespace LowTempRadiantSystem {
                         } else {
                             ShowSevereError(state, "Autosizing of water flow requires a heating loop Sizing:Plant object");
                             ShowContinueError(state,
-                                              "Occurs in ZoneHVAC:LowTemperatureRadiant:VariableFlow Object=" +
-                                                  state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name);
+                                              format("Occurs in ZoneHVAC:LowTemperatureRadiant:VariableFlow Object={}",
+                                                     state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name));
                             ErrorsFound = true;
                         }
                     }
@@ -2983,9 +2987,9 @@ namespace LowTempRadiantSystem {
                                 if ((std::abs(WaterVolFlowMaxHeatDes - WaterVolFlowMaxHeatUser) / WaterVolFlowMaxHeatUser) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state,
-                                                "SizeLowTempRadiantSystem: Potential issue with equipment sizing for "
-                                                "ZoneHVAC:LowTemperatureRadiant:VariableFlow = \"" +
-                                                    state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name + "\".");
+                                                format("SizeLowTempRadiantSystem: Potential issue with equipment sizing for "
+                                                       "ZoneHVAC:LowTemperatureRadiant:VariableFlow = \"{}\".",
+                                                       state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name));
                                     ShowContinueError(state,
                                                       format("User-Specified Maximum Hot Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxHeatUser));
                                     ShowContinueError(
@@ -3122,13 +3126,13 @@ namespace LowTempRadiantSystem {
                                 rho = GetDensityGlycol(
                                     state,
                                     state.dataPlnt->PlantLoop(state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.loopNum).FluidName,
-                                    DataGlobalConstants::CWInitConvTemp,
+                                    Constant::CWInitConvTemp,
                                     state.dataPlnt->PlantLoop(state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.loopNum).FluidIndex,
                                     RoutineName);
                                 Cp = GetSpecificHeatGlycol(
                                     state,
                                     state.dataPlnt->PlantLoop(state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.loopNum).FluidName,
-                                    DataGlobalConstants::CWInitConvTemp,
+                                    Constant::CWInitConvTemp,
                                     state.dataPlnt->PlantLoop(state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.loopNum).FluidIndex,
                                     RoutineName);
                                 WaterVolFlowMaxCoolDes = DesCoilLoad / (state.dataSize->PlantSizData(PltSizCoolNum).DeltaT * Cp * rho);
@@ -3138,8 +3142,8 @@ namespace LowTempRadiantSystem {
                         } else {
                             ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object");
                             ShowContinueError(state,
-                                              "Occurs in ZoneHVAC:LowTemperatureRadiant:VariableFlow Object=" +
-                                                  state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name);
+                                              format("Occurs in ZoneHVAC:LowTemperatureRadiant:VariableFlow Object={}",
+                                                     state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name));
                             ErrorsFound = true;
                         }
                     }
@@ -3165,9 +3169,9 @@ namespace LowTempRadiantSystem {
                                 if ((std::abs(WaterVolFlowMaxCoolDes - WaterVolFlowMaxCoolUser) / WaterVolFlowMaxCoolUser) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state,
-                                                "SizeLowTempRadiantSystem: Potential issue with equipment sizing for "
-                                                "ZoneHVAC:LowTemperatureRadiant:VariableFlow = \"" +
-                                                    state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name + "\".");
+                                                format("SizeLowTempRadiantSystem: Potential issue with equipment sizing for "
+                                                       "ZoneHVAC:LowTemperatureRadiant:VariableFlow = \"{}\".",
+                                                       state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name));
                                     ShowContinueError(state,
                                                       format("User-Specified Maximum Cool Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxCoolUser));
                                     ShowContinueError(
@@ -3217,9 +3221,9 @@ namespace LowTempRadiantSystem {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(TubeLengthDes - TubeLengthUser) / TubeLengthUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state,
-                                                "SizeLowTempRadiantSystem: Potential issue with equipment sizing for "
-                                                "ZoneHVAC:LowTemperatureRadiant:VariableFlow = \"" +
-                                                    state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name + "\".");
+                                                format("SizeLowTempRadiantSystem: Potential issue with equipment sizing for "
+                                                       "ZoneHVAC:LowTemperatureRadiant:VariableFlow = \"{}\".",
+                                                       state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name));
                                     ShowContinueError(state, format("User-Specified Hydronic Tubing Length of {:.5R} [m]", TubeLengthUser));
                                     ShowContinueError(state, format("differs from Design Size Hydronic Tubing Length of {:.5R} [m]", TubeLengthDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -3300,13 +3304,13 @@ namespace LowTempRadiantSystem {
                             rho = GetDensityGlycol(
                                 state,
                                 state.dataPlnt->PlantLoop(state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWPlantLoc.loopNum).FluidName,
-                                DataGlobalConstants::HWInitConvTemp,
+                                Constant::HWInitConvTemp,
                                 state.dataPlnt->PlantLoop(state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWPlantLoc.loopNum).FluidIndex,
                                 "SizeLowTempRadiantSystem");
                             Cp = GetSpecificHeatGlycol(
                                 state,
                                 state.dataPlnt->PlantLoop(state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWPlantLoc.loopNum).FluidName,
-                                DataGlobalConstants::HWInitConvTemp,
+                                Constant::HWInitConvTemp,
                                 state.dataPlnt->PlantLoop(state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWPlantLoc.loopNum).FluidIndex,
                                 "SizeLowTempRadiantSystem");
                             WaterVolFlowMaxHeatDes = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad /
@@ -3318,8 +3322,8 @@ namespace LowTempRadiantSystem {
                         if (OpMode == OperatingMode::ClgHtg || OpMode == OperatingMode::HtgOnly) {
                             ShowSevereError(state, "Autosizing of water flow requires a heating loop Sizing:Plant object");
                             ShowContinueError(state,
-                                              "Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow Object=" +
-                                                  state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name);
+                                              format("Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow Object={}",
+                                                     state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name));
                             ErrorsFound = true;
                         }
                     }
@@ -3338,13 +3342,13 @@ namespace LowTempRadiantSystem {
                             rho = GetDensityGlycol(
                                 state,
                                 state.dataPlnt->PlantLoop(state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum).FluidName,
-                                DataGlobalConstants::CWInitConvTemp,
+                                Constant::CWInitConvTemp,
                                 state.dataPlnt->PlantLoop(state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum).FluidIndex,
                                 "SizeLowTempRadiantSystem");
                             Cp = GetSpecificHeatGlycol(
                                 state,
                                 state.dataPlnt->PlantLoop(state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum).FluidName,
-                                DataGlobalConstants::CWInitConvTemp,
+                                Constant::CWInitConvTemp,
                                 state.dataPlnt->PlantLoop(state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum).FluidIndex,
                                 "SizeLowTempRadiantSystem");
                             WaterVolFlowMaxCoolDes = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad /
@@ -3356,8 +3360,8 @@ namespace LowTempRadiantSystem {
                         if (OpMode == OperatingMode::ClgHtg || OpMode == OperatingMode::ClgOnly) {
                             ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object");
                             ShowContinueError(state,
-                                              "Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow Object=" +
-                                                  state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name);
+                                              format("Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow Object={}",
+                                                     state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name));
                             ErrorsFound = true;
                         }
                     }
@@ -3394,9 +3398,9 @@ namespace LowTempRadiantSystem {
                                 if ((std::abs(WaterVolFlowMaxDes - WaterVolFlowMaxUser) / WaterVolFlowMaxUser) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state,
-                                                "SizeLowTempRadiantSystem: Potential issue with equipment sizing for "
-                                                "ZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" " +
-                                                    state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name + "\".");
+                                                format("SizeLowTempRadiantSystem: Potential issue with equipment sizing for "
+                                                       "ZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" {}\".",
+                                                       state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name));
                                     ShowContinueError(state, format("User-Specified Maximum Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxUser));
                                     ShowContinueError(state,
                                                       format("differs from Design Size Maximum Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxDes));
@@ -3446,9 +3450,9 @@ namespace LowTempRadiantSystem {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(TubeLengthDes - TubeLengthUser) / TubeLengthUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state,
-                                                "SizeLowTempRadiantSystem: Potential issue with equipment sizing for "
-                                                "ZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" " +
-                                                    state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name + "\".");
+                                                format("SizeLowTempRadiantSystem: Potential issue with equipment sizing for "
+                                                       "ZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" {}\".",
+                                                       state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name));
                                     ShowContinueError(state, format("User-Specified Hydronic Tubing Length of {:.5R} [m]", TubeLengthUser));
                                     ShowContinueError(state, format("differs from Design Size Hydronic Tubing Length of {:.5R} [m]", TubeLengthDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -3508,8 +3512,8 @@ namespace LowTempRadiantSystem {
         Real64 tubeLength(0.0); // temporary holding place for the function calculation
 
         for (int surfNum = 1; surfNum <= this->NumOfSurfaces; ++surfNum) {
-            auto &thisHydrSysSurf(state.dataSurface->Surface(this->SurfacePtr(surfNum)));
-            auto &thisHydrSpacing(state.dataConstruction->Construct(thisHydrSysSurf.Construction).ThicknessPerpend);
+            auto &thisHydrSysSurf = state.dataSurface->Surface(this->SurfacePtr(surfNum));
+            auto const &thisHydrSpacing = state.dataConstruction->Construct(thisHydrSysSurf.Construction).ThicknessPerpend;
             if ((thisHydrSpacing > 0.005) && (thisHydrSpacing < 0.5)) { // limit allowable spacing to between 1cm and 1m
                 tubeLength += thisHydrSysSurf.Area / (2.0 * thisHydrSpacing);
             } else { // if not in allowable limit, default back to 0.15m (15cm or 6 inches)
@@ -3570,10 +3574,10 @@ namespace LowTempRadiantSystem {
         Real64 mdot;         // local temporary for fluid mass flow rate
         bool SysRunning;     // True when system is running
 
-        VarFlowRadDesignData variableFlowDesignDataObject{
-            state.dataLowTempRadSys->HydronicRadiantSysDesign(this->DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
+        VarFlowRadDesignData variableFlowDesignDataObject =                           // Is this intended to be a copy?
+            state.dataLowTempRadSys->HydronicRadiantSysDesign(this->DesignObjectPtr); // Contains the data for variable flow hydronic systems
 
-        auto &Surface(state.dataSurface->Surface);
+        auto &Surface = state.dataSurface->Surface;
 
         ControlNode = 0;
         MaxWaterFlow = 0.0;
@@ -3630,7 +3634,7 @@ namespace LowTempRadiantSystem {
             // potentially be heating or cooling at a particular control temperature
             if (OffTempHeat > OffTempCool) {
                 MassFlowFrac = 0.0;
-                ShowSevereError(state, "Overlapping heating and cooling control temps in radiant system: " + this->Name);
+                ShowSevereError(state, format("Overlapping heating and cooling control temps in radiant system: {}", this->Name));
                 ShowFatalError(state, "Preceding condition causes termination.");
 
             } else { // Temperatures for heating and cooling do not overlap--calculate the mass flow fraction
@@ -3711,7 +3715,7 @@ namespace LowTempRadiantSystem {
         //   of Illinois at Urbana-Champaign, Department of Mechanical and Industrial
         //   Engineering.
 
-        auto &Zone(state.dataHeatBal->Zone);
+        auto &Zone = state.dataHeatBal->Zone;
 
         // Using/Aliasing
         using PlantUtilities::SetComponentFlowRate;
@@ -3737,10 +3741,10 @@ namespace LowTempRadiantSystem {
         Real64 ZeroFlowSurfTemp;  // Temperature of radiant surface when flow is zero
         int ZoneNum;              // Zone pointer for this radiant system
 
-        VarFlowRadDesignData variableFlowDesignDataObject{
-            state.dataLowTempRadSys->HydronicRadiantSysDesign(this->DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
+        VarFlowRadDesignData variableFlowDesignDataObject =                           // Is this intended to be a deep copy?
+            state.dataLowTempRadSys->HydronicRadiantSysDesign(this->DesignObjectPtr); // Contains the data for variable flow hydronic systems
 
-        auto &Surface(state.dataSurface->Surface);
+        auto &Surface = state.dataSurface->Surface;
 
         Real64 Ca; // Coefficients to relate the inlet water temperature to the heat source
         Real64 Cb;
@@ -3771,7 +3775,7 @@ namespace LowTempRadiantSystem {
         default: {
             WaterNodeIn = 0; // Suppress uninitialized warning
             ShowSevereError(state, "Illegal low temperature radiant system operating mode");
-            ShowContinueError(state, "Occurs in Radiant System=" + this->Name);
+            ShowContinueError(state, format("Occurs in Radiant System={}", this->Name));
             ShowFatalError(state, "Preceding condition causes termination.");
         } break;
         }
@@ -3867,6 +3871,7 @@ namespace LowTempRadiantSystem {
                 // system as a function of the water inlet temperature (flow rate is also in there
                 // as well as all of the heat balance terms "hidden" in Ck and Cl).
                 ConstrNum = Surface(SurfNum).Construction;
+                auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
 
                 if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF) {
 
@@ -3879,9 +3884,9 @@ namespace LowTempRadiantSystem {
                     Cf = state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum);
 
                     Cg = state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
-                    Ch = state.dataConstruction->Construct(ConstrNum).CTFTSourceQ(0);
-                    Ci = state.dataConstruction->Construct(ConstrNum).CTFTSourceIn(0);
-                    Cj = state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0);
+                    Ch = thisConstruct.CTFTSourceQ[0];
+                    Ci = thisConstruct.CTFTSourceIn[0];
+                    Cj = thisConstruct.CTFTSourceOut[0];
 
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
@@ -3937,7 +3942,8 @@ namespace LowTempRadiantSystem {
             // A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
             // conditions.
             this->CondCausedShutDown = false;
-            DewPointTemp = PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
+            DewPointTemp =
+                PsyTdpFnWPb(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).airHumRat, state.dataEnvrn->OutBaroPress);
 
             if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlSimpleOff)) {
 
@@ -3962,8 +3968,8 @@ namespace LowTempRadiantSystem {
                             if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
                                 ShowWarningMessage(state, format("{} [{}]", cHydronicSystem, this->Name));
                                 ShowContinueError(state,
-                                                  "Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
-                                                      "] temperature below dew-point temperature--potential for condensation exists");
+                                                  format("Surface [{}] temperature below dew-point temperature--potential for condensation exists",
+                                                         Surface(this->SurfacePtr(RadSurfNum2)).Name));
                                 ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
                                 ShowContinueError(state,
                                                   format("Predicted radiant system surface temperature = {:.2R}",
@@ -4069,6 +4075,8 @@ namespace LowTempRadiantSystem {
                                                                      this->DesignObjectPtr,
                                                                      typeOfRadiantSystem);
 
+                            ConstrNum = Surface(SurfNum).Construction;
+                            auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
                             if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF) {
                                 // For documentation on coefficients, see code earlier in this subroutine
                                 Ca = state.dataHeatBalFanSys->RadSysTiHBConstCoef(SurfNum);
@@ -4078,9 +4086,9 @@ namespace LowTempRadiantSystem {
                                 Ce = state.dataHeatBalFanSys->RadSysToHBTinCoef(SurfNum);
                                 Cf = state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum);
                                 Cg = state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
-                                Ch = state.dataConstruction->Construct(ConstrNum).CTFTSourceQ(0);
-                                Ci = state.dataConstruction->Construct(ConstrNum).CTFTSourceIn(0);
-                                Cj = state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0);
+                                Ch = thisConstruct.CTFTSourceQ[0];
+                                Ci = thisConstruct.CTFTSourceIn[0];
+                                Cj = thisConstruct.CTFTSourceOut[0];
                                 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
                                 state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
@@ -4107,7 +4115,6 @@ namespace LowTempRadiantSystem {
                                 this->CondCausedShutDown = true;
                                 WaterMassFlow = 0.0;
                                 this->OperatingMode = NotOperating;
-                                RadSurfNum = RadSurfNum2;
                                 SetComponentFlowRate(state, WaterMassFlow, this->ColdWaterInNode, this->ColdWaterOutNode, this->CWPlantLoc);
                                 this->WaterMassFlowRate = WaterMassFlow;
                                 for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
@@ -4127,8 +4134,8 @@ namespace LowTempRadiantSystem {
                             if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
                                 ShowWarningMessage(state, format("{} [{}]", cHydronicSystem, this->Name));
                                 ShowContinueError(state,
-                                                  "Surface [" + Surface(this->SurfacePtr(CondSurfNum)).Name +
-                                                      "] temperature below dew-point temperature--potential for condensation exists");
+                                                  format("Surface [{}] temperature below dew-point temperature--potential for condensation exists",
+                                                         Surface(this->SurfacePtr(CondSurfNum)).Name));
                                 ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
                                 ShowContinueError(state,
                                                   format("Predicted radiant system surface temperature = {:.2R}",
@@ -4163,7 +4170,7 @@ namespace LowTempRadiantSystem {
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-        LoadMet = SumHATsurf(state, ZoneNum) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum);
+        LoadMet = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - this->ZeroLTRSourceSumHATsurf;
     }
 
     void ConstantFlowRadiantSystemData::calculateLowTemperatureRadiantSystem(EnergyPlusData &state,
@@ -4206,7 +4213,7 @@ namespace LowTempRadiantSystem {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr LowCpFluidValue(100.0); // lowest allowed Cp fluid value (to avoid dividing by zero) [J/kg-K]
-        auto constexpr RoutineName("CalcLowTempCFloRadiantSystem");
+        constexpr std::string_view RoutineName("CalcLowTempCFloRadiantSystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpFluid;         // Specific heat of the fluid in the radiant system
@@ -4228,16 +4235,14 @@ namespace LowTempRadiantSystem {
         Real64 SysWaterInTemp;  // Fluid temperature supplied from the loop
         Real64 WaterTempHi;     // Current high point in water temperature range
         Real64 WaterTempLo;     // Current low point in water temperature range
-        int ZoneNum;            // number of zone being served
         Real64 mdot;            // local temporary for water mass flow rate kg/s
 
-        ConstantFlowRadDesignData ConstantFlowDesignDataObject{
-            state.dataLowTempRadSys->CflowRadiantSysDesign(this->DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
-        auto &Surface(state.dataSurface->Surface);
-        auto &Node(state.dataLoopNodes->Node);
+        ConstantFlowRadDesignData ConstantFlowDesignDataObject =                   // Once again, is this supposed to be a deep copy?
+            state.dataLowTempRadSys->CflowRadiantSysDesign(this->DesignObjectPtr); // Contains the data for variable flow hydronic systems
+        auto &Surface = state.dataSurface->Surface;
+        auto &Node = state.dataLoopNodes->Node;
 
         // initialize local variables
-        ZoneNum = this->ZonePtr;
         SysRunning = true; // default to running and turn off only if not running
         state.dataLowTempRadSys->VarOffCond = false;
 
@@ -4284,7 +4289,7 @@ namespace LowTempRadiantSystem {
                     SetPointTempHi = GetCurrentScheduleValue(state, this->HotCtrlHiTempSchedPtr);
                     SetPointTempLo = GetCurrentScheduleValue(state, this->HotCtrlLoTempSchedPtr);
                     if (SetPointTempHi < SetPointTempLo) {
-                        ShowSevereError(state, "Heating setpoint temperature mismatch in" + this->Name);
+                        ShowSevereError(state, format("Heating setpoint temperature mismatch in{}", this->Name));
                         ShowContinueError(state, "High setpoint temperature is less than low setpoint temperature--check your schedule input");
                         ShowFatalError(state, "Preceding condition causes termination.");
                     }
@@ -4292,7 +4297,7 @@ namespace LowTempRadiantSystem {
                     WaterTempHi = GetCurrentScheduleValue(state, this->HotWaterHiTempSchedPtr);
                     WaterTempLo = GetCurrentScheduleValue(state, this->HotWaterLoTempSchedPtr);
                     if (WaterTempHi < WaterTempLo) {
-                        ShowSevereError(state, "Heating water temperature mismatch in" + this->Name);
+                        ShowSevereError(state, format("Heating water temperature mismatch in{}", this->Name));
                         ShowContinueError(state, "High water temperature is less than low water temperature--check your schedule input");
                         ShowFatalError(state, "Preceding condition causes termination.");
                     }
@@ -4323,7 +4328,7 @@ namespace LowTempRadiantSystem {
                     SetPointTempHi = GetCurrentScheduleValue(state, this->ColdCtrlHiTempSchedPtr);
                     SetPointTempLo = GetCurrentScheduleValue(state, this->ColdCtrlLoTempSchedPtr);
                     if (SetPointTempHi < SetPointTempLo) {
-                        ShowSevereError(state, "Cooling setpoint temperature mismatch in" + this->Name);
+                        ShowSevereError(state, format("Cooling setpoint temperature mismatch in{}", this->Name));
                         ShowContinueError(state, "High setpoint temperature is less than low setpoint temperature--check your schedule input");
                         ShowFatalError(state, "Preceding condition causes termination.");
                     }
@@ -4331,7 +4336,7 @@ namespace LowTempRadiantSystem {
                     WaterTempHi = GetCurrentScheduleValue(state, this->ColdWaterHiTempSchedPtr);
                     WaterTempLo = GetCurrentScheduleValue(state, this->ColdWaterLoTempSchedPtr);
                     if (WaterTempHi < WaterTempLo) {
-                        ShowSevereError(state, "Cooling water temperature mismatch in" + this->Name);
+                        ShowSevereError(state, format("Cooling water temperature mismatch in{}", this->Name));
                         ShowContinueError(state, "High water temperature is less than low water temperature--check your schedule input");
                         ShowFatalError(state, "Preceding condition causes termination.");
                     }
@@ -4708,7 +4713,7 @@ namespace LowTempRadiantSystem {
         //   of Illinois at Urbana-Champaign, Department of Mechanical and Industrial
         //   Engineering.
 
-        auto &Zone(state.dataHeatBal->Zone);
+        auto &Zone = state.dataHeatBal->Zone;
 
         // Using/Aliasing
         using FluidProperties::GetSpecificHeatGlycol;
@@ -4717,7 +4722,7 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr TempCheckLimit(0.1); // Maximum allowed temperature difference between outlet temperature calculations
         Real64 constexpr ZeroSystemResp(0.1); // Response below which the system response is really zero
-        auto constexpr RoutineName("CalcLowTempCFloRadSysComps");
+        constexpr std::string_view RoutineName("CalcLowTempCFloRadSysComps");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ConstrNum;                // Index for construction number in Construct derived type
@@ -4737,15 +4742,14 @@ namespace LowTempRadiantSystem {
         Real64 TotalRadSysPower;      // Total heat source/sink to radiant system
         Real64 TwiCoeff;              // Intermeidate calculation variable for determining the water inlet temperature
         Real64 WaterMassFlow;         // Water mass flow rate in the radiant system, kg/s
-        int WaterNodeIn;              // Node number of the water entering the radiant system
         Real64 WaterOutletTempCheck;  // Radiant system water outlet temperature (calculated from mixing all outlet streams together)
         Real64 WaterTempIn;           // Temperature of the water entering the radiant system, in C
         int ZoneNum;                  // number of zone being served
         Real64 ZoneMult;              // Zone multiplier for this system
 
-        ConstantFlowRadDesignData ConstantFlowDesignDataObject{
-            state.dataLowTempRadSys->CflowRadiantSysDesign(this->DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
-        auto &Surface(state.dataSurface->Surface);
+        ConstantFlowRadDesignData ConstantFlowDesignDataObject =                   // I repeat myself
+            state.dataLowTempRadSys->CflowRadiantSysDesign(this->DesignObjectPtr); // Contains the data for variable flow hydronic systems
+        auto &Surface = state.dataSurface->Surface;
 
         Real64 Ca; // Coefficients to relate the inlet water temperature to the heat source
         Real64 Cb;
@@ -4775,20 +4779,6 @@ namespace LowTempRadiantSystem {
         state.dataLowTempRadSys->Cmj = 0.0;
         state.dataLowTempRadSys->WaterTempOut = this->WaterInletTemp;
 
-        // Set the conditions on the water side inlet
-        switch (this->OperatingMode) {
-        case HeatingMode: {
-            WaterNodeIn = this->HotWaterInNode;
-        } break;
-        case CoolingMode: {
-            WaterNodeIn = this->ColdWaterInNode;
-        } break;
-        default: {
-            ShowSevereError(state, "Illegal low temperature radiant system operating mode");
-            ShowContinueError(state, "Occurs in Radiant System=" + this->Name);
-            ShowFatalError(state, "Preceding condition causes termination.");
-        } break;
-        }
         ZoneNum = this->ZonePtr;
         ZoneMult = double(Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier);
         WaterMassFlow = this->WaterMassFlowRate / ZoneMult;
@@ -4883,6 +4873,7 @@ namespace LowTempRadiantSystem {
                 // as well as all of the heat balance terms "hidden" in Ck and Cl).
 
                 ConstrNum = Surface(SurfNum).Construction;
+                auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
 
                 Ca = state.dataHeatBalFanSys->RadSysTiHBConstCoef(SurfNum);
                 Cb = state.dataHeatBalFanSys->RadSysTiHBToutCoef(SurfNum);
@@ -4893,9 +4884,9 @@ namespace LowTempRadiantSystem {
                 Cf = state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum);
 
                 Cg = state.dataHeatBalFanSys->CTFTsrcConstPart(SurfNum);
-                Ch = state.dataConstruction->Construct(ConstrNum).CTFTSourceQ(0);
-                Ci = state.dataConstruction->Construct(ConstrNum).CTFTSourceIn(0);
-                Cj = state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0);
+                Ch = thisConstruct.CTFTSourceQ[0];
+                Ci = thisConstruct.CTFTSourceIn[0];
+                Cj = thisConstruct.CTFTSourceOut[0];
 
                 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
@@ -5029,7 +5020,8 @@ namespace LowTempRadiantSystem {
             // A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
             // conditions.
             this->CondCausedShutDown = false;
-            DewPointTemp = PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRat(this->ZonePtr), state.dataEnvrn->OutBaroPress);
+            DewPointTemp =
+                PsyTdpFnWPb(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->ZonePtr).airHumRat, state.dataEnvrn->OutBaroPress);
 
             if ((this->OperatingMode == CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlSimpleOff)) {
 
@@ -5054,8 +5046,8 @@ namespace LowTempRadiantSystem {
                             if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
                                 ShowWarningMessage(state, format("{} [{}]", cConstantFlowSystem, this->Name));
                                 ShowContinueError(state,
-                                                  "Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
-                                                      "] temperature below dew-point temperature--potential for condensation exists");
+                                                  format("Surface [{}] temperature below dew-point temperature--potential for condensation exists",
+                                                         Surface(this->SurfacePtr(RadSurfNum2)).Name));
                                 ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
                                 ShowContinueError(state,
                                                   format("Predicted radiant system surface temperature = {:.2R}",
@@ -5116,9 +5108,10 @@ namespace LowTempRadiantSystem {
                             if (!state.dataGlobal->WarmupFlag) {
                                 if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
                                     ShowWarningMessage(state, format("{} [{}]", cConstantFlowSystem, this->Name));
-                                    ShowContinueError(state,
-                                                      "Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
-                                                          "] temperature below dew-point temperature--potential for condensation exists");
+                                    ShowContinueError(
+                                        state,
+                                        format("Surface [{}] temperature below dew-point temperature--potential for condensation exists",
+                                               Surface(this->SurfacePtr(RadSurfNum2)).Name));
                                     ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
                                     ShowContinueError(state,
                                                       format("Predicted radiant system surface temperature = {:.2R}",
@@ -5179,7 +5172,7 @@ namespace LowTempRadiantSystem {
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-        LoadMet = SumHATsurf(state, this->ZonePtr) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(this->ZonePtr);
+        LoadMet = state.dataHeatBal->Zone(this->ZonePtr).sumHATsurf(state) - this->ZeroLTRSourceSumHATsurf;
     }
     // TODO Write unit tests for baseboard
     void ConstantFlowRadiantSystemData::calculateRunningMeanAverageTemperature(EnergyPlusData &state, int RadSysNum)
@@ -5216,12 +5209,12 @@ namespace LowTempRadiantSystem {
     Real64 ConstantFlowRadiantSystemData::calculateCurrentDailyAverageODB(EnergyPlusData &state)
     {
         Real64 sum = 0.0;
-        for (int hourNumber = 1; hourNumber <= DataGlobalConstants::HoursInDay; ++hourNumber) {
+        for (int hourNumber = 1; hourNumber <= Constant::HoursInDay; ++hourNumber) {
             for (int timeStepNumber = 1; timeStepNumber <= state.dataGlobal->NumOfTimeStepInHour; ++timeStepNumber) {
                 sum += state.dataWeatherManager->TodayOutDryBulbTemp(timeStepNumber, hourNumber);
             }
         }
-        return sum / double(DataGlobalConstants::HoursInDay * state.dataGlobal->NumOfTimeStepInHour);
+        return sum / double(Constant::HoursInDay * state.dataGlobal->NumOfTimeStepInHour);
     }
 
     void ElectricRadiantSystemData::calculateLowTemperatureRadiantSystem(EnergyPlusData &state,
@@ -5270,7 +5263,7 @@ namespace LowTempRadiantSystem {
         // initialize local variables
         ZoneNum = this->ZonePtr;
         HeatFrac = 0.0;
-        auto &Surface(state.dataSurface->Surface);
+        auto &Surface = state.dataSurface->Surface;
 
         if (GetCurrentScheduleValue(state, this->SchedPtr) <= 0.0) {
 
@@ -5311,7 +5304,7 @@ namespace LowTempRadiantSystem {
                 HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-                LoadMet = SumHATsurf(state, ZoneNum) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum);
+                LoadMet = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - this->ZeroLTRSourceSumHATsurf;
 
             } else { //  OFF or COOLING MODE (not allowed for an electric low temperature radiant system), turn it off
 
@@ -5334,31 +5327,26 @@ namespace LowTempRadiantSystem {
         // iterating orwe had to go back and shorten the time step.  As a result, we have to subtract out the previous value that we
         // added.  If the system time step elapsed is different, then we just need to add the new values to the running average.
 
-        // Using/Aliasing
-        auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
+        Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+        Real64 TimeStepZone = state.dataGlobal->TimeStepZone;
 
         for (int radSurfNum = 1; radSurfNum <= this->NumOfSurfaces; ++radSurfNum) {
 
             int surfNum = this->SurfacePtr(radSurfNum);
 
-            if (state.dataLowTempRadSys->LastSysTimeElapsed(surfNum) == SysTimeElapsed) {
+            if (this->LastSysTimeElapsed == SysTimeElapsed) {
                 // Still iterating or reducing system time step, so subtract old values which were
                 // not valid
-                state.dataLowTempRadSys->QRadSysSrcAvg(surfNum) -= state.dataLowTempRadSys->LastQRadSysSrc(surfNum) *
-                                                                   state.dataLowTempRadSys->LastTimeStepSys(surfNum) / state.dataGlobal->TimeStepZone;
+                this->QRadSysSrcAvg(radSurfNum) -= this->LastQRadSysSrc(radSurfNum) * this->LastTimeStepSys / TimeStepZone;
             }
 
             // Update the running average and the "last" values with the current values of the appropriate variables
-            state.dataLowTempRadSys->QRadSysSrcAvg(surfNum) +=
-                state.dataHeatBalFanSys->QRadSysSource(surfNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
-
-            state.dataLowTempRadSys->LastQRadSysSrc(surfNum) = state.dataHeatBalFanSys->QRadSysSource(surfNum);
-            state.dataLowTempRadSys->LastSysTimeElapsed(surfNum) = SysTimeElapsed;
-            state.dataLowTempRadSys->LastTimeStepSys(surfNum) = TimeStepSys;
+            this->QRadSysSrcAvg(radSurfNum) += state.dataHeatBalFanSys->QRadSysSource(surfNum) * TimeStepSys / TimeStepZone;
+            this->LastQRadSysSrc(radSurfNum) = state.dataHeatBalFanSys->QRadSysSource(surfNum);
         }
+        this->LastSysTimeElapsed = SysTimeElapsed;
+        this->LastTimeStepSys = TimeStepSys;
     }
 
     void VariableFlowRadiantSystemData::updateLowTemperatureRadiantSystem(EnergyPlusData &state)
@@ -5370,7 +5358,7 @@ namespace LowTempRadiantSystem {
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        auto constexpr RoutineName("UpdateVariableFlowSystem");
+        constexpr std::string_view RoutineName("UpdateVariableFlowSystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 cpWater;       // Specific heat of water
@@ -5378,8 +5366,8 @@ namespace LowTempRadiantSystem {
         Real64 waterMassFlow; // Flow rate of water in the radiant system
         int waterOutletNode;  // Node number for the water side outlet of the radiant system
 
-        auto &Zone(state.dataHeatBal->Zone);
-        auto &Node(state.dataLoopNodes->Node);
+        auto &Zone = state.dataHeatBal->Zone;
+        auto &Node = state.dataLoopNodes->Node;
 
         // For a hydronic system, calculate the water side outlet conditions and set the
         // appropriate conditions on the correct HVAC node.
@@ -5552,7 +5540,7 @@ namespace LowTempRadiantSystem {
             if (state.dataLowTempRadSys->warnTooLow) {
                 if (this->OutRangeLoErrorCount == 0) {
                     ShowSevereMessage(state, "UpdateLowTempRadiantSystem: model result for fluid outlet temperature is not physical.");
-                    ShowContinueError(state, "Occurs for radiant system name = " + this->Name);
+                    ShowContinueError(state, format("Occurs for radiant system name = {}", this->Name));
                     ShowContinueError(state, format("Calculated radiant system outlet temperature = {:.3R} [C]", outletTemp));
                     ShowContinueError(state, format("Radiant system inlet temperature = {:.3R} [C]", inletTemp));
                     ShowContinueError(
@@ -5569,7 +5557,7 @@ namespace LowTempRadiantSystem {
             if (state.dataLowTempRadSys->warnTooHigh) {
                 if (this->OutRangeHiErrorCount == 0) {
                     ShowSevereMessage(state, "UpdateLowTempRadiantSystem: model result for fluid outlet temperature is not physical.");
-                    ShowContinueError(state, "Occurs for radiant system name = " + this->Name);
+                    ShowContinueError(state, format("Occurs for radiant system name = {}", this->Name));
                     ShowContinueError(state, format("Calculated radiant system outlet temperature = {:.3R} [C]", outletTemp));
                     ShowContinueError(state, format("Radiant system inlet temperature = {:.3R} [C]", inletTemp));
                     ShowContinueError(
@@ -5587,13 +5575,14 @@ namespace LowTempRadiantSystem {
 
     Real64 RadiantSystemBaseData::setRadiantSystemControlTemperature(EnergyPlusData &state, LowTempRadiantControlTypes TempControlType)
     {
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->ZonePtr);
         switch (TempControlType) {
         case LowTempRadiantControlTypes::MATControl:
-            return state.dataHeatBalFanSys->MAT(this->ZonePtr);
+            return thisZoneHB.MAT;
         case LowTempRadiantControlTypes::MRTControl:
             return state.dataHeatBal->ZoneMRT(this->ZonePtr);
         case LowTempRadiantControlTypes::OperativeControl:
-            return 0.5 * (state.dataHeatBalFanSys->MAT(this->ZonePtr) + state.dataHeatBal->ZoneMRT(this->ZonePtr));
+            return 0.5 * (thisZoneHB.MAT + state.dataHeatBal->ZoneMRT(this->ZonePtr));
         case LowTempRadiantControlTypes::ODBControl:
             return state.dataHeatBal->Zone(this->ZonePtr).OutDryBulbTemp;
         case LowTempRadiantControlTypes::OWBControl:
@@ -5606,7 +5595,7 @@ namespace LowTempRadiantSystem {
         case LowTempRadiantControlTypes::RunningMeanODBControl:
             return this->todayRunningMeanOutdoorDryBulbTemperature;
         default:
-            ShowSevereError(state, "Illegal control type in low temperature radiant system or it's design object: " + this->Name);
+            ShowSevereError(state, format("Illegal control type in low temperature radiant system or it's design object: {}", this->Name));
             ShowFatalError(state, "Preceding condition causes termination.");
             return 0.0; // hush the compiler
         }
@@ -5638,7 +5627,7 @@ namespace LowTempRadiantSystem {
         case LowTempRadiantSetpointTypes::ZeroFlowPower:
             return scheduleValue;
         default:
-            ShowSevereError(state, "Illegal setpoint type in low temperature radiant system: " + this->Name);
+            ShowSevereError(state, format("Illegal setpoint type in low temperature radiant system: {}", this->Name));
             ShowFatalError(state, "Preceding condition causes termination.");
             return scheduleValue + 0.5 * throttlingRange; // hush the compiler
         }
@@ -5710,7 +5699,7 @@ namespace LowTempRadiantSystem {
             NumOfPropDivisions, {0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656}); // Conductivity, in W/mK
         Array1D<Real64> Pr(NumOfPropDivisions,
                            {12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88}); // Prandtl number (dimensionless)
-        auto constexpr RoutineName("calculateHXEffectivenessTerm");
+        constexpr std::string_view RoutineName("calculateHXEffectivenessTerm");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Index;
@@ -5796,12 +5785,12 @@ namespace LowTempRadiantSystem {
             // Calculate the NTU parameter
             // NTU = UA/[(Mdot*Cp)min]
             // where: U = h (convection coefficient) and h = (k)(Nu)/D
-            //        A = DataGlobalConstants::Pi()*D*TubeLength
-            NTU = U * DataGlobalConstants::Pi * TubeDiameterOuter * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
+            //        A = Constant::Pi()*D*TubeLength
+            NTU = U * Constant::Pi * TubeDiameterOuter * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
         } else { // (this->FluidToSlabHeatTransfer == FluidToSlabHeatTransferTypes::ConvectionOnly)
 
             // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-            ReD = 4.0 * WaterMassFlow * FlowFraction / (DataGlobalConstants::Pi * MUactual * TubeDiameterInner * NumCircs);
+            ReD = 4.0 * WaterMassFlow * FlowFraction / (Constant::Pi * MUactual * TubeDiameterInner * NumCircs);
 
             // Calculate the Nusselt number based on what flow regime one is in
             if (ReD >= MaxLaminarRe) { // Turbulent flow --> use Colburn equation
@@ -5817,7 +5806,7 @@ namespace LowTempRadiantSystem {
             // NTU = UA/[(Mdot*Cp)min]
             // where: U = h (convection coefficient) and h = (k)(Nu)/D
             //        A = Pi*D*TubeLength
-            NTU = DataGlobalConstants::Pi * Kactual * NuD * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
+            NTU = Constant::Pi * Kactual * NuD * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
         }
 
         // Calculate Epsilon*MassFlowRate*Cp
@@ -5874,10 +5863,10 @@ namespace LowTempRadiantSystem {
         // Fluid resistance to heat transfer, assumes turbulent flow (Equation B5, p. 38 of ISO Standard 11855-2)
         Real64 distanceBetweenPipes = 2.0 * state.dataConstruction->Construct(constructionNumber).ThicknessPerpend;
         Real64 ratioDiameterToMassFlowLength = TubeDiameterInner / WaterMassFlow / this->TubeLength;
-        Real64 rFluid = 0.125 / DataGlobalConstants::Pi * std::pow(distanceBetweenPipes, 0.13) * std::pow(ratioDiameterToMassFlowLength, 0.87);
+        Real64 rFluid = 0.125 / Constant::Pi * std::pow(distanceBetweenPipes, 0.13) * std::pow(ratioDiameterToMassFlowLength, 0.87);
 
         // Resistance to heat transfer (conduction through the piping material, Equation B6, p. 38 of ISO Standard 11855-2)
-        Real64 rTube = 0.5 * distanceBetweenPipes * std::log(TubeDiameterOuter / TubeDiameterInner) / DataGlobalConstants::Pi / TubeConductivity;
+        Real64 rTube = 0.5 * distanceBetweenPipes * std::log(TubeDiameterOuter / TubeDiameterInner) / Constant::Pi / TubeConductivity;
 
         calculateUFromISOStandard = 1.0 / (rFluid + rTube);
 
@@ -5913,22 +5902,41 @@ namespace LowTempRadiantSystem {
 
         LowTempRadSysOn = false;
 
-        // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
-        if (!allocated(state.dataLowTempRadSys->QRadSysSrcAvg)) return;
+        // If there are no radiant systems in this input file, just RETURN
+        if (state.dataLowTempRadSys->TotalNumOfRadSystems == 0) return;
 
-        // If it was allocated, then we have to check to see if this was running at all...
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (state.dataLowTempRadSys->QRadSysSrcAvg(SurfNum) != 0.0) {
-                LowTempRadSysOn = true;
-                break; // DO loop
+        // Now check to see if anything is running and transfer information from the "average" variables to
+        // the array that will be used within the heat balance.
+        state.dataHeatBalFanSys->QRadSysSource = 0.0; // Zero this out first
+        for (int numRadSys = 1; numRadSys <= state.dataLowTempRadSys->NumOfHydrLowTempRadSys; ++numRadSys) {
+            auto &thisLTR = state.dataLowTempRadSys->HydrRadSys(numRadSys);
+            for (int numRadSurf = 1; numRadSurf <= thisLTR.NumOfSurfaces; ++numRadSurf) {
+                if (thisLTR.QRadSysSrcAvg(numRadSurf) != 0.0) LowTempRadSysOn = true;
+                SurfNum = thisLTR.SurfacePtr(numRadSurf);
+                state.dataHeatBalFanSys->QRadSysSource(SurfNum) = thisLTR.QRadSysSrcAvg(numRadSurf);
+            }
+        }
+        for (int numRadSys = 1; numRadSys <= state.dataLowTempRadSys->NumOfCFloLowTempRadSys; ++numRadSys) {
+            auto &thisLTR = state.dataLowTempRadSys->CFloRadSys(numRadSys);
+            for (int numRadSurf = 1; numRadSurf <= thisLTR.NumOfSurfaces; ++numRadSurf) {
+                if (thisLTR.QRadSysSrcAvg(numRadSurf) != 0.0) LowTempRadSysOn = true;
+                SurfNum = thisLTR.SurfacePtr(numRadSurf);
+                state.dataHeatBalFanSys->QRadSysSource(SurfNum) = thisLTR.QRadSysSrcAvg(numRadSurf);
+            }
+        }
+        for (int numRadSys = 1; numRadSys <= state.dataLowTempRadSys->NumOfElecLowTempRadSys; ++numRadSys) {
+            auto &thisLTR = state.dataLowTempRadSys->ElecRadSys(numRadSys);
+            for (int numRadSurf = 1; numRadSurf <= thisLTR.NumOfSurfaces; ++numRadSurf) {
+                if (thisLTR.QRadSysSrcAvg(numRadSurf) != 0.0) LowTempRadSysOn = true;
+                SurfNum = thisLTR.SurfacePtr(numRadSurf);
+                state.dataHeatBalFanSys->QRadSysSource(SurfNum) = thisLTR.QRadSysSrcAvg(numRadSurf);
             }
         }
 
-        state.dataHeatBalFanSys->QRadSysSource = state.dataLowTempRadSys->QRadSysSrcAvg;
-        auto &Surface(state.dataSurface->Surface);
+        auto const &Surface = state.dataSurface->Surface;
 
-        // For interzone surfaces, QRadSysSrcAvg was only updated for the "active" side.  The active side
-        // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
+        // For interzone surfaces, QRadSysSource was only updated for the "active" side.  The
+        // active side would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum) {
                 if (std::abs(state.dataHeatBalFanSys->QRadSysSource(SurfNum) -
@@ -5944,63 +5952,13 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Peter Graham Ellis
-        //       DATE WRITTEN   July 2003
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function calculates the zone sum of Hc*Area*Tsurf.  It replaces the old SUMHAT.
-        // The SumHATsurf code below is also in the CalcZoneSums subroutine in ZoneTempPredictorCorrector
-        // and should be updated accordingly.
-
-        // Using/Aliasing
-        using namespace DataSurfaces;
-        using namespace DataHeatBalance;
-
-        // Return value
-        Real64 sumHATsurf(0.0);
-
-        auto &Surface(state.dataSurface->Surface);
-
-        for (int surfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; surfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++surfNum) {
-            Real64 Area = Surface(surfNum).Area;
-
-            if (Surface(surfNum).Class == SurfaceClass::Window) {
-                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(surfNum))) {
-                    // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += state.dataSurface->SurfWinDividerArea(surfNum);
-                }
-
-                if (state.dataSurface->SurfWinFrameArea(surfNum) > 0.0) {
-                    // Window frame contribution
-                    sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataSurface->SurfWinFrameArea(surfNum) *
-                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(surfNum)) * state.dataSurface->SurfWinFrameTempIn(surfNum);
-                }
-
-                if (state.dataSurface->SurfWinDividerArea(surfNum) > 0.0 &&
-                    !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(surfNum))) {
-                    // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataSurface->SurfWinDividerArea(surfNum) *
-                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(surfNum)) * state.dataSurface->SurfWinDividerTempIn(surfNum);
-                }
-            }
-
-            sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(surfNum);
-        }
-
-        return sumHATsurf;
-    }
-
     void VariableFlowRadiantSystemData::reportLowTemperatureRadiantSystem([[maybe_unused]] EnergyPlusData &state)
     {
 
-        auto &Zone(state.dataHeatBal->Zone);
+        auto &Zone = state.dataHeatBal->Zone;
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         Real64 totalRadSysPower(0.0); // Total source/sink power for the radiant system (sum of all surfaces of the system)
 
@@ -6030,11 +5988,11 @@ namespace LowTempRadiantSystem {
             this->WaterOutletTemp = this->WaterInletTemp;
         }
 
-        this->HeatEnergy = this->HeatPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        this->CoolEnergy = this->CoolPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        this->HeatEnergy = this->HeatPower * TimeStepSysSec;
+        this->CoolEnergy = this->CoolPower * TimeStepSysSec;
 
         if (this->CondCausedShutDown) {
-            this->CondCausedTimeOff = TimeStepSys * DataGlobalConstants::SecInHour;
+            this->CondCausedTimeOff = TimeStepSysSec;
         } else {
             this->CondCausedTimeOff = 0.0;
         }
@@ -6043,13 +6001,13 @@ namespace LowTempRadiantSystem {
     void ConstantFlowRadiantSystemData::reportLowTemperatureRadiantSystem(EnergyPlusData &state)
     {
 
-        auto &Zone(state.dataHeatBal->Zone);
+        auto &Zone = state.dataHeatBal->Zone;
 
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        auto constexpr routineName("ReportConstantFlowSystem");
+        constexpr std::string_view routineName("ReportConstantFlowSystem");
         Real64 cpFluid;               // Specific heat of the fluid in the radiant system
         Real64 totalRadSysPower(0.0); // Total source/sink power for the radiant system (sum of all surfaces of the system)
 
@@ -6106,13 +6064,13 @@ namespace LowTempRadiantSystem {
             this->PumpHeattoFluid = 0.0;
         }
 
-        this->HeatEnergy = this->HeatPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        this->CoolEnergy = this->CoolPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        this->PumpEnergy = this->PumpPower * TimeStepSys * DataGlobalConstants::SecInHour;
-        this->PumpHeattoFluidEnergy = this->PumpHeattoFluid * TimeStepSys * DataGlobalConstants::SecInHour;
+        this->HeatEnergy = this->HeatPower * TimeStepSysSec;
+        this->CoolEnergy = this->CoolPower * TimeStepSysSec;
+        this->PumpEnergy = this->PumpPower * TimeStepSysSec;
+        this->PumpHeattoFluidEnergy = this->PumpHeattoFluid * TimeStepSysSec;
 
         if (this->CondCausedShutDown) {
-            this->CondCausedTimeOff = TimeStepSys * DataGlobalConstants::SecInHour;
+            this->CondCausedTimeOff = TimeStepSysSec;
         } else {
             this->CondCausedTimeOff = 0.0;
         }
@@ -6121,11 +6079,9 @@ namespace LowTempRadiantSystem {
     void ElectricRadiantSystemData::reportLowTemperatureRadiantSystem([[maybe_unused]] EnergyPlusData &state)
     {
 
-        auto &Zone(state.dataHeatBal->Zone);
-
+        auto &Zone = state.dataHeatBal->Zone;
+        Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         // Using/Aliasing
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
         Real64 totalRadSysPower(0.0); // Total source/sink power for the radiant system (sum of all surfaces of the system)
 
         for (int radSurfNum = 1; radSurfNum <= this->NumOfSurfaces; ++radSurfNum) {
@@ -6135,7 +6091,7 @@ namespace LowTempRadiantSystem {
         totalRadSysPower *= double(Zone(this->ZonePtr).Multiplier * Zone(this->ZonePtr).ListMultiplier);
 
         this->ElecPower = totalRadSysPower;
-        this->ElecEnergy = this->ElecPower * TimeStepSys * DataGlobalConstants::SecInHour;
+        this->ElecEnergy = this->ElecPower * TimeStepSysSec;
         this->HeatPower = this->ElecPower;
         this->HeatEnergy = this->ElecEnergy;
     }

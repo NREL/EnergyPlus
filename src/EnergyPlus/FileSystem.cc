@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -81,9 +81,9 @@ namespace FileSystem {
 #endif
 
     static constexpr std::array<std::string_view, static_cast<std::size_t>(FileTypes::Num)> FileTypesExt{
-        "epJSON", "json", "glhe", "cbor", "msgpack", "ubjson", "bson", "idf", "imf", "csv", "tsv", "txt", "eso", "mtr"};
+        "epJSON", "json", "glhe", "cbor", "msgpack", "ubjson", "bson", "idf", "imf", "csv", "tsv", "txt", "eso", "mtr", "ddy"};
     static constexpr std::array<std::string_view, static_cast<std::size_t>(FileTypes::Num)> FileTypesExtUC{
-        "EPJSON", "JSON", "GLHE", "CBOR", "MSGPACK", "UBJSON", "BSON", "IDF", "IMF", "CSV", "TSV", "TXT", "ESO", "MTR"};
+        "EPJSON", "JSON", "GLHE", "CBOR", "MSGPACK", "UBJSON", "BSON", "IDF", "IMF", "CSV", "TSV", "TXT", "ESO", "MTR", "DDY"};
 
     static_assert(FileTypesExt.size() == static_cast<std::size_t>(FileTypes::Num), "Mismatched FileTypes enum and FileTypesExt array.");
     static_assert(FileTypesExtUC.size() == static_cast<std::size_t>(FileTypes::Num), "Mismatched FileTypes enum and FileTypesExtUC array.");
@@ -144,7 +144,7 @@ namespace FileSystem {
         fs::path p = fs::absolute(path);
 
         while (fs::is_symlink(p)) {
-            auto linkpath = fs::read_symlink(p);
+            fs::path linkpath = fs::read_symlink(p);
             if (linkpath.is_absolute()) {
                 p = linkpath;
             } else {
@@ -227,15 +227,15 @@ namespace FileSystem {
     FileTypes getFileType(fs::path const &filePath)
     {
 #ifdef _WIN32
-        auto const filePathStr = fs::path(filePath).extension().string();
-        auto extension = std::string_view(filePathStr.c_str());
+        std::string const filePathStr = fs::path(filePath).extension().string();
+        std::string_view extension = filePathStr.c_str();
 #else
-        auto extension = std::string_view(fs::path(filePath).extension().c_str());
+        std::string_view extension = fs::path(filePath).extension().c_str();
 #endif
 
         extension.remove_prefix(extension.find_last_of('.') + 1);
         std::string stringExtension = std::string(extension);
-        return static_cast<FileTypes>(getEnumerationValue(FileTypesExtUC, UtilityRoutines::MakeUPPERCase(stringExtension)));
+        return static_cast<FileTypes>(getEnumValue(FileTypesExtUC, UtilityRoutines::makeUPPER(stringExtension)));
     }
 
     // TODO: remove for fs::path::replace_extension directly? Note that replace_extension mutates the object
@@ -339,10 +339,10 @@ namespace FileSystem {
     std::string readFile(fs::path const &filePath, std::ios_base::openmode mode)
     {
 #ifdef _WIN32
-        auto filePathStr = filePath.string();
-        auto path = filePathStr.c_str();
+        std::string filePathStr = filePath.string();
+        const char *path = filePathStr.c_str();
 #else
-        auto path = filePath.c_str();
+        const char *path = filePath.c_str();
 #endif
 
         if (!fileExists(filePath)) {
@@ -361,19 +361,19 @@ namespace FileSystem {
         }
 
         auto close_file = [](FILE *f) { fclose(f); };
-        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(path, fopen_mode.data()), close_file);
+        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(path, fopen_mode.data()), close_file); // (THIS_AUTO_OK)
         if (!holder) {
             throw FatalError(fmt::format("Could not open file: {}", path));
         }
 
-        auto f = holder.get();
-        const auto size = fs::file_size(filePath);
+        auto f = holder.get(); // (THIS_AUTO_OK)
+        const std::uintmax_t size = fs::file_size(filePath);
         std::string result;
         result.resize(size);
 
-        auto bytes_read = fread(result.data(), 1, size, f);
-        auto is_eof = feof(f);
-        auto has_error = ferror(f);
+        size_t bytes_read = fread(result.data(), 1, size, f);
+        bool is_eof = feof(f);
+        bool has_error = ferror(f);
         if (is_eof != 0) {
             return result;
         }
@@ -386,10 +386,10 @@ namespace FileSystem {
     nlohmann::json readJSON(fs::path const &filePath, std::ios_base::openmode mode)
     {
 #ifdef _WIN32
-        auto filePathStr = filePath.string();
-        auto path = filePathStr.c_str();
+        std::string filePathStr = filePath.string();
+        const char *path = filePathStr.c_str();
 #else
-        auto path = filePath.c_str();
+        const char *path = filePath.c_str();
 #endif
 
         if (!fileExists(filePath)) {
@@ -408,13 +408,13 @@ namespace FileSystem {
         }
 
         auto close_file = [](FILE *f) { fclose(f); };
-        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(path, fopen_mode.data()), close_file);
+        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(path, fopen_mode.data()), close_file); // (THIS_AUTO_OK)
         if (!holder) {
             throw FatalError(fmt::format("Could not open file: {}", path));
         }
-        auto f = holder.get();
+        auto f = holder.get(); // (THIS_AUTO_OK)
 
-        auto const ext = getFileType(filePath);
+        FileTypes const ext = getFileType(filePath);
         switch (ext) {
         case FileTypes::EpJSON:
         case FileTypes::JSON:

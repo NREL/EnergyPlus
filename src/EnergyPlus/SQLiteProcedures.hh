@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -83,8 +83,8 @@ protected:
                      fs::path const &dbName,
                      fs::path const &errorFilePath);
 
-    int sqliteExecuteCommand(const std::string &commandBuffer);
-    int sqlitePrepareStatement(sqlite3_stmt *&stmt, const std::string &stmtBuffer);
+    int sqliteExecuteCommand(std::string_view commandBuffer);
+    int sqlitePrepareStatement(sqlite3_stmt *&stmt, std::string_view stmtBuffer);
 
     int sqliteBindText(sqlite3_stmt *stmt, const int stmtInsertLocationIndex, std::string_view textBuffer);
     int sqliteBindInteger(sqlite3_stmt *stmt, const int stmtInsertLocationIndex, const int intToInsert);
@@ -115,12 +115,12 @@ public:
     // This allows for testing of private methods in SQLite
     friend class SQLiteFixture;
 
-    void addScheduleData(int const number, std::string const &name, std::string const &type, double const minValue, double const maxValue);
+    void addScheduleData(int const number, std::string_view name, std::string_view type, double const minValue, double const maxValue);
     void addZoneData(int const number, DataHeatBalance::ZoneData const &zoneData);
     void addZoneListData(int const number, DataHeatBalance::ZoneListData const &zoneListData);
-    void addSurfaceData(int const number, DataSurfaces::SurfaceData const &surfaceData, std::string const &surfaceClass);
+    void addSurfaceData(int const number, DataSurfaces::SurfaceData const &surfaceData, std::string_view surfaceClass);
     void addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData const &zoneGroupData);
-    void addMaterialData(int const number, Material::MaterialProperties const &materialData);
+    void addMaterialData(int const number, Material::MaterialBase const *materialData);
     void addConstructionData(int const number, Construction::ConstructionProps const &constructionData, double const &constructionUValue);
     void addNominalLightingData(int const number, DataHeatBalance::LightsData const &nominalLightingData);
     void addNominalPeopleData(int const number, DataHeatBalance::PeopleData const &nominalPeopleData);
@@ -132,7 +132,7 @@ public:
     void addNominalBaseboardData(int const number, DataHeatBalance::BBHeatData const &nominalBaseboardData);
     void addInfiltrationData(int const number, DataHeatBalance::InfiltrationData const &infiltrationData);
     void addVentilationData(int const number, DataHeatBalance::VentilationData const &ventilationData);
-    void addRoomAirModelData(int const number, DataRoomAirModel::AirModelData const &roomAirModelData);
+    void addRoomAirModelData(int const number, RoomAir::AirModelData const &roomAirModelData);
 
     // Open the DB and prepare for writing data
     // Create all of the tables on construction
@@ -157,67 +157,77 @@ public:
     // Rollback a transaction (cancel)
     void sqliteRollback();
 
+    // Rollback to a named savepoint (nested transaction)
+    void sqliteRollbackToSavepoint(std::string_view savepoint_name);
+
+    // Release a named savepoint (nested transaction)
+    void sqliteReleaseSavepoint(std::string_view savepoint_name);
+
+    // create a named savepoint (nested transaction)
+    void sqliteCreateSavepoint(std::string_view savepoint_name);
+
     // Within a current transaction
     bool sqliteWithinTransaction();
 
     void createSQLiteReportDictionaryRecord(int const reportVariableReportID,
                                             int const storeTypeIndex,
-                                            std::string const &indexGroup,
+                                            std::string_view indexGroup,
                                             std::string_view keyedValueString,
                                             std::string_view const variableName,
                                             int const indexType,
-                                            std::string const &units,
+                                            std::string_view units,
                                             int const reportingFreq,
                                             bool isMeter,
                                             std::string_view const ScheduleName = {});
 
     void createSQLiteReportDataRecord(int const recordIndex,
                                       Real64 const value,
-                                      Optional_int_const reportingInterval = _,
-                                      Optional<Real64 const> minValue = _,
-                                      Optional_int_const minValueDate = _,
-                                      Optional<Real64 const> maxValue = _,
-                                      Optional_int_const maxValueDate = _,
-                                      Optional_int_const minutesPerTimeStep = _);
+                                      ObjexxFCL::Optional_int_const reportingInterval = _,
+                                      ObjexxFCL::Optional<Real64 const> minValue = _,
+                                      ObjexxFCL::Optional_int_const minValueDate = _,
+                                      ObjexxFCL::Optional<Real64 const> maxValue = _,
+                                      ObjexxFCL::Optional_int_const maxValueDate = _,
+                                      ObjexxFCL::Optional_int_const minutesPerTimeStep = _);
 
     void createSQLiteTimeIndexRecord(int const reportingInterval,
                                      int const recordIndex,
                                      int const CumlativeSimulationDays,
                                      int const curEnvirNum,
                                      int const simulationYear,
-                                     Optional_int_const Month = _,
-                                     Optional_int_const DayOfMonth = _,
-                                     Optional_int_const Hour = _,
-                                     Optional<Real64 const> EndMinute = _,
-                                     Optional<Real64 const> StartMinute = _,
-                                     Optional_int_const DST = _,
-                                     Optional_string_const DayType = _,
+                                     bool const curYearIsLeapYear,
+                                     ObjexxFCL::Optional_int_const Month = _,
+                                     ObjexxFCL::Optional_int_const DayOfMonth = _,
+                                     ObjexxFCL::Optional_int_const Hour = _,
+                                     ObjexxFCL::Optional<Real64 const> EndMinute = _,
+                                     ObjexxFCL::Optional<Real64 const> StartMinute = _,
+                                     ObjexxFCL::Optional_int_const DST = _,
+                                     ObjexxFCL::Optional_string_const DayType = _,
                                      bool const warmupFlag = false);
 
     void createYearlyTimeIndexRecord(int const simulationYear, int const curEnvirNum);
 
-    void addSQLiteZoneSizingRecord(std::string const &ZoneName,   // the name of the zone
-                                   std::string const &LoadType,   // the description of the input variable
-                                   Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
-                                   Real64 const UserDesLoad,      // the value from the sizing calculation modified by user input [W]
-                                   Real64 const CalcDesFlow,      // calculated design air flow rate [m3/s]
-                                   Real64 const UserDesFlow,      // user input or modified design air flow rate [m3/s]
-                                   std::string const &DesDayName, // the name of the design day that produced the peak
-                                   std::string const &PeakHrMin,  // time stamp of the peak
-                                   Real64 const PeakTemp,         // temperature at peak [C]
-                                   Real64 const PeakHumRat,       // humidity ratio at peak [kg water/kg dry air]
-                                   Real64 const MinOAVolFlow,     // zone design minimum outside air flow rate [m3/s]
-                                   Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
+    void addSQLiteZoneSizingRecord(std::string_view ZoneName,   // the name of the zone
+                                   std::string_view LoadType,   // the description of the input variable
+                                   Real64 const CalcDesLoad,    // the value from the sizing calculation [W]
+                                   Real64 const UserDesLoad,    // the value from the sizing calculation modified by user input [W]
+                                   Real64 const CalcDesFlow,    // calculated design air flow rate [m3/s]
+                                   Real64 const UserDesFlow,    // user input or modified design air flow rate [m3/s]
+                                   std::string_view DesDayName, // the name of the design day that produced the peak
+                                   std::string_view PeakHrMin,  // time stamp of the peak
+                                   Real64 const PeakTemp,       // temperature at peak [C]
+                                   Real64 const PeakHumRat,     // humidity ratio at peak [kg water/kg dry air]
+                                   Real64 const MinOAVolFlow,   // zone design minimum outside air flow rate [m3/s]
+                                   Real64 const DOASHeatAddRate // zone design heat addition rate from the DOAS [W]
     );
 
-    void addSQLiteSystemSizingRecord(std::string const &SysName,      // the name of the system
-                                     std::string const &LoadType,     // either "Cooling" or "Heating"
-                                     std::string const &PeakLoadType, // either "Sensible" or "Total"
-                                     Real64 const &UserDesCap,        // User  Design Capacity
-                                     Real64 const &CalcDesVolFlow,    // Calculated Cooling Design Air Flow Rate
-                                     Real64 const &UserDesVolFlow,    // User Cooling Design Air Flow Rate
-                                     std::string const &DesDayName,   // the name of the design day that produced the peak
-                                     std::string const &PeakHrMin     // time stamp of the peak
+    void addSQLiteSystemSizingRecord(std::string_view SysName,      // the name of the system
+                                     std::string_view LoadType,     // either "Cooling" or "Heating"
+                                     std::string_view PeakLoadType, // either "Sensible" or "Total"
+                                     Real64 const UserDesCap,       // User  Design Capacity
+                                     Real64 const CalcDesVolFlow,   // Calculated Cooling Design Air Flow Rate
+                                     Real64 const UserDesVolFlow,   // User Cooling Design Air Flow Rate
+                                     std::string_view DesDayName,   // the name of the design day that produced the peak
+                                     std::string_view PeakHrMin     // time stamp of the peak
     );
 
     void addSQLiteComponentSizingRecord(std::string_view CompType, // the type of the component
@@ -226,12 +236,8 @@ public:
                                         Real64 const VarValue      // the value from the sizing calculation
     );
 
-    void createSQLiteDaylightMapTitle(int const mapNum,
-                                      std::string const &mapName,
-                                      std::string const &environmentName,
-                                      int const zone,
-                                      std::string const &refPts,
-                                      Real64 const zCoord);
+    void createSQLiteDaylightMapTitle(
+        int const mapNum, std::string_view mapName, std::string_view environmentName, int const zone, std::string_view refPts, Real64 const zCoord);
 
     void createSQLiteDaylightMap(int const mapNum,
                                  int const year,
@@ -247,13 +253,13 @@ public:
     void createSQLiteTabularDataRecords(Array2D_string const &body, // row,column
                                         Array1D_string const &rowLabels,
                                         Array1D_string const &columnLabels,
-                                        std::string const &ReportName,
-                                        std::string const &ReportForString,
-                                        std::string const &TableName);
+                                        std::string_view ReportName,
+                                        std::string_view ReportForString,
+                                        std::string_view TableName);
 
-    void createSQLiteSimulationsRecord(int const ID, const std::string &verString, const std::string &currentDateTime);
+    void createSQLiteSimulationsRecord(int const ID, std::string_view verString, std::string_view currentDateTime);
 
-    void createSQLiteErrorRecord(int const simulationIndex, int const errorType, std::string const &errorMessage, int const cnt);
+    void createSQLiteErrorRecord(int const simulationIndex, int const errorType, std::string_view errorMessage, int const cnt);
 
     void updateSQLiteErrorRecord(std::string const &errorMessage);
 
@@ -262,18 +268,18 @@ public:
     void updateSQLiteSimulationRecord(int const id, int const numOfTimeStepInHour);
 
     void createSQLiteEnvironmentPeriodRecord(const int curEnvirNum,
-                                             const std::string &environmentName,
-                                             const DataGlobalConstants::KindOfSim kindOfSim,
+                                             std::string_view environmentName,
+                                             const Constant::KindOfSim kindOfSim,
                                              const int simulationIndex = 1);
 
-    void sqliteWriteMessage(const std::string &message);
+    void sqliteWriteMessage(std::string_view message);
 
     void createZoneExtendedOutput();
 
     void initializeIndexes();
 
 private:
-    int createSQLiteStringTableRecord(std::string const &stringValue, int const stringType);
+    int createSQLiteStringTableRecord(std::string_view stringValue, int const stringType);
 
     static std::string storageType(const int storageTypeIndex);
     static std::string timestepTypeName(const int timestepType);
@@ -376,6 +382,9 @@ private:
     sqlite3_stmt *m_errorUpdateStmt;
     sqlite3_stmt *m_simulationUpdateStmt;
     sqlite3_stmt *m_simulationDataUpdateStmt;
+    sqlite3_stmt *m_rollbackToSavepointStmt;
+    sqlite3_stmt *m_createSavepointStmt;
+    sqlite3_stmt *m_releaseSavepointStmt;
 
     static const int LocalReportEach;     //  Write out each time UpdatedataandLocalReport is called
     static const int LocalReportTimeStep; //  Write out at 'EndTimeStepFlag'
@@ -404,8 +413,8 @@ private:
         Schedule(std::shared_ptr<std::ostream> const &errorStream,
                  std::shared_ptr<sqlite3> const &db,
                  int const scheduleNumber,
-                 std::string const &scheduleName,
-                 std::string const &scheduleType,
+                 std::string_view scheduleName,
+                 std::string_view scheduleType,
                  double const scheduleMinValue,
                  double const scheduleMaxValue)
             : SQLiteData(errorStream, db), number(scheduleNumber), name(scheduleName), type(scheduleType), minValue(scheduleMinValue),
@@ -413,7 +422,7 @@ private:
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
@@ -430,7 +439,7 @@ private:
                 std::shared_ptr<sqlite3> const &db,
                 int const surfaceNumber,
                 DataSurfaces::SurfaceData const &surfaceData,
-                std::string const &surfaceClass)
+                std::string_view surfaceClass)
             : SQLiteData(errorStream, db), number(surfaceNumber), name(surfaceData.Name), construction(surfaceData.Construction),
               surfaceClass(surfaceClass), area(surfaceData.Area), grossArea(surfaceData.GrossArea), perimeter(surfaceData.Perimeter),
               azimuth(surfaceData.Azimuth), height(surfaceData.Height), reveal(surfaceData.Reveal), shape(surfaceData.Shape),
@@ -440,7 +449,7 @@ private:
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
@@ -477,13 +486,13 @@ private:
               centroidZ(zoneData.Centroid.z), ofType(zoneData.OfType), multiplier(zoneData.Multiplier), listMultiplier(zoneData.ListMultiplier),
               minimumX(zoneData.MinimumX), maximumX(zoneData.MaximumX), minimumY(zoneData.MinimumY), maximumY(zoneData.MaximumY),
               minimumZ(zoneData.MinimumZ), maximumZ(zoneData.MaximumZ), ceilingHeight(zoneData.CeilingHeight), volume(zoneData.Volume),
-              insideConvectionAlgo(zoneData.InsideConvectionAlgo), outsideConvectionAlgo(zoneData.OutsideConvectionAlgo),
-              floorArea(zoneData.FloorArea), extGrossWallArea(zoneData.ExtGrossWallArea), extNetWallArea(zoneData.ExtNetWallArea),
-              extWindowArea(zoneData.ExtWindowArea), isPartOfTotalArea(zoneData.isPartOfTotalArea)
+              insideConvectionAlgo(zoneData.IntConvAlgo), outsideConvectionAlgo(zoneData.ExtConvAlgo), floorArea(zoneData.FloorArea),
+              extGrossWallArea(zoneData.ExtGrossWallArea), extNetWallArea(zoneData.ExtNetWallArea), extWindowArea(zoneData.ExtWindowArea),
+              isPartOfTotalArea(zoneData.isPartOfTotalArea)
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
@@ -506,8 +515,8 @@ private:
         double const &maximumZ;
         double const &ceilingHeight;
         double const &volume;
-        int const &insideConvectionAlgo;
-        int const &outsideConvectionAlgo;
+        Convect::HcInt const &insideConvectionAlgo;
+        Convect::HcExt const &outsideConvectionAlgo;
         double const &floorArea;
         double const &extGrossWallArea;
         double const &extNetWallArea;
@@ -526,7 +535,7 @@ private:
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
         virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt, sqlite3_stmt *subInsertStmt);
 
     private:
@@ -547,7 +556,7 @@ private:
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
@@ -562,22 +571,22 @@ private:
         Material(std::shared_ptr<std::ostream> const &errorStream,
                  std::shared_ptr<sqlite3> const &db,
                  int const materialNumber,
-                 EnergyPlus::Material::MaterialProperties const &materialData)
-            : SQLiteData(errorStream, db), number(materialNumber), name(materialData.Name), group(materialData.Group),
-              roughness(materialData.Roughness), conductivity(materialData.Conductivity), density(materialData.Density),
-              isoMoistCap(materialData.IsoMoistCap), porosity(materialData.Porosity), resistance(materialData.Resistance), rOnly(materialData.ROnly),
-              specHeat(materialData.SpecHeat), thermGradCoef(materialData.ThermGradCoef), thickness(materialData.Thickness),
-              vaporDiffus(materialData.VaporDiffus)
+                 EnergyPlus::Material::MaterialChild const *materialData)
+            : SQLiteData(errorStream, db), number(materialNumber), name(materialData->Name), group(materialData->group),
+              roughness(materialData->Roughness), conductivity(materialData->Conductivity), density(materialData->Density),
+              isoMoistCap(materialData->IsoMoistCap), porosity(materialData->Porosity), resistance(materialData->Resistance),
+              rOnly(materialData->ROnly), specHeat(materialData->SpecHeat), thermGradCoef(materialData->ThermGradCoef),
+              thickness(materialData->Thickness), vaporDiffus(materialData->VaporDiffus)
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
         std::string const &name;
-        DataHeatBalance::MaterialGroup const &group;
-        DataSurfaces::SurfaceRoughness const &roughness;
+        EnergyPlus::Material::Group const &group;
+        EnergyPlus::Material::SurfaceRoughness const &roughness;
         double const &conductivity;
         double const &density;
         double const &isoMoistCap;
@@ -612,7 +621,7 @@ private:
         }
 
         // only inserts construction
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
         // inserts construction and construction layers
         virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt, sqlite3_stmt *subInsertStmt);
 
@@ -628,7 +637,7 @@ private:
         double const &outsideAbsorpSolar;
         double const &insideAbsorpThermal;
         double const &outsideAbsorpThermal;
-        DataSurfaces::SurfaceRoughness const &outsideRoughness;
+        EnergyPlus::Material::SurfaceRoughness const &outsideRoughness;
         bool const &typeIsWindow;
         double const &uValue;
 
@@ -644,7 +653,7 @@ private:
             {
             }
 
-            virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+            virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
         private:
             int const &constructNumber;
@@ -670,7 +679,7 @@ private:
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
@@ -705,7 +714,7 @@ private:
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
@@ -745,7 +754,7 @@ private:
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
@@ -775,7 +784,7 @@ private:
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
@@ -805,7 +814,7 @@ private:
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
@@ -835,7 +844,7 @@ private:
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
@@ -865,7 +874,7 @@ private:
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
@@ -896,7 +905,7 @@ private:
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
@@ -924,7 +933,7 @@ private:
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
@@ -946,7 +955,7 @@ private:
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
@@ -962,20 +971,19 @@ private:
         RoomAirModel(std::shared_ptr<std::ostream> const &errorStream,
                      std::shared_ptr<sqlite3> const &db,
                      int const roomAirModelNumber,
-                     DataRoomAirModel::AirModelData const &roomAirModelData)
-            : SQLiteData(errorStream, db), number(roomAirModelNumber), airModelName(roomAirModelData.AirModelName),
-              airModelType(roomAirModelData.AirModelType), tempCoupleScheme(roomAirModelData.TempCoupleScheme),
-              simAirModel(roomAirModelData.SimAirModel)
+                     RoomAir::AirModelData const &roomAirModelData)
+            : SQLiteData(errorStream, db), number(roomAirModelNumber), airModelName(roomAirModelData.Name), airModel(roomAirModelData.AirModel),
+              tempCoupleScheme(roomAirModelData.TempCoupleScheme), simAirModel(roomAirModelData.SimAirModel)
         {
         }
 
-        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt);
+        virtual bool insertIntoSQLite(sqlite3_stmt *insertStmt) override;
 
     private:
         int const number;
         std::string const &airModelName;
-        DataRoomAirModel::RoomAirModel const &airModelType;
-        DataRoomAirModel::CouplingScheme const &tempCoupleScheme;
+        RoomAir::RoomAirModel const &airModel;
+        RoomAir::CouplingScheme const &tempCoupleScheme;
         bool const &simAirModel;
     };
 
@@ -998,6 +1006,8 @@ private:
     std::vector<std::unique_ptr<SQLite::Ventilation>> ventilations;
     std::vector<std::unique_ptr<SQLite::RoomAirModel>> roomAirModels;
 };
+
+bool ParseSQLiteInput(EnergyPlusData &state, bool &writeOutputToSQLite, bool &writeTabularDataToSQLite);
 
 std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state);
 

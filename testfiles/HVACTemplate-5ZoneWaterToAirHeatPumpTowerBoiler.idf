@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,22.2;
+  Version,24.1;
 
   Building,
     Building,                !- Name
@@ -1803,7 +1803,6 @@
     autosize,                !- Supplemental Heating Coil Capacity {W}
     2.5,                     !- Maximum Cycling Rate {cycles/hr}
     60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
     ,                        !- Dedicated Outdoor Air System Name
     Electric,                !- Supplemental Heating Coil Type
@@ -1849,7 +1848,6 @@
     autosize,                !- Supplemental Heating Coil Capacity {W}
     2.5,                     !- Maximum Cycling Rate {cycles/hr}
     60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
     ,                        !- Dedicated Outdoor Air System Name
     Electric,                !- Supplemental Heating Coil Type
@@ -1895,7 +1893,6 @@
     autosize,                !- Supplemental Heating Coil Capacity {W}
     2.5,                     !- Maximum Cycling Rate {cycles/hr}
     60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
     ,                        !- Dedicated Outdoor Air System Name
     Electric,                !- Supplemental Heating Coil Type
@@ -1941,7 +1938,6 @@
     autosize,                !- Supplemental Heating Coil Capacity {W}
     2.5,                     !- Maximum Cycling Rate {cycles/hr}
     60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
     ,                        !- Dedicated Outdoor Air System Name
     Electric,                !- Supplemental Heating Coil Type
@@ -1987,7 +1983,6 @@
     autosize,                !- Supplemental Heating Coil Capacity {W}
     2.5,                     !- Maximum Cycling Rate {cycles/hr}
     60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
     60,                      !- Heat Pump Fan Delay Time {s}
     ,                        !- Dedicated Outdoor Air System Name
     Electric,                !- Supplemental Heating Coil Type

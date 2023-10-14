@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -121,12 +121,10 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
     state->dataHeatBal->People(1).ZonePtr = 1;
     state->dataHeatBal->People(1).NumberOfPeople = 100.0;
-    state->dataHeatBal->People(1).NumberOfPeoplePtr =
-        DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = ScheduleManager::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
     state->dataHeatBal->People(2).ZonePtr = 1;
     state->dataHeatBal->People(2).NumberOfPeople = 200.0;
-    state->dataHeatBal->People(2).NumberOfPeoplePtr =
-        DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->People(2).NumberOfPeoplePtr = ScheduleManager::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
 
     state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
 
@@ -239,10 +237,10 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
     state->dataHeatBal->People(1).ZonePtr = 1;
     state->dataHeatBal->People(1).NumberOfPeople = 10.0;
-    state->dataHeatBal->People(1).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // always returns a 1 for schedule value
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = ScheduleManager::ScheduleAlwaysOn; // always returns a 1 for schedule value
     state->dataHeatBal->People(2).ZonePtr = 1;
     state->dataHeatBal->People(2).NumberOfPeople = 20.0;
-    state->dataHeatBal->People(2).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // always returns a 1 for schedule value
+    state->dataHeatBal->People(2).NumberOfPeoplePtr = ScheduleManager::ScheduleAlwaysOn; // always returns a 1 for schedule value
 
     state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow = DataSizing::AutoSize;

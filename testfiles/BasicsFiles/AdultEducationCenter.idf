@@ -84,7 +84,7 @@
 ! Utility Tariffs:
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,22.2;
+  Version,24.1;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -1124,7 +1124,7 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: REPORT METER ===========
 
-  Output:Meter,DistrictHeating:Facility,Hourly;
+  Output:Meter,DistrictHeatingWater:Facility,Hourly;
 
   Output:Meter,DistrictCooling:Facility,Hourly;
 

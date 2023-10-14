@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -88,10 +88,8 @@ typedef std::int64_t Int64;
 #include <ObjexxFCL/Array2S.fwd.hh>
 #include <ObjexxFCL/Array3D.fwd.hh>
 #include <ObjexxFCL/Array4D.fwd.hh>
-#include <ObjexxFCL/Array5D.fwd.hh>
 #include <ObjexxFCL/MArray1.fwd.hh>
 #include <ObjexxFCL/Omit.hh>
-#include <ObjexxFCL/Optional.fwd.hh>
 #include <ObjexxFCL/Reference.fwd.hh>
 #include <ObjexxFCL/Vector2.fwd.hh>
 #include <ObjexxFCL/Vector3.fwd.hh>
@@ -131,15 +129,7 @@ using ObjexxFCL::Array3D_bool;
 using ObjexxFCL::Array3D_int;
 using ObjexxFCL::Array4D;
 using ObjexxFCL::Array4D_int;
-using ObjexxFCL::Array5D;
 using ObjexxFCL::MArray1;
-using ObjexxFCL::Optional;
-using ObjexxFCL::Optional_bool;
-using ObjexxFCL::Optional_bool_const;
-using ObjexxFCL::Optional_int;
-using ObjexxFCL::Optional_int_const;
-using ObjexxFCL::Optional_string;
-using ObjexxFCL::Optional_string_const;
 using ObjexxFCL::Reference;
 using ObjexxFCL::Vector2;
 using ObjexxFCL::Vector3;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,10 +54,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -209,8 +211,7 @@ namespace PlantChillers {
         Real64 ActualCOP;
         Real64 QHeatRecovery;
         Real64 EnergyHeatRecovery;
-        Real64 HeatRecInletTemp;
-        Real64 HeatRecOutletTemp;
+        Real64 HeatRecInletTemp; // (HeatRecOutletTemp is in base already)
         Real64 HeatRecMdot;
         Real64 ChillerCondAvgTemp; // the effective condenser temperature for chiller performance [C]
 
@@ -220,7 +221,7 @@ namespace PlantChillers {
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
               HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0),
               HeatRecInletLimitSchedNum(0), HRPlantLoc{}, CondOutletHumRat(0.0), ActualCOP(0.0), QHeatRecovery(0.0), EnergyHeatRecovery(0.0),
-              HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0), ChillerCondAvgTemp(0.0)
+              HeatRecInletTemp(0.0), HeatRecMdot(0.0), ChillerCondAvgTemp(0.0)
         {
         }
 
@@ -263,9 +264,8 @@ namespace PlantChillers {
 
     struct EngineDrivenChillerSpecs : BaseChillerSpecs
     {
-        // Members
-        std::string FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
         // temperature at the chiller evaporator side outlet
+        Constant::eFuel FuelType;
         Array1D<Real64> CapRatCoef;                // (EngineDriven RCAVC() ) coeff of cap ratio poly fit
         Array1D<Real64> PowerRatCoef;              // (EngineDriven ADJEC() ) coeff of power rat poly fit
         Array1D<Real64> FullLoadCoef;              // (EngineDriven RPWRC() ) coeff of full load poly. fit
@@ -307,9 +307,8 @@ namespace PlantChillers {
         Real64 FuelMdot;            // Fuel Amount used (Kg/s)
         Real64 ExhaustStackTemp;    // Exhaust Stack Temperature (C)
 
-        Real64 HeatRecOutletTemp; // Heat Recovery Loop Outlet Temperature (C)
-        Real64 HeatRecMdot;       // Heat Recovery Loop Mass flow rate (kg/s)
-        Real64 FuelCOP;           // Fuel COP [delivered cooling rate/fuel energy input rate] (W/W)
+        Real64 HeatRecMdot; // Heat Recovery Loop Mass flow rate (kg/s)
+        Real64 FuelCOP;     // Fuel COP [delivered cooling rate/fuel energy input rate] (W/W)
 
         // Default Constructor
         EngineDrivenChillerSpecs()
@@ -322,8 +321,7 @@ namespace PlantChillers {
 
               // engine driven:
               QLubeOilRecovered(0.0), QExhaustRecovered(0.0), FuelEnergyUseRate(0.0), TotalHeatEnergyRec(0.0), JacketEnergyRec(0.0),
-              LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0), FuelMdot(0.0), ExhaustStackTemp(0.0), HeatRecOutletTemp(0.0),
-              HeatRecMdot(0.0), FuelCOP(0.0)
+              LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0), FuelMdot(0.0), ExhaustStackTemp(0.0), HeatRecMdot(0.0), FuelCOP(0.0)
         {
         }
 
@@ -365,7 +363,7 @@ namespace PlantChillers {
     struct GTChillerSpecs : BaseChillerSpecs
     {
         // Members
-        std::string FuelType;         // Type of Fuel - DIESEL, GASOLINE, GAS
+        Constant::eFuel FuelType;
         Array1D<Real64> CapRatCoef;   // (GT RCAVC() ) coeff of cap ratio poly fit
         Array1D<Real64> PowerRatCoef; // (GT ADJEC() ) coeff of power rat poly fit
         Array1D<Real64> FullLoadCoef; // (GT RPWRC() ) coeff of full load poly. fit
@@ -392,8 +390,7 @@ namespace PlantChillers {
         Real64 ExhaustStackTemp;                   // Temperature of Exhaust Gases
         int HeatRecInletNodeNum;                   // Node number on the heat recovery inlet side of the condenser
         int HeatRecOutletNodeNum;                  // Node number on the heat recovery outlet side of the condenser
-        Real64 HeatRecInletTemp;                   // Inlet Temperature of the heat recovery fluid
-        Real64 HeatRecOutletTemp;                  // Outlet Temperature of the heat recovery fluid
+        Real64 HeatRecInletTemp;                   // Inlet Temperature of the heat recovery fluid (HeatRecOutletTemp is in base already)
         Real64 HeatRecMdot;                        // Heat Recovery Loop Mass flow rate
         Real64 DesignHeatRecVolFlowRate;           // m3/s, Design Water mass flow rate through heat recovery loop
         bool DesignHeatRecVolFlowRateWasAutoSized; // true if previous field was autosize on input
@@ -418,10 +415,9 @@ namespace PlantChillers {
               PLBasedExhaustTempCoef(3, 0.0), TempBasedExhaustTempCoef(3, 0.0), HeatRecLubeEnergy(0.0), HeatRecLubeRate(0.0),
               HeatRecLubeEnergyCoef(3, 0.0), UAtoCapRat(0.0), UAtoCapCoef(3, 0.0), GTEngineCapacity(0.0), GTEngineCapacityWasAutoSized(false),
               MaxExhaustperGTPower(0.0), DesignSteamSatTemp(0.0), ExhaustStackTemp(0.0), HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0),
-              HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0), DesignHeatRecVolFlowRate(0.0),
-              DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), FuelHeatingValue(0.0),
-              HeatRecCapacityFraction(0.0), engineCapacityScalar(0.35), HeatRecMaxTemp(0.0), HRPlantLoc{}, FuelEnergyUsed(0.0),
-              FuelEnergyUsedRate(0.0), FuelMassUsed(0.0), FuelMassUsedRate(0.0), FuelCOP(0.0)
+              HeatRecInletTemp(0.0), HeatRecMdot(0.0), DesignHeatRecVolFlowRate(0.0), DesignHeatRecVolFlowRateWasAutoSized(false),
+              DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), FuelHeatingValue(0.0), HeatRecCapacityFraction(0.0), engineCapacityScalar(0.35),
+              HeatRecMaxTemp(0.0), HRPlantLoc{}, FuelEnergyUsed(0.0), FuelEnergyUsedRate(0.0), FuelMassUsed(0.0), FuelMassUsedRate(0.0), FuelCOP(0.0)
         {
         }
 

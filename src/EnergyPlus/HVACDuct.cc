@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -137,7 +137,7 @@ namespace HVACDuct {
         if (CompIndex == 0) {
             DuctNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACDuct->Duct);
             if (DuctNum == 0) {
-                ShowFatalError(state, "SimDuct: Component not found=" + std::string{CompName});
+                ShowFatalError(state, format("SimDuct: Component not found={}", CompName));
             }
             CompIndex = DuctNum;
         } else {
@@ -160,8 +160,6 @@ namespace HVACDuct {
                 state.dataHVACDuct->CheckEquipName(DuctNum) = false;
             }
         }
-
-        InitDuct(state, DuctNum);
 
         CalcDuct(DuctNum);
 
@@ -215,7 +213,6 @@ namespace HVACDuct {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataHVACDuct->Duct(DuctNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataHVACDuct->Duct(DuctNum).InletNodeNum = GetOnlySingleNode(state,
@@ -247,64 +244,8 @@ namespace HVACDuct {
         // No output variables
 
         if (ErrorsFound) {
-            ShowFatalError(state, std::string{RoutineName} + " Errors found in input");
+            ShowFatalError(state, format("{} Errors found in input", RoutineName));
         }
-    }
-
-    void InitDuct(EnergyPlusData &state, int const DuctNum) // number of the current duct being simulated
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Buhl
-        //       DATE WRITTEN   17May2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is for initializations of the Duct Components
-
-        // METHODOLOGY EMPLOYED:
-        // Uses the status flags to trigger initializations
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool MyOneTimeFlag(true);
-        Array1D_bool MyEnvrnFlag;
-
-        // do one time initializations
-        if (MyOneTimeFlag) {
-            // initialize the environment and sizing flags
-            MyEnvrnFlag.dimension(state.dataHVACDuct->NumDucts, true);
-
-            MyOneTimeFlag = false;
-        }
-
-        // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(DuctNum)) {
-        }
-
-        if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(DuctNum) = true;
-        }
-
-        // do these initializations every HVAC time step
     }
 
     void CalcDuct([[maybe_unused]] int const DuctNum) // number of the current duct being simulated !unused1208

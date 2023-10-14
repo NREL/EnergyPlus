@@ -81,7 +81,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,22.2;
+  Version,24.1;
 
   Building,
     Multistory Example,      !- Name

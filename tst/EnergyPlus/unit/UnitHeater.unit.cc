@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -871,7 +871,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
         "  Branch,",
         "    Heating Purchased Hot Water Branch,  !- Name",
         "    ,                        !- Pressure Drop Curve Name",
-        "    DistrictHeating,         !- Component 1 Object Type",
+        "    DistrictHeating:Water,         !- Component 1 Object Type",
         "    Purchased Heating,       !- Component 1 Name",
         "    Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name",
         "    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name",
@@ -1005,10 +1005,10 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
 
         "  PlantEquipmentList,",
         "    heating plant,           !- Name",
-        "    DistrictHeating,         !- Equipment 1 Object Type",
+        "    DistrictHeating:Water,         !- Equipment 1 Object Type",
         "    Purchased Heating;       !- Equipment 1 Name",
 
-        "  DistrictHeating,",
+        "  DistrictHeating:Water,",
         "    Purchased Heating,       !- Name",
         "    Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name",
         "    Purchased Heat Outlet Node,  !- Hot Water Outlet Node Name",
@@ -1125,6 +1125,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
 
     state->dataLoopNodes->MoreNodeInfo.allocate(20);
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
 
@@ -1152,12 +1153,12 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     HWMaxVolFlowRate = state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate;
     HWDensity = GetDensityGlycol(*state,
                                  state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidName,
-                                 DataGlobalConstants::HWInitConvTemp,
+                                 Constant::HWInitConvTemp,
                                  state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidIndex,
                                  "xxx");
     CpHW = GetSpecificHeatGlycol(*state,
                                  state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidName,
-                                 DataGlobalConstants::HWInitConvTemp,
+                                 Constant::HWInitConvTemp,
                                  state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidIndex,
                                  "xxx");
     HWPlantDeltaTDesign = state->dataSize->PlantSizData(PltSizHeatNum).DeltaT;
@@ -1349,8 +1350,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataGlobal->DoingSizing = true;
 
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
@@ -2462,11 +2463,11 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
 
     EXPECT_EQ(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes, 2);
     // first priority zone equipment is zone ADU
-    EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(1).EquipType, "ZONEHVAC:AIRDISTRIBUTIONUNIT");
+    EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(1).EquipTypeName, "ZONEHVAC:AIRDISTRIBUTIONUNIT");
     EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(1).EquipName, "MAIN ZONE ATU");
     EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(1).Name, "MAIN ZONE REHEAT COIL");
     // second priority zone equipment is unit heater
-    EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(2).EquipType, "ZONEHVAC:UNITHEATER");
+    EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(2).EquipTypeName, "ZONEHVAC:UNITHEATER");
     EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(2).EquipName, "UNITHEATER");
     EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(2).Name, "UNITHEATER_ELECTRICHEATER");
     // check the reheat coil output

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -70,15 +71,18 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
 {
     auto &SurfaceFD = state->dataHeatBalFiniteDiffMgr->SurfaceFD;
     int constexpr numNodes(4);
+    Real64 constexpr allowedTolerance = 0.0001;
     int nodeNum(0);
     SurfaceFD.allocate(1);
     int constexpr SurfNum(1);
-    SurfaceFD(SurfNum).QDreport.allocate(numNodes + 1);
-    SurfaceFD(SurfNum).TDpriortimestep.allocate(numNodes + 1);
-    SurfaceFD(SurfNum).TDT.allocate(numNodes + 1);
-    SurfaceFD(SurfNum).CpDelXRhoS1.allocate(numNodes + 1);
-    SurfaceFD(SurfNum).CpDelXRhoS2.allocate(numNodes + 1);
+    auto &surfFD = SurfaceFD(SurfNum);
+    surfFD.QDreport.allocate(numNodes + 1);
+    surfFD.TDpriortimestep.allocate(numNodes + 1);
+    surfFD.TDT.allocate(numNodes + 1);
+    surfFD.CpDelXRhoS1.allocate(numNodes + 1);
+    surfFD.CpDelXRhoS2.allocate(numNodes + 1);
     state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux.allocate(1);
+    state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 600.0;
 
     Real64 expectedResult1(0.0);
@@ -86,53 +90,71 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
     Real64 expectedResult3(0.0);
     Real64 expectedResult4(0.0);
     Real64 expectedResult5(0.0);
+    Real64 expectedResultO(1.0);
 
     // Steady-state case
     state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum) = 100.0;
     nodeNum = 1;
-    SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 20.0;
-    SurfaceFD(SurfNum).TDT(nodeNum) = 20.0;
-    SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 1000.0;
-    SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
+    surfFD.TDpriortimestep(nodeNum) = 20.0;
+    surfFD.TDT(nodeNum) = 20.0;
+    surfFD.CpDelXRhoS1(nodeNum) = 1000.0;
+    surfFD.CpDelXRhoS2(nodeNum) = 2000.0;
     expectedResult1 = state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum);
 
     nodeNum = 2;
-    SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 22.0;
-    SurfaceFD(SurfNum).TDT(nodeNum) = 22.0;
-    SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 1000.0;
-    SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
+    surfFD.TDpriortimestep(nodeNum) = 22.0;
+    surfFD.TDT(nodeNum) = 22.0;
+    surfFD.CpDelXRhoS1(nodeNum) = 1000.0;
+    surfFD.CpDelXRhoS2(nodeNum) = 2000.0;
     expectedResult2 = state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum);
 
     nodeNum = 3;
-    SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 23.0;
-    SurfaceFD(SurfNum).TDT(nodeNum) = 23.0;
-    SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 1000.0;
-    SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
+    surfFD.TDpriortimestep(nodeNum) = 23.0;
+    surfFD.TDT(nodeNum) = 23.0;
+    surfFD.CpDelXRhoS1(nodeNum) = 1000.0;
+    surfFD.CpDelXRhoS2(nodeNum) = 2000.0;
     expectedResult3 = state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum);
 
     nodeNum = 4;
-    SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 26.0;
-    SurfaceFD(SurfNum).TDT(nodeNum) = 26.0;
-    SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 1000.0;
-    SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
+    surfFD.TDpriortimestep(nodeNum) = 26.0;
+    surfFD.TDT(nodeNum) = 26.0;
+    surfFD.CpDelXRhoS1(nodeNum) = 1000.0;
+    surfFD.CpDelXRhoS2(nodeNum) = 2000.0;
     expectedResult4 = state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum);
 
     nodeNum = 5;
-    SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 27.0;
-    SurfaceFD(SurfNum).TDT(nodeNum) = 27.0;
-    SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 1000.0;
-    SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
+    surfFD.TDpriortimestep(nodeNum) = 27.0;
+    surfFD.TDT(nodeNum) = 27.0;
+    surfFD.CpDelXRhoS1(nodeNum) = 1000.0;
+    surfFD.CpDelXRhoS2(nodeNum) = 2000.0;
     expectedResult5 = state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum);
 
+    state->dataEnvrn->IsRain = false;
+    state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum) = 77.0;
+    expectedResultO = 77.0;
+
     CalcNodeHeatFlux(*state, SurfNum, numNodes);
-    EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(1), expectedResult1, 0.0001);
-    EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(2), expectedResult2, 0.0001);
-    EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(3), expectedResult3, 0.0001);
-    EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(4), expectedResult4, 0.0001);
-    EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(5), expectedResult5, 0.0001);
+    EXPECT_NEAR(surfFD.QDreport(1), expectedResult1, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(2), expectedResult2, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(3), expectedResult3, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(4), expectedResult4, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(5), expectedResult5, allowedTolerance);
+    EXPECT_NEAR(state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum), expectedResultO, allowedTolerance);
+
+    state->dataEnvrn->IsRain = true;
+    state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum) = 77.0;
+    expectedResultO = -state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum);
+
+    CalcNodeHeatFlux(*state, SurfNum, numNodes);
+    EXPECT_NEAR(surfFD.QDreport(1), expectedResult1, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(2), expectedResult2, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(3), expectedResult3, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(4), expectedResult4, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(5), expectedResult5, allowedTolerance);
+    EXPECT_NEAR(state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum), expectedResultO, allowedTolerance);
 
     // Reset
-    SurfaceFD(SurfNum).QDreport = 0.0;
+    surfFD.QDreport = 0.0;
     expectedResult1 = 0.0;
     expectedResult2 = 0.0;
     expectedResult3 = 0.0;
@@ -144,50 +166,67 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CalcNodeHeatFluxTest)
     state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum) = -200.0;
 
     nodeNum = 5;
-    SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 27.5;
-    SurfaceFD(SurfNum).TDT(nodeNum) = 27.0;
-    SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 0.0;
-    SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 0.0;
+    surfFD.TDpriortimestep(nodeNum) = 27.5;
+    surfFD.TDT(nodeNum) = 27.0;
+    surfFD.CpDelXRhoS1(nodeNum) = 0.0;
+    surfFD.CpDelXRhoS2(nodeNum) = 0.0;
     expectedResult5 = state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum);
 
     nodeNum = 4;
-    SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 26.0;
-    SurfaceFD(SurfNum).TDT(nodeNum) = 26.0;
-    SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 0.0;
-    SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
+    surfFD.TDpriortimestep(nodeNum) = 26.0;
+    surfFD.TDT(nodeNum) = 26.0;
+    surfFD.CpDelXRhoS1(nodeNum) = 0.0;
+    surfFD.CpDelXRhoS2(nodeNum) = 2000.0;
     expectedResult4 = expectedResult5; // r-layer with zero heat capacity, so flux passes through
 
     nodeNum = 3;
-    SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 23.0;
-    SurfaceFD(SurfNum).TDT(nodeNum) = 23.0;
-    SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 1000.0;
-    SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
+    surfFD.TDpriortimestep(nodeNum) = 23.0;
+    surfFD.TDT(nodeNum) = 23.0;
+    surfFD.CpDelXRhoS1(nodeNum) = 1000.0;
+    surfFD.CpDelXRhoS2(nodeNum) = 2000.0;
     expectedResult3 = expectedResult4; // no change in temperature at nodes 4 and 3, so flux passes through
 
     nodeNum = 2;
-    SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 22.2;
-    SurfaceFD(SurfNum).TDT(nodeNum) = 22.0;
-    SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 1000.0;
-    SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
-    expectedResult2 = expectedResult3 + (SurfaceFD(SurfNum).TDT(nodeNum) - SurfaceFD(SurfNum).TDpriortimestep(nodeNum)) *
-                                            SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) / state->dataGlobal->TimeStepZoneSec;
+    surfFD.TDpriortimestep(nodeNum) = 22.2;
+    surfFD.TDT(nodeNum) = 22.0;
+    surfFD.CpDelXRhoS1(nodeNum) = 1000.0;
+    surfFD.CpDelXRhoS2(nodeNum) = 2000.0;
+    expectedResult2 =
+        expectedResult3 + (surfFD.TDT(nodeNum) - surfFD.TDpriortimestep(nodeNum)) * surfFD.CpDelXRhoS2(nodeNum) / state->dataGlobal->TimeStepZoneSec;
 
     nodeNum = 1;
-    SurfaceFD(SurfNum).TDpriortimestep(nodeNum) = 20.1;
-    SurfaceFD(SurfNum).TDT(nodeNum) = 20.0;
-    SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum) = 1000.0;
-    SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) = 2000.0;
-    expectedResult1 = expectedResult2 + (SurfaceFD(SurfNum).TDT(nodeNum + 1) - SurfaceFD(SurfNum).TDpriortimestep(nodeNum + 1)) *
-                                            SurfaceFD(SurfNum).CpDelXRhoS1(nodeNum + 1) / state->dataGlobal->TimeStepZoneSec;
-    expectedResult1 = expectedResult1 + (SurfaceFD(SurfNum).TDT(nodeNum) - SurfaceFD(SurfNum).TDpriortimestep(nodeNum)) *
-                                            SurfaceFD(SurfNum).CpDelXRhoS2(nodeNum) / state->dataGlobal->TimeStepZoneSec;
+    surfFD.TDpriortimestep(nodeNum) = 20.1;
+    surfFD.TDT(nodeNum) = 20.0;
+    surfFD.CpDelXRhoS1(nodeNum) = 1000.0;
+    surfFD.CpDelXRhoS2(nodeNum) = 2000.0;
+    expectedResult1 = expectedResult2 + (surfFD.TDT(nodeNum + 1) - surfFD.TDpriortimestep(nodeNum + 1)) * surfFD.CpDelXRhoS1(nodeNum + 1) /
+                                            state->dataGlobal->TimeStepZoneSec;
+    expectedResult1 =
+        expectedResult1 + (surfFD.TDT(nodeNum) - surfFD.TDpriortimestep(nodeNum)) * surfFD.CpDelXRhoS2(nodeNum) / state->dataGlobal->TimeStepZoneSec;
+
+    state->dataEnvrn->IsRain = false;
+    state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum) = 123.0;
+    expectedResultO = 123.0;
 
     CalcNodeHeatFlux(*state, SurfNum, numNodes);
-    EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(1), expectedResult1, 0.0001);
-    EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(2), expectedResult2, 0.0001);
-    EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(3), expectedResult3, 0.0001);
-    EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(4), expectedResult4, 0.0001);
-    EXPECT_NEAR(SurfaceFD(SurfNum).QDreport(5), expectedResult5, 0.0001);
+    EXPECT_NEAR(surfFD.QDreport(1), expectedResult1, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(2), expectedResult2, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(3), expectedResult3, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(4), expectedResult4, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(5), expectedResult5, allowedTolerance);
+    EXPECT_NEAR(state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum), expectedResultO, allowedTolerance);
+
+    state->dataEnvrn->IsRain = true;
+    state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum) = 123.0;
+    expectedResultO = -expectedResult1;
+
+    CalcNodeHeatFlux(*state, SurfNum, numNodes);
+    EXPECT_NEAR(surfFD.QDreport(1), expectedResult1, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(2), expectedResult2, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(3), expectedResult3, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(4), expectedResult4, allowedTolerance);
+    EXPECT_NEAR(surfFD.QDreport(5), expectedResult5, allowedTolerance);
+    EXPECT_NEAR(state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum), expectedResultO, allowedTolerance);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChange)
@@ -223,13 +262,13 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChang
     SurfaceFD(surfaceIndex).PhaseChangeStateOld(finiteDiffLayerIndex) = HysteresisPhaseChange::PhaseChangeStates::MELTING;
 
     // create a materials data object and assign the phase change variable based on above IDF processing
-    Material::MaterialProperties material;
+    Material::MaterialChild material;
     material.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory(*state, "PCMNAME");
 
     // create local variables to calculate and call the new worker function
     Real64 newSpecificHeat, newDensity, newThermalConductivity;
     adjustPropertiesForPhaseChange(
-        *state, finiteDiffLayerIndex, surfaceIndex, material, 20.0, 20.1, newSpecificHeat, newDensity, newThermalConductivity);
+        *state, finiteDiffLayerIndex, surfaceIndex, &material, 20.0, 20.1, newSpecificHeat, newDensity, newThermalConductivity);
 
     // check the values are correct
     EXPECT_NEAR(10187.3, newSpecificHeat, 0.1);
@@ -310,8 +349,8 @@ TEST_F(EnergyPlusFixture, DISABLED_HeatBalFiniteDiffManager_skipNotUsedConstruct
     ASSERT_TRUE(process_idf(idf_objects));
 
     ErrorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);                                // expect no errors
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);                      // expect no errors
 
     ErrorsFound = false;
     HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
@@ -394,8 +433,8 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_findAnySurfacesUsingConstruct
     ASSERT_TRUE(process_idf(idf_objects));
 
     ErrorsFound = false;
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);                                // expect no errors
+    Material::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);                      // expect no errors
 
     ErrorsFound = false;
     HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
@@ -415,6 +454,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_findAnySurfacesUsingConstruct
     state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux.allocate(thisData->TotSurfaces);
     state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux.allocate(thisData->TotSurfaces);
     state->dataGlobal->TimeStepZoneSec = 600.0;
+    state->dataGlobal->NumOfTimeStepInHour = 6;
 
     // call the function for initialization of finite difference calculation
     std::string const error_string = delimited_string({"   ** Severe  ** InitialInitHeatBalFiniteDiff: Found Material that is too thin and/or too "

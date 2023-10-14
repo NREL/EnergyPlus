@@ -51,7 +51,7 @@
                 heating, cooling, lighting, ventilating, and other energy flows. EnergyPlus is a stand-alone simulation
                 engine
                 without a ‘user friendly’ graphical interface. EnergyPlus reads input and writes output as text files,
-                although as of 9.3, EnergyPlus started becoming a library.
+                although as of 9.3, EnergyPlus became a library.
             </div>
             <div class="col-md-2"></div>
         </div>
@@ -91,9 +91,9 @@
     <h2>* Version Numbers *</h2>
     <p>
         EnergyPlus historically used version numbers that varied the major number and sometimes the minor
-        number. Starting with the March 2022 release, we are moving forward with a more modern version numbering scheme.
-        The EnergyPlus version will be based on the year and the release number. The March 2022 release is
-        EnergyPlus 22.1 and the Fall release will be EnergyPlus 22.2. If additional major releases are created
+        number. Starting with the March 2022 release, we moved forward with a more modern version numbering scheme.
+        The EnergyPlus version will be based on the year and the release number. The March 2022 release was
+        EnergyPlus 22.1, the Fall release was EnergyPlus 22.2, and so on. If additional major releases are created
         for some reason, they would increment the release number further. Rare intermediate releases may be numbered
         with a patch number such as 22.1.1.
     </p>
@@ -169,15 +169,40 @@
                     on exact object changes that you can do by hand. The updater program is described more fully in the
                     Auxiliary Programs document.
                     <ul class="list-group">
-                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:CurveFit:Speed</li>
+                        <li class="list-group-item transition-object-name">Branch</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:TwoSpeed</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:CurveFit:Performance</li>
                         <li class="list-group-item transition-object-name">Coil:Cooling:DX:SingleSpeed</li>
                         <li class="list-group-item transition-object-name">Coil:Cooling:DX:MultiSpeed</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:VariableSpeed</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:TwoStageWithHumidityControlMode</li>
                         <li class="list-group-item transition-object-name">Coil:Heating:DX:SingleSpeed</li>
                         <li class="list-group-item transition-object-name">Coil:Heating:DX:MultiSpeed</li>
-                        <li class="list-group-item transition-object-name">FuelFactors</li>
-                        <li class="list-group-item transition-object-name">Space</li>
+                        <li class="list-group-item transition-object-name">Coil:Heating:DX:VariableSpeed</li>
+                        <li class="list-group-item transition-object-name">Coil:WaterHeating:AirToWaterHeatPump:Pumped</li>
+                        <li class="list-group-item transition-object-name">Coil:WaterHeating:AirToWaterHeatPump:Wrapped</li>
+                        <li class="list-group-item transition-object-name">Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed</li>
+                        <li class="list-group-item transition-object-name">DistrictHeating</li>
+                        <li class="list-group-item transition-object-name">EnergyManagementSystem:MeteredOutputVariable</li>
+                        <li class="list-group-item transition-object-name">Exterior:FuelEquipment</li>
+                        <li class="list-group-item transition-object-name">HVACTemplate:Zone:WaterToAirHeatPump</li>
+                        <li class="list-group-item transition-object-name">AirLoopHVAC:UnitarySystem</li>
+                        <li class="list-group-item transition-object-name">AirLoopHVAC:UnitarySystem:WaterToAir</li>
+                        <li class="list-group-item transition-object-name">ZoneHVAC:WaterToAirHeatPump</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:WaterToAirHeatPump:ParameterEstimation</li>
+                        <li class="list-group-item transition-object-name">Coil:Heating:WaterToAirHeatPump:ParameterEstimation</li>
                         <li class="list-group-item transition-object-name">Coil:Cooling:WaterToAirHeatPump:EquationFit</li>
                         <li class="list-group-item transition-object-name">Coil:Heating:WaterToAirHeatPump:EquationFit</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit</li>
+                        <li class="list-group-item transition-object-name">LifeCycleCost:UsePriceEscalation</li>
+                        <li class="list-group-item transition-object-name">LifeCycleCost:UseAdjustment</li>
+                        <li class="list-group-item transition-object-name">OtherEquipment</li>
+                        <li class="list-group-item transition-object-name">PythonPlugin:OutputVariable</li>
+                        <li class="list-group-item transition-object-name">PlantEquipmentList</li>
+                        <li class="list-group-item transition-object-name">PlantEquipmentOperation:ComponentSetpoint</li>
+                        <li class="list-group-item transition-object-name">WaterHeat:Mixed</li>
+                        <li class="list-group-item transition-object-name">WaterHeater:Stratified</li>
+                        <li class="list-group-item transition-object-name">ZoneHVAC:HybridUnitaryHVAC</li>
                     </ul>
                 </div>
             </div>
@@ -206,7 +231,7 @@
     <p>
         The install includes the IDFVersionUpdater program and the necessary programs to convert from the previous
         version (including .rvi and .mvi files) to the current version. The install also includes the necessary programs
-        to convert from older versions back to v7.2.0. For versions older than v7.2.0, first we applaud your dedication
+        to convert from older versions back to v9.0.0. For versions older than that, first we applaud your dedication
         to EnergyPlus that stretches for quite some time, and second you will need to visit the
         <a href="https://energyplushelp.freshdesk.com/support/solutions/folders/67000241428">Helpdesk</a> to request
         multiple conversion set of programs.
@@ -249,56 +274,40 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9051">9051</a></td>
-            <td>Allow Coil:WaterHeating:Desuperheater to use Coil:Cooling:DX</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10138">10138</a></td>
+            <td>Add Vertical (1-D) Solution to Earth Tube Object</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9156">9156</a></td>
-            <td>Enhancement to Resilience Metrics</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10143">10143</a></td>
+            <td>Ruleset Model Description Phase 2</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9392">9392</a></td>
-            <td>Add staging actuator to Coil:Heating:Electric:MultiStage</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9746">9746</a></td>
+            <td>Improved Support for Multi-speed Fans</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9402">9402</a></td>
-            <td>Allow running just load calculations and no full simulations</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9756">9756</a></td>
+            <td>90.1 metrics - EER/IEER</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9404">9404</a></td>
-            <td>Enhancement to Simplified Shading</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9949">9949</a></td>
+            <td>Enhancement to crankcase heater</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9406">9406</a></td>
-            <td>New Feature - Latent Sizing</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9950">9950</a></td>
+            <td>Evaporative cooler RH control</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9409">9409</a></td>
-            <td>New Feature Multiple Ground Temperature and Ground Reflectance</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9979">9979</a></td>
+            <td>New plant heat pump features and supervisory controller</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9463">9463</a></td>
-            <td>Add ASHRAE Standard 205 Chiller object </td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9982">9982</a></td>
+            <td>Extend Spaces to Sizing and HVAC</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9465">9465</a></td>
-            <td>AirflowNetwork Duct Autosizing</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9480">9480</a></td>
-            <td>7038 90.1 metric</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9564">9564</a></td>
-            <td>Support Space for Infiltration and Ventilation</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9571">9571</a></td>
-            <td>Luminance-based window shading control per 90.1 Appendix C requirements</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9595">9595</a></td>
-            <td>Support Space for Mixing and CrossMixing</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9987">9987</a></td>
+            <td>Multistage economizer control</td>
         </tr>
     </table>
     <h3><a id="PerformanceFeatures"></a>Runtime Performance Enhancing Developments</h3>
@@ -308,16 +317,12 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9561">9561</a></td>
-            <td>9560 eliminate loop for surface heat transfer algorithm and replace with select reset</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9623">9623</a></td>
+            <td>Enhance perf logging</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9600">9600</a></td>
-            <td>Update MovingAvg function</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9634">9634</a></td>
-            <td>Use currDifSolarRad, currBeamSolarRad to hold adjusted solar and other cleanups in the incident solar multiplier feature</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9782">9782</a></td>
+            <td>Refactor loops for zone sizing array initialization</td>
         </tr>
     </table>
     <h3><a id="RefactoringEfforts"></a>Targeted Refactoring Efforts</h3>
@@ -327,56 +332,28 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9149">9149</a></td>
-            <td>Coil refactoring Heat Exchanger Assisted DX Cooling Coil</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10015">10015</a></td>
+            <td>Refactor logic in VRF control function to simplify code readability</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9273">9273</a></td>
-            <td>ZoneHVAC:PackagedTerminalAirConditioner transition to UnitarySystem</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10050">10050</a></td>
+            <td>ConvectionCoefficients Enumeration-based Cleanup</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9323">9323</a></td>
-            <td>Enum Refactor & Remove `SELECT_CASE_var`</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10202">10202</a></td>
+            <td>Update penumbra</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9399">9399</a></td>
-            <td>Move DataHVACGlobals::SetPointType to enum and switch/case</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9902">9902</a></td>
+            <td>End Use Cleanup</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9413">9413</a></td>
-            <td>Remove `select_case_var`s & `enum` cleanup</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9924">9924</a></td>
+            <td>Remove Optional Arguments, Part 1</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9429">9429</a></td>
-            <td>AirflowNetwork Refactor</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9449">9449</a></td>
-            <td>Switch AFN simulation control from ints to an enum</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9452">9452</a></td>
-            <td>Refactor and Cleanup OutputReports.cc</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9454">9454</a></td>
-            <td>Expose EPVector resize method, change allocation handling</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9535">9535</a></td>
-            <td>Update GHE Interpolation Routine </td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9537">9537</a></td>
-            <td>Implement 9418 ITE environment class addition and code specifications update</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9557">9557</a></td>
-            <td>Test SetupOutputVariable changes to accept std::string_view type for parameters</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9584">9584</a></td>
-            <td>Clean up array references in sizing code to speed up code execution</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9981">9981</a></td>
+            <td>Improved ReadTheDocs Documentation</td>
         </tr>
     </table>
 

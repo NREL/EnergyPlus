@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,6 @@
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Array4D.hh>
-#include <ObjexxFCL/Array5D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -66,10 +65,9 @@ struct MoistureBalanceData : BaseGlobalStruct
     // This is more or less the traditional value from BLAST.
     // static constexpr Real64 Lam = 2500000.0; // heat of adsorption for building materials
     // Public Variables that will also be used in the Moisture Surface Balance
-    Array3D<Real64> FluxH;  // transfer function coeff for calculating the CPF Flux history term
-    Array5D<Real64> IcoefH; // transfer function coeff for calculating the CPF history term
-    Array4D<Real64> Icoef;  // transfer function coeff for calculating the CPF history term
-    Array2D<Real64> DiffC;  // Thermal Diffusivity in combined potential formulation (CPF)
+    Array3D<Real64> FluxH; // transfer function coeff for calculating the CPF Flux history term
+    Array4D<Real64> Icoef; // transfer function coeff for calculating the CPF history term
+    Array2D<Real64> DiffC; // Thermal Diffusivity in combined potential formulation (CPF)
     // for each equation
     Array2D<Real64> mtinc; // # of Moisture transfer function time increment for each equation
     Array1D<Real64> S1;    // Thermal Diffusivity in combined potential formulation (CPF)

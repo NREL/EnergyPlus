@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -166,10 +166,7 @@ TEST_F(EnergyPlusFixture, GasAbsorption_GetInput_Test)
     EXPECT_FALSE(state->dataChillerGasAbsorption->GasAbsorber(1).isWaterCooled);
 
     EXPECT_EQ(2., state->dataChillerGasAbsorption->GasAbsorber(1).CHWLowLimitTemp);
-    EXPECT_EQ("NaturalGas", state->dataChillerGasAbsorption->GasAbsorber(1).FuelType);
-
-    // Additional tests for fuel type input
-    EXPECT_EQ(state->dataChillerGasAbsorption->GasAbsorber(1).FuelType, "NaturalGas");
+    EXPECT_TRUE(compare_enums(Constant::eFuel::NaturalGas, state->dataChillerGasAbsorption->GasAbsorber(1).FuelType));
 }
 
 TEST_F(EnergyPlusFixture, GasAbsorption_getDesignCapacities_Test)

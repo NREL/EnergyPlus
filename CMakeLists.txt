@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.17)
+
 # Use ccache if available, has to be before "project()"
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -9,7 +11,14 @@ cmake_policy(SET CMP0048 NEW) # handling project_version_* variables
 
 project(EnergyPlus)
 
-cmake_minimum_required(VERSION 3.17)
+# Raise an error if attempting to compile on macOS older than 10.15 - it does not work
+if (APPLE)
+  if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+    message(FATAL_ERROR "CMAKE_OSX_DEPLOYMENT_TARGET not set. Please set CMAKE_OSX_DEPLOYMENT_TARGET to 10.15 or greater and try again.")
+  elseif (CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS "10.15")
+    message(FATAL_ERROR "The minimum required version for macOS is 10.15, however CMAKE_OSX_DEPLOYMENT_TARGET is set to ${CMAKE_OSX_DEPLOYMENT_TARGET}.")
+  endif()
+endif()
 
 if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER "3.0")
   cmake_policy(SET CMP0054 NEW) # CMake 3.1 added this policy
@@ -43,6 +52,8 @@ if(ENABLE_PCH)
     "${PROJECT_SOURCE_DIR}/third_party/nlohmann/json.hpp"
     )
 endif()
+
+option(ENABLE_UNITY "Enable Unity Build" OFF)
 
 add_library(project_fp_options INTERFACE)
 
@@ -143,6 +154,11 @@ option(LINK_WITH_PYTHON "Link with Python Library for Python Plugin Builds" OFF)
 option(ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON)
 option(ENABLE_GTEST_SHUFFLE "Enable shuffle to eliminate order dependency" ON)
 option(ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON)
+
+
+if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
+  option(ENABLE_HARDENED_RUNTIME "Enable Control Flow Guard and Buffer Security Check" OFF)
+endif()
 
 mark_as_advanced(ENABLE_INSTALL_REMOTE)
 
@@ -274,12 +290,9 @@ set(SAMAPI_EXPORT OFF FORCE)
 if(OPENGL_FOUND)
   target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/penumbra/include)
 endif()
-target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/kiva-ep/src)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/kiva/src)
 target_include_directories(project_options INTERFACE "${kiva_BINARY_DIR}/src/libkiva")
 target_include_directories(project_options SYSTEM INTERFACE "${kiva_SOURCE_DIR}/vendor/boost-1.61.0/")
-
-add_subdirectory(scripts/dev/generate_embeddable_epJSON_schema)
-set_target_properties(generate_embeddedable_epJSON_schema PROPERTIES FOLDER "Internal")
 
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP/include)
@@ -293,15 +306,6 @@ endif()
 # E+ required libraries
 add_subdirectory(idd)
 
-execute_process(
-  COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${PROJECT_SOURCE_DIR}"
-  TIMEOUT 30
-  RESULT_VARIABLE generate_epJSON_schema_result)
-if(${generate_epJSON_schema_result} MATCHES ".*timeout.*")
-  message(FATAL_ERROR "Generating epJSON Schema from IDD failed: ${generate_epJSON_schema_result}")
-endif()
-configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd")
-configure_file(idd/Energy+.schema.epJSON.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON")
 configure_file(idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd")
 configure_file(idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd")
 
@@ -317,7 +321,6 @@ configure_file("workflows/transition.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/work
 # of course E+ itself
 add_subdirectory(src/EnergyPlus)
 set_target_properties(airflownetworklib PROPERTIES FOLDER "Internal")
-set_target_properties(GenerateEmbeddedEpJSONSchema PROPERTIES FOLDER "Internal")
 set_target_properties(energyplusparser PROPERTIES FOLDER "Internal")
 
 if(BUILD_TESTING)
@@ -329,6 +332,10 @@ if(BUILD_TESTING)
       option(VALGRIND_ANALYZE_PERFORMANCE_TESTS "Analyze performance tests via valgrind / callgrind" OFF)
       if(VALGRIND_ANALYZE_PERFORMANCE_TESTS)
         find_program(VALGRIND NAMES valgrind PATH /usr/bin /usr/local/bin)
+      endif()
+      option(PERF_STAT_ANALYZE_PERFORMANCE_TESTS "Analyze performance tests via `perf stat`" OFF)
+      if(PERF_STAT_ANALYZE_PERFORMANCE_TESTS)
+        find_program(PERF NAMES perf PATH /usr/bin /usr/local/bin)
       endif()
     endif()
     add_subdirectory(performance_tests)
@@ -362,9 +369,9 @@ if(BUILD_FORTRAN)
     PROJECT Transition
     CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS}
     NO_EXTERNAL_INSTALL)
-  file(COPY "idd/V22-1-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V22-2-0-Energy+.idd")
-  file(COPY "src/Transition/SupportFiles/Report Variables 22-1-0 to 22-2-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  file(COPY "${PREVIOUS_IDD}" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}-Energy+.idd")
+  file(COPY "src/Transition/SupportFiles/Report Variables ${PREV_RELEASE_MAJOR}-${PREV_RELEASE_MINOR}-${PREV_RELEASE_PATCH} to ${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
   cmake_add_fortran_subdirectory(
     src/Basement
     PROJECT Basement
@@ -442,6 +449,10 @@ mark_as_advanced(FMT_INSTALL)
 mark_as_advanced(FMT_PEDANTIC)
 mark_as_advanced(FMT_TEST)
 mark_as_advanced(FMT_WERROR)
+mark_as_advanced(FMT_DEBUG_POSTFIX)
+mark_as_advanced(FMT_INC_DIR)
+mark_as_advanced(FMT_MODULE)
+mark_as_advanced(FMT_OS)
 mark_as_advanced(GLFW_BUILD_DOCS)
 mark_as_advanced(GLFW_BUILD_EXAMPLES)
 mark_as_advanced(GLFW_BUILD_TESTS)
@@ -460,3 +471,11 @@ mark_as_advanced(USE_PSYCHROMETRICS_CACHING)
 mark_as_advanced(USE_GLYCOL_CACHING)
 mark_as_advanced(USE_PSYCH_STATS)
 mark_as_advanced(USE_PSYCH_ERRORS)
+mark_as_advanced(LSB_RELEASE)
+mark_as_advanced(LIBTK205_BUILD_TESTING)
+mark_as_advanced(libtk205_USE_SUBMODULES)
+mark_as_advanced(ENABLE_SANITIZER_ADDRESS)
+mark_as_advanced(ENABLE_SANITIZER_LEAK)
+mark_as_advanced(ENABLE_SANITIZER_MEMORY)
+mark_as_advanced(ENABLE_SANITIZER_THREAD)
+mark_as_advanced(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR)

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -129,8 +129,8 @@ void ManageSizing(EnergyPlusData &state)
     // Design day simulations are run again with central air systems supplied by
     // purchased hot and cold water, yielding central heating and cooling capacities.
 
-    auto &CalcSysSizing(state.dataSize->CalcSysSizing);
-    auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
+    auto &CalcSysSizing = state.dataSize->CalcSysSizing;
+    auto &SysSizPeakDDNum = state.dataSize->SysSizPeakDDNum;
 
     // Using/Aliasing
     using SimAirServingZones::ManageAirLoops;
@@ -157,23 +157,14 @@ void ManageSizing(EnergyPlusData &state)
     int TimeStepInDay(0); // time step number
     int LastMonth(0);
     int LastDayOfMonth(0);
-    Real64 TempAtPeak(0.0);   // Outside temperature at peak cooling/heating for reporting
-    Real64 HumRatAtPeak(0.0); // Outside humidity ratio at peak cooling/heating for reporting
-    int TimeStepAtPeak(0);    // time step number at heat or cool peak
-    int DDNum(0);             // Design Day index
-    int AirLoopNum(0);        // air loop index
-    //  EXTERNAL            ReportZoneSizing
-    //  EXTERNAL            ReportSysSizing
+    int AirLoopNum(0); // air loop index
     std::string curName;
     int NumSizingPeriodsPerformed;
     int numZoneSizeIter; // number of times to repeat zone sizing calcs. 1 normal, 2 load component reporting
     int iZoneCalcIter;   // index for repeating the zone sizing calcs
     bool isUserReqCompLoadReport;
-    Real64 DOASHeatGainRateAtHtPk(0.0); // zone heat gain rate from the DOAS at the heating peak [W]
-    Real64 DOASHeatGainRateAtClPk(0.0); // zone heat gain rate from the DOAS at the cooling peak [W]
-    Real64 TStatSetPtAtPk(0.0);         // thermostat set point at peak
 
-    auto &FinalSysSizing(state.dataSize->FinalSysSizing);
+    auto &FinalSysSizing = state.dataSize->FinalSysSizing;
 
     TimeStepInDay = 0;
     state.dataSize->SysSizingRunDone = false;
@@ -192,7 +183,7 @@ void ManageSizing(EnergyPlusData &state)
     if (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing) {
         if ((state.dataSize->NumSysSizInput > 0 && state.dataSize->NumZoneSizingInput == 0) ||
             (!state.dataGlobal->DoZoneSizing && state.dataGlobal->DoSystemSizing && state.dataSize->NumSysSizInput > 0)) {
-            ShowSevereError(state, std::string{RoutineName} + "Requested System Sizing but did not request Zone Sizing.");
+            ShowSevereError(state, format("{}Requested System Sizing but did not request Zone Sizing.", RoutineName));
             ShowContinueError(state, "System Sizing cannot be done without Zone Sizing");
             ShowFatalError(state, "Program terminates for preceding conditions.");
         }
@@ -210,12 +201,13 @@ void ManageSizing(EnergyPlusData &state)
             if (fileHasSizingPeriodDays) {
                 ShowWarningError(
                     state,
-                    std::string{RoutineName} +
-                        "The ZoneComponentLoadSummary report was requested but no sizing objects were found so that report cannot be generated.");
+                    format("{}The ZoneComponentLoadSummary report was requested but no sizing objects were found so that report cannot be generated.",
+                           RoutineName));
             } else {
                 ShowWarningError(state,
-                                 std::string{RoutineName} + "The ZoneComponentLoadSummary report was requested but no SizingPeriod:DesignDay or "
-                                                            "SizingPeriod:WeatherFileDays objects were found so that report cannot be generated.");
+                                 format("{}The ZoneComponentLoadSummary report was requested but no SizingPeriod:DesignDay or "
+                                        "SizingPeriod:WeatherFileDays objects were found so that report cannot be generated.",
+                                        RoutineName));
             }
         }
     }
@@ -228,8 +220,8 @@ void ManageSizing(EnergyPlusData &state)
     if ((state.dataGlobal->DoZoneSizing) && (state.dataSize->NumZoneSizingInput == 0)) {
         ShowWarningError(
             state,
-            std::string{RoutineName} +
-                "For a zone sizing run, there must be at least 1 Sizing:Zone input object. SimulationControl Zone Sizing option ignored.");
+            format("{}For a zone sizing run, there must be at least 1 Sizing:Zone input object. SimulationControl Zone Sizing option ignored.",
+                   RoutineName));
     }
 
     if ((state.dataSize->NumZoneSizingInput > 0) &&
@@ -285,7 +277,7 @@ void ManageSizing(EnergyPlusData &state)
                 if (ErrorsFound) break;
 
                 // check that environment is one of the design days
-                if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+                if (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
                     continue;
                 }
 
@@ -331,8 +323,8 @@ void ManageSizing(EnergyPlusData &state)
                             DisplayString(state,
                                           fmt::format("...for Sizing Period: #{} {}", NumSizingPeriodsPerformed, state.dataEnvrn->EnvironmentName));
                         }
-                        UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::BeginDay);
-                        UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::BeginDay);
+                        UpdateZoneSizing(state, Constant::CallIndicator::BeginDay);
+                        UpdateFacilitySizing(state, Constant::CallIndicator::BeginDay);
                     }
 
                     for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
@@ -398,8 +390,8 @@ void ManageSizing(EnergyPlusData &state)
                     } // ... End hour loop.
 
                     if (state.dataGlobal->EndDayFlag && !state.dataGlobal->WarmupFlag) {
-                        UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndDay);
-                        UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndDay);
+                        UpdateZoneSizing(state, Constant::CallIndicator::EndDay);
+                        UpdateFacilitySizing(state, Constant::CallIndicator::EndDay);
                     }
 
                     if (!state.dataGlobal->WarmupFlag && (state.dataGlobal->DayOfSim > 0) &&
@@ -415,12 +407,11 @@ void ManageSizing(EnergyPlusData &state)
             } // ... End environment loop
 
             if (NumSizingPeriodsPerformed > 0) {
-                UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
-                UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
+                UpdateZoneSizing(state, Constant::CallIndicator::EndZoneSizingCalc);
+                UpdateFacilitySizing(state, Constant::CallIndicator::EndZoneSizingCalc);
                 state.dataSize->ZoneSizingRunDone = true;
             } else {
-                ShowSevereError(state,
-                                std::string{RoutineName} + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
+                ShowSevereError(state, format("{}No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.", RoutineName));
                 ErrorsFound = true;
             }
 
@@ -447,8 +438,8 @@ void ManageSizing(EnergyPlusData &state)
     if ((state.dataGlobal->DoSystemSizing) && (state.dataSize->NumSysSizInput == 0) && (state.dataSizingManager->NumAirLoops > 0)) {
         ShowWarningError(
             state,
-            std::string{RoutineName} +
-                "For a system sizing run, there must be at least 1 Sizing:System object input. SimulationControl System Sizing option ignored.");
+            format("{}For a system sizing run, there must be at least 1 Sizing:System object input. SimulationControl System Sizing option ignored.",
+                   RoutineName));
     }
 
     if ((state.dataSize->NumSysSizInput > 0) && (state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing) && !ErrorsFound) {
@@ -482,7 +473,7 @@ void ManageSizing(EnergyPlusData &state)
             GetNextEnvironment(state, Available, ErrorsFound); // get an environment
 
             // check that environment is one of the design days
-            if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+            if (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
                 continue;
             }
 
@@ -517,7 +508,7 @@ void ManageSizing(EnergyPlusData &state)
                         DisplayString(state,
                                       fmt::format("...for Sizing Period: #{} {}", NumSizingPeriodsPerformed, state.dataEnvrn->EnvironmentName));
                     }
-                    UpdateSysSizing(state, DataGlobalConstants::CallIndicator::BeginDay);
+                    UpdateSysSizing(state, Constant::CallIndicator::BeginDay);
                 }
 
                 for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
@@ -547,7 +538,7 @@ void ManageSizing(EnergyPlusData &state)
 
                         ManageWeather(state);
 
-                        UpdateSysSizing(state, DataGlobalConstants::CallIndicator::DuringDay);
+                        UpdateSysSizing(state, Constant::CallIndicator::DuringDay);
 
                         state.dataGlobal->BeginHourFlag = false;
                         state.dataGlobal->BeginDayFlag = false;
@@ -559,7 +550,7 @@ void ManageSizing(EnergyPlusData &state)
 
                 } // ... End hour loop.
 
-                if (state.dataGlobal->EndDayFlag) UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndDay);
+                if (state.dataGlobal->EndDayFlag) UpdateSysSizing(state, Constant::CallIndicator::EndDay);
 
                 if (!state.dataGlobal->WarmupFlag && (state.dataGlobal->DayOfSim > 0) &&
                     (state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn)) {
@@ -571,11 +562,10 @@ void ManageSizing(EnergyPlusData &state)
         } // ... End environment loop
 
         if (NumSizingPeriodsPerformed > 0) {
-            UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndSysSizingCalc);
+            UpdateSysSizing(state, Constant::CallIndicator::EndSysSizingCalc);
             state.dataSize->SysSizingRunDone = true;
         } else {
-            ShowSevereError(state,
-                            std::string{RoutineName} + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
+            ShowSevereError(state, format("{}No Sizing periods were performed for System Sizing. No System Sizing calculations saved.", RoutineName));
             ErrorsFound = true;
         }
     } else if ((state.dataSize->NumZoneSizingInput > 0) &&
@@ -593,210 +583,71 @@ void ManageSizing(EnergyPlusData &state)
 
     // report sizing results to eio file
     if (state.dataSize->ZoneSizingRunDone) {
-        for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
-            if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            if (state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolVolFlow > 0.0) {
-                TimeStepAtPeak = state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax;
-                DDNum = state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolDDNum;
-                if (DDNum > 0 && TimeStepAtPeak > 0) {
-                    TempAtPeak = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepAtPeak);
-                    HumRatAtPeak = state.dataSize->DesDayWeath(DDNum).HumRat(TimeStepAtPeak);
-                    DOASHeatGainRateAtClPk = state.dataSize->CalcZoneSizing(DDNum, CtrlZoneNum).DOASHeatAddSeq(TimeStepAtPeak);
-                    TStatSetPtAtPk = state.dataSize->ZoneSizing(DDNum, CtrlZoneNum).CoolTstatTempSeq(TimeStepAtPeak);
-                } else {
-                    TempAtPeak = 0.0;
-                    HumRatAtPeak = 0.0;
-                    DOASHeatGainRateAtClPk = 0.0;
-                    TStatSetPtAtPk = 0.0;
-                }
-                ReportZoneSizing(state,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolSizingType,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolLoad,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolVolFlow,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolDesDay,
-                                 state.dataSize->CoolPeakDateHrMin(CtrlZoneNum),
-                                 TempAtPeak,
-                                 HumRatAtPeak,
-                                 state.dataHeatBal->Zone(CtrlZoneNum).FloorArea,
-                                 state.dataHeatBal->Zone(CtrlZoneNum).TotOccupants,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA,
-                                 DOASHeatGainRateAtClPk);
-                curName = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName;
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchZnClCalcDesLd, curName, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad);
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchZnClUserDesLd, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolLoad);
-                if (state.dataHeatBal->Zone(CtrlZoneNum).FloorArea != 0.0) {
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchZnClUserDesLdPerArea,
-                                     curName,
-                                     state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolLoad / state.dataHeatBal->Zone(CtrlZoneNum).FloorArea);
-                }
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnClCalcDesAirFlow,
-                                 curName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow,
-                                 3);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnClUserDesAirFlow,
-                                 curName,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolVolFlow,
-                                 3);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClDesDay, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolDesDay);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkTime, curName, state.dataSize->CoolPeakDateHrMin(CtrlZoneNum));
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkTstatTemp, curName, TStatSetPtAtPk);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnClPkIndTemp,
-                                 curName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnClPkIndHum,
-                                 curName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak,
-                                 5);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkOATemp, curName, TempAtPeak);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkOAHum, curName, HumRatAtPeak, 5);
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchZnClPkOAMinFlow, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA, 3);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkDOASHeatGain, curName, DOASHeatGainRateAtClPk);
-            } else {
-                curName = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName;
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClCalcDesLd, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClUserDesLd, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClUserDesLdPerArea, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClCalcDesAirFlow, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClUserDesAirFlow, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClDesDay, curName, "N/A");
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkTime, curName, "N/A");
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkTstatTemp, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkIndTemp, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkIndHum, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkOATemp, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkOAHum, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkOAMinFlow, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkDOASHeatGain, curName, 0.0, 1);
-            }
-            if (state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow > 0.0) {
-                TimeStepAtPeak = state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax;
-                DDNum = state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDDNum;
-                if (DDNum > 0 && TimeStepAtPeak > 0) {
-                    TempAtPeak = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepAtPeak);
-                    HumRatAtPeak = state.dataSize->DesDayWeath(DDNum).HumRat(TimeStepAtPeak);
-                    DOASHeatGainRateAtHtPk = state.dataSize->CalcZoneSizing(DDNum, CtrlZoneNum).DOASHeatAddSeq(TimeStepAtPeak);
-                    TStatSetPtAtPk = state.dataSize->ZoneSizing(DDNum, CtrlZoneNum).HeatTstatTempSeq(TimeStepAtPeak);
-                } else {
-                    TempAtPeak = 0.0;
-                    HumRatAtPeak = 0.0;
-                    DOASHeatGainRateAtHtPk = 0.0;
-                    TStatSetPtAtPk = 0.0;
-                }
-                ReportZoneSizing(state,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatSizingType,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDesDay,
-                                 state.dataSize->HeatPeakDateHrMin(CtrlZoneNum),
-                                 TempAtPeak,
-                                 HumRatAtPeak,
-                                 state.dataHeatBal->Zone(CtrlZoneNum).FloorArea,
-                                 state.dataHeatBal->Zone(CtrlZoneNum).TotOccupants,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA,
-                                 DOASHeatGainRateAtHtPk);
-                curName = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName;
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchZnHtCalcDesLd, curName, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad);
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchZnHtUserDesLd, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad);
-                if (state.dataHeatBal->Zone(CtrlZoneNum).FloorArea != 0.0) {
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchZnHtUserDesLdPerArea,
-                                     curName,
-                                     state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad / state.dataHeatBal->Zone(CtrlZoneNum).FloorArea);
-                }
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnHtCalcDesAirFlow,
-                                 curName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow,
-                                 3);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnHtUserDesAirFlow,
-                                 curName,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow,
-                                 3);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtDesDay, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDesDay);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkTime, curName, state.dataSize->HeatPeakDateHrMin(CtrlZoneNum));
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkTstatTemp, curName, TStatSetPtAtPk);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnHtPkIndTemp,
-                                 curName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnHtPkIndHum,
-                                 curName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak,
-                                 5);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkOATemp, curName, TempAtPeak);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkOAHum, curName, HumRatAtPeak, 5);
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchZnHtPkOAMinFlow, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA, 3);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkDOASHeatGain, curName, DOASHeatGainRateAtHtPk);
-            } else {
-                curName = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName;
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtCalcDesLd, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtUserDesLd, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtUserDesLdPerArea, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtCalcDesAirFlow, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtUserDesAirFlow, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtDesDay, curName, "N/A");
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkTime, curName, "N/A");
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkTstatTemp, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkIndTemp, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkIndHum, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkOATemp, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkOAHum, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkOAMinFlow, curName, 0.0, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkDOASHeatGain, curName, 0.0, 1);
+        bool isSpace = true;
+        if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+            for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+                if (!state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->space(spaceNum).zoneNum).IsControlled) continue;
+                reportZoneSizing(state,
+                                 state.dataHeatBal->space(spaceNum),
+                                 state.dataSize->FinalSpaceSizing(spaceNum),
+                                 state.dataSize->CalcFinalSpaceSizing(spaceNum),
+                                 state.dataSize->CalcSpaceSizing,
+                                 state.dataSize->SpaceSizing,
+                                 isSpace);
             }
         }
-        // Deallocate arrays no longer needed
-        state.dataSize->ZoneSizing.deallocate();
-        // CalcZoneSizing.deallocate();
+        isSpace = false;
+        for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
+            if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
+            reportZoneSizing(state,
+                             state.dataHeatBal->Zone(CtrlZoneNum),
+                             state.dataSize->FinalZoneSizing(CtrlZoneNum),
+                             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum),
+                             state.dataSize->CalcZoneSizing,
+                             state.dataSize->ZoneSizing,
+                             isSpace);
+        }
     }
+    // Deallocate arrays no longer needed
+    state.dataSize->ZoneSizing.deallocate();
+    // CalcZoneSizing.deallocate();
+    if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+        state.dataSize->SpaceSizing.deallocate();
+    }
+
     if (state.dataSize->SysSizingRunDone) {
         for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             curName = FinalSysSizing(AirLoopNum).AirPriLoopName;
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizCalcClAir, curName, CalcSysSizing(AirLoopNum).DesCoolVolFlow);
             if (std::abs(CalcSysSizing(AirLoopNum).DesCoolVolFlow) <= 1.e-8) {
                 ShowWarningError(state,
-                                 std::string{RoutineName} +
-                                     "Calculated Cooling Design Air Flow Rate for System=" + FinalSysSizing(AirLoopNum).AirPriLoopName + " is zero.");
+                                 format("{}Calculated Cooling Design Air Flow Rate for System={} is zero.",
+                                        RoutineName,
+                                        FinalSysSizing(AirLoopNum).AirPriLoopName));
                 ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
             }
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizUserClAir, curName, FinalSysSizing(AirLoopNum).DesCoolVolFlow);
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizCalcHtAir, curName, CalcSysSizing(AirLoopNum).DesHeatVolFlow);
             if (std::abs(CalcSysSizing(AirLoopNum).DesHeatVolFlow) <= 1.e-8) {
                 ShowWarningError(state,
-                                 std::string{RoutineName} +
-                                     "Calculated Heating Design Air Flow Rate for System=" + FinalSysSizing(AirLoopNum).AirPriLoopName + " is zero.");
+                                 format("{}Calculated Heating Design Air Flow Rate for System={} is zero.",
+                                        RoutineName,
+                                        FinalSysSizing(AirLoopNum).AirPriLoopName));
                 ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
             }
-            std::string coolPeakLoadKind;
+            std::string_view coolPeakLoadKind;
             std::string coolPeakDDDate;
             int coolPeakDD = 0;
             Real64 coolCap = 0.;
-            if (FinalSysSizing(AirLoopNum).CoolingPeakLoadType == SensibleCoolingLoad) {
+            int timeStepIndexAtPeakCoolLoad = 0;
+            if (FinalSysSizing(AirLoopNum).coolingPeakLoad == DataSizing::PeakLoad::SensibleCooling) {
                 coolPeakLoadKind = "Sensible";
                 coolPeakDDDate = SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate;
                 coolPeakDD = SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD;
                 coolCap = FinalSysSizing(AirLoopNum).SensCoolCap;
-            } else if (FinalSysSizing(AirLoopNum).CoolingPeakLoadType == TotalCoolingLoad) {
-                if (FinalSysSizing(AirLoopNum).LoadSizeType == DataSizing::Latent && state.dataHeatBal->DoLatentSizing) {
+                if (coolPeakDD > 0) timeStepIndexAtPeakCoolLoad = SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk(coolPeakDD);
+            } else if (FinalSysSizing(AirLoopNum).coolingPeakLoad == DataSizing::PeakLoad::TotalCooling) {
+                if (FinalSysSizing(AirLoopNum).loadSizingType == DataSizing::LoadSizing::Latent && state.dataHeatBal->DoLatentSizing) {
                     coolPeakLoadKind = "Total Based on Latent";
                 } else {
                     coolPeakLoadKind = "Total";
@@ -804,6 +655,7 @@ void ManageSizing(EnergyPlusData &state)
                 coolPeakDDDate = SysSizPeakDDNum(AirLoopNum).cTotCoolPeakDDDate;
                 coolPeakDD = SysSizPeakDDNum(AirLoopNum).TotCoolPeakDD;
                 coolCap = FinalSysSizing(AirLoopNum).TotCoolCap;
+                if (coolPeakDD > 0) timeStepIndexAtPeakCoolLoad = SysSizPeakDDNum(AirLoopNum).TimeStepAtTotCoolPk(coolPeakDD);
             }
             if (coolPeakDD > 0) {
                 ReportSysSizing(state,
@@ -815,7 +667,7 @@ void ManageSizing(EnergyPlusData &state)
                                 FinalSysSizing(AirLoopNum).DesCoolVolFlow,
                                 FinalSysSizing(AirLoopNum).CoolDesDay,
                                 coolPeakDDDate,
-                                SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(coolPeakDD));
+                                timeStepIndexAtPeakCoolLoad);
             } else {
                 ReportSysSizing(state,
                                 curName,
@@ -858,11 +710,21 @@ void ManageSizing(EnergyPlusData &state)
         state.dataSize->SysSizing.deallocate();
     }
 
+    // Size SpaceHVAC fractions
+    if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+        for (auto &thisSpaceHVACSplitter : state.dataZoneEquip->zoneEquipSplitter) {
+            thisSpaceHVACSplitter.size(state);
+        }
+        for (auto &thisSpaceHVACMixer : state.dataZoneEquip->zoneEquipMixer) {
+            thisSpaceHVACMixer.size(state);
+        }
+    }
+
     if ((state.dataGlobal->DoPlantSizing) && (state.dataSize->NumPltSizInput == 0)) {
         ShowWarningError(
             state,
-            std::string{RoutineName} +
-                "For a plant sizing run, there must be at least 1 Sizing:Plant object input. SimulationControl Plant Sizing option ignored.");
+            format("{}For a plant sizing run, there must be at least 1 Sizing:Plant object input. SimulationControl Plant Sizing option ignored.",
+                   RoutineName));
     }
 
     if ((state.dataSize->NumPltSizInput > 0) && (state.dataGlobal->DoPlantSizing) && !ErrorsFound) {
@@ -880,7 +742,7 @@ bool CalcdoLoadComponentPulseNow(EnergyPlusData &state,
                                  bool const WarmupFlag,
                                  int const HourOfDay,
                                  int const TimeStep,
-                                 DataGlobalConstants::KindOfSim const KindOfSim)
+                                 Constant::KindOfSim const KindOfSim)
 {
     // This routine decides whether or not to do a Load Component Pulse.  True when yes it should, false when in shouldn't
     // This check looks to do the pulse at the first time step of the 10th hour of the day while not in warmup mode.
@@ -891,7 +753,7 @@ bool CalcdoLoadComponentPulseNow(EnergyPlusData &state,
     int constexpr TimeStepToPulse(1);
 
     if ((isPulseZoneSizing) && (!WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) &&
-        ((KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodDesign) || (state.dataGlobal->DayOfSim == 1))) {
+        ((KindOfSim == Constant::KindOfSim::RunPeriodDesign) || (state.dataGlobal->DayOfSim == 1))) {
         return true;
     } else {
         return false;
@@ -909,9 +771,9 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
 
     // Also store zone level flow information for Standard 62.1 calculations, Vpz, Vpz_min, Vdz, and Vdz_min for both cooling and heating
 
-    auto &AirDistUnit(state.dataDefineEquipment->AirDistUnit);
-    auto &FinalSysSizing(state.dataSize->FinalSysSizing);
-    auto &sd_airterminal(state.dataSingleDuct->sd_airterminal);
+    auto &AirDistUnit = state.dataDefineEquipment->AirDistUnit;
+    auto &FinalSysSizing = state.dataSize->FinalSysSizing;
+    auto &sd_airterminal = state.dataSingleDuct->sd_airterminal;
 
     if ((state.dataSize->NumSysSizInput > 0) && (state.dataGlobal->DoSystemSizing)) { // only if there is system sizing
 
@@ -1069,6 +931,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                 for (int pIUATUNum = 1; pIUATUNum <= state.dataPowerInductionUnits->NumPIUs; ++pIUATUNum) {
                     if (AirLoopNum == state.dataPowerInductionUnits->PIU(pIUATUNum).AirLoopNum) {
                         int termUnitSizingIndex = AirDistUnit(state.dataPowerInductionUnits->PIU(pIUATUNum).ADUNum).TermUnitSizingNum;
+                        auto &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
                         airLoopMaxFlowRateSum += state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                         if (state.dataPowerInductionUnits->PIU(pIUATUNum).UnitType_Num ==
                             DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
@@ -1099,10 +962,10 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                                 state.dataPowerInductionUnits->PIU(pIUATUNum).MaxTotAirVolFlow; // which is constant for series PIU
 
                             // store Ep for 62.1 calculations
-                            state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFraction =
+                            thisTermUnitFinalZoneSizing.ZonePrimaryAirFraction =
                                 state.dataSize->VpzMinClgByZone(termUnitSizingIndex) /
                                 state.dataSize->VdzClgByZone(termUnitSizingIndex); // min primary divided by max total
-                            state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFractionHtg =
+                            thisTermUnitFinalZoneSizing.ZonePrimaryAirFractionHtg =
                                 state.dataSize->VpzMinHtgByZone(termUnitSizingIndex) / state.dataSize->VdzHtgByZone(termUnitSizingIndex);
 
                         } else if (state.dataPowerInductionUnits->PIU(pIUATUNum).UnitType_Num ==
@@ -1140,10 +1003,10 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow +
                                 state.dataPowerInductionUnits->PIU(pIUATUNum).MaxSecAirVolFlow; // expect min primary and CV fan running
 
-                            state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFraction =
+                            thisTermUnitFinalZoneSizing.ZonePrimaryAirFraction =
                                 state.dataSize->VpzMinClgByZone(termUnitSizingIndex) /
                                 state.dataSize->VdzClgByZone(termUnitSizingIndex); // min primary divided by max total
-                            state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFractionHtg =
+                            thisTermUnitFinalZoneSizing.ZonePrimaryAirFractionHtg =
                                 state.dataSize->VpzMinHtgByZone(termUnitSizingIndex) / state.dataSize->VdzHtgByZone(termUnitSizingIndex);
                         }
                     }
@@ -1151,7 +1014,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
             }
 
             auto &IndUnit = state.dataHVACSingleDuctInduc->IndUnit;
-            auto &NumIndUnits = state.dataHVACSingleDuctInduc->NumIndUnits;
+            int NumIndUnits = state.dataHVACSingleDuctInduc->NumIndUnits;
 
             // sum up heating and max flows for any four pipe induction units
             // dual path for std 62.1
@@ -1333,10 +1196,10 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
 
 void ManageSystemVentilationAdjustments(EnergyPlusData &state)
 {
-    auto &AirDistUnit(state.dataDefineEquipment->AirDistUnit);
-    auto &FinalSysSizing(state.dataSize->FinalSysSizing);
-    auto &VbzByZone(state.dataSize->VbzByZone);
-    auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo);
+    auto &AirDistUnit = state.dataDefineEquipment->AirDistUnit;
+    auto &FinalSysSizing = state.dataSize->FinalSysSizing;
+    auto &VbzByZone = state.dataSize->VbzByZone;
+    auto &AirToZoneNodeInfo = state.dataAirLoop->AirToZoneNodeInfo;
 
     // redo std 62.1 calculations using latest information on zone flows and report to tables
 
@@ -1348,13 +1211,14 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
         if (FinalSysSizing(AirLoopNum).OAAutoSized &&
             (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::VRP ||
              state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::SP) &&
-            state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones > 1 && FinalSysSizing(AirLoopNum).LoadSizeType != Ventilation) {
+            state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones > 1 &&
+            FinalSysSizing(AirLoopNum).loadSizingType != DataSizing::LoadSizing::Ventilation) {
 
             // Loop over all zones connected to air loop, redo both cooling and heating calcs for Zdz minimum discharge outdoor air fraction for
             // each zone
             for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
                 int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
-                auto &thisTermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
+                auto const &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
                 if (state.dataSize->VdzMinClgByZone(termUnitSizingIndex) > 0.0) {
                     state.dataSize->ZdzClgByZone(termUnitSizingIndex) =
                         min(1.0, thisTermUnitFinalZoneSizing.VozClgByZone / state.dataSize->VdzMinClgByZone(termUnitSizingIndex));
@@ -1370,7 +1234,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             }
             for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
                 int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
-                auto &thisTermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
+                auto const &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
                 if (state.dataSize->VdzMinClgByZone(termUnitSizingIndex) > 0.0) {
                     state.dataSize->ZdzClgByZone(termUnitSizingIndex) =
                         min(1.0, thisTermUnitFinalZoneSizing.VozClgByZone / state.dataSize->VdzMinClgByZone(termUnitSizingIndex));
@@ -1448,7 +1312,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                     } else {
                         termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                     }
-                    auto &thisTermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
+                    auto const &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
                     Real64 Er = thisTermUnitFinalZoneSizing.ZoneSecondaryRecirculation; // user input in Zone Air Distribution design spec object
 
                     if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::SP) { // 62.1 simplified procedure
@@ -1525,7 +1389,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             if (termUnitSizingIndex == 0) {
                 termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(1);
             }
-            auto &thisTermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
+            auto const &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
             // single zone cooling
             state.dataSize->VotClgBySys(AirLoopNum) = VbzByZone(termUnitSizingIndex) / thisTermUnitFinalZoneSizing.ZoneADEffCooling;
             state.dataSize->EvzByZoneCool(termUnitSizingIndex) = thisTermUnitFinalZoneSizing.ZoneADEffCooling;
@@ -1764,7 +1628,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                         termUnitSizingIndex, AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex, AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                 }
                 if (MatchingCooledZoneNum == 0) {
-                    auto &thisTermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
+                    auto const &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zvpAlN,
                                                              thisTermUnitFinalZoneSizing.ZoneName,
@@ -1854,7 +1718,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                         termUnitSizingIndex, AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex, AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                 }
                 if (MatchingCooledZoneNum == 0) {
-                    auto &thisTermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
+                    auto const &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
                     // Zone ventilation parameters, (table 3)
                     RpPzSum += thisTermUnitFinalZoneSizing.DesOAFlowPPer * thisTermUnitFinalZoneSizing.TotPeopleInZone;
                     RaAzSum += thisTermUnitFinalZoneSizing.DesOAFlowPerArea * thisTermUnitFinalZoneSizing.TotalZoneFloorArea;
@@ -2144,8 +2008,8 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
 void DetermineSystemPopulationDiversity(EnergyPlusData &state)
 {
 
-    auto &FinalSysSizing(state.dataSize->FinalSysSizing);
-    auto &SysSizInput(state.dataSize->SysSizInput);
+    auto &FinalSysSizing = state.dataSize->FinalSysSizing;
+    auto &SysSizInput = state.dataSize->SysSizInput;
 
     // determine Pz sum, Ps, and D for each air system for standard 62.1
 
@@ -2164,16 +2028,17 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
         // only retrieve data if the occupant density is set to be autosized
         if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
-            state.dataSize->PzSumBySys(AirLoopNum) = 0.0;
+            auto &pzSumBySys = state.dataSize->PzSumBySys(AirLoopNum);
+            pzSumBySys = 0.0;
             state.dataSize->PsBySys(AirLoopNum) = 0.0;
             for (int zoneNumOnLoop = 1; zoneNumOnLoop <= state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones; ++zoneNumOnLoop) {
-                int CtrlZoneNum = state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).ActualZoneNumber(zoneNumOnLoop);
+                int zoneNum = state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).ActualZoneNumber(zoneNumOnLoop);
+                auto const &finalZoneSizing = state.dataSize->FinalZoneSizing(zoneNum);
                 for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
-                    if (state.dataHeatBal->People(PeopleNum).ZonePtr == state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneNum) {
-                        state.dataSize->PzSumBySys(AirLoopNum) +=
-                            (state.dataHeatBal->People(PeopleNum).NumberOfPeople *
-                             state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneNum).Multiplier *
-                             state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneNum).ListMultiplier);
+                    if (state.dataHeatBal->People(PeopleNum).ZonePtr == finalZoneSizing.ZoneNum) {
+                        pzSumBySys +=
+                            (state.dataHeatBal->People(PeopleNum).NumberOfPeople * state.dataHeatBal->Zone(finalZoneSizing.ZoneNum).Multiplier *
+                             state.dataHeatBal->Zone(finalZoneSizing.ZoneNum).ListMultiplier);
                     }
                 }
             }
@@ -2378,12 +2243,12 @@ void GetOARequirements(EnergyPlusData &state)
                 auto const &objectFields = instance.value();
                 auto &thisOAReq = state.dataSize->OARequirements(oaIndex);
                 ip->markObjectAsUsed(cCurrentModuleObject2, instance.key());
-                std::string thisOAReqName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string thisOAReqName = UtilityRoutines::makeUPPER(instance.key());
 
                 if (UtilityRoutines::FindItemInList(thisOAReqName, state.dataSize->OARequirements) > 0) {
-                    ShowSevereError(state,
-                                    std::string(RoutineName) + cCurrentModuleObject2 + "=\"" + thisOAReqName +
-                                        "\" is a duplicate DesignSpecification:OutdoorAir name.");
+                    ShowSevereError(
+                        state,
+                        format("{}{}=\"{}\" is a duplicate DesignSpecification:OutdoorAir name.", RoutineName, cCurrentModuleObject2, thisOAReqName));
                     ErrorsFound = true;
                 }
                 thisOAReq.Name = thisOAReqName;
@@ -2393,8 +2258,8 @@ void GetOARequirements(EnergyPlusData &state)
                 auto extensibles = objectFields.find("space_specs");
                 auto const &extensionSchemaProps = objectSchemaProps["space_specs"]["items"]["properties"];
                 if (extensibles != objectFields.end()) {
-                    auto extensiblesArray = extensibles.value();
-                    for (auto extensibleInstance : extensiblesArray) {
+                    auto &extensiblesArray = extensibles.value();
+                    for (auto &extensibleInstance : extensiblesArray) {
                         // Zones and spaces are not created yet, validate space names in ZoneEquipmentManager::SetupZoneSizingArrays
                         std::string thisSpaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_name");
                         thisOAReq.dsoaSpaceNames.emplace_back(thisSpaceName);
@@ -2405,20 +2270,20 @@ void GetOARequirements(EnergyPlusData &state)
                             thisOAReq.dsoaIndexes.emplace_back(thisDsoaNum);
                             ++thisOAReq.numDSOA;
                         } else {
-                            ShowSevereError(state, std::string(RoutineName) + cCurrentModuleObject2 + "=" + thisOAReq.Name);
-                            ShowContinueError(state, "DesignSpecification:OutdoorAir=" + thisDsoaName + " not found.");
+                            ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject2, thisOAReq.Name));
+                            ShowContinueError(state, format("DesignSpecification:OutdoorAir={} not found.", thisDsoaName));
                             ErrorsFound = true;
                         }
                     }
                 } else {
-                    ShowSevereError(state, std::string(RoutineName) + cCurrentModuleObject2 + "=" + thisOAReq.Name + " is empty.");
+                    ShowSevereError(state, format("{}{}={} is empty.", RoutineName, cCurrentModuleObject2, thisOAReq.Name));
                     ShowContinueError(state, "At least one pair of Space Name and Space Design Specification Outdoor Air Object Name is required.");
                     ErrorsFound = true;
                 }
             }
 
             if (ErrorsFound) {
-                ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
+                ShowFatalError(state, format("{}Errors found in input.  Preceding condition(s) cause termination.", RoutineName));
             }
         }
     }
@@ -2475,11 +2340,10 @@ void ProcessInputOARequirements(EnergyPlusData &state,
     auto &thisOARequirements(state.dataSize->OARequirements(OAIndex));
 
     if (NumAlphas > 1) {
-        thisOARequirements.OAFlowMethod =
-            static_cast<OAFlowCalcMethod>(getEnumerationValue(OAFlowCalcMethodNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(2))));
+        thisOARequirements.OAFlowMethod = static_cast<OAFlowCalcMethod>(getEnumValue(OAFlowCalcMethodNamesUC, UtilityRoutines::makeUPPER(Alphas(2))));
         if (thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Invalid) {
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
-            ShowContinueError(state, "...Invalid " + cAlphaFields(2) + "=\"" + Alphas(2) + "\",");
+            ShowSevereError(state, format("{}{}=\"{}\",", RoutineName, CurrentModuleObject, state.dataSize->OARequirements(OAIndex).Name));
+            ShowContinueError(state, format("...Invalid {}=\"{}\",", cAlphaFields(2), Alphas(2)));
             ShowContinueError(state,
                               "...Valid choices are Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, IndoorAirQualityProcedure, "
                               "ProportionalControlBasedOnDesignOccupancy, and ProportionalControlBasedOnOccupancySchedule.");
@@ -2533,21 +2397,20 @@ void ProcessInputOARequirements(EnergyPlusData &state,
     }
 
     // Set default schedule
-    state.dataSize->OARequirements(OAIndex).OAFlowFracSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    state.dataSize->OARequirements(OAIndex).OAFlowFracSchPtr = ScheduleManager::ScheduleAlwaysOn;
     if (NumAlphas > 2) {
         if (!lAlphaBlanks(3)) {
             state.dataSize->OARequirements(OAIndex).OAFlowFracSchPtr = GetScheduleIndex(state, Alphas(3));
             if (state.dataSize->OARequirements(OAIndex).OAFlowFracSchPtr > 0) {
                 if (!CheckScheduleValueMinMax(state, state.dataSize->OARequirements(OAIndex).OAFlowFracSchPtr, ">=", 0.0, "<=", 1.0)) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
-                    ShowContinueError(state, "Error found in " + cAlphaFields(3) + " = " + Alphas(3));
+                    ShowSevereError(state, format("{}{}=\"{}\",", RoutineName, CurrentModuleObject, state.dataSize->OARequirements(OAIndex).Name));
+                    ShowContinueError(state, format("Error found in {} = {}", cAlphaFields(3), Alphas(3)));
                     ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
-                ShowContinueError(state, "...Not Found " + cAlphaFields(3) + "=\"" + Alphas(3) + "\".");
+                ShowSevereError(state, format("{}{}=\"{}\",", RoutineName, CurrentModuleObject, state.dataSize->OARequirements(OAIndex).Name));
+                ShowContinueError(state, format("...Not Found {}=\"{}\".", cAlphaFields(3), Alphas(3)));
                 ErrorsFound = true;
             }
         }
@@ -2558,15 +2421,14 @@ void ProcessInputOARequirements(EnergyPlusData &state,
             state.dataSize->OARequirements(OAIndex).OAPropCtlMinRateSchPtr = GetScheduleIndex(state, Alphas(4));
             if (state.dataSize->OARequirements(OAIndex).OAPropCtlMinRateSchPtr > 0) {
                 if (!CheckScheduleValueMinMax(state, state.dataSize->OARequirements(OAIndex).OAPropCtlMinRateSchPtr, ">=", 0.0, "<=", 1.0)) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
-                    ShowContinueError(state, "Error found in " + cAlphaFields(4) + " = " + Alphas(4));
+                    ShowSevereError(state, format("{}{}=\"{}\",", RoutineName, CurrentModuleObject, state.dataSize->OARequirements(OAIndex).Name));
+                    ShowContinueError(state, format("Error found in {} = {}", cAlphaFields(4), Alphas(4)));
                     ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
-                ShowContinueError(state, "...Not Found " + cAlphaFields(4) + "=\"" + Alphas(4) + "\".");
+                ShowSevereError(state, format("{}{}=\"{}\",", RoutineName, CurrentModuleObject, state.dataSize->OARequirements(OAIndex).Name));
+                ShowContinueError(state, format("...Not Found {}=\"{}\".", cAlphaFields(4), Alphas(4)));
                 ErrorsFound = true;
             }
         }
@@ -2684,19 +2546,17 @@ void GetZoneAirDistribution(EnergyPlusData &state)
                     state.dataSize->ZoneAirDistribution(ZADIndex).ZoneADEffSchName = Alphas(2);
                     state.dataSize->ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr = GetScheduleIndex(state, Alphas(2));
                     if (state.dataSize->ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr > 0) {
-                        if (!CheckScheduleValueMinMax(state, state.dataSize->ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr, ">", 0.0)) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                                state.dataSize->ZoneAirDistribution(ZADIndex).Name + "\",");
-                            ShowContinueError(state, "Error found in " + cAlphaFields(2) + " = " + Alphas(2));
+                        if (!CheckScheduleValueMinMax(state, state.dataSize->ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr, false, 0.0)) {
+                            ShowSevereError(
+                                state, format("{}{}=\"{}\",", RoutineName, CurrentModuleObject, state.dataSize->ZoneAirDistribution(ZADIndex).Name));
+                            ShowContinueError(state, format("Error found in {} = {}", cAlphaFields(2), Alphas(2)));
                             ShowContinueError(state, "Schedule values must be >0.0)");
                             ErrorsFound = true;
                         }
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->ZoneAirDistribution(ZADIndex).Name +
-                                            "\",");
-                        ShowContinueError(state, "...Not Found " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
+                                        format("{}{}=\"{}\",", RoutineName, CurrentModuleObject, state.dataSize->ZoneAirDistribution(ZADIndex).Name));
+                        ShowContinueError(state, format("...Not Found {}=\"{}\".", cAlphaFields(2), Alphas(2)));
                         ErrorsFound = true;
                     }
                 }
@@ -2711,7 +2571,7 @@ void GetZoneAirDistribution(EnergyPlusData &state)
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(state, format("{}Errors found in input.  Preceding condition(s) cause termination.", RoutineName));
         }
     }
 }
@@ -2777,7 +2637,7 @@ void GetSizingParams(EnergyPlusData &state)
         state.dataSize->GlobalCoolSizingFactor = 1.0;
         state.dataSize->NumTimeStepsInAvg = state.dataGlobal->NumOfTimeStepInHour;
     } else {
-        ShowFatalError(state, cCurrentModuleObject + ": More than 1 occurrence of this object; only 1 allowed");
+        ShowFatalError(state, format("{}: More than 1 occurrence of this object; only 1 allowed", cCurrentModuleObject));
     }
     if (state.dataGlobal->OverrideTimestep) {
         state.dataSize->NumTimeStepsInAvg = state.dataGlobal->NumOfTimeStepInHour;
@@ -2825,8 +2685,10 @@ void GetSizingParams(EnergyPlusData &state)
         } else {
             state.dataSize->SizingFileColSep = CharComma; // comma
             ShowWarningError(state,
-                             cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + " entered value=\"" +
-                                 state.dataIPShortCut->cAlphaArgs(1) + "\", Commas will be used to separate fields.");
+                             format("{}: invalid {} entered value=\"{}\", Commas will be used to separate fields.",
+                                    cCurrentModuleObject,
+                                    state.dataIPShortCut->cAlphaFieldNames(1),
+                                    state.dataIPShortCut->cAlphaArgs(1)));
             state.dataIPShortCut->cAlphaArgs(1) = "Comma";
         }
         print(state.files.eio, "! <Sizing Output Files>,Style\n");
@@ -2938,15 +2800,17 @@ void GetZoneSizingInput(EnergyPlusData &state)
             SizingZoneObjects(Item).ZoneOrZoneListPtr = ZLItem;
         } else {
             ShowSevereError(state,
-                            cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
-                                state.dataIPShortCut->cAlphaFieldNames(1) + " not found.");
+                            format("{}=\"{}\" invalid {} not found.",
+                                   cCurrentModuleObject,
+                                   state.dataIPShortCut->cAlphaArgs(1),
+                                   state.dataIPShortCut->cAlphaFieldNames(1)));
             ErrorsFound = true;
             errFlag = true;
         }
     }
 
     if (errFlag) {
-        ShowSevereError(state, "GetZoneSizingInput: Errors with invalid names in " + cCurrentModuleObject + " objects.");
+        ShowSevereError(state, format("GetZoneSizingInput: Errors with invalid names in {} objects.", cCurrentModuleObject));
         ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
         state.dataSize->NumZoneSizingInput = 0;
     }
@@ -3008,15 +2872,15 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 //      \key TemperatureDifference
                 //      \default SupplyAirTemperature
                 {
-                    auto const coolingSATMethod(state.dataIPShortCut->cAlphaArgs(2));
+                    std::string const &coolingSATMethod = state.dataIPShortCut->cAlphaArgs(2);
                     if (coolingSATMethod == "SUPPLYAIRTEMPERATURE") {
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnCoolDgnSAMethod = SupplyAirTemperature;
                     } else if (coolingSATMethod == "TEMPERATUREDIFFERENCE") {
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnCoolDgnSAMethod = TemperatureDifference;
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                        ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(
-                            state, "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\"");
+                            state, format("... incorrect {}=\"{}\"", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
                         ShowContinueError(state, "... valid values are SupplyAirTemperature or TemperatureDifference.");
                         ErrorsFound = true;
                     }
@@ -3056,7 +2920,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 //      \key TemperatureDifference
                 //      \default SupplyAirTemperature
                 {
-                    auto const heatingSATMethod(state.dataIPShortCut->cAlphaArgs(3));
+                    std::string const &heatingSATMethod = state.dataIPShortCut->cAlphaArgs(3);
                     if (heatingSATMethod == "SUPPLYAIRTEMPERATURE") {
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnHeatDgnSAMethod = SupplyAirTemperature;
                     } else if (heatingSATMethod == "TEMPERATUREDIFFERENCE") {
@@ -3105,7 +2969,8 @@ void GetZoneSizingInput(EnergyPlusData &state)
                                            cCurrentModuleObject,
                                            state.dataIPShortCut->cNumericFieldNames(5),
                                            state.dataIPShortCut->rNumericArgs(5)));
-                    ShowContinueError(state, ".. value should not be negative. Occurs in Sizing Object=" + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(state,
+                                      format(".. value should not be negative. Occurs in Sizing Object={}", state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 } else {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesHumRat = state.dataIPShortCut->rNumericArgs(5);
@@ -3123,7 +2988,8 @@ void GetZoneSizingInput(EnergyPlusData &state)
                                            cCurrentModuleObject,
                                            state.dataIPShortCut->cNumericFieldNames(6),
                                            state.dataIPShortCut->rNumericArgs(6)));
-                    ShowContinueError(state, ".. value should not be negative. Occurs in Sizing Object=" + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(state,
+                                      format(".. value should not be negative. Occurs in Sizing Object={}", state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                 } else {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatDesHumRat = state.dataIPShortCut->rNumericArgs(6);
@@ -3140,10 +3006,10 @@ void GetZoneSizingInput(EnergyPlusData &state)
                     if (OAIndex > 0) {
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneDesignSpecOAIndex = OAIndex;
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
-                        ShowContinueError(state,
-                                          "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
-                                              "\".");
+                        ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                        ShowContinueError(
+                            state,
+                            format("... incorrect {}=\"{}\".", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
                         ErrorsFound = true;
                     }
                 } else { // If no design spec object specified, i.e. no OA, then leave ZoneDesignSpecOAIndex = 0
@@ -3155,7 +3021,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lNumericFieldBlanks(7) || state.dataIPShortCut->rNumericArgs(7) == 0.0) {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatSizingFactor = state.dataSize->GlobalHeatSizingFactor;
                 } else if (state.dataIPShortCut->rNumericArgs(7) < 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                              state.dataIPShortCut->cNumericFieldNames(7),
@@ -3170,7 +3036,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lNumericFieldBlanks(8) || state.dataIPShortCut->rNumericArgs(8) == 0.0) {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolSizingFactor = state.dataSize->GlobalCoolSizingFactor;
                 } else if (state.dataIPShortCut->rNumericArgs(8) < 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                              state.dataIPShortCut->cNumericFieldNames(8),
@@ -3190,7 +3056,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lNumericFieldBlanks(9)) {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).DesCoolAirFlow = 0.0;
                 } else if (state.dataIPShortCut->rNumericArgs(9) < 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                              state.dataIPShortCut->cNumericFieldNames(9),
@@ -3213,7 +3079,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).DesCoolMinAirFlowPerArea = state.dataIPShortCut->rNumericArgs(10);
                     }
                 } else if (state.dataIPShortCut->rNumericArgs(10) < 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                              state.dataIPShortCut->cNumericFieldNames(108),
@@ -3231,7 +3097,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lNumericFieldBlanks(11)) {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).DesCoolMinAirFlow = 0.0;
                 } else if (state.dataIPShortCut->rNumericArgs(11) < 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                              state.dataIPShortCut->cNumericFieldNames(11),
@@ -3242,7 +3108,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 }
                 //  N12,\field Cooling Minimum Air Flow Fraction
                 if (state.dataIPShortCut->rNumericArgs(12) < 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                              state.dataIPShortCut->cNumericFieldNames(12),
@@ -3263,7 +3129,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lNumericFieldBlanks(13)) {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).DesHeatAirFlow = 0.0;
                 } else if (state.dataIPShortCut->rNumericArgs(13) < 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                              state.dataIPShortCut->cNumericFieldNames(13),
@@ -3287,7 +3153,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).DesHeatMaxAirFlowPerArea = state.dataIPShortCut->rNumericArgs(14);
                     }
                 } else if (state.dataIPShortCut->rNumericArgs(14) < 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                              state.dataIPShortCut->cNumericFieldNames(14),
@@ -3312,7 +3178,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).DesHeatMaxAirFlow = state.dataIPShortCut->rNumericArgs(15);
                     }
                 } else if (state.dataIPShortCut->rNumericArgs(15) < 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                              state.dataIPShortCut->cNumericFieldNames(15),
@@ -3336,7 +3202,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).DesHeatMaxAirFlowFrac = state.dataIPShortCut->rNumericArgs(16);
                     }
                 } else if (state.dataIPShortCut->rNumericArgs(16) < 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                              state.dataIPShortCut->cNumericFieldNames(16),
@@ -3376,10 +3242,10 @@ void GetZoneSizingInput(EnergyPlusData &state)
                             state.dataSize->ZoneAirDistribution(ObjIndex).ZoneVentilationEff;
                     } else {
                         // generate a warning message
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
-                        ShowContinueError(state,
-                                          "... not found " + state.dataIPShortCut->cAlphaFieldNames(7) + "=\"" + state.dataIPShortCut->cAlphaArgs(7) +
-                                              "\".");
+                        ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+                        ShowContinueError(
+                            state,
+                            format("... not found {}=\"{}\".", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
                         ErrorsFound = true;
                     }
                 } else {
@@ -3389,74 +3255,35 @@ void GetZoneSizingInput(EnergyPlusData &state)
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneSecondaryRecirculation = 0.0;
                 }
 
-                {
-                    auto const coolAirDesMethod(state.dataIPShortCut->cAlphaArgs(5));
-                    if (coolAirDesMethod == "DESIGNDAY") {
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod = FromDDCalc;
-                    } else if (coolAirDesMethod == "FLOW/ZONE") {
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod = InpDesAirFlow;
-                    } else if (coolAirDesMethod == "DESIGNDAYWITHLIMIT") {
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod = DesAirFlowWithLim;
-                    } else {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
-                        ShowContinueError(state,
-                                          "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) +
-                                              "\".");
-                        ShowContinueError(state, "... valid values are DesignDay, Flow/Zone or DesignDayWithLimit.");
-                        ErrorsFound = true;
-                    }
-                }
-                {
-                    auto const heatAirDesMethod(state.dataIPShortCut->cAlphaArgs(6));
-                    if (heatAirDesMethod == "DESIGNDAY") {
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod = FromDDCalc;
-                    } else if (heatAirDesMethod == "FLOW/ZONE") {
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod = InpDesAirFlow;
-                    } else if (heatAirDesMethod == "DESIGNDAYWITHLIMIT") {
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod = DesAirFlowWithLim;
-                    } else {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
-                        ShowContinueError(state,
-                                          "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + state.dataIPShortCut->cAlphaArgs(6) +
-                                              "\".");
-                        ShowContinueError(state, "... valid values are DesignDay, Flow/Zone or DesignDayWithLimit.");
-                        ErrorsFound = true;
-                    }
-                }
-                if (state.dataIPShortCut->cAlphaArgs(8) == "YES") {
-                    state.dataSize->ZoneSizingInput(ZoneSizIndex).AccountForDOAS = true;
-                } else {
-                    state.dataSize->ZoneSizingInput(ZoneSizIndex).AccountForDOAS = false;
-                }
+                constexpr static std::array<std::string_view, static_cast<int>(DataSizing::AirflowSizingMethod::Num)> AirflowSizingMethodNamesUC = {
+                    "DESIGNDAY", "FLOW/ZONE", "DESIGNDAYWITHLIMIT"};
+                state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod = static_cast<AirflowSizingMethod>(
+                    getEnumValue(AirflowSizingMethodNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
+                assert(state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod != AirflowSizingMethod::Invalid);
+                state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod = static_cast<AirflowSizingMethod>(
+                    getEnumValue(AirflowSizingMethodNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(6))));
+                assert(state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod != AirflowSizingMethod::Invalid);
+
+                BooleanSwitch accountForDOAS = getYesNoValue(state.dataIPShortCut->cAlphaArgs(8));
+                state.dataSize->ZoneSizingInput(ZoneSizIndex).AccountForDOAS = (accountForDOAS == BooleanSwitch::Yes) ? true : false;
+
                 if (state.dataSize->ZoneSizingInput(ZoneSizIndex).AccountForDOAS) {
-                    {
-                        auto const DOASControlMethod(state.dataIPShortCut->cAlphaArgs(9));
-                        if (DOASControlMethod == "NEUTRALSUPPLYAIR") {
-                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy = DOANeutralSup;
-                        } else if (DOASControlMethod == "NEUTRALDEHUMIDIFIEDSUPPLYAIR") {
-                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy = DOANeutralDehumSup;
-                        } else if (DOASControlMethod == "COLDSUPPLYAIR") {
-                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy = DOACoolSup;
-                        } else {
-                            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
-                            ShowContinueError(state,
-                                              "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(9) + "=\"" +
-                                                  state.dataIPShortCut->cAlphaArgs(9) + "\".");
-                            ShowContinueError(state, "... valid values are NeutralSupplyAir, NeutralDehumidifiedSupplyAir or ColdSupplyAir.");
-                            ErrorsFound = true;
-                        }
-                    }
+                    constexpr static std::array<std::string_view, static_cast<int>(DataSizing::DOASControl::Num)> DOASControlNamesUC = {
+                        "NEUTRALSUPPLYAIR", "NEUTRALDEHUMIDIFIEDSUPPLYAIR", "COLDSUPPLYAIR"};
+                    state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy = static_cast<DataSizing::DOASControl>(
+                        getEnumValue(DOASControlNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
+
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint = state.dataIPShortCut->rNumericArgs(17);
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = state.dataIPShortCut->rNumericArgs(18);
                     if (state.dataIPShortCut->rNumericArgs(17) > 0.0 && state.dataIPShortCut->rNumericArgs(18) > 0.0 &&
                         state.dataIPShortCut->rNumericArgs(17) >= state.dataIPShortCut->rNumericArgs(18)) {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                        ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         ShowContinueError(state, "... Dedicated Outside Air Low Setpoint for Design must be less than the High Setpoint");
                         ErrorsFound = true;
                     }
                 }
-                zoneSizingIndex.zoneSizingMethod = static_cast<DataSizing::ZoneSizing>(
-                    getEnumerationValue(DataSizing::ZoneSizingMethodNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
+                zoneSizingIndex.zoneSizingMethod =
+                    static_cast<DataSizing::ZoneSizing>(getEnumValue(DataSizing::ZoneSizingMethodNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
                 if (zoneSizingIndex.zoneSizingMethod != ZoneSizing::SensibleOnly) {
                     zoneSizingIndex.zoneLatentSizing = true;
                     state.dataHeatBal->DoLatentSizing = true;
@@ -3514,7 +3341,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, cCurrentModuleObject + ": Errors found in getting input. Program terminates.");
+        ShowFatalError(state, format("{}: Errors found in getting input. Program terminates.", cCurrentModuleObject));
     }
 }
 
@@ -3523,7 +3350,7 @@ void ReportTemperatureInputError(
 {
     if (state.dataIPShortCut->rNumericArgs(paramNum) < comparisonTemperature) {
         if (shouldFlagSevere) { // heating supply air temperature is lower than cooling supply air temperature--not allowed
-            ShowSevereError(state, cObjectName + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has invalid data.");
+            ShowSevereError(state, format("{}=\"{}\" has invalid data.", cObjectName, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state,
                               format("... incorrect {}=[{:.2R}] is less than {}=[{:.2R}]",
                                      state.dataIPShortCut->cNumericFieldNames(paramNum),
@@ -3533,7 +3360,7 @@ void ReportTemperatureInputError(
             ShowContinueError(state, "This is not allowed.  Please check and revise your input.");
             ErrorsFound = true;
         } else { // then input is lower than comparison tempeature--just produce a warning for user to check input
-            ShowWarningError(state, cObjectName + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has invalid data.");
+            ShowWarningError(state, format("{}=\"{}\" has invalid data.", cObjectName, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state,
                               format("... incorrect {}=[{:.2R}] is less than [{:.2R}]",
                                      state.dataIPShortCut->cNumericFieldNames(paramNum),
@@ -3697,7 +3524,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
     bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
     int NumDesDays;          // Number of design days in input
 
-    auto &SysSizInput(state.dataSize->SysSizInput);
+    auto &SysSizInput = state.dataSize->SysSizInput;
 
     state.dataSizingManager->NumAirLoops = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC");
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -3728,96 +3555,51 @@ void GetSystemSizingInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum), cCurrentModuleObject, ErrorsFound);
+        assert(!state.dataIPShortCut->cAlphaArgs(iNameAlphaNum).empty());
 
         SysSizInput(SysSizIndex).AirPriLoopName = state.dataIPShortCut->cAlphaArgs(iNameAlphaNum);
-        {
-            auto const loadSizeType(state.dataIPShortCut->cAlphaArgs(iLoadTypeSizeAlphaNum));
-            if (loadSizeType == "SENSIBLE") {
-                SysSizInput(SysSizIndex).LoadSizeType = Sensible;
-            } else if (loadSizeType == "LATENT") {
-                SysSizInput(SysSizIndex).LoadSizeType = Latent;
-            } else if (loadSizeType == "TOTAL") {
-                SysSizInput(SysSizIndex).LoadSizeType = Total;
-            } else if (loadSizeType == "VENTILATIONREQUIREMENT") {
-                SysSizInput(SysSizIndex).LoadSizeType = Ventilation;
-            }
-        }
-        // assign CoolingPeakLoadType based on LoadSizeType for now
-        if (SysSizInput(SysSizIndex).LoadSizeType == Sensible) {
-            SysSizInput(SysSizIndex).CoolingPeakLoadType = SensibleCoolingLoad;
-        } else if (SysSizInput(SysSizIndex).LoadSizeType == Total ||
-                   (SysSizInput(SysSizIndex).LoadSizeType == Latent && state.dataHeatBal->DoLatentSizing)) {
-            SysSizInput(SysSizIndex).CoolingPeakLoadType = TotalCoolingLoad;
+
+        constexpr std::array<std::string_view, static_cast<int>(DataSizing::LoadSizing::Num)> LoadSizingNamesUC{
+            "SENSIBLE", "LATENT", "TOTAL", "VENTILATIONREQUIREMENT"};
+        SysSizInput(SysSizIndex).loadSizingType = static_cast<DataSizing::LoadSizing>(
+            getEnumValue(LoadSizingNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(iLoadTypeSizeAlphaNum))));
+
+        // assign PeakLoad based on LoadSizing for now
+        if (SysSizInput(SysSizIndex).loadSizingType == DataSizing::LoadSizing::Sensible) {
+            SysSizInput(SysSizIndex).coolingPeakLoad = DataSizing::PeakLoad::SensibleCooling;
+        } else if (SysSizInput(SysSizIndex).loadSizingType == DataSizing::LoadSizing::Total ||
+                   (SysSizInput(SysSizIndex).loadSizingType == DataSizing::LoadSizing::Latent && state.dataHeatBal->DoLatentSizing)) {
+            SysSizInput(SysSizIndex).coolingPeakLoad = DataSizing::PeakLoad::TotalCooling;
         } else {
-            SysSizInput(SysSizIndex).CoolingPeakLoadType = SensibleCoolingLoad;
+            SysSizInput(SysSizIndex).coolingPeakLoad = DataSizing::PeakLoad::SensibleCooling;
         }
         // set the CoolCapControl input
-        SysSizInput(SysSizIndex).CoolCapControl = VAV;
+        constexpr std::array<std::string_view, static_cast<int>(CapacityControl::Num)> CapacityControlNamesUC{"VAV", "BYPASS", "VT", "ONOFF"};
+        SysSizInput(SysSizIndex).CoolCapControl = static_cast<CapacityControl>(
+            getEnumValue(CapacityControlNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(iCoolCapControlAlphaNum))));
+
         {
-            auto const CoolCapCtrl(state.dataIPShortCut->cAlphaArgs(iCoolCapControlAlphaNum));
-            if (CoolCapCtrl == "VAV") {
-                SysSizInput(SysSizIndex).CoolCapControl = VAV;
-            } else if (CoolCapCtrl == "BYPASS") {
-                SysSizInput(SysSizIndex).CoolCapControl = Bypass;
-            } else if (CoolCapCtrl == "VT") {
-                SysSizInput(SysSizIndex).CoolCapControl = VT;
-            } else if (CoolCapCtrl == "ONOFF") {
-                SysSizInput(SysSizIndex).CoolCapControl = OnOff;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
-                ShowContinueError(state,
-                                  "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(iCoolCapControlAlphaNum) + "=\"" +
-                                      state.dataIPShortCut->cAlphaArgs(iCoolCapControlAlphaNum) + "\".");
-                ShowContinueError(state, "... valid values are VAV, Bypass, VT, or OnOff.");
-                ErrorsFound = true;
-            }
-        }
-        {
-            auto const sizingOption(state.dataIPShortCut->cAlphaArgs(iSizingOptionAlphaNum));
+            std::string const &sizingOption = state.dataIPShortCut->cAlphaArgs(iSizingOptionAlphaNum);
             if (sizingOption == "COINCIDENT") {
                 SysSizInput(SysSizIndex).SizingOption = Coincident;
             } else if (sizingOption == "NONCOINCIDENT") {
                 SysSizInput(SysSizIndex).SizingOption = NonCoincident;
             } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
+                ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
                 ShowContinueError(state,
-                                  "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(iSizingOptionAlphaNum) + "=\"" +
-                                      state.dataIPShortCut->cAlphaArgs(iSizingOptionAlphaNum) + "\".");
+                                  format("... incorrect {}=\"{}\".",
+                                         state.dataIPShortCut->cAlphaFieldNames(iSizingOptionAlphaNum),
+                                         state.dataIPShortCut->cAlphaArgs(iSizingOptionAlphaNum)));
                 ShowContinueError(state, "... valid values are Coincident or NonCoincident.");
                 ErrorsFound = true;
             }
         }
-        {
-            auto const coolOAOption(state.dataIPShortCut->cAlphaArgs(i100PercentOACoolingAlphaNum));
-            if (coolOAOption == "YES") {
-                SysSizInput(SysSizIndex).CoolOAOption = AllOA;
-            } else if (coolOAOption == "NO") {
-                SysSizInput(SysSizIndex).CoolOAOption = MinOA;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
-                ShowContinueError(state,
-                                  "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(i100PercentOACoolingAlphaNum) + "=\"" +
-                                      state.dataIPShortCut->cAlphaArgs(i100PercentOACoolingAlphaNum) + "\".");
-                ShowContinueError(state, "... valid values are Yes or No.");
-                ErrorsFound = true;
-            }
-        }
-        {
-            auto const heatOAOption(state.dataIPShortCut->cAlphaArgs(i100PercentOAHeatingAlphaNum));
-            if (heatOAOption == "YES") {
-                SysSizInput(SysSizIndex).HeatOAOption = 1;
-            } else if (heatOAOption == "NO") {
-                SysSizInput(SysSizIndex).HeatOAOption = 2;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
-                ShowContinueError(state,
-                                  "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(i100PercentOAHeatingAlphaNum) + "=\"" +
-                                      state.dataIPShortCut->cAlphaArgs(i100PercentOAHeatingAlphaNum) + "\".");
-                ShowContinueError(state, "... valid values are Yes or No.");
-                ErrorsFound = true;
-            }
-        }
+
+        BooleanSwitch is100PctOACooling = getYesNoValue(state.dataIPShortCut->cAlphaArgs(i100PercentOACoolingAlphaNum));
+        SysSizInput(SysSizIndex).CoolOAOption = (is100PctOACooling == BooleanSwitch::Yes) ? OAControl::AllOA : OAControl::MinOA;
+
+        BooleanSwitch is100PctOAHeating = getYesNoValue(state.dataIPShortCut->cAlphaArgs(i100PercentOAHeatingAlphaNum));
+        SysSizInput(SysSizIndex).HeatOAOption = (is100PctOAHeating == BooleanSwitch::Yes) ? OAControl::AllOA : OAControl::MinOA;
 
         //  N1, \field Design Outdoor Air Flow Rate
         //      \type real
@@ -3828,7 +3610,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
             SysSizInput(SysSizIndex).DesOutAirVolFlow = AutoSize;
         } else if (state.dataIPShortCut->rNumericArgs(iDesignOAVolFlowNumericNum) < 0.0 &&
                    state.dataIPShortCut->rNumericArgs(iDesignOAVolFlowNumericNum) != AutoSize) {
-            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
+            ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
             ShowContinueError(state,
                               format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                      state.dataIPShortCut->cNumericFieldNames(iDesignOAVolFlowNumericNum),
@@ -3851,8 +3633,8 @@ void GetSystemSizingInput(EnergyPlusData &state)
             SysSizInput(SysSizIndex).SysAirMinFlowRat = 0.0;
         } else if ((state.dataIPShortCut->rNumericArgs(iMinSysAirFlowRatioNumericNum) < 0.0) &&
                    (state.dataIPShortCut->rNumericArgs(iMinSysAirFlowRatioNumericNum) != DataSizing::AutoSize)) {
-            ShowSevereError(state,
-                            cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iMinSysAirFlowRatioNumericNum) + "\", invalid data.");
+            ShowSevereError(
+                state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iMinSysAirFlowRatioNumericNum)));
             ShowContinueError(state,
                               format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                      state.dataIPShortCut->cNumericFieldNames(iMinSysAirFlowRatioNumericNum),
@@ -3897,7 +3679,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
         if (state.dataIPShortCut->lNumericFieldBlanks(iMaxCoolAirVolFlowNumericNum)) {
             SysSizInput(SysSizIndex).DesCoolAirFlow = 0.0;
         } else if (state.dataIPShortCut->rNumericArgs(iMaxCoolAirVolFlowNumericNum) < 0.0) {
-            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
+            ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
             ShowContinueError(state,
                               format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                      state.dataIPShortCut->cNumericFieldNames(iMaxCoolAirVolFlowNumericNum),
@@ -3924,7 +3706,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
         if (state.dataIPShortCut->lNumericFieldBlanks(iMaxHeatAirVolFlowNumericNum)) {
             SysSizInput(SysSizIndex).DesHeatAirFlow = 0.0;
         } else if (state.dataIPShortCut->rNumericArgs(iMaxHeatAirVolFlowNumericNum) < 0.0) {
-            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
+            ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
             ShowContinueError(state,
                               format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                      state.dataIPShortCut->cNumericFieldNames(iMaxHeatAirVolFlowNumericNum),
@@ -3945,7 +3727,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
         if (state.dataIPShortCut->lNumericFieldBlanks(iZoneMaxOAFractionNumericNum)) {
             SysSizInput(SysSizIndex).MaxZoneOAFraction = 0.0;
         } else if (state.dataIPShortCut->rNumericArgs(iZoneMaxOAFractionNumericNum) < 0.0) {
-            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
+            ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
             ShowContinueError(state,
                               format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                      state.dataIPShortCut->cNumericFieldNames(iZoneMaxOAFractionNumericNum),
@@ -3955,28 +3737,29 @@ void GetSystemSizingInput(EnergyPlusData &state)
             SysSizInput(SysSizIndex).MaxZoneOAFraction = state.dataIPShortCut->rNumericArgs(iZoneMaxOAFractionNumericNum);
         }
         {
-            auto const coolAirDesMethod(state.dataIPShortCut->cAlphaArgs(iCoolSAFMAlphaNum));
+            std::string const &coolAirDesMethod = state.dataIPShortCut->cAlphaArgs(iCoolSAFMAlphaNum);
             if (coolAirDesMethod == "DESIGNDAY") {
-                SysSizInput(SysSizIndex).CoolAirDesMethod = FromDDCalc;
+                SysSizInput(SysSizIndex).CoolAirDesMethod = AirflowSizingMethod::FromDDCalc;
             } else if (coolAirDesMethod == "FLOW/SYSTEM") {
-                SysSizInput(SysSizIndex).CoolAirDesMethod = InpDesAirFlow;
+                SysSizInput(SysSizIndex).CoolAirDesMethod = AirflowSizingMethod::InpDesAirFlow;
             } else if (coolAirDesMethod == "FLOWPERFLOORAREA") {
-                SysSizInput(SysSizIndex).CoolAirDesMethod = InpDesAirFlow;
+                SysSizInput(SysSizIndex).CoolAirDesMethod = AirflowSizingMethod::InpDesAirFlow;
                 SysSizInput(SysSizIndex).ScaleCoolSAFMethod = FlowPerFloorArea;
                 SysSizInput(SysSizIndex).FlowPerFloorAreaCooled = state.dataIPShortCut->rNumericArgs(iCoolFlowPerFloorAreaNumericNum);
             } else if (coolAirDesMethod == "FRACTIONOFAUTOSIZEDCOOLINGAIRFLOW") {
-                SysSizInput(SysSizIndex).CoolAirDesMethod = FromDDCalc;
+                SysSizInput(SysSizIndex).CoolAirDesMethod = AirflowSizingMethod::FromDDCalc;
                 SysSizInput(SysSizIndex).ScaleCoolSAFMethod = FractionOfAutosizedCoolingAirflow;
                 SysSizInput(SysSizIndex).FractionOfAutosizedCoolingAirflow = state.dataIPShortCut->rNumericArgs(iCoolFlowPerFracCoolNumericNum);
             } else if (coolAirDesMethod == "FLOWPERCOOLINGCAPACITY") {
-                SysSizInput(SysSizIndex).CoolAirDesMethod = FromDDCalc;
+                SysSizInput(SysSizIndex).CoolAirDesMethod = AirflowSizingMethod::FromDDCalc;
                 SysSizInput(SysSizIndex).ScaleCoolSAFMethod = FlowPerCoolingCapacity;
                 SysSizInput(SysSizIndex).FlowPerCoolingCapacity = state.dataIPShortCut->rNumericArgs(iCoolFlowPerCoolCapNumericNum);
             } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
+                ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
                 ShowContinueError(state,
-                                  "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(iCoolSAFMAlphaNum) + "=\"" +
-                                      state.dataIPShortCut->cAlphaArgs(iCoolSAFMAlphaNum) + "\".");
+                                  format("... incorrect {}=\"{}\".",
+                                         state.dataIPShortCut->cAlphaFieldNames(iCoolSAFMAlphaNum),
+                                         state.dataIPShortCut->cAlphaArgs(iCoolSAFMAlphaNum)));
                 ShowContinueError(state,
                                   "... valid values are DesignDay, Flow/System, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, or "
                                   "FlowPerCoolingCapacity.");
@@ -3984,32 +3767,33 @@ void GetSystemSizingInput(EnergyPlusData &state)
             }
         }
         {
-            auto const heatAirDesMethod(state.dataIPShortCut->cAlphaArgs(iHeatSAFMAlphaNum));
+            std::string const &heatAirDesMethod = state.dataIPShortCut->cAlphaArgs(iHeatSAFMAlphaNum);
             if (heatAirDesMethod == "DESIGNDAY") {
-                SysSizInput(SysSizIndex).HeatAirDesMethod = FromDDCalc;
+                SysSizInput(SysSizIndex).HeatAirDesMethod = AirflowSizingMethod::FromDDCalc;
             } else if (heatAirDesMethod == "FLOW/SYSTEM") {
-                SysSizInput(SysSizIndex).HeatAirDesMethod = InpDesAirFlow;
+                SysSizInput(SysSizIndex).HeatAirDesMethod = AirflowSizingMethod::InpDesAirFlow;
             } else if (heatAirDesMethod == "FLOWPERFLOORAREA") {
-                SysSizInput(SysSizIndex).HeatAirDesMethod = InpDesAirFlow;
+                SysSizInput(SysSizIndex).HeatAirDesMethod = AirflowSizingMethod::InpDesAirFlow;
                 SysSizInput(SysSizIndex).ScaleHeatSAFMethod = FlowPerFloorArea;
                 SysSizInput(SysSizIndex).FlowPerFloorAreaHeated = state.dataIPShortCut->rNumericArgs(iHeatFlowPerFloorAreaNumericNum);
             } else if (heatAirDesMethod == "FRACTIONOFAUTOSIZEDHEATINGAIRFLOW") {
-                SysSizInput(SysSizIndex).HeatAirDesMethod = FromDDCalc;
+                SysSizInput(SysSizIndex).HeatAirDesMethod = AirflowSizingMethod::FromDDCalc;
                 SysSizInput(SysSizIndex).ScaleHeatSAFMethod = FractionOfAutosizedHeatingAirflow;
                 SysSizInput(SysSizIndex).FractionOfAutosizedHeatingAirflow = state.dataIPShortCut->rNumericArgs(iHeatFlowPerFracHeatNumericNum);
             } else if (heatAirDesMethod == "FRACTIONOFAUTOSIZEDCOOLINGAIRFLOW") {
-                SysSizInput(SysSizIndex).HeatAirDesMethod = FromDDCalc;
+                SysSizInput(SysSizIndex).HeatAirDesMethod = AirflowSizingMethod::FromDDCalc;
                 SysSizInput(SysSizIndex).ScaleHeatSAFMethod = FractionOfAutosizedCoolingAirflow;
                 SysSizInput(SysSizIndex).FractionOfAutosizedCoolingAirflow = state.dataIPShortCut->rNumericArgs(iHeatFlowPerFracCoolNumericNum);
             } else if (heatAirDesMethod == "FLOWPERHEATINGCAPACITY") {
-                SysSizInput(SysSizIndex).HeatAirDesMethod = FromDDCalc;
+                SysSizInput(SysSizIndex).HeatAirDesMethod = AirflowSizingMethod::FromDDCalc;
                 SysSizInput(SysSizIndex).ScaleHeatSAFMethod = FlowPerHeatingCapacity;
                 SysSizInput(SysSizIndex).FlowPerHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFlowPerHeatCapNumericNum);
             } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
+                ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
                 ShowContinueError(state,
-                                  "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(iHeatSAFMAlphaNum) + "=\"" +
-                                      state.dataIPShortCut->cAlphaArgs(iHeatSAFMAlphaNum) + "\".");
+                                  format("... incorrect {}=\"{}\".",
+                                         state.dataIPShortCut->cAlphaFieldNames(iHeatSAFMAlphaNum),
+                                         state.dataIPShortCut->cAlphaArgs(iHeatSAFMAlphaNum)));
                 ShowContinueError(state,
                                   "... valid values are DesignDay, Flow/System, FlowPerFloorArea, FractionOfAutosizedHeatingAirflow, or "
                                   "FlowPerHeatingCapacity.");
@@ -4017,36 +3801,40 @@ void GetSystemSizingInput(EnergyPlusData &state)
             }
         }
         {
-            auto const systemOAMethod(state.dataIPShortCut->cAlphaArgs(iSystemOASMethodAlphaNum));
+            std::string const &systemOAMethod = state.dataIPShortCut->cAlphaArgs(iSystemOASMethodAlphaNum);
             if (systemOAMethod == "ZONESUM") {
                 SysSizInput(SysSizIndex).SystemOAMethod = SysOAMethod::ZoneSum;
             } else if (systemOAMethod == "STANDARD62.1VENTILATIONRATEPROCEDURE") {
                 SysSizInput(SysSizIndex).SystemOAMethod = SysOAMethod::VRP;
-                if (SysSizInput(SysSizIndex).LoadSizeType == Ventilation) {
+                if (SysSizInput(SysSizIndex).loadSizingType == DataSizing::LoadSizing::Ventilation) {
                     ShowWarningError(
-                        state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid combination of inputs.");
+                        state,
+                        format("{}=\"{}\", invalid combination of inputs.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
                     ShowContinueError(state,
-                                      state.dataIPShortCut->cAlphaFieldNames(iLoadTypeSizeAlphaNum) + " = " +
-                                          state.dataIPShortCut->cAlphaArgs(iLoadTypeSizeAlphaNum) + " and " +
-                                          state.dataIPShortCut->cAlphaFieldNames(iSystemOASMethodAlphaNum) + " = " +
-                                          state.dataIPShortCut->cAlphaArgs(iSystemOASMethodAlphaNum) + ".");
+                                      format("{} = {} and {} = {}.",
+                                             state.dataIPShortCut->cAlphaFieldNames(iLoadTypeSizeAlphaNum),
+                                             state.dataIPShortCut->cAlphaArgs(iLoadTypeSizeAlphaNum),
+                                             state.dataIPShortCut->cAlphaFieldNames(iSystemOASMethodAlphaNum),
+                                             state.dataIPShortCut->cAlphaArgs(iSystemOASMethodAlphaNum)));
                     ShowContinueError(state, "Resetting System Outdoor Air Method to ZoneSum.");
                     SysSizInput(SysSizIndex).SystemOAMethod = SysOAMethod::ZoneSum;
                 } else {
                     if (SysSizInput(SysSizIndex).DesOutAirVolFlow > 0) {
-                        ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
+                        ShowSevereError(state,
+                                        format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
                         ShowContinueError(state,
-                                          "SystemOAMethod is set to VRP and " + state.dataIPShortCut->cNumericFieldNames(iDesignOAVolFlowNumericNum) +
-                                              " > 0, user entry will be ignored.");
+                                          format("SystemOAMethod is set to VRP and {} > 0, user entry will be ignored.",
+                                                 state.dataIPShortCut->cNumericFieldNames(iDesignOAVolFlowNumericNum)));
                     }
                 }
             } else if (systemOAMethod == "STANDARD62.1SIMPLIFIEDPROCEDURE") {
                 SysSizInput(SysSizIndex).SystemOAMethod = SysOAMethod::SP;
             } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
+                ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
                 ShowContinueError(state,
-                                  "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(iSystemOASMethodAlphaNum) + "=\"" +
-                                      state.dataIPShortCut->cAlphaArgs(iSystemOASMethodAlphaNum) + "\".");
+                                  format("... incorrect {}=\"{}\".",
+                                         state.dataIPShortCut->cAlphaFieldNames(iSystemOASMethodAlphaNum),
+                                         state.dataIPShortCut->cAlphaArgs(iSystemOASMethodAlphaNum)));
                 ShowContinueError(state, "... valid values are ZoneSum or Standard62.1VentilationRateProcedure.");
                 ErrorsFound = true;
             }
@@ -4058,7 +3846,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
             // SysSizInput( SysSizIndex ).ScaledCoolingCapacity = AutoSize can be set to autosize cooling capacity
             SysSizInput(SysSizIndex).ScaledCoolingCapacity = state.dataIPShortCut->rNumericArgs(iCoolDesignCapacityNumericNum);
             if (SysSizInput(SysSizIndex).ScaledCoolingCapacity < 0.0 && SysSizInput(SysSizIndex).ScaledCoolingCapacity != AutoSize) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
+                ShowSevereError(state, format("{} = {}", cCurrentModuleObject, SysSizInput(SysSizIndex).AirPriLoopName));
                 ShowContinueError(state,
                                   format("Illegal {} = {:.7T}",
                                          state.dataIPShortCut->cNumericFieldNames(iCoolDesignCapacityNumericNum),
@@ -4070,31 +3858,34 @@ void GetSystemSizingInput(EnergyPlusData &state)
             if (!state.dataIPShortCut->lNumericFieldBlanks(iCoolCapacityPerFloorAreaNumericNum)) {
                 SysSizInput(SysSizIndex).ScaledCoolingCapacity = state.dataIPShortCut->rNumericArgs(iCoolCapacityPerFloorAreaNumericNum);
                 if (SysSizInput(SysSizIndex).ScaledCoolingCapacity <= 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
+                    ShowSevereError(state, format("{} = {}", cCurrentModuleObject, SysSizInput(SysSizIndex).AirPriLoopName));
                     ShowContinueError(state,
-                                      "Input for " + state.dataIPShortCut->cAlphaFieldNames(iCoolCAPMAlphaNum) + " = " +
-                                          state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum));
+                                      format("Input for {} = {}",
+                                             state.dataIPShortCut->cAlphaFieldNames(iCoolCAPMAlphaNum),
+                                             state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum)));
                     ShowContinueError(state,
                                       format("Illegal {} = {:.7T}",
                                              state.dataIPShortCut->cNumericFieldNames(iCoolCapacityPerFloorAreaNumericNum),
                                              state.dataIPShortCut->rNumericArgs(iCoolCapacityPerFloorAreaNumericNum)));
                     ErrorsFound = true;
                 } else if (SysSizInput(SysSizIndex).ScaledCoolingCapacity == AutoSize) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
+                    ShowSevereError(state, format("{} = {}", cCurrentModuleObject, SysSizInput(SysSizIndex).AirPriLoopName));
                     ShowContinueError(state,
-                                      "Input for " + state.dataIPShortCut->cAlphaFieldNames(iCoolCAPMAlphaNum) + " = " +
-                                          state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum));
+                                      format("Input for {} = {}",
+                                             state.dataIPShortCut->cAlphaFieldNames(iCoolCAPMAlphaNum),
+                                             state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum)));
                     ShowContinueError(state,
-                                      "Illegal " + state.dataIPShortCut->cNumericFieldNames(iCoolCapacityPerFloorAreaNumericNum) + " = Autosize");
+                                      format("Illegal {} = Autosize", state.dataIPShortCut->cNumericFieldNames(iCoolCapacityPerFloorAreaNumericNum)));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
+                ShowSevereError(state, format("{} = {}", cCurrentModuleObject, SysSizInput(SysSizIndex).AirPriLoopName));
                 ShowContinueError(state,
-                                  "Input for " + state.dataIPShortCut->cAlphaFieldNames(iCoolCAPMAlphaNum) + " = " +
-                                      state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum));
-                ShowContinueError(state,
-                                  "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iCoolCapacityPerFloorAreaNumericNum));
+                                  format("Input for {} = {}",
+                                         state.dataIPShortCut->cAlphaFieldNames(iCoolCAPMAlphaNum),
+                                         state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum)));
+                ShowContinueError(
+                    state, format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(iCoolCapacityPerFloorAreaNumericNum)));
                 ErrorsFound = true;
             }
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum), "FRACTIONOFAUTOSIZEDCOOLINGCAPACITY")) {
@@ -4102,7 +3893,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
             if (!state.dataIPShortCut->lNumericFieldBlanks(iCoolFracOfAutosizedCapacityNumericNum)) {
                 SysSizInput(SysSizIndex).ScaledCoolingCapacity = state.dataIPShortCut->rNumericArgs(iCoolFracOfAutosizedCapacityNumericNum);
                 if (SysSizInput(SysSizIndex).ScaledCoolingCapacity < 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
+                    ShowSevereError(state, format("{} = {}", cCurrentModuleObject, SysSizInput(SysSizIndex).AirPriLoopName));
                     ShowContinueError(state,
                                       format("Illegal {} = {:.7T}",
                                              state.dataIPShortCut->cNumericFieldNames(iCoolFracOfAutosizedCapacityNumericNum),
@@ -4110,22 +3901,25 @@ void GetSystemSizingInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
+                ShowSevereError(state, format("{} = {}", cCurrentModuleObject, SysSizInput(SysSizIndex).AirPriLoopName));
                 ShowContinueError(state,
-                                  "Input for " + state.dataIPShortCut->cAlphaFieldNames(iCoolCAPMAlphaNum) + " = " +
-                                      state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum));
-                ShowContinueError(state,
-                                  "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iCoolFracOfAutosizedCapacityNumericNum));
+                                  format("Input for {} = {}",
+                                         state.dataIPShortCut->cAlphaFieldNames(iCoolCAPMAlphaNum),
+                                         state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum)));
+                ShowContinueError(
+                    state,
+                    format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(iCoolFracOfAutosizedCapacityNumericNum)));
                 ErrorsFound = true;
             }
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum), "NONE")) {
             SysSizInput(SysSizIndex).CoolingCapMethod = None;
             SysSizInput(SysSizIndex).ScaledCoolingCapacity = 0.0;
         } else {
-            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
+            ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
             ShowContinueError(state,
-                              "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(iCoolCAPMAlphaNum) + "=\"" +
-                                  state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum) + "\".");
+                              format("... incorrect {}=\"{}\".",
+                                     state.dataIPShortCut->cAlphaFieldNames(iCoolCAPMAlphaNum),
+                                     state.dataIPShortCut->cAlphaArgs(iCoolCAPMAlphaNum)));
             ShowContinueError(state,
                               "... valid values are CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, or None.");
             ErrorsFound = true;
@@ -4137,7 +3931,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
             // SysSizInput( SysSizIndex ).ScaledHeatingCapacity = AutoSize can be set to autosize heating capacity
             SysSizInput(SysSizIndex).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
             if (SysSizInput(SysSizIndex).ScaledHeatingCapacity < 0.0 && SysSizInput(SysSizIndex).ScaledHeatingCapacity != AutoSize) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
+                ShowSevereError(state, format("{} = {}", cCurrentModuleObject, SysSizInput(SysSizIndex).AirPriLoopName));
                 ShowContinueError(state,
                                   format("Illegal {} = {:.7T}",
                                          state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum),
@@ -4149,31 +3943,34 @@ void GetSystemSizingInput(EnergyPlusData &state)
             if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                 SysSizInput(SysSizIndex).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
                 if (SysSizInput(SysSizIndex).ScaledHeatingCapacity <= 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
+                    ShowSevereError(state, format("{} = {}", cCurrentModuleObject, SysSizInput(SysSizIndex).AirPriLoopName));
                     ShowContinueError(state,
-                                      "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
+                                      format("Input for {} = {}",
+                                             state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
+                                             state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
                     ShowContinueError(state,
                                       format("Illegal {} = {:.7T}",
                                              state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
                                              state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                     ErrorsFound = true;
                 } else if (SysSizInput(SysSizIndex).ScaledHeatingCapacity == AutoSize) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
+                    ShowSevereError(state, format("{} = {}", cCurrentModuleObject, SysSizInput(SysSizIndex).AirPriLoopName));
                     ShowContinueError(state,
-                                      "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
+                                      format("Input for {} = {}",
+                                             state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
+                                             state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
                     ShowContinueError(state,
-                                      "Illegal " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
+                                      format("Illegal {} = Autosize", state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum)));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
+                ShowSevereError(state, format("{} = {}", cCurrentModuleObject, SysSizInput(SysSizIndex).AirPriLoopName));
                 ShowContinueError(state,
-                                  "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                      state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                ShowContinueError(state,
-                                  "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
+                                  format("Input for {} = {}",
+                                         state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
+                                         state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
+                ShowContinueError(
+                    state, format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum)));
                 ErrorsFound = true;
             }
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FRACTIONOFAUTOSIZEDHEATINGCAPACITY")) {
@@ -4181,7 +3978,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
             if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                 SysSizInput(SysSizIndex).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
                 if (SysSizInput(SysSizIndex).ScaledHeatingCapacity < 0.0) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
+                    ShowSevereError(state, format("{} = {}", cCurrentModuleObject, SysSizInput(SysSizIndex).AirPriLoopName));
                     ShowContinueError(state,
                                       format("Illegal {} = {:.7T}",
                                              state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
@@ -4189,22 +3986,25 @@ void GetSystemSizingInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
+                ShowSevereError(state, format("{} = {}", cCurrentModuleObject, SysSizInput(SysSizIndex).AirPriLoopName));
                 ShowContinueError(state,
-                                  "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                      state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                ShowContinueError(state,
-                                  "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
+                                  format("Input for {} = {}",
+                                         state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
+                                         state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
+                ShowContinueError(
+                    state,
+                    format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum)));
                 ErrorsFound = true;
             }
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "NONE")) {
             SysSizInput(SysSizIndex).HeatingCapMethod = None;
             SysSizInput(SysSizIndex).ScaledHeatingCapacity = 0.0;
         } else {
-            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
+            ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
             ShowContinueError(state,
-                              "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + "=\"" +
-                                  state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum) + "\".");
+                              format("... incorrect {}=\"{}\".",
+                                     state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
+                                     state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
             ShowContinueError(state,
                               "... valid values are HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedHeatingCapacity, or None.");
             ErrorsFound = true;
@@ -4219,7 +4019,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
             SysSizInput(SysSizIndex).OccupantDiversity = AutoSize;
         } else if (state.dataIPShortCut->rNumericArgs(iOccupantDiversity) <= 0.0 &&
                    state.dataIPShortCut->rNumericArgs(iOccupantDiversity) != AutoSize) {
-            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
+            ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
             ShowContinueError(state,
                               format("... incorrect {}=[{:.2R}],  value should not be negative.",
                                      state.dataIPShortCut->cNumericFieldNames(iOccupantDiversity),
@@ -4227,7 +4027,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
             ErrorsFound = true;
         } else if (state.dataIPShortCut->rNumericArgs(iOccupantDiversity) > 1.0 &&
                    state.dataIPShortCut->rNumericArgs(iOccupantDiversity) != AutoSize) {
-            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
+            ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
             ShowContinueError(state,
                               format("... incorrect {}=[{:.2R}],  value should not be greater than 1.0.",
                                      state.dataIPShortCut->cNumericFieldNames(iOccupantDiversity),
@@ -4239,7 +4039,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, cCurrentModuleObject + ": Errors found in getting input. Program terminates.");
+        ShowFatalError(state, format("{}: Errors found in getting input. Program terminates.", cCurrentModuleObject));
     }
 }
 
@@ -4285,7 +4085,7 @@ void GetPlantSizingInput(EnergyPlusData &state)
             e.PlantLoopName.clear();
             e.ExitTemp = 0.0;
             e.DeltaT = 0.0;
-            e.LoopType = 0;
+            e.LoopType = DataSizing::TypeOfPlantLoop::Invalid;
             e.DesVolFlowRate = 0.0;
         }
         for (int i = 1; i <= state.dataSize->NumPltSizInput; ++i) {
@@ -4318,36 +4118,23 @@ void GetPlantSizingInput(EnergyPlusData &state)
             state.dataSize->PlantSizData(PltSizIndex).NumTimeStepsInAvg = 1.0;
         }
 
-        {
-            auto const loopType(state.dataIPShortCut->cAlphaArgs(2));
-            if (loopType == "HEATING") {
-                state.dataSize->PlantSizData(PltSizIndex).LoopType = HeatingLoop;
-            } else if (loopType == "COOLING") {
-                state.dataSize->PlantSizData(PltSizIndex).LoopType = CoolingLoop;
-            } else if (loopType == "CONDENSER") {
-                state.dataSize->PlantSizData(PltSizIndex).LoopType = CondenserLoop;
-            } else if (loopType == "STEAM") {
-                state.dataSize->PlantSizData(PltSizIndex).LoopType = SteamLoop;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
-                ShowContinueError(state,
-                                  "...incorrect " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
-                ShowContinueError(state, R"(...Valid values are "Heating", "Cooling", "Condenser" or "Steam".)");
-                ErrorsFound = true;
-            }
-        }
+        constexpr static std::array<std::string_view, static_cast<int>(DataSizing::TypeOfPlantLoop::Num)> TypeOfPlantLoopNamesUC = {
+            "HEATING", "COOLING", "CONDENSER", "STEAM"};
+        state.dataSize->PlantSizData(PltSizIndex).LoopType =
+            static_cast<TypeOfPlantLoop>(getEnumValue(TypeOfPlantLoopNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
+        assert(state.dataSize->PlantSizData(PltSizIndex).LoopType != TypeOfPlantLoop::Invalid);
 
         if (NumAlphas > 2) {
             {
-                auto const concurrenceOption(state.dataIPShortCut->cAlphaArgs(3));
+                std::string const &concurrenceOption = state.dataIPShortCut->cAlphaArgs(3);
                 if (concurrenceOption == "NONCOINCIDENT") {
                     state.dataSize->PlantSizData(PltSizIndex).ConcurrenceOption = NonCoincident;
                 } else if (concurrenceOption == "COINCIDENT") {
                     state.dataSize->PlantSizData(PltSizIndex).ConcurrenceOption = Coincident;
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(
-                        state, "...incorrect " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
+                        state, format("...incorrect {}=\"{}\".", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                     ShowContinueError(state, R"(...Valid values are "NonCoincident" or "Coincident".)");
                     ErrorsFound = true;
                 }
@@ -4355,7 +4142,7 @@ void GetPlantSizingInput(EnergyPlusData &state)
         }
         if (NumAlphas > 3) {
             {
-                auto const sizingFactorOption(state.dataIPShortCut->cAlphaArgs(4));
+                std::string const &sizingFactorOption = state.dataIPShortCut->cAlphaArgs(4);
                 if (sizingFactorOption == "NONE") {
                     state.dataSize->PlantSizData(PltSizIndex).SizingFactorOption = NoSizingFactorMode;
                 } else if (sizingFactorOption == "GLOBALHEATINGSIZINGFACTOR") {
@@ -4375,7 +4162,7 @@ void GetPlantSizingInput(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, cCurrentModuleObject + ": Errors found in getting input. Program terminates.");
+        ShowFatalError(state, format("{}: Errors found in getting input. Program terminates.", cCurrentModuleObject));
     }
 }
 
@@ -4408,7 +4195,7 @@ void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound)
         if (ErrorsFound) break;
 
         // check that environment is one of the design days
-        if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) {
+        if (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
             continue;
         }
 
@@ -4461,61 +4248,240 @@ void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound)
     } // ... End environment loop.
 }
 
-void ReportZoneSizing(EnergyPlusData &state,
-                      std::string const &ZoneName,   // the name of the zone
-                      std::string const &LoadType,   // the description of the input variable
-                      Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
-                      Real64 const UserDesLoad,      // the value from the sizing calculation modified by user input [W]
-                      Real64 const CalcDesFlow,      // calculated design air flow rate [m3/s]
-                      Real64 const UserDesFlow,      // user input or modified design air flow rate [m3/s]
-                      std::string const &DesDayName, // the name of the design day that produced the peak
-                      std::string const &PeakHrMin,  // time stamp of the peak
-                      Real64 const PeakTemp,         // temperature at peak [C]
-                      Real64 const PeakHumRat,       // humidity ratio at peak [kg water/kg dry air]
-                      Real64 const FloorArea,        // zone floor area [m2]
-                      Real64 const TotOccs,          // design number of occupants for the zone
-                      Real64 const MinOAVolFlow,     // zone design minimum outside air flow rate [m3/s]
-                      Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
-)
+void reportZoneSizing(EnergyPlusData &state,
+                      DataHeatBalance::ZoneSpaceData const &zoneOrSpace,
+                      DataSizing::ZoneSizingData const &zsFinalSizing,
+                      DataSizing::ZoneSizingData const &zsCalcFinalSizing,
+                      Array2D<DataSizing::ZoneSizingData> const &zsCalcSizing,
+                      Array2D<DataSizing::ZoneSizingData> const &zSizing,
+                      bool const isSpace)
+{
+    std::string_view const curName = zoneOrSpace.Name;
+    // shift for predefined reports for space vs zone
+    int shift = 0;
+    if (isSpace) shift = state.dataOutRptPredefined->pdchSpClCalcDesLd - state.dataOutRptPredefined->pdchZnClCalcDesLd;
+    int thisNum = zsFinalSizing.ZoneNum; // Zone or space num
+    if (zsFinalSizing.DesCoolVolFlow > 0.0) {
+        int TimeStepAtPeak = zsFinalSizing.TimeStepNumAtCoolMax;
+        int DDNum = zsFinalSizing.CoolDDNum;
+        Real64 TempAtPeak = 0.0;
+        Real64 HumRatAtPeak = 0.0;
+        Real64 DOASHeatGainRateAtClPk = 0.0;
+        Real64 TStatSetPtAtPk = 0.0;
+        if (DDNum > 0 && TimeStepAtPeak > 0) {
+            TempAtPeak = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepAtPeak);
+            HumRatAtPeak = state.dataSize->DesDayWeath(DDNum).HumRat(TimeStepAtPeak);
+            DOASHeatGainRateAtClPk = zsCalcSizing(DDNum, thisNum).DOASHeatAddSeq(TimeStepAtPeak);
+            TStatSetPtAtPk = zSizing(DDNum, thisNum).CoolTstatTempSeq(TimeStepAtPeak);
+        }
+        reportZoneSizingEio(state,
+                            zsFinalSizing.ZoneName,
+                            zsCalcFinalSizing.CoolSizingType,
+                            zsCalcFinalSizing.DesCoolLoad,
+                            zsFinalSizing.DesCoolLoad,
+                            zsCalcFinalSizing.DesCoolVolFlow,
+                            zsFinalSizing.DesCoolVolFlow,
+                            zsFinalSizing.CoolDesDay,
+                            zsCalcFinalSizing.CoolPeakDateHrMin,
+                            TempAtPeak,
+                            HumRatAtPeak,
+                            zoneOrSpace.FloorArea,
+                            zoneOrSpace.TotOccupants,
+                            zsFinalSizing.MinOA,
+                            DOASHeatGainRateAtClPk,
+                            isSpace);
+        OutputReportPredefined::PreDefTableEntry(
+            state, shift + state.dataOutRptPredefined->pdchZnClCalcDesLd, curName, zsCalcFinalSizing.DesCoolLoad);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClUserDesLd, curName, zsFinalSizing.DesCoolLoad);
+        if (zoneOrSpace.FloorArea != 0.0) {
+            OutputReportPredefined::PreDefTableEntry(
+                state, shift + state.dataOutRptPredefined->pdchZnClUserDesLdPerArea, curName, zsFinalSizing.DesCoolLoad / zoneOrSpace.FloorArea);
+        }
+        OutputReportPredefined::PreDefTableEntry(
+            state, shift + state.dataOutRptPredefined->pdchZnClCalcDesAirFlow, curName, zsCalcFinalSizing.DesCoolVolFlow, 3);
+        OutputReportPredefined::PreDefTableEntry(
+            state, shift + state.dataOutRptPredefined->pdchZnClUserDesAirFlow, curName, zsFinalSizing.DesCoolVolFlow, 3);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClDesDay, curName, zsFinalSizing.CoolDesDay);
+        OutputReportPredefined::PreDefTableEntry(
+            state, shift + state.dataOutRptPredefined->pdchZnClPkTime, curName, zsCalcFinalSizing.CoolPeakDateHrMin);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClPkTstatTemp, curName, TStatSetPtAtPk);
+        OutputReportPredefined::PreDefTableEntry(
+            state, shift + state.dataOutRptPredefined->pdchZnClPkIndTemp, curName, zsCalcFinalSizing.ZoneTempAtCoolPeak);
+        OutputReportPredefined::PreDefTableEntry(
+            state, shift + state.dataOutRptPredefined->pdchZnClPkIndHum, curName, zsCalcFinalSizing.ZoneHumRatAtCoolPeak, 5);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClPkOATemp, curName, TempAtPeak);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClPkOAHum, curName, HumRatAtPeak, 5);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClPkOAMinFlow, curName, zsFinalSizing.MinOA, 3);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClPkDOASHeatGain, curName, DOASHeatGainRateAtClPk);
+    } else {
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClCalcDesLd, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClUserDesLd, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClUserDesLdPerArea, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClCalcDesAirFlow, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClUserDesAirFlow, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClDesDay, curName, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClPkTime, curName, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClPkTstatTemp, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClPkIndTemp, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClPkIndHum, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClPkOATemp, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClPkOAHum, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClPkOAMinFlow, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClPkDOASHeatGain, curName, 0.0, 1);
+    }
+    if (zsFinalSizing.DesHeatVolFlow > 0.0) {
+        int TimeStepAtPeak = zsFinalSizing.TimeStepNumAtHeatMax;
+        int DDNum = zsFinalSizing.HeatDDNum;
+        Real64 TempAtPeak = 0.0;
+        Real64 HumRatAtPeak = 0.0;
+        Real64 DOASHeatGainRateAtHtPk = 0.0;
+        Real64 TStatSetPtAtPk = 0.0;
+        if (DDNum > 0 && TimeStepAtPeak > 0) {
+            TempAtPeak = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepAtPeak);
+            HumRatAtPeak = state.dataSize->DesDayWeath(DDNum).HumRat(TimeStepAtPeak);
+            DOASHeatGainRateAtHtPk = zsCalcSizing(DDNum, thisNum).DOASHeatAddSeq(TimeStepAtPeak);
+            TStatSetPtAtPk = zSizing(DDNum, thisNum).HeatTstatTempSeq(TimeStepAtPeak);
+        }
+        reportZoneSizingEio(state,
+                            zsFinalSizing.ZoneName,
+                            zsCalcFinalSizing.HeatSizingType,
+                            zsCalcFinalSizing.DesHeatLoad,
+                            zsFinalSizing.DesHeatLoad,
+                            zsCalcFinalSizing.DesHeatVolFlow,
+                            zsFinalSizing.DesHeatVolFlow,
+                            zsFinalSizing.HeatDesDay,
+                            zsCalcFinalSizing.HeatPeakDateHrMin,
+                            TempAtPeak,
+                            HumRatAtPeak,
+                            zoneOrSpace.FloorArea,
+                            zoneOrSpace.TotOccupants,
+                            zsFinalSizing.MinOA,
+                            DOASHeatGainRateAtHtPk,
+                            isSpace);
+        OutputReportPredefined::PreDefTableEntry(
+            state, shift + state.dataOutRptPredefined->pdchZnHtCalcDesLd, curName, zsCalcFinalSizing.DesHeatLoad);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtUserDesLd, curName, zsFinalSizing.DesHeatLoad);
+        if (zoneOrSpace.FloorArea != 0.0) {
+            OutputReportPredefined::PreDefTableEntry(
+                state, shift + state.dataOutRptPredefined->pdchZnHtUserDesLdPerArea, curName, zsFinalSizing.DesHeatLoad / zoneOrSpace.FloorArea);
+        }
+        OutputReportPredefined::PreDefTableEntry(
+            state, shift + state.dataOutRptPredefined->pdchZnHtCalcDesAirFlow, curName, zsCalcFinalSizing.DesHeatVolFlow, 3);
+        OutputReportPredefined::PreDefTableEntry(
+            state, shift + state.dataOutRptPredefined->pdchZnHtUserDesAirFlow, curName, zsFinalSizing.DesHeatVolFlow, 3);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtDesDay, curName, zsFinalSizing.HeatDesDay);
+        OutputReportPredefined::PreDefTableEntry(
+            state, shift + state.dataOutRptPredefined->pdchZnHtPkTime, curName, zsCalcFinalSizing.HeatPeakDateHrMin);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtPkTstatTemp, curName, TStatSetPtAtPk);
+        OutputReportPredefined::PreDefTableEntry(
+            state, shift + state.dataOutRptPredefined->pdchZnHtPkIndTemp, curName, zsCalcFinalSizing.ZoneTempAtHeatPeak);
+        OutputReportPredefined::PreDefTableEntry(
+            state, shift + state.dataOutRptPredefined->pdchZnHtPkIndHum, curName, zsCalcFinalSizing.ZoneHumRatAtHeatPeak, 5);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtPkOATemp, curName, TempAtPeak);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtPkOAHum, curName, HumRatAtPeak, 5);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtPkOAMinFlow, curName, zsFinalSizing.MinOA, 3);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtPkDOASHeatGain, curName, DOASHeatGainRateAtHtPk);
+    } else {
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtCalcDesLd, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtUserDesLd, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtUserDesLdPerArea, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtCalcDesAirFlow, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtUserDesAirFlow, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtDesDay, curName, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtPkTime, curName, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtPkTstatTemp, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtPkIndTemp, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtPkIndHum, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtPkOATemp, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtPkOAHum, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtPkOAMinFlow, curName, 0.0, 1);
+        OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtPkDOASHeatGain, curName, 0.0, 1);
+    }
+}
+void reportZoneSizingEio(EnergyPlusData &state,
+                         std::string const &ZoneName,   // the name of the zone
+                         std::string const &LoadType,   // the description of the input variable
+                         Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
+                         Real64 const UserDesLoad,      // the value from the sizing calculation modified by user input [W]
+                         Real64 const CalcDesFlow,      // calculated design air flow rate [m3/s]
+                         Real64 const UserDesFlow,      // user input or modified design air flow rate [m3/s]
+                         std::string const &DesDayName, // the name of the design day that produced the peak
+                         std::string const &PeakHrMin,  // time stamp of the peak
+                         Real64 const PeakTemp,         // temperature at peak [C]
+                         Real64 const PeakHumRat,       // humidity ratio at peak [kg water/kg dry air]
+                         Real64 const FloorArea,        // zone floor area [m2]
+                         Real64 const TotOccs,          // design number of occupants for the zone
+                         Real64 const MinOAVolFlow,     // zone design minimum outside air flow rate [m3/s]
+                         Real64 const DOASHeatAddRate,  // zone design heat addition rate from the DOAS [W]
+                         bool const isSpace)
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   Decenber 2001
     //       MODIFIED       August 2008, Greg Stark
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine writes one item of zone sizing data to the "eio" file..
 
-    if (state.dataSizingManager->ReportZoneSizingMyOneTimeFlag) {
-        static constexpr std::string_view Format_990(
+    if (state.dataSizingManager->ReportZoneSizingMyOneTimeFlag && !isSpace) {
+        static constexpr std::string_view Format_990_Zone(
             "! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, Calc Des Air Flow "
             "Rate {m3/s}, User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
             "Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
             "Calc DOAS Heat Addition Rate {W}");
-        print(state.files.eio, "{}\n", Format_990);
+        print(state.files.eio, "{}\n", Format_990_Zone);
         state.dataSizingManager->ReportZoneSizingMyOneTimeFlag = false;
     }
+    if (state.dataSizingManager->ReportSpaceSizingMyOneTimeFlag && isSpace) {
+        static constexpr std::string_view Format_990_Space(
+            "! <Space Sizing Information>, Space Name, Load Type, Calc Des Load {W}, User Des Load {W}, Calc Des Air Flow "
+            "Rate {m3/s}, User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
+            "Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
+            "Calc DOAS Heat Addition Rate {W}");
+        print(state.files.eio, "{}\n", Format_990_Space);
+        state.dataSizingManager->ReportSpaceSizingMyOneTimeFlag = false;
+    }
 
-    static constexpr std::string_view Format_991(
+    static constexpr std::string_view Format_991_Space(
+        " Space Sizing Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
+    static constexpr std::string_view Format_991_Zone(
         " Zone Sizing Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
-    print(state.files.eio,
-          Format_991,
-          ZoneName,
-          LoadType,
-          CalcDesLoad,
-          UserDesLoad,
-          CalcDesFlow,
-          UserDesFlow,
-          DesDayName,
-          PeakHrMin,
-          PeakTemp,
-          PeakHumRat,
-          FloorArea,
-          TotOccs,
-          MinOAVolFlow,
-          DOASHeatAddRate);
+    if (isSpace) {
+        print(state.files.eio,
+              Format_991_Space,
+              ZoneName,
+              LoadType,
+              CalcDesLoad,
+              UserDesLoad,
+              CalcDesFlow,
+              UserDesFlow,
+              DesDayName,
+              PeakHrMin,
+              PeakTemp,
+              PeakHumRat,
+              FloorArea,
+              TotOccs,
+              MinOAVolFlow,
+              DOASHeatAddRate);
+    } else {
+        print(state.files.eio,
+              Format_991_Zone,
+              ZoneName,
+              LoadType,
+              CalcDesLoad,
+              UserDesLoad,
+              CalcDesFlow,
+              UserDesFlow,
+              DesDayName,
+              PeakHrMin,
+              PeakTemp,
+              PeakHumRat,
+              FloorArea,
+              TotOccs,
+              MinOAVolFlow,
+              DOASHeatAddRate);
+    }
 
     // BSLLC Start
     if (state.dataSQLiteProcedures->sqlite) {
@@ -4537,22 +4503,22 @@ void ReportZoneSizing(EnergyPlusData &state,
 
 // Writes system sizing data to EIO file using one row per system
 void ReportSysSizing(EnergyPlusData &state,
-                     std::string const &SysName,      // the name of the zone
-                     std::string const &LoadType,     // either "Cooling" or "Heating"
-                     std::string const &PeakLoadKind, // either "Sensible" or "Total"
-                     Real64 const UserDesCap,         // User  Design Capacity
-                     Real64 const CalcDesVolFlow,     // Calculated  Design Air Flow Rate
-                     Real64 const UserDesVolFlow,     // User Design Air Flow Rate
-                     std::string const &DesDayName,   // the name of the design day that produced the peak
-                     std::string const &DesDayDate,   // the date that produced the peak
-                     int const TimeStepIndex          // time step of the peak
+                     std::string const &SysName,    // the name of the zone
+                     std::string_view LoadType,     // either "Cooling" or "Heating"
+                     std::string_view PeakLoadKind, // either "Sensible" or "Total"
+                     Real64 const UserDesCap,       // User  Design Capacity
+                     Real64 const CalcDesVolFlow,   // Calculated  Design Air Flow Rate
+                     Real64 const UserDesVolFlow,   // User Design Air Flow Rate
+                     std::string const &DesDayName, // the name of the design day that produced the peak
+                     std::string const &DesDayDate, // the date that produced the peak
+                     int const TimeStepIndex        // time step of the peak
 )
 {
 
     if (state.dataSizingManager->ReportSysSizingMyOneTimeFlag) {
         print(state.files.eio,
               "{}\n",
-              "! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity, Calc Des Air "
+              "! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity [W], Calc Des Air "
               "Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak");
         state.dataSizingManager->ReportSysSizingMyOneTimeFlag = false;
     }
@@ -4728,16 +4694,16 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow <= 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
                         ShowContinueError(
                             state,
                             format("Illegal {} = {:.7T}", cNumericFields(iMaxCoolAirVolFlowNumericNum), Numbers(iMaxCoolAirVolFlowNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iCoolSAFMAlphaNum) + " = " + Alphas(iCoolSAFMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iMaxCoolAirVolFlowNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iCoolSAFMAlphaNum), Alphas(iCoolSAFMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iMaxCoolAirVolFlowNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iCoolSAFMAlphaNum), "FlowPerFloorArea")) {
@@ -4746,26 +4712,26 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow = Numbers(iCoolFlowPerFloorAreaNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow <= 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iCoolSAFMAlphaNum) + " = " + Alphas(iCoolSAFMAlphaNum));
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iCoolSAFMAlphaNum), Alphas(iCoolSAFMAlphaNum)));
                         ShowContinueError(
                             state,
                             format("Illegal {} = {:.7T}", cNumericFields(iCoolFlowPerFloorAreaNumericNum), Numbers(iCoolFlowPerFloorAreaNumericNum)));
                         ErrorsFound = true;
                         // Autosized input is not allowed
                     } else if (state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iCoolSAFMAlphaNum) + " = " + Alphas(iCoolSAFMAlphaNum));
-                        ShowContinueError(state, "Illegal " + cNumericFields(iCoolFlowPerFloorAreaNumericNum) + " = Autosize");
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iCoolSAFMAlphaNum), Alphas(iCoolSAFMAlphaNum)));
+                        ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(iCoolFlowPerFloorAreaNumericNum)));
                         ErrorsFound = true;
                     } else {
                         // user input cooling supply air flow per unit conditioned area is saved in ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iCoolSAFMAlphaNum) + " = " + Alphas(iCoolSAFMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iCoolFlowPerFloorAreaNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iCoolSAFMAlphaNum), Alphas(iCoolSAFMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iCoolFlowPerFloorAreaNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iCoolSAFMAlphaNum), "FractionOfAutosizedCoolingAirflow")) {
@@ -4774,26 +4740,26 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow = Numbers(iCoolFlowPerFracCoolNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow <= 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iCoolSAFMAlphaNum) + " = " + Alphas(iCoolSAFMAlphaNum));
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iCoolSAFMAlphaNum), Alphas(iCoolSAFMAlphaNum)));
                         ShowContinueError(
                             state,
                             format("Illegal {} = {:.7T}", cNumericFields(iCoolFlowPerFracCoolNumericNum), Numbers(iCoolFlowPerFracCoolNumericNum)));
                         ErrorsFound = true;
                         // Autosized input is not allowed
                     } else if (state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iCoolSAFMAlphaNum) + " = " + Alphas(iCoolSAFMAlphaNum));
-                        ShowContinueError(state, "Illegal " + cNumericFields(iCoolFlowPerFracCoolNumericNum) + " = Autosize");
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iCoolSAFMAlphaNum), Alphas(iCoolSAFMAlphaNum)));
+                        ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(iCoolFlowPerFracCoolNumericNum)));
                         ErrorsFound = true;
                     } else {
                         // user input fraction of cooling supply air flow rate is saved in ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iCoolSAFMAlphaNum) + " = " + Alphas(iCoolSAFMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iCoolFlowPerFracCoolNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iCoolSAFMAlphaNum), Alphas(iCoolSAFMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iCoolFlowPerFracCoolNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iCoolSAFMAlphaNum), "FlowPerCoolingCapacity")) {
@@ -4803,26 +4769,26 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow = Numbers(iCoolFlowPerCoolCapNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow <= 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iCoolSAFMAlphaNum) + " = " + Alphas(iCoolSAFMAlphaNum));
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iCoolSAFMAlphaNum), Alphas(iCoolSAFMAlphaNum)));
                         ShowContinueError(
                             state,
                             format("Illegal {} = {:.7T}", cNumericFields(iCoolFlowPerCoolCapNumericNum), Numbers(iCoolFlowPerCoolCapNumericNum)));
                         ErrorsFound = true;
                         // Autosized input is not allowed
                     } else if (state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iCoolSAFMAlphaNum) + " = " + Alphas(iCoolSAFMAlphaNum));
-                        ShowContinueError(state, "Illegal " + cNumericFields(iCoolFlowPerCoolCapNumericNum) + " = Autosize");
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iCoolSAFMAlphaNum), Alphas(iCoolSAFMAlphaNum)));
+                        ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(iCoolFlowPerCoolCapNumericNum)));
                         ErrorsFound = true;
                     } else {
                         // user input cooling supply air flow per unit cooling capacity is saved in ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iCoolSAFMAlphaNum) + " = " + Alphas(iCoolSAFMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iCoolFlowPerCoolCapNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iCoolSAFMAlphaNum), Alphas(iCoolSAFMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iCoolFlowPerCoolCapNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iCoolSAFMAlphaNum), "None") || lAlphaBlanks(iCoolSAFMAlphaNum)) {
@@ -4830,8 +4796,8 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                 state.dataSize->ZoneHVACSizing(zSIndex).MaxCoolAirVolFlow = 0.0;
                 // cooling supply air flow rate will not be sized, may be cooling coil does not exist
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                ShowContinueError(state, "Illegal " + cAlphaFields(iCoolSAFMAlphaNum) + " = " + Alphas(iCoolSAFMAlphaNum));
+                ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(iCoolSAFMAlphaNum), Alphas(iCoolSAFMAlphaNum)));
                 ErrorsFound = true;
             }
             // Determine supply air flow rate sizing method for heating mode
@@ -4844,16 +4810,16 @@ void GetZoneHVACSizing(EnergyPlusData &state)
 
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow <= 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
                         ShowContinueError(
                             state,
                             format("Illegal {} = {:.7T}", cNumericFields(iMaxHeatAirVolFlowNumericNum), Numbers(iMaxHeatAirVolFlowNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iHeatSAFMAlphaNum) + " = " + Alphas(iHeatSAFMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iMaxHeatAirVolFlowNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatSAFMAlphaNum), Alphas(iHeatSAFMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iMaxHeatAirVolFlowNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatSAFMAlphaNum), "FlowPerFloorArea")) {
@@ -4862,26 +4828,26 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow = Numbers(iHeatFlowPerFloorAreaNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow <= 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iHeatSAFMAlphaNum) + " = " + Alphas(iHeatSAFMAlphaNum));
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatSAFMAlphaNum), Alphas(iHeatSAFMAlphaNum)));
                         ShowContinueError(
                             state,
                             format("Illegal {} = {:.7T}", cNumericFields(iHeatFlowPerFloorAreaNumericNum), Numbers(iHeatFlowPerFloorAreaNumericNum)));
                         ErrorsFound = true;
                         // Autosized input is not allowed
                     } else if (state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iHeatSAFMAlphaNum) + " = " + Alphas(iHeatSAFMAlphaNum));
-                        ShowContinueError(state, "Illegal " + cNumericFields(iHeatFlowPerFloorAreaNumericNum) + " = Autosize");
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatSAFMAlphaNum), Alphas(iHeatSAFMAlphaNum)));
+                        ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(iHeatFlowPerFloorAreaNumericNum)));
                         ErrorsFound = true;
                     } else {
                         // user input heating supply air flow per unit conditioned area is saved in ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iHeatSAFMAlphaNum) + " = " + Alphas(iHeatSAFMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iHeatFlowPerFloorAreaNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatSAFMAlphaNum), Alphas(iHeatSAFMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iHeatFlowPerFloorAreaNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatSAFMAlphaNum), "FractionOfAutosizedHeatingAirflow")) {
@@ -4890,26 +4856,26 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow = Numbers(iHeatFlowPerFracCoolNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow <= 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iHeatSAFMAlphaNum) + " = " + Alphas(iHeatSAFMAlphaNum));
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatSAFMAlphaNum), Alphas(iHeatSAFMAlphaNum)));
                         ShowContinueError(
                             state,
                             format("Illegal {} = {:.7T}", cNumericFields(iHeatFlowPerFracCoolNumericNum), Numbers(iHeatFlowPerFracCoolNumericNum)));
                         ErrorsFound = true;
                         // Autosized input is not allowed
                     } else if (state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iHeatSAFMAlphaNum) + " = " + Alphas(iHeatSAFMAlphaNum));
-                        ShowContinueError(state, "Illegal " + cNumericFields(iHeatFlowPerFracCoolNumericNum) + " = Autosize");
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatSAFMAlphaNum), Alphas(iHeatSAFMAlphaNum)));
+                        ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(iHeatFlowPerFracCoolNumericNum)));
                         ErrorsFound = true;
                     } else {
                         // user input fraction of heating supply air flow rate is saved in ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iHeatSAFMAlphaNum) + " = " + Alphas(iHeatSAFMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iHeatFlowPerFracCoolNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatSAFMAlphaNum), Alphas(iHeatSAFMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iHeatFlowPerFracCoolNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatSAFMAlphaNum), "FlowPerHeatingCapacity")) {
@@ -4918,34 +4884,34 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow = Numbers(iHeatFlowPerHeatCapNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow <= 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iHeatSAFMAlphaNum) + " = " + Alphas(iHeatSAFMAlphaNum));
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatSAFMAlphaNum), Alphas(iHeatSAFMAlphaNum)));
                         ShowContinueError(
                             state,
                             format("Illegal {} = {:.7T}", cNumericFields(iHeatFlowPerHeatCapNumericNum), Numbers(iHeatFlowPerHeatCapNumericNum)));
                         ErrorsFound = true;
                         // Autosized input is not allowed
                     } else if (state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iHeatSAFMAlphaNum) + " = " + Alphas(iHeatSAFMAlphaNum));
-                        ShowContinueError(state, "Illegal " + cNumericFields(iHeatFlowPerHeatCapNumericNum) + " = Autosize");
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatSAFMAlphaNum), Alphas(iHeatSAFMAlphaNum)));
+                        ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(iHeatFlowPerHeatCapNumericNum)));
                         ErrorsFound = true;
                     } else {
                         // user input heating supply air flow per unit heating capacity is saved in ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iHeatSAFMAlphaNum) + " = " + Alphas(iHeatSAFMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iHeatFlowPerHeatCapNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatSAFMAlphaNum), Alphas(iHeatSAFMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iHeatFlowPerHeatCapNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatSAFMAlphaNum), "None") || lAlphaBlanks(iHeatSAFMAlphaNum)) {
                 state.dataSize->ZoneHVACSizing(zSIndex).HeatingSAFMethod = None;
                 state.dataSize->ZoneHVACSizing(zSIndex).MaxHeatAirVolFlow = 0.0;
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                ShowContinueError(state, "Illegal " + cAlphaFields(iHeatSAFMAlphaNum) + " = " + Alphas(iHeatSAFMAlphaNum));
+                ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(iHeatSAFMAlphaNum), Alphas(iHeatSAFMAlphaNum)));
                 ErrorsFound = true;
             }
 
@@ -4958,7 +4924,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow < 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
                                                  cNumericFields(iMaxNoCoolHeatAirVolFlowNumericNum),
@@ -4966,9 +4932,9 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iNoCoolHeatSAFMAlphaNum) + " = " + Alphas(iNoCoolHeatSAFMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iMaxNoCoolHeatAirVolFlowNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iNoCoolHeatSAFMAlphaNum), Alphas(iNoCoolHeatSAFMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iMaxNoCoolHeatAirVolFlowNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iNoCoolHeatSAFMAlphaNum), "FlowPerFloorArea")) {
@@ -4977,8 +4943,8 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow = Numbers(iNoCoolHeatFlowPerFloorAreaNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow < 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iNoCoolHeatSAFMAlphaNum) + " = " + Alphas(iNoCoolHeatSAFMAlphaNum));
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iNoCoolHeatSAFMAlphaNum), Alphas(iNoCoolHeatSAFMAlphaNum)));
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
                                                  cNumericFields(iNoCoolHeatFlowPerFloorAreaNumericNum),
@@ -4986,9 +4952,9 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         ErrorsFound = true;
                         // Autosized input is not allowed
                     } else if (state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iNoCoolHeatSAFMAlphaNum) + " = " + Alphas(iNoCoolHeatSAFMAlphaNum));
-                        ShowContinueError(state, "Illegal " + cNumericFields(iNoCoolHeatFlowPerFloorAreaNumericNum) + " = Autosize");
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iNoCoolHeatSAFMAlphaNum), Alphas(iNoCoolHeatSAFMAlphaNum)));
+                        ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(iNoCoolHeatFlowPerFloorAreaNumericNum)));
                         ErrorsFound = true;
                     } else {
                         // user input supply air flow per unit floor area during no cooling or heating area is saved in
@@ -4996,9 +4962,9 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iNoCoolHeatSAFMAlphaNum) + " = " + Alphas(iNoCoolHeatSAFMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iNoCoolHeatFlowPerFloorAreaNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iNoCoolHeatSAFMAlphaNum), Alphas(iNoCoolHeatSAFMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iNoCoolHeatFlowPerFloorAreaNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iNoCoolHeatSAFMAlphaNum), "FractionOfAutosizedCoolingAirflow")) {
@@ -5007,8 +4973,8 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow = Numbers(iNoCoolHeatFlowPerFracCoolNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow < 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iNoCoolHeatSAFMAlphaNum) + " = " + Alphas(iNoCoolHeatSAFMAlphaNum));
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iNoCoolHeatSAFMAlphaNum), Alphas(iNoCoolHeatSAFMAlphaNum)));
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
                                                  cNumericFields(iNoCoolHeatFlowPerFracCoolNumericNum),
@@ -5016,9 +4982,9 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         ErrorsFound = true;
                         // Autosized input is not allowed
                     } else if (state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iNoCoolHeatSAFMAlphaNum) + " = " + Alphas(iNoCoolHeatSAFMAlphaNum));
-                        ShowContinueError(state, "Illegal " + cNumericFields(iNoCoolHeatFlowPerFracCoolNumericNum) + " = Autosize");
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iNoCoolHeatSAFMAlphaNum), Alphas(iNoCoolHeatSAFMAlphaNum)));
+                        ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(iNoCoolHeatFlowPerFracCoolNumericNum)));
                         ErrorsFound = true;
                     } else {
                         // user input frcation of cooling supply air flow rate during no cooling or heating area is saved in
@@ -5026,9 +4992,9 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iNoCoolHeatSAFMAlphaNum) + " = " + Alphas(iNoCoolHeatSAFMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iNoCoolHeatFlowPerFracCoolNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iNoCoolHeatSAFMAlphaNum), Alphas(iNoCoolHeatSAFMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iNoCoolHeatFlowPerFracCoolNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iNoCoolHeatSAFMAlphaNum), "FractionOfAutosizedHeatingAirflow")) {
@@ -5037,8 +5003,8 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                     state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow = Numbers(iNoCoolHeatFlowPerFracHeatNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow < 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iNoCoolHeatSAFMAlphaNum) + " = " + Alphas(iNoCoolHeatSAFMAlphaNum));
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iNoCoolHeatSAFMAlphaNum), Alphas(iNoCoolHeatSAFMAlphaNum)));
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
                                                  cNumericFields(iNoCoolHeatFlowPerFracHeatNumericNum),
@@ -5046,9 +5012,9 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         ErrorsFound = true;
                         // Autosized input is not allowed
                     } else if (state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iNoCoolHeatSAFMAlphaNum) + " = " + Alphas(iNoCoolHeatSAFMAlphaNum));
-                        ShowContinueError(state, "Illegal " + cNumericFields(iNoCoolHeatFlowPerFracHeatNumericNum) + " = Autosize");
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iNoCoolHeatSAFMAlphaNum), Alphas(iNoCoolHeatSAFMAlphaNum)));
+                        ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(iNoCoolHeatFlowPerFracHeatNumericNum)));
                         ErrorsFound = true;
                     } else {
                         // user input frcation of heating supply air flow rate during no cooling or heating area is saved in
@@ -5056,17 +5022,17 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iNoCoolHeatSAFMAlphaNum) + " = " + Alphas(iNoCoolHeatSAFMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iNoCoolHeatFlowPerFracHeatNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iNoCoolHeatSAFMAlphaNum), Alphas(iNoCoolHeatSAFMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iNoCoolHeatFlowPerFracHeatNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iNoCoolHeatSAFMAlphaNum), "None") || lAlphaBlanks(iNoCoolHeatSAFMAlphaNum)) {
                 state.dataSize->ZoneHVACSizing(zSIndex).NoCoolHeatSAFMethod = None;
                 state.dataSize->ZoneHVACSizing(zSIndex).MaxNoCoolHeatAirVolFlow = 0.0;
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                ShowContinueError(state, "Illegal " + cAlphaFields(iNoCoolHeatSAFMAlphaNum) + " = " + Alphas(iNoCoolHeatSAFMAlphaNum));
+                ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(iNoCoolHeatSAFMAlphaNum), Alphas(iNoCoolHeatSAFMAlphaNum)));
                 ErrorsFound = true;
             }
 
@@ -5079,16 +5045,16 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     if (state.dataSize->ZoneHVACSizing(zSIndex).ScaledCoolingCapacity < 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).ScaledCoolingCapacity != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
                         ShowContinueError(
                             state,
                             format("Illegal {} = {:.7T}", cNumericFields(iCoolDesignCapacityNumericNum), Numbers(iCoolDesignCapacityNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iCoolCAPMAlphaNum) + " = " + Alphas(iCoolCAPMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iCoolDesignCapacityNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iCoolCAPMAlphaNum), Alphas(iCoolCAPMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iCoolDesignCapacityNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iCoolCAPMAlphaNum), "CapacityPerFloorArea")) {
@@ -5096,8 +5062,8 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                 if (!lNumericBlanks(iCoolCapacityPerFloorAreaNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).ScaledCoolingCapacity = Numbers(iCoolCapacityPerFloorAreaNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).ScaledCoolingCapacity <= 0.0) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iCoolCAPMAlphaNum) + " = " + Alphas(iCoolCAPMAlphaNum));
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iCoolCAPMAlphaNum), Alphas(iCoolCAPMAlphaNum)));
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
                                                  cNumericFields(iCoolCapacityPerFloorAreaNumericNum),
@@ -5105,15 +5071,15 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         ErrorsFound = true;
                         // Autosized input is not allowed
                     } else if (state.dataSize->ZoneHVACSizing(zSIndex).ScaledCoolingCapacity == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iCoolCAPMAlphaNum) + " = " + Alphas(iCoolCAPMAlphaNum));
-                        ShowContinueError(state, "Illegal " + cNumericFields(iCoolCapacityPerFloorAreaNumericNum) + " = Autosize");
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iCoolCAPMAlphaNum), Alphas(iCoolCAPMAlphaNum)));
+                        ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(iCoolCapacityPerFloorAreaNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iCoolCAPMAlphaNum) + " = " + Alphas(iCoolCAPMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iCoolCapacityPerFloorAreaNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iCoolCAPMAlphaNum), Alphas(iCoolCAPMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iCoolCapacityPerFloorAreaNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iCoolCAPMAlphaNum), "FractionOfAutosizedCoolingCapacity")) {
@@ -5124,7 +5090,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     if (state.dataSize->ZoneHVACSizing(zSIndex).ScaledCoolingCapacity < 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).ScaledCoolingCapacity != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
                                                  cNumericFields(iCoolFracOfAutosizedCapacityNumericNum),
@@ -5132,16 +5098,16 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iCoolCAPMAlphaNum) + " = " + Alphas(iCoolCAPMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iCoolFracOfAutosizedCapacityNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iCoolCAPMAlphaNum), Alphas(iCoolCAPMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iCoolFracOfAutosizedCapacityNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iCoolCAPMAlphaNum), "None") || lAlphaBlanks(iCoolCAPMAlphaNum)) {
                 state.dataSize->ZoneHVACSizing(zSIndex).CoolingCapMethod = None;
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                ShowContinueError(state, "Illegal " + cAlphaFields(iCoolCAPMAlphaNum) + " = " + Alphas(iCoolCAPMAlphaNum));
+                ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(iCoolCAPMAlphaNum), Alphas(iCoolCAPMAlphaNum)));
                 ErrorsFound = true;
             }
 
@@ -5154,16 +5120,16 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     if (state.dataSize->ZoneHVACSizing(zSIndex).ScaledHeatingCapacity < 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).ScaledHeatingCapacity != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
                         ShowContinueError(
                             state,
                             format("Illegal {} = {:.7T}", cNumericFields(iHeatDesignCapacityNumericNum), Numbers(iHeatDesignCapacityNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iHeatCAPMAlphaNum) + " = " + Alphas(iHeatCAPMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iHeatDesignCapacityNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatCAPMAlphaNum), Alphas(iHeatCAPMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iHeatDesignCapacityNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
@@ -5171,8 +5137,8 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                 if (!lNumericBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     state.dataSize->ZoneHVACSizing(zSIndex).ScaledHeatingCapacity = Numbers(iHeatCapacityPerFloorAreaNumericNum);
                     if (state.dataSize->ZoneHVACSizing(zSIndex).ScaledHeatingCapacity <= 0.0) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iHeatCAPMAlphaNum) + " = " + Alphas(iHeatCAPMAlphaNum));
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatCAPMAlphaNum), Alphas(iHeatCAPMAlphaNum)));
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
                                                  cNumericFields(iHeatCapacityPerFloorAreaNumericNum),
@@ -5180,15 +5146,15 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         ErrorsFound = true;
                         // Autosized input is not allowed
                     } else if (state.dataSize->ZoneHVACSizing(zSIndex).ScaledHeatingCapacity == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(iHeatCAPMAlphaNum) + " = " + Alphas(iHeatCAPMAlphaNum));
-                        ShowContinueError(state, "Illegal " + cNumericFields(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                        ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatCAPMAlphaNum), Alphas(iHeatCAPMAlphaNum)));
+                        ShowContinueError(state, format("Illegal {} = Autosize", cNumericFields(iHeatCapacityPerFloorAreaNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iHeatCAPMAlphaNum) + " = " + Alphas(iHeatCAPMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iHeatCapacityPerFloorAreaNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatCAPMAlphaNum), Alphas(iHeatCAPMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iHeatCapacityPerFloorAreaNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
@@ -5199,7 +5165,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         state.dataSize->ZoneHVACSizing(zSIndex).RequestAutoSize = true;
                     if (state.dataSize->ZoneHVACSizing(zSIndex).ScaledHeatingCapacity < 0.0 &&
                         state.dataSize->ZoneHVACSizing(zSIndex).ScaledCoolingCapacity != AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
                                                  cNumericFields(iHeatFracOfAutosizedCapacityNumericNum),
@@ -5207,16 +5173,16 @@ void GetZoneHVACSizing(EnergyPlusData &state)
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(iHeatCAPMAlphaNum) + " = " + Alphas(iHeatCAPMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(iHeatFracOfAutosizedCapacityNumericNum));
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                    ShowContinueError(state, format("Input for {} = {}", cAlphaFields(iHeatCAPMAlphaNum), Alphas(iHeatCAPMAlphaNum)));
+                    ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iHeatFracOfAutosizedCapacityNumericNum)));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(Alphas(iHeatCAPMAlphaNum), "None") || lAlphaBlanks(iHeatCAPMAlphaNum)) {
                 state.dataSize->ZoneHVACSizing(zSIndex).HeatingCapMethod = None;
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + state.dataSize->ZoneHVACSizing(zSIndex).Name);
-                ShowContinueError(state, "Illegal " + cAlphaFields(iHeatCAPMAlphaNum) + " = " + Alphas(iHeatCAPMAlphaNum));
+                ShowSevereError(state, format("{} = {}", CurrentModuleObject, state.dataSize->ZoneHVACSizing(zSIndex).Name));
+                ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(iHeatCAPMAlphaNum), Alphas(iHeatCAPMAlphaNum)));
                 ErrorsFound = true;
             }
         }
@@ -5230,7 +5196,7 @@ void GetZoneHVACSizing(EnergyPlusData &state)
     lNumericBlanks.deallocate();
 
     if (ErrorsFound) {
-        ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
+        ShowFatalError(state, format("{}Errors found in input.  Preceding condition(s) cause termination.", RoutineName));
     }
 }
 
@@ -5277,7 +5243,7 @@ void GetAirTerminalSizing(EnergyPlusData &state)
 
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            auto &thisATSizing(state.dataSize->AirTerminalSizingSpec(zSIndex));
+            auto &thisATSizing = state.dataSize->AirTerminalSizingSpec(zSIndex);
             thisATSizing.Name = state.dataIPShortCut->cAlphaArgs(1);
             thisATSizing.DesSensCoolingFrac = state.dataIPShortCut->rNumericArgs(1);
             thisATSizing.DesCoolSATRatio = state.dataIPShortCut->rNumericArgs(2);
@@ -5288,17 +5254,17 @@ void GetAirTerminalSizing(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
+        ShowFatalError(state, format("{}Errors found in input.  Preceding condition(s) cause termination.", RoutineName));
     }
 }
 
 // Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
-void UpdateFacilitySizing([[maybe_unused]] EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator)
+void UpdateFacilitySizing([[maybe_unused]] EnergyPlusData &state, Constant::CallIndicator const CallIndicator)
 {
     int NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
 
-    auto &CalcFacilitySizing(state.dataSize->CalcFacilitySizing);
-    auto &CalcFinalFacilitySizing(state.dataSize->CalcFinalFacilitySizing);
+    auto &CalcFacilitySizing = state.dataSize->CalcFacilitySizing;
+    auto &CalcFinalFacilitySizing = state.dataSize->CalcFinalFacilitySizing;
 
     //  test if allocated here
     if (!CalcFacilitySizing.allocated()) {
@@ -5350,10 +5316,10 @@ void UpdateFacilitySizing([[maybe_unused]] EnergyPlusData &state, DataGlobalCons
         CalcFinalFacilitySizing.HeatZoneTempSeq = 0.;
         CalcFinalFacilitySizing.HeatLoadSeq = 0.;
     }
-    if (CallIndicator == DataGlobalConstants::CallIndicator::BeginDay) {
+    if (CallIndicator == Constant::CallIndicator::BeginDay) {
         CalcFacilitySizing(state.dataSize->CurOverallSimDay).HeatDDNum = state.dataSize->CurOverallSimDay;
         CalcFacilitySizing(state.dataSize->CurOverallSimDay).CoolDDNum = state.dataSize->CurOverallSimDay;
-    } else if (CallIndicator == DataGlobalConstants::CallIndicator::DuringDay) {
+    } else if (CallIndicator == Constant::CallIndicator::DuringDay) {
         int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
         // save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
         Real64 sumCoolLoad = 0.;
@@ -5366,25 +5332,20 @@ void UpdateFacilitySizing([[maybe_unused]] EnergyPlusData &state, DataGlobalCons
         Real64 wghtdCoolDOASLatAdd = 0.;
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            Real64 curCoolLoad = state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolLoadSeq(TimeStepInDay);
+            auto const &thisCalcZoneSizing = state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum);
+            Real64 curCoolLoad = thisCalcZoneSizing.CoolLoadSeq(TimeStepInDay);
             if (curCoolLoad > 0.0) {
                 sumCoolLoad += curCoolLoad;
-                wghtdCoolZoneTemp +=
-                    state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq(TimeStepInDay) * curCoolLoad;
-                wghtdCoolHumRat +=
-                    state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneHumRatSeq(TimeStepInDay) * curCoolLoad;
-                wghtdCoolDOASHeatAdd +=
-                    state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DOASHeatAddSeq(TimeStepInDay) * curCoolLoad;
-                wghtdCoolDOASLatAdd +=
-                    state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DOASLatAddSeq(TimeStepInDay) * curCoolLoad;
+                wghtdCoolZoneTemp += thisCalcZoneSizing.CoolZoneTempSeq(TimeStepInDay) * curCoolLoad;
+                wghtdCoolHumRat += thisCalcZoneSizing.CoolZoneHumRatSeq(TimeStepInDay) * curCoolLoad;
+                wghtdCoolDOASHeatAdd += thisCalcZoneSizing.DOASHeatAddSeq(TimeStepInDay) * curCoolLoad;
+                wghtdCoolDOASLatAdd += thisCalcZoneSizing.DOASLatAddSeq(TimeStepInDay) * curCoolLoad;
             }
-            Real64 curHeatLoad = state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatLoadSeq(TimeStepInDay);
+            Real64 curHeatLoad = thisCalcZoneSizing.HeatLoadSeq(TimeStepInDay);
             if (curHeatLoad > 0.0) {
                 sumHeatLoad += curHeatLoad;
-                wghtdHeatZoneTemp +=
-                    state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepInDay) * curHeatLoad;
-                wghtdHeatHumRat +=
-                    state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneHumRatSeq(TimeStepInDay) * curHeatLoad;
+                wghtdHeatZoneTemp += thisCalcZoneSizing.HeatZoneTempSeq(TimeStepInDay) * curHeatLoad;
+                wghtdHeatHumRat += thisCalcZoneSizing.HeatZoneHumRatSeq(TimeStepInDay) * curHeatLoad;
             }
         }
 
@@ -5402,7 +5363,7 @@ void UpdateFacilitySizing([[maybe_unused]] EnergyPlusData &state, DataGlobalCons
             CalcFacilitySizing(state.dataSize->CurOverallSimDay).HeatOutHumRatSeq(TimeStepInDay) = wghtdHeatHumRat / sumHeatLoad;
         }
 
-    } else if (CallIndicator == DataGlobalConstants::CallIndicator::EndDay) {
+    } else if (CallIndicator == Constant::CallIndicator::EndDay) {
         for (int TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex) {
             if (CalcFacilitySizing(state.dataSize->CurOverallSimDay).CoolLoadSeq(TimeStepIndex) >
                 CalcFacilitySizing(state.dataSize->CurOverallSimDay).DesCoolLoad) {
@@ -5418,7 +5379,7 @@ void UpdateFacilitySizing([[maybe_unused]] EnergyPlusData &state, DataGlobalCons
             }
         }
 
-    } else if (CallIndicator == DataGlobalConstants::CallIndicator::EndZoneSizingCalc) {
+    } else if (CallIndicator == Constant::CallIndicator::EndZoneSizingCalc) {
         for (int DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
             if (CalcFacilitySizing(DDNum).DesCoolLoad > CalcFinalFacilitySizing.DesCoolLoad) {
                 CalcFinalFacilitySizing.DesCoolLoad = CalcFacilitySizing(DDNum).DesCoolLoad;
@@ -5453,13 +5414,13 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
     // M.J. Witte, July 2017
 
     for (int termUnitSizingIndex = 1; termUnitSizingIndex <= state.dataSize->NumAirTerminalUnits; ++termUnitSizingIndex) {
-        auto &thisTUFZSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
-        auto &thisTUSizing(state.dataSize->TermUnitSizing(termUnitSizingIndex));
+        auto &thisTUFZSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
+        auto &thisTUSizing = state.dataSize->TermUnitSizing(termUnitSizingIndex);
         int ctrlZoneNum = thisTUSizing.CtrlZoneNum;
-        auto const &thisFZSizing(state.dataSize->FinalZoneSizing(ctrlZoneNum));
+        auto const &thisFZSizing = state.dataSize->FinalZoneSizing(ctrlZoneNum);
 
         // Copy everything from FinalZoneSizing to TermUnitFinalZoneSizing
-        thisTUFZSizing = thisFZSizing;
+        thisTUFZSizing.copyFromZoneSizing(thisFZSizing);
         thisTUFZSizing.ADUName = thisTUSizing.ADUName;
 
         if (state.dataSize->NumAirTerminalSizingSpec > 0) {
@@ -5480,8 +5441,6 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
             }
             Real64 coolLoadRatio = thisTUSizing.SpecDesSensCoolingFrac;
             thisTUFZSizing.DesCoolLoad = thisFZSizing.DesCoolLoad * coolLoadRatio;
-            thisTUFZSizing.CoolMassFlow = thisFZSizing.CoolMassFlow * coolFlowRatio; // this field in TUFSizing doesn't appear to be used
-            thisTUFZSizing.CoolLoadSeq = thisFZSizing.CoolLoadSeq * coolLoadRatio;   // this field in TUFSizing doesn't appear to be used
             thisTUFZSizing.NonAirSysDesCoolLoad = thisFZSizing.NonAirSysDesCoolLoad * coolLoadRatio;
             thisTUFZSizing.NonAirSysDesCoolVolFlow = thisFZSizing.NonAirSysDesCoolVolFlow * coolFlowRatio;
             // Adjust DesCoolVolFlow, DesCoolMassFlow, and CoolFlowSeq with cooling frac, SAT ratio, and minOA frac adjustments
@@ -5515,8 +5474,6 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
             }
             Real64 heatLoadRatio = thisTUSizing.SpecDesSensHeatingFrac;
             thisTUFZSizing.DesHeatLoad = thisFZSizing.DesHeatLoad * heatLoadRatio;
-            thisTUFZSizing.HeatMassFlow = thisFZSizing.HeatMassFlow * heatFlowRatio; // this field in TUFSizing doesn't appear to be used
-            thisTUFZSizing.HeatLoadSeq = thisFZSizing.HeatLoadSeq * heatLoadRatio;   // this field in TUFSizing doesn't appear to be used
             thisTUFZSizing.NonAirSysDesHeatLoad = thisFZSizing.NonAirSysDesHeatLoad * heatLoadRatio;
             thisTUFZSizing.NonAirSysDesHeatVolFlow = thisFZSizing.NonAirSysDesHeatVolFlow * heatFlowRatio;
             // Adjust DesHeatVolFlow, DesHeatMassFlow, and HeatFlowSeq with Heating frac, SAT ratio, and minOA frac adjustments
@@ -5553,6 +5510,36 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
                 thisTUFZSizing.DesHeatOAFlowFrac = 0.0;
             }
         }
+
+        // begin std 229 air terminal new table
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchAirTermZoneName,
+                                                 thisTUFZSizing.ADUName,
+                                                 thisTUFZSizing.ZoneNum > 0 ? state.dataHeatBal->Zone(thisTUFZSizing.ZoneNum).Name : "N/A");
+
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchAirTermMinFlow,
+                                                 thisTUFZSizing.ADUName,
+                                                 thisTUFZSizing.DesCoolVolFlowMin); // ? there is another name that looks similar (see the next line)
+
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchAirTermMinOutdoorFlow, thisTUFZSizing.ADUName, thisTUFZSizing.MinOA);
+
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchAirTermSupCoolingSP, thisTUFZSizing.ADUName, thisTUFZSizing.CoolDesTemp);
+
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchAirTermSupHeatingSP, thisTUFZSizing.ADUName, thisTUFZSizing.HeatDesTemp);
+
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchAirTermHeatingCap,
+                                                 thisTUFZSizing.ADUName,
+                                                 thisTUFZSizing.DesHeatLoad); // ? DesHeatLoad ==? Heating capacity?
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchAirTermCoolingCap,
+                                                 thisTUFZSizing.ADUName,
+                                                 thisTUFZSizing.DesCoolLoad); // ? DesCoolLoad ==? Cooling capacity?
+        // end std 229 air terminal new table
     }
 }
 } // namespace EnergyPlus::SizingManager

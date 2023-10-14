@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 
 int numWarnings = 0;
 int oneTimeHalfway = 0;
+int progressValue = 0;
 
 void BeginNewEnvironmentHandler(EnergyPlusState state)
 {
@@ -136,6 +137,7 @@ void newEnvrnHandler(EnergyPlusState state)
 
 void progressHandler(int const progress)
 {
+    progressValue = progress;
     if (oneTimeHalfway == 0 && progress > 50) {
         printf("Were halfway there!\n");
         oneTimeHalfway = 1;
@@ -185,6 +187,9 @@ int main(int argc, const char *argv[])
     if (numWarnings > 0) {
         printf("There were %d warnings!\n", numWarnings);
         numWarnings = 0;
+    }
+    if (progressValue != 100) {
+        return 1;
     }
     oneTimeHalfway = 0;
     // reset and run again

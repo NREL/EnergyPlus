@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -307,6 +307,7 @@ namespace EvaporativeCoolers {
         int UnitLoadControlLimitsErrorIndex;  // root solver errors, art load ratio limits exceeded.
         int ZonePtr;                          // pointer to a zone served by an evaportive cooler unit
         int HVACSizingIndex;                  // index of a HVACSizing object for an evaportive cooler unit
+        Real64 ShutOffRelativeHumidity;       // Zone relative humidity above which the evap cooler is shut off.
         bool MySize;                          // sizing logic flag
         bool MyEnvrn;                         // sim environmental logic flag
         bool MyFan;                           // fan sizing logic flag
@@ -326,7 +327,7 @@ namespace EvaporativeCoolers {
               UnitSensibleCoolingEnergy(0.0), UnitLatentHeatingRate(0.0), UnitLatentHeatingEnergy(0.0), UnitLatentCoolingRate(0.0),
               UnitLatentCoolingEnergy(0.0), UnitFanSpeedRatio(0.0), UnitPartLoadRatio(0.0), UnitVSControlMaxIterErrorIndex(0),
               UnitVSControlLimitsErrorIndex(0), UnitLoadControlMaxIterErrorIndex(0), UnitLoadControlLimitsErrorIndex(0), ZonePtr(0),
-              HVACSizingIndex(0), MySize(true), MyEnvrn(true), MyFan(true), MyZoneEq(true)
+              HVACSizingIndex(0), ShutOffRelativeHumidity(100.0), MySize(true), MyEnvrn(true), MyFan(true), MyZoneEq(true)
         {
         }
     };
@@ -379,8 +380,6 @@ namespace EvaporativeCoolers {
                                              Real64 EWBTSec,
                                              Real64 EHumRatSec);
 
-    Real64 CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state, Real64 AirMassFlowSec, std::array<Real64, 6> const &Par);
-
     Real64 IndEvapCoolerPower(EnergyPlusData &state,
                               int EvapCoolIndex,        // Unit index
                               OperatingMode DryWetMode, // dry or wet operating mode of evaporator cooler
@@ -431,18 +430,10 @@ namespace EvaporativeCoolers {
                                    Real64 ZoneCoolingLoad // target cooling load
     );
 
-    Real64 ZoneEvapUnitLoadResidual(EnergyPlusData &state,
-                                    Real64 PartLoadRatio,            // zone evap unit part load ratiod
-                                    std::array<Real64, 2> const &Par // parameters
-    );
-
     void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
                                      int UnitNum,           // unit number
-                                     int ZoneNum,           // number of zone being served
                                      Real64 ZoneCoolingLoad // target cooling load
     );
-
-    Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 FanSpeedRatio, std::array<Real64, 5> const &Par);
 
     void ReportZoneEvaporativeCoolerUnit(EnergyPlusData &state, int UnitNum); // unit number
 

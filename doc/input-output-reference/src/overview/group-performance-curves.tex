@@ -1,6 +1,6 @@
 \section{Group - Performance Curves}\label{group---performance-curves}
 
-This group of objects primarily consists of polynomial curves that are used to characterize the performance of HVAC equipment. Several other non-polynomial curves are also included to characterize the performance of pumps and fans. All of the curves are input, stored, and evaluated entirely within the CurveManager module. The curves are usually derived from fits or regressions to data covering a limited range. Results for independent variable values outside this range are likely to be invalid, so curve input always contains a range of validity (maximum and minimum permitted values) for each independent variable and can optionally have limits on the curve ouput. No error or warning message is issued if an independent variable is outside the range. Instead, the curve manager uses the minimum value if an independent variable is less than the minimum, and the maximum if a variable exceeds the maximum. Similarly, no error or warning message is issued if the curve output is outside the range of the optional minimum and maximum curve output limits. Instead, the curve manager uses the minimum and maximum curve limits to cap the output of the performance curve.
+This group of objects primarily consists of polynomial curves that are used to characterize the performance of HVAC equipment. Several other non-polynomial curves are also included to characterize the performance of pumps and fans. All of the curves are input, stored, and evaluated entirely within the Curve module. The curves are usually derived from fits or regressions to data covering a limited range. Results for independent variable values outside this range are likely to be invalid, so curve input always contains a range of validity (maximum and minimum permitted values) for each independent variable and can optionally have limits on the curve output. No error or warning message is issued if an independent variable is outside the range. Instead, the curve manager uses the minimum value if an independent variable is less than the minimum, and the maximum if a variable exceeds the maximum. Similarly, no error or warning message is issued if the curve output is outside the range of the optional minimum and maximum curve output limits. Instead, the curve manager uses the minimum and maximum curve limits to cap the output of the performance curve.
 
 Curve names must be unique across all curve types.
 
@@ -93,7 +93,7 @@ The following is another example, as might be applied in the \hyperref[fancompon
 Curve:Linear,
   DiagnosticSPR, ! Curve Name f = C1 + C2\*x
   248.84, ! Coefficient1 Constant [Pa]
-  0., ! Coefficent 2 Press/Flow [Pa-s/m3]
+  0., ! Coefficient 2 Press/Flow [Pa-s/m3]
   0., ! Minimum Value of x (Qfan) [m3/s]
   100., ! Maximum Value of x (Qfan) [m3/s]
   62.5, ! Minimum Curve Output [Pa]
@@ -2374,7 +2374,7 @@ The optional field is provided for future purposes so that the IDF Editor could 
 
 \paragraph{Field: Output Unit Type}\label{field-output-unit-type-16}
 
-The optional field is provided for future purposes so that the IDF Editor could display the appropriate SI or IP units for the Minimum and Maximum Curve Ouput. Currently, only Dimensionless option is provided so that no unit conversion is used for this curve.
+The optional field is provided for future purposes so that the IDF Editor could display the appropriate SI or IP units for the Minimum and Maximum Curve output. Currently, only Dimensionless option is provided so that no unit conversion is used for this curve.
 
 An example input of the Curve:DoubleExponentialDecay input is:
 
@@ -2395,7 +2395,7 @@ Curve:DoubleExponentialDecay,
 
 \paragraph{Performance Curve Output Value}\label{performance-curve-output-value}
 
-The current value of the performance curve. This value is averaged over the time step being reported. Inactive or unused performance curves will show a value of -999 (e.g., equipment is off, a specific performance curve is not required for this aspect of the equipment model at this time step, etc.). This value means that the performance curve was not called during the simulation and, therefore, not evaluated. This inactive state value is only set at the beginning of each environment. When averaging over long periods of time, this inactive state value may skew results. In this case, use a detaled reporting frequency (ref. Output:Variable object) to view results at each HVAC time step.
+The current value of the performance curve. This value is averaged over the time step being reported. Inactive or unused performance curves will show a value of -999 (e.g., equipment is off, a specific performance curve is not required for this aspect of the equipment model at this time step, etc.). This value means that the performance curve was not called during the simulation and, therefore, not evaluated. This inactive state value is only set at the beginning of each environment. When averaging over long periods of time, this inactive state value may skew results. In this case, use a detailed reporting frequency (ref. Output:Variable object) to view results at each HVAC time step.
 
 \paragraph{Performance Curve Input Variable 1(-N) Value {[]}}\label{performance-curve-input-variable-1-n-value}
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -135,7 +135,7 @@ namespace HeatPumpWaterToWaterHEATING {
 
         virtual ~GshpPeHeatingSpecs() = default;
 
-        static PlantComponent *factory(EnergyPlusData &state, const std::string &objectName);
+        static GshpPeHeatingSpecs *factory(EnergyPlusData &state, const std::string &objectName);
 
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,
@@ -170,8 +170,6 @@ struct HeatPumpWaterToWaterHEATINGData : BaseGlobalStruct
     int NumGSHPs = 0;
     bool GetWWHPHeatingInput = true;
     Array1D<HeatPumpWaterToWaterHEATING::GshpPeHeatingSpecs> GSHP;
-    Real64 CurrentSimTime = 0.0;
-    Real64 PrevSimTime = 0.0;
 
     void clear_state() override
     {
@@ -179,8 +177,6 @@ struct HeatPumpWaterToWaterHEATINGData : BaseGlobalStruct
         this->NumGSHPs = 0;
         this->GetWWHPHeatingInput = true;
         this->GSHP.deallocate();
-        this->CurrentSimTime = 0.0;
-        this->PrevSimTime = 0.0;
     }
 };
 

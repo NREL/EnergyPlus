@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -273,8 +273,15 @@ namespace VentilatedSlab {
         Real64 ZoneInletTemp;             // supply air temp
         std::string AvailManagerListName; // Name of an availability manager list object
         int AvailStatus;
-        int HVACSizingIndex; // index of a HVACSizing object for a ventilator slab
-        bool FirstPass;      // detects first time through for resetting sizing data
+        int HVACSizingIndex;                 // index of a HVACSizing object for a ventilator slab
+        bool FirstPass;                      // detects first time through for resetting sizing data
+        Real64 ZeroVentSlabSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+        Array1D<Real64> QRadSysSrcAvg;       // Average source over the time step for a particular radiant surfaceD
+        // Record keeping variables used to calculate QRadSysSrcAvg locally
+        Array1D<Real64> LastQRadSysSrc; // Need to keep the last value in case we are still iterating
+        Real64 LastSysTimeElapsed;      // Need to keep the last value in case we are still iterating
+        Real64 LastTimeStepSys;         // Need to keep the last value in case we are still iterating
+
         // Default Constructor
         VentilatedSlabData()
             : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), CoreDiameter(0.0), CoreLength(0.0), CoreNumbers(0.0),
@@ -296,7 +303,8 @@ namespace VentilatedSlab {
               RadHeatingEnergy(0.0), RadCoolingPower(0.0), RadCoolingEnergy(0.0), HeatCoilPower(0.0), HeatCoilEnergy(0.0), TotCoolCoilPower(0.0),
               TotCoolCoilEnergy(0.0), SensCoolCoilPower(0.0), SensCoolCoilEnergy(0.0), LateCoolCoilPower(0.0), LateCoolCoilEnergy(0.0),
               ElecFanPower(0.0), ElecFanEnergy(0.0), AirMassFlowRate(0.0), AirVolFlow(0.0), SlabInTemp(0.0), SlabOutTemp(0.0), ReturnAirTemp(0.0),
-              FanOutletTemp(0.0), ZoneInletTemp(0.0), AvailStatus(0), HVACSizingIndex(0), FirstPass(true)
+              FanOutletTemp(0.0), ZoneInletTemp(0.0), AvailStatus(0), HVACSizingIndex(0), FirstPass(true), ZeroVentSlabSourceSumHATsurf(0.0),
+              QRadSysSrcAvg(0.0), LastQRadSysSrc(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0)
         {
         }
     };
@@ -373,8 +381,6 @@ namespace VentilatedSlab {
                                     Real64 const CoreDiameter, // Inside diameter of the tubing in the radiant system, in m
                                     Real64 const CoreNumbers);
 
-    Real64 SumHATsurf(EnergyPlusData &state, int ZoneNum); // Zone number
-
     void ReportVentilatedSlab(EnergyPlusData &state, int const Item); // Index for the ventilated slab under consideration within the derived types
 
     //*****************************************************************************************
@@ -387,19 +393,12 @@ struct VentilatedSlabData : BaseGlobalStruct
     int OperatingMode = 0; // Used to keep track of whether system is in heating or cooling mode
 
     // MODULE VARIABLE DECLARATIONS:
-    bool HCoilOn = false;                 // TRUE if the heating coil (gas or electric especially) should be running
-    int NumOfVentSlabs = 0;               // Number of ventilated slab in the input file
-    Real64 OAMassFlowRate = 0.0;          // Outside air mass flow rate for the ventilated slab
-    Array1D_double QRadSysSrcAvg;         // Average source over the time step for a particular radiant surfaceD
-    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
-    int MaxCloNumOfSurfaces = 0;          // Used to set allocate size in CalcClo routine
-    Real64 QZnReq = 0.0;                  // heating or cooling needed by system [watts]
+    bool HCoilOn = false;        // TRUE if the heating coil (gas or electric especially) should be running
+    int NumOfVentSlabs = 0;      // Number of ventilated slab in the input file
+    Real64 OAMassFlowRate = 0.0; // Outside air mass flow rate for the ventilated slab
+    int MaxCloNumOfSurfaces = 0; // Used to set allocate size in CalcClo routine
+    Real64 QZnReq = 0.0;         // heating or cooling needed by system [watts]
 
-    // Record keeping variables used to calculate QRadSysSrcAvg locally
-
-    Array1D_double LastQRadSysSrc;      // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     Array1D_bool CheckEquipName;
 
     // Autosizing variables
@@ -431,11 +430,6 @@ struct VentilatedSlabData : BaseGlobalStruct
         this->OAMassFlowRate = 0.0;
         this->MaxCloNumOfSurfaces = 0;
         this->QZnReq = 0.0;
-        this->QRadSysSrcAvg.deallocate();
-        this->ZeroSourceSumHATsurf.deallocate();
-        this->LastQRadSysSrc.deallocate();
-        this->LastSysTimeElapsed.deallocate();
-        this->LastTimeStepSys.deallocate();
         this->CheckEquipName.deallocate();
         this->MySizeFlag.deallocate();
         this->VentSlab.deallocate();

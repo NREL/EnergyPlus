@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,7 +77,6 @@ Real64 CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _o
         if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
             this->autoSizedValue = _originalValue;
         } else {
-            Real64 OutAirFrac = 1.0;
             if (this->curOASysNum > 0) { // coil is in OA stream
                 if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                     this->autoSizedValue = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOAHumRat;
@@ -90,12 +89,11 @@ Real64 CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _o
                 if (this->primaryAirSystem(this->curSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).MixHumRatAtCoolPeak;
                 } else { // there is precooling of the OA stream
+                    Real64 OutAirFrac = 1.0;
                     if (this->dataFlowUsedForSizing > 0.0) {
                         OutAirFrac = this->finalSysSizing(this->curSysNum).DesOutAirVolFlow / this->dataFlowUsedForSizing;
-                    } else {
-                        OutAirFrac = 1.0;
+                        OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                     }
-                    OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                     this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).PrecoolHumRat +
                                            (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).RetHumRatAtCoolPeak;
                 }

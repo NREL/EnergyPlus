@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,6 +80,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::SwimmingPool {
 
@@ -234,10 +235,10 @@ void GetSwimmingPool(EnergyPlusData &state)
 
         state.dataSwimmingPools->Pool(Item).AvgDepth = Numbers(1);
         if (state.dataSwimmingPools->Pool(Item).AvgDepth < MinDepth) {
-            ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has an average depth that is too small.");
+            ShowWarningError(state, format("{}{}=\"{} has an average depth that is too small.", RoutineName, CurrentModuleObject, Alphas(1)));
             ShowContinueError(state, "The pool average depth has been reset to the minimum allowed depth.");
         } else if (state.dataSwimmingPools->Pool(Item).AvgDepth > MaxDepth) {
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has an average depth that is too large.");
+            ShowSevereError(state, format("{}{}=\"{} has an average depth that is too large.", RoutineName, CurrentModuleObject, Alphas(1)));
             ShowContinueError(state, "The pool depth must be less than the maximum average depth of 10 meters.");
             ErrorsFound = true;
         }
@@ -245,78 +246,74 @@ void GetSwimmingPool(EnergyPlusData &state)
         state.dataSwimmingPools->Pool(Item).ActivityFactorSchedName = Alphas(3);
         state.dataSwimmingPools->Pool(Item).ActivityFactorSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(3));
         if ((state.dataSwimmingPools->Pool(Item).ActivityFactorSchedPtr == 0) && (!lAlphaBlanks(3))) {
-            ShowSevereError(state, cAlphaFields(3) + " not found: " + Alphas(3));
-            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+            ShowSevereError(state, format("{} not found: {}", cAlphaFields(3), Alphas(3)));
+            ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
             ErrorsFound = true;
         }
 
         state.dataSwimmingPools->Pool(Item).MakeupWaterSupplySchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(4));
         if ((state.dataSwimmingPools->Pool(Item).MakeupWaterSupplySchedPtr == 0) && (!lAlphaBlanks(4))) {
-            ShowSevereError(state, cAlphaFields(4) + " not found: " + Alphas(4));
-            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+            ShowSevereError(state, format("{} not found: {}", cAlphaFields(4), Alphas(4)));
+            ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
             ErrorsFound = true;
         }
 
         state.dataSwimmingPools->Pool(Item).CoverSchedName = Alphas(5);
         state.dataSwimmingPools->Pool(Item).CoverSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(5));
         if ((state.dataSwimmingPools->Pool(Item).CoverSchedPtr == 0) && (!lAlphaBlanks(5))) {
-            ShowSevereError(state, cAlphaFields(5) + " not found: " + Alphas(5));
-            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+            ShowSevereError(state, format("{} not found: {}", cAlphaFields(5), Alphas(5)));
+            ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
             ErrorsFound = true;
         }
 
         state.dataSwimmingPools->Pool(Item).CoverEvapFactor = Numbers(2);
         if (state.dataSwimmingPools->Pool(Item).CoverEvapFactor < MinCoverFactor) {
-            ShowWarningError(state,
-                             std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has an evaporation cover factor less than zero.");
+            ShowWarningError(state, format("{}{}=\"{} has an evaporation cover factor less than zero.", RoutineName, CurrentModuleObject, Alphas(1)));
             ShowContinueError(state, "The evaporation cover factor has been reset to zero.");
             state.dataSwimmingPools->Pool(Item).CoverEvapFactor = MinCoverFactor;
         } else if (state.dataSwimmingPools->Pool(Item).CoverEvapFactor > MaxCoverFactor) {
-            ShowWarningError(
-                state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has an evaporation cover factor greater than one.");
+            ShowWarningError(state,
+                             format("{}{}=\"{} has an evaporation cover factor greater than one.", RoutineName, CurrentModuleObject, Alphas(1)));
             ShowContinueError(state, "The evaporation cover factor has been reset to one.");
             state.dataSwimmingPools->Pool(Item).CoverEvapFactor = MaxCoverFactor;
         }
 
         state.dataSwimmingPools->Pool(Item).CoverConvFactor = Numbers(3);
         if (state.dataSwimmingPools->Pool(Item).CoverConvFactor < MinCoverFactor) {
-            ShowWarningError(state,
-                             std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has a convection cover factor less than zero.");
+            ShowWarningError(state, format("{}{}=\"{} has a convection cover factor less than zero.", RoutineName, CurrentModuleObject, Alphas(1)));
             ShowContinueError(state, "The convection cover factor has been reset to zero.");
             state.dataSwimmingPools->Pool(Item).CoverConvFactor = MinCoverFactor;
         } else if (state.dataSwimmingPools->Pool(Item).CoverConvFactor > MaxCoverFactor) {
-            ShowWarningError(state,
-                             std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has a convection cover factor greater than one.");
+            ShowWarningError(state, format("{}{}=\"{} has a convection cover factor greater than one.", RoutineName, CurrentModuleObject, Alphas(1)));
             ShowContinueError(state, "The convection cover factor has been reset to one.");
             state.dataSwimmingPools->Pool(Item).CoverConvFactor = MaxCoverFactor;
         }
 
         state.dataSwimmingPools->Pool(Item).CoverSWRadFactor = Numbers(4);
         if (state.dataSwimmingPools->Pool(Item).CoverSWRadFactor < MinCoverFactor) {
-            ShowWarningError(state,
-                             std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
-                                 " has a short-wavelength radiation cover factor less than zero.");
+            ShowWarningError(
+                state,
+                format("{}{}=\"{} has a short-wavelength radiation cover factor less than zero.", RoutineName, CurrentModuleObject, Alphas(1)));
             ShowContinueError(state, "The short-wavelength radiation cover factor has been reset to zero.");
             state.dataSwimmingPools->Pool(Item).CoverSWRadFactor = MinCoverFactor;
         } else if (state.dataSwimmingPools->Pool(Item).CoverSWRadFactor > MaxCoverFactor) {
-            ShowWarningError(state,
-                             std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
-                                 " has a short-wavelength radiation cover factor greater than one.");
+            ShowWarningError(
+                state,
+                format("{}{}=\"{} has a short-wavelength radiation cover factor greater than one.", RoutineName, CurrentModuleObject, Alphas(1)));
             ShowContinueError(state, "The short-wavelength radiation cover factor has been reset to one.");
             state.dataSwimmingPools->Pool(Item).CoverSWRadFactor = MaxCoverFactor;
         }
 
         state.dataSwimmingPools->Pool(Item).CoverLWRadFactor = Numbers(5);
         if (state.dataSwimmingPools->Pool(Item).CoverLWRadFactor < MinCoverFactor) {
-            ShowWarningError(state,
-                             std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
-                                 " has a long-wavelength radiation cover factor less than zero.");
+            ShowWarningError(
+                state, format("{}{}=\"{} has a long-wavelength radiation cover factor less than zero.", RoutineName, CurrentModuleObject, Alphas(1)));
             ShowContinueError(state, "The long-wavelength radiation cover factor has been reset to zero.");
             state.dataSwimmingPools->Pool(Item).CoverLWRadFactor = MinCoverFactor;
         } else if (state.dataSwimmingPools->Pool(Item).CoverLWRadFactor > MaxCoverFactor) {
-            ShowWarningError(state,
-                             std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
-                                 " has a long-wavelength radiation cover factor greater than one.");
+            ShowWarningError(
+                state,
+                format("{}{}=\"{} has a long-wavelength radiation cover factor greater than one.", RoutineName, CurrentModuleObject, Alphas(1)));
             ShowContinueError(state, "The long-wavelength radiation cover factor has been reset to one.");
             state.dataSwimmingPools->Pool(Item).CoverLWRadFactor = MaxCoverFactor;
         }
@@ -349,29 +346,29 @@ void GetSwimmingPool(EnergyPlusData &state)
         state.dataSwimmingPools->Pool(Item).WaterVolFlowMax = Numbers(6);
         state.dataSwimmingPools->Pool(Item).MiscPowerFactor = Numbers(7);
         if (state.dataSwimmingPools->Pool(Item).MiscPowerFactor < MinPowerFactor) {
-            ShowWarningError(
-                state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has a miscellaneous power factor less than zero.");
+            ShowWarningError(state,
+                             format("{}{}=\"{} has a miscellaneous power factor less than zero.", RoutineName, CurrentModuleObject, Alphas(1)));
             ShowContinueError(state, "The miscellaneous power factor has been reset to zero.");
             state.dataSwimmingPools->Pool(Item).MiscPowerFactor = MinPowerFactor;
         }
 
         state.dataSwimmingPools->Pool(Item).SetPtTempSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(8));
         if ((state.dataSwimmingPools->Pool(Item).SetPtTempSchedPtr == 0) && (!lAlphaBlanks(8))) {
-            ShowSevereError(state, cAlphaFields(8) + " not found: " + Alphas(8));
-            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+            ShowSevereError(state, format("{} not found: {}", cAlphaFields(8), Alphas(8)));
+            ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
             ErrorsFound = true;
         }
         if (lAlphaBlanks(8)) {
-            ShowSevereError(state, cAlphaFields(8) + " left blank.  This is NOT allowed as there must be a pool water setpoint temperature.");
-            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+            ShowSevereError(state,
+                            format("{} left blank.  This is NOT allowed as there must be a pool water setpoint temperature.", cAlphaFields(8)));
+            ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
             ErrorsFound = true;
         }
 
         state.dataSwimmingPools->Pool(Item).MaxNumOfPeople = Numbers(8);
         if (state.dataSwimmingPools->Pool(Item).MaxNumOfPeople < 0.0) {
-            ShowWarningError(state,
-                             std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
-                                 " was entered with negative people.  This is not allowed.");
+            ShowWarningError(
+                state, format("{}{}=\"{} was entered with negative people.  This is not allowed.", RoutineName, CurrentModuleObject, Alphas(1)));
             ShowContinueError(state, "The number of people has been reset to zero.");
             state.dataSwimmingPools->Pool(Item).MaxNumOfPeople = 0.0;
         }
@@ -379,16 +376,16 @@ void GetSwimmingPool(EnergyPlusData &state)
         state.dataSwimmingPools->Pool(Item).PeopleSchedName = Alphas(9);
         state.dataSwimmingPools->Pool(Item).PeopleSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(9));
         if ((state.dataSwimmingPools->Pool(Item).PeopleSchedPtr == 0) && (!lAlphaBlanks(9))) {
-            ShowSevereError(state, cAlphaFields(9) + " not found: " + Alphas(9));
-            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+            ShowSevereError(state, format("{} not found: {}", cAlphaFields(9), Alphas(9)));
+            ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
             ErrorsFound = true;
         }
 
         state.dataSwimmingPools->Pool(Item).PeopleHeatGainSchedName = Alphas(10);
         state.dataSwimmingPools->Pool(Item).PeopleHeatGainSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(10));
         if ((state.dataSwimmingPools->Pool(Item).PeopleHeatGainSchedPtr == 0) && (!lAlphaBlanks(10))) {
-            ShowSevereError(state, cAlphaFields(10) + " not found: " + Alphas(10));
-            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+            ShowSevereError(state, format("{} not found: {}", cAlphaFields(10), Alphas(10)));
+            ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
             ErrorsFound = true;
         }
     }
@@ -401,7 +398,7 @@ void GetSwimmingPool(EnergyPlusData &state)
     lNumericBlanks.deallocate();
 
     if (ErrorsFound) {
-        ShowFatalError(state, std::string{RoutineName} + "Errors found in swimming pool input. Preceding conditions cause termination.");
+        ShowFatalError(state, format("{}Errors found in swimming pool input. Preceding conditions cause termination.", RoutineName));
     }
 }
 
@@ -413,39 +410,38 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
     static constexpr std::string_view CurrentModuleObject("SwimmingPool:Indoor");
 
     if (this->SurfacePtr <= 0) {
-        ShowSevereError(state, std::string{RoutineName} + "Invalid " + std::string{cAlphaField2} + " = " + std::string{Alpha2});
-        ShowContinueError(state, "Occurs in " + std::string{CurrentModuleObject} + " = " + std::string{Alpha1});
+        ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaField2, Alpha2));
+        ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alpha1));
         ErrorsFound = true;
     } else if (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(this->SurfacePtr)) {
-        ShowSevereError(state, std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + std::string{Alpha1} + "\", Invalid Surface");
-        ShowContinueError(
-            state, std::string{cAlphaField2} + "=\"" + std::string{Alpha2} + "\" has been used in another radiant system, ventilated slab, or pool.");
+        ShowSevereError(state, format("{}{}=\"{}\", Invalid Surface", RoutineName, CurrentModuleObject, Alpha1));
+        ShowContinueError(state, format("{}=\"{}\" has been used in another radiant system, ventilated slab, or pool.", cAlphaField2, Alpha2));
         ShowContinueError(state,
                           "A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these.");
         ErrorsFound = true;
         // Something present that is not allowed for a swimming pool (non-CTF algorithm, movable insulation, or radiant source/sink
     } else if (state.dataSurface->Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF) {
         ShowSevereError(state,
-                        state.dataSurface->Surface(this->SurfacePtr).Name +
-                            " is a pool and is attempting to use a non-CTF solution algorithm.  This is "
-                            "not allowed.  Use the CTF solution algorithm for this surface.");
+                        format("{} is a pool and is attempting to use a non-CTF solution algorithm.  This is not allowed.  Use the CTF solution "
+                               "algorithm for this surface.",
+                               state.dataSurface->Surface(this->SurfacePtr).Name));
         ErrorsFound = true;
 
     } else if (state.dataSurface->Surface(this->SurfacePtr).Class == DataSurfaces::SurfaceClass::Window) {
         ShowSevereError(state,
-                        state.dataSurface->Surface(this->SurfacePtr).Name +
-                            " is a pool and is defined as a window.  This is not allowed.  A pool must be a floor that is NOT a window.");
+                        format("{} is a pool and is defined as a window.  This is not allowed.  A pool must be a floor that is NOT a window.",
+                               state.dataSurface->Surface(this->SurfacePtr).Name));
         ErrorsFound = true;
     } else if (state.dataSurface->SurfMaterialMovInsulInt(this->SurfacePtr) > 0) {
         ShowSevereError(state,
-                        state.dataSurface->Surface(this->SurfacePtr).Name +
-                            " is a pool and has movable insulation.  This is not allowed.  Remove the movable insulation for this surface.");
+                        format("{} is a pool and has movable insulation.  This is not allowed.  Remove the movable insulation for this surface.",
+                               state.dataSurface->Surface(this->SurfacePtr).Name));
         ErrorsFound = true;
     } else if (state.dataConstruction->Construct(state.dataSurface->Surface(this->SurfacePtr).Construction).SourceSinkPresent) {
         ShowSevereError(
             state,
-            state.dataSurface->Surface(this->SurfacePtr).Name +
-                " is a pool and uses a construction with a source/sink.  This is not allowed.  Use a standard construction for this surface.");
+            format("{} is a pool and uses a construction with a source/sink.  This is not allowed.  Use a standard construction for this surface.",
+                   state.dataSurface->Surface(this->SurfacePtr).Name));
         ErrorsFound = true;
     } else { // ( Pool( Item ).SurfacePtr > 0 )
         state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(this->SurfacePtr) = true;
@@ -453,9 +449,7 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
         this->ZonePtr = state.dataSurface->Surface(this->SurfacePtr).Zone;
         // Check to make sure pool surface is a floor
         if (state.dataSurface->Surface(this->SurfacePtr).Class != DataSurfaces::SurfaceClass::Floor) {
-            ShowSevereError(state,
-                            std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + std::string{Alpha1} +
-                                " contains a surface name that is NOT a floor.");
+            ShowSevereError(state, format("{}{}=\"{} contains a surface name that is NOT a floor.", RoutineName, CurrentModuleObject, Alpha1));
             ShowContinueError(
                 state, "A swimming pool must be associated with a surface that is a FLOOR.  Association with other surface types is not permitted.");
             ErrorsFound = true;
@@ -484,27 +478,13 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
 
     if (this->MyOneTimeFlag) {
         this->setupOutputVars(state); // Set up the output variables once here
-        this->ZeroSourceSumHATsurf.allocate(state.dataGlobal->NumOfZones);
-        this->ZeroSourceSumHATsurf = 0.0;
-        this->QPoolSrcAvg.allocate(state.dataSurface->TotSurfaces);
-        this->QPoolSrcAvg = 0.0;
-        this->HeatTransCoefsAvg.allocate(state.dataSurface->TotSurfaces);
-        this->HeatTransCoefsAvg = 0.0;
-        this->LastQPoolSrc.allocate(state.dataSurface->TotSurfaces);
-        this->LastQPoolSrc = 0.0;
-        this->LastHeatTransCoefs.allocate(state.dataSurface->TotSurfaces);
-        this->LastHeatTransCoefs = 0.0;
-        this->LastSysTimeElapsed.allocate(state.dataSurface->TotSurfaces);
-        this->LastSysTimeElapsed = 0.0;
-        this->LastTimeStepSys.allocate(state.dataSurface->TotSurfaces);
-        this->LastTimeStepSys = 0.0;
         this->MyOneTimeFlag = false;
     }
 
     SwimmingPoolData::initSwimmingPoolPlantLoopIndex(state);
 
     if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlagGeneral) {
-        this->ZeroSourceSumHATsurf = 0.0;
+        this->ZeroPoolSourceSumHATsurf = 0.0;
         this->QPoolSrcAvg = 0.0;
         this->HeatTransCoefsAvg = 0.0;
         this->LastQPoolSrc = 0.0;
@@ -535,13 +515,13 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
     if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
 
         int ZoneNum = this->ZonePtr;
-        this->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum); // Set this to figure what part of the load the radiant system meets
-        int SurfNum = this->SurfacePtr;
-        this->QPoolSrcAvg(SurfNum) = 0.0;        // Initialize this variable to zero (pool parameters "off")
-        this->HeatTransCoefsAvg(SurfNum) = 0.0;  // Initialize this variable to zero (pool parameters "off")
-        this->LastQPoolSrc(SurfNum) = 0.0;       // At the start of a time step, reset to zero so average calculation can begin again
-        this->LastSysTimeElapsed(SurfNum) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
-        this->LastTimeStepSys(SurfNum) = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
+        this->ZeroPoolSourceSumHATsurf =
+            state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure what the impact of the swimming pool on all zone surfaces
+        this->QPoolSrcAvg = 0.0;                                // Initialize this variable to zero (pool parameters "off")
+        this->HeatTransCoefsAvg = 0.0;                          // Initialize this variable to zero (pool parameters "off")
+        this->LastQPoolSrc = 0.0;                               // At the start of a time step, reset to zero so average calculation can begin again
+        this->LastSysTimeElapsed = 0.0;                         // At the start of a time step, reset to zero so average calculation can begin again
+        this->LastTimeStepSys = 0.0;                            // At the start of a time step, reset to zero so average calculation can begin again
     }
 
     // initialize the flow rate for the component on the plant side (this follows standard procedure for other components like low temperature
@@ -556,15 +536,19 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
         if (this->CurActivityFactor < MinActivityFactor) {
             this->CurActivityFactor = MinActivityFactor;
             ShowWarningError(state,
-                             std::string{RoutineName} + ": Swimming Pool =\"" + this->Name + " Activity Factor Schedule =\"" +
-                                 this->ActivityFactorSchedName + " has a negative value.  This is not allowed.");
+                             format("{}: Swimming Pool =\"{} Activity Factor Schedule =\"{} has a negative value.  This is not allowed.",
+                                    RoutineName,
+                                    this->Name,
+                                    this->ActivityFactorSchedName));
             ShowContinueError(state, "The activity factor has been reset to zero.");
         }
         if (this->CurActivityFactor > MaxActivityFactor) {
             this->CurActivityFactor = 1.0;
             ShowWarningError(state,
-                             std::string{RoutineName} + ": Swimming Pool =\"" + this->Name + " Activity Factor Schedule =\"" +
-                                 this->ActivityFactorSchedName + " has a value larger than 10.  This is not allowed.");
+                             format("{}: Swimming Pool =\"{} Activity Factor Schedule =\"{} has a value larger than 10.  This is not allowed.",
+                                    RoutineName,
+                                    this->Name,
+                                    this->ActivityFactorSchedName));
             ShowContinueError(state, "The activity factor has been reset to unity.");
         }
     } else {
@@ -585,16 +569,20 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
     if (this->PeopleHeatGainSchedPtr > 0) {
         if (HeatGainPerPerson < 0.0) {
             ShowWarningError(state,
-                             std::string{RoutineName} + ": Swimming Pool =\"" + this->Name + " Heat Gain Schedule =\"" +
-                                 this->PeopleHeatGainSchedName + " has a negative value.  This is not allowed.");
+                             format("{}: Swimming Pool =\"{} Heat Gain Schedule =\"{} has a negative value.  This is not allowed.",
+                                    RoutineName,
+                                    this->Name,
+                                    this->PeopleHeatGainSchedName));
             ShowContinueError(state, "The heat gain per person has been reset to zero.");
             HeatGainPerPerson = 0.0;
         }
         if (this->PeopleSchedPtr > 0) {
             if (PeopleModifier < 0.0) {
                 ShowWarningError(state,
-                                 std::string{RoutineName} + ": Swimming Pool =\"" + this->Name + " People Schedule =\"" + this->PeopleSchedName +
-                                     " has a negative value.  This is not allowed.");
+                                 format("{}: Swimming Pool =\"{} People Schedule =\"{} has a negative value.  This is not allowed.",
+                                        RoutineName,
+                                        this->Name,
+                                        this->PeopleSchedName));
                 ShowContinueError(state, "The number of people has been reset to zero.");
                 PeopleModifier = 0.0;
             }
@@ -612,14 +600,18 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
         this->CurCoverSchedVal = ScheduleManager::GetCurrentScheduleValue(state, this->CoverSchedPtr);
         if (this->CurCoverSchedVal > 1.0) {
             ShowWarningError(state,
-                             std::string{RoutineName} + ": Swimming Pool =\"" + this->Name + " Cover Schedule =\"" + this->CoverSchedName +
-                                 " has a value greater than 1.0 (100%).  This is not allowed.");
+                             format("{}: Swimming Pool =\"{} Cover Schedule =\"{} has a value greater than 1.0 (100%).  This is not allowed.",
+                                    RoutineName,
+                                    this->Name,
+                                    this->CoverSchedName));
             ShowContinueError(state, "The cover has been reset to one or fully covered.");
             this->CurCoverSchedVal = 1.0;
         } else if (this->CurCoverSchedVal < 0.0) {
             ShowWarningError(state,
-                             std::string{RoutineName} + ": Swimming Pool =\"" + this->Name + " Cover Schedule =\"" + this->CoverSchedName +
-                                 " has a negative value.  This is not allowed.");
+                             format("{}: Swimming Pool =\"{} Cover Schedule =\"{} has a negative value.  This is not allowed.",
+                                    RoutineName,
+                                    this->Name,
+                                    this->CoverSchedName));
             ShowContinueError(state, "The cover has been reset to zero or uncovered.");
             this->CurCoverSchedVal = 0.0;
         }
@@ -659,10 +651,10 @@ void SwimmingPoolData::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "MainsWater",
                         "Heating",
-                        _,
+                        {},
                         "System");
     SetupOutputVariable(state,
                         "Indoor Pool Makeup Water Temperature",
@@ -720,10 +712,10 @@ void SwimmingPoolData::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATINGCOILS",
-                        _,
+                        {},
                         "System");
     SetupOutputVariable(state,
                         "Indoor Pool Radiant to Convection by Cover",
@@ -825,7 +817,7 @@ void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(EnergyPlusData &state)
             PlantUtilities::ScanPlantLoopsForObject(
                 state, this->Name, DataPlant::PlantEquipmentType::SwimmingPool_Indoor, this->HWplantLoc, errFlag, _, _, _, this->WaterInletNode, _);
             if (errFlag) {
-                ShowFatalError(state, std::string{RoutineName} + ": Program terminated due to previous condition(s).");
+                ShowFatalError(state, format("{}: Program terminated due to previous condition(s).", RoutineName));
             }
         }
         this->MyPlantScanFlagPool = false;
@@ -897,15 +889,17 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     // initialize local variables
     int SurfNum = this->SurfacePtr;                         // surface number of floor that is the pool
     int ZoneNum = state.dataSurface->Surface(SurfNum).Zone; // index to zone array
+    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
     // Convection coefficient calculation
-    Real64 HConvIn = 0.22 * std::pow(std::abs(this->PoolWaterTemp - state.dataHeatBalFanSys->MAT(ZoneNum)), 1.0 / 3.0) *
-                     this->CurCoverConvFac; // convection coefficient for pool
-    calcSwimmingPoolEvap(state, EvapRate, SurfNum, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
+    Real64 HConvIn =
+        0.22 * std::pow(std::abs(this->PoolWaterTemp - thisZoneHB.MAT), 1.0 / 3.0) * this->CurCoverConvFac; // convection coefficient for pool
+    calcSwimmingPoolEvap(state, EvapRate, SurfNum, thisZoneHB.MAT, thisZoneHB.airHumRat);
     this->MakeUpWaterMassFlowRate = EvapRate;
-    Real64 EvapEnergyLossPerArea =
-        -EvapRate * Psychrometrics::PsyHfgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataHeatBalFanSys->MAT(ZoneNum)) /
-        state.dataSurface->Surface(SurfNum).Area; // energy effect of evaporation rate per unit area in W/m2
+    Real64 EvapEnergyLossPerArea = -EvapRate *
+                                   Psychrometrics::PsyHfgAirFnWTdb(thisZoneHB.airHumRat,
+                                                                   thisZoneHB.MAT) /
+                                   state.dataSurface->Surface(SurfNum).Area; // energy effect of evaporation rate per unit area in W/m2
     this->EvapHeatLossRate = EvapEnergyLossPerArea * state.dataSurface->Surface(SurfNum).Area;
     // LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
     // to the air directly and added to the zone air heat balance
@@ -936,7 +930,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     // Now calculate the requested mass flow rate from the plant loop to achieve the proper pool temperature
     // old equation using surface heat balance form: MassFlowRate = CpDeltaTi * ( CondTerms + ConvTerm + SWtotal + LWtotal + PeopleGain +
     // PoolMassTerm + MUWTerm + EvapEnergyLossPerArea );
-    Real64 MassFlowRate = (this->WaterMass / (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour)) *
+    Real64 MassFlowRate = (this->WaterMass / (state.dataHVACGlobal->TimeStepSysSec)) *
                           ((TInSurf - TH22) / (TLoopInletTemp - TInSurf)); // Target mass flow rate to achieve the proper setpoint temperature
     if (MassFlowRate > this->WaterMassFlowRateMax) {
         MassFlowRate = this->WaterMassFlowRateMax;
@@ -948,7 +942,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
 
     // We now have a flow rate so we can assemble the terms needed for the surface heat balance that is solved for the inside face temperature
     state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) =
-        SWtotal + LWtotal + PeopleGain + EvapEnergyLossPerArea + HConvIn * state.dataHeatBalFanSys->MAT(ZoneNum) +
+        SWtotal + LWtotal + PeopleGain + EvapEnergyLossPerArea + HConvIn * thisZoneHB.MAT +
         (EvapRate * Tmuw + MassFlowRate * TLoopInletTemp + (this->WaterMass * TH22 / state.dataGlobal->TimeStepZoneSec)) * Cp /
             state.dataSurface->Surface(SurfNum).Area;
     state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) =
@@ -956,8 +950,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
 
     // Finally take care of the latent and convective gains resulting from the pool
     state.dataHeatBalFanSys->SumConvPool(ZoneNum) += this->RadConvertToConvect;
-    state.dataHeatBalFanSys->SumLatentPool(ZoneNum) +=
-        EvapRate * Psychrometrics::PsyHfgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataHeatBalFanSys->MAT(ZoneNum));
+    state.dataHeatBalFanSys->SumLatentPool(ZoneNum) += EvapRate * Psychrometrics::PsyHfgAirFnWTdb(thisZoneHB.airHumRat, thisZoneHB.MAT);
 }
 
 void SwimmingPoolData::calcSwimmingPoolEvap(EnergyPlusData &state,
@@ -996,23 +989,22 @@ void SwimmingPoolData::update(EnergyPlusData &state)
 
     int SurfNum = this->SurfacePtr; // surface number/pointer
 
-    if (this->LastSysTimeElapsed(SurfNum) == state.dataHVACGlobal->SysTimeElapsed) {
+    if (this->LastSysTimeElapsed == state.dataHVACGlobal->SysTimeElapsed) {
         // Still iterating or reducing system time step, so subtract old values which were
         // not valid
-        this->QPoolSrcAvg(SurfNum) -= this->LastQPoolSrc(SurfNum) * this->LastTimeStepSys(SurfNum) / state.dataGlobal->TimeStepZone;
-        this->HeatTransCoefsAvg(SurfNum) -= this->LastHeatTransCoefs(SurfNum) * this->LastTimeStepSys(SurfNum) / state.dataGlobal->TimeStepZone;
+        this->QPoolSrcAvg -= this->LastQPoolSrc * this->LastTimeStepSys / state.dataGlobal->TimeStepZone;
+        this->HeatTransCoefsAvg -= this->LastHeatTransCoefs * this->LastTimeStepSys / state.dataGlobal->TimeStepZone;
     }
 
     // Update the running average and the "last" values with the current values of the appropriate variables
-    this->QPoolSrcAvg(SurfNum) +=
-        state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
-    this->HeatTransCoefsAvg(SurfNum) +=
+    this->QPoolSrcAvg += state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
+    this->HeatTransCoefsAvg +=
         state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
 
-    this->LastQPoolSrc(SurfNum) = state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum);
-    this->LastHeatTransCoefs(SurfNum) = state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum);
-    this->LastSysTimeElapsed(SurfNum) = state.dataHVACGlobal->SysTimeElapsed;
-    this->LastTimeStepSys(SurfNum) = state.dataHVACGlobal->TimeStepSys;
+    this->LastQPoolSrc = state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum);
+    this->LastHeatTransCoefs = state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum);
+    this->LastSysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    this->LastTimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     PlantUtilities::SafeCopyPlantNode(state, this->WaterInletNode, this->WaterOutletNode);
 
@@ -1048,23 +1040,19 @@ void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRU
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     SwimmingPoolOn = false;
 
-    // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
+    // If there are no pools, then just RETURN
+
+    if (state.dataSwimmingPools->NumSwimmingPools == 0) return;
+
     for (int PoolNum = 1; PoolNum <= state.dataSwimmingPools->NumSwimmingPools; ++PoolNum) {
-        if (!allocated(state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg)) return;
-
-        // If it was allocated, then we have to check to see if this was running at all
-        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg(SurfNum) != 0.0) {
-                SwimmingPoolOn = true;
-                break; // DO loop
-            }
-        }
-
-        state.dataHeatBalFanSys->QPoolSurfNumerator = state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg;
-        state.dataHeatBalFanSys->PoolHeatTransCoefs = state.dataSwimmingPools->Pool(PoolNum).HeatTransCoefsAvg;
+        auto &thisPool = state.dataSwimmingPools->Pool(PoolNum);
+        if (thisPool.QPoolSrcAvg != 0.0) SwimmingPoolOn = true;
+        int SurfNum = thisPool.SurfacePtr; // surface number index
+        state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) = thisPool.QPoolSrcAvg;
+        state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) = thisPool.HeatTransCoefsAvg;
     }
 
-    // For interzone surfaces, modQPoolSrcAvg was only updated for the "active" side.  The active side
+    // For interzone surfaces, QPoolSrcAvg was only updated for the "active" side.  The active side
     // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum) {
@@ -1100,49 +1088,6 @@ void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRU
             }
         }
     }
-}
-
-Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
-{
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Peter Graham Ellis
-    //       DATE WRITTEN   July 2003
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function calculates the zone sum of Hc*Area*Tsurf.  It replaces the old SUMHAT.
-    // The SumHATsurf code below is also in the CalcZoneSums subroutine in ZoneTempPredictorCorrector and should be updated accordingly.
-
-    Real64 SumHATsurf = 0.0; // Return value
-
-    for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-        Real64 Area = state.dataSurface->Surface(SurfNum).Area; // Effective surface area
-
-        if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
-            if (state.dataSurface->SurfWinShadingFlag(SurfNum) == DataSurfaces::WinShadingType::IntShade ||
-                state.dataSurface->SurfWinShadingFlag(SurfNum) == DataSurfaces::WinShadingType::IntBlind) {
-                // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
-                Area += state.dataSurface->SurfWinDividerArea(SurfNum);
-            }
-
-            if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
-                // Window frame contribution
-                SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
-                              (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempIn(SurfNum);
-            }
-
-            if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 &&
-                state.dataSurface->SurfWinShadingFlag(SurfNum) != DataSurfaces::WinShadingType::IntShade &&
-                state.dataSurface->SurfWinShadingFlag(SurfNum) != DataSurfaces::WinShadingType::IntBlind) {
-                // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                              (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempIn(SurfNum);
-            }
-        }
-
-        SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
-    }
-
-    return SumHATsurf;
 }
 
 void ReportSwimmingPool(EnergyPlusData &state)
@@ -1194,13 +1139,12 @@ void ReportSwimmingPool(EnergyPlusData &state)
 
         // Finally calculate the summed up report variables
         state.dataSwimmingPools->Pool(PoolNum).MiscEquipEnergy =
-            state.dataSwimmingPools->Pool(PoolNum).MiscEquipPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-        state.dataSwimmingPools->Pool(PoolNum).HeatEnergy =
-            state.dataSwimmingPools->Pool(PoolNum).HeatPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataSwimmingPools->Pool(PoolNum).MiscEquipPower * state.dataHVACGlobal->TimeStepSysSec;
+        state.dataSwimmingPools->Pool(PoolNum).HeatEnergy = state.dataSwimmingPools->Pool(PoolNum).HeatPower * state.dataHVACGlobal->TimeStepSysSec;
         state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMass =
-            state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMassFlowRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMassFlowRate * state.dataHVACGlobal->TimeStepSysSec;
         state.dataSwimmingPools->Pool(PoolNum).EvapEnergyLoss =
-            state.dataSwimmingPools->Pool(PoolNum).EvapHeatLossRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataSwimmingPools->Pool(PoolNum).EvapHeatLossRate * state.dataHVACGlobal->TimeStepSysSec;
 
         state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterVolFlowRate =
             MakeUpWaterVolFlowFunct(state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMassFlowRate, Density);

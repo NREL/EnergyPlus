@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,8 +55,9 @@ namespace DataSurfaces {
 }
 
 namespace DataHeatBalance {
-    struct MaterialProperties;
-}
+    struct MaterialBase;
+    struct MaterialChild;
+} // namespace DataHeatBalance
 
 } // namespace EnergyPlus
 
@@ -165,18 +166,17 @@ namespace WindowManager {
         int getNumOfLayers(EnergyPlusData &state) const;
 
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer>
-        getSolidLayer(EnergyPlusData &state, Material::MaterialProperties const &material, int const t_Index);
+        getSolidLayer(EnergyPlusData &state, Material::MaterialBase const *material, int const t_Index);
 
-        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getGapLayer(Material::MaterialProperties const &material) const;
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getGapLayer(Material::MaterialBase const *material) const;
 
         std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getShadeToGlassLayer(EnergyPlusData &state, int const t_Index) const;
 
-        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getComplexGapLayer(EnergyPlusData &state,
-                                                                            Material::MaterialProperties const &material) const;
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> getComplexGapLayer(EnergyPlusData &state, Material::MaterialBase const *material) const;
 
-        Gases::CGas getGas(Material::MaterialProperties const &material) const;
+        Gases::CGas getGas(Material::MaterialBase const *material) const;
         static Gases::CGas getAir();
-        Material::MaterialProperties *getLayerMaterial(EnergyPlusData &state, int const t_Index) const;
+        Material::MaterialBase *getLayerMaterial(EnergyPlusData &state, int const t_Index) const;
     };
 } // namespace WindowManager
 

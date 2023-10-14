@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1206,7 +1206,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "  Branch,",
         "    Heating Purchased Hot Water Branch,  !- Name",
         "    ,                        !- Pressure Drop Curve Name",
-        "    DistrictHeating,         !- Component 1 Object Type",
+        "    DistrictHeating:Water,         !- Component 1 Object Type",
         "    Purchased Heating,       !- Component 1 Name",
         "    Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name",
         "    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name",
@@ -1336,7 +1336,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 
         "  PlantEquipmentList,",
         "    heating plant,           !- Name",
-        "    DistrictHeating,         !- Equipment 1 Object Type",
+        "    DistrictHeating:Water,         !- Equipment 1 Object Type",
         "    Purchased Heating;       !- Equipment 1 Name",
 
         "  Pump:VariableSpeed,",
@@ -1355,7 +1355,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "    0.0,                     !- Design Minimum Flow Rate {m3/s}",
         "    Intermittent;            !- Pump Control Type",
 
-        "  DistrictHeating,",
+        "  DistrictHeating:Water,",
         "    Purchased Heating,       !- Name",
         "    Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name",
         "    Purchased Heat Outlet Node,  !- Hot Water Outlet Node Name",
@@ -1714,7 +1714,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "    DH Water Outlet Node,    !- Boiler Water Outlet Node Name",
         "    100.0,                   !- Water Outlet Upper Temperature Limit {C}",
         "    NotModulated,            !- Boiler Flow Mode",
-        "    4770.00,                 !- Parasitic Electric Load {W}",
+        "    4770.00,                 !- On Cycle Parasitic Electric Load {W}",
         "    1.00;                    !- Sizing Factor",
 
         "  Curve:Linear,",

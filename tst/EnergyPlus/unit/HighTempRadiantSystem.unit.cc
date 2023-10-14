@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -102,8 +102,8 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem)
     state->dataSurface->Surface.allocate(1);
     state->dataSurface->Surface(1).Name = "WALL1";
     state->dataSurface->Surface(1).Zone = 1;
-    state->dataSurface->SurfIntConvSurfGetsRadiantHeat.allocate(1);
-    state->dataSurface->SurfIntConvSurfGetsRadiantHeat = 0.0;
+    state->dataSurface->surfIntConv.allocate(1);
+    state->dataSurface->surfIntConv(1).getsRadiantHeat = false;
 
     ErrorsFound = false;
 
@@ -140,7 +140,7 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_SizeHighTempRadiantSystemSca
     state->dataHighTempRadSys->HighTempRadSysNumericFields(RadSysNum).FieldNames.allocate(1);
     state->dataHighTempRadSys->HighTempRadSys(RadSysNum).Name = "TESTSCALABLEFLAG";
     state->dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr = 1;
-    state->dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
+    state->dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatingCapMethod = DataSizing::DesignSizingType::CapacityPerFloorArea;
     state->dataHighTempRadSys->HighTempRadSys(RadSysNum).ScaledHeatingCapacity = 100.0;
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataHeatBal->Zone.allocate(1);

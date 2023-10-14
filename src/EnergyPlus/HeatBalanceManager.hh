@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -89,7 +89,7 @@ namespace HeatBalanceManager {
 
     void GetHeatBalanceInput(EnergyPlusData &state);
 
-    void CheckUsedConstructions(EnergyPlusData &state, bool &ErrorsFound);
+    void CheckUsedConstructions(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFound);
 
     bool CheckValidSimulationObjects(EnergyPlusData &state);
 
@@ -99,15 +99,7 @@ namespace HeatBalanceManager {
 
     void GetSiteAtmosphereData(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
-
     void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
-
-    void ValidateMaterialRoughness(EnergyPlusData &state,
-                                   int const MaterNum,           // Which Material number being validated.
-                                   std::string const &Roughness, // Roughness String
-                                   bool &ErrorsFound             // If errors found
-    );
 
     void GetConstructData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
@@ -125,9 +117,9 @@ namespace HeatBalanceManager {
                          std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
                          Array1D_string const &cAlphaArgs,
-                         int &NumAlphas,
+                         int const &NumAlphas,
                          Array1D<Real64> const &rNumericArgs,
-                         int &NumNumbers,
+                         int const &NumNumbers,
                          Array1D_bool const &lNumericFieldBlanks, // Unused
                          Array1D_bool const &lAlphaFieldBlanks,
                          Array1D_string const &cAlphaFieldNames,
@@ -153,7 +145,7 @@ namespace HeatBalanceManager {
 
     void OpenShadingFile(EnergyPlusData &state);
 
-    void GetFrameAndDividerData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
+    void GetFrameAndDividerData(EnergyPlusData &state); // set to true if errors found in input
 
     void SearchWindow5DataFile(EnergyPlusData &state,
                                fs::path const &DesiredFilePath,            // File path (or just name) that contains the Window5 constructions.

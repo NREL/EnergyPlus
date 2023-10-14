@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -89,7 +89,7 @@ const valijson::Schema &validation_schema(const json *schema)
     assert(last_schema == schema);
 
     static const std::unique_ptr<valijson::Schema> retval = [&]() {
-        auto vs = std::make_unique<valijson::Schema>();
+        auto vs = std::make_unique<valijson::Schema>(); // (THIS_AUTO_OK)
         valijson::SchemaParser parser;
         valijson::adapters::NlohmannJsonAdapter schema_doc(*schema);
         parser.populateSchema(schema_doc, *vs);

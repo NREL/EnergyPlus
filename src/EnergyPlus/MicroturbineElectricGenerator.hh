@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,10 +53,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -163,7 +165,7 @@ namespace MicroturbineElectricGenerator {
         Real64 ThermalEfficiencyLHV;  // Reporting: Thermal (heat recovery to water) efficiency LHV (-)
         Real64 AncillaryEnergy;       // Reporting: Ancillary energy use (J)
         Real64 StandbyEnergy;         // Reporting: Standby energy use (J)
-        std::string FuelType;
+        Constant::eFuel FuelType;
         bool myFlag;
 
         // Default Constructor

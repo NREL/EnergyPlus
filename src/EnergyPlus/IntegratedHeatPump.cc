@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,9 +77,6 @@ void SimIHP(EnergyPlusData &state,
             std::string_view CompName,                               // Coil Name
             int &CompIndex,                                          // Index for Component name
             int const CyclingScheme,                                 // Continuous fan OR cycling compressor
-            Real64 &MaxONOFFCyclesperHour,                           // Maximum cycling rate of heat pump [cycles/hr]
-            Real64 &HPTimeConstant,                                  // Heat pump time constant [s]
-            Real64 &FanDelayTime,                                    // Fan delay time, time delay for the HP's fan to
             DataHVACGlobals::CompressorOperation const CompressorOp, // compressor on/off. 0 = off; 1= on
             Real64 const PartLoadFrac,                               // part load fraction
             int const SpeedNum,                                      // compressor speed number
@@ -87,8 +84,8 @@ void SimIHP(EnergyPlusData &state,
             Real64 const SensLoad,                                   // Sensible demand load [W]
             Real64 const LatentLoad,                                 // Latent demand load [W]
             bool const IsCallbyWH, // whether the call from the water heating loop or air loop, true = from water heating loop
-            [[maybe_unused]] bool const FirstHVACIteration, // TRUE if First iteration of simulation
-            Optional<Real64 const> OnOffAirFlowRat          // ratio of comp on to comp off air flow rate
+            [[maybe_unused]] bool const FirstHVACIteration,   // TRUE if First iteration of simulation
+            ObjexxFCL::Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
 )
 {
 
@@ -150,98 +147,17 @@ void SimIHP(EnergyPlusData &state,
     case IHPOperationMode::SpaceClg:
         if (!IsCallbyWH) // process when called from air loop
         {
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCDWHCoolCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCDWHWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHDWHHeatCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHDWHWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.DWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCDWHCoolCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCDWHWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHDWHHeatCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHDWHWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.DWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 
             SimVariableSpeedCoils(state,
                                   std::string(),
                                   ihp.SCCoilIndex,
                                   CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
                                   CompressorOp,
                                   PartLoadFrac,
                                   SpeedNum,
@@ -250,20 +166,7 @@ void SimIHP(EnergyPlusData &state,
                                   LatentLoad,
                                   OnOffAirFlowRat);
 
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 
             ihp.AirFlowSavInAirLoop = airMassFlowRate;
         }
@@ -273,112 +176,18 @@ void SimIHP(EnergyPlusData &state,
     case IHPOperationMode::SpaceHtg:
         if (!IsCallbyWH) // process when called from air loop
         {
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCDWHCoolCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCDWHWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHDWHHeatCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHDWHWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.DWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCDWHCoolCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCDWHWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHDWHHeatCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHDWHWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.DWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 
             SimVariableSpeedCoils(state,
                                   std::string(),
                                   ihp.SHCoilIndex,
                                   CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
                                   CompressorOp,
                                   PartLoadFrac,
                                   SpeedNum,
@@ -394,112 +203,18 @@ void SimIHP(EnergyPlusData &state,
     case IHPOperationMode::DedicatedWaterHtg:
         if (IsCallbyWH) // process when called from water loop
         {
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCDWHCoolCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCDWHWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHDWHHeatCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHDWHWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCDWHCoolCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCDWHWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHDWHHeatCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHDWHWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 
             SimVariableSpeedCoils(state,
                                   std::string(),
                                   ihp.DWHCoilIndex,
                                   CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
                                   CompressorOp,
                                   PartLoadFrac,
                                   SpeedNum,
@@ -516,98 +231,17 @@ void SimIHP(EnergyPlusData &state,
     case IHPOperationMode::SCWHMatchSC:
         if (!IsCallbyWH) // process when called from air loop
         {
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCDWHCoolCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCDWHWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHDWHHeatCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHDWHWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.DWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCDWHCoolCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCDWHWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHDWHHeatCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHDWHWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.DWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 
             SimVariableSpeedCoils(state,
                                   std::string(),
                                   ihp.SCWHCoilIndex,
                                   CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
                                   CompressorOp,
                                   PartLoadFrac,
                                   SpeedNum,
@@ -616,20 +250,7 @@ void SimIHP(EnergyPlusData &state,
                                   LatentLoad,
                                   OnOffAirFlowRat);
 
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 
             ihp.AirFlowSavInAirLoop = airMassFlowRate;
         }
@@ -640,98 +261,17 @@ void SimIHP(EnergyPlusData &state,
     case IHPOperationMode::SCWHMatchWH:
         if (IsCallbyWH) // process when called from water loop
         {
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCDWHCoolCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCDWHWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHDWHHeatCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHDWHWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.DWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCDWHCoolCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCDWHWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHDWHHeatCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHDWHWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.DWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 
             SimVariableSpeedCoils(state,
                                   std::string(),
                                   ihp.SCWHCoilIndex,
                                   CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
                                   CompressorOp,
                                   PartLoadFrac,
                                   SpeedNum,
@@ -740,20 +280,7 @@ void SimIHP(EnergyPlusData &state,
                                   LatentLoad,
                                   OnOffAirFlowRat);
 
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 
             ihp.AirFlowSavInWaterLoop = airMassFlowRate;
         }
@@ -763,84 +290,16 @@ void SimIHP(EnergyPlusData &state,
     case IHPOperationMode::SpaceClgDedicatedWaterHtg:
         if (!IsCallbyWH) // process when called from air loop
         {
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHDWHHeatCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHDWHWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.DWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHDWHHeatCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHDWHWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.DWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 
             SimVariableSpeedCoils(state,
                                   std::string(),
                                   ihp.SCDWHWHCoilIndex,
                                   CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
                                   CompressorOp,
                                   PartLoadFrac,
                                   SpeedNum,
@@ -852,9 +311,6 @@ void SimIHP(EnergyPlusData &state,
                                   std::string(),
                                   ihp.SCDWHCoolCoilIndex,
                                   CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
                                   CompressorOp,
                                   PartLoadFrac,
                                   SpeedNum,
@@ -863,20 +319,7 @@ void SimIHP(EnergyPlusData &state,
                                   LatentLoad,
                                   OnOffAirFlowRat);
 
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 
             ihp.AirFlowSavInAirLoop = airMassFlowRate;
         }
@@ -887,98 +330,17 @@ void SimIHP(EnergyPlusData &state,
     case IHPOperationMode::SHDWHElecHeatOn:
         if (!IsCallbyWH) // process when called from air loop
         {
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCDWHCoolCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCDWHWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SCCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.SHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
-            SimVariableSpeedCoils(state,
-                                  std::string(),
-                                  ihp.DWHCoilIndex,
-                                  CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
-                                  CompressorOp,
-                                  0.0,
-                                  1,
-                                  0.0,
-                                  0.0,
-                                  0.0,
-                                  OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCDWHCoolCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCDWHWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SCCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.SHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+            SimVariableSpeedCoils(state, std::string(), ihp.DWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
 
             SimVariableSpeedCoils(state,
                                   std::string(),
                                   ihp.SHDWHWHCoilIndex,
                                   CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
                                   CompressorOp,
                                   PartLoadFrac,
                                   SpeedNum,
@@ -990,9 +352,6 @@ void SimIHP(EnergyPlusData &state,
                                   std::string(),
                                   ihp.SHDWHHeatCoilIndex,
                                   CyclingScheme,
-                                  MaxONOFFCyclesperHour,
-                                  HPTimeConstant,
-                                  FanDelayTime,
                                   CompressorOp,
                                   PartLoadFrac,
                                   SpeedNum,
@@ -1008,118 +367,14 @@ void SimIHP(EnergyPlusData &state,
         break;
     case IHPOperationMode::Idle:
     default: // clear up
-        SimVariableSpeedCoils(state,
-                              std::string(),
-                              ihp.SCDWHCoolCoilIndex,
-                              CyclingScheme,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
-                              CompressorOp,
-                              0.0,
-                              1,
-                              0.0,
-                              0.0,
-                              0.0,
-                              OnOffAirFlowRat);
-        SimVariableSpeedCoils(state,
-                              std::string(),
-                              ihp.SCDWHWHCoilIndex,
-                              CyclingScheme,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
-                              CompressorOp,
-                              0.0,
-                              1,
-                              0.0,
-                              0.0,
-                              0.0,
-                              OnOffAirFlowRat);
-        SimVariableSpeedCoils(state,
-                              std::string(),
-                              ihp.SHDWHHeatCoilIndex,
-                              CyclingScheme,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
-                              CompressorOp,
-                              0.0,
-                              1,
-                              0.0,
-                              0.0,
-                              0.0,
-                              OnOffAirFlowRat);
-        SimVariableSpeedCoils(state,
-                              std::string(),
-                              ihp.SHDWHWHCoilIndex,
-                              CyclingScheme,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
-                              CompressorOp,
-                              0.0,
-                              1,
-                              0.0,
-                              0.0,
-                              0.0,
-                              OnOffAirFlowRat);
-        SimVariableSpeedCoils(state,
-                              std::string(),
-                              ihp.SCWHCoilIndex,
-                              CyclingScheme,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
-                              CompressorOp,
-                              0.0,
-                              1,
-                              0.0,
-                              0.0,
-                              0.0,
-                              OnOffAirFlowRat);
-        SimVariableSpeedCoils(state,
-                              std::string(),
-                              ihp.SCCoilIndex,
-                              CyclingScheme,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
-                              CompressorOp,
-                              0.0,
-                              1,
-                              0.0,
-                              0.0,
-                              0.0,
-                              OnOffAirFlowRat);
-        SimVariableSpeedCoils(state,
-                              std::string(),
-                              ihp.SHCoilIndex,
-                              CyclingScheme,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
-                              CompressorOp,
-                              0.0,
-                              1,
-                              0.0,
-                              0.0,
-                              0.0,
-                              OnOffAirFlowRat);
-        SimVariableSpeedCoils(state,
-                              std::string(),
-                              ihp.DWHCoilIndex,
-                              CyclingScheme,
-                              MaxONOFFCyclesperHour,
-                              HPTimeConstant,
-                              FanDelayTime,
-                              CompressorOp,
-                              0.0,
-                              1,
-                              0.0,
-                              0.0,
-                              0.0,
-                              OnOffAirFlowRat);
+        SimVariableSpeedCoils(state, std::string(), ihp.SCDWHCoolCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+        SimVariableSpeedCoils(state, std::string(), ihp.SCDWHWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+        SimVariableSpeedCoils(state, std::string(), ihp.SHDWHHeatCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+        SimVariableSpeedCoils(state, std::string(), ihp.SHDWHWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+        SimVariableSpeedCoils(state, std::string(), ihp.SCWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+        SimVariableSpeedCoils(state, std::string(), ihp.SCCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+        SimVariableSpeedCoils(state, std::string(), ihp.SHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
+        SimVariableSpeedCoils(state, std::string(), ihp.DWHCoilIndex, CyclingScheme, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRat);
         ihp.TankSourceWaterMassFlowRate = 0.0;
         ihp.AirFlowSavInAirLoop = 0.0;
         ihp.AirFlowSavInWaterLoop = 0.0;
@@ -1443,7 +698,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).AirInletNodeNum != InNode) ||
             (state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCWHCoilIndex).AirOutletNodeNum != OutNode)) {
-            ShowContinueError(state, "Mistaken air node connection: " + CurrentModuleObject + ihp.SCWHCoilName + "-wrong coil node names.");
+            ShowContinueError(state, format("Mistaken air node connection: {}{}-wrong coil node names.", CurrentModuleObject, ihp.SCWHCoilName));
             ErrorsFound = true;
         }
         SetUpCompSets(state, CurrentModuleObject, ihp.Name + " Cooling Coil", ihp.SCWHCoilType, ihp.SCWHCoilName, InNodeName, OutNodeName);
@@ -1468,7 +723,7 @@ void GetIHPInput(EnergyPlusData &state)
 
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCDWHCoolCoilIndex).AirInletNodeNum != InNode) ||
             (state.dataVariableSpeedCoils->VarSpeedCoil(ihp.SCDWHCoolCoilIndex).AirOutletNodeNum != OutNode)) {
-            ShowContinueError(state, "Mistaken air node connection: " + CurrentModuleObject + ihp.SCDWHCoolCoilName + "-wrong coil node names.");
+            ShowContinueError(state, format("Mistaken air node connection: {}{}-wrong coil node names.", CurrentModuleObject, ihp.SCDWHCoolCoilName));
             ErrorsFound = true;
         }
         SetUpCompSets(state, CurrentModuleObject, ihp.Name + " Cooling Coil", ihp.SCDWHCoolCoilType, ihp.SCDWHCoolCoilName, InNodeName, OutNodeName);
@@ -2106,7 +1361,7 @@ void InitializeIHP(EnergyPlusData &state, int const DXCoilNum)
 
 void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
 {
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     // Obtains and Allocates AS-IHP related parameters from input file
     if (state.dataIntegratedHP->GetCoilsInputFlag) { // First time subroutine has been entered
@@ -2183,15 +1438,12 @@ void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
         break;
     }
 
-    Real64 ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
-
-    ihp.Energy = ihp.TotalPower * ReportingConstant;                                 // total electric energy consumption
-                                                                                     // [J]
-    ihp.EnergyLoadTotalCooling = ihp.TotalCoolingRate * ReportingConstant;           // total cooling energy [J]
-    ihp.EnergyLoadTotalHeating = ihp.TotalSpaceHeatingRate * ReportingConstant;      // total heating energy [J]
-    ihp.EnergyLoadTotalWaterHeating = ihp.TotalWaterHeatingRate * ReportingConstant; // total heating energy [J]
-    ihp.EnergyLatent = ihp.TotalLatentLoad * ReportingConstant;                      // total latent energy [J]
-    ihp.EnergySource = ihp.Qsource * ReportingConstant;                              // total source energy
+    ihp.Energy = ihp.TotalPower * TimeStepSysSec;                                 // total electric energy consumption [J]
+    ihp.EnergyLoadTotalCooling = ihp.TotalCoolingRate * TimeStepSysSec;           // total cooling energy [J]
+    ihp.EnergyLoadTotalHeating = ihp.TotalSpaceHeatingRate * TimeStepSysSec;      // total heating energy [J]
+    ihp.EnergyLoadTotalWaterHeating = ihp.TotalWaterHeatingRate * TimeStepSysSec; // total heating energy [J]
+    ihp.EnergyLatent = ihp.TotalLatentLoad * TimeStepSysSec;                      // total latent energy [J]
+    ihp.EnergySource = ihp.Qsource * TimeStepSysSec;                              // total source energy
 
     if (ihp.TotalPower > 0.0) {
         Real64 TotalDelivery = ihp.TotalCoolingRate + ihp.TotalSpaceHeatingRate + ihp.TotalWaterHeatingRate;
@@ -2217,7 +1469,7 @@ void DecideWorkMode(EnergyPlusData &state,
     using DataHVACGlobals::SmallLoad;
     using WaterThermalTanks::GetWaterThermalTankInput;
 
-    auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+    Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     Real64 MyLoad(0.0);
     Real64 WHHeatTimeSav(0.0); // time accumulation for water heating
@@ -2293,8 +1545,8 @@ void DecideWorkMode(EnergyPlusData &state,
     // keep the water heating time and volume history
     WHHeatTimeSav = ihp.SHDWHRunTime;
     if (IHPOperationMode::SpaceClgDedicatedWaterHtg == ihp.CurMode) {
-        WHHeatVolSave = ihp.WaterFlowAccumVol + state.dataLoopNodes->Node(ihp.WaterTankoutNod).MassFlowRate / 983.0 * TimeStepSys *
-                                                    DataGlobalConstants::SecInHour; // 983 - water density at 60 C
+        WHHeatVolSave = ihp.WaterFlowAccumVol +
+                        state.dataLoopNodes->Node(ihp.WaterTankoutNod).MassFlowRate / 983.0 * TimeStepSysSec; // 983 - water density at 60 C
     } else {
         WHHeatVolSave = 0.0;
     }
@@ -2341,7 +1593,7 @@ void DecideWorkMode(EnergyPlusData &state,
     {
         ihp.CurMode = IHPOperationMode::DedicatedWaterHtg;
     } else if (SensLoad > SmallLoad) {
-        ihp.SHDWHRunTime = WHHeatTimeSav + TimeStepSys * DataGlobalConstants::SecInHour;
+        ihp.SHDWHRunTime = WHHeatTimeSav + TimeStepSysSec;
 
         if (WHHeatTimeSav > ihp.TimeLimitSHDWH) {
             ihp.CurMode = IHPOperationMode::SHDWHElecHeatOn;
@@ -2360,8 +1612,7 @@ void ClearCoils(EnergyPlusData &state, int const DXCoilNum)
 {
     using VariableSpeedCoils::SimVariableSpeedCoils;
 
-    Real64 EMP1(0.0), EMP2(0.0), EMP3(0.0); // place holder to calling clear up function
-    int CycFanCycCoil(1);                   // fan cycl manner place holder
+    int CycFanCycCoil(1); // fan cycl manner place holder
 
     // Obtains and Allocates WatertoAirHP related parameters from input file
     if (state.dataIntegratedHP->GetCoilsInputFlag) { // First time subroutine has been entered
@@ -2379,118 +1630,22 @@ void ClearCoils(EnergyPlusData &state, int const DXCoilNum)
     auto &ihp = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum);
 
     // clear up
-    SimVariableSpeedCoils(state,
-                          std::string(),
-                          ihp.SCDWHCoolCoilIndex,
-                          CycFanCycCoil,
-                          EMP1,
-                          EMP2,
-                          EMP3,
-                          DataHVACGlobals::CompressorOperation::On,
-                          0.0,
-                          1.0,
-                          0.0,
-                          0.0,
-                          0.0,
-                          1.0);
-    SimVariableSpeedCoils(state,
-                          std::string(),
-                          ihp.SCDWHWHCoilIndex,
-                          CycFanCycCoil,
-                          EMP1,
-                          EMP2,
-                          EMP3,
-                          DataHVACGlobals::CompressorOperation::On,
-                          0.0,
-                          1.0,
-                          0.0,
-                          0.0,
-                          0.0,
-                          1.0);
-    SimVariableSpeedCoils(state,
-                          std::string(),
-                          ihp.SHDWHHeatCoilIndex,
-                          CycFanCycCoil,
-                          EMP1,
-                          EMP2,
-                          EMP3,
-                          DataHVACGlobals::CompressorOperation::On,
-                          0.0,
-                          1.0,
-                          0.0,
-                          0.0,
-                          0.0,
-                          1.0);
-    SimVariableSpeedCoils(state,
-                          std::string(),
-                          ihp.SHDWHWHCoilIndex,
-                          CycFanCycCoil,
-                          EMP1,
-                          EMP2,
-                          EMP3,
-                          DataHVACGlobals::CompressorOperation::On,
-                          0.0,
-                          1.0,
-                          0.0,
-                          0.0,
-                          0.0,
-                          1.0);
-    SimVariableSpeedCoils(state,
-                          std::string(),
-                          ihp.SCWHCoilIndex,
-                          CycFanCycCoil,
-                          EMP1,
-                          EMP2,
-                          EMP3,
-                          DataHVACGlobals::CompressorOperation::On,
-                          0.0,
-                          1.0,
-                          0.0,
-                          0.0,
-                          0.0,
-                          1.0);
-    SimVariableSpeedCoils(state,
-                          std::string(),
-                          ihp.SCCoilIndex,
-                          CycFanCycCoil,
-                          EMP1,
-                          EMP2,
-                          EMP3,
-                          DataHVACGlobals::CompressorOperation::On,
-                          0.0,
-                          1.0,
-                          0.0,
-                          0.0,
-                          0.0,
-                          1.0);
-    SimVariableSpeedCoils(state,
-                          std::string(),
-                          ihp.SHCoilIndex,
-                          CycFanCycCoil,
-                          EMP1,
-                          EMP2,
-                          EMP3,
-                          DataHVACGlobals::CompressorOperation::On,
-                          0.0,
-                          1.0,
-                          0.0,
-                          0.0,
-                          0.0,
-                          1.0);
-    SimVariableSpeedCoils(state,
-                          std::string(),
-                          ihp.DWHCoilIndex,
-                          CycFanCycCoil,
-                          EMP1,
-                          EMP2,
-                          EMP3,
-                          DataHVACGlobals::CompressorOperation::On,
-                          0.0,
-                          1.0,
-                          0.0,
-                          0.0,
-                          0.0,
-                          1.0);
+    SimVariableSpeedCoils(
+        state, std::string(), ihp.SCDWHCoolCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(
+        state, std::string(), ihp.SCDWHWHCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(
+        state, std::string(), ihp.SHDWHHeatCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(
+        state, std::string(), ihp.SHDWHWHCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(
+        state, std::string(), ihp.SCWHCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(
+        state, std::string(), ihp.SCCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(
+        state, std::string(), ihp.SHCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(
+        state, std::string(), ihp.DWHCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 }
 
 IHPOperationMode GetCurWorkMode(EnergyPlusData &state, int const DXCoilNum)

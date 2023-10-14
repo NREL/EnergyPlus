@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -220,8 +220,8 @@ class Runtime:
         cli_args = cli_arg_type(*args_with_program_name)
         return self.api.energyplus(state, len(args_with_program_name), cli_args)
 
-    # def stop_simulation(self, state: c_void_p) -> None:
-    #     pass
+    def stop_simulation(self, state: c_void_p) -> None:
+        self.api.stopSimulation(state)
 
     def set_console_output_status(self, state, print_output: bool) -> None:
         """

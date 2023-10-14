@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -809,7 +809,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
         "    SOURCE Supply Cooling Outlet Node,  !- Setpoint 1 Node Name",
         "    0.003,                   !- Component 1 Flow Rate {m3/s}",
         "    Cooling,                 !- Operation 1 Type",
-        "    DistrictHeating,         !- Equipment 2 Object Type",
+        "    DistrictHeating:Water,         !- Equipment 2 Object Type",
         "    SOURCE Purchased Heating,!- Equipment 2 Name",
         "    SOURCE Supply Heating Inlet Node,  !- Demand Calculation 2 Node Name",
         "    SOURCE Supply Heating Outlet Node,  !- Setpoint 2 Node Name",
@@ -888,12 +888,12 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
         "  Branch,",
         "    SOURCE Heating Branch,   !- Name",
         "    ,                        !- Pressure Drop Curve Name",
-        "    DistrictHeating,         !- Component 1 Object Type",
+        "    DistrictHeating:Water,         !- Component 1 Object Type",
         "    SOURCE Purchased Heating,!- Component 1 Name",
         "    SOURCE Supply Heating Inlet Node,  !- Component 1 Inlet Node Name",
         "    SOURCE Supply Heating Outlet Node;  !- Component 1 Outlet Node Name",
 
-        "  DistrictHeating,",
+        "  DistrictHeating:Water,",
         "    SOURCE Purchased Heating,!- Name",
         "    SOURCE Supply Heating Inlet Node,  !- Hot Water Inlet Node Name",
         "    SOURCE Supply Heating Outlet Node,  !- Hot Water Outlet Node Name",
@@ -1901,7 +1901,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
         "    SOURCE Supply Cooling Outlet Node,  !- Setpoint 1 Node Name",
         "    0.003,                   !- Component 1 Flow Rate {m3/s}",
         "    Cooling,                 !- Operation 1 Type",
-        "    DistrictHeating,         !- Equipment 2 Object Type",
+        "    DistrictHeating:Water,         !- Equipment 2 Object Type",
         "    SOURCE Purchased Heating,!- Equipment 2 Name",
         "    SOURCE Supply Heating Inlet Node,  !- Demand Calculation 2 Node Name",
         "    SOURCE Supply Heating Outlet Node,  !- Setpoint 2 Node Name",
@@ -1980,12 +1980,12 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
         "  Branch,",
         "    SOURCE Heating Branch,   !- Name",
         "    ,                        !- Pressure Drop Curve Name",
-        "    DistrictHeating,         !- Component 1 Object Type",
+        "    DistrictHeating:Water,         !- Component 1 Object Type",
         "    SOURCE Purchased Heating,!- Component 1 Name",
         "    SOURCE Supply Heating Inlet Node,  !- Component 1 Inlet Node Name",
         "    SOURCE Supply Heating Outlet Node;  !- Component 1 Outlet Node Name",
 
-        "  DistrictHeating,",
+        "  DistrictHeating:Water,",
         "    SOURCE Purchased Heating,!- Name",
         "    SOURCE Supply Heating Inlet Node,  !- Hot Water Inlet Node Name",
         "    SOURCE Supply Heating Outlet Node,  !- Hot Water Outlet Node Name",

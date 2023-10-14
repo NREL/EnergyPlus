@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -413,7 +413,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)
     state->dataOutputProcessor->EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
     state->dataOutputProcessor->EnergyMeters(2).Name = "NATURALGAS:FACILITY";
     state->dataOutputProcessor->EnergyMeters(3).Name = "DISTRICTCOOLING:FACILITY";
-    state->dataOutputProcessor->EnergyMeters(4).Name = "DISTRICTHEATING:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(4).Name = "DISTRICTHEATINGWATER:FACILITY";
 
     state->dataEconTariff->numTariff = 4;
     state->dataEconTariff->tariff.allocate(state->dataEconTariff->numTariff);
@@ -450,11 +450,11 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)
     EXPECT_EQ("SecondaryGeneralUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "Electricity"));
     EXPECT_EQ("SmallCGUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "Natural Gas"));
     EXPECT_EQ("DistrictCoolingUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Cooling"));
-    EXPECT_EQ("DistrictHeatingUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating"));
+    EXPECT_EQ("DistrictHeatingUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating Water"));
 
     EXPECT_EQ("0.855", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "Electricity"));
     EXPECT_EQ("6.391", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "District Cooling"));
-    EXPECT_EQ("10.871", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "District Heating"));
+    EXPECT_EQ("10.871", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "District Heating Water"));
 }
 
 TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
@@ -589,7 +589,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * Constant::SecInHour;
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
     ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
@@ -620,7 +620,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(EconomicTariff::seasonSummer, state->dataEconTariff->chargeSimple(2).season);
     EXPECT_EQ(0.04, state->dataEconTariff->chargeSimple(2).costPerVal);
 
-    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather; // fake a weather run
 
     // Unitialized: default initialized to 0
     EXPECT_EQ(0, state->dataEconTariff->tariff(1).seasonForMonth(5));
@@ -1131,12 +1131,11 @@ TEST_F(SQLiteFixture, WriteEconomicTariffTable_DualUnits)
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * Constant::SecInHour;
 
     ScheduleManager::ProcessScheduleInput(*state);
     ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
 
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularBEPS = true;
@@ -1153,7 +1152,7 @@ TEST_F(SQLiteFixture, WriteEconomicTariffTable_DualUnits)
 
     ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
     EconomicTariff::UpdateUtilityBills(*state);
-    state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather;
 
     state->dataEnvrn->Month = 5;
     state->dataEnvrn->DayOfMonth = 31;
@@ -1265,8 +1264,6 @@ TEST_F(SQLiteFixture, WriteEconomicTariffTable_DualUnits)
         // Add informative message if failed
         EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
     }
-
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }
 
 TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariff_with_Custom_Meter)
@@ -1406,7 +1403,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariff_with_Custom_Meter)
 
     state->dataOutputProcessor->EnergyMeters(3).Name = "NATURALGAS:FACILITY";
     state->dataOutputProcessor->EnergyMeters(4).Name = "DISTRICTCOOLING:FACILITY";
-    state->dataOutputProcessor->EnergyMeters(5).Name = "DISTRICTHEATING:FACILITY";
+    state->dataOutputProcessor->EnergyMeters(5).Name = "DISTRICTHEATINGWATER:FACILITY";
     state->dataOutputProcessor->EnergyMeters(6).Name = "WATER:FACILITY";
     state->dataOutputProcessor->EnergyMeters(7).Name = "Building Natural Gas";
 
@@ -1478,7 +1475,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariff_with_Custom_Meter)
 
     EXPECT_EQ("DistrictCoolingUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Cooling"));
 
-    EXPECT_EQ("DistrictHeatingUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating"));
+    EXPECT_EQ("DistrictHeatingUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating Water"));
 
     EXPECT_EQ("", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "Other"));
 
@@ -1488,7 +1485,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariff_with_Custom_Meter)
 
     EXPECT_EQ("5.000", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "District Cooling"));
 
-    EXPECT_EQ("11.200", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "District Heating"));
+    EXPECT_EQ("11.200", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "District Heating Water"));
 
     EXPECT_EQ("NOT FOUND", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsVirt, "Other"));
 }

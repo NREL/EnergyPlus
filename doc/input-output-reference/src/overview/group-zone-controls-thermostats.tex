@@ -223,6 +223,18 @@ Outputs available from controlled zones. The ``key'' in the below is the Zone Na
 \item
   HVAC,Average,Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate {[}W{]}
 \item
+  HVAC,Average,Space Predicted Sensible Load to Setpoint Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Space Predicted Sensible Load to Heating Setpoint Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Space Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Space System Predicted Sensible Load to Setpoint Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Space System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Space System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate {[}W{]}
+\item
   Zone,Average,Zone Thermostat Control Type {[]}
 \item
   Zone,Average,Zone Thermostat Heating Setpoint Temperature {[}C{]}
@@ -342,7 +354,7 @@ This may indicate a simulation with reduced reliability during the oscillation. 
 
 \paragraph{Zone Oscillating Temperatures During Occupancy Time{[}hr{]}}\label{zone-oscillating-temperatures-during-occupancy-timehr}
 
-Like Zone Oscillating Temperatures Time but for oscillations that occur only when the zone has occupancy. For zones unoccupied during night or weekend hours, ocscillations during those times may not have much impact on the accuracy of the annual energy prediction.
+Like Zone Oscillating Temperatures Time but for oscillations that occur only when the zone has occupancy. For zones unoccupied during night or weekend hours, oscillations during those times may not have much impact on the accuracy of the annual energy prediction.
 
 \paragraph{Zone Oscillating Temperatures in Deadband Time{[}hr{]}}\label{zone-oscillating-temperatures-in-deadband-timehr}
 
@@ -591,7 +603,7 @@ Operative temperature (OT) is a weighted mixture of Zone Mean Air Temperature (M
 
 This object is used to modify the behavior of \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} objects (control types \hyperref[thermostatsetpointsinglecooling]{ThermostatSetpoint:SingleCooling} and \hyperref[thermostatsetpointdualsetpoint]{ThermostatSetpoint:DualSetpoint} only) based on zone air humidity conditions. Specifically, this TemperatureAndHumidity zone control resets the \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat}'s cooling setpoint temperature downward when the zone air relative humidity exceeds the Dehumidifying Relative Humidity Setpoint defined in this object. The reduced cooling setpoint temperature typically results in longer cooling coil runtimes and additional dehumidification. The rate at which the cooling setpoint temperature is reduced is dictated by the user-specified Overcool Control Ratio. The maximum reduction in cooling setpoint temperature is defined by the user-entered OverCool Range (user choice of a constant value for the entire simulation or a schedule that can define how the overcool range varies over time). For details regarding the calculations, see the EnergyPlus Engineering Reference.
 
-Note: As described above, this ZoneControl:Thermostat:TemperatureAndHumidity control object modifies the cooling setpoint temperature of \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} objects. The ZoneControl:Thermostat:TemperatureAndHumidity object works independently of the \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} object; that is, it does not replace the need for, or coordinate its input fields with, \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} objects that are required for other types of high humidity control (e.g., ZoneControl:Humidstat objects are required for \hyperref[zonehvacdehumidifierdx]{ZoneHVAC:Dehumidifier:DX} objects, AirLoopHVAC:Unitary* objects with CoolReheat or MultiMode dehumidification control types, etc.)
+Note: As described above, this ZoneControl:Thermostat:TemperatureAndHumidity control object modifies the cooling setpoint temperature of \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} objects. The ZoneControl:Thermostat:TemperatureAndHumidity object works independently of the \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} object; that is, it does not replace the need for, or coordinate its input fields with, \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} objects that are required for other types of high humidity control (e.g., ZoneControl:Humidistat objects are required for \hyperref[zonehvacdehumidifierdx]{ZoneHVAC:Dehumidifier:DX} objects, AirLoopHVAC:Unitary* objects with CoolReheat or MultiMode dehumidification control types, etc.)
 
 \subsubsection{Inputs}\label{inputs-6-031}
 
@@ -858,6 +870,18 @@ Outputs available from the ZoneControl:Humidistat:
   HVAC,Average,Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}
 \item
   HVAC,Average,Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}
+\item
+  HVAC,Average,Zone Predicted Moisture Load Moisture Transfer Rate {[}kgWater/s{]}
+\item
+  HVAC,Average,Space Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}
+\item
+  HVAC,Average,Space Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}
+\item
+  HVAC,Average,Space System Predicted Moisture Load Moisture Transfer Rate {[}kgWater/s{]}
+\item
+  HVAC,Average,Space System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}
+\item
+  HVAC,Average,Space System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate {[}kgWater/s{]}
 \end{itemize}
 
 \paragraph{Zone Predicted Moisture Load Moisture Transfer Rate {[}kgWater/s{]}}
@@ -1017,7 +1041,7 @@ ZoneList,AllControlledZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
 
 \subsubsection{Outputs}\label{outputs-3-024}
 
-Three outputs are available from the ZoneControl:Thermostat:ThermalComfort object. Two output variables used primarily for the ZoneControl:Thermost object are also described here to explain their meaning when using thermal comfort control.
+Three outputs are available from the ZoneControl:Thermostat:ThermalComfort object. Two output variables used primarily for the ZoneControl:Thermostat object are also described here to explain their meaning when using thermal comfort control.
 
 \textbf{ZoneControl:ThermalComfort}
 
@@ -1251,4 +1275,4 @@ This output is the average predicted outdoor airflow rate in kg/s required to me
 
 \paragraph{Zone Generic Air Contaminant Setpoint Concentration {[}ppm{]}}\label{zone-generic-air-contaminant-setpoint-concentration-ppm}
 
-This output variable is the averagegeneric contaminant setpoint value, in parts per million, for the time step being reported.
+This output variable is the average generic contaminant setpoint value, in parts per million, for the time step being reported.

@@ -90,7 +90,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,22.2;
+  Version,24.1;
 
   Timestep,6;
 
@@ -1296,10 +1296,6 @@
     Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Cooling Coil Object Type
     Heat Pump Cooling Mode,  !- Cooling Coil Name
     0.001,                   !- Cooling Convergence
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -1342,7 +1338,11 @@
     8.97686E-03,             !- Leak Rate Coefficient
     ,                        !- Source Side Heat Transfer Coefficient {W/K}
     3.51058E-03,             !- Source Side Heat Transfer Resistance1 {dimensionless}
-    8.67910E-04;             !- Source Side Heat Transfer Resistance2 {W/K}
+    8.67910E-04,             !- Source Side Heat Transfer Resistance2 {W/K}
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
 ! The Plant Fluid Type may have changed.
 
@@ -1370,7 +1370,8 @@
     9.64709E-05,             !- Leak Rate Coefficient {dimensionless}
     ,                        !- Source Side Heat Transfer Coefficient {W/K}
     8.47544E-08,             !- Source Side Heat Transfer Resistance1 {dimensionless}
-    4.83787E-05;             !- Source Side Heat Transfer Resistance2 {W/K}
+    4.83787E-05,             !- Source Side Heat Transfer Resistance2 {W/K}
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Fan:OnOff,
     Supply Fan 1,            !- Name

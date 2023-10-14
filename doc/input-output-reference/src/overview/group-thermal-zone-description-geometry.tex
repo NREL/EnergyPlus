@@ -13,7 +13,7 @@ named \textless{}Zone Name\textgreater{}-Remainder will be created.
 Input references to Space Names must have a matching Space object. 
 Default space names may not be referenced in the input except for \hyperref[outputvariable]{Output:Variable} keys).
 
-Space geometry is specified by attaching surfaces to a space using the ``Space Name'' field. If a Space has only floor surface(s) and internal mass assigned to it, the Space is assumed to share the same enclosure with other such Spaces in the same Zone (and with any surfaces that are not explicitly assinged to a space). If a Space also has other types of surfaces (e.g. wall, ceiling, or roof) then the Space forms its own enclosure unless it is connected to other spaces with air boundaries (see \hyperref[constructionairboundary]{Construction:AirBoundary}).
+Space geometry is specified by attaching surfaces to a space using the ``Space Name'' field. If a Space has only floor surface(s) and internal mass assigned to it, the Space is assumed to share the same enclosure with other such Spaces in the same Zone (and with any surfaces that are not explicitly assigned to a space). If a Space also has other types of surfaces (e.g. wall, ceiling, or roof) then the Space forms its own enclosure unless it is connected to other spaces with air boundaries (see \hyperref[constructionairboundary]{Construction:AirBoundary}).
 
 \subsubsection{Inputs}\label{space-inputs-048}
 
@@ -31,7 +31,7 @@ Space ceiling height is used in several areas within EnergyPlus (such as various
 
 Note that the Ceiling Height is the distance from the Floor to the Ceiling in the Space, not an absolute height from the ground.
 
-NOTE: At the moment, the autocalcuted Space ceiling height is set to the Zone ceiling height.
+NOTE: At the moment, the autocalculated Space ceiling height is set to the Zone ceiling height.
 
 \paragraph{Field: Volume}\label{field-space-volume}
 
@@ -106,7 +106,7 @@ The Zone North Axis is specified \textbf{relative to the Building North Axis}. T
 
 \paragraph{Field(s): (X,Y,Z) Origin}\label{fields-xyz-origin}
 
-The X,Y,Z coordinates of a zone origin can be specified, for convenience in vertice entry. Depending on the values in ``\hyperref[globalgeometryrules]{GlobalGeometryRules}'' (see description later in this section), these will be used to completely specify the building coordinates in ``world coordinate'' or not. Zone Origin coordinates are specified \textbf{relative to the Building Origin (which always 0,0,0)}. The following figure illustrates the use of Zone North Axis as well as Zone Origin values.
+The X,Y,Z coordinates of a zone origin can be specified, for convenience in vertices entry. Depending on the values in ``\hyperref[globalgeometryrules]{GlobalGeometryRules}'' (see description later in this section), these will be used to completely specify the building coordinates in ``world coordinate'' or not. Zone Origin coordinates are specified \textbf{relative to the Building Origin (which always 0,0,0)}. The following figure illustrates the use of Zone North Axis as well as Zone Origin values.
 
 \begin{figure}[hbtp] % fig 27
 \centering
@@ -218,6 +218,54 @@ The outdoor wind speed calculated at the height above ground of the zone centroi
   Zone,Sum,Space Total Internal Total Heating Energy {[}J{]}
 \item
   Zone,Average,Space Total Internal Total Heating Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Temperature {[}C{]}
+\item
+  Zone,Average,Space Mean Air Dewpoint Temperature {[}C{]}
+\item
+  Zone,Average,Space Mean Radiant Temperature {[}C{]}
+\item
+  Zone,Average,Space Operative Temperature {[}C{]}
+\item
+  HVAC,Average,Space Air Heat Balance Internal Convective Heat Gain Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance Surface Convection Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance InterSpace Air Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance Outdoor Air Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance System Air Transfer Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance System Convective Heat Gain Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance Air Energy Storage Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Heat Balance Deviation Rate {[}W{]}
+\item
+  HVAC,Sum,Space Air System Sensible Heating Energy {[}J{]}
+\item
+  HVAC,Sum,Space Air System Sensible Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Space Air System Sensible Heating Rate {[}W{]}
+\item
+  HVAC,Average,Space Air System Sensible Cooling Rate {[}W{]}
+\item
+  HVAC,Average,Space Air Humidity Ratio{[}kgWater/kgDryAir{]}
+\item
+  HVAC,Average,Space Air Relative Humidity{[}\%{]}
+\item
+  HVAC,Sum,Space Air System Latent Heating Energy {[}J{]}
+\item
+  HVAC,Sum,Space Air System Latent Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Space Air System Latent Heating Rate {[}W{]}
+\item
+  HVAC,Average,Space Air System Latent Cooling Rate {[}W{]}
+\item
+  HVAC,Average,Space Air System Sensible Heat Ratio {[}{]}
+\item
+  HVAC,Average,Space Air Vapor Pressure Difference {[}Pa{]}
 \end{itemize}
 
 \subsubsection{Zone Thermal Outputs Overview}\label{zone-thermal-outputs}
@@ -321,7 +369,7 @@ These two variable outputs are/should be identical. However, note that they can 
 
 \paragraph{Zone Mean Air Temperature {[}C{]}}\label{zone-mean-air-temperature-c}
 
-From the code definition, the zone mean air temperature is the average temperature of the air temperatures at the system timestep. Remember that the zone heat balance represents a ``well stirred'' model for a zone, therefore there is only one mean air temperature to represent the air temperature for the zone.
+From the code definition, the zone mean air temperature is the average temperature of the air temperatures at the system timestep. Remember that the zone heat balance represents a ``well stirred'' model for a zone, therefore there is only one mean air temperature to represent the air temperature for the zone unless a non-mixing RoomAirModel is specified.
 
 \paragraph{Zone Air Temperature {[}C{]}}\label{zone-air-temperature-c}
 
@@ -345,7 +393,104 @@ Zone Operative Temperature (OT) is the average of the Zone Mean Air Temperature 
 
 \paragraph{Zone Air Heat Balance Internal Convective Heat Gain Rate {[}W{]}}\label{zone-air-heat-balance-internal-convective-heat-gain-rate-w}
 
-The Zone Air Heat Balance Internal Convective Heat Gain Rate is the sum, in watts, of heat transferred to the zone air from all types of internal gains, including people, lights, equipment etc. This and the following provide results on the load components of the zone air heat balance. This field is not multiplied by zone or group multipliers.
+The Zone Air Heat Balance Internal Convective Heat Gain Rate is the sum, in watts, of heat transferred to the zone air from all types of internal gains from energyplus objects (e.g., people, lights, devices, appliances, equipment) listed in Tables \ref{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-constituents} and \ref{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-from-fenestration}. In addition to the convective heat gains listed in these tables, if a zone or a space is served by a zone HVAC equipment, i.e., the zone has no return air node, or served by an AirloopHVAC system that has cycling fan operating mode, then the convective heat gain specified to the return air is re-directed to the space or the zone air heat balance as convective internal heat gain. This and the following provide results on the load components of the zone air heat balance. This field is not multiplied by zone or group multipliers.
+
+\begin{longtable}[c]{@{}lc@{}}
+	\caption{Space or Zone Zone Air Heat Balance Internal Convective Heat Gain Constituents} \label{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-constituents} \tabularnewline
+	\toprule
+	EnergyPlus Object &  Convective Heat Gain Type \tabularnewline
+	\midrule
+	\endfirsthead
+	
+	\caption[]{Space or Zone Zone Air Heat Balance Internal Convective Heat Gain Constituents} \tabularnewline
+	\toprule
+	EnergyPlus Object &  Convective Heat Gain Type \tabularnewline
+	\midrule
+	\endhead
+	
+	People     &     People    \tabularnewline
+	Lights     &     Lights    \tabularnewline
+	ElectricEquipment     &     ElectricEquipment    \tabularnewline
+	ElectricEquipment:ITE:AirCooled     &     ElectricEquipmentITEAirCooled    \tabularnewline
+	GasEquipment     &     GasEquipment    \tabularnewline
+	HotWaterEquipment     &     HotWaterEquipment    \tabularnewline
+	SteamEquipment     &     SteamEquipment    \tabularnewline
+	OtherEquipment     &     OtherEquipment    \tabularnewline
+	Refrigeration:Case     &     RefrigerationCase    \tabularnewline
+	Refrigeration:CompressorRack     &     RefrigerationCompressorRack    \tabularnewline
+	Refrigeration:System:Condenser:AirCooled     &     RefrigerationSystemAirCooledCondenser    \tabularnewline
+	Refrigeration:System:SuctionPipe     &     RefrigerationSystemSuctionPipe    \tabularnewline
+	Refrigeration:SecondarySystem:Receiver     &     RefrigerationSecondaryReceiver    \tabularnewline
+	Refrigeration:SecondarySystem:Pipe     &     RefrigerationSecondaryPipe    \tabularnewline
+	Refrigeration:WalkIn     &     RefrigerationWalkIn    \tabularnewline
+	Refrigeration:TranscriticalSystem:GasCooler:AirCooled     &     RefrigerationTransSysAirCooledGasCooler    \tabularnewline
+	Refrigeration:TranscriticalSystem:SuctionPipeMT     &     RefrigerationTransSysSuctionPipeMT    \tabularnewline
+	Refrigeration:TranscriticalSystem:SuctionPipeLT     &     RefrigerationTransSysSuctionPipeLT    \tabularnewline
+	WaterUse:Equipment     &     WaterUseEquipment    \tabularnewline
+	WaterHeater:Mixed     &     WaterHeaterMixed    \tabularnewline
+	WaterHeater:Stratified     &     WaterHeaterStratified    \tabularnewline
+	ZoneBaseboard:OutdoorTemperatureControlled     &     ZoneBaseboardOutdoorTemperatureControlled    \tabularnewline
+	ThermalStorage:ChilledWater:Mixed     &     ThermalStorageChilledWaterMixed    \tabularnewline
+	ThermalStorage:ChilledWater:Stratified     &     ThermalStorageChilledWaterStratified    \tabularnewline
+	Pipe:Indoor     &     PipeIndoor    \tabularnewline
+	Pump:VariableSpeed     &     Pump\textunderscore VarSpeed    \tabularnewline
+	Pump:ConstantSpeed     &     Pump\textunderscore ConSpeed    \tabularnewline
+	Pump:VariableSpeed:Condensate     &     Pump\textunderscore Cond    \tabularnewline
+	HeaderedPumps:VariableSpeed     &     PumpBank\textunderscore VarSpeed    \tabularnewline
+	HeaderedPumps:ConstantSpeed     &     PumpBank\textunderscore ConSpeed    \tabularnewline
+	PlantComponent:UserDefined     &     PlantComponentUserDefined    \tabularnewline
+	Coil:UserDefined     &     CoilUserDefined    \tabularnewline
+	ZoneHVAC:ForcedAir:UserDefined     &     ZoneHVACForcedAirUserDefined    \tabularnewline
+	AirTerminal:SingleDuct:UserDefined     &     AirTerminalUserDefined    \tabularnewline
+	Coil:Cooling:DX:SingleSpeed:ThermalStorage     &     PackagedTESCoilTank    \tabularnewline
+	Fan:SystemModel     &     FanSystemModel    \tabularnewline
+	Coil:Cooling:DX:SingleSpeed     &     SecCoolingDXCoilSingleSpeed    \tabularnewline
+	Coil:Heating:DX:SingleSpeed     &     SecHeatingDXCoilSingleSpeed    \tabularnewline
+	Coil:Cooling:DX:TwoSpeed     &     SecCoolingDXCoilTwoSpeed    \tabularnewline
+	Coil:Cooling:DX:MultiSpeed     &     SecCoolingDXCoilMultiSpeed    \tabularnewline
+	Coil:Heating:DX:MultiSpeed     &     SecHeatingDXCoilMultiSpeed    \tabularnewline
+	Generator:FuelCell     &     GeneratorFuelCell    \tabularnewline
+	Generator:MicroCHP     &     GeneratorMicroCHP    \tabularnewline
+	ElectricLoadCenter:Transformer     &     ElectricLoadCenterTransformer    \tabularnewline
+	ElectricLoadCenter:Inverter:Simple     &     ElectricLoadCenterInverterSimple    \tabularnewline
+	ElectricLoadCenter:Inverter:FunctionOfPower     &     ElectricLoadCenterInverterFunctionOfPower    \tabularnewline
+	ElectricLoadCenter:Inverter:LookUpTable     &     ElectricLoadCenterInverterLookUpTable    \tabularnewline
+	ElectricLoadCenter:Storage:LiIonNMCBattery     &     ElectricLoadCenterStorageLiIonNmcBattery    \tabularnewline
+	ElectricLoadCenter:Storage:Battery     &     ElectricLoadCenterStorageBattery    \tabularnewline
+	ElectricLoadCenter:Storage:Simple     &     ElectricLoadCenterStorageSimple    \tabularnewline
+	ElectricLoadCenter:Storage:Converter     &     ElectricLoadCenterConverter    \tabularnewline
+
+	\bottomrule
+
+\end{longtable}
+
+
+
+\begin{longtable}[c]{@{}lcc@{}}
+	\caption{Space or Zone Zone Air Heat Balance Internal Convective Heat Gain from fenestration} \label{table:space-or-zone-air-heat-balance-internal-convective-heat-gain-from-fenestration} \tabularnewline
+	\toprule
+	FenestrationSurface:Detailed Components &  Internal Convective Heat Gain Sources \tabularnewline
+	\midrule
+	\endfirsthead
+	
+	\caption[]{Space or Zone Zone Air Heat Balance Internal Convective Heat Gain Constituents} \tabularnewline
+	\toprule
+	FenestrationSurface:Detailed Components &  Internal Convective Heat Gain Sources \tabularnewline
+	\midrule
+	\endhead
+	
+	WindowProperty:FrameAndDivider &  Convective heat gain from window frame and divider  \tabularnewline
+	Construction:WindowEquivalentLayer  &  Other convective heat gain from equivalent layer window model \tabularnewline
+	Construction &  Natural convection heat gain from a gap \tabularnewline
+	  &             between glass and interior shade or blind \tabularnewline
+	Construction:ComplexFenestrationState &  Convective heat gain from air flow \tabularnewline
+	  &             through a gap between glass and interior shade or blind \tabularnewline
+
+
+	\bottomrule
+
+\end{longtable}
+
 
 \paragraph{Zone Air Heat Balance Surface Convection Rate {[}W{]}}\label{zone-air-heat-balance-surface-convection-rate-w}
 
@@ -464,19 +609,45 @@ These output variables express the sum of heat gain in Watts (for rate) or joule
 
 \paragraph{Space or Zone Total Internal Convective Heating Energy {[}J{]}}\label{zone-total-internal-convective-heating-energy-j}
 
-These output variables represent the sum of convective gains from specific sources (e.g.~equipment) throughout the space or zone in Watts (for rate) or joules. This includes convective gain from \hyperref[people]{People}, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
+These output variables represent the sum of convective gains from specific sources (e.g.~equipment) throughout the space or zone in Watts (for rate) or joules. This includes convective gain from Energyplus objects that are listed in Table \ref{table:space-or-zone-total-internal-heat-gain-constituents}: 
+
+\begin{longtable}[c]{@{}lcc@{}}
+	\caption{Space or Zone Total Internal Heat Gain Constituents} \label{table:space-or-zone-total-internal-heat-gain-constituents} \tabularnewline
+	\toprule
+	EnergyPlus Object &  Internal Heat Gain Type \tabularnewline
+	\midrule
+	\endfirsthead
+	
+	\caption[]{Space or Zone Total Internal Heat Gain Constituents} \tabularnewline
+	\toprule
+	EnergyPlus Object &  Internal Heat Gain Type \tabularnewline
+	\midrule
+	\endhead
+	
+	People   &  People \tabularnewline
+	Lights   &  Lights \tabularnewline
+	ElectricEquipment   &  ElectricEquipment \tabularnewline
+	ElectricEquipment:ITE:AirCooled   &  ElectricEquipmentITEAirCooled \tabularnewline
+	GasEquipment   &  GasEquipment \tabularnewline
+	HotWaterEquipment   &  HotWaterEquipment \tabularnewline
+	SteamEquipment   &  SteamEquipment \tabularnewline
+	OtherEquipment   &  OtherEquipment \tabularnewline
+	
+	\bottomrule
+
+\end{longtable}
 
 \paragraph{Space or Zone Total Internal Latent Gain Rate {[}W{]}}\label{zone-total-internal-latent-gain-rate-w}
 
 \paragraph{Space or Zone Total Internal Latent Gain Energy {[}J{]}}\label{zone-total-internal-latent-gain-energy-j}
 
-These output variables represent the sum of latent gains from specific internal sources (e.g.~equipment) throughout the space or zone in Watts (for rate) or joules. This includes latent gain from \hyperref[people]{People}, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
+These output variables represent the sum of latent gains from specific internal sources (e.g.~equipment) throughout the space or zone in Watts (for rate) or joules. This includes latent gain from Energyplus objects that are listed in Table \ref{table:space-or-zone-total-internal-heat-gain-constituents}.
 
 \paragraph{Space or Zone Total Internal Total Heating Rate {[}W{]}}\label{zone-total-internal-total-heating-rate-w}
 
 \paragraph{Space or Zone Total Internal Total Heating Energy {[}J{]}}\label{zone-total-internal-total-heating-energy-j}
 
-These output variables represent the sum of all heat gains throughout the space or zone in Watts (for rate) or joules. This includes all heat gains from \hyperref[people]{People}, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
+These output variables represent the sum of all heat gains throughout the space or zone in Watts (for rate) or joules. This includes all heat gains from Energyplus objects that are listed in Table \ref{table:space-or-zone-total-internal-heat-gain-constituents}.
 
 \paragraph{Zone Exfiltration Heat Transfer Rate {[}W{]}}\label{zone-exfiltration-heat-transfer-rate-w}
 
@@ -2655,12 +2826,14 @@ Zone,Sum,Surface Outside Face Net Thermal Radiation Heat Gain Energy [J]
 Zone,Average,Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient [W/m2-K]
 Zone,Average,Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient [W/m2-K]
 Zone,Average,Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient [W/m2-K]
+Zone,Average,Surface Outside Face Thermal Radiation to Surrounding Surfaces Heat Transfer Coefficient [W/m2-K]
+Zone,Average,Surface Outside Face Surrounding Surfaces Average Temperature [C]
 Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate [W]
 Zone,Sum,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Energy [J]
 Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate per Area[W/m2]
 Zone,Average,Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate [W]
 Zone,Average,Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate per Area[W/m2]
-Zone, Sum,Surface Inside Face Interior Windows Incident Beam Solar Radiation Energy [J]
+Zone,Sum,Surface Inside Face Interior Windows Incident Beam Solar Radiation Energy [J]
 Zone,Average,Surface Inside Face Initial Transmitted Diffuse Absorbed Solar Radiation Rate [W]
 Zone,Average,Surface Inside Face Initial Transmitted Diffuse Transmitted Out Window Solar Radiation Rate [W]
 Zone,Average,Surface Inside Face Absorbed Shortwave Radiation Rate [W]
@@ -2941,7 +3114,7 @@ These ``inside face solar radiation heat gain'' output variables describe the he
 
 \subsubsection{Surface Inside Face Lights Radiation Heat Gain Energy {[}J{]}}\label{surface-inside-face-lights-radiation-heat-gain-energy-j}
 
-These ``inside face lights radiation heat gain'' output variables describe the heat transferred by shortwave radiation onto the inside face. The values are always positive and indicate heat is being added to the surface's face by shortwave radiation that emanated from electric lighting equipment and was absorbed by the surface. Different versions of the report are available including the basic heat gain rate (W), and a per unit area flux (W/m2), and an energy version (J).
+These ``inside face lights radiation heat gain'' output variables describe the heat transferred by shortwave radiation onto the inside face. The values are always positive and indicate heat is being added to the surface's face by shortwave radiation that emanated from electric lighting equipment and was absorbed by the surface. Note that this includes light from other zones that are transmitted through interzone windows. Different versions of the report are available including the basic heat gain rate (W), and a per unit area flux (W/m2), and an energy version (J).
 
 \subsubsection{Surface Inside Face Internal Gains Radiation Heat Gain Rate {[}W{]}}\label{surface-inside-face-internal-gains-radiation-heat-gain-rate-w}
 
@@ -3071,6 +3244,14 @@ This is thermal radiation heat transfer rate between the outside face and the ai
 
 This is total heat transfer rate between the outside face and the air mass surrounding the surface by convection and thermal radiation.
 
+\subsubsection{Surface Outside Face Thermal Radiation to Surrounding Surfaces Heat Transfer Coefficient {[}W/m2-K{]}}\label{surface-outside-face-thermal-radiation-to-surrounding-surfaces-heat-transfer-coefficient-wm2-k}
+
+This is the coefficient that describes thermal radiation heat transfer between the outside face of an exterior surface and the surrounding surfaces it views. It is the value of ``Hr'' in the classic linearized model for thermal radiation exchange Q = Hr * A * (T\_surf -- T\_srdsurfs) when applied to the surrounding surfaces. Where T\_surf = Surface Outside Face Temperature, and T\_srdsurf = Average temperature of the surrounding surfaces viewed by an exterior surface.
+
+\subsubsection{Surface Outside Face Surrounding Surfaces Average Temperature {[}C{]}}\label{surface-outside-face-surrounding-surfaces-average-temperature-C}
+
+This is the average surface temperature of the surrounding surfaces viewed by an exterior surface, in degrees Celsius. The surrounding surfaces average temperature is a view factor weighed surface temperature of multiple surrounding surfaces seen by an exterior surface. If an exterior surface views a single surrounding surface then the average temperature is the same as the user specified surrounding surface temperature.
+
 \subsubsection{Surface Outside Face Solar Radiation Heat Gain Rate {[}W{]}}\label{surface-outside-face-solar-radiation-heat-gain-rate-w}
 
 \subsubsection{Surface Outside Face Solar Radiation Heat Gain Rate per Area {[}W/m2{]}}\label{surface-outside-face-solar-radiation-heat-gain-rate-per-area-wm2}
@@ -3160,7 +3341,7 @@ The following variables apply only to opaque surfaces, where an opaque surface i
 
 These ``inside face conduction'' output variables describe heat flow by conduction right at the inside face of an opaque heat transfer surface. A positive value means that the conduction is from just inside the inside face toward the inside face. A negative value means that the conduction is from the inside face into the core of the heat transfer surface.
 
-Note that Inside Face Conduction, when positive, does \textbf{not} indicate the heat flow from the surface to the zone air, which is governed by the inside face convection coefficient and the difference in temperature between the inside face and the zone air.
+Note that Inside Face Conduction, when positive, does \textbf{not} necessarily indicate the heat flow from the surface to the zone air, which is governed by the inside face convection coefficient, the difference in temperature between the inside face and the zone air, and various radiation terms due to solar, internal gains, and radiant exchange with other surfaces in the zone.
 
 Different versions of the reports are available. The basic heat gain rate (W) and a per unit area flux (W/m\(^{2}\)) can have positive or negative values with the sign convention that positive indicates heat flowing toward the face itself. There are also directed ``gain'' and ``loss'' versions that have only positive values or zero when the heat flow direction opposes.
 
@@ -3178,7 +3359,9 @@ Former Name: For Conduction Finite Difference simulations (CondFD), CondFD Insid
 
 These ``outside face conduction'' output variables describe heat flow by conduction right at the outside face of an opaque heat transfer surface. A positive value means that the conduction is from just inside the outside face toward the outside face. A negative value means that the conduction is from the outside face into the core of the heat transfer surface.
 
-Note that outside face conduction, when positive, does \textbf{not} indicate the heat flow from the surface to the surrounding air, which is governed by the outside face convection coefficient and the difference in temperature between the inside face and the surrounding air.
+Note that outside face conduction, when positive, does \textbf{not} necessarily indicate the heat flow from the surface to the surrounding air, due to the fact that there could be various terms such as convection and/or radiation terms based on whatever is the ''outside'' environment for this surface.
+
+When the surface in question is a partition, the output for this variable is set to zero because there is no outside face because the surface is fully exposed to the zone.  When the surface is an interzone partition, the value will be non-zero because there will potentially be conduction into or out of the zone on the other side at this surface.
 
 Different versions of the reports are available. The basic heat transfer rate (W) and a per unit area flux (W/m\(^{2}\)) can have positive or negative values with the sign convention that positive indicates heat flowing toward the face itself. There are also directed ``gain'' and ``loss'' versions that have only positive values or zero when the heat flow direction opposes.
 
@@ -4308,7 +4491,7 @@ Window shading with coverings like drapes, blinds, screens or pull-down shades c
 
 With WindowShadingControl you specify the type,  location, and timing of the shading device, what variable or combination of variables controls deployment of the shading device, and what the control setpoint is. If the shading device is a blind, you also specify how the slat angle is controlled. Each WindowShadingControl object is associated with a zone and has a list of one or more windows and glass doors to which the shading control is applied (ref: \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} with Type = Window or GlassDoor, Window, and \hyperref[glazeddoor]{GlazedDoor}).
 
-NOTE: WindowShadingControl does not work with complex fenestration systems. Controlled complex fenestration systems can be made only with Energy Management Systems objects. Refrencing a \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} in a WindowShadingControl while using complex fenestration systems will be ignored by program.
+NOTE: WindowShadingControl does not work with complex fenestration systems. Controlled complex fenestration systems can be made only with Energy Management Systems objects. Referencing a \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} in a WindowShadingControl while using complex fenestration systems will be ignored by program.
 
 As shown in Figure~\ref{fig:allowed-locations-of-a-window-shading-device.}, a shading device can be inside the window (Shading Type = InteriorShade or InteriorBlind), outside the window (Shading Type = ExteriorShade or ExteriorBlind), or between panes of glass (Shading Type = BetweenGlassShade or BetweenGlassBlind). The exception is window screens which can only be outside the window (Shading Type = ExteriorScreen).
 

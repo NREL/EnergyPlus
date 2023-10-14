@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -275,7 +275,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     state->dataSize->PlantSizData(1).DeltaT = 11.0;
     state->dataSize->PlantSizData(1).ExitTemp = 82;
     state->dataSize->PlantSizData(1).PlantLoopName = "HotWaterLoop";
-    state->dataSize->PlantSizData(1).LoopType = 1;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Heating;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurSysNum = 0;
@@ -323,7 +323,8 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
             max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow,
                 state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
                 state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
-    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum)
+        .copyFromZoneSizing(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum));
     state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = state->dataHeatBal->Zone(1).FloorArea;
     OutputReportPredefined::SetPredefinedTables(*state);
     state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
@@ -527,7 +528,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     state->dataSize->PlantSizData(1).DeltaT = 11.0;
     state->dataSize->PlantSizData(1).ExitTemp = 82;
     state->dataSize->PlantSizData(1).PlantLoopName = "HotWaterLoop";
-    state->dataSize->PlantSizData(1).LoopType = 1;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Heating;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurSysNum = 0;
@@ -574,7 +575,8 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
             max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow,
                 state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
                 state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
-    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum)
+        .copyFromZoneSizing(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum));
     state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = state->dataHeatBal->Zone(1).FloorArea;
     state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = state->dataHeatBal->Zone(1).FloorArea;
     state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
@@ -778,7 +780,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     state->dataSize->PlantSizData(1).DeltaT = 11.0;
     state->dataSize->PlantSizData(1).ExitTemp = 82;
     state->dataSize->PlantSizData(1).PlantLoopName = "HotWaterLoop";
-    state->dataSize->PlantSizData(1).LoopType = 1;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Heating;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurSysNum = 0;
@@ -825,7 +827,8 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
             max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow,
                 state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
                 state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
-    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum)
+        .copyFromZoneSizing(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum));
     state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = state->dataHeatBal->Zone(1).FloorArea;
     state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
     SizeWaterCoil(*state, 1);
@@ -1029,7 +1032,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     state->dataSize->PlantSizData(1).DeltaT = 11.0;
     state->dataSize->PlantSizData(1).ExitTemp = 82;
     state->dataSize->PlantSizData(1).PlantLoopName = "HotWaterLoop";
-    state->dataSize->PlantSizData(1).LoopType = 1;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Heating;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurSysNum = 0;
@@ -1076,7 +1079,8 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
             max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow,
                 state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
                 state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
-    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum)
+        .copyFromZoneSizing(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum));
     state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = state->dataHeatBal->Zone(1).FloorArea;
     state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
     SizeWaterCoil(*state, 1);
@@ -1235,7 +1239,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     state->dataSize->PlantSizData(1).DeltaT = 11.0;
     state->dataSize->PlantSizData(1).ExitTemp = 82;
     state->dataSize->PlantSizData(1).PlantLoopName = "HotWaterLoop";
-    state->dataSize->PlantSizData(1).LoopType = 1;
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::TypeOfPlantLoop::Heating;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 0;

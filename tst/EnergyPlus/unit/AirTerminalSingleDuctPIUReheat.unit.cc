@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1143,6 +1143,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
         "    Autosize,                !- High Speed Rated Sensible Heat Ratio",
         "    3,                       !- High Speed Gross Rated Cooling COP {W/W}",
         "    Autosize,                !- High Speed Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    ,                        !- Unit Internal Static Air Pressure {Pa}",
         "    Node 9,                  !- Air Inlet Node Name",
         "    Node 10,                 !- Air Outlet Node Name",
@@ -1155,6 +1157,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
         "    0.69,                    !- Low Speed Gross Rated Sensible Heat Ratio",
         "    3,                       !- Low Speed Gross Rated Cooling COP {W/W}",
         "    Autosize,                !- Low Speed Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    Curve Biquadratic 3,     !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
         "    Curve Biquadratic 4,     !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
         "    ,                        !- Condenser Air Inlet Node Name",

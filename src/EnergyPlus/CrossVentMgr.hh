@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,19 +57,19 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace CrossVentMgr {
+namespace RoomAir {
 
-    void ManageUCSDCVModel(EnergyPlusData &state, int ZoneNum);
+    void ManageCrossVent(EnergyPlusData &state, int ZoneNum);
 
-    void InitUCSDCV(EnergyPlusData &state, int ZoneNum);
+    void InitCrossVent(EnergyPlusData &state, int ZoneNum);
 
-    void HcUCSDCV(EnergyPlusData &state, int ZoneNum);
+    void HcCrossVent(EnergyPlusData &state, int ZoneNum);
 
-    void EvolveParaUCSDCV(EnergyPlusData &state, int ZoneNum);
+    void EvolveParaCrossVent(EnergyPlusData &state, int ZoneNum);
 
-    void CalcUCSDCV(EnergyPlusData &state, int ZoneNum);
+    void CalcCrossVent(EnergyPlusData &state, int ZoneNum);
 
-} // namespace CrossVentMgr
+} // namespace RoomAir
 
 struct CrossVentMgrData : BaseGlobalStruct
 {
@@ -83,7 +83,7 @@ struct CrossVentMgrData : BaseGlobalStruct
 
     void clear_state() override
     {
-        *this = CrossVentMgrData();
+        new (this) CrossVentMgrData();
     }
 };
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,6 +57,9 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -68,9 +71,9 @@ namespace ZoneEquipmentManager {
 
     struct SimulationOrder
     {
-        std::string EquipType;
-        int EquipTypeEnum = 0;
-        std::string EquipName;
+        std::string EquipTypeName = "";
+        DataZoneEquipment::ZoneEquipType equipType = DataZoneEquipment::ZoneEquipType::Invalid;
+        std::string EquipName = "";
         int EquipPtr = 0;
         int CoolingPriority = 0;
         int HeatingPriority = 0;
@@ -86,13 +89,81 @@ namespace ZoneEquipmentManager {
 
     void InitZoneEquipment(EnergyPlusData &state, bool FirstHVACIteration); // unused 1208
 
+    void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
+                                     DataZoneEquipment::EquipConfiguration &ZoneEquipConfig,
+                                     DataSizing::ZoneSizingData &zsCalcSizing,
+                                     DataZoneEnergyDemands::ZoneSystemSensibleDemand &zsEnergyDemand,
+                                     DataZoneEnergyDemands::ZoneSystemMoistureDemand &zsMoistureDemand,
+                                     DataHeatBalance::ZoneData &zoneOrSpace,
+                                     int zoneNum,
+                                     int spaceNum = 0);
+
+    void sizeZoneSpaceEquipmentPart2(EnergyPlusData &state,
+                                     DataZoneEquipment::EquipConfiguration &zoneEquipConfig,
+                                     DataSizing::ZoneSizingData &zsCalcSizing,
+                                     int zoneNum,
+                                     int spaceNum = 0);
+
     void SizeZoneEquipment(EnergyPlusData &state);
 
     void SetUpZoneSizingArrays(EnergyPlusData &state);
 
+    void fillZoneSizingFromInput(EnergyPlusData &state,
+                                 DataSizing::ZoneSizingInputData const &zoneSizingInput,
+                                 Array2D<DataSizing::ZoneSizingData> &zsSizing,
+                                 Array2D<DataSizing::ZoneSizingData> &zsCalcSizing,
+                                 DataSizing::ZoneSizingData &zsFinalSizing,
+                                 DataSizing::ZoneSizingData &zsCalcFinalSizing,
+                                 std::string_view const zoneOrSpaceName,
+                                 int const zoneOrSpaceNum);
+
     void RezeroZoneSizingArrays(EnergyPlusData &state);
 
-    void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator CallIndicator);
+    void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator CallIndicator);
+
+    void updateZoneSizingBeginDay(EnergyPlusData &state, DataSizing::ZoneSizingData &zsCalcSizing);
+
+    void updateZoneSizingDuringDay(DataSizing::ZoneSizingData &zsSizing,
+                                   DataSizing::ZoneSizingData &zsCalcSizing,
+                                   Real64 const tstatHi,
+                                   Real64 const tstatLo,
+                                   Real64 &sizTstatHi,
+                                   Real64 &sizTstatLo,
+                                   int const timeStepInDay,
+                                   Real64 const fracTimeStepZone);
+
+    void updateZoneSizingEndDayMovingAvg(DataSizing::ZoneSizingData &zsCalcSizing, int const numTimeStepsInAvg);
+
+    void updateZoneSizingEndDay(DataSizing::ZoneSizingData &zsCalcSizing,
+                                DataSizing::ZoneSizingData &zsCalcFinalSizing,
+                                int const numTimeStepInDay,
+                                DataSizing::DesDayWeathData const &desDayWeath,
+                                Real64 const stdRhoAir);
+
+    void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, DataSizing::ZoneSizingData const &zsCalcSizing);
+
+    void
+    updateZoneSizingEndZoneSizingCalc2(DataSizing::ZoneSizingData &zsCalcSizing, int const timeStepIndex, int const hourPrint, int const minutes);
+
+    void updateZoneSizingEndZoneSizingCalc3(DataSizing::ZoneSizingData &zsCalcFinalSizing,
+                                            Array2D<DataSizing::ZoneSizingData> &zsCalcSizing,
+                                            bool &anyLatentLoad,
+                                            int const zoneOrSpaceNum);
+
+    void updateZoneSizingEndZoneSizingCalc4(DataSizing::ZoneSizingData &zsSizing, DataSizing::ZoneSizingData const &zsCalcSizing);
+
+    void updateZoneSizingEndZoneSizingCalc5(DataSizing::ZoneSizingData &zsFinalSizing, DataSizing::ZoneSizingData const &zsCalcFinalSizing);
+
+    void updateZoneSizingEndZoneSizingCalc6(DataSizing::ZoneSizingData &zsSizing,
+                                            DataSizing::ZoneSizingData const &zsCalcSizing,
+                                            int const numTimeStepsInDay);
+
+    void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
+                                            DataSizing::ZoneSizingData &zsFinalSizing,
+                                            DataSizing::ZoneSizingData &zsCalcFinalSizing,
+                                            Array2D<DataSizing::ZoneSizingData> &zsSizing,
+                                            Array2D<DataSizing::ZoneSizingData> &zsCalcSizing,
+                                            int const zoneOrSpaceNum);
 
     void SimZoneEquipment(EnergyPlusData &state, bool FirstHVACIteration, bool &SimAir);
 
@@ -100,13 +171,35 @@ namespace ZoneEquipmentManager {
 
     void InitSystemOutputRequired(EnergyPlusData &state, int ZoneNum, bool FirstHVACIteration, bool ResetSimOrder = false);
 
+    void initOutputRequired(EnergyPlusData &state,
+                            int const ZoneNum,
+                            DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+                            DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
+                            bool const FirstHVACIteration,
+                            bool const ResetSimOrder,
+                            int spaceNum = 0);
+
     void DistributeSystemOutputRequired(EnergyPlusData &state, int ZoneNum, bool FirstHVACIteration);
 
-    void UpdateSystemOutputRequired(EnergyPlusData &state,
-                                    int ZoneNum,
-                                    Real64 SysOutputProvided,               // sensible output provided by zone equipment (W)
-                                    Real64 LatOutputProvided,               // latent output provided by zone equipment (kg/s)
-                                    Optional_int_const EquipPriorityNum = _ // index in PrioritySimOrder for this update
+    void distributeOutputRequired(EnergyPlusData &state,
+                                  int const ZoneNum,
+                                  DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+                                  DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture);
+
+    void updateSystemOutputRequired(EnergyPlusData &state,
+                                    int const ZoneNum,
+                                    Real64 const SysOutputProvided, // sensible output provided by zone equipment (W)
+                                    Real64 const LatOutputProvided, // latent output provided by zone equipment (kg/s)
+                                    DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+                                    DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
+                                    int const EquipPriorityNum = -1 // optional index in PrioritySimOrder for this update
+    );
+
+    void adjustSystemOutputRequired(Real64 const sensibleRatio, // sensible load adjustment
+                                    Real64 const latentRatio,   // latent load adjustment
+                                    DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+                                    DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
+                                    int const equipPriorityNum // index in PrioritySimOrder
     );
 
     void CalcZoneMassBalance(EnergyPlusData &state, bool FirstHVACIteration);
@@ -139,11 +232,11 @@ namespace ZoneEquipmentManager {
     void UpdateZoneEquipment(EnergyPlusData &state, bool &SimAir);
 
     void CalcDOASSupCondsForSizing(EnergyPlusData &state,
-                                   Real64 OutDB,        // outside air temperature [C]
-                                   Real64 OutHR,        // outside humidity ratio [kg Water / kg Dry Air]
-                                   int DOASControl,     // dedicated outside air control strategy
-                                   Real64 DOASLowTemp,  // DOAS low setpoint [C]
-                                   Real64 DOASHighTemp, // DOAS high setpoint [C]
+                                   Real64 OutDB,                        // outside air temperature [C]
+                                   Real64 OutHR,                        // outside humidity ratio [kg Water / kg Dry Air]
+                                   DataSizing::DOASControl DOASControl, // dedicated outside air control strategy
+                                   Real64 DOASLowTemp,                  // DOAS low setpoint [C]
+                                   Real64 DOASHighTemp,                 // DOAS high setpoint [C]
                                    Real64 W90H, // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
                                    Real64 W90L, // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
                                    Real64 &DOASSupTemp, // DOAS supply temperature [C]

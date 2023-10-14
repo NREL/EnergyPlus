@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -75,6 +75,7 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EMSManager;
@@ -1093,7 +1094,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EMSManager::CheckIfAnyEMS(*state); // get EMS input
     state->dataEMSMgr->FinishProcessingUserInput = true;
     bool ErrorsFound(false);
-    CurveManager::GetCurveInputData(*state, ErrorsFound); // process curve for use with EMS
+    Curve::GetCurveInputData(*state, ErrorsFound); // process curve for use with EMS
     EXPECT_FALSE(ErrorsFound);
 
     bool anyRan;
@@ -1113,12 +1114,11 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
                           ObjexxFCL::Optional_int_const()); // process trend functions again using above data
     EXPECT_TRUE(anyRan);
 
-    int index(0);
-    int offset(27); // first 26 values in ErlExpression() are key words + 1 EMS global variable
+    int offset = 28; // first 27 values in ErlExpression() are constant and built-in variables
     EXPECT_TRUE(compare_enums(state->dataRuntimeLang->ErlExpression(1).Operator, ErlFunc::Round));
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(1).NumOperands, 1);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(1).Operand.size(), 1u);
-    index = 1 + offset;
+    int index = 1 + offset;
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR1");
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Value.Number, 2.0); // round(2.1)
 
@@ -1636,10 +1636,13 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     EXPECT_FALSE(state->dataSurface->SurfWinShadingFlagEMSOn(2));
     EXPECT_EQ(state->dataSurface->SurfWinShadingFlagEMSValue(2), 0.0);
 
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->space(1).WindowSurfaceFirst = 1;
+    state->dataHeatBal->space(1).WindowSurfaceLast = 2;
     state->dataHeatBal->Zone.allocate(1);
-    state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).WindowSurfaceLast = 2;
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
     state->dataGlobal->NumOfZones = 1;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataSurface->SurfWinShadingFlagEMSOn(2) = true;
     state->dataSurface->SurfWinShadingFlagEMSValue(2) = 1.0; // WinShadingType::IntShade
     SolarShading::WindowShadingManager(*state);

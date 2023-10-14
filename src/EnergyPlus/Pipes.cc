@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -89,7 +89,7 @@ PlantComponent *LocalPipeData::factory(EnergyPlusData &state, DataPlant::PlantEq
         }
     }
     // If we didn't find it, fatal
-    ShowFatalError(state, "LocalPipeDataFactory: Error getting inputs for pipe named: " + objectName); // LCOV_EXCL_LINE
+    ShowFatalError(state, format("LocalPipeDataFactory: Error getting inputs for pipe named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
     return nullptr; // LCOV_EXCL_LINE
 }
@@ -120,7 +120,7 @@ void LocalPipeData::oneTimeInit_new(EnergyPlusData &state)
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "ConstantConditionsOC"
     if (FoundOnLoop == 0) {
-        ShowFatalError(state, "SimPipes: Pipe=\"" + this->Name + "\" not found on a Plant Loop."); // LCOV_EXCL_LINE
+        ShowFatalError(state, format("SimPipes: Pipe=\"{}\" not found on a Plant Loop.", this->Name)); // LCOV_EXCL_LINE
     }
 #pragma clang diagnostic pop
     if (errFlag) {

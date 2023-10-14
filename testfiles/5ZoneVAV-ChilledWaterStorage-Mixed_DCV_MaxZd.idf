@@ -74,7 +74,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes, PSI Indiana year 2004.
 
-  Version,22.2;
+  Version,24.1;
 
   Timestep,4;
 
@@ -4375,7 +4375,7 @@
     HeatSys1 Supply Equipment Outlet Node,  !- Boiler Water Outlet Node Name
     95.0,                    !- Water Outlet Upper Temperature Limit {C}
     LeavingSetpointModulated,!- Boiler Flow Mode
-    75.0,                    !- Parasitic Electric Load {W}
+    75.0,                    !- On Cycle Parasitic Electric Load {W}
     1.1;                     !- Sizing Factor
 
   SetpointManager:Scheduled,

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,6 +62,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -330,17 +331,13 @@ namespace OutputReportTabular {
     struct MonthlyInputType
     {
         // Members
-        std::string name;  // identifier
-        int numFieldSet;   // number of monthly field sets
-        int firstFieldSet; // pointer to the first field set
-        int numTables;     // number of tables
-        int firstTable;    // pointer to the first table
-        int showDigits;    // the number of digits to be shown
-
-        // Default Constructor
-        MonthlyInputType() : numFieldSet(0), firstFieldSet(0), numTables(0), firstTable(0), showDigits(0)
-        {
-        }
+        std::string name;      // identifier
+        int numFieldSet = 0;   // number of monthly field sets
+        int firstFieldSet = 0; // pointer to the first field set
+        int numTables = 0;     // number of tables
+        int firstTable = 0;    // pointer to the first table
+        int showDigits = 0;    // the number of digits to be shown
+        bool isNamedMonthly = false;
     };
 
     struct MonthlyFieldSetInputType
@@ -522,7 +519,7 @@ namespace OutputReportTabular {
 
     void GetInputTabularMonthly(EnergyPlusData &state);
 
-    int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int const inNumDigitsShown);
+    int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int const inNumDigitsShown, bool isNamedMonthly = false);
 
     void AddMonthlyFieldSetInput(
         EnergyPlusData &state, int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, AggType const inAggregate);
@@ -566,7 +563,7 @@ namespace OutputReportTabular {
     void WriteTableOfContents(EnergyPlusData &state);
 
     void AddTOCReportPeriod(const int nReportPeriods,
-                            const std::string kw,
+                            const std::string &kw,
                             const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
                             std::ostream &tbl_stream);
 
@@ -612,7 +609,7 @@ namespace OutputReportTabular {
                        bool &desConditionlinepassed,
                        bool &heatingDesignlinepassed,
                        bool &coolingDesignlinepassed,
-                       bool &isKoppen,
+                       bool isKoppen,
                        bool &insideLiquidPrecipitation);
 
     void FillWeatherPredefinedEntries(EnergyPlusData &state);
@@ -649,7 +646,7 @@ namespace OutputReportTabular {
 
     void WriteCompCostTable(EnergyPlusData &state);
 
-    void writeRowReportPeriodInputVeri(const std::string reportType,
+    void writeRowReportPeriodInputVeri(const std::string &reportType,
                                        Array2D_string &tableBody,
                                        const int rowid,
                                        const int periodIdx,
@@ -664,7 +661,7 @@ namespace OutputReportTabular {
     std::string formatReportPeriodTimestamp(const int year, const int month, const int day, const int hour);
 
     void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
-                                          const std::string reportKeyWord,
+                                          const std::string &reportKeyWord,
                                           const int periodIdx,
                                           const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData);
 
@@ -859,7 +856,7 @@ namespace OutputReportTabular {
 
     void WriteSubtitle(EnergyPlusData &state, std::string const &subtitle);
 
-    void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, Optional_bool_const isBold = _);
+    void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, bool const useBold = false);
 
     void WriteTable(EnergyPlusData &state,
                     Array2S_string const body, // row,column
@@ -1056,29 +1053,29 @@ struct OutputReportTabularData : BaseGlobalStruct
     Array1D<Real64> SourceFactors = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
     Array1D_bool ffSchedUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
     Array1D_int ffSchedIndex = Array1D_int(OutputReportTabular::numResourceTypes, 0);
-    Array2D_int meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0);
+    Array2D_int meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, static_cast<int>(Constant::EndUse::Num), 0);
     Array3D_int meterNumEndUseSubBEPS;
     Array3D_int meterNumEndUseSpTypeBEPS;
     // arrays that hold the names of the resource and end uses
     Array1D_string resourceTypeNames = Array1D_string(OutputReportTabular::numResourceTypes);
     Array1D_string sourceTypeNames = Array1D_string(OutputReportTabular::numSourceTypes);
-    Array1D_string endUseNames = Array1D_string(DataGlobalConstantsData::iEndUseSize);
+    Array1D_string endUseNames = Array1D_string(static_cast<int>(Constant::EndUse::Num));
     // arrays that hold the actual values for the year
     Array1D<Real64> gatherTotalsBEPS = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
     Array1D<Real64> gatherTotalsBySourceBEPS = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
     Array1D<Real64> gatherTotalsSource = Array1D<Real64>(OutputReportTabular::numSourceTypes, 0.0);
     Array1D<Real64> gatherTotalsBySource = Array1D<Real64>(OutputReportTabular::numSourceTypes, 0.0);
-    Array2D<Real64> gatherEndUseBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
-    Array2D<Real64> gatherEndUseBySourceBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
+    Array2D<Real64> gatherEndUseBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, static_cast<int>(Constant::EndUse::Num), 0.0);
+    Array2D<Real64> gatherEndUseBySourceBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, static_cast<int>(Constant::EndUse::Num), 0.0);
     Array3D<Real64> gatherEndUseSubBEPS;
     Array3D<Real64> gatherEndUseSpTypeBEPS;
-    Array1D_bool needOtherRowLEED45 = Array1D_bool(DataGlobalConstantsData::iEndUseSize);
-    Array1D_bool needOtherRowEndUse = Array1D_bool(DataGlobalConstantsData::iEndUseSize);
+    Array1D_bool needOtherRowLEED45 = Array1D_bool(static_cast<int>(Constant::EndUse::Num));
+    Array1D_bool needOtherRowEndUse = Array1D_bool(static_cast<int>(Constant::EndUse::Num));
 
     // arrays the hold the demand values
     Array1D<Real64> gatherDemandTotal = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
-    Array2D<Real64> gatherDemandEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
-    Array2D<Real64> gatherDemandIndEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
+    Array2D<Real64> gatherDemandEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, static_cast<int>(Constant::EndUse::Num), 0.0);
+    Array2D<Real64> gatherDemandIndEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, static_cast<int>(Constant::EndUse::Num), 0.0);
     Array3D<Real64> gatherDemandEndUseSub;
     Array3D<Real64> gatherDemandIndEndUseSub;
     Array1D_int gatherDemandTimeStamp = Array1D_int(OutputReportTabular::numResourceTypes, 0);
@@ -1138,8 +1135,8 @@ struct OutputReportTabularData : BaseGlobalStruct
     Real64 sourceFactorElectric = 0.0;
     Real64 sourceFactorNaturalGas = 0.0;
     Real64 efficiencyDistrictCooling = 0.0;
-    Real64 efficiencyDistrictHeating = 0.0;
-    Real64 sourceFactorSteam = 0.0;
+    Real64 efficiencyDistrictHeatingWater = 0.0;
+    Real64 sourceFactorDistrictHeatingSteam = 0.0;
     Real64 sourceFactorGasoline = 0.0;
     Real64 sourceFactorDiesel = 0.0;
     Real64 sourceFactorCoal = 0.0;
@@ -1243,7 +1240,6 @@ struct OutputReportTabularData : BaseGlobalStruct
     int numPeopleAdaptive = 0;
 
     Real64 BigNum = 0.0;
-    bool VarWarning = true;
     int ErrCount1 = 0;
     Array1D<OutputProcessor::VariableType> MonthlyColumnsTypeOfVar;
     Array1D<OutputProcessor::TimeStepType> MonthlyColumnsStepType;
@@ -1398,25 +1394,25 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->SourceFactors = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
         this->ffSchedUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
         this->ffSchedIndex = Array1D_int(OutputReportTabular::numResourceTypes, 0);
-        this->meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0);
+        this->meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, static_cast<int>(Constant::EndUse::Num), 0);
         this->meterNumEndUseSubBEPS.deallocate();
         this->meterNumEndUseSpTypeBEPS.deallocate();
         this->resourceTypeNames = Array1D_string(OutputReportTabular::numResourceTypes);
         this->sourceTypeNames = Array1D_string(OutputReportTabular::numSourceTypes);
-        this->endUseNames = Array1D_string(DataGlobalConstantsData::iEndUseSize);
+        this->endUseNames = Array1D_string(static_cast<int>(Constant::EndUse::Num));
         this->gatherTotalsBEPS = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
         this->gatherTotalsBySourceBEPS = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
         this->gatherTotalsSource = Array1D<Real64>(OutputReportTabular::numSourceTypes, 0.0);
         this->gatherTotalsBySource = Array1D<Real64>(OutputReportTabular::numSourceTypes, 0.0);
-        this->gatherEndUseBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
-        this->gatherEndUseBySourceBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
+        this->gatherEndUseBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, static_cast<int>(Constant::EndUse::Num), 0.0);
+        this->gatherEndUseBySourceBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, static_cast<int>(Constant::EndUse::Num), 0.0);
         this->gatherEndUseSubBEPS.deallocate();
         this->gatherEndUseSpTypeBEPS.deallocate();
-        this->needOtherRowLEED45 = Array1D_bool(DataGlobalConstantsData::iEndUseSize);
-        this->needOtherRowEndUse = Array1D_bool(DataGlobalConstantsData::iEndUseSize);
+        this->needOtherRowLEED45 = Array1D_bool(static_cast<int>(Constant::EndUse::Num));
+        this->needOtherRowEndUse = Array1D_bool(static_cast<int>(Constant::EndUse::Num));
         this->gatherDemandTotal = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
-        this->gatherDemandEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
-        this->gatherDemandIndEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
+        this->gatherDemandEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, static_cast<int>(Constant::EndUse::Num), 0.0);
+        this->gatherDemandIndEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, static_cast<int>(Constant::EndUse::Num), 0.0);
         this->gatherDemandEndUseSub.deallocate();
         this->gatherDemandIndEndUseSub.deallocate();
         this->gatherDemandTimeStamp = Array1D_int(OutputReportTabular::numResourceTypes, 0);
@@ -1468,8 +1464,8 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->sourceFactorElectric = 0.0;
         this->sourceFactorNaturalGas = 0.0;
         this->efficiencyDistrictCooling = 0.0;
-        this->efficiencyDistrictHeating = 0.0;
-        this->sourceFactorSteam = 0.0;
+        this->efficiencyDistrictHeatingWater = 0.0;
+        this->sourceFactorDistrictHeatingSteam = 0.0;
         this->sourceFactorGasoline = 0.0;
         this->sourceFactorDiesel = 0.0;
         this->sourceFactorCoal = 0.0;
@@ -1544,7 +1540,6 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->numPeopleAdaptive = 0;
 
         this->BigNum = 0.0;
-        this->VarWarning = true;
         this->ErrCount1 = 0;
         this->MonthlyColumnsTypeOfVar.clear();
         this->MonthlyColumnsStepType.clear();

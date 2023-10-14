@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -110,7 +110,7 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfTempIn;           // Temperature of the Inside Surface for each heat transfer surface
     Array1D<Real64> SurfTempInsOld;       // SurfTempIn from previous iteration for convergence check
     Array1D<Real64> SurfTempInTmp;        // Inside Surface Temperature Of Each Heat Transfer Surface
-    Array1D<Real64> SurfHcExt;            // Outside Convection Coefficient
+    Array1D<Real64> SurfHConvExt;         // Outside Convection Coefficient
     Array1D<Real64> SurfWinCoeffAdjRatio; // Convective Coefficient Adjustment Ratio assuming highly conductive frames
                                           // Only applicable for exterior window surfaces
     Array1D<Real64> SurfHAirExt;          // Outside Radiation Coefficient to Air
@@ -120,27 +120,28 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfTempSource;       // Temperature at the source location for each heat transfer surface
     Array1D<Real64> SurfTempUserLoc;      // Temperature at the user specified location for each heat transfer surface
     Array1D<Real64> SurfTempInMovInsRep;  // Temperature of interior movable insulation on the side facing the zone
+    Array1D<Real64> SurfHSrdSurfExt;      // Outside Radiation Coefficient to Surrounding Surfaces
 
-    Array1D<Real64> SurfQConvInReport;     // Surface convection heat gain at inside face [J]
+    Array1D<Real64> SurfQConvInRep;        // Surface convection heat gain at inside face [J]
     Array1D<Real64> SurfQdotConvInRep;     // Surface convection heat transfer rate at inside face surface [W] (report)
     Array1D<Real64> SurfQdotConvInPerArea; // Surface conv heat transfer rate per m2 at inside face surf (report){w/m2]
 
     // these next three all are for net IR thermal radiation exchange with other surfaces in the model.
-    Array1D<Real64> SurfQRadNetSurfInReport; // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> SurfQRadNetSurfInRep;    // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadNetSurfInRep; // Surface thermal radiation heat transfer inside face surface [W]
     // these next three all are for solar radiation gains on inside face
-    Array1D<Real64> SurfQRadSolarInReport;        // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> SurfQRadSolarInRep;           // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadSolarInRep;        // Surface thermal radiation heat transfer inside face surface [W]
     Array1D<Real64> SurfQdotRadSolarInRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Inside face surf
     // these next two all are for Lights visible radiation gains on inside face
-    Array1D<Real64> SurfQRadLightsInReport; // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> SurfQRadLightsInRep;    // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadLightsInRep; // Surface thermal radiation heat transfer inside face surface [W]
     // these next two all are for Internal Gains sources of radiation gains on inside face
-    Array1D<Real64> SurfQRadIntGainsInReport; // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> SurfQRadIntGainsInRep;    // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadIntGainsInRep; // Surface thermal radiation heat transfer inside face surface [W]
     // these next four all are for Radiative HVAC sources of radiation gains on inside face
     Array1D<bool> AnyRadiantSystems;          // True if there are any radiant systems
-    Array1D<Real64> SurfQRadHVACInReport;     // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> SurfQRadHVACInRep;        // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadHVACInRep;     // Surface thermal radiation heat transfer inside face surface [W]
     Array1D<Real64> SurfQdotRadHVACInPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Inside face surf
 
@@ -234,13 +235,13 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<bool> SurfMovInsulIntPresent;       // True when interior movable insulation is present
     Array1D<bool> SurfMovInsulIntPresentPrevTS; // True when interior movable insulation was present during the previous time step
 
-    Array1D<Real64> SurfMovInsulHExt;                         // Resistance or "h" value of exterior movable insulation
-    Array1D<Real64> SurfMovInsulHInt;                         // Resistance or "h" value of interior movable insulation
-    Array1D<Real64> SurfAbsSolarExt;                          // Solar Absorptivity of surface inside face or interior movable insulation if present
-    Array1D<Real64> SurfAbsThermalExt;                        // Thermal Absorptivity of surface inside face or interior movable insulation if present
-    Array1D<Real64> SurfAbsSolarInt;                          // Solar absorptivity of surface outside face or exterior movable insulation if present
-    Array1D<DataSurfaces::SurfaceRoughness> SurfRoughnessExt; // Roughness of surface inside face or interior movable insulation if present
-    Array1D<Real64> SurfAbsThermalInt; // Thermal absorptivity of surface outside face or exterior movable insulation if present
+    Array1D<Real64> SurfMovInsulHExt;                     // Resistance or "h" value of exterior movable insulation
+    Array1D<Real64> SurfMovInsulHInt;                     // Resistance or "h" value of interior movable insulation
+    Array1D<Real64> SurfAbsSolarExt;                      // Solar Absorptivity of surface outside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsThermalExt;                    // Thermal Absorptivity of surface outside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsSolarInt;                      // Solar absorptivity of surface inside face or exterior movable insulation if present
+    Array1D<Material::SurfaceRoughness> SurfRoughnessExt; // Roughness of surface inside face or exterior movable insulation if present
+    Array1D<Real64> SurfAbsThermalInt;                    // Thermal absorptivity of surface inside face or exterior movable insulation if present
     std::vector<int> SurfMovInsulIndexList;
     std::vector<int> SurfMovSlatsIndexList;
     void clear_state() override

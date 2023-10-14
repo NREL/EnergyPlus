@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,6 +57,8 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
 
@@ -84,18 +86,21 @@ TEST_F(EnergyPlusFixture, ExerciseCoolTower)
     ASSERT_TRUE(process_idf(idf_objects, false));
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = "ZONE 1";
-    state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBalFanSys->MAT(1) = 20.0;
-    state->dataHeatBalFanSys->MCPC.allocate(1);
-    state->dataHeatBalFanSys->MCPC(1) = 1;
-    state->dataHeatBalFanSys->MCPTC.allocate(1);
-    state->dataHeatBalFanSys->MCPTC(1) = 1;
-    state->dataHeatBalFanSys->CTMFL.allocate(1);
-    state->dataHeatBalFanSys->CTMFL(1) = 1;
-    state->dataHeatBalFanSys->ZT.allocate(1);
-    state->dataHeatBalFanSys->ZT(1) = 1;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
-    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 1;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 20.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 1.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPC = 1;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTC = 1;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).CTMFL = 1;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 1;
+
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutWetBulbTemp = 26.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutHumRat =
+        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
+    state->dataEnvrn->StdRhoAir =
+        Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
     state->dataEnvrn->WindSpeed = 20.0;
     CoolTower::ManageCoolTower(*state);
     // auto &thisTower = state->dataCoolTower->CoolTowerSys(1);

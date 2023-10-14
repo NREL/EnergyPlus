@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,8 +60,10 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -70,6 +72,8 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/WaterManager.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
@@ -77,7 +81,7 @@ using namespace DataAirLoop;
 using namespace DataAirSystems;
 using namespace DataHVACGlobals;
 using namespace DataSizing;
-using namespace CurveManager;
+using namespace Curve;
 using namespace OutputReportPredefined;
 using namespace ScheduleManager;
 using namespace DataEnvironment;
@@ -91,7 +95,6 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     using Psychrometrics::PsyTsatFnHPb;
     using Psychrometrics::PsyWFnTdbH;
     int DXCoilNum;
-    int CurveNum;
 
     state->dataDXCoils->NumDXCoils = 2;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
@@ -163,53 +166,49 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataDXCoils->DXCoil(DXCoilNum).RegionNum = 4;
     state->dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor = -17.78;
 
-    state->dataCurveManager->NumCurves = 3;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(3);
 
-    CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 2.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 2.0;
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
+    curve1->curveType = CurveType::Quadratic;
+    curve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve1->coeff[0] = 1;
+    curve1->coeff[1] = 0.0;
+    curve1->coeff[2] = 0.0;
+    curve1->coeff[3] = 0.0;
+    curve1->coeff[4] = 0.0;
+    curve1->coeff[5] = 0.0;
+    curve1->inputLimits[0].min = 0.0;
+    curve1->inputLimits[0].max = 2.0;
+    curve1->inputLimits[1].min = 0.0;
+    curve1->inputLimits[1].max = 2.0;
 
-    CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 0.7;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 1.0;
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
+    curve2->curveType = CurveType::Quadratic;
+    curve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve2->coeff[0] = 1;
+    curve2->coeff[1] = 0.0;
+    curve2->coeff[2] = 0.0;
+    curve2->coeff[3] = 0.0;
+    curve2->coeff[4] = 0.0;
+    curve2->coeff[5] = 0.0;
+    curve2->inputLimits[0].min = 0.0;
+    curve2->inputLimits[0].max = 1.0;
+    curve2->inputLimits[1].min = 0.7;
+    curve2->inputLimits[1].max = 1.0;
 
-    CurveNum = 3;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 100.0;
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
+    curve3->curveType = CurveType::BiQuadratic;
+    curve3->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve3->coeff[0] = 1;
+    curve3->coeff[1] = 0.0;
+    curve3->coeff[2] = 0.0;
+    curve3->coeff[3] = 0.0;
+    curve3->coeff[4] = 0.0;
+    curve3->coeff[5] = 0.0;
+    curve3->inputLimits[0].min = -100.0;
+    curve3->inputLimits[0].max = 100.0;
+    curve3->inputLimits[1].min = -100.0;
+    curve3->inputLimits[1].max = 100.0;
 
     SetPredefinedTables(*state);
     SizeDXCoil(*state, 2);
@@ -284,7 +283,6 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 TEST_F(EnergyPlusFixture, DXCoils_Test2)
 {
     int DXCoilNum;
-    int CurveNum;
 
     state->dataGlobal->DisplayExtraWarnings = true;
     state->dataSize->SysSizingRunDone = true;
@@ -318,53 +316,49 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     state->dataDXCoils->DXCoil(DXCoilNum).EIRFFlow(1) = 1;
     state->dataDXCoils->DXCoil(DXCoilNum).EIRFTemp(1) = 1;
     state->dataDXCoils->DXCoil(DXCoilNum).PLFFPLR(1) = 1;
-    state->dataCurveManager->NumCurves = 3;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(3);
 
-    CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 2.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 2.0;
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
+    curve1->curveType = CurveType::Quadratic;
+    curve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve1->coeff[0] = 1;
+    curve1->coeff[1] = 0.0;
+    curve1->coeff[2] = 0.0;
+    curve1->coeff[3] = 0.0;
+    curve1->coeff[4] = 0.0;
+    curve1->coeff[5] = 0.0;
+    curve1->inputLimits[0].min = 0.0;
+    curve1->inputLimits[0].max = 2.0;
+    curve1->inputLimits[1].min = 0.0;
+    curve1->inputLimits[1].max = 2.0;
 
-    CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 1.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 0.7;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 1.0;
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
+    curve2->curveType = CurveType::Quadratic;
+    curve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve2->coeff[0] = 1;
+    curve2->coeff[1] = 0.0;
+    curve2->coeff[2] = 0.0;
+    curve2->coeff[3] = 0.0;
+    curve2->coeff[4] = 0.0;
+    curve2->coeff[5] = 0.0;
+    curve2->inputLimits[0].min = 0.0;
+    curve2->inputLimits[0].max = 1.0;
+    curve2->inputLimits[1].min = 0.7;
+    curve2->inputLimits[1].max = 1.0;
 
-    CurveNum = 3;
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 100.0;
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
+    curve3->curveType = CurveType::BiQuadratic;
+    curve3->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve3->coeff[0] = 1;
+    curve3->coeff[1] = 0.0;
+    curve3->coeff[2] = 0.0;
+    curve3->coeff[3] = 0.0;
+    curve3->coeff[4] = 0.0;
+    curve3->coeff[5] = 0.0;
+    curve3->inputLimits[0].min = -100.0;
+    curve3->inputLimits[0].max = 100.0;
+    curve3->inputLimits[1].min = -100.0;
+    curve3->inputLimits[1].max = 100.0;
 
     SetPredefinedTables(*state);
     SizeDXCoil(*state, 2);
@@ -411,7 +405,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
 
     Coil.DXCoilType = "Coil:Heating:DX:MultiSpeed";
     Coil.DXCoilType_Num = CoilDX_MultiSpeedHeating;
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
 
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataHeatBal->HeatReclaimDXCoil.allocate(state->dataDXCoils->NumDXCoils);
@@ -457,8 +451,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
-    Coil.FuelType = "Electricity";
-    Coil.FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
+    Coil.FuelType = Constant::eFuel::Electricity;
     Coil.RegionNum = 4;
     Coil.MSRatedTotCap(1) = 2202.5268975202675;
     Coil.MSRatedCOP(1) = 4.200635910578916;
@@ -477,189 +470,186 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
             Coil.MSRatedAirVolFlowRate(mode) * PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, 21.11, 0.00881, "InitDXCoil");
     }
 
-    state->dataCurveManager->NumCurves = 11;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(11);
 
-    PerformanceCurveData *pCurve;
+    Curve::Curve *pCurve;
 
     int constexpr nCapfT1 = 1;
-    pCurve = &state->dataCurveManager->PerfCurve(nCapfT1);
+    pCurve = state->dataCurveManager->PerfCurve(nCapfT1);
     pCurve->curveType = CurveType::BiQuadratic;
     pCurve->Name = "HP_Heat-Cap-fT1";
-    pCurve->Coeff1 = 0.95624428;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Coeff4 = 0.005999544;
-    pCurve->Coeff5 = -0.0000900072;
-    pCurve->Coeff6 = 0;
-    pCurve->Var1Min = -100;
-    pCurve->Var1Max = 100;
-    pCurve->Var2Min = -100;
-    pCurve->Var2Max = 100;
+    pCurve->coeff[0] = 0.95624428;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->coeff[3] = 0.005999544;
+    pCurve->coeff[4] = -0.0000900072;
+    pCurve->coeff[5] = 0;
+    pCurve->inputLimits[0].min = -100;
+    pCurve->inputLimits[0].max = 100;
+    pCurve->inputLimits[1].min = -100;
+    pCurve->inputLimits[1].max = 100;
 
     Coil.MSCCapFTemp(1) = nCapfT1;
 
     int constexpr nCapfFF1 = 2;
-    pCurve = &state->dataCurveManager->PerfCurve(nCapfFF1);
+    pCurve = state->dataCurveManager->PerfCurve(nCapfFF1);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-Cap-fFF1";
-    pCurve->Coeff1 = 1;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->coeff[0] = 1;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->inputLimits[0].min = 0;
+    pCurve->inputLimits[0].max = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
 
     Coil.MSCCapFFlow(1) = nCapfFF1;
 
     int constexpr nEIRfT1 = 3;
-    pCurve = &state->dataCurveManager->PerfCurve(nEIRfT1);
+    pCurve = state->dataCurveManager->PerfCurve(nEIRfT1);
     pCurve->curveType = CurveType::BiQuadratic;
     pCurve->Name = "HP_Heat-EIR-fT1";
-    pCurve->Coeff1 = 1.065476178;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Coeff4 = -0.0085714308;
-    pCurve->Coeff5 = 0.0000857142;
-    pCurve->Coeff6 = 0;
-    pCurve->Var1Min = -100;
-    pCurve->Var1Max = 100;
-    pCurve->Var2Min = -100;
-    pCurve->Var2Max = 100;
+    pCurve->coeff[0] = 1.065476178;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->coeff[3] = -0.0085714308;
+    pCurve->coeff[4] = 0.0000857142;
+    pCurve->coeff[5] = 0;
+    pCurve->inputLimits[0].min = -100;
+    pCurve->inputLimits[0].max = 100;
+    pCurve->inputLimits[1].min = -100;
+    pCurve->inputLimits[1].max = 100;
 
     Coil.MSEIRFTemp(1) = nEIRfT1;
 
     int constexpr nEIRfFF1 = 4;
-    pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF1);
+    pCurve = state->dataCurveManager->PerfCurve(nEIRfFF1);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-EIR-fFF1";
-    pCurve->Coeff1 = 1;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->coeff[0] = 1;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->inputLimits[0].min = 0;
+    pCurve->inputLimits[0].max = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
 
     Coil.MSEIRFFlow(1) = nEIRfFF1;
 
     int constexpr nPLFfPLR1 = 5;
-    pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR1);
+    pCurve = state->dataCurveManager->PerfCurve(nPLFfPLR1);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-PLF-fPLR1";
-    pCurve->Coeff1 = 1;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 1;
-    pCurve->CurveMin = 0.7;
-    pCurve->CurveMax = 1;
+    pCurve->coeff[0] = 1;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->inputLimits[0].min = 0;
+    pCurve->inputLimits[0].max = 1;
+    pCurve->outputLimits.min = 0.7;
+    pCurve->outputLimits.max = 1;
 
     Coil.MSPLFFPLR(1) = nPLFfPLR1;
 
     int constexpr nConstantBiquadratic = 6;
-    pCurve = &state->dataCurveManager->PerfCurve(nConstantBiquadratic);
+    pCurve = state->dataCurveManager->PerfCurve(nConstantBiquadratic);
     pCurve->curveType = CurveType::BiQuadratic;
     pCurve->Name = "ConstantBiquadratic";
-    pCurve->Coeff1 = 1;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Coeff4 = 0;
-    pCurve->Coeff5 = 0;
-    pCurve->Coeff6 = 0;
-    pCurve->Var1Min = -100;
-    pCurve->Var1Max = 100;
-    pCurve->Var2Min = -100;
-    pCurve->Var2Max = 100;
+    pCurve->coeff[0] = 1;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->coeff[3] = 0;
+    pCurve->coeff[4] = 0;
+    pCurve->coeff[5] = 0;
+    pCurve->inputLimits[0].min = -100;
+    pCurve->inputLimits[0].max = 100;
+    pCurve->inputLimits[1].min = -100;
+    pCurve->inputLimits[1].max = 100;
 
     Coil.MSWasteHeat(1) = nConstantBiquadratic;
     Coil.MSWasteHeat(2) = nConstantBiquadratic;
 
     int constexpr nCapfT2 = 7;
-    pCurve = &state->dataCurveManager->PerfCurve(nCapfT2);
+    pCurve = state->dataCurveManager->PerfCurve(nCapfT2);
     pCurve->curveType = CurveType::BiQuadratic;
     pCurve->Name = "HP_Heat-Cap-fT2";
-    pCurve->Coeff1 = 0.95624428;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Coeff4 = 0.005999544;
-    pCurve->Coeff5 = -0.0000900072;
-    pCurve->Coeff6 = 0;
-    pCurve->Var1Min = -100;
-    pCurve->Var1Max = 100;
-    pCurve->Var2Min = -100;
-    pCurve->Var2Max = 100;
+    pCurve->coeff[0] = 0.95624428;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->coeff[3] = 0.005999544;
+    pCurve->coeff[4] = -0.0000900072;
+    pCurve->coeff[5] = 0;
+    pCurve->inputLimits[0].min = -100;
+    pCurve->inputLimits[0].max = 100;
+    pCurve->inputLimits[1].min = -100;
+    pCurve->inputLimits[1].max = 100;
 
     Coil.MSCCapFTemp(2) = nCapfT2;
 
     int constexpr nCapfFF2 = 8;
-    pCurve = &state->dataCurveManager->PerfCurve(nCapfFF2);
+    pCurve = state->dataCurveManager->PerfCurve(nCapfFF2);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-Cap-fFF2";
-    pCurve->Coeff1 = 1;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->coeff[0] = 1;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->inputLimits[0].min = 0;
+    pCurve->inputLimits[0].max = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
 
     Coil.MSCCapFFlow(2) = nCapfFF2;
 
     int constexpr nEIRfT2 = 9;
-    pCurve = &state->dataCurveManager->PerfCurve(nEIRfT2);
+    pCurve = state->dataCurveManager->PerfCurve(nEIRfT2);
     pCurve->curveType = CurveType::BiQuadratic;
     pCurve->Name = "HP_Heat-EIR-fT2";
-    pCurve->Coeff1 = 1.065476178;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Coeff4 = -0.0085714308;
-    pCurve->Coeff5 = 0.0000857142;
-    pCurve->Coeff6 = 0;
-    pCurve->Var1Min = -100;
-    pCurve->Var1Max = 100;
-    pCurve->Var2Min = -100;
-    pCurve->Var2Max = 100;
+    pCurve->coeff[0] = 1.065476178;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->coeff[3] = -0.0085714308;
+    pCurve->coeff[4] = 0.0000857142;
+    pCurve->coeff[5] = 0;
+    pCurve->inputLimits[0].min = -100;
+    pCurve->inputLimits[0].max = 100;
+    pCurve->inputLimits[1].min = -100;
+    pCurve->inputLimits[1].max = 100;
 
     Coil.MSEIRFTemp(2) = nEIRfT2;
 
     int constexpr nEIRfFF2 = 10;
-    pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF2);
+    pCurve = state->dataCurveManager->PerfCurve(nEIRfFF2);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-EIR-fFF2";
-    pCurve->Coeff1 = 1;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->coeff[0] = 1;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->inputLimits[0].min = 0;
+    pCurve->inputLimits[0].max = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
 
     Coil.MSEIRFFlow(2) = nEIRfFF2;
 
     int constexpr nPLFfPLR2 = 11;
-    pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR2);
+    pCurve = state->dataCurveManager->PerfCurve(nPLFfPLR2);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-PLF-fPLR2";
-    pCurve->Coeff1 = 1;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 1;
-    pCurve->CurveMin = 0.7;
-    pCurve->CurveMax = 1;
+    pCurve->coeff[0] = 1;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->inputLimits[0].min = 0;
+    pCurve->inputLimits[0].max = 1;
+    pCurve->outputLimits.min = 0.7;
+    pCurve->outputLimits.max = 1;
 
     Coil.MSPLFFPLR(2) = nPLFfPLR2;
 
     for (int CurveNum = 1; CurveNum <= state->dataCurveManager->NumCurves; ++CurveNum) {
-        PerformanceCurveData &rCurve = state->dataCurveManager->PerfCurve(CurveNum);
-        if (rCurve.curveType == CurveType::BiQuadratic) {
-            rCurve.ObjectType = "Curve:Biquadratic";
-            rCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-        } else if (rCurve.curveType == CurveType::Quadratic) {
-            rCurve.ObjectType = "Curve:Quadratic";
-            rCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
+        Curve::Curve *rCurve = state->dataCurveManager->PerfCurve(CurveNum);
+        if (rCurve->curveType == CurveType::BiQuadratic) {
+            rCurve->interpolationType = InterpType::EvaluateCurveToLimits;
+        } else if (rCurve->curveType == CurveType::Quadratic) {
+            rCurve->interpolationType = InterpType::EvaluateCurveToLimits;
         }
     }
 
@@ -794,7 +784,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.Name = "DX Single Speed Heating Coil";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
     Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     state->dataLoopNodes->Node.allocate(1);
     Coil.AirOutNode = 1;
 
@@ -815,99 +805,95 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
-    Coil.FuelType = "Electricity";
-    Coil.FuelTypeNum = DataGlobalConstants::ResourceType::Electricity;
+    Coil.FuelType = Constant::eFuel::Electricity;
     Coil.RegionNum = 4;
 
-    state->dataCurveManager->NumCurves = 5;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(5);
 
-    PerformanceCurveData *pCurve;
+    Curve::Curve *pCurve;
 
     int constexpr nCapfT2 = 1;
-    pCurve = &state->dataCurveManager->PerfCurve(nCapfT2);
+    pCurve = state->dataCurveManager->PerfCurve(nCapfT2);
     pCurve->curveType = CurveType::BiQuadratic;
     pCurve->Name = "HP_Heat-Cap-fT2";
-    pCurve->Coeff1 = 0.95624428;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Coeff4 = 0.005999544;
-    pCurve->Coeff5 = -0.0000900072;
-    pCurve->Coeff6 = 0;
-    pCurve->Var1Min = -100;
-    pCurve->Var1Max = 100;
-    pCurve->Var2Min = -100;
-    pCurve->Var2Max = 100;
+    pCurve->coeff[0] = 0.95624428;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->coeff[3] = 0.005999544;
+    pCurve->coeff[4] = -0.0000900072;
+    pCurve->coeff[5] = 0;
+    pCurve->inputLimits[0].min = -100;
+    pCurve->inputLimits[0].max = 100;
+    pCurve->inputLimits[1].min = -100;
+    pCurve->inputLimits[1].max = 100;
 
     Coil.CCapFTemp(1) = nCapfT2;
 
     int constexpr nCapfFF2 = 2;
-    pCurve = &state->dataCurveManager->PerfCurve(nCapfFF2);
+    pCurve = state->dataCurveManager->PerfCurve(nCapfFF2);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-Cap-fFF2";
-    pCurve->Coeff1 = 1;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->coeff[0] = 1;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->inputLimits[0].min = 0;
+    pCurve->inputLimits[0].max = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
 
     Coil.CCapFFlow(1) = nCapfFF2;
 
     int constexpr nEIRfT2 = 3;
-    pCurve = &state->dataCurveManager->PerfCurve(nEIRfT2);
+    pCurve = state->dataCurveManager->PerfCurve(nEIRfT2);
     pCurve->curveType = CurveType::BiQuadratic;
     pCurve->Name = "HP_Heat-EIR-fT2";
-    pCurve->Coeff1 = 1.065476178;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Coeff4 = -0.0085714308;
-    pCurve->Coeff5 = 0.0000857142;
-    pCurve->Coeff6 = 0;
-    pCurve->Var1Min = -100;
-    pCurve->Var1Max = 100;
-    pCurve->Var2Min = -100;
-    pCurve->Var2Max = 100;
+    pCurve->coeff[0] = 1.065476178;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->coeff[3] = -0.0085714308;
+    pCurve->coeff[4] = 0.0000857142;
+    pCurve->coeff[5] = 0;
+    pCurve->inputLimits[0].min = -100;
+    pCurve->inputLimits[0].max = 100;
+    pCurve->inputLimits[1].min = -100;
+    pCurve->inputLimits[1].max = 100;
 
     Coil.EIRFTemp(1) = nEIRfT2;
 
     int constexpr nEIRfFF2 = 4;
-    pCurve = &state->dataCurveManager->PerfCurve(nEIRfFF2);
+    pCurve = state->dataCurveManager->PerfCurve(nEIRfFF2);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-EIR-fFF2";
-    pCurve->Coeff1 = 1;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 2;
-    pCurve->CurveMin = 0;
-    pCurve->CurveMax = 2;
+    pCurve->coeff[0] = 1;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->inputLimits[0].min = 0;
+    pCurve->inputLimits[0].max = 2;
+    pCurve->outputLimits.min = 0;
+    pCurve->outputLimits.max = 2;
 
     Coil.EIRFFlow(1) = nEIRfFF2;
 
     int constexpr nPLFfPLR2 = 5;
-    pCurve = &state->dataCurveManager->PerfCurve(nPLFfPLR2);
+    pCurve = state->dataCurveManager->PerfCurve(nPLFfPLR2);
     pCurve->curveType = CurveType::Quadratic;
     pCurve->Name = "HP_Heat-PLF-fPLR2";
-    pCurve->Coeff1 = 1;
-    pCurve->Coeff2 = 0;
-    pCurve->Coeff3 = 0;
-    pCurve->Var1Min = 0;
-    pCurve->Var1Max = 1;
-    pCurve->CurveMin = 0.7;
-    pCurve->CurveMax = 1;
+    pCurve->coeff[0] = 1;
+    pCurve->coeff[1] = 0;
+    pCurve->coeff[2] = 0;
+    pCurve->inputLimits[0].min = 0;
+    pCurve->inputLimits[0].max = 1;
+    pCurve->outputLimits.min = 0.7;
+    pCurve->outputLimits.max = 1;
 
     Coil.PLFFPLR(1) = nPLFfPLR2;
 
     for (int CurveNum = 1; CurveNum <= state->dataCurveManager->NumCurves; ++CurveNum) {
-        PerformanceCurveData &rCurve = state->dataCurveManager->PerfCurve(CurveNum);
-        if (rCurve.curveType == CurveType::BiQuadratic) {
-            rCurve.ObjectType = "Curve:Biquadratic";
-            rCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
-        } else if (rCurve.curveType == CurveType::Quadratic) {
-            rCurve.ObjectType = "Curve:Quadratic";
-            rCurve.InterpolationType = InterpType::EvaluateCurveToLimits;
+        Curve::Curve *rCurve = state->dataCurveManager->PerfCurve(CurveNum);
+        if (rCurve->curveType == CurveType::BiQuadratic) {
+            rCurve->interpolationType = InterpType::EvaluateCurveToLimits;
+        } else if (rCurve->curveType == CurveType::Quadratic) {
+            rCurve->interpolationType = InterpType::EvaluateCurveToLimits;
         }
     }
 
@@ -1067,6 +1053,7 @@ TEST_F(EnergyPlusFixture, DXCoilEvapCondPumpSizingTest)
         "	,                     !- Evaporative Condenser Air Flow Rate",
         "	autosize,             !- Evaporative Condenser Pump Rated Power Consumption",
         "	0.0,                  !- Crankcase Heater Capacity",
+        " ,                     !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "	10.0;                 !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
     });
 
@@ -1086,6 +1073,1021 @@ TEST_F(EnergyPlusFixture, DXCoilEvapCondPumpSizingTest)
     EXPECT_EQ(state->dataDXCoils->DXCoil(1).RatedTotCap(1) * 0.004266, state->dataDXCoils->DXCoil(1).EvapCondPumpElecNomPower(1));
     // Minimum Outdoor Temperature for Compressor Operation defaults to -25.0 C
     EXPECT_EQ(state->dataDXCoils->DXCoil(1).MinOATCompressor, -25.0);
+}
+
+TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "Coil:Cooling:DX:SingleSpeed,",
+        "Coil:Cooling:DX:SingleSpeed coil,    !- Name",
+        ",                        !- Availability Schedule Name",
+        "32000,                   !- Gross Rated Total Cooling Capacity {W}",
+        "0.75,                    !- Gross Rated Sensible Heat Ratio",
+        "3.0,                     !- Gross Rated Cooling COP {W/W}",
+        "1.7,                     !- Rated Air Flow Rate {m3/s}",
+        ",                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}",
+        "DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
+        "Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
+        "Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
+        "Cubic,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
+        "Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "Cubic,                 !- Part Load Fraction Correlation Curve Name",
+        ",                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        ",                        !- Nominal Time for Condensate Removal to Begin {s}",
+        ",                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+        ",                        !- Maximum Cycling Rate {cycles/hr}",
+        ",                        !- Latent Capacity Time Constant {s}",
+        ",                        !- Condenser Air Inlet Node Name",
+        "EvaporativelyCooled,     !- Condenser Type",
+        ",                        !- Evaporative Condenser Effectiveness {dimensionless}",
+        ",                        !- Evaporative Condenser Air Flow Rate {m3/s}",
+        ",                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "10,                      !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve,          !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        ",                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        ",                        !- Supply Water Storage Tank Name",
+        ",                        !- Condensate Collection Water Storage Tank Name",
+        "200,                     !- Basin Heater Capacity {W/K}",
+        ",                        !- Basin Heater Setpoint Temperature",
+        ",                        !- Basin Heater Operating Schedule Name",
+        ",                        !- Sensible Heat Ratio Function of Temperature Curve Name",
+        ",                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name",
+        ",                        !- Report ASHRAE Standard 127 Performance Ratings",
+        ";                        !- Zone Name for Condenser Placement",
+
+        "Coil:Heating:DX:SingleSpeed,",
+        "Coil:Heating:DX:SingleSpeed coil,      !- Name",
+        "  ,                                       !- Availability Schedule Name",
+        "  18584.26,                               !- Gross Rated Heating Capacity {W}",
+        "  3.8,                                    !- Gross Rated Heating COP {W/W}",
+        "  1.0,                                    !- Rated Air Flow Rate {m3/s}",
+        "  673.3,                                  !- 2017 Rated Supply Fan Power Per Volume Flow Rate",
+        "  673.3,                                  !- 2023 Rated Supply Fan Power Per Volume Flow Rate",
+        "  PTHP Thermal Zone One Cooling Coil Outlet Node, !- Air Inlet Node Name",
+        "  PTHP Thermal Zone One Heating Coil Outlet Node, !- Air Outlet Node Name",
+        "  Biquadratic,                      !- Heating Capacity Function of Temperature Curve Name",
+        "  Cubic,                            !- Heating Capacity Function of Flow Fraction Curve Name",
+        "  Biquadratic,                      !- Energy Input Ratio Function of Temperature Curve Name",
+        "  Cubic,                            !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  Cubic,                            !- Part Load Fraction Correlation Curve Name",
+        "  ,                                       !- Defrost Energy Input Ratio Function of Temperature Curve Name",
+        "  -8,                                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "  ,                                       !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
+        "  5,                                      !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
+        "  10,                                     !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve2,                          !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "  10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "  Resistive,                              !- Defrost Strategy",
+        "  Timed,                                  !- Defrost Control",
+        "  0.166667,                               !- Defrost Time Period Fraction",
+        "  2000,                                   !- Resistive Defrost Heater Capacity {W}",
+        ",                                         !- Region number for calculating HSPF",
+        ",                                         !- Evaporator Air Inlet Node Name",
+        ",                                         !- Zone Name for Evaporator Placement",
+        ",                                         !- Secondary Coil Air Flow Rate",
+        ",                                         !- Secondary Coil Fan Flow Scaling Factor",
+        ",                                         !- Nominal Sensible Heat Ratio of Secondary Coil",
+        ",                                         !- Sensible Heat Ratio Modifier Function of Temperature Curve Name",
+        ";                                         !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name",
+
+        "Coil:Cooling:DX:MultiSpeed,",
+        "Coil:Cooling:DX:MultiSpeed coil,                     !- Name",
+        ",                                         !- Availability Schedule Name",
+        "DX Cooling Coil Air Inlet Node,           !- Air Inlet Node Name",
+        "Heating Coil Air Inlet Node,              !- Air Outlet Node Name",
+        "Outdoor Condenser Air Node,               !- Condenser Air Inlet Node Name",
+        "AirCooled,                                !- Condenser Type",
+        ",                                         !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        ",                                         !- Supply Water Storage Tank Name",
+        ",                                         !- Condensate Collection Water Storage Tank Name",
+        "No,                                       !- Apply Part Load Fraction to Speeds Greater than 1",
+        "No,                                       !- Apply Latent Degradation to Speeds Greater than 1",
+        "10.0,                                    !- Crankcase Heater Capacity{ W }",
+        "heaterCapCurve3,                          !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "10.0,                                     !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
+        ",                                         !- Basin Heater Capacity{ W / K }",
+        ",                                         !- Basin Heater Setpoint Temperature{ C }",
+        ",                                         !- Basin Heater Operating Schedule Name",
+        "Electricity,                              !- Fuel Type",
+        "4,                                        !- Number of Speeds",
+        "7500,                                     !- Speed 1 Gross Rated Total Cooling Capacity{ W }",
+        "0.75,                                     !- Speed 1 Gross Rated Sensible Heat Ratio",
+        "3.0,                                      !- Speed 1 Gross Rated Cooling COP{ W / W }",
+        "0.40,                                     !- Speed 1 Rated Air Flow Rate{ m3 / s }",
+        "453.3,                                    !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "453.3,                                    !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
+        "Biquadratic, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+        "Cubic, !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "Biquadratic, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "Cubic, !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "Cubic, !- Speed 1 Part Load Fraction Correlation Curve Name",
+        "1000.0, !- Speed 1 Nominal Time for Condensate Removal to Begin{ s }",
+        "1.5, !- Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity{ dimensionless }",
+        "3.0, !- Speed 1 Maximum Cycling Rate{ cycles / hr }",
+        "45.0, !- Speed 1 Latent Capacity Time Constant{ s }",
+        "0.2, !- Speed 1 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        ", !- Speed 1 Waste Heat Function of Temperature Curve Name",
+        "0.9, !- Speed 1 Evaporative Condenser Effectiveness{ dimensionless }",
+        "0.05, !- Speed 1 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        "50, !- Speed 1 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        "17500, !- Speed 2 Gross Rated Total Cooling Capacity{ W }",
+        "0.75, !- Speed 2 Gross Rated Sensible Heat Ratio",
+        "3.0, !- Speed 2 Gross Rated Cooling COP{ W / W }",
+        "0.85, !- Speed 2 Rated Air Flow Rate{ m3 / s }",
+        "523.3, !- 2017 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "523.3, !- 2023 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
+        "Biquadratic, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+        "Cubic, !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "Biquadratic, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+        "Cubic, !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "Cubic, !- Speed 2 Part Load Fraction Correlation Curve Name",
+        "1000.0, !- Speed 2 Nominal Time for Condensate Removal to Begin{ s }",
+        "1.5, !- Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }",
+        "3.0, !- Speed 2 Maximum Cycling Rate{ cycles / hr }",
+        "45.0, !- Speed 2 Latent Capacity Time Constant{ s }",
+        "0.2, !- Speed 2 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        ", !- Speed 2 Waste Heat Function of Temperature Curve Name",
+        "0.9, !- Speed 2 Evaporative Condenser Effectiveness{ dimensionless }",
+        "0.1, !- Speed 2 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        "60, !- Speed 2 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        "25500, !- Speed 3 Gross Rated Total Cooling Capacity{ W }",
+        "0.75, !- Speed 3 Gross Rated Sensible Heat Ratio",
+        "3.0, !- Speed 3 Gross Rated Cooling COP{ W / W }",
+        "1.25, !- Speed 3 Rated Air Flow Rate{ m3 / s }",
+        "573.3, !- 2017 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "573.3, !- 2023 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
+        "Biquadratic, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+        "Cubic, !- Speed 3 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "Biquadratic, !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+        "Cubic, !- Speed 3 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "Cubic, !- Speed 3 Part Load Fraction Correlation Curve Name",
+        "1000.0, !- Speed 3 Nominal Time for Condensate Removal to Begin{ s }",
+        "1.5, !- Speed 3 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }",
+        "3.0, !- Speed 3 Maximum Cycling Rate{ cycles / hr }",
+        "45.0, !- Speed 3 Latent Capacity Time Constant{ s }",
+        "0.2, !- Speed 3 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        ", !- Speed 3 Waste Heat Function of Temperature Curve Name",
+        "0.9, !- Speed 3 Evaporative Condenser Effectiveness{ dimensionless }",
+        "0.2, !- Speed 3 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        "80, !- Speed 3 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        "35500, !- Speed 4 Gross Rated Total Cooling Capacity{ W }",
+        "0.75, !- Speed 4 Gross Rated Sensible Heat Ratio",
+        "3.0, !- Speed 4 Gross Rated Cooling COP{ W / W }",
+        "1.75, !- Speed 4 Rated Air Flow Rate{ m3 / s }",
+        "673.3, !- 2017 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "673.3, !- 2023 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
+        "Biquadratic, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
+        "Cubic, !- Speed 4 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "Biquadratic, !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+        "Cubic, !- Speed 4 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "Cubic, !- Speed 4 Part Load Fraction Correlation Curve Name",
+        "1000.0, !- Speed 4 Nominal Time for Condensate Removal to Begin{ s }",
+        "1.5, !- Speed 4 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }",
+        "3.0, !- Speed 4 Maximum Cycling Rate{ cycles / hr }",
+        "45.0, !- Speed 4 Latent Capacity Time Constant{ s }",
+        "0.2, !- Speed 4 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        ", !- Speed 4 Waste Heat Function of Temperature Curve Name",
+        "0.9, !- Speed 4 Evaporative Condenser Effectiveness{ dimensionless }",
+        "0.3, !- Speed 4 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        "100,                     !- Speed 4 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        ";                                         !- Zone Name for Condenser Placement",
+
+        " Coil:Heating:DX:MultiSpeed,",
+        "Coil:Heating:DX:MultiSpeed coil,                          !- Name",
+        "   ,                                       !- Availability Schedule Name",
+        "   ashp unitary system Cooling Coil - Heating Coil Node, !- Air Inlet Node Name",
+        "   ashp unitary system Heating Coil - Supplemental Coil Node, !- Air Outlet Node Name",
+        "   -17.7777777777778,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "   ,                                       !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
+        "   10,                                     !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve4,                           !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "   10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "   Biquadratic,                            !- Defrost Energy Input Ratio Function of Temperature Curve Name",
+        "   4.44444444444444,                       !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
+        "   ReverseCycle,                           !- Defrost Strategy",
+        "   OnDemand,                               !- Defrost Control",
+        "   0.058333,                               !- Defrost Time Period Fraction",
+        "   AutoSize,                               !- Resistive Defrost Heater Capacity {W}",
+        "   No,                                     !- Apply Part Load Fraction to Speeds Greater than 1",
+        "   Electricity,                            !- Fuel Type",
+        "   4,                                      !- Region number for Calculating HSPF",
+        "   2,                                      !- Number of Speeds",
+        "   10128.5361851424,                       !- Speed Gross Rated Heating Capacity 1 {W}",
+        "   4.4518131589158,                        !- Speed Gross Rated Heating COP 1 {W/W}",
+        "   0.531903646383625,                      !- Speed Rated Air Flow Rate 1 {m3/s}",
+        "   773.3,                                  !- 2017 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.3,                                  !- 2023 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}", //??
+        "   Biquadratic,                        !- Speed Heating Capacity Function of Temperature Curve Name 1",
+        "   Cubic,                       !- Speed Heating Capacity Function of Flow Fraction Curve Name 1",
+        "   Biquadratic,                        !- Speed Energy Input Ratio Function of Temperature Curve Name 1",
+        "   Cubic,                       !- Speed Energy Input Ratio Function of Flow Fraction Curve Name 1",
+        "   Cubic,                      !- Speed Part Load Fraction Correlation Curve Name 1",
+        "   0.2,                                    !- Speed Rated Waste Heat Fraction of Power Input 1 {dimensionless}",
+        "   ConstantBiquadratic,                    !- Speed Waste Heat Function of Temperature Curve Name 1",
+        "   14067.4113682534,                       !- Speed Gross Rated Heating Capacity 2 {W}",
+        "   3.9871749697327,                        !- Speed Gross Rated Heating COP 2 {W/W}",
+        "   0.664879557979531,                      !- Speed Rated Air Flow Rate 2 {m3/s}",
+        "   773.3,                                  !- 2017 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.3,                                  !- 2023 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   Biquadratic,                        !- Speed Heating Capacity Function of Temperature Curve Name 2",
+        "   Cubic,                       !- Speed Heating Capacity Function of Flow Fraction Curve Name 2",
+        "   Biquadratic,                        !- Speed Energy Input Ratio Function of Temperature Curve Name 2",
+        "   Cubic,                       !- Speed Energy Input Ratio Function of Flow Fraction Curve Name 2",
+        "   Cubic,                      !- Speed Part Load Fraction Correlation Curve Name 2",
+        "   0.2,                                    !- Speed Rated Waste Heat Fraction of Power Input 2 {dimensionless}",
+        "   Biquadratic,                    !- Speed Waste Heat Function of Temperature Curve Name 2",
+        ", !- fill other fields",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ";",
+
+        "  Coil:Cooling:DX:VariableSpeed,",
+        "Coil:Cooling:DX:VariableSpeed coil,    !- Name",
+        "    Zone1WindACFanOutletNode,  !- Indoor Air Inlet Node Name",
+        "    Zone1WindACAirOutletNode,  !- Indoor Air Outlet Node Name",
+        "    1,                       !- Number of Speeds {dimensionless}",
+        "    1,                       !- Nominal Speed Level {dimensionless}",
+        "    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}",
+        "    AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+        "    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
+        "    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
+        "    Cubic,                   !- Energy Part Load Fraction Curve Name",
+        "    ,                        !- Condenser Air Inlet Node Name",
+        "    AirCooled,               !- Condenser Type",
+        "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    10,                      !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve5,             !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    ,                        !- Supply Water Storage Tank Name",
+        "    ,                        !- Condensate Collection Water Storage Tank Name",
+        "    ,                        !- Basin Heater Capacity {W/K}",
+        "    ,                        !- Basin Heater Setpoint Temperature {C}",
+        "    ,                        !- Basin Heater Operating Schedule Name",
+        "    36991.44197,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}",
+        "    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
+        "    3.866381837,             !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}",
+        "    3.776,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    10.62,                   !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}",
+        "    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}",
+        "    Biquadratic,             !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",,,,,,,,,,,,,,,,,;"
+
+        "  Coil:Heating:DX:VariableSpeed,",
+        "Coil:Heating:DX:VariableSpeed coil,  !- Name",
+        "    Heating Coil Air Inlet Node,  !- Indoor Air Inlet Node Name",
+        "    SuppHeating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name",
+        "    10,                      !- Number of Speeds {dimensionless}",
+        "    10,                      !- Nominal Speed Level {dimensionless}",
+        "    35000,                   !- Rated Heating Capacity At Selected Nominal Speed Level {w}",
+        "    1.7,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+        "    Biquadratic,             !- Energy Part Load Fraction Curve Name",
+        "    ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name",
+        "    -5.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
+        "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
+        "    10.0,                   !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve6,             !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "    Resistive,               !- Defrost Strategy",
+        "    TIMED,                   !- Defrost Control",
+        "    0.166667,                !- Defrost Time Period Fraction",
+        "    20000,                   !- Resistive Defrost Heater Capacity {W}",
+        "    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.1661088,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 1 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 1 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 2 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 2 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 3 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 3 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 3 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 3 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 4 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 5 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 5 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 5 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 5 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 6 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 6 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 6 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 6 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 7 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 7 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 7 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 7 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 8 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 8 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 8 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 8 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 9 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 9 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 9 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 9 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 10 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 10 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 10 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 10 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic;                   !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+
+        "Coil:Cooling:DX:TwoStageWithHumidityControlMode,",
+        "Coil:Cooling:DX:TwoStageWithHumidityControlMode coil,       !- Name",
+        ",                        !- Availability Schedule Name",
+        "DOAS Supply Fan Outlet,  !- Air Inlet Node Name",
+        "DOAS Cooling Coil Outlet,!- Air Outlet Node Name",
+        "10,                      !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve7,         !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        ",                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "2,                       !- Number of Capacity Stages",
+        "1,                       !- Number of Enhanced Dehumidification Modes",
+        "CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type",
+        "DOAS Standard Perf 1,    !- Normal Mode Stage 1 Coil Performance Name",
+        "CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type",
+        "DOAS Standard Perf 1,    !- Normal Mode Stage 1+2 Coil Performance Name",
+        "CoilPerformance:DX:Cooling,  !- Dehumidification Mode 1 Stage 1 Coil Performance Object Type",
+        "DOAS Standard Perf 1,    !- Dehumidification Mode 1 Stage 1 Coil Performance Name",
+        "CoilPerformance:DX:Cooling,  !- Dehumidification Mode 1 Stage 1+2 Coil Performance Object Type",
+        "DOAS Standard Perf 1,    !- Dehumidification Mode 1 Stage 1+2 Coil Performance Name",
+        ",                        !- Supply Water Storage Tank Name",
+        ",                        !- Condensate Collection Water Storage Tank Name",
+        "0,                       !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        ",                        !- Basin Heater Capacity",
+        ",                        !- Basin Heater Setpoint Temperature",
+        ";                        !- Basin Heater Operating Schedule Name",
+
+        "Coil:WaterHeating:AirToWaterHeatPump:Wrapped,",
+        "    HPWH Coil_1,             !- Name",
+        "    1400,                    !- Rated Heating Capacity {W}",
+        "    2.8,                     !- Rated COP {W/W}",
+        "    0.88,                    !- Rated Sensible Heat Ratio",
+        "    19.72222222222222,       !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}",
+        "    13.533905564389693,      !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}",
+        "    48.89,                   !- Rated Condenser Water Temperature {C}",
+        "    0.08542248664,           !- Rated Evaporator Air Flow Rate {m3/s}",
+        "    Yes,                     !- Evaporator Fan Power Included in Rated COP",
+        "    HPWH Air Inlet Node_1,   !- Evaporator Air Inlet Node Name",
+        "    HPWH CoilAirOutlet FanAirInlet_1,  !- Evaporator Air Outlet Node Name",
+        "    10,                      !- Crankcase Heater Capacity {W}",
+        "    heaterCapCurve8,         !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "    0,                       !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
+        "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
+        "    Biquadratic,             !- Heating Capacity Function of Temperature Curve Name",
+        "    ,                        !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Heating COP Function of Temperature Curve Name",
+        "    ,",
+        "    ;",
+
+        "  Coil:WaterHeating:AirToWaterHeatPump:Pumped,",
+        "    Zone4HPWHDXCoil,         !- Name",
+        "    4000.0,                  !- Rated Heating Capacity {W}",
+        "    3.2,                     !- Rated COP {W/W}",
+        "    0.6956,                  !- Rated Sensible Heat Ratio",
+        "    29.44,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}",
+        "    22.22,                   !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}",
+        "    55.72,                   !- Rated Condenser Inlet Water Temperature {C}",
+        "    autocalculate,           !- Rated Evaporator Air Flow Rate {m3/s}",
+        "    autocalculate,           !- Rated Condenser Water Flow Rate {m3/s}",
+        "    No,                      !- Evaporator Fan Power Included in Rated COP",
+        "    No,                      !- Condenser Pump Power Included in Rated COP",
+        "    No,                      !- Condenser Pump Heat Included in Rated Heating Capacity and Rated COP",
+        "    150.0,                   !- Condenser Water Pump Power {W}",
+        "    0.1,                     !- Fraction of Condenser Pump Heat to Water",
+        "    Zone4AirOutletNode,      !- Evaporator Air Inlet Node Name",
+        "    Zone4DXCoilAirOutletNode,!- Evaporator Air Outlet Node Name",
+        "    Zone4WaterInletNode,     !- Condenser Water Inlet Node Name",
+        "    Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name",
+        "    10.0,                    !- Crankcase Heater Capacity {W}",
+        "    heaterCapCurve9,         !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
+        "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
+        "    Cubic,                   !- Heating Capacity Function of Temperature Curve Name",
+        "    ,                        !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    ,                        !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,             !- Heating COP Function of Temperature Curve Name",
+        "    ,                        !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    ,                        !- Heating COP Function of Water Flow Fraction Curve Name",
+        "    Cubic;                   !- Part Load Fraction Correlation Curve Name",
+
+        "  Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,",
+        "    HPWHOutdoorDXCoilVS,     !- Name",
+        "	10,						 !- Number of Speeds",
+        "	10,						 !- Nominal speed level",
+        "    4000.0,                  !- Rated Heating Capacity {W}",
+        "    29.44,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}",
+        "    22.22,                   !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}",
+        "    55.72,                   !- Rated Condenser Inlet Water Temperature {C}",
+        "    0.2685,                  !- Rated Evaporator Air Flow Rate {m3/s}",
+        "    0.00016,                 !- Rated Condenser Water Flow Rate {m3/s}",
+        "    No,                      !- Evaporator Fan Power Included in Rated COP",
+        "    No,                      !- Condenser Pump Power Included in Rated COP",
+        "    No,                      !- Condenser Pump Heat Included in Rated Heating Capacity and Rated COP",
+        "    0.1,                     !- Fraction of Condenser Pump Heat to Water",
+        "    HPOutdoorFanAirOutletNode,   !- Evaporator Air Inlet Node Name",
+        "    HPOutdoorAirOutletNode,  	  !- Evaporator Air Outlet Node Name",
+        "    HPOutdoorWaterInletNode, 	 !- Condenser Water Inlet Node Name",
+        "    HPOutdoorWaterOutletNode,	 !- Condenser Water Outlet Node Name",
+        "    10.0,                   !- Crankcase Heater Capacity {W}",
+        "    heaterCapCurve10,        !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
+        "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
+        "    Biquadratic,             !- Part Load Fraction Correlation Curve Name",
+        "	400.00,					 !- Speed 1 Water Heating capacity {W} of Reference Unit",
+        "	5.0, 					 !- Speed 1 Water Heating COP {W/W} of Reference Unit",
+        "	0.80, 					 !- Speed 1 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.020140,                !- Speed 1 Air Flow Rate of Reference Unit",
+        "	0.000018,                !- Speed 1 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 1 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	800.00,					 !- Speed 2 Water Heating capacity {W} of Reference Unit",
+        "	4.8, 					 !- Speed 2 Water Heating COP {W/W} of Reference Unit",
+        "	0.79, 					 !- Speed 2 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.040280,                !- Speed 2 Air Flow Rate of Reference Unit",
+        "	0.000036,                !- Speed 2 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 2 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	1200.00,				 !- Speed 3 Water Heating capacity {W} of Reference Unit",
+        "	4.4, 					 !- Speed 3 Water Heating COP {W/W} of Reference Unit",
+        "	0.78, 					 !- Speed 3 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.060420,                !- Speed 3 Air Flow Rate of Reference Unit",
+        "	0.000054,                !- Speed 3 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 3 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	1600.00,				 !- Speed 4 Water Heating capacity {W} of Reference Unit",
+        "	4.0, 					 !- Speed 4 Water Heating COP {W/W} of Reference Unit",
+        "	0.77, 					 !- Speed 4 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.080560,                !- Speed 4 Air Flow Rate of Reference Unit",
+        "	0.000072,                !- Speed 4 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 4 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	2000.00,				 !- Speed 5 Water Heating capacity {W} of Reference Unit",
+        "	3.8, 					 !- Speed 5 Water Heating COP {W/W} of Reference Unit",
+        "	0.76, 					 !- Speed 5 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.100700,                !- Speed 5 Air Flow Rate of Reference Unit",
+        "	0.000090,                !- Speed 5 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 5 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	2400.00,				 !- Speed 6 Water Heating capacity {W} of Reference Unit",
+        "	3.4, 					 !- Speed 6 Water Heating COP {W/W} of Reference Unit",
+        "	0.75, 					 !- Speed 6 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.120840,                !- Speed 6 Air Flow Rate of Reference Unit",
+        "	0.000108,                !- Speed 6 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 6 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	2800.00,				 !- Speed 7 Water Heating capacity {W} of Reference Unit",
+        "	3.0, 					 !- Speed 7 Water Heating COP {W/W} of Reference Unit",
+        "	0.74, 					 !- Speed 7 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.140980,                !- Speed 7 Air Flow Rate of Reference Unit",
+        "	0.000126,                !- Speed 7 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 7 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	3200.00,				 !- Speed 8 Water Heating capacity {W} of Reference Unit",
+        "	2.6, 					 !- Speed 8 Water Heating COP {W/W} of Reference Unit",
+        "	0.73, 					 !- Speed 8 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.161120,                !- Speed 8 Air Flow Rate of Reference Unit",
+        "	0.000144,                !- Speed 8 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 8 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	3600.00,				 !- Speed 9 Water Heating capacity {W} of Reference Unit",
+        "	2.3, 					 !- Speed 9 Water Heating COP {W/W} of Reference Unit",
+        "	0.72, 					 !- Speed 9 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.181260,                !- Speed 9 Air Flow Rate of Reference Unit",
+        "	0.000162,                !- Speed 9 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 9 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	4000.00,				 !- Speed 10 Water Heating capacity {W} of Reference Unit",
+        "	2.0, 					 !- Speed 10 Water Heating COP {W/W} of Reference Unit",
+        "	0.70, 					 !- Speed 10 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.201400,                !- Speed 10 Air Flow Rate of Reference Unit",
+        "	0.000179,                !- Speed 10 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 10 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic;                      !- Heating COP Function of Water Flow Fraction Curve Name",
+
+        "CoilPerformance:DX:Cooling,",
+        "DOAS Standard Perf 1,    !- Name",
+        "autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "autosize,                !- Gross Rated Sensible Heat Ratio",
+        "3,                       !- Gross Rated Cooling COP {W/W}",
+        "autosize,                !- Rated Air Flow Rate {m3/s}",
+        "0.5,                     !- Fraction of Air Flow Bypassed Around Coil",
+        "Biquadratic,             !- Total Cooling Capacity Function of Temperature Curve Name",
+        "Cubic,                   !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "Biquadratic,             !- Energy Input Ratio Function of Temperature Curve Name",
+        "Cubic,                   !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "Cubic,                   !- Part Load Fraction Correlation Curve Name",
+        ",                        !- Nominal Time for Condensate Removal to Begin {s}",
+        ",                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+        "0;                       !- Maximum Cycling Rate {cycles/hr}",
+
+        "Curve:Linear,",
+        "heaterCapCurve,          !- Name",
+        "10.0,                    !- Coefficient1 Constant",
+        "-2.0,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve2,          !- Name",
+        "15.0,                    !- Coefficient1 Constant",
+        "-2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve3,          !- Name",
+        "22.0,                    !- Coefficient1 Constant",
+        "-3.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve4,          !- Name",
+        "25.0,                    !- Coefficient1 Constant",
+        "2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve5,          !- Name",
+        "26.0,                    !- Coefficient1 Constant",
+        "2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve6,          !- Name",
+        "28.0,                    !- Coefficient1 Constant",
+        "2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve7,          !- Name",
+        "29.0,                    !- Coefficient1 Constant",
+        "2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve8,          !- Name",
+        "30.0,                    !- Coefficient1 Constant",
+        "2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve9,          !- Name",
+        "31.0,                    !- Coefficient1 Constant",
+        "2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve10,          !- Name",
+        "32.0,                    !- Coefficient1 Constant",
+        "2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Biquadratic,",
+        "  Biquadratic,             !- Name",
+        "  1.0,                     !- Coefficient1 Constant",
+        "  1.0,                     !- Coefficient2 x",
+        "  1.0,                     !- Coefficient3 x**2",
+        "  1.0,                     !- Coefficient4 y",
+        "  1.0,                     !- Coefficient5 y**2",
+        "  1.0,                     !- Coefficient6 x*y",
+        "  5,                       !- Minimum Value of x",
+        "  40,                      !- Maximum Value of x",
+        "  5,                       !- Minimum Value of y",
+        "  40,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+        " ",
+        "Curve:Cubic,",
+        "  Cubic,                   !- Name",
+        "  1.0,                     !- Coefficient1 Constant",
+        "  1.0,                     !- Coefficient2 x",
+        "  1.0,                     !- Coefficient3 x**2",
+        "  0,                       !- Coefficient4 x**3",
+        "  5,                       !- Minimum Value of x",
+        "  40,                      !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature;             !- Output Unit Type",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ProcessScheduleInput(*state);
+    GetCurveInput(*state);
+    GetDXCoils(*state);
+    VariableSpeedCoils::GetVarSpeedCoilInput(*state);
+    // Coil:Cooling:DX:SingleSpeed
+    EXPECT_EQ(state->dataDXCoils->DXCoil(1).DXCoilType_Num, CoilDX_CoolingSingleSpeed);
+    EXPECT_EQ("HEATERCAPCURVE", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(1).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:Cooling:DX:TwoStageWithHumidityControlMode
+    EXPECT_EQ(state->dataDXCoils->DXCoil(2).DXCoilType_Num, CoilDX_CoolingTwoStageWHumControl);
+    EXPECT_EQ("HEATERCAPCURVE7", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(2).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:Heating:DX:SingleSpeed
+    EXPECT_EQ(state->dataDXCoils->DXCoil(3).DXCoilType_Num, CoilDX_HeatingEmpirical);
+    EXPECT_EQ("HEATERCAPCURVE2", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(3).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:WaterHeating:AirToWaterHeatPump:Pumped
+    EXPECT_EQ(state->dataDXCoils->DXCoil(4).DXCoilType_Num, CoilDX_HeatPumpWaterHeaterPumped);
+    EXPECT_EQ("HEATERCAPCURVE9", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(4).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:WaterHeating:AirToWaterHeatPump:Wrapped
+    EXPECT_EQ(state->dataDXCoils->DXCoil(5).DXCoilType_Num, CoilDX_HeatPumpWaterHeaterWrapped);
+    EXPECT_EQ("HEATERCAPCURVE8", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(5).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:Cooling:DX:MultiSpeed
+    EXPECT_EQ(state->dataDXCoils->DXCoil(6).DXCoilType_Num, CoilDX_MultiSpeedCooling);
+    EXPECT_EQ("HEATERCAPCURVE3", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(6).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:Heating:DX:MultiSpeed
+    EXPECT_EQ(state->dataDXCoils->DXCoil(7).DXCoilType_Num, CoilDX_MultiSpeedHeating);
+    EXPECT_EQ("HEATERCAPCURVE4", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(7).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:Cooling:DX:VariableSpeed
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).VSCoilType, Coil_CoolingAirToAirVariableSpeed);
+    EXPECT_EQ("HEATERCAPCURVE5", Curve::GetCurveName(*state, state->dataVariableSpeedCoils->VarSpeedCoil(1).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:Heating:DX:VariableSpeed
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(2).VSCoilType, Coil_HeatingAirToAirVariableSpeed);
+    EXPECT_EQ("HEATERCAPCURVE6", Curve::GetCurveName(*state, state->dataVariableSpeedCoils->VarSpeedCoil(2).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(3).VSCoilType, CoilDX_HeatPumpWaterHeaterVariableSpeed);
+    EXPECT_EQ("HEATERCAPCURVE10", Curve::GetCurveName(*state, state->dataVariableSpeedCoils->VarSpeedCoil(3).CrankcaseHeaterCapacityCurveIndex));
+
+    state->dataEnvrn->OutDryBulbTemp = -5.0;
+    int const FanOpMode = ContFanCycCoil;
+    Real64 PLR = 0.0;
+    int DXCoilNum = 1;
+    CalcDXHeatingCoil(*state, DXCoilNum, PLR, FanOpMode);
+    // Coil:Cooling:DX:SingleSpeed
+    //    power = 10 - 2x
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 200.0);
+    DXCoilNum = 3;
+    CalcDXHeatingCoil(*state, DXCoilNum, PLR, FanOpMode);
+    //    power = 15 - 2x
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 250.0);
+
+    Real64 SpeedRatio = 0.0;
+    Real64 CycRatio = 1.0;
+    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    int SingleMode = 0;
+
+    int VarSpeedCoilNum = 1;
+    int CyclingScheme = 1;
+    Real64 SensLoad = 100.0;
+    Real64 LatentLoad = 100.0;
+    Real64 OnOffAirFlowRatio = 0.5;
+    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirMassFlowRate = 1.0;
+    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).RunFrac = 0.0;
+    // power = 26 + 2x
+    VariableSpeedCoils::CalcVarSpeedCoilCooling(*state,
+                                                VarSpeedCoilNum,
+                                                CyclingScheme,
+                                                SensLoad,
+                                                LatentLoad,
+                                                CompressorOp,
+                                                PLR,
+                                                OnOffAirFlowRatio,
+                                                SpeedRatio,
+                                                state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).NumOfSpeeds);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).CrankcaseHeaterPower, 160.0);
+
+    VarSpeedCoilNum = 2;
+    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirMassFlowRate = 0.5;
+    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).RunFrac = 0.0;
+    // power = 28 + 2x
+    state->dataEnvrn->OutHumRat = 0.0114507065;
+    state->dataEnvrn->OutBaroPress = 98200.0;
+    VariableSpeedCoils::CalcVarSpeedCoilHeating(*state,
+                                                VarSpeedCoilNum,
+                                                CyclingScheme,
+                                                SensLoad,
+                                                CompressorOp,
+                                                PLR,
+                                                OnOffAirFlowRatio,
+                                                SpeedRatio,
+                                                state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).NumOfSpeeds);
+    // here the runtime fraction is 1.0 when the number of speed is more than 1. crankcase heater capacity is modified but power is not affected as a
+    // result
+    EXPECT_EQ(state->dataVariableSpeedCoils->CrankcaseHeatingPower, 180.0);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).CrankcaseHeaterPower, 0.0);
+
+    // VarSpeedCoilNum = 3;
+    // // power = 32 + 2x
+    // state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirMassFlowRate = 0.5;
+    // state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).RunFrac = 0.0;
+    // state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirInletNodeNum = 0;
+    // PLR = 0.5;
+    // // fixme: sort out the logic first, might be a bug? crankcase heater might always be off?
+    // VariableSpeedCoils::CalcVarSpeedHPWH(
+    //     *state, DXCoilNum, RuntimeFrac, PLR, SpeedRatio, state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).NumOfSpeeds,
+    //     CyclingScheme);
+    // // here the runtime fraction is 1.0 when the number of speed is more than 1. crankcase heater capacity is modified but power is not affected as
+    // a
+    // // result
+    // EXPECT_EQ(state->dataVariableSpeedCoils->CrankcaseHeatingPower, 22.0);
+    // EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).CrankcaseHeaterPower, 0.0);
+
+    // Coil:Cooling:DX:MultiSpeed
+    DXCoilNum = 6;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap = 4000.0;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirMassFlowRate.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirMassFlowRate = 2.0;
+    CalcMultiSpeedDXCoilCooling(
+        *state, DXCoilNum, SpeedRatio, CycRatio, state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds, FanOpMode, CompressorOp, SingleMode);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 370.0);
+
+    // Coil:Heating:DX:MultiSpeed
+    DXCoilNum = 7;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap = 4000.0;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirMassFlowRate.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirMassFlowRate = 2.0;
+    CalcMultiSpeedDXCoilCooling(
+        *state, DXCoilNum, SpeedRatio, CycRatio, state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds, FanOpMode, CompressorOp, SingleMode);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 150.0);
+
+    // Coil:Cooling:DX:TwoStageWithHumidityControlMode
+    DXCoilNum = 2;
+    bool FirstHVACIteration = true;
+    Real64 AirFlowRatio = 1.0;
+    DXCoils::CalcDoe2DXCoil(*state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PLR, FanOpMode, _, AirFlowRatio);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 190.0);
+
+    // Coil:WaterHeating:AirToWaterHeatPump:Pumped,
+    // for water heaters, the following temperature is used in heater capacity curve calculation
+    state->dataHVACGlobal->HPWHCrankcaseDBTemp = -6.0;
+    DXCoilNum = 4;
+    DXCoils::CalcDoe2DXCoil(*state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PLR, FanOpMode, _, AirFlowRatio);
+    // heaterCapCurve9, power = 31 + 2x
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 190.0);
+
+    // Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
+    DXCoilNum = 5;
+    state->dataHVACGlobal->HPWHCrankcaseDBTemp = -7.0;
+    DXCoils::CalcDoe2DXCoil(*state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PLR, FanOpMode, _, AirFlowRatio);
+    // heaterCapCurve8, power = 30 + 2x
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 160.0);
 }
 
 TEST_F(EnergyPlusFixture, TestDXCoilIndoorOrOutdoor)
@@ -1165,6 +2167,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
         "  No, !- Apply Part Load Fraction to Speeds Greater than 1",
         "  No, !- Apply Latent Degradation to Speeds Greater than 1",
         "  200.0, !- Crankcase Heater Capacity{ W }",
+        "  ,      !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
         "  , !- Basin Heater Capacity{ W / K }",
         "  , !- Basin Heater Setpoint Temperature{ C }",
@@ -1315,15 +2318,13 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     // Case 1 test
     GetDXCoils(*state);
 
-    EXPECT_EQ("Electricity", state->dataDXCoils->DXCoil(1).FuelType); // it also covers a test for fuel type input
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Electricity, state->dataDXCoils->DXCoil(1).FuelTypeNum));
+    EXPECT_TRUE(compare_enums(Constant::eFuel::Electricity, state->dataDXCoils->DXCoil(1).FuelType));
     EXPECT_EQ(0, state->dataDXCoils->DXCoil(1).MSWasteHeat(2));
 
     // Test calculations of the waste heat function #5162
 
     // Case 2 test waste heat is zero when the parent has not heat recovery inputs
-    state->dataDXCoils->DXCoil(1).FuelType = "NaturalGas";
-    state->dataDXCoils->DXCoil(1).FuelTypeNum = DataGlobalConstants::ResourceType::Natural_Gas;
+    state->dataDXCoils->DXCoil(1).FuelType = Constant::eFuel::NaturalGas;
     state->dataDXCoils->DXCoil(1).MSHPHeatRecActive = false;
 
     state->dataEnvrn->OutDryBulbTemp = 35;
@@ -1456,6 +2457,7 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
         "	,                     !- Evaporative Condenser Air Flow Rate",
         "	autosize,             !- Evaporative Condenser Pump Rated Power Consumption",
         "	0.0,                  !- Crankcase Heater Capacity",
+        " ,                     !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "	10.0;                 !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
     });
 
@@ -1565,6 +2567,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
         "  No, !- Apply Part Load Fraction to Speeds Greater than 1",
         "  No, !- Apply Latent Degradation to Speeds Greater than 1",
         "  200.0, !- Crankcase Heater Capacity{ W }",
+        "  ,      !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
         "  , !- Basin Heater Capacity{ W / K }",
         "  , !- Basin Heater Setpoint Temperature{ C }",
@@ -1789,6 +2792,7 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
         "	,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "	5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "	0.0,                     !- Crankcase Heater Capacity {W}",
+        " ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "	10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "	,                        !- Defrost Strategy",
         "	,                        !- Defrost Control",
@@ -1962,6 +2966,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
         "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "    200.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    Resistive,               !- Defrost Strategy",
         "    TIMED,                   !- Defrost Control",
@@ -2061,6 +3066,8 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
         "    0.8,                     !- High Speed Rated Sensible Heat Ratio",
         "    3.0,                     !- High Speed Gross Rated Cooling COP{ W / W }",
         "    autosize,                !- High Speed Rated Air Flow Rate{ m3 / s }",
+        "    773.3,                   !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    ,                        !- Unit Internal Static Air Pressure{ Pa }",
         "    Mixed Air Node 1,        !- Air Inlet Node Name",
         "    Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name",
@@ -2073,6 +3080,8 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
         "    0.8,                     !- Low Speed Gross Rated Sensible Heat Ratio",
         "    4.2,                     !- Low Speed Gross Rated Cooling COP{ W / W }",
         "    autosize,                !- Low Speed Rated Air Flow Rate{ m3 / s }",
+        "    773.3,                   !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    WindACCoolCapFT,         !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
         "    WindACEIRFT,             !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
         "    ;  !- Condenser Air Inlet Node Name",
@@ -2090,7 +3099,6 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
 
 TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     std::string const idf_objects = delimited_string({
@@ -2170,6 +3178,8 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
         "  0.8,                     !- High Speed Rated Sensible Heat Ratio",
         "  3.0,                     !- High Speed Gross Rated Cooling COP{ W / W }",
         "  autosize,                !- High Speed Rated Air Flow Rate{ m3 / s }",
+        "  773.3,                   !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "  934.4,                   !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "  ,                        !- Unit Internal Static Air Pressure{ Pa }",
         "  Mixed Air Node 1,        !- Air Inlet Node Name",
         "  Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name",
@@ -2182,6 +3192,8 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
         "  0.8,                     !- Low Speed Gross Rated Sensible Heat Ratio",
         "  4.2,                     !- Low Speed Gross Rated Cooling COP{ W / W }",
         "  autosize,                !- Low Speed Rated Air Flow Rate{ m3 / s }",
+        "  773.3,                   !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "  934.4,                   !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "  WindACCoolCapFT,         !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
         "  WindACEIRFT,             !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
         "  Main Cooling Coil 1 Condenser Node,  !- Condenser Air Inlet Node Name",
@@ -2318,13 +3330,10 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
             EXPECT_NEAR(testQuery.expectedValue, return_val, 0.01) << "Failed for " << testQuery.displayString;
         }
     }
-
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }
 
 TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     std::string const idf_objects = delimited_string({
@@ -2423,6 +3432,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
         "  autosize,             !- Evaporative Condenser Air Flow Rate",
         "  autosize,             !- Evaporative Condenser Pump Rated Power Consumption",
         "  0.0,                  !- Crankcase Heater Capacity",
+        "  ,                     !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  10.0;                 !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
     });
 
@@ -2534,8 +3544,6 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
             EXPECT_NEAR(testQuery.expectedValue, return_val, 0.01) << "Failed for " << testQuery.displayString;
         }
     }
-
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }
 
 TEST_F(EnergyPlusFixture, TestMultiSpeedHeatingCoilSizingOutput)
@@ -2557,6 +3565,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedHeatingCoilSizingOutput)
         "   No,                                     !- Apply Part Load Fraction to Speeds Greater than 1",
         "   No,                                     !- Apply Latent Degradation to Speeds Greater than 1",
         "   0,                                      !- Crankcase Heater Capacity {W}",
+        "   ,                                       !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "   10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "   0,                                      !- Basin Heater Capacity {W/K}",
         "   2,                                      !- Basin Heater Setpoint Temperature {C}",
@@ -2739,6 +3748,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedHeatingCoilSizingOutput)
         "   -17.7777777777778,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "   ,                                       !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "   50,                                     !- Crankcase Heater Capacity {W}",
+        "   ,                                       !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "   10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "   DefrostEIR,                             !- Defrost Energy Input Ratio Function of Temperature Curve Name",
         "   4.44444444444444,                       !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
@@ -2956,6 +3966,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilTabularReporting)
         "   No,                                     !- Apply Part Load Fraction to Speeds Greater than 1",
         "   No,                                     !- Apply Latent Degradation to Speeds Greater than 1",
         "   0,                                      !- Crankcase Heater Capacity {W}",
+        "   ,                                       !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "   10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "   0,                                      !- Basin Heater Capacity {W/K}",
         "   2,                                      !- Basin Heater Setpoint Temperature {C}",
@@ -3192,6 +4203,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
         "   No,                                     !- Apply Part Load Fraction to Speeds Greater than 1",
         "   No,                                     !- Apply Latent Degradation to Speeds Greater than 1",
         "   0,                                      !- Crankcase Heater Capacity {W}",
+        "   ,                                       !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "   10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "   0,                                      !- Basin Heater Capacity {W/K}",
         "   2,                                      !- Basin Heater Setpoint Temperature {C}",
@@ -3374,6 +4386,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
         "   -17.7777777777778,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "   ,                                       !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "   50,                                     !- Crankcase Heater Capacity {W}",
+        "   ,                                       !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "   10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "   DefrostEIR,                             !- Defrost Energy Input Ratio Function of Temperature Curve Name",
         "   4.44444444444444,                       !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
@@ -3594,6 +4607,24 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     // Design Capacity at speed 2 and speed 1
     EXPECT_NEAR(32731.91, state->dataDXCoils->DXCoil(1).MSRatedTotCap(2), 0.01);
     EXPECT_NEAR(16365.95, state->dataDXCoils->DXCoil(1).MSRatedTotCap(1), 0.01);
+    // Check EIO reporting
+    std::string clg_coil_eio_output = R"EIO(! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value
+ Component Sizing Information, Coil:Cooling:DX:MultiSpeed, ASHP CLG COIL, Design Size Speed 2 Rated Air Flow Rate [m3/s], 1.75000
+ Component Sizing Information, Coil:Cooling:DX:MultiSpeed, ASHP CLG COIL, Design Size Speed 1 Rated Air Flow Rate [m3/s], 0.87500
+ Component Sizing Information, Coil:Cooling:DX:MultiSpeed, ASHP CLG COIL, Design Size Speed 2 Gross Rated Total Cooling Capacity [W], 32731.91226
+ Component Sizing Information, Coil:Cooling:DX:MultiSpeed, ASHP CLG COIL, Design Size Speed 1 Gross Rated Total Cooling Capacity [W], 16365.95613
+ Component Sizing Information, Coil:Cooling:DX:MultiSpeed, ASHP CLG COIL, Design Size Speed 2 Rated Sensible Heat Ratio, 0.80039
+ Component Sizing Information, Coil:Cooling:DX:MultiSpeed, ASHP CLG COIL, Design Size Speed 1 Rated Sensible Heat Ratio, 0.80039
+ Component Sizing Information, Coil:Cooling:DX:MultiSpeed, ASHP CLG COIL, Design Size Speed 1 Evaporative Condenser Air Flow Rate [m3/s], 1.86572
+ Component Sizing Information, Coil:Cooling:DX:MultiSpeed, ASHP CLG COIL, Design Size Speed 2 Evaporative Condenser Air Flow Rate [m3/s], 3.73144
+ Component Sizing Information, Coil:Cooling:DX:MultiSpeed, ASHP CLG COIL, Design Size Speed 1 Rated Evaporative Condenser Pump Power Consumption [W], 69.81717
+ Component Sizing Information, Coil:Cooling:DX:MultiSpeed, ASHP CLG COIL, Design Size Speed 2 Rated Evaporative Condenser Pump Power Consumption [W], 139.63434
+! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER {Btu/W-h}
+ DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:MultiSpeed, ASHP CLG COIL, 31065.3,  ,  , 16.52, 16.03,||
+ DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:MultiSpeed, ASHP CLG COIL, 30783.3, 3.66, 12.50, 15.20, 15.30, 11.950323501582877
+)EIO";
+    replace_pipes_with_spaces(clg_coil_eio_output);
+    EXPECT_TRUE(compare_eio_stream(clg_coil_eio_output, true));
 
     // check multi-speed DX heating coil
     EXPECT_EQ("ASHP HTG COIL", state->dataDXCoils->DXCoil(2).Name);
@@ -3606,6 +4637,18 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     EXPECT_EQ(0.875, state->dataDXCoils->DXCoil(2).MSRatedAirVolFlowRate(1));
     EXPECT_NEAR(32731.91, state->dataDXCoils->DXCoil(2).MSRatedTotCap(2), 0.01);
     EXPECT_NEAR(16365.95, state->dataDXCoils->DXCoil(2).MSRatedTotCap(1), 0.01);
+    // Check EIO reporting
+    const std::string htg_coil_eio_output =
+        R"EIO( Component Sizing Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, Design Size Speed 2 Gross Rated Heating COP [m3/s], 1.75000
+ Component Sizing Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, Design Size Speed 1 Rated Air Flow Rate [m3/s], 0.87500
+ Component Sizing Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, Design Size Speed 1 Rated Waste Heat Fraction of Power Input [W], 32731.91226
+ Component Sizing Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, Design Size Speed 1 Gross Rated Heating Capacity [W], 16365.95613
+ Component Sizing Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, Design Size Resistive Defrost Heater Capacity, 0.00000
+! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number
+ DX Heating Coil Standard Rating Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, 34415.4, 20666.4, 6.56, 4
+ DX Heating Coil Standard Rating Information, Coil:Heating:DX:MultiSpeed, ASHP HTG COIL, 34697.2, 20948.1, 5.12, 4
+)EIO";
+    EXPECT_TRUE(compare_eio_stream(htg_coil_eio_output, true));
 }
 
 TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
@@ -3627,6 +4670,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
         "   No,                                     !- Apply Part Load Fraction to Speeds Greater than 1",
         "   No,                                     !- Apply Latent Degradation to Speeds Greater than 1",
         "   0,                                      !- Crankcase Heater Capacity {W}",
+        "   ,                                       !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "   10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "   0,                                      !- Basin Heater Capacity {W/K}",
         "   2,                                      !- Basin Heater Setpoint Temperature {C}",
@@ -3874,7 +4918,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
 TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
 {
     int DXCoilNum;
-    int CurveNum;
 
     state->dataDXCoils->NumDXCoils = 2;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
@@ -3889,72 +4932,67 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
         state->dataDXCoils->DXCoil(DXCoilNum).MSCCapFTemp.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
     }
 
-    state->dataCurveManager->NumCurves = 4;
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(4);
 
-    CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).Name = "HP_Cool-Cap-fT-SP1";
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1.658788451;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -0.0834530076;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.00342409032;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 0.0024332436;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = -4.5036e-005;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = -0.00053367984;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 13.88;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 23.88;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 18.33;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 51.66;
+    auto *curve1 = state->dataCurveManager->PerfCurve(1);
+    curve1->Name = "HP_Cool-Cap-fT-SP1";
+    curve1->curveType = CurveType::BiQuadratic;
+    curve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve1->coeff[0] = 1.658788451;
+    curve1->coeff[1] = -0.0834530076;
+    curve1->coeff[2] = 0.00342409032;
+    curve1->coeff[3] = 0.0024332436;
+    curve1->coeff[4] = -4.5036e-005;
+    curve1->coeff[5] = -0.00053367984;
+    curve1->inputLimits[0].min = 13.88;
+    curve1->inputLimits[0].max = 23.88;
+    curve1->inputLimits[1].min = 18.33;
+    curve1->inputLimits[1].max = 51.66;
 
-    CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).Name = "HP_Cool-Cap-fT-SP2";
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1.472738138;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -0.0672218352;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0029199042;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 5.16005999999982e-005;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = -2.97756e-005;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = -0.00035908596;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 13.88;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 23.88;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 18.33;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 51.66;
+    auto *curve2 = state->dataCurveManager->PerfCurve(2);
+    curve2->Name = "HP_Cool-Cap-fT-SP2";
+    curve2->curveType = CurveType::BiQuadratic;
+    curve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve2->coeff[0] = 1.472738138;
+    curve2->coeff[1] = -0.0672218352;
+    curve2->coeff[2] = 0.0029199042;
+    curve2->coeff[3] = 5.16005999999982e-005;
+    curve2->coeff[4] = -2.97756e-005;
+    curve2->coeff[5] = -0.00035908596;
+    curve2->inputLimits[0].min = 13.88;
+    curve2->inputLimits[0].max = 23.88;
+    curve2->inputLimits[1].min = 18.33;
+    curve2->inputLimits[1].max = 51.66;
 
-    CurveNum = 3;
-    state->dataCurveManager->PerfCurve(CurveNum).Name = "HP_Heat-Cap-fT-SP1";
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 0.84077409;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -0.0014336586;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -0.000150336;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 0.029628603;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.000161676;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = -2.349e-005;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 100.0;
+    auto *curve3 = state->dataCurveManager->PerfCurve(3);
+    curve3->Name = "HP_Heat-Cap-fT-SP1";
+    curve3->curveType = CurveType::BiQuadratic;
+    curve3->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve3->coeff[0] = 0.84077409;
+    curve3->coeff[1] = -0.0014336586;
+    curve3->coeff[2] = -0.000150336;
+    curve3->coeff[3] = 0.029628603;
+    curve3->coeff[4] = 0.000161676;
+    curve3->coeff[5] = -2.349e-005;
+    curve3->inputLimits[0].min = -100.0;
+    curve3->inputLimits[0].max = 100.0;
+    curve3->inputLimits[1].min = -100.0;
+    curve3->inputLimits[1].max = 100.0;
 
-    CurveNum = 4;
-    state->dataCurveManager->PerfCurve(CurveNum).Name = "HP_Heat-Cap-fT-SP2";
-    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
-    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 0.831506971;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.0018392166;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -0.000187596;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 0.0266002056;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.000191484;
-    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = -6.5772e-005;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = -100.0;
-    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 100.0;
+    auto *curve4 = state->dataCurveManager->PerfCurve(4);
+    curve4->Name = "HP_Heat-Cap-fT-SP2";
+    curve4->curveType = CurveType::BiQuadratic;
+    curve4->interpolationType = InterpType::EvaluateCurveToLimits;
+    curve4->coeff[0] = 0.831506971;
+    curve4->coeff[1] = 0.0018392166;
+    curve4->coeff[2] = -0.000187596;
+    curve4->coeff[3] = 0.0266002056;
+    curve4->coeff[4] = 0.000191484;
+    curve4->coeff[5] = -6.5772e-005;
+    curve4->inputLimits[0].min = -100.0;
+    curve4->inputLimits[0].max = 100.0;
+    curve4->inputLimits[1].min = -100.0;
+    curve4->inputLimits[1].max = 100.0;
 
     state->dataDXCoils->DXCoil(1).MSCCapFTemp(1) = 1;
     state->dataDXCoils->DXCoil(1).MSCCapFTemp(2) = 2;
@@ -4015,7 +5053,6 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
 {
     int DXCoilNum(1);
     state->dataDXCoils->NumDXCoils = 1;
-    state->dataCurveManager->NumCurves = 2;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
     state->dataLoopNodes->Node.allocate(2);
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
@@ -4028,7 +5065,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     state->dataDXCoils->DXCoilFullLoadOutAirHumRat.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilFanOpMode.allocate(state->dataDXCoils->NumDXCoils);
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(2);
     auto &Coil = state->dataDXCoils->DXCoil(DXCoilNum);
     auto &constantcurve1 = state->dataCurveManager->PerfCurve(1);
     auto &constantcurve2 = state->dataCurveManager->PerfCurve(2);
@@ -4036,7 +5073,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     auto &AirOutletNode = state->dataLoopNodes->Node(2);
     // set coil parameters
     Coil.DXCoilType_Num = CoilDX_CoolingSingleSpeed;
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     Coil.RatedTotCap(1) = 17580.0;
     Coil.RatedCOP(1) = 3.0;
     Coil.RatedEIR(1) = 1.0 / Coil.RatedCOP(1);
@@ -4050,34 +5087,32 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     Coil.AirOutNode = 2;
     Coil.AirInNode = 1;
     // biquadratic curve
-    constantcurve1.Name = "constant biquadratic curve";
-    constantcurve1.curveType = CurveType::BiQuadratic;
-    constantcurve1.ObjectType = "Curve:Biquadratic";
-    constantcurve1.InterpolationType = InterpType::EvaluateCurveToLimits;
-    constantcurve1.Coeff1 = 1.0;
-    constantcurve1.Coeff2 = 0.0;
-    constantcurve1.Coeff3 = 0.0;
-    constantcurve1.Coeff4 = 0.0;
-    constantcurve1.Coeff5 = 0.0;
-    constantcurve1.Coeff6 = 0.0;
-    constantcurve1.Var1Min = 10.0;
-    constantcurve1.Var1Max = 25.0;
-    constantcurve1.Var2Min = 0.0;
-    constantcurve1.Var2Max = 100.0;
-    constantcurve1.CurveMin = 1.0;
-    constantcurve1.CurveMax = 1.0;
+    constantcurve1->Name = "constant biquadratic curve";
+    constantcurve1->curveType = CurveType::BiQuadratic;
+    constantcurve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    constantcurve1->coeff[0] = 1.0;
+    constantcurve1->coeff[1] = 0.0;
+    constantcurve1->coeff[2] = 0.0;
+    constantcurve1->coeff[3] = 0.0;
+    constantcurve1->coeff[4] = 0.0;
+    constantcurve1->coeff[5] = 0.0;
+    constantcurve1->inputLimits[0].min = 10.0;
+    constantcurve1->inputLimits[0].max = 25.0;
+    constantcurve1->inputLimits[1].min = 0.0;
+    constantcurve1->inputLimits[1].max = 100.0;
+    constantcurve1->outputLimits.min = 1.0;
+    constantcurve1->outputLimits.max = 1.0;
     // quadratic curve
-    constantcurve2.Name = "constant quadratic curve";
-    constantcurve2.curveType = CurveType::Quadratic;
-    constantcurve2.ObjectType = "Curve:Quadratic";
-    constantcurve2.InterpolationType = InterpType::EvaluateCurveToLimits;
-    constantcurve2.Coeff1 = 1.0;
-    constantcurve2.Coeff2 = 0.0;
-    constantcurve2.Coeff3 = 0.0;
-    constantcurve2.Var1Min = 0.0;
-    constantcurve2.Var1Max = 1.0;
-    constantcurve2.CurveMin = 1.0;
-    constantcurve2.CurveMax = 1.0;
+    constantcurve2->Name = "constant quadratic curve";
+    constantcurve2->curveType = CurveType::Quadratic;
+    constantcurve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    constantcurve2->coeff[0] = 1.0;
+    constantcurve2->coeff[1] = 0.0;
+    constantcurve2->coeff[2] = 0.0;
+    constantcurve2->inputLimits[0].min = 0.0;
+    constantcurve2->inputLimits[0].max = 1.0;
+    constantcurve2->outputLimits.min = 1.0;
+    constantcurve2->outputLimits.max = 1.0;
     // test 1: dry cooling
     Coil.BypassedFlowFrac(1) = 0.0;
     Coil.InletAirMassFlowRate = 1.0;
@@ -4107,7 +5142,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(17580.0, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling only
     EXPECT_NEAR(0.0, Coil.LatCoolingEnergyRate, 1.0E-11);        // zero latent cooling rate
     EXPECT_DOUBLE_EQ(AirInletNode.HumRat, AirOutletNode.HumRat); // dry cooling only
-    ;
+
     // check against local calculation
     Real64 results_totaloutput = Coil.InletAirMassFlowRate * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
                                                               Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
@@ -4135,7 +5170,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(4475.4221929927808, Coil.LatCoolingEnergyRate, 0.0001);  // latent cooling rate
     EXPECT_DOUBLE_EQ(0.0100, AirInletNode.HumRat);                       // input check
     EXPECT_NEAR(0.0082418676694790537, AirOutletNode.HumRat, 0.00001);   // cooling and dehumidification
-    ;
+
     // check against hand calculation
     results_totaloutput = Coil.InletAirMassFlowRate * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
                                                        Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
@@ -4145,6 +5180,22 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_latentoutput, Coil.LatCoolingEnergyRate, 1.0E-11);
+
+    // set storage tank for testing
+    state->dataWaterData->NumWaterStorageTanks = 1;
+    state->dataWaterData->WaterStorage.allocate(state->dataWaterData->NumWaterStorageTanks);
+    Coil.CondensateCollectMode = CondensateCollectAction::ToTank;
+    state->dataWaterData->WaterStorage(1).VdotAvailSupply.allocate(1);
+    state->dataWaterData->WaterStorage(1).TwaterSupply.allocate(1);
+    Coil.CondensateTankID = 1;
+    Coil.CondensateTankSupplyARRID = 1;
+    // calculate condensate vol flow rate
+    Real64 waterDensity = Psychrometrics::RhoH2O((Coil.InletAirTemp + Coil.OutletAirTemp) / 2.0);
+    Real64 results_condenstateVdot = Coil.InletAirMassFlowRate * (Coil.InletAirHumRat - Coil.OutletAirHumRat) / waterDensity;
+    Coil.DXCoilType = "Coil:Cooling:DX:SingleSpeed";
+    ReportDXCoil(*state, DXCoilNum);
+    // check condensate volume flow rate
+    EXPECT_NEAR(results_condenstateVdot, Coil.CondensateVdot, 1.0E-11);
 }
 
 TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
@@ -4152,7 +5203,6 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
 
     int DXCoilNum(1);
     state->dataDXCoils->NumDXCoils = 1;
-    state->dataCurveManager->NumCurves = 2;
     state->dataHVACGlobal->MSHPMassFlowRateLow = 0.6;
     state->dataHVACGlobal->MSHPMassFlowRateHigh = 1.0;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
@@ -4165,17 +5215,17 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     state->dataDXCoils->DXCoilOutletHumRat.allocate(1);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
     state->dataDXCoils->DXCoilFanOpMode.allocate(1);
-    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+    state->dataCurveManager->allocateCurveVector(2);
 
     auto &Coil = state->dataDXCoils->DXCoil(1);
-    auto &constantcurve1 = state->dataCurveManager->PerfCurve(1);
-    auto &constantcurve2 = state->dataCurveManager->PerfCurve(2);
+    EnergyPlus::Curve::Curve *constantcurve1 = state->dataCurveManager->PerfCurve(1);
+    EnergyPlus::Curve::Curve *constantcurve2 = state->dataCurveManager->PerfCurve(2);
     auto &AirInletNode = state->dataLoopNodes->Node(1);
     auto &AirOutletNode = state->dataLoopNodes->Node(2);
 
     Coil.DXCoilType_Num = CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
-    Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     Coil.NumOfSpeeds = 2;
     Coil.MSRatedTotCap.allocate(Coil.NumOfSpeeds);
     Coil.MSRatedSHR.allocate(Coil.NumOfSpeeds);
@@ -4206,34 +5256,32 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     Coil.AirOutNode = 2;
     Coil.AirInNode = 1;
     // biquadratic curve
-    constantcurve1.Name = "constant biquadratic curve";
-    constantcurve1.curveType = CurveType::BiQuadratic;
-    constantcurve1.ObjectType = "Curve:Biquadratic";
-    constantcurve1.InterpolationType = InterpType::EvaluateCurveToLimits;
-    constantcurve1.Coeff1 = 1.0;
-    constantcurve1.Coeff2 = 0.0;
-    constantcurve1.Coeff3 = 0.0;
-    constantcurve1.Coeff4 = 0.0;
-    constantcurve1.Coeff5 = 0.0;
-    constantcurve1.Coeff6 = 0.0;
-    constantcurve1.Var1Min = 10.0;
-    constantcurve1.Var1Max = 25.0;
-    constantcurve1.Var2Min = 0.0;
-    constantcurve1.Var2Max = 100.0;
-    constantcurve1.CurveMin = 1.0;
-    constantcurve1.CurveMax = 1.0;
+    constantcurve1->Name = "constant biquadratic curve";
+    constantcurve1->curveType = CurveType::BiQuadratic;
+    constantcurve1->interpolationType = InterpType::EvaluateCurveToLimits;
+    constantcurve1->coeff[0] = 1.0;
+    constantcurve1->coeff[1] = 0.0;
+    constantcurve1->coeff[2] = 0.0;
+    constantcurve1->coeff[3] = 0.0;
+    constantcurve1->coeff[4] = 0.0;
+    constantcurve1->coeff[5] = 0.0;
+    constantcurve1->inputLimits[0].min = 10.0;
+    constantcurve1->inputLimits[0].max = 25.0;
+    constantcurve1->inputLimits[1].min = 0.0;
+    constantcurve1->inputLimits[1].max = 100.0;
+    constantcurve1->outputLimits.min = 1.0;
+    constantcurve1->outputLimits.max = 1.0;
     // quadratic curve
-    constantcurve2.Name = "constant quadratic curve";
-    constantcurve2.curveType = CurveType::Quadratic;
-    constantcurve2.ObjectType = "Curve:Quadratic";
-    constantcurve2.InterpolationType = InterpType::EvaluateCurveToLimits;
-    constantcurve2.Coeff1 = 1.0;
-    constantcurve2.Coeff2 = 0.0;
-    constantcurve2.Coeff3 = 0.0;
-    constantcurve2.Var1Min = 0.0;
-    constantcurve2.Var1Max = 1.0;
-    constantcurve2.CurveMin = 1.0;
-    constantcurve2.CurveMax = 1.0;
+    constantcurve2->Name = "constant quadratic curve";
+    constantcurve2->curveType = CurveType::Quadratic;
+    constantcurve2->interpolationType = InterpType::EvaluateCurveToLimits;
+    constantcurve2->coeff[0] = 1.0;
+    constantcurve2->coeff[1] = 0.0;
+    constantcurve2->coeff[2] = 0.0;
+    constantcurve2->inputLimits[0].min = 0.0;
+    constantcurve2->inputLimits[0].max = 1.0;
+    constantcurve2->outputLimits.min = 1.0;
+    constantcurve2->outputLimits.max = 1.0;
     // set coil parameter
     Coil.MSRatedTotCap(1) = 10710.0; // 60 % of full capacity
     Coil.MSRatedTotCap(2) = 17850.0; // 5 ton capcity
@@ -4281,7 +5329,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(0.0, Coil.LatCoolingEnergyRate, 1.0E-11);        // zero latent cooling rate at low speed
     EXPECT_DOUBLE_EQ(0.0075, AirInletNode.HumRat);               // input check
     EXPECT_DOUBLE_EQ(AirInletNode.HumRat, AirOutletNode.HumRat); // dry cooling only
-    ;
+
     // check against hand calculation at low speed
     Real64 results_totaloutput = state->dataHVACGlobal->MSHPMassFlowRateLow * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
                                                                                Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
@@ -4300,7 +5348,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(0.0, Coil.LatCoolingEnergyRate, 1.0E-11);        // zero latent cooling rate at high speed
     EXPECT_DOUBLE_EQ(0.0075, AirInletNode.HumRat);               // input check
     EXPECT_DOUBLE_EQ(AirInletNode.HumRat, AirOutletNode.HumRat); // dry cooling only
-    ;
+
     // check against hand calculation
     results_totaloutput = state->dataHVACGlobal->MSHPMassFlowRateHigh * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
                                                                          Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
@@ -4328,7 +5376,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(2779.6587940815953, Coil.LatCoolingEnergyRate, 0.0001);  // latent cooling rate at low speed
     EXPECT_DOUBLE_EQ(0.0100, AirInletNode.HumRat);                       // input check
     EXPECT_NEAR(0.0081800569931542392, AirOutletNode.HumRat, 0.00001);   // cooling and dehumidification
-    ;
+
     // check against hand calculation at low speed
     results_totaloutput = state->dataHVACGlobal->MSHPMassFlowRateLow * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
                                                                         Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
@@ -4347,7 +5395,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(4632.7646568026576, Coil.LatCoolingEnergyRate, 0.0001);  // latent cooling rate at high speed
     EXPECT_DOUBLE_EQ(0.0100, AirInletNode.HumRat);                       // input check
     EXPECT_NEAR(0.0081800569931542392, AirOutletNode.HumRat, 0.00001);   // cooling and dehumidification
-    ;
+
     // check against hand calculation
     results_totaloutput = state->dataHVACGlobal->MSHPMassFlowRateHigh * (Psychrometrics::PsyHFnTdbW(AirInletNode.Temp, AirInletNode.HumRat) -
                                                                          Psychrometrics::PsyHFnTdbW(AirOutletNode.Temp, AirOutletNode.HumRat));
@@ -4357,6 +5405,21 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     EXPECT_NEAR(results_totaloutput, Coil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_sensibleoutput, Coil.SensCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(results_latentoutput, Coil.LatCoolingEnergyRate, 1.0E-11);
+
+    // set storage tank for testing
+    state->dataWaterData->NumWaterStorageTanks = 1;
+    state->dataWaterData->WaterStorage.allocate(state->dataWaterData->NumWaterStorageTanks);
+    Coil.CondensateCollectMode = CondensateCollectAction::ToTank;
+    state->dataWaterData->WaterStorage(1).VdotAvailSupply.allocate(1);
+    state->dataWaterData->WaterStorage(1).TwaterSupply.allocate(1);
+    Coil.CondensateTankID = 1;
+    Coil.CondensateTankSupplyARRID = 1;
+    // calculate condensate vol flow rate
+    Real64 waterDensity = Psychrometrics::RhoH2O((Coil.InletAirTemp + Coil.OutletAirTemp) / 2.0);
+    Real64 results_condenstateVdot = Coil.InletAirMassFlowRate * (Coil.InletAirHumRat - Coil.OutletAirHumRat) / waterDensity;
+    ReportDXCoil(*state, DXCoilNum);
+    // check condensate volume flow rate
+    EXPECT_NEAR(results_condenstateVdot, Coil.CondensateVdot, 1.0E-11);
 }
 
 TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
@@ -4402,6 +5465,8 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
         "    0.75,                    !- High Speed Rated Sensible Heat Ratio",
         "    3,                       !- High Speed Gross Rated Cooling COP {W/W}",
         "    1.0,                     !- High Speed Rated Air Flow Rate {m3/s}",
+        "    ,",
+        "    ,",
         "    400,                     !- Unit Internal Static Air Pressure {Pa}",
         "    Node 9,                  !- Air Inlet Node Name",
         "    Node 10,                 !- Air Outlet Node Name",
@@ -4414,6 +5479,8 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
         "    0.70,                    !- Low Speed Gross Rated Sensible Heat Ratio",
         "    3,                       !- Low Speed Gross Rated Cooling COP {W/W}",
         "    0.30,                    !- Low Speed Rated Air Flow Rate {m3/s}",
+        "    ,",
+        "    ,",
         "    LSCoolCAPFT,             !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
         "    LSCoolEIRFT,             !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
         "    ,                        !- Condenser Air Inlet Node Name",
@@ -4487,6 +5554,1312 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
     CalcTwoSpeedDXCoilStandardRating(*state, dXCoilIndex);
     EXPECT_EQ("8.72", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilEERIP, coolcoilTwoSpeed.Name));
     EXPECT_EQ("10.15", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilIEERIP, coolcoilTwoSpeed.Name));
+}
+
+TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatings_Curve_Fix_Test)
+{
+    // Test the PR 9694 that fixes Issue 9301; will report severe error if tested in original develop branch
+    std::string const idf_objects = delimited_string({
+
+        "ScheduleTypeLimits,",
+        "    OnOff,                   !- Name",
+        "    0,                       !- Lower Limit Value",
+        "    1,                       !- Upper Limit Value",
+        "    Discrete,                !- Numeric Type",
+        "    availability;            !- Unit Type",
+
+        "Schedule:Constant,",
+        "    Always On Discrete,      !- Name",
+        "    OnOff,                   !- Schedule Type Limits Name",
+        "    1;                       !- Hourly Value",
+
+        "Fan:VariableVolume,",
+        "    Fan Variable Volume,     !- Name",
+        "    Always On Discrete,      !- Availability Schedule Name",
+        "    0.60,                    !- Fan Total Efficiency",
+        "    500,                     !- Pressure Rise {Pa}",
+        "    1.0,                     !- Maximum Flow Rate {m3/s}",
+        "    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method",
+        "    0,                       !- Fan Power Minimum Flow Fraction",
+        "    0,                       !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "    0.90,                    !- Motor Efficiency",
+        "    1,                       !- Motor In Airstream Fraction",
+        "    0.040759894,             !- Fan Power Coefficient 1",
+        "    0.08804497,              !- Fan Power Coefficient 2",
+        "    -0.07292612,             !- Fan Power Coefficient 3",
+        "    0.943739823,             !- Fan Power Coefficient 4",
+        "    0,                       !- Fan Power Coefficient 5",
+        "    Node 11,                 !- Air Inlet Node Name",
+        "    Node 3;                  !- Air Outlet Node Name",
+
+        "Coil:Cooling:DX:TwoSpeed,",
+        "    CCooling DX Two Speed,   !- Name",
+        "    Always On Discrete,      !- Availability Schedule Name",
+        "    17580.0,                 !- High Speed Gross Rated Total Cooling Capacity {W}",
+        "    0.75,                    !- High Speed Rated Sensible Heat Ratio",
+        "    3,                       !- High Speed Gross Rated Cooling COP {W/W}",
+        "    1.0,                     !- High Speed Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    400,                     !- Unit Internal Static Air Pressure {Pa}",
+        "    Node 9,                  !- Air Inlet Node Name",
+        "    Node 10,                 !- Air Outlet Node Name",
+        "    CoolCAPFT,               !- Total Cooling Capacity Function of Temperature Curve Name",
+        "    CoolCAPFFF,              !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "    CoolEIRFT,               !- Energy Input Ratio Function of Temperature Curve Name",
+        "    CoolEIRFFF,              !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "    CoolPLFFPLR,             !- Part Load Fraction Correlation Curve Name",
+        "    4300.0,                  !- Low Speed Gross Rated Total Cooling Capacity {W}",
+        "    0.70,                    !- Low Speed Gross Rated Sensible Heat Ratio",
+        "    3,                       !- Low Speed Gross Rated Cooling COP {W/W}",
+        "    0.30,                    !- Low Speed Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    CapFT2_Lookup_Table,             !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
+        "    LSCoolEIRFT,             !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
+        "    ,                        !- Condenser Air Inlet Node Name",
+        "    AirCooled,               !- Condenser Type",
+        "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    ,                        !- High Speed Evaporative Condenser Effectiveness {dimensionless}",
+        "    ,                        !- High Speed Evaporative Condenser Air Flow Rate {m3/s}",
+        "    ,                        !- High Speed Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    ,                        !- Low Speed Evaporative Condenser Effectiveness {dimensionless}",
+        "    ,                        !- Low Speed Evaporative Condenser Air Flow Rate {m3/s}",
+        "    ,                        !- Low Speed Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    ,                        !- Supply Water Storage Tank Name",
+        "    ,                        !- Condensate Collection Water Storage Tank Name",
+        "    0,                       !- Basin Heater Capacity {W/K}",
+        "    2;                       !- Basin Heater Setpoint Temperature {C}",
+
+        "Curve:Quadratic,CoolCAPFFF,0.77136,0.34053,-0.11088,0.75918,1.13877, 0.0, 2.0, Dimensionless, Dimensionless; ",
+        "Curve:Quadratic,CoolEIRFFF,1.2055,-0.32953,0.12308,0.75918,1.13877, 0.0, 2.0, Dimensionless, Dimensionless; ",
+        "Curve:Quadratic,CoolPLFFPLR,0.771,0.229, 0.0, 0.0, 1.0, 0.0, 1.0, Dimensionless, Dimensionless; ",
+        "Curve:Biquadratic,CoolCAPFT,0.42415,0.04426,-0.00042,0.00333,-8e-005,-0.00021,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Biquadratic,CoolEIRFT,1.23649,-0.02431,0.00057,-0.01434,0.00063,-0.00038,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Biquadratic,LSCoolCAPFT,0.42415,0.04426,-0.00042,0.00333,-8e-005,-0.00021,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Biquadratic,LSCoolEIRFT,1.23649,-0.02431,0.00057,-0.01434,0.00063,-0.00038,17,22,13,46, , , Temperature, Temperature, Dimensionless;",
+
+        "  Table:IndependentVariable,                                      ",
+        "    CapFT2_Lookup_Table_IndependentVariable_1,  !- Name ",
+        "    Cubic,                   !- Interpolation Method              ",
+        "    Constant,                !- Extrapolation Method              ",
+        "    12.2222222222222,        !- Minimum Value                     ",
+        "    26.6666666666667,        !- Maximum Value                     ",
+        "    ,                        !- Normalization Reference Value     ",
+        "    Dimensionless,           !- Unit Type                         ",
+        "    ,                        !- External File Name                ",
+        "    ,                        !- External File Column Number       ",
+        "    ,                        !- External File Starting Row Number ",
+        "    12.2222222222222,        !- Value 1                           ",
+        "    14.4444444444444,        !- Value 2                           ",
+        "    16.6666666666667,        !- <none>                            ",
+        "    19.4444444444444,        !- <none>                            ",
+        "    22.2222222222222,        !- <none>                            ",
+        "    24.4444444444444,        !- <none>                            ",
+        "    26.6666666666667;        !- <none>                            ",
+        "                                                                  ",
+        "  Table:IndependentVariable,                                      ",
+        "    CapFT2_Lookup_Table_IndependentVariable_2,  !- Name ",
+        "    Cubic,                   !- Interpolation Method              ",
+        "    Constant,                !- Extrapolation Method              ",
+        "    18.3333333333333,        !- Minimum Value                     ",
+        "    51.6666666666667,        !- Maximum Value                     ",
+        "    ,                        !- Normalization Reference Value     ",
+        "    Dimensionless,           !- Unit Type                         ",
+        "    ,                        !- External File Name                ",
+        "    ,                        !- External File Column Number       ",
+        "    ,                        !- External File Starting Row Number ",
+        "    18.3333333333333,        !- Value 1                           ",
+        "    23.8888888888889,        !- Value 2                           ",
+        "    29.4444444444444,        !- <none>                            ",
+        "    35,                      !- <none>                            ",
+        "    40.5555555555556,        !- <none>                            ",
+        "    46.1111111111111,        !- <none>                            ",
+        "    51.6666666666667;        !- <none>                            ",
+        "                                                                  ",
+        "                                                                  ",
+        "  Table:IndependentVariableList,                                                               ",
+        "    CapFT2_Lookup_Table_IndependentVariableList,  !- Name                            ",
+        "    CapFT2_Lookup_Table_IndependentVariable_1,  !- Independent Variable 1 Name       ",
+        "    CapFT2_Lookup_Table_IndependentVariable_2;  !- Independent Variable 2 Name       ",
+        "                                                                                               ",
+        "  Table:Lookup,                                                                                ",
+        "    CapFT2_Lookup_Table,  !- Name                                                    ",
+        "    CapFT2_Lookup_Table_IndependentVariableList,  !- Independent Variable List Name  ",
+        "    ,                        !- Normalization Method                                           ",
+        "    ,                        !- Normalization Divisor                                          ",
+        "    ,                        !- Minimum Output                                                 ",
+        "    ,                        !- Maximum Output                                                 ",
+        "    Dimensionless,           !- Output Unit Type                                               ",
+        "    ,                        !- External File Name                                             ",
+        "    ,                        !- External File Column Number                                    ",
+        "    ,                        !- External File Starting Row Number                              ",
+        "    1.01443897684415,        !- Output Value 1                                                 ",
+        "    0.98190971215566,        !- Output Value 2                                                 ",
+        "    0.944262991348902,       !- <none>                                                         ",
+        "    0.902464389801025,       !- <none>                                                         ",
+        "    0.856867303450902,       !- <none>                                                         ",
+        "    0.806505292654037,       !- <none>                                                         ",
+        "    0.770701512694359,       !- <none>                                                         ",
+        "    1.01543273528417,        !- <none>                                                         ",
+        "    0.982820928096771,       !- <none>                                                         ",
+        "    0.945059061050415,       !- <none>                                                         ",
+        "    0.90331569314003,        !- <none>                                                         ",
+        "    0.857631295919418,       !- <none>                                                         ",
+        "    0.807194809118907,       !- <none>                                                         ",
+        "    0.771346032619476,       !- <none>                                                         ",
+        "    1.04978396495183,        !- <none>                                                         ",
+        "    1.00899545351664,        !- <none>                                                         ",
+        "    0.961967547734578,       !- <none>                                                         ",
+        "    0.91093651453654,        !- <none>                                                         ",
+        "    0.859048008918762,       !- <none>                                                         ",
+        "    0.807978371779124,       !- <none>                                                         ",
+        "    0.772054821252823,       !- <none>                                                         ",
+        "    1.14711582660675,        !- <none>                                                         ",
+        "    1.1034460067749,         !- <none>                                                         ",
+        "    1.05519445737203,        !- <none>                                                         ",
+        "    1,                       !- <none>                                                         ",
+        "    0.938460657993952,       !- <none>                                                         ",
+        "    0.870475401480993,       !- <none>                                                         ",
+        "    0.815074309706688,       !- <none>                                                         ",
+        "    1.24975691239039,        !- <none>                                                         ",
+        "    1.20405109723409,        !- <none>                                                         ",
+        "    1.15290776888529,        !- <none>                                                         ",
+        "    1.09695122639338,        !- <none>                                                         ",
+        "    1.03253835439682,        !- <none>                                                         ",
+        "    0.959350367387136,       !- <none>                                                         ",
+        "    0.895228445529938,       !- <none>                                                         ",
+        "    1.33291016022364,        !- <none>                                                         ",
+        "    1.28505523999532,        !- <none>                                                         ",
+        "    1.23106513420741,        !- <none>                                                         ",
+        "    1.17154357830683,        !- <none>                                                         ",
+        "    1.10512377818425,        !- <none>                                                         ",
+        "    1.02879746754964,        !- <none>                                                         ",
+        "    0.962242349982262,       !- <none>                                                         ",
+        "    1.41531632343928,        !- <none>                                                         ",
+        "    1.36335378885269,        !- <none>                                                         ",
+        "    1.30721437931061,        !- <none>                                                         ",
+        "    1.24311178922653,        !- <none>                                                         ",
+        "    1.17164691289266,        !- <none>                                                         ",
+        "    1.0931831796964,         !- <none>                                                         ",
+        "    1.02748036384583;        !- <none>                                                         "});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataEnvrn->StdRhoAir = 1.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    GetCurveInput(*state);
+    Fans::GetFanInput(*state);
+    GetDXCoils(*state);
+    int dXCoilIndex = UtilityRoutines::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
+    int fanIndex = UtilityRoutines::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::FanName);
+    auto &coolcoilTwoSpeed = state->dataDXCoils->DXCoil(dXCoilIndex);
+    auto &supplyFan = state->dataFans->Fan(fanIndex);
+    coolcoilTwoSpeed.SupplyFanIndex = fanIndex;
+    coolcoilTwoSpeed.SupplyFanName = supplyFan.FanName;
+    coolcoilTwoSpeed.SupplyFan_TypeNum = supplyFan.FanType_Num;
+    state->dataGlobal->SysSizingCalc = true;
+    coolcoilTwoSpeed.RatedAirMassFlowRate(1) = coolcoilTwoSpeed.RatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
+    coolcoilTwoSpeed.RatedAirMassFlowRate2 = coolcoilTwoSpeed.RatedAirVolFlowRate2 * state->dataEnvrn->StdRhoAir;
+    supplyFan.MaxAirMassFlowRate = supplyFan.MaxAirFlowRate * state->dataEnvrn->StdRhoAir;
+    supplyFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    auto &InletNode = state->dataLoopNodes->Node(supplyFan.InletNodeNum);
+    auto &OutletNode = state->dataLoopNodes->Node(supplyFan.OutletNodeNum);
+    InletNode.MassFlowRate = 1.0;
+    InletNode.MassFlowRateMax = 1.0;
+    InletNode.MassFlowRateMaxAvail = 1.0;
+    InletNode.MassFlowRateMinAvail = 0.0;
+    OutletNode.MassFlowRate = 1.0;
+    OutletNode.MassFlowRateMax = 1.0;
+    OutletNode.MassFlowRateMaxAvail = 1.0;
+    OutletNode.MassFlowRateMinAvail = 0.0;
+    OutputReportPredefined::SetPredefinedTables(*state);
+
+    // test 1: using internal static and fan pressure rise
+
+    CalcTwoSpeedDXCoilStandardRating(*state, dXCoilIndex);
+    EXPECT_EQ(coolcoilTwoSpeed.Name, "CCOOLING DX TWO SPEED");
+    EXPECT_EQ(coolcoilTwoSpeed.DXCoilType, "Coil:Cooling:DX:TwoSpeed");
+    EXPECT_EQ(coolcoilTwoSpeed.DXCoilType_Num, CoilDX_CoolingTwoSpeed);
+    EXPECT_EQ(coolcoilTwoSpeed.InternalStaticPressureDrop, 400.0);
+    EXPECT_TRUE(coolcoilTwoSpeed.RateWithInternalStaticAndFanObject);
+    EXPECT_EQ("8.77", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilEERIP, coolcoilTwoSpeed.Name));
+    EXPECT_EQ("11.25", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilIEERIP, coolcoilTwoSpeed.Name));
+
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+
+    // test 2: using default fan power per evap air flow rate, 365 W/1000 scfm or 773.3 W/(m3/s)
+
+    coolcoilTwoSpeed.RateWithInternalStaticAndFanObject = false;
+    OutputReportPredefined::SetPredefinedTables(*state);
+    CalcTwoSpeedDXCoilStandardRating(*state, dXCoilIndex);
+    EXPECT_EQ("8.72", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilEERIP, coolcoilTwoSpeed.Name));
+    EXPECT_EQ("10.16", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilIEERIP, coolcoilTwoSpeed.Name));
+
+    EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
+}
+
+TEST_F(EnergyPlusFixture, MSCoolingCoil_TestErrorMessageWithoutPLRobjects)
+{
+    // Test #10121
+
+    using Psychrometrics::PsyHFnTdbW;
+    using Psychrometrics::PsyTwbFnTdbWPb;
+
+    std::string const idf_objects = delimited_string({
+        " Schedule:Compact,",
+        "	FanAndCoilAvailSched, !- Name",
+        "	Fraction,             !- Schedule Type Limits Name",
+        "	Through: 12/31,       !- Field 1",
+        "	For: AllDays,         !- Field 2",
+        "	Until: 24:00, 1.0;    !- Field 3",
+        " OutdoorAir:Node,",
+        "	Outdoor Condenser Air Node, !- Name",
+        "	1.0;                     !- Height Above Ground{ m }",
+        " Coil:Cooling:DX:MultiSpeed,",
+        "  Heat Pump ACDXCoil 1, !- Name",
+        "  FanAndCoilAvailSched, !- Availability Schedule Name",
+        "  DX Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
+        "  Heating Coil Air Inlet Node, !- Air Outlet Node Name",
+        "  Outdoor Condenser Air Node, !- Condenser Air Inlet Node Name",
+        "  AirCooled, !- Condenser Type",
+        "  , !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "  , !- Supply Water Storage Tank Name",
+        "  , !- Condensate Collection Water Storage Tank Name",
+        "  No, !- Apply Part Load Fraction to Speeds Greater than 1",
+        "  No, !- Apply Latent Degradation to Speeds Greater than 1",
+        "  200.0, !- Crankcase Heater Capacity{ W }",
+        "  ,      !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
+        "  , !- Basin Heater Capacity{ W / K }",
+        "  , !- Basin Heater Setpoint Temperature{ C }",
+        "  , !- Basin Heater Operating Schedule Name",
+        "  Electricity, !- Fuel Type",
+        "  4, !- Number of Speeds",
+        "  7500, !- Speed 1 Gross Rated Total Cooling Capacity{ W }",
+        "  0.75, !- Speed 1 Gross Rated Sensible Heat Ratio",
+        "  3.0, !- Speed 1 Gross Rated Cooling COP{ W / W }",
+        "  0.40, !- Speed 1 Rated Air Flow Rate{ m3 / s }",
+        "  453.3, !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  453.3, !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
+        "  HPACCoolCapFT Speed, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+        "  HPACCoolCapFF Speed, !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "  HPACCOOLEIRFT Speed, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "  HPACCOOLEIRFF Speed, !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  HPACCOOLPLFFPLR Speed, !- Speed 1 Part Load Fraction Correlation Curve Name",
+        "  1000.0, !- Speed 1 Nominal Time for Condensate Removal to Begin{ s }",
+        "  1.5, !- Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity{ dimensionless }",
+        "  3.0, !- Speed 1 Maximum Cycling Rate{ cycles / hr }",
+        "  45.0, !- Speed 1 Latent Capacity Time Constant{ s }",
+        "  0.2, !- Speed 1 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        "  , !- Speed 1 Waste Heat Function of Temperature Curve Name",
+        "  0.9, !- Speed 1 Evaporative Condenser Effectiveness{ dimensionless }",
+        "  0.05, !- Speed 1 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        "  50, !- Speed 1 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        "  17500, !- Speed 2 Gross Rated Total Cooling Capacity{ W }",
+        "  0.75, !- Speed 2 Gross Rated Sensible Heat Ratio",
+        "  3.0, !- Speed 2 Gross Rated Cooling COP{ W / W }",
+        "  0.85, !- Speed 2 Rated Air Flow Rate{ m3 / s }",
+        "  523.3, !- 2017 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  523.3, !- 2023 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
+        "  HPACCoolCapFT Speed, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+        "  HPACCoolCapFF Speed, !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "  HPACCOOLEIRFT Speed, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+        "  HPACCOOLEIRFF Speed, !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  HPACCOOLPLFFPLR Speed, !- Speed 2 Part Load Fraction Correlation Curve Name",
+        "  1000.0, !- Speed 2 Nominal Time for Condensate Removal to Begin{ s }",
+        "  1.5, !- Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }",
+        "  3.0, !- Speed 2 Maximum Cycling Rate{ cycles / hr }",
+        "  45.0, !- Speed 2 Latent Capacity Time Constant{ s }",
+        "  0.2, !- Speed 2 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        "  , !- Speed 2 Waste Heat Function of Temperature Curve Name",
+        "  0.9, !- Speed 2 Evaporative Condenser Effectiveness{ dimensionless }",
+        "  0.1, !- Speed 2 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        "  60, !- Speed 2 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        "  25500, !- Speed 3 Gross Rated Total Cooling Capacity{ W }",
+        "  0.75, !- Speed 3 Gross Rated Sensible Heat Ratio",
+        "  3.0, !- Speed 3 Gross Rated Cooling COP{ W / W }",
+        "  1.25, !- Speed 3 Rated Air Flow Rate{ m3 / s }",
+        "  573.3, !- 2017 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  573.3, !- 2023 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
+        "  HPACCoolCapFT Speed, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+        "  HPACCoolCapFF Speed, !- Speed 3 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "  HPACCOOLEIRFT Speed, !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+        "  HPACCOOLEIRFF Speed, !- Speed 3 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  HPACCOOLPLFFPLR Speed, !- Speed 3 Part Load Fraction Correlation Curve Name",
+        "  1000.0, !- Speed 3 Nominal Time for Condensate Removal to Begin{ s }",
+        "  1.5, !- Speed 3 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }",
+        "  3.0, !- Speed 3 Maximum Cycling Rate{ cycles / hr }",
+        "  45.0, !- Speed 3 Latent Capacity Time Constant{ s }",
+        "  0.2, !- Speed 3 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        "  , !- Speed 3 Waste Heat Function of Temperature Curve Name",
+        "  0.9, !- Speed 3 Evaporative Condenser Effectiveness{ dimensionless }",
+        "  0.2, !- Speed 3 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        "  80, !- Speed 3 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        "  35500, !- Speed 4 Gross Rated Total Cooling Capacity{ W }",
+        "  0.75, !- Speed 4 Gross Rated Sensible Heat Ratio",
+        "  3.0, !- Speed 4 Gross Rated Cooling COP{ W / W }",
+        "  1.75, !- Speed 4 Rated Air Flow Rate{ m3 / s }",
+        "  673.3, !- 2017 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "  673.3, !- 2023 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
+        "  HPACCoolCapFT Speed, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
+        "  HPACCoolCapFF Speed, !- Speed 4 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "  HPACCOOLEIRFT Speed, !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+        "  HPACCOOLEIRFF Speed, !- Speed 4 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  HPACCOOLPLFFPLR Speed, !- Speed 4 Part Load Fraction Correlation Curve Name",
+        "  1000.0, !- Speed 4 Nominal Time for Condensate Removal to Begin{ s }",
+        "  1.5, !- Speed 4 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }",
+        "  3.0, !- Speed 4 Maximum Cycling Rate{ cycles / hr }",
+        "  45.0, !- Speed 4 Latent Capacity Time Constant{ s }",
+        "  0.2, !- Speed 4 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        "  , !- Speed 4 Waste Heat Function of Temperature Curve Name",
+        "  0.9, !- Speed 4 Evaporative Condenser Effectiveness{ dimensionless }",
+        "  0.3, !- Speed 4 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        " 100;                     !- Speed 4 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        " Curve:Biquadratic,",
+        "  HPACCoolCapFT Speed, !- Name",
+        "  1.0, !- Coefficient1 Constant",
+        "  0.0, !- Coefficient2 x",
+        "  0.0, !- Coefficient3 x**2",
+        "  0.0, !- Coefficient4 y",
+        "  0.0, !- Coefficient5 y**2",
+        "  0.0, !- Coefficient6 x*y",
+        "  12.77778, !- Minimum Value of x",
+        "  23.88889, !- Maximum Value of x",
+        "  23.88889, !- Minimum Value of y",
+        "  46.11111, !- Maximum Value of y",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Temperature, !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+        " Curve:Cubic,",
+        "  HPACCoolCapFF Speed, !- Name",
+        "  .47278589, !- Coefficient1 Constant",
+        "  1.2433415, !- Coefficient2 x",
+        "  -1.0387055, !- Coefficient3 x**2",
+        "  .32257813, !- Coefficient4 x**3",
+        "  0.5, !- Minimum Value of x",
+        "  1.5;                   !- Maximum Value of x",
+        " Curve:Biquadratic,",
+        "  HPACCOOLEIRFT Speed, !- Name",
+        "  0.632475E+00, !- Coefficient1 Constant",
+        "  -0.121321E-01, !- Coefficient2 x",
+        "  0.507773E-03, !- Coefficient3 x**2",
+        "  0.155377E-01, !- Coefficient4 y",
+        "  0.272840E-03, !- Coefficient5 y**2",
+        "  -0.679201E-03, !- Coefficient6 x*y",
+        "  12.77778, !- Minimum Value of x",
+        "  23.88889, !- Maximum Value of x",
+        "  23.88889, !- Minimum Value of y",
+        "  46.11111, !- Maximum Value of y",
+        "  , !- Minimum Curve Output",
+        "  , !- Maximum Curve Output",
+        "  Temperature, !- Input Unit Type for X",
+        "  Temperature, !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+        "Curve:Cubic,",
+        "  HPACCOOLEIRFF Speed, !- Name",
+        "  .47278589, !- Coefficient1 Constant",
+        "  1.2433415, !- Coefficient2 x",
+        "  -1.0387055, !- Coefficient3 x**2",
+        "  .32257813, !- Coefficient4 x**3",
+        "  0.5, !- Minimum Value of x",
+        "  1.5;                     !- Maximum Value of x",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ASSERT_THROW(GetDXCoils(*state), std::runtime_error);
+    std::string const error_string = delimited_string({
+        "   ** Warning ** ProcessScheduleInput: Schedule:Compact=\"FANANDCOILAVAILSCHED\", Schedule Type Limits Name=\"FRACTION\" not found -- will "
+        "not be validated",
+        "   ** Severe  ** GetDXCoils: Coil:Cooling:DX:MultiSpeed=\"HEAT PUMP ACDXCOIL 1\", invalid",
+        "   **   ~~~   ** ...not found Speed 1 Part Load Fraction Correlation Curve Name=\"HPACCOOLPLFFPLR SPEED\".",
+        "   ** Severe  ** GetDXCoils: Coil:Cooling:DX:MultiSpeed=\"HEAT PUMP ACDXCOIL 1\", invalid",
+        "   **   ~~~   ** ...not found Speed 2 Part Load Fraction Correlation Curve Name=\"HPACCOOLPLFFPLR SPEED\".",
+        "   ** Severe  ** GetDXCoils: Coil:Cooling:DX:MultiSpeed=\"HEAT PUMP ACDXCOIL 1\", invalid",
+        "   **   ~~~   ** ...not found Speed 3 Part Load Fraction Correlation Curve Name=\"HPACCOOLPLFFPLR SPEED\".",
+        "   ** Severe  ** GetDXCoils: Coil:Cooling:DX:MultiSpeed=\"HEAT PUMP ACDXCOIL 1\", invalid",
+        "   **   ~~~   ** ...not found Speed 4 Part Load Fraction Correlation Curve Name=\"HPACCOOLPLFFPLR SPEED\".",
+        "   **  Fatal  ** GetDXCoils: Errors found in getting Coil:Cooling:DX:MultiSpeed input. Preceding condition(s) causes termination.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=4",
+        "   ..... Last severe error=GetDXCoils: Coil:Cooling:DX:MultiSpeed=\"HEAT PUMP ACDXCOIL 1\", invalid",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, Test_DHW_End_Use_Cat_Removal)
+{
+    std::string const idf_objects = delimited_string({
+
+        "Coil:Cooling:DX:SingleSpeed,",
+        "Coil:Cooling:DX:SingleSpeed coil,    !- Name",
+        ",                        !- Availability Schedule Name",
+        "32000,                   !- Gross Rated Total Cooling Capacity {W}",
+        "0.75,                    !- Gross Rated Sensible Heat Ratio",
+        "3.0,                     !- Gross Rated Cooling COP {W/W}",
+        "1.7,                     !- Rated Air Flow Rate {m3/s}",
+        ",                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow {W/(m3/s)}",
+        "DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
+        "Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
+        "Biquadratic,           !- Total Cooling Capacity Function of Temperature Curve Name",
+        "Cubic,                 !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "Biquadratic,           !- Energy Input Ratio Function of Temperature Curve Name",
+        "Cubic,                 !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "Cubic,                 !- Part Load Fraction Correlation Curve Name",
+        ",                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        ",                        !- Nominal Time for Condensate Removal to Begin {s}",
+        ",                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+        ",                        !- Maximum Cycling Rate {cycles/hr}",
+        ",                        !- Latent Capacity Time Constant {s}",
+        ",                        !- Condenser Air Inlet Node Name",
+        "EvaporativelyCooled,     !- Condenser Type",
+        ",                        !- Evaporative Condenser Effectiveness {dimensionless}",
+        ",                        !- Evaporative Condenser Air Flow Rate {m3/s}",
+        ",                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "10,                      !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve,          !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        ",                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        ",                        !- Supply Water Storage Tank Name",
+        ",                        !- Condensate Collection Water Storage Tank Name",
+        "200,                     !- Basin Heater Capacity {W/K}",
+        ",                        !- Basin Heater Setpoint Temperature",
+        ",                        !- Basin Heater Operating Schedule Name",
+        ",                        !- Sensible Heat Ratio Function of Temperature Curve Name",
+        ",                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name",
+        ",                        !- Report ASHRAE Standard 127 Performance Ratings",
+        ";                        !- Zone Name for Condenser Placement",
+
+        "Coil:Heating:DX:SingleSpeed,",
+        "Coil:Heating:DX:SingleSpeed coil,      !- Name",
+        "  ,                                       !- Availability Schedule Name",
+        "  18584.26,                               !- Gross Rated Heating Capacity {W}",
+        "  3.8,                                    !- Gross Rated Heating COP {W/W}",
+        "  1.0,                                    !- Rated Air Flow Rate {m3/s}",
+        "  673.3,                                  !- 2017 Rated Supply Fan Power Per Volume Flow Rate",
+        "  673.3,                                  !- 2023 Rated Supply Fan Power Per Volume Flow Rate",
+        "  PTHP Thermal Zone One Cooling Coil Outlet Node, !- Air Inlet Node Name",
+        "  PTHP Thermal Zone One Heating Coil Outlet Node, !- Air Outlet Node Name",
+        "  Biquadratic,                      !- Heating Capacity Function of Temperature Curve Name",
+        "  Cubic,                            !- Heating Capacity Function of Flow Fraction Curve Name",
+        "  Biquadratic,                      !- Energy Input Ratio Function of Temperature Curve Name",
+        "  Cubic,                            !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  Cubic,                            !- Part Load Fraction Correlation Curve Name",
+        "  ,                                       !- Defrost Energy Input Ratio Function of Temperature Curve Name",
+        "  -8,                                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "  ,                                       !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
+        "  5,                                      !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
+        "  10,                                     !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve2,                          !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "  10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "  Resistive,                              !- Defrost Strategy",
+        "  Timed,                                  !- Defrost Control",
+        "  0.166667,                               !- Defrost Time Period Fraction",
+        "  2000,                                   !- Resistive Defrost Heater Capacity {W}",
+        ",                                         !- Region number for calculating HSPF",
+        ",                                         !- Evaporator Air Inlet Node Name",
+        ",                                         !- Zone Name for Evaporator Placement",
+        ",                                         !- Secondary Coil Air Flow Rate",
+        ",                                         !- Secondary Coil Fan Flow Scaling Factor",
+        ",                                         !- Nominal Sensible Heat Ratio of Secondary Coil",
+        ",                                         !- Sensible Heat Ratio Modifier Function of Temperature Curve Name",
+        ";                                         !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name",
+
+        "Coil:Cooling:DX:MultiSpeed,",
+        "Coil:Cooling:DX:MultiSpeed coil,                     !- Name",
+        ",                                         !- Availability Schedule Name",
+        "DX Cooling Coil Air Inlet Node,           !- Air Inlet Node Name",
+        "Heating Coil Air Inlet Node,              !- Air Outlet Node Name",
+        "Outdoor Condenser Air Node,               !- Condenser Air Inlet Node Name",
+        "AirCooled,                                !- Condenser Type",
+        ",                                         !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        ",                                         !- Supply Water Storage Tank Name",
+        ",                                         !- Condensate Collection Water Storage Tank Name",
+        "No,                                       !- Apply Part Load Fraction to Speeds Greater than 1",
+        "No,                                       !- Apply Latent Degradation to Speeds Greater than 1",
+        "10.0,                                    !- Crankcase Heater Capacity{ W }",
+        "heaterCapCurve3,                          !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "10.0,                                     !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
+        ",                                         !- Basin Heater Capacity{ W / K }",
+        ",                                         !- Basin Heater Setpoint Temperature{ C }",
+        ",                                         !- Basin Heater Operating Schedule Name",
+        "Electricity,                              !- Fuel Type",
+        "4,                                        !- Number of Speeds",
+        "7500,                                     !- Speed 1 Gross Rated Total Cooling Capacity{ W }",
+        "0.75,                                     !- Speed 1 Gross Rated Sensible Heat Ratio",
+        "3.0,                                      !- Speed 1 Gross Rated Cooling COP{ W / W }",
+        "0.40,                                     !- Speed 1 Rated Air Flow Rate{ m3 / s }",
+        "453.3,                                    !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "453.3,                                    !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
+        "Biquadratic, !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+        "Cubic, !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "Biquadratic, !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "Cubic, !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "Cubic, !- Speed 1 Part Load Fraction Correlation Curve Name",
+        "1000.0, !- Speed 1 Nominal Time for Condensate Removal to Begin{ s }",
+        "1.5, !- Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity{ dimensionless }",
+        "3.0, !- Speed 1 Maximum Cycling Rate{ cycles / hr }",
+        "45.0, !- Speed 1 Latent Capacity Time Constant{ s }",
+        "0.2, !- Speed 1 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        ", !- Speed 1 Waste Heat Function of Temperature Curve Name",
+        "0.9, !- Speed 1 Evaporative Condenser Effectiveness{ dimensionless }",
+        "0.05, !- Speed 1 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        "50, !- Speed 1 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        "17500, !- Speed 2 Gross Rated Total Cooling Capacity{ W }",
+        "0.75, !- Speed 2 Gross Rated Sensible Heat Ratio",
+        "3.0, !- Speed 2 Gross Rated Cooling COP{ W / W }",
+        "0.85, !- Speed 2 Rated Air Flow Rate{ m3 / s }",
+        "523.3, !- 2017 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "523.3, !- 2023 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
+        "Biquadratic, !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+        "Cubic, !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "Biquadratic, !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+        "Cubic, !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "Cubic, !- Speed 2 Part Load Fraction Correlation Curve Name",
+        "1000.0, !- Speed 2 Nominal Time for Condensate Removal to Begin{ s }",
+        "1.5, !- Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }",
+        "3.0, !- Speed 2 Maximum Cycling Rate{ cycles / hr }",
+        "45.0, !- Speed 2 Latent Capacity Time Constant{ s }",
+        "0.2, !- Speed 2 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        ", !- Speed 2 Waste Heat Function of Temperature Curve Name",
+        "0.9, !- Speed 2 Evaporative Condenser Effectiveness{ dimensionless }",
+        "0.1, !- Speed 2 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        "60, !- Speed 2 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        "25500, !- Speed 3 Gross Rated Total Cooling Capacity{ W }",
+        "0.75, !- Speed 3 Gross Rated Sensible Heat Ratio",
+        "3.0, !- Speed 3 Gross Rated Cooling COP{ W / W }",
+        "1.25, !- Speed 3 Rated Air Flow Rate{ m3 / s }",
+        "573.3, !- 2017 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "573.3, !- 2023 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
+        "Biquadratic, !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+        "Cubic, !- Speed 3 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "Biquadratic, !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+        "Cubic, !- Speed 3 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "Cubic, !- Speed 3 Part Load Fraction Correlation Curve Name",
+        "1000.0, !- Speed 3 Nominal Time for Condensate Removal to Begin{ s }",
+        "1.5, !- Speed 3 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }",
+        "3.0, !- Speed 3 Maximum Cycling Rate{ cycles / hr }",
+        "45.0, !- Speed 3 Latent Capacity Time Constant{ s }",
+        "0.2, !- Speed 3 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        ", !- Speed 3 Waste Heat Function of Temperature Curve Name",
+        "0.9, !- Speed 3 Evaporative Condenser Effectiveness{ dimensionless }",
+        "0.2, !- Speed 3 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        "80, !- Speed 3 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        "35500, !- Speed 4 Gross Rated Total Cooling Capacity{ W }",
+        "0.75, !- Speed 4 Gross Rated Sensible Heat Ratio",
+        "3.0, !- Speed 4 Gross Rated Cooling COP{ W / W }",
+        "1.75, !- Speed 4 Rated Air Flow Rate{ m3 / s }",
+        "673.3, !- 2017 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "673.3, !- 2023 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}", //??TBD:BPS
+        "Biquadratic, !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
+        "Cubic, !- Speed 4 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "Biquadratic, !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+        "Cubic, !- Speed 4 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "Cubic, !- Speed 4 Part Load Fraction Correlation Curve Name",
+        "1000.0, !- Speed 4 Nominal Time for Condensate Removal to Begin{ s }",
+        "1.5, !- Speed 4 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity{ dimensionless }",
+        "3.0, !- Speed 4 Maximum Cycling Rate{ cycles / hr }",
+        "45.0, !- Speed 4 Latent Capacity Time Constant{ s }",
+        "0.2, !- Speed 4 Rated Waste Heat Fraction of Power Input{ dimensionless }",
+        ", !- Speed 4 Waste Heat Function of Temperature Curve Name",
+        "0.9, !- Speed 4 Evaporative Condenser Effectiveness{ dimensionless }",
+        "0.3, !- Speed 4 Evaporative Condenser Air Flow Rate{ m3 / s }",
+        "100,                     !- Speed 4 Rated Evaporative Condenser Pump Power Consumption{ W }",
+        ";                                         !- Zone Name for Condenser Placement",
+
+        " Coil:Heating:DX:MultiSpeed,",
+        "Coil:Heating:DX:MultiSpeed coil,                          !- Name",
+        "   ,                                       !- Availability Schedule Name",
+        "   ashp unitary system Cooling Coil - Heating Coil Node, !- Air Inlet Node Name",
+        "   ashp unitary system Heating Coil - Supplemental Coil Node, !- Air Outlet Node Name",
+        "   -17.7777777777778,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "   ,                                       !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
+        "   10,                                     !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve4,                           !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "   10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "   Biquadratic,                            !- Defrost Energy Input Ratio Function of Temperature Curve Name",
+        "   4.44444444444444,                       !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
+        "   ReverseCycle,                           !- Defrost Strategy",
+        "   OnDemand,                               !- Defrost Control",
+        "   0.058333,                               !- Defrost Time Period Fraction",
+        "   AutoSize,                               !- Resistive Defrost Heater Capacity {W}",
+        "   No,                                     !- Apply Part Load Fraction to Speeds Greater than 1",
+        "   Electricity,                            !- Fuel Type",
+        "   4,                                      !- Region number for Calculating HSPF",
+        "   2,                                      !- Number of Speeds",
+        "   10128.5361851424,                       !- Speed Gross Rated Heating Capacity 1 {W}",
+        "   4.4518131589158,                        !- Speed Gross Rated Heating COP 1 {W/W}",
+        "   0.531903646383625,                      !- Speed Rated Air Flow Rate 1 {m3/s}",
+        "   773.3,                                  !- 2017 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.3,                                  !- 2023 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}", //??
+        "   Biquadratic,                        !- Speed Heating Capacity Function of Temperature Curve Name 1",
+        "   Cubic,                       !- Speed Heating Capacity Function of Flow Fraction Curve Name 1",
+        "   Biquadratic,                        !- Speed Energy Input Ratio Function of Temperature Curve Name 1",
+        "   Cubic,                       !- Speed Energy Input Ratio Function of Flow Fraction Curve Name 1",
+        "   Cubic,                      !- Speed Part Load Fraction Correlation Curve Name 1",
+        "   0.2,                                    !- Speed Rated Waste Heat Fraction of Power Input 1 {dimensionless}",
+        "   ConstantBiquadratic,                    !- Speed Waste Heat Function of Temperature Curve Name 1",
+        "   14067.4113682534,                       !- Speed Gross Rated Heating Capacity 2 {W}",
+        "   3.9871749697327,                        !- Speed Gross Rated Heating COP 2 {W/W}",
+        "   0.664879557979531,                      !- Speed Rated Air Flow Rate 2 {m3/s}",
+        "   773.3,                                  !- 2017 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   934.3,                                  !- 2023 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "   Biquadratic,                        !- Speed Heating Capacity Function of Temperature Curve Name 2",
+        "   Cubic,                       !- Speed Heating Capacity Function of Flow Fraction Curve Name 2",
+        "   Biquadratic,                        !- Speed Energy Input Ratio Function of Temperature Curve Name 2",
+        "   Cubic,                       !- Speed Energy Input Ratio Function of Flow Fraction Curve Name 2",
+        "   Cubic,                      !- Speed Part Load Fraction Correlation Curve Name 2",
+        "   0.2,                                    !- Speed Rated Waste Heat Fraction of Power Input 2 {dimensionless}",
+        "   Biquadratic,                    !- Speed Waste Heat Function of Temperature Curve Name 2",
+        ", !- fill other fields",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ";",
+
+        "  Coil:Cooling:DX:VariableSpeed,",
+        "Coil:Cooling:DX:VariableSpeed coil,    !- Name",
+        "    Zone1WindACFanOutletNode,  !- Indoor Air Inlet Node Name",
+        "    Zone1WindACAirOutletNode,  !- Indoor Air Outlet Node Name",
+        "    1,                       !- Number of Speeds {dimensionless}",
+        "    1,                       !- Nominal Speed Level {dimensionless}",
+        "    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {w}",
+        "    AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+        "    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
+        "    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
+        "    Cubic,                   !- Energy Part Load Fraction Curve Name",
+        "    ,                        !- Condenser Air Inlet Node Name",
+        "    AirCooled,               !- Condenser Type",
+        "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    10,                      !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve5,             !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    ,                        !- Supply Water Storage Tank Name",
+        "    ,                        !- Condensate Collection Water Storage Tank Name",
+        "    ,                        !- Basin Heater Capacity {W/K}",
+        "    ,                        !- Basin Heater Setpoint Temperature {C}",
+        "    ,                        !- Basin Heater Operating Schedule Name",
+        "    36991.44197,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}",
+        "    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
+        "    3.866381837,             !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}",
+        "    3.776,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    10.62,                   !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}",
+        "    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}",
+        "    Biquadratic,             !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",",
+        ",,,,,,,,,,,,,,,,,;"
+
+        "  Coil:Heating:DX:VariableSpeed,",
+        "Coil:Heating:DX:VariableSpeed coil,  !- Name",
+        "    Heating Coil Air Inlet Node,  !- Indoor Air Inlet Node Name",
+        "    SuppHeating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name",
+        "    10,                      !- Number of Speeds {dimensionless}",
+        "    10,                      !- Nominal Speed Level {dimensionless}",
+        "    35000,                   !- Rated Heating Capacity At Selected Nominal Speed Level {w}",
+        "    1.7,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+        "    Biquadratic,             !- Energy Part Load Fraction Curve Name",
+        "    ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name",
+        "    -5.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
+        "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
+        "    10.0,                   !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve6,             !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "    Resistive,               !- Defrost Strategy",
+        "    TIMED,                   !- Defrost Control",
+        "    0.166667,                !- Defrost Time Period Fraction",
+        "    20000,                   !- Resistive Defrost Heater Capacity {W}",
+        "    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.1661088,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 1 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 1 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 2 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 2 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 3 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 3 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 3 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 3 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 4 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 5 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 5 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 5 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 5 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 6 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 6 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 6 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 6 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 7 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 7 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 7 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 7 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 8 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 8 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 8 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 8 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 9 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 9 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 9 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 9 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 10 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 10 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    Biquadratic,             !- Speed 10 Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                   !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Speed 10 Energy Input Ratio Function of Temperature Curve Name",
+        "    Cubic;                   !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+
+        "Coil:Cooling:DX:TwoStageWithHumidityControlMode,",
+        "Coil:Cooling:DX:TwoStageWithHumidityControlMode coil,       !- Name",
+        ",                        !- Availability Schedule Name",
+        "DOAS Supply Fan Outlet,  !- Air Inlet Node Name",
+        "DOAS Cooling Coil Outlet,!- Air Outlet Node Name",
+        "10,                      !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve7,         !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        ",                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "2,                       !- Number of Capacity Stages",
+        "1,                       !- Number of Enhanced Dehumidification Modes",
+        "CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type",
+        "DOAS Standard Perf 1,    !- Normal Mode Stage 1 Coil Performance Name",
+        "CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type",
+        "DOAS Standard Perf 1,    !- Normal Mode Stage 1+2 Coil Performance Name",
+        "CoilPerformance:DX:Cooling,  !- Dehumidification Mode 1 Stage 1 Coil Performance Object Type",
+        "DOAS Standard Perf 1,    !- Dehumidification Mode 1 Stage 1 Coil Performance Name",
+        "CoilPerformance:DX:Cooling,  !- Dehumidification Mode 1 Stage 1+2 Coil Performance Object Type",
+        "DOAS Standard Perf 1,    !- Dehumidification Mode 1 Stage 1+2 Coil Performance Name",
+        ",                        !- Supply Water Storage Tank Name",
+        ",                        !- Condensate Collection Water Storage Tank Name",
+        "0,                       !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        ",                        !- Basin Heater Capacity",
+        ",                        !- Basin Heater Setpoint Temperature",
+        ";                        !- Basin Heater Operating Schedule Name",
+
+        "Coil:WaterHeating:AirToWaterHeatPump:Wrapped,",
+        "    HPWH Coil_1,             !- Name",
+        "    1400,                    !- Rated Heating Capacity {W}",
+        "    2.8,                     !- Rated COP {W/W}",
+        "    0.88,                    !- Rated Sensible Heat Ratio",
+        "    19.72222222222222,       !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}",
+        "    13.533905564389693,      !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}",
+        "    48.89,                   !- Rated Condenser Water Temperature {C}",
+        "    0.08542248664,           !- Rated Evaporator Air Flow Rate {m3/s}",
+        "    Yes,                     !- Evaporator Fan Power Included in Rated COP",
+        "    HPWH Air Inlet Node_1,   !- Evaporator Air Inlet Node Name",
+        "    HPWH CoilAirOutlet FanAirInlet_1,  !- Evaporator Air Outlet Node Name",
+        "    10,                      !- Crankcase Heater Capacity {W}",
+        "    heaterCapCurve8,         !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "    0,                       !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
+        "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
+        "    Biquadratic,             !- Heating Capacity Function of Temperature Curve Name",
+        "    ,                        !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Biquadratic,             !- Heating COP Function of Temperature Curve Name",
+        "    ,",
+        "    ;",
+
+        "  Coil:WaterHeating:AirToWaterHeatPump:Pumped,",
+        "    Zone4HPWHDXCoil,         !- Name",
+        "    4000.0,                  !- Rated Heating Capacity {W}",
+        "    3.2,                     !- Rated COP {W/W}",
+        "    0.6956,                  !- Rated Sensible Heat Ratio",
+        "    29.44,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}",
+        "    22.22,                   !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}",
+        "    55.72,                   !- Rated Condenser Inlet Water Temperature {C}",
+        "    autocalculate,           !- Rated Evaporator Air Flow Rate {m3/s}",
+        "    autocalculate,           !- Rated Condenser Water Flow Rate {m3/s}",
+        "    No,                      !- Evaporator Fan Power Included in Rated COP",
+        "    No,                      !- Condenser Pump Power Included in Rated COP",
+        "    No,                      !- Condenser Pump Heat Included in Rated Heating Capacity and Rated COP",
+        "    150.0,                   !- Condenser Water Pump Power {W}",
+        "    0.1,                     !- Fraction of Condenser Pump Heat to Water",
+        "    Zone4AirOutletNode,      !- Evaporator Air Inlet Node Name",
+        "    Zone4DXCoilAirOutletNode,!- Evaporator Air Outlet Node Name",
+        "    Zone4WaterInletNode,     !- Condenser Water Inlet Node Name",
+        "    Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name",
+        "    10.0,                    !- Crankcase Heater Capacity {W}",
+        "    heaterCapCurve9,         !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
+        "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
+        "    Cubic,                   !- Heating Capacity Function of Temperature Curve Name",
+        "    ,                        !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    ,                        !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,             !- Heating COP Function of Temperature Curve Name",
+        "    ,                        !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    ,                        !- Heating COP Function of Water Flow Fraction Curve Name",
+        "    Cubic;                   !- Part Load Fraction Correlation Curve Name",
+
+        "  Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,",
+        "    HPWHOutdoorDXCoilVS,     !- Name",
+        "	10,						 !- Number of Speeds",
+        "	10,						 !- Nominal speed level",
+        "    4000.0,                  !- Rated Heating Capacity {W}",
+        "    29.44,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}",
+        "    22.22,                   !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}",
+        "    55.72,                   !- Rated Condenser Inlet Water Temperature {C}",
+        "    0.2685,                  !- Rated Evaporator Air Flow Rate {m3/s}",
+        "    0.00016,                 !- Rated Condenser Water Flow Rate {m3/s}",
+        "    No,                      !- Evaporator Fan Power Included in Rated COP",
+        "    No,                      !- Condenser Pump Power Included in Rated COP",
+        "    No,                      !- Condenser Pump Heat Included in Rated Heating Capacity and Rated COP",
+        "    0.1,                     !- Fraction of Condenser Pump Heat to Water",
+        "    HPOutdoorFanAirOutletNode,   !- Evaporator Air Inlet Node Name",
+        "    HPOutdoorAirOutletNode,  	  !- Evaporator Air Outlet Node Name",
+        "    HPOutdoorWaterInletNode, 	 !- Condenser Water Inlet Node Name",
+        "    HPOutdoorWaterOutletNode,	 !- Condenser Water Outlet Node Name",
+        "    10.0,                   !- Crankcase Heater Capacity {W}",
+        "    heaterCapCurve10,        !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
+        "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
+        "    Biquadratic,             !- Part Load Fraction Correlation Curve Name",
+        "	400.00,					 !- Speed 1 Water Heating capacity {W} of Reference Unit",
+        "	5.0, 					 !- Speed 1 Water Heating COP {W/W} of Reference Unit",
+        "	0.80, 					 !- Speed 1 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.020140,                !- Speed 1 Air Flow Rate of Reference Unit",
+        "	0.000018,                !- Speed 1 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 1 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	800.00,					 !- Speed 2 Water Heating capacity {W} of Reference Unit",
+        "	4.8, 					 !- Speed 2 Water Heating COP {W/W} of Reference Unit",
+        "	0.79, 					 !- Speed 2 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.040280,                !- Speed 2 Air Flow Rate of Reference Unit",
+        "	0.000036,                !- Speed 2 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 2 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	1200.00,				 !- Speed 3 Water Heating capacity {W} of Reference Unit",
+        "	4.4, 					 !- Speed 3 Water Heating COP {W/W} of Reference Unit",
+        "	0.78, 					 !- Speed 3 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.060420,                !- Speed 3 Air Flow Rate of Reference Unit",
+        "	0.000054,                !- Speed 3 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 3 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	1600.00,				 !- Speed 4 Water Heating capacity {W} of Reference Unit",
+        "	4.0, 					 !- Speed 4 Water Heating COP {W/W} of Reference Unit",
+        "	0.77, 					 !- Speed 4 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.080560,                !- Speed 4 Air Flow Rate of Reference Unit",
+        "	0.000072,                !- Speed 4 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 4 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	2000.00,				 !- Speed 5 Water Heating capacity {W} of Reference Unit",
+        "	3.8, 					 !- Speed 5 Water Heating COP {W/W} of Reference Unit",
+        "	0.76, 					 !- Speed 5 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.100700,                !- Speed 5 Air Flow Rate of Reference Unit",
+        "	0.000090,                !- Speed 5 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 5 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	2400.00,				 !- Speed 6 Water Heating capacity {W} of Reference Unit",
+        "	3.4, 					 !- Speed 6 Water Heating COP {W/W} of Reference Unit",
+        "	0.75, 					 !- Speed 6 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.120840,                !- Speed 6 Air Flow Rate of Reference Unit",
+        "	0.000108,                !- Speed 6 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 6 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	2800.00,				 !- Speed 7 Water Heating capacity {W} of Reference Unit",
+        "	3.0, 					 !- Speed 7 Water Heating COP {W/W} of Reference Unit",
+        "	0.74, 					 !- Speed 7 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.140980,                !- Speed 7 Air Flow Rate of Reference Unit",
+        "	0.000126,                !- Speed 7 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 7 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	3200.00,				 !- Speed 8 Water Heating capacity {W} of Reference Unit",
+        "	2.6, 					 !- Speed 8 Water Heating COP {W/W} of Reference Unit",
+        "	0.73, 					 !- Speed 8 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.161120,                !- Speed 8 Air Flow Rate of Reference Unit",
+        "	0.000144,                !- Speed 8 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 8 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	3600.00,				 !- Speed 9 Water Heating capacity {W} of Reference Unit",
+        "	2.3, 					 !- Speed 9 Water Heating COP {W/W} of Reference Unit",
+        "	0.72, 					 !- Speed 9 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.181260,                !- Speed 9 Air Flow Rate of Reference Unit",
+        "	0.000162,                !- Speed 9 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 9 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating COP Function of Water Flow Fraction Curve Name",
+        "	4000.00,				 !- Speed 10 Water Heating capacity {W} of Reference Unit",
+        "	2.0, 					 !- Speed 10 Water Heating COP {W/W} of Reference Unit",
+        "	0.70, 					 !- Speed 10 Sensible Heat Transfer Ratio of Reference Unit",
+        "	0.201400,                !- Speed 10 Air Flow Rate of Reference Unit",
+        "	0.000179,                !- Speed 10 water Air Flow Rate of Reference Unit",
+        "	10.0,                    !- Speed 10 Water Pump Power of Reference Unit",
+        "    Biquadratic,                !- Heating Capacity Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    Cubic,                      !- Heating Capacity Function of Water Flow Fraction Curve Name",
+        "    Biquadratic,                !- Heating COP Function of Temperature Curve Name",
+        "    Cubic,                      !- Heating COP Function of Air Flow Fraction Curve Name",
+        "    Cubic;                      !- Heating COP Function of Water Flow Fraction Curve Name",
+
+        "CoilPerformance:DX:Cooling,",
+        "DOAS Standard Perf 1,    !- Name",
+        "autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "autosize,                !- Gross Rated Sensible Heat Ratio",
+        "3,                       !- Gross Rated Cooling COP {W/W}",
+        "autosize,                !- Rated Air Flow Rate {m3/s}",
+        "0.5,                     !- Fraction of Air Flow Bypassed Around Coil",
+        "Biquadratic,             !- Total Cooling Capacity Function of Temperature Curve Name",
+        "Cubic,                   !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "Biquadratic,             !- Energy Input Ratio Function of Temperature Curve Name",
+        "Cubic,                   !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "Cubic,                   !- Part Load Fraction Correlation Curve Name",
+        ",                        !- Nominal Time for Condensate Removal to Begin {s}",
+        ",                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+        "0;                       !- Maximum Cycling Rate {cycles/hr}",
+
+        "Curve:Linear,",
+        "heaterCapCurve,          !- Name",
+        "10.0,                    !- Coefficient1 Constant",
+        "-2.0,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve2,          !- Name",
+        "15.0,                    !- Coefficient1 Constant",
+        "-2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve3,          !- Name",
+        "22.0,                    !- Coefficient1 Constant",
+        "-3.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve4,          !- Name",
+        "25.0,                    !- Coefficient1 Constant",
+        "2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve5,          !- Name",
+        "26.0,                    !- Coefficient1 Constant",
+        "2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve6,          !- Name",
+        "28.0,                    !- Coefficient1 Constant",
+        "2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve7,          !- Name",
+        "29.0,                    !- Coefficient1 Constant",
+        "2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve8,          !- Name",
+        "30.0,                    !- Coefficient1 Constant",
+        "2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve9,          !- Name",
+        "31.0,                    !- Coefficient1 Constant",
+        "2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Linear,",
+        "heaterCapCurve10,          !- Name",
+        "32.0,                    !- Coefficient1 Constant",
+        "2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
+
+        "Curve:Biquadratic,",
+        "  Biquadratic,             !- Name",
+        "  1.0,                     !- Coefficient1 Constant",
+        "  1.0,                     !- Coefficient2 x",
+        "  1.0,                     !- Coefficient3 x**2",
+        "  1.0,                     !- Coefficient4 y",
+        "  1.0,                     !- Coefficient5 y**2",
+        "  1.0,                     !- Coefficient6 x*y",
+        "  5,                       !- Minimum Value of x",
+        "  40,                      !- Maximum Value of x",
+        "  5,                       !- Minimum Value of y",
+        "  40,                      !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+        " ",
+        "Curve:Cubic,",
+        "  Cubic,                   !- Name",
+        "  1.0,                     !- Coefficient1 Constant",
+        "  1.0,                     !- Coefficient2 x",
+        "  1.0,                     !- Coefficient3 x**2",
+        "  0,                       !- Coefficient4 x**3",
+        "  5,                       !- Minimum Value of x",
+        "  40,                      !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature;             !- Output Unit Type",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ProcessScheduleInput(*state);
+    GetCurveInput(*state);
+    GetDXCoils(*state);
+    VariableSpeedCoils::GetVarSpeedCoilInput(*state);
+
+    EXPECT_EQ(24, state->dataOutputProcessor->NumEnergyMeters);
+    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(20).Name, "WaterSystems:Electricity");
+    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(20).ResourceType, "Electricity");
+    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(20).EndUse, "WaterSystems");
+
+    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(21).Name, "General:WaterSystems:Electricity");
+    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(21).ResourceType, "Electricity");
+    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(21).EndUse, "WaterSystems");
 }
 
 } // namespace EnergyPlus

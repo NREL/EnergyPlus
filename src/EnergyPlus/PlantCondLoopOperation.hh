@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,12 +48,10 @@
 #ifndef PlantCondLoopOperation_hh_INCLUDED
 #define PlantCondLoopOperation_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Optional.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
 
@@ -100,6 +98,12 @@ namespace PlantCondLoopOperation {
                          int const LoopNum,                // May be set here and passed on
                          int const SchemeNum,              // May be set here and passed on
                          bool &ErrorsFound                 // May be set here and passed on
+    );
+
+    void GetChillerHeaterChangeoverOpSchemeInput(EnergyPlusData &state,
+                                                 std::string &CurrentModuleObject, // for ease in renaming
+                                                 int const NumSchemes,             // may be set here and passed on
+                                                 bool &ErrorsFound                 // may be set here and passed on
     );
 
     void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
@@ -178,11 +182,16 @@ struct PlantCondLoopOperationData : BaseGlobalStruct
     Array1D<DataPlant::LoopType> EquipListsTypeList;
     Array1D_int EquipListsIndexList;
     bool lDummy = false; // for User-defined component load dispatch
+    bool LoadSupervisoryChillerHeaterOpScheme = true;
+    Array1D<DataPlant::ChillerHeaterSupervisoryOperationData> ChillerHeaterSupervisoryOperationSchemes;
+
     void clear_state() override
     {
         this->GetPlantOpInput = true;
         this->InitLoadDistributionOneTimeFlag = true;
         this->LoadEquipListOneTimeFlag = true;
+        this->LoadSupervisoryChillerHeaterOpScheme = true;
+        this->ChillerHeaterSupervisoryOperationSchemes.clear();
         this->TotNumLists = 0;
         this->EquipListsNameList.clear();
         this->EquipListsTypeList.clear();

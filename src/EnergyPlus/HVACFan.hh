@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -88,16 +88,13 @@ namespace HVACFan {
         FanSystem(FanSystem const &) = default;
 
         void simulate(EnergyPlusData &state,
-                      //        bool const firstHVACIteration,
-                      Optional<Real64 const> flowFraction = _,     // Flow fraction in operating mode 1
-                      Optional_bool_const zoneCompTurnFansOn = _,  // Turn fans ON signal from ZoneHVAC component
-                      Optional_bool_const zoneCompTurnFansOff = _, // Turn Fans OFF signal from ZoneHVAC component
-                      Optional<Real64 const> pressureRise = _,     // Pressure difference to use for DeltaPress
-                      Optional<Real64 const> massFlowRate1 = _,    // Mass flow rate in operating mode 1 [kg/s]
-                      Optional<Real64 const> runTimeFraction1 = _, // Run time fraction in operating mode 1
-                      Optional<Real64 const> massFlowRate2 = _,    // Mass flow rate in operating mode 2 [kg/s]
-                      Optional<Real64 const> runTimeFraction2 = _, // Run time fraction in operating mode 2
-                      Optional<Real64 const> pressureRise2 = _     // Pressure difference to use for operating mode 2
+                      ObjexxFCL::Optional<Real64 const> flowFraction = _,     // Flow fraction in operating mode 1
+                      ObjexxFCL::Optional<Real64 const> pressureRise = _,     // Pressure difference to use for DeltaPress
+                      ObjexxFCL::Optional<Real64 const> massFlowRate1 = _,    // Mass flow rate in operating mode 1 [kg/s]
+                      ObjexxFCL::Optional<Real64 const> runTimeFraction1 = _, // Run time fraction in operating mode 1
+                      ObjexxFCL::Optional<Real64 const> massFlowRate2 = _,    // Mass flow rate in operating mode 2 [kg/s]
+                      ObjexxFCL::Optional<Real64 const> runTimeFraction2 = _, // Run time fraction in operating mode 2
+                      ObjexxFCL::Optional<Real64 const> pressureRise2 = _     // Pressure difference to use for operating mode 2
         );
 
         Real64 fanPower() const;
@@ -143,6 +140,9 @@ namespace HVACFan {
         int powerModFuncFlowFractionCurveIndex; // pointer to performance curve or table
         int AirLoopNum;                         // AirLoop number
         bool AirPathFlag;                       // Yes, this fan is a part of airpath
+        int m_numSpeeds;                        // input for how many speed levels for discrete fan
+        std::vector<Real64> m_massFlowAtSpeed;
+        std::vector<Real64> m_flowFractionAtSpeed; // array of flow fractions for speed levels
 
         // Mass Flow Rate Control Variables
         bool fanIsSecondaryDriver; // true if this fan is used to augment flow and may pass air when off.
@@ -156,14 +156,15 @@ namespace HVACFan {
 
         void set_size(EnergyPlusData &state);
 
-        void calcSimpleSystemFan(EnergyPlusData &state,
-                                 Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
-                                 Optional<Real64 const> pressureRise, // Pressure difference to use for DeltaPress
-                                 Optional<Real64 const> flowRatio1,   // Flow ratio in operating mode 1
-                                 Optional<Real64 const> runTimeFrac1, // Run time fraction in operating mode 1
-                                 Optional<Real64 const> flowRatio2,   // Flow ratio in operating mode 2
-                                 Optional<Real64 const> runTimeFrac2, // Run time fraction in operating mode 2
-                                 Optional<Real64 const> pressureRise2 // Pressure difference to use for operating mode 2
+        void
+        calcSimpleSystemFan(EnergyPlusData &state,
+                            ObjexxFCL::Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
+                            ObjexxFCL::Optional<Real64 const> pressureRise, // Pressure difference to use for DeltaPress
+                            ObjexxFCL::Optional<Real64 const> flowRatio1,   // Flow ratio in operating mode 1
+                            ObjexxFCL::Optional<Real64 const> runTimeFrac1, // Run time fraction in operating mode 1
+                            ObjexxFCL::Optional<Real64 const> flowRatio2,   // Flow ratio in operating mode 2
+                            ObjexxFCL::Optional<Real64 const> runTimeFrac2, // Run time fraction in operating mode 2
+                            ObjexxFCL::Optional<Real64 const> pressureRise2 // Pressure difference to use for operating mode 2
         );
 
         void update(EnergyPlusData &state) const;
@@ -207,12 +208,9 @@ namespace HVACFan {
         Real64 m_qdotConvZone;                          // fan power lost to surrounding zone by convection to air (W)
         Real64 m_qdotRadZone;                           // fan power lost to surrounding zone by radiation to zone surfaces(W)
         std::string m_endUseSubcategoryName;
-        int m_numSpeeds;                            // input for how many speed levels for discrete fan
-        std::vector<Real64> m_flowFractionAtSpeed;  // array of flow fractions for speed levels
         std::vector<Real64> m_powerFractionAtSpeed; // array of power fractions for speed levels
         std::vector<bool> m_powerFractionInputAtSpeed;
         // calculation variables
-        std::vector<Real64> m_massFlowAtSpeed;
         std::vector<Real64> m_totEfficAtSpeed;
         Real64 m_inletAirMassFlowRate; // MassFlow through the Fan being Simulated [kg/Sec]
         Real64 m_outletAirMassFlowRate;
@@ -227,8 +225,6 @@ namespace HVACFan {
         Real64 m_outletAirHumRat;
         Real64 m_inletAirEnthalpy;
         Real64 m_outletAirEnthalpy;
-        bool m_objTurnFansOn;
-        bool m_objTurnFansOff;
         bool m_objEnvrnFlag;  // initialize to true
         bool m_objSizingFlag; // initialize to true, set to false after sizing routine
 

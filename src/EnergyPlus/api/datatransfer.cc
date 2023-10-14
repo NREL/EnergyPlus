@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
@@ -64,9 +65,80 @@
 #include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/api/runtime.h>
 
+APIDataEntry *getAPIData(EnergyPlusState state, unsigned int *resultingSize)
+{
+    struct LocalAPIDataEntry
+    {
+        std::string what;
+        std::string name;
+        std::string type;
+        std::string key;
+        LocalAPIDataEntry(std::string _what, std::string _name, std::string _key, std::string _type)
+            : what(std::move(_what)), name(std::move(_name)), type(std::move(_type)), key(std::move(_key))
+        {
+        }
+    };
+    std::vector<LocalAPIDataEntry> localDataEntries;
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    for (auto const &availActuator : thisState->dataRuntimeLang->EMSActuatorAvailable) {
+        if (availActuator.ComponentTypeName.empty() && availActuator.UniqueIDName.empty() && availActuator.ControlTypeName.empty()) {
+            break;
+        }
+        localDataEntries.emplace_back("Actuator", availActuator.ComponentTypeName, availActuator.ControlTypeName, availActuator.UniqueIDName);
+    }
+    for (auto const &availVariable : thisState->dataRuntimeLang->EMSInternalVarsAvailable) {
+        if (availVariable.DataTypeName.empty() && availVariable.UniqueIDName.empty()) {
+            break;
+        }
+        localDataEntries.emplace_back("InternalVariable", availVariable.DataTypeName, "", availVariable.UniqueIDName);
+    }
+    for (auto const &gVarName : thisState->dataPluginManager->globalVariableNames) {
+        localDataEntries.emplace_back("PluginGlobalVariable", "", "", gVarName);
+    }
+    for (auto const &trend : thisState->dataPluginManager->trends) {
+        localDataEntries.emplace_back("PluginTrendVariable,", "", "", trend.name);
+    }
+    for (auto const &meter : thisState->dataOutputProcessor->EnergyMeters) {
+        if (meter.Name.empty()) {
+            break;
+        }
+        localDataEntries.emplace_back("OutputMeter", "", "", meter.Name);
+    }
+    for (auto const &variable : thisState->dataOutputProcessor->RVariableTypes) {
+        if (variable.VarNameOnly.empty() && variable.KeyNameOnlyUC.empty()) {
+            break;
+        }
+        localDataEntries.emplace_back("OutputVariable", variable.VarNameOnly, "", variable.KeyNameOnlyUC);
+    }
+    *resultingSize = localDataEntries.size();
+    auto *data = new APIDataEntry[*resultingSize];
+    for (unsigned int i = 0; i < *resultingSize; i++) {
+        data[i].what = new char[std::strlen(localDataEntries[i].what.c_str()) + 1];
+        std::strcpy(data[i].what, localDataEntries[i].what.c_str());
+        data[i].name = new char[std::strlen(localDataEntries[i].name.c_str()) + 1];
+        std::strcpy(data[i].name, localDataEntries[i].name.c_str());
+        data[i].key = new char[std::strlen(localDataEntries[i].key.c_str()) + 1];
+        std::strcpy(data[i].key, localDataEntries[i].key.c_str());
+        data[i].type = new char[std::strlen(localDataEntries[i].type.c_str()) + 1];
+        std::strcpy(data[i].type, localDataEntries[i].type.c_str());
+    }
+    return data;
+}
+
+void freeAPIData(struct APIDataEntry *data, unsigned int arraySize)
+{
+    for (unsigned int i = 0; i < arraySize; i++) {
+        delete[] data[i].what;
+        delete[] data[i].name;
+        delete[] data[i].key;
+        delete[] data[i].type;
+    }
+    delete[] data;
+}
+
 char *listAllAPIDataCSV(EnergyPlusState state)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     std::string output = "**ACTUATORS**\n";
     for (auto const &availActuator : thisState->dataRuntimeLang->EMSActuatorAvailable) {
         if (availActuator.ComponentTypeName.empty() && availActuator.UniqueIDName.empty() && availActuator.ControlTypeName.empty()) {
@@ -75,7 +147,7 @@ char *listAllAPIDataCSV(EnergyPlusState state)
         output.append("Actuator,");
         output.append(availActuator.ComponentTypeName).append(",");
         output.append(availActuator.ControlTypeName).append(",");
-        output.append(availActuator.UniqueIDName).append(";\n");
+        output.append(availActuator.UniqueIDName).append("\n");
     }
     output.append("**INTERNAL_VARIABLES**\n");
     for (auto const &availVariable : thisState->dataRuntimeLang->EMSInternalVarsAvailable) {
@@ -116,23 +188,24 @@ char *listAllAPIDataCSV(EnergyPlusState state)
     // note that we cannot just return a c_str to the local string, as the string will be destructed upon leaving
     // this function, and undefined behavior will occur.
     // instead make a deep copy, and the user must manage the new char * pointer
-    char *p = new char[std::strlen(output.c_str())];
+    // strcpy copies including the null-terminator, strlen doesn't include it
+    char *p = new char[std::strlen(output.c_str()) + 1];
     std::strcpy(p, output.c_str());
     return p;
 }
 
 int apiDataFullyReady(EnergyPlusState state)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (thisState->dataPluginManager->fullyReady) {
-        return 0;
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 int apiErrorFlag(EnergyPlusState state)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (thisState->dataPluginManager->apiErrorFlag) {
         return 1;
     } else {
@@ -142,15 +215,42 @@ int apiErrorFlag(EnergyPlusState state)
 
 void resetErrorFlag(EnergyPlusState state)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     thisState->dataPluginManager->apiErrorFlag = false;
+}
+
+const char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize)
+{
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto &epjson = thisState->dataInputProcessing->inputProcessor->epJSON;
+    auto instances = epjson.find(objectType);
+    if (instances == epjson.end()) {
+        *resultingSize = 0;
+        return nullptr;
+    }
+    auto &instancesValue = instances.value();
+    *resultingSize = instancesValue.size();
+    auto *data = new const char *[*resultingSize];
+    unsigned int i = -1;
+    for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+        i++;
+        data[i] = instance.key().data();
+    }
+    return data;
+}
+
+void freeObjectNames(const char **objectNames, unsigned int arraySize)
+{
+    // as of right now we don't actually need to free the underlying strings, they exist in the epJSON instance, so just delete our array of pointers
+    (void)arraySize; // no op to avoid compiler warning that this variable is unused, in the future, this may be needed so keeping it in the API now
+    delete[] objectNames;
 }
 
 int getNumNodesInCondFDSurfaceLayer(EnergyPlusState state, const char *surfName, const char *matName)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    auto UCsurfName = EnergyPlus::UtilityRoutines::MakeUPPERCase(surfName);
-    auto UCmatName = EnergyPlus::UtilityRoutines::MakeUPPERCase(matName);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    std::string UCsurfName = EnergyPlus::UtilityRoutines::makeUPPER(surfName);
+    std::string UCmatName = EnergyPlus::UtilityRoutines::makeUPPER(matName);
     return EnergyPlus::HeatBalFiniteDiffManager::numNodesInMaterialLayer(*thisState, UCsurfName, UCmatName);
 }
 
@@ -159,7 +259,7 @@ void requestVariable(EnergyPlusState state, const char *type, const char *key)
     // allow specifying a request for an output variable, so that E+ does not have to keep all of them in memory
     // should be called before energyplus is run!
     // note that the variable request array is cleared during clear_state, so if you run multiple E+ runs, these must be requested again each time.
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     EnergyPlus::OutputProcessor::APIOutputVariableRequest request;
     request.varName = type;
     request.varKey = key;
@@ -177,9 +277,9 @@ int getVariableHandle(EnergyPlusState state, const char *type, const char *key)
     //  - index N+M being the highest integer variable handle
     // In this function, it is as simple as looping over both types and continuing to increment
     // the handle carefully.  In the getValue function it is just a matter of checking array sizes.
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
-    std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    std::string const typeUC = EnergyPlus::UtilityRoutines::makeUPPER(type);
+    std::string const keyUC = EnergyPlus::UtilityRoutines::makeUPPER(key);
     int handle = -1; // initialize to -1 as a flag
     if (thisState->dataOutputProcessor->RVariableTypes.allocated()) {
         handle = 0; // initialize to 0 to get a 1 based Array1D index
@@ -219,7 +319,7 @@ Real64 getVariableValue(EnergyPlusState state, const int handle)
     //  - index N+1 being the first integer variable handle
     //  - index N+M being the highest integer variable handle
     // note that this function will return -1 if it cannot
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle > 0 && handle <= thisState->dataOutputProcessor->NumOfRVariable) {
         auto &thisOutputVar = thisState->dataOutputProcessor->RVariableTypes(handle);
         return *thisOutputVar.VarPtr.Which;
@@ -246,9 +346,9 @@ Real64 getVariableValue(EnergyPlusState state, const int handle)
 
 int getMeterHandle(EnergyPlusState state, const char *meterName)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    std::string const meterNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(meterName);
-    auto i = EnergyPlus::GetMeterIndex(*thisState, meterNameUC);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    std::string const meterNameUC = EnergyPlus::UtilityRoutines::makeUPPER(meterName);
+    int i = EnergyPlus::GetMeterIndex(*thisState, meterNameUC);
     if (i == 0) {
         // inside E+, zero is meaningful, but through the API, I want to use negative one as a signal of a bad lookup
         return -1;
@@ -259,7 +359,7 @@ int getMeterHandle(EnergyPlusState state, const char *meterName)
 
 Real64 getMeterValue(EnergyPlusState state, int handle)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 1 && handle <= (int)thisState->dataOutputProcessor->EnergyMeters.size()) {
         return EnergyPlus::GetCurrentMeterValue(*thisState, handle);
     } else {
@@ -281,23 +381,22 @@ Real64 getMeterValue(EnergyPlusState state, int handle)
 int getActuatorHandle(EnergyPlusState state, const char *componentType, const char *controlType, const char *uniqueKey)
 {
     int handle = 0;
-    std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(componentType);
-    std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(uniqueKey);
-    std::string const controlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(controlType);
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    std::string const typeUC = EnergyPlus::UtilityRoutines::makeUPPER(componentType);
+    std::string const keyUC = EnergyPlus::UtilityRoutines::makeUPPER(uniqueKey);
+    std::string const controlUC = EnergyPlus::UtilityRoutines::makeUPPER(controlType);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     for (int ActuatorLoop = 1; ActuatorLoop <= thisState->dataRuntimeLang->numEMSActuatorsAvailable; ++ActuatorLoop) {
         auto &availActuator = thisState->dataRuntimeLang->EMSActuatorAvailable(ActuatorLoop);
         handle++;
-        std::string const actuatorTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ComponentTypeName);
-        std::string const actuatorIDUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.UniqueIDName);
-        std::string const actuatorControlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ControlTypeName);
+        std::string const actuatorTypeUC = EnergyPlus::UtilityRoutines::makeUPPER(availActuator.ComponentTypeName);
+        std::string const actuatorIDUC = EnergyPlus::UtilityRoutines::makeUPPER(availActuator.UniqueIDName);
+        std::string const actuatorControlUC = EnergyPlus::UtilityRoutines::makeUPPER(availActuator.ControlTypeName);
         if (typeUC == actuatorTypeUC && keyUC == actuatorIDUC && controlUC == actuatorControlUC) {
 
             if (availActuator.handleCount > 0) {
                 // If the handle is already used by an IDF EnergyManagementSystem:Actuator, we should warn the user
                 bool foundActuator = false;
-                for (int ActuatorLoopUsed = 1; ActuatorLoopUsed <= thisState->dataRuntimeLang->numActuatorsUsed; ++ActuatorLoopUsed) {
-                    auto const &usedActuator = thisState->dataRuntimeLang->EMSActuatorUsed(ActuatorLoopUsed);
+                for (auto const &usedActuator : thisState->dataRuntimeLang->EMSActuatorUsed) {
                     if (usedActuator.ActuatorVariableNum == handle) {
                         EnergyPlus::ShowWarningError(
                             *thisState,
@@ -335,7 +434,7 @@ int getActuatorHandle(EnergyPlusState state, const char *componentType, const ch
 void resetActuator(EnergyPlusState state, int handle)
 {
     // resets the actuator so that E+ will use the internally calculated value again
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 1 && handle <= thisState->dataRuntimeLang->numEMSActuatorsAvailable) {
         auto &theActuator(thisState->dataRuntimeLang->EMSActuatorAvailable(handle));
         *theActuator.Actuated = false;
@@ -355,7 +454,7 @@ void resetActuator(EnergyPlusState state, int handle)
 
 void setActuatorValue(EnergyPlusState state, const int handle, const Real64 value)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 1 && handle <= thisState->dataRuntimeLang->numEMSActuatorsAvailable) {
         auto &theActuator(thisState->dataRuntimeLang->EMSActuatorAvailable(handle));
         if (theActuator.RealValue) {
@@ -384,7 +483,7 @@ void setActuatorValue(EnergyPlusState state, const int handle, const Real64 valu
 
 Real64 getActuatorValue(EnergyPlusState state, const int handle)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 1 && handle <= thisState->dataRuntimeLang->numEMSActuatorsAvailable) {
         auto &theActuator(thisState->dataRuntimeLang->EMSActuatorAvailable(handle));
         if (theActuator.RealValue) {
@@ -418,13 +517,13 @@ Real64 getActuatorValue(EnergyPlusState state, const int handle)
 int getInternalVariableHandle(EnergyPlusState state, const char *type, const char *key)
 {
     int handle = 0;
-    std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
-    std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    std::string const typeUC = EnergyPlus::UtilityRoutines::makeUPPER(type);
+    std::string const keyUC = EnergyPlus::UtilityRoutines::makeUPPER(key);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     for (auto const &availVariable : thisState->dataRuntimeLang->EMSInternalVarsAvailable) { // TODO: this should stop at numEMSInternalVarsAvailable
         handle++;
-        std::string const variableTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availVariable.DataTypeName);
-        std::string const variableIDUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availVariable.UniqueIDName);
+        std::string const variableTypeUC = EnergyPlus::UtilityRoutines::makeUPPER(availVariable.DataTypeName);
+        std::string const variableIDUC = EnergyPlus::UtilityRoutines::makeUPPER(availVariable.UniqueIDName);
         if (typeUC == variableTypeUC && keyUC == variableIDUC) {
             return handle;
         }
@@ -434,9 +533,9 @@ int getInternalVariableHandle(EnergyPlusState state, const char *type, const cha
 
 Real64 getInternalVariableValue(EnergyPlusState state, int handle)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 1 && handle <= (int)thisState->dataRuntimeLang->numEMSInternalVarsAvailable) {
-        auto thisVar = thisState->dataRuntimeLang->EMSInternalVarsAvailable(handle);
+        auto const &thisVar = thisState->dataRuntimeLang->EMSInternalVarsAvailable(handle);
         if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PtrDataType::Real) {
             return *thisVar.RealValue;
         } else if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PtrDataType::Integer) {
@@ -468,13 +567,13 @@ Real64 getInternalVariableValue(EnergyPlusState state, int handle)
 
 int getPluginGlobalVariableHandle(EnergyPlusState state, const char *name)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataPluginManager->pluginManager->getGlobalVariableHandle(*thisState, name);
 }
 
 Real64 getPluginGlobalVariableValue(EnergyPlusState state, int handle)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxGlobalVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return 0
@@ -490,7 +589,7 @@ Real64 getPluginGlobalVariableValue(EnergyPlusState state, int handle)
 
 void setPluginGlobalVariableValue(EnergyPlusState state, int handle, Real64 value)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxGlobalVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
@@ -505,13 +604,13 @@ void setPluginGlobalVariableValue(EnergyPlusState state, int handle, Real64 valu
 
 int getPluginTrendVariableHandle(EnergyPlusState state, const char *name)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     return EnergyPlus::PluginManagement::PluginManager::getTrendVariableHandle(*thisState, name);
 }
 
 Real64 getPluginTrendVariableValue(EnergyPlusState state, int handle, int timeIndex)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
@@ -539,7 +638,7 @@ Real64 getPluginTrendVariableValue(EnergyPlusState state, int handle, int timeIn
 
 Real64 getPluginTrendVariableAverage(EnergyPlusState state, int handle, int count)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
@@ -568,7 +667,7 @@ Real64 getPluginTrendVariableAverage(EnergyPlusState state, int handle, int coun
 
 Real64 getPluginTrendVariableMin(EnergyPlusState state, int handle, int count)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
@@ -596,7 +695,7 @@ Real64 getPluginTrendVariableMin(EnergyPlusState state, int handle, int count)
 
 Real64 getPluginTrendVariableMax(EnergyPlusState state, int handle, int count)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
@@ -624,7 +723,7 @@ Real64 getPluginTrendVariableMax(EnergyPlusState state, int handle, int count)
 
 Real64 getPluginTrendVariableSum(EnergyPlusState state, int handle, int count)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
@@ -652,7 +751,7 @@ Real64 getPluginTrendVariableSum(EnergyPlusState state, int handle, int count)
 
 Real64 getPluginTrendVariableDirection(EnergyPlusState state, int handle, int count)
 {
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle < 0 || handle > thisState->dataPluginManager->pluginManager->maxTrendVariableIndex) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
@@ -683,6 +782,12 @@ int year(EnergyPlusState state)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataEnvrn->Year;
+}
+
+int calendarYear(EnergyPlusState state)
+{
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataGlobal->CalendarYear;
 }
 
 int month(EnergyPlusState state)
@@ -820,16 +925,16 @@ int kindOfSim(EnergyPlusState state)
 int getConstructionHandle(EnergyPlusState state, const char *constructionName)
 {
     int handle = 0;
-    std::string const nameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(constructionName);
-    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    std::string const nameUC = EnergyPlus::UtilityRoutines::makeUPPER(constructionName);
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     for (auto const &construct : thisState->dataConstruction->Construct) {
         handle++;
-        std::string const thisNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(construct.Name);
+        std::string const thisNameUC = EnergyPlus::UtilityRoutines::makeUPPER(construct.Name);
         if (nameUC == thisNameUC) {
             return handle;
         }
     }
-    return 0;
+    return -1; // return -1 if it wasn't found
 }
 
 int actualTime(EnergyPlusState)

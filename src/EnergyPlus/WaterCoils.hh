@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -242,9 +242,10 @@ namespace WaterCoils {
               RatioAirSideToWaterSideConvect(1.0), AirSideNominalConvect(0.0), LiquidSideNominalConvect(0.0), Control(0), AirInletNodeNum(0),
               AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), WaterPlantLoc{}, CondensateCollectMode(1001), CondensateTankID(0),
               CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false),
-              FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0),
-              DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""), ControllerIndex(0), reportCoilFinalSizes(true),
-              AirLoopDOASFlag(false), heatRecoveryCoil(false)
+              FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0), OriginalUACoilVariable(0.0), OriginalUACoilExternal(0.0),
+              OriginalUACoilInternal(0.0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0),
+              UseDesignWaterDeltaTemp(false), ControllerName(""), ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false),
+              heatRecoveryCoil(false)
         {
         }
     };
@@ -266,9 +267,9 @@ namespace WaterCoils {
                                      std::string_view CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
-                                     Optional<Real64> QActual = _,
-                                     Optional_int_const FanOpMode = _,
-                                     Optional<Real64 const> PartLoadRatio = _);
+                                     ObjexxFCL::Optional<Real64> QActual = _,
+                                     ObjexxFCL::Optional_int_const FanOpMode = _,
+                                     ObjexxFCL::Optional<Real64 const> PartLoadRatio = _);
 
     void GetWaterCoilInput(EnergyPlusData &state);
 
@@ -401,16 +402,6 @@ namespace WaterCoils {
 
     void CalcPolynomCoef(EnergyPlusData &state, Array2<Real64> const &OrderedPair, Array1D<Real64> &PolynomCoef);
 
-    Real64 SimpleHeatingCoilUAResidual(EnergyPlusData &state,
-                                       Real64 const UA,           // UA of coil
-                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
-    );
-
-    Real64 SimpleCoolingCoilUAResidual(EnergyPlusData &state,
-                                       Real64 const UA,           // UA of coil
-                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
-    );
-
     // Iterate Routine for Cooling Coil
 
     void CoilAreaFracIter(Real64 &NewSurfAreaWetFrac,       // Out Value of variable
@@ -487,11 +478,6 @@ namespace WaterCoils {
                       Real64 const PB  // barometric pressure {Pascals}
     );
 
-    Real64 EnthalpyResidual(EnergyPlusData &state,
-                            Real64 const Tprov,        // test value of Tdb [C]
-                            Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
-    );
-
     Real64 EstimateHEXSurfaceArea(EnergyPlusData &state, int const CoilNum); // coil number, [-]
 
     int GetWaterCoilIndex(EnergyPlusData &state,
@@ -527,11 +513,11 @@ namespace WaterCoils {
     // sets data to a coil that is used as a regeneration air heating coil in
     // desiccant dehumidification system
     void SetWaterCoilData(EnergyPlusData &state,
-                          int const CoilNum,                           // index of hot water heating Coil
-                          bool &ErrorsFound,                           // Set to true if certain errors found
-                          Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
-                          Optional_int DesiccantDehumIndex = _,        // Index for the desiccant dehum system where this caoil is used
-                          Optional_bool heatRecoveryCoil = _           // true if water coil is connected to heat recovery loop
+                          int const CoilNum,                                      // index of hot water heating Coil
+                          bool &ErrorsFound,                                      // Set to true if certain errors found
+                          ObjexxFCL::Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
+                          ObjexxFCL::Optional_int DesiccantDehumIndex = _,        // Index for the desiccant dehum system where this caoil is used
+                          ObjexxFCL::Optional_bool heatRecoveryCoil = _           // true if water coil is connected to heat recovery loop
     );
 
     // estimate heating coil design inlet water temperature for autosizing UA-value
@@ -593,7 +579,6 @@ struct WaterCoilsData : BaseGlobalStruct
     Array1D_bool MyCoilReportFlag;
     Array1D_bool PlantLoopScanFlag;
     Array1D<Real64> CoefSeries = Array1D<Real64>(5); // Tuned Changed to static: High call count: Set before use
-    Array1D<Real64> Par = Array1D<Real64>(4);        // Tuned Changed to static: High call count: Set before use
     bool NoSatCurveIntersect = false;                // TRUE if failed to find apparatus dew-point
     bool BelowInletWaterTemp = false;                // TRUE if apparatus dew-point below design inlet water temperature
     bool CBFTooLarge = false;                        // TRUE if the coil bypass factor is unrealistically large
@@ -633,7 +618,6 @@ struct WaterCoilsData : BaseGlobalStruct
         this->MyCoilReportFlag.deallocate();
         this->PlantLoopScanFlag.deallocate();
         this->CoefSeries = Array1D<Real64>(5);
-        this->Par = Array1D<Real64>(4);
         this->NoSatCurveIntersect = false;
         this->BelowInletWaterTemp = false;
         this->CBFTooLarge = false;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -94,6 +94,7 @@
 #include <EnergyPlus/MicroturbineElectricGenerator.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/PipeHeatTransfer.hh>
@@ -286,7 +287,7 @@ void GetPlantLoopData(EnergyPlusData &state)
     // Using/Aliasing
     using ScheduleManager::GetScheduleIndex;
     using SetPointManager::IsNodeOnSetPtManager;
-    auto localTempSetPt = SetPointManager::CtrlVarType::Temp;
+    SetPointManager::CtrlVarType localTempSetPt = SetPointManager::CtrlVarType::Temp;
     using NodeInputManager::GetOnlySingleNode;
     using namespace BranchInputManager;
     using DataSizing::AutoSize;
@@ -429,8 +430,8 @@ void GetPlantLoopData(EnergyPlusData &state)
         // correct loop temperature step.  Loop data is read in supply side, but the volume is not used in
         // a calculation there.
         this_loop.Volume = Num(5);
-        if (state.dataIPShortCut->lNumericFieldBlanks(5)) this_loop.Volume = DataGlobalConstants::AutoCalculate;
-        if (this_loop.Volume == DataGlobalConstants::AutoCalculate) {
+        if (state.dataIPShortCut->lNumericFieldBlanks(5)) this_loop.Volume = Constant::AutoCalculate;
+        if (this_loop.Volume == Constant::AutoCalculate) {
             this_loop.VolumeWasAutoSized = true;
         }
         // circulation time used to autocalculate loop volume
@@ -597,8 +598,8 @@ void GetPlantLoopData(EnergyPlusData &state)
         if (NumAlphas >= PressSimAlphaIndex) {
             MatchedPressureString = false;
 
-            this_loop.PressureSimType = static_cast<DataPlant::PressSimType>(
-                getEnumerationValue(PressureSimTypeNamesUC, UtilityRoutines::MakeUPPERCase(Alpha(PressSimAlphaIndex))));
+            this_loop.PressureSimType =
+                static_cast<DataPlant::PressSimType>(getEnumValue(PressureSimTypeNamesUC, UtilityRoutines::makeUPPER(Alpha(PressSimAlphaIndex))));
             switch (this_loop.PressureSimType) {
                 // Check all types
             case DataPlant::PressSimType::NoPressure:
@@ -875,8 +876,7 @@ void GetPlantInput(EnergyPlusData &state)
                     this_comp.TypeOf = this_comp_type;
                     this_comp.location = EnergyPlus::PlantLocation(LoopNum, LoopSideNum, BranchNum, CompNum);
 
-                    this_comp.Type =
-                        static_cast<PlantEquipmentType>(getEnumerationValue(PlantEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(this_comp_type)));
+                    this_comp.Type = static_cast<PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_comp_type)));
 
                     switch (this_comp.Type) {
                     case PlantEquipmentType::Pipe: {
@@ -1176,6 +1176,18 @@ void GetPlantInput(EnergyPlusData &state)
                         }
                         break;
                     }
+                    case PlantEquipmentType::HeatPumpFuelFiredHeating: {
+                        this_comp.compPtr = EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::factory(
+                            state, PlantEquipmentType::HeatPumpFuelFiredHeating, CompNames(CompNum));
+                        this_comp.CurOpSchemeType = OpScheme::Invalid;
+                        break;
+                    }
+                    case PlantEquipmentType::HeatPumpFuelFiredCooling: {
+                        this_comp.compPtr = EIRPlantLoopHeatPumps::EIRFuelFiredHeatPump::factory(
+                            state, PlantEquipmentType::HeatPumpFuelFiredCooling, CompNames(CompNum));
+                        this_comp.CurOpSchemeType = OpScheme::Invalid;
+                        break;
+                    }
                     case PlantEquipmentType::HeatPumpVRF: {
                         if (LoopSideNum == LoopSideLocation::Demand) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
@@ -1193,6 +1205,11 @@ void GetPlantInput(EnergyPlusData &state)
                     case PlantEquipmentType::PurchHotWater: {
                         this_comp.compPtr =
                             OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, PlantEquipmentType::PurchHotWater, CompNames(CompNum));
+                        break;
+                    }
+                    case PlantEquipmentType::PurchSteam: {
+                        this_comp.compPtr =
+                            OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, PlantEquipmentType::PurchSteam, CompNames(CompNum));
                         break;
                     }
                     case PlantEquipmentType::TS_IceSimple: {
@@ -1837,7 +1854,7 @@ void GetPlantInput(EnergyPlusData &state)
                 for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                     //                    auto &this_comp_type(CompTypes(CompNum));
                     auto &this_comp(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
-                    auto type = this_comp.TypeOf;
+                    // auto type = this_comp.TypeOf;
                     this_comp.oneTimeInit(state);
                 }
             }
@@ -3086,13 +3103,39 @@ void SizePlantLoop(EnergyPlusData &state,
                                                      state.dataPlnt->PlantLoop(LoopNum).Name,
                                                      "Maximum Loop Flow Rate [m3/s]",
                                                      state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
+                        // begin std 229 plantloop equipment summary new table
+                        OutputReportPredefined::PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchPLCLType, state.dataPlnt->PlantLoop(LoopNum).Name, "PlantLoop");
+                        // end std 229 plantloop equipment summary new table
                     } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
                         BaseSizer::reportSizerOutput(state,
                                                      "CondenserLoop",
                                                      state.dataPlnt->PlantLoop(LoopNum).Name,
                                                      "Maximum Loop Flow Rate [m3/s]",
                                                      state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
+                        // begin std 229 plantloop equipment summary new table
+                        OutputReportPredefined::PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchPLCLType, state.dataPlnt->PlantLoop(LoopNum).Name, "CondenserLoop");
+                        // end std 229 plantloop equipment summary new table
                     }
+                    // begin std 229 plantloop equipment summary new table
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchPLCLProvHeat,
+                                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                                             state.dataPlnt->PlantLoop(LoopNum).HeatingDemand >= 0 ? "Yes" : "No");
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchPLCLProvCool,
+                                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                                             state.dataPlnt->PlantLoop(LoopNum).CoolingDemand >= 0 ? "Yes" : "No");
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchPLCLMaxLoopFlowRate,
+                                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                                             state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchPLCLMinLoopFlowRate,
+                                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                                             state.dataPlnt->PlantLoop(LoopNum).MinVolFlowRate);
+                    // end std 229 plantloop equipment summary new table
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
@@ -3131,12 +3174,60 @@ void SizePlantLoop(EnergyPlusData &state,
                 // condenser loop vs plant loop breakout needed.
                 BaseSizer::reportSizerOutput(
                     state, "PlantLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Plant Loop Volume [m3]", state.dataPlnt->PlantLoop(LoopNum).Volume);
+                // begin std 229 added lines
+                BaseSizer::reportSizerOutput(state,
+                                             "PlantLoop",
+                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                             "Design Supply Temperature [C]",
+                                             state.dataPlnt->PlantLoop(LoopNum).PlantSizNum > 0
+                                                 ? state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ExitTemp
+                                                 : -999.0);
+                BaseSizer::reportSizerOutput(state,
+                                             "PlantLoop",
+                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                             "Design Return Temperature [C]",
+                                             state.dataPlnt->PlantLoop(LoopNum).PlantSizNum > 0
+                                                 ? state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ExitTemp -
+                                                       state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).DeltaT
+                                                 : -999.0);
+                BaseSizer::reportSizerOutput(state,
+                                             "PlantLoop",
+                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                             "Sizing option (Coincident/NonCoincident)",
+                                             state.dataPlnt->PlantLoop(LoopNum).PlantSizNum > 0
+                                                 ? state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ConcurrenceOption
+                                                 : -1);
+                // end std 229 added lines
             } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
                 BaseSizer::reportSizerOutput(state,
                                              "CondenserLoop",
                                              state.dataPlnt->PlantLoop(LoopNum).Name,
                                              "Condenser Loop Volume [m3]",
                                              state.dataPlnt->PlantLoop(LoopNum).Volume);
+                // begin std 229 added lines
+                BaseSizer::reportSizerOutput(state,
+                                             "CondenserLoop",
+                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                             "Design Supply Temperature [C]",
+                                             state.dataPlnt->PlantLoop(LoopNum).PlantSizNum > 0
+                                                 ? state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ExitTemp
+                                                 : -999.0);
+                BaseSizer::reportSizerOutput(state,
+                                             "CondenserLoop",
+                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                             "Design Return Temperature [C]",
+                                             state.dataPlnt->PlantLoop(LoopNum).PlantSizNum > 0
+                                                 ? state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ExitTemp -
+                                                       state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).DeltaT
+                                                 : -999.0);
+                BaseSizer::reportSizerOutput(state,
+                                             "CondenserLoop",
+                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                             "Sizing option (Coincident/NonCoincident)",
+                                             state.dataPlnt->PlantLoop(LoopNum).PlantSizNum
+                                                 ? state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ConcurrenceOption
+                                                 : -1);
+                // end std 229 added lines
             }
         }
         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
@@ -3159,11 +3250,18 @@ void SizePlantLoop(EnergyPlusData &state,
 
     // should now have plant volume, calculate plant volume's mass for fluid type
     if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Water) {
-        FluidDensity = GetDensityGlycol(state,
-                                        state.dataPlnt->PlantLoop(LoopNum).FluidName,
-                                        DataGlobalConstants::InitConvTemp,
-                                        state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
-                                        RoutineName);
+        FluidDensity = GetDensityGlycol(
+            state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Constant::InitConvTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+        if (PlantSizNum > 0 && allocated(state.dataSize->PlantSizData)) { // method only works if sizing delta T is avaiable
+            Real64 cp = GetSpecificHeatGlycol(state,
+                                              state.dataPlnt->PlantLoop(LoopNum).FluidName,
+                                              Constant::InitConvTemp,
+                                              state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
+                                              RoutineName);
+            Real64 DesignPlantCapacity =
+                cp * FluidDensity * state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate * state.dataSize->PlantSizData(PlantSizNum).DeltaT;
+            state.dataSize->PlantSizData(PlantSizNum).DesCapacity = DesignPlantCapacity; // store it for later use in scaling
+        }
     } else if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Steam) {
         FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
     } else {
@@ -3297,11 +3395,8 @@ void ResizePlantLoopLevelSizes(EnergyPlusData &state, int const LoopNum // Suppl
 
     // should now have plant volume, calculate plant volume's mass for fluid type
     if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Water) {
-        FluidDensity = GetDensityGlycol(state,
-                                        state.dataPlnt->PlantLoop(LoopNum).FluidName,
-                                        DataGlobalConstants::InitConvTemp,
-                                        state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
-                                        RoutineName);
+        FluidDensity = GetDensityGlycol(
+            state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Constant::InitConvTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
     } else if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Steam) {
         FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
     } else {
@@ -3836,6 +3931,9 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                         this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
                         this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapHiOutLimit;
                     } break;
+                    case DataPlant::PlantEquipmentType::PurchSteam: { //
+                        this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
+                    } break;
                     case DataPlant::PlantEquipmentType::TS_IceDetailed: { //                   = 28
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                         this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
@@ -4199,6 +4297,17 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                     } break;
                     case DataPlant::PlantEquipmentType::HeatPumpEIRCooling:
                     case PlantEquipmentType::HeatPumpEIRHeating: { // 95, 96
+                        this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
+                        if (LoopSideCtr == LoopSideLocation::Demand) {
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
+                        } else {
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                            this_component.HowLoadServed = DataPlant::HowMet::ByNominalCap;
+                        }
+                    } break;
+                    case DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling:
+                    case PlantEquipmentType::HeatPumpFuelFiredHeating: {
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                         if (LoopSideCtr == LoopSideLocation::Demand) {
                             this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,7 +52,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-//#include <EnergyPlus/Data/EnergyPlusData.hh>
+// #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
@@ -260,10 +260,26 @@ protected:
     // if it makes sense for the unit test to continue after returning from function.
     // This will add the required objects if not specified: Version, Building, GlobalGeometryRules
     // Will return false if no errors found and true if errors found
-    bool process_idf(std::string const &idf_snippet, bool use_assertions = true);
+    bool process_idf(std::string_view const idf_snippet, bool use_assertions = true);
 
     // Opens output files as stringstreams
     void openOutputFiles(EnergyPlusData &state);
+
+    // A worker function that keeps trailing spaces in multiline raw string literals
+    void replace_pipes_with_spaces(std::string &stringLiteral)
+    {
+        // C++ now allows nice raw multiline string literals
+        // These are very useful for unit tests that compare against a long chunk of text
+        // For example, if you have an EIO output to compare, you can just paste it right into a variable and compare
+        // However, if the raw literal has trailing spaces on any line, editors tend to remove them
+        // I tried disabling clang-format for sections of code, I tried using an .editorconfig file, and still
+        // the editor would remove them on saving the file.  And for my editor, I _can_ disable that, but only for all
+        // files, which is not preferred.  We do want trailing spaces stripped, just not inside raw string literals.
+        // Anyway, the solution I came up with is a small worker function here.  In the string literal, just put in
+        // pipe characters ( "|" ) where the trailing spaces would be.  Then pass your string literal into this
+        // function, and it will programmatically replace them with strings.  You can then do asserts as needed.
+        std::replace(stringLiteral.begin(), stringLiteral.end(), '|', ' '); // replace the trailing || with spaces
+    }
 
 public:
     EnergyPlusData *state;

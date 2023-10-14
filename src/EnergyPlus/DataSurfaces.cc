@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,7 +56,6 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -64,6 +63,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::DataSurfaces {
 
@@ -80,7 +80,6 @@ namespace EnergyPlus::DataSurfaces {
 using namespace DataVectorTypes;
 using namespace DataBSDFWindow;
 using namespace DataHeatBalance;
-using namespace DataHeatBalFanSys;
 using namespace DataZoneEquipment;
 using namespace DataLoopNode;
 using namespace Psychrometrics;
@@ -227,9 +226,10 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
     Real64 RefAirTemp = 0;
 
     // determine reference air temperature for this surface
+    auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(this->spaceNum);
     switch (state.dataSurface->SurfTAirRef(t_SurfNum)) {
     case RefAirTemp::ZoneMeanAirTemp: {
-        RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
+        RefAirTemp = thisSpaceHB.MAT;
     } break;
     case RefAirTemp::AdjacentAirTemp: {
         RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(t_SurfNum);
@@ -240,31 +240,33 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
         // ZoneEquipConfigNum = ZoneNum;
         // check whether this zone is a controlled zone or not
         if (!state.dataHeatBal->Zone(Zone).IsControlled) {
-            ShowFatalError(
-                state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + state.dataHeatBal->Zone(Zone).Name);
+            ShowFatalError(state,
+                           format("Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone {}",
+                                  state.dataHeatBal->Zone(Zone).Name));
             // return;
         }
         // determine supply air conditions
         Real64 SumSysMCp = 0;
         Real64 SumSysMCpT = 0;
-        for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(Zone).NumInletNodes; ++NodeNum) {
-            Real64 NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode(NodeNum)).Temp;
-            Real64 MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode(NodeNum)).MassFlowRate;
-            Real64 CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(Zone));
-            SumSysMCp += MassFlowRate * CpAir;
-            SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
+        auto &inletNodes = (state.dataHeatBal->doSpaceHeatBalance) ? state.dataZoneEquip->spaceEquipConfig(this->spaceNum).InletNode
+                                                                   : state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode;
+        for (int nodeNum : inletNodes) {
+            auto &inNode = state.dataLoopNodes->Node(nodeNum);
+            Real64 CpAir = PsyCpAirFnW(thisSpaceHB.airHumRat);
+            SumSysMCp += inNode.MassFlowRate * CpAir;
+            SumSysMCpT += inNode.MassFlowRate * CpAir * inNode.Temp;
         }
         // a weighted average of the inlet temperatures.
         if (SumSysMCp > 0.0) {
             // a weighted average of the inlet temperatures.
             RefAirTemp = SumSysMCpT / SumSysMCp;
         } else {
-            RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
+            RefAirTemp = thisSpaceHB.MAT;
         }
     } break;
     default: {
         // currently set to mean air temp but should add error warning here
-        RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
+        RefAirTemp = thisSpaceHB.MAT;
     } break;
     }
 
@@ -323,7 +325,7 @@ Real64 SurfaceData::getOutsideIR(EnergyPlusData &state, const int t_SurfNum) con
     if (ExtBoundCond > 0) {
         value = state.dataSurface->SurfWinIRfromParentZone(ExtBoundCond) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(ExtBoundCond);
     } else {
-        Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + DataGlobalConstants::KelvinConv;
+        Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + Constant::KelvinConv;
         value = state.dataWindowManager->sigma * pow_4(tout);
         value = ViewFactorSkyIR *
                     (state.dataSurface->SurfAirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) +
@@ -502,7 +504,7 @@ Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
     if (totalWidth == 0.0) {
         // This should never happen, but if it does, print a somewhat meaningful fatal error
         // (instead of allowing a divide by zero).
-        ShowFatalError(state, "Calculated projected surface width is zero for surface=\"" + Name + "\"");
+        ShowFatalError(state, format("Calculated projected surface width is zero for surface=\"{}\"", Name));
     }
 
     Real64 averageHeight = 0.0;
@@ -531,7 +533,7 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
     calcHashKey.EnclIndex = SolarEnclIndex;
     calcHashKey.TAirRef = state.dataSurface->SurfTAirRef(SurfNum);
 
-    auto extBoundCond = state.dataSurface->Surface(SurfNum).ExtBoundCond;
+    int extBoundCond = state.dataSurface->Surface(SurfNum).ExtBoundCond;
     if (extBoundCond > 0) {
         calcHashKey.ExtZone = state.dataSurface->Surface(extBoundCond).Zone;
         calcHashKey.ExtEnclIndex = state.dataSurface->Surface(extBoundCond).SolarEnclIndex;
@@ -548,8 +550,10 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
     calcHashKey.ViewFactorSky = round(ViewFactorSky * 10.0) / 10.0;
 
     calcHashKey.HeatTransferAlgorithm = HeatTransferAlgorithm;
-    calcHashKey.IntConvCoeff = state.dataSurface->SurfIntConvCoeffIndex(SurfNum);
-    calcHashKey.ExtConvCoeff = state.dataSurface->SurfExtConvCoeffIndex(SurfNum);
+    calcHashKey.intConvModel = state.dataSurface->surfIntConv(SurfNum).model;
+    calcHashKey.extConvModel = state.dataSurface->surfExtConv(SurfNum).model;
+    calcHashKey.intConvUserModelNum = state.dataSurface->surfIntConv(SurfNum).userModelNum;
+    calcHashKey.extConvUserModelNum = state.dataSurface->surfExtConv(SurfNum).userModelNum;
     calcHashKey.OSCPtr = OSCPtr;
     calcHashKey.OSCMPtr = OSCMPtr;
 
@@ -565,6 +569,7 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
     calcHashKey.LinkedOutAirNode = state.dataSurface->Surface(SurfNum).SurfLinkedOutAirNode;
     calcHashKey.OutsideHeatSourceTermSchedule = OutsideHeatSourceTermSchedule;
     calcHashKey.InsideHeatSourceTermSchedule = InsideHeatSourceTermSchedule;
+    calcHashKey.ViewFactorSrdSurfs = state.dataSurface->Surface(SurfNum).ViewFactorSrdSurfs;
 }
 
 void SurfaceData::set_representative_surface(EnergyPlusData &state, const int SurfNum)
@@ -731,6 +736,78 @@ Real64 AbsBackSide(EnergyPlusData &state, int SurfNum)
         (state.dataSurface->SurfWinExtBeamAbsByShade(SurfNum) + state.dataSurface->SurfWinExtDiffAbsByShade(SurfNum)) *
         state.dataSurface->SurfWinShadeAbsFacFace2(SurfNum);
     return AbsorptanceFromExteriorBackSide + AbsorptanceFromInteriorBackSide;
+}
+
+void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
+{
+    if (!state.dataHeatBal->AnyVariableAbsorptance) return;
+    for (int surfNum : state.dataSurface->AllHTSurfaceList) {
+        auto const &thisSurface = state.dataSurface->Surface(surfNum);
+        int ConstrNum = thisSurface.Construction;
+        auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
+        int TotLayers = thisConstruct.TotLayers;
+        if (TotLayers == 0) continue;
+        int materNum = thisConstruct.LayerPoint(1);
+        if (materNum == 0) continue; // error finding material number
+        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(materNum));
+        assert(thisMaterial != nullptr);
+        if (thisMaterial->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
+            // check for dynamic coating defined on interior surface
+            if (thisSurface.ExtBoundCond != ExternalEnvironment) {
+                ShowWarningError(state,
+                                 format("MaterialProperty:VariableAbsorptance defined on an interior surface, {}. This VariableAbsorptance property "
+                                        "will be ignored here",
+                                        thisSurface.Name));
+            } else {
+                state.dataSurface->AllVaryAbsOpaqSurfaceList.push_back(surfNum);
+            }
+        }
+    }
+    // check for dynamic coating defined on the non-outside layer of a construction
+    for (int ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
+        auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
+        for (int Layer = 2; Layer <= thisConstruct.TotLayers; ++Layer) {
+            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(Layer)));
+            if (thisMaterial->absorpVarCtrlSignal != Material::VariableAbsCtrlSignal::Invalid) {
+                ShowWarningError(state,
+                                 format("MaterialProperty:VariableAbsorptance defined on a inside-layer materials, {}. This VariableAbsorptance "
+                                        "property will be ignored here",
+                                        thisMaterial->Name));
+            }
+        }
+    }
+}
+
+Compass4 AzimuthToCompass4(Real64 azimuth)
+{
+    assert(azimuth >= 0.0 && azimuth < 360.0);
+    for (int c4 = 0; c4 < static_cast<int>(Compass4::Num); ++c4) {
+        Real64 lo = Compass4AzimuthLo[c4];
+        Real64 hi = Compass4AzimuthHi[c4];
+        if (lo > hi) {
+            if (azimuth >= lo || azimuth < hi) return static_cast<Compass4>(c4);
+        } else {
+            if (azimuth >= lo && azimuth < hi) return static_cast<Compass4>(c4);
+        }
+    }
+    assert(false);
+    return Compass4::Invalid;
+}
+
+Compass8 AzimuthToCompass8(Real64 azimuth)
+{
+    assert(azimuth >= 0.0 && azimuth < 360.0);
+    for (int c8 = 0; c8 < static_cast<int>(Compass8::Num); ++c8) {
+        Real64 lo = Compass8AzimuthLo[c8];
+        Real64 hi = Compass8AzimuthHi[c8];
+        if (lo > hi) {
+            if (azimuth >= lo || azimuth < hi) return static_cast<Compass8>(c8);
+        } else {
+            if (azimuth >= lo && azimuth < hi) return static_cast<Compass8>(c8);
+        }
+    }
+    assert(false);
+    return Compass8::Invalid;
 }
 
 } // namespace EnergyPlus::DataSurfaces

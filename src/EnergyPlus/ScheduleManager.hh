@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,7 +68,30 @@ struct EnergyPlusData;
 
 namespace ScheduleManager {
 
-    int constexpr MaxDayTypes(12);
+    constexpr int ScheduleAlwaysOn = -1;
+
+    enum class DayType
+    {
+        Invalid = -1,
+        Dummy = 0,
+        Sunday = 1,
+        Monday,
+        Tuesday,
+        Wednesday,
+        Thursday,
+        Friday,
+        Saturday,
+        Holiday,
+        SummerDesignDay,
+        WinterDesignDay,
+        CustomDay1,
+        CustomDay2,
+        Num
+    };
+
+    int constexpr maxDayTypes = static_cast<int>(DayType::Num) - 1;
+    extern const std::array<std::string_view, static_cast<int>(DayType::Num)> dayTypeNames;
+    extern const std::array<std::string_view, static_cast<int>(DayType::Num)> dayTypeNamesUC;
 
     enum class SchedType : int
     {
@@ -95,6 +118,14 @@ namespace ScheduleManager {
         No,      // no interpolation
         Average, // interpolation only to resolve time intervals not matching timestep lengths (this was previously interpolate:yes)
         Linear,  // linear interpolation from the previous time to the current time for the entire schedule
+        Num
+    };
+
+    enum class Clusivity
+    {
+        Invalid = -1,
+        Inclusive,
+        Exclusive,
         Num
     };
 
@@ -139,7 +170,7 @@ namespace ScheduleManager {
         Array1D_int DaySchedulePointer; // Index of Day Schedule
 
         // Default Constructor
-        WeekScheduleData() : Used(false), DaySchedulePointer(MaxDayTypes, 0)
+        WeekScheduleData() : Used(false), DaySchedulePointer(maxDayTypes, 0)
         {
         }
     };
@@ -194,8 +225,11 @@ namespace ScheduleManager {
 
     int GetDayScheduleIndex(EnergyPlusData &state, std::string &ScheduleName);
 
-    void GetScheduleValuesForDay(
-        EnergyPlusData &state, int const ScheduleIndex, Array2S<Real64> DayValues, Optional_int_const JDay = _, Optional_int_const CurDayofWeek = _);
+    void GetScheduleValuesForDay(EnergyPlusData &state,
+                                 int const ScheduleIndex,
+                                 Array2S<Real64> DayValues,
+                                 ObjexxFCL::Optional_int_const JDay = _,
+                                 ObjexxFCL::Optional_int_const CurDayofWeek = _);
 
     void GetSingleDayScheduleValues(EnergyPlusData &state,
                                     int const DayScheduleIndex, // Index of the DaySchedule for values
@@ -240,17 +274,25 @@ namespace ScheduleManager {
     );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const ScheduleIndex,      // Which Schedule being tested
-                                  std::string const &MinString, // Minimum indicator ('>', '>=')
-                                  Real64 const Minimum          // Minimum desired value
+                                  int const ScheduleIndex, // Which Schedule being tested
+                                  bool includeOrEquals,    // Minimum indicator ('>', '>=')
+                                  Real64 const Minimum     // Minimum desired value
     );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const ScheduleIndex,      // Which Schedule being tested
-                                  std::string const &MinString, // Minimum indicator ('>', '>=')
-                                  Real64 const Minimum,         // Minimum desired value
-                                  std::string const &MaxString, // Maximum indicator ('<', ',=')
-                                  Real64 const Maximum          // Maximum desired value
+                                  int const ScheduleIndex,    // Which Schedule being tested
+                                  std::string_view MinString, // Minimum indicator ('>', '>=')
+                                  Real64 const Minimum,       // Minimum desired value
+                                  std::string_view MaxString, // Maximum indicator ('<', ',=')
+                                  Real64 const Maximum        // Maximum desired value
+    );
+
+    bool CheckScheduleValueMinMax(EnergyPlusData &state,
+                                  int const ScheduleIndex, // Which Schedule being tested
+                                  Clusivity clusiveMin,    // true ? '>' : '>='
+                                  Real64 const Minimum,    // Minimum desired value
+                                  Clusivity clusiveMax,    // true ? '<' : '<='
+                                  Real64 const Maximum     // Maximum desired value
     );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,

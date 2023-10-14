@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -75,61 +75,66 @@ using namespace EnergyPlus::WaterToAirHeatPump;
 TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 {
 
-    std::string const idf_objects =
-        delimited_string({" Coil:Cooling:WaterToAirHeatPump:ParameterEstimation, ",
-                          "   Sys 1 Heat Pump Cooling Mode, !- Name",
-                          "   Scroll,      !- Compressor Type",
-                          "   R22,         !- Refrigerant Type",
-                          "   0.0015,      !- Design Source Side Flow Rate{ m3 / s }",
-                          "   38000,       !- Nominal Cooling Coil Capacity{ W }",
-                          "   0,           !- Nominal Time for Condensate Removal to Begin{ s }",
-                          "   0,           !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity{ dimensionless }",
-                          "   3000000,     !- High Pressure Cutoff{ Pa }",
-                          "   0,           !- Low Pressure Cutoff{ Pa }",
-                          "   Sys 1 Water to Air Heat Pump Source Side1 Inlet Node, !- Water Inlet Node Name",
-                          "   Sys 1 Water to Air Heat Pump Source Side1 Outlet Node, !- Water Outlet Node Name",
-                          "   Sys 1 Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
-                          "   Sys 1 Heating Coil Air Inlet Node, !- Air Outlet Node Name",
-                          "   3.78019E+03, !- Load Side Total Heat Transfer Coefficient{ W / K }",
-                          "   2.80303E+03, !- Load Side Outside Surface Heat Transfer Coefficient{ W / K }",
-                          "   7.93591E-01, !- Superheat Temperature at the Evaporator Outlet{ C }",
-                          "   1.91029E+03, !- Compressor Power Losses{ W }",
-                          "   2.66127E+00, !- Compressor Efficiency",
-                          "   ,            !- Compressor Piston Displacement{ m3 / s }",
-                          "   ,            !- Compressor Suction / Discharge Pressure Drop{ Pa }",
-                          "   ,            !- Compressor Clearance Factor{ dimensionless }",
-                          "   1.06009E-01, !- Refrigerant Volume Flow Rate{ m3 / s }",
-                          "   1.65103E+00, !- Volume Ratio{ dimensionless }",
-                          "   9.73887E-03, !- Leak Rate Coefficient",
-                          "   1.04563E+03, !- Source Side Heat Transfer Coefficient{ W / K }",
-                          "   0.8,         !- Source Side Heat Transfer Resistance1{ dimensionless }",
-                          "   20.0;       !- Source Side Heat Transfer Resistance2{ W / K }",
+    std::string const idf_objects = delimited_string({
+        " Coil:Cooling:WaterToAirHeatPump:ParameterEstimation, ",
+        "   Sys 1 Heat Pump Cooling Mode, !- Name",
+        "   Scroll,      !- Compressor Type",
+        "   R22,         !- Refrigerant Type",
+        "   0.0015,      !- Design Source Side Flow Rate{ m3 / s }",
+        "   38000,       !- Nominal Cooling Coil Capacity{ W }",
+        "   0,           !- Nominal Time for Condensate Removal to Begin{ s }",
+        "   0,           !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity{ dimensionless }",
+        "   3000000,     !- High Pressure Cutoff{ Pa }",
+        "   0,           !- Low Pressure Cutoff{ Pa }",
+        "   Sys 1 Water to Air Heat Pump Source Side1 Inlet Node, !- Water Inlet Node Name",
+        "   Sys 1 Water to Air Heat Pump Source Side1 Outlet Node, !- Water Outlet Node Name",
+        "   Sys 1 Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
+        "   Sys 1 Heating Coil Air Inlet Node, !- Air Outlet Node Name",
+        "   3.78019E+03, !- Load Side Total Heat Transfer Coefficient{ W / K }",
+        "   2.80303E+03, !- Load Side Outside Surface Heat Transfer Coefficient{ W / K }",
+        "   7.93591E-01, !- Superheat Temperature at the Evaporator Outlet{ C }",
+        "   1.91029E+03, !- Compressor Power Losses{ W }",
+        "   2.66127E+00, !- Compressor Efficiency",
+        "   ,            !- Compressor Piston Displacement{ m3 / s }",
+        "   ,            !- Compressor Suction / Discharge Pressure Drop{ Pa }",
+        "   ,            !- Compressor Clearance Factor{ dimensionless }",
+        "   1.06009E-01, !- Refrigerant Volume Flow Rate{ m3 / s }",
+        "   1.65103E+00, !- Volume Ratio{ dimensionless }",
+        "   9.73887E-03, !- Leak Rate Coefficient",
+        "   1.04563E+03, !- Source Side Heat Transfer Coefficient{ W / K }",
+        "   0.8,         !- Source Side Heat Transfer Resistance1{ dimensionless }",
+        "   20.0,        !- Source Side Heat Transfer Resistance2{ W / K }",
+        "   PLFFPLR;     !- Part Load Fraction Correlation Curve Name",
 
-                          " Coil:Heating:WaterToAirHeatPump:ParameterEstimation,",
-                          "   Sys 1 Heat Pump HEATING Mode, !- Name",
-                          "   Scroll,      !- Compressor Type",
-                          "   R22,         !- Refrigerant Type",
-                          "   0.0015,      !- Design Source Side Flow Rate{ m3 / s }",
-                          "   38000,       !- Gross Rated Heating Capacity{ W }",
-                          "   3000000,     !- High Pressure Cutoff",
-                          "   0,           !- Low Pressure Cutoff{ Pa }",
-                          "   Sys 1 Water to Air Heat Pump Source Side2 Inlet Node, !- Water Inlet Node Name",
-                          "   Sys 1 Water to Air Heat Pump Source Side2 Outlet Node, !- Water Outlet Node Name",
-                          "   Sys 1 Heating Coil Air Inlet Node, !- Air Inlet Node Name",
-                          "   Sys 1 SuppHeating Coil Air Inlet Node, !- Air Outlet Node Name",
-                          "   3.91379E+03, !- Load Side Total Heat Transfer Coefficient{ W / K }",
-                          "   5.94753E-01, !- Superheat Temperature at the Evaporator Outlet{ C }",
-                          "   2.49945E+03, !- Compressor Power Losses{ W }",
-                          "   8.68734E-01, !- Compressor Efficiency",
-                          "   ,            !- Compressor Piston Displacement{ m3 / s }",
-                          "   ,            !- Compressor Suction / Discharge Pressure Drop{ Pa }",
-                          "   ,            !- Compressor Clearance Factor{ dimensionless }",
-                          "   7.23595E-02, !- Refrigerant Volume Flow Rate{ m3 / s }",
-                          "   3.69126E+00, !- Volume Ratio{ dimensionless }",
-                          "   1.75701E-05, !- Leak Rate Coefficient{ dimensionless }",
-                          "   3.65348E+03, !- Source Side Heat Transfer Coefficient{ W / K }",
-                          "   0.8,         !- Source Side Heat Transfer Resistance1{ dimensionless }",
-                          "   20.0;        !- Source Side Heat Transfer Resistance2{ W / K }"});
+        " Coil:Heating:WaterToAirHeatPump:ParameterEstimation,",
+        "   Sys 1 Heat Pump HEATING Mode, !- Name",
+        "   Scroll,      !- Compressor Type",
+        "   R22,         !- Refrigerant Type",
+        "   0.0015,      !- Design Source Side Flow Rate{ m3 / s }",
+        "   38000,       !- Gross Rated Heating Capacity{ W }",
+        "   3000000,     !- High Pressure Cutoff",
+        "   0,           !- Low Pressure Cutoff{ Pa }",
+        "   Sys 1 Water to Air Heat Pump Source Side2 Inlet Node, !- Water Inlet Node Name",
+        "   Sys 1 Water to Air Heat Pump Source Side2 Outlet Node, !- Water Outlet Node Name",
+        "   Sys 1 Heating Coil Air Inlet Node, !- Air Inlet Node Name",
+        "   Sys 1 SuppHeating Coil Air Inlet Node, !- Air Outlet Node Name",
+        "   3.91379E+03, !- Load Side Total Heat Transfer Coefficient{ W / K }",
+        "   5.94753E-01, !- Superheat Temperature at the Evaporator Outlet{ C }",
+        "   2.49945E+03, !- Compressor Power Losses{ W }",
+        "   8.68734E-01, !- Compressor Efficiency",
+        "   ,            !- Compressor Piston Displacement{ m3 / s }",
+        "   ,            !- Compressor Suction / Discharge Pressure Drop{ Pa }",
+        "   ,            !- Compressor Clearance Factor{ dimensionless }",
+        "   7.23595E-02, !- Refrigerant Volume Flow Rate{ m3 / s }",
+        "   3.69126E+00, !- Volume Ratio{ dimensionless }",
+        "   1.75701E-05, !- Leak Rate Coefficient{ dimensionless }",
+        "   3.65348E+03, !- Source Side Heat Transfer Coefficient{ W / K }",
+        "   0.8,         !- Source Side Heat Transfer Resistance1{ dimensionless }",
+        "   20.0,        !- Source Side Heat Transfer Resistance2{ W / K }",
+        "   PLFFPLR;     !- Part Load Fraction Correlation Curve Name",
+
+        "Curve:Quadratic, PLFFPLR, 0.85, 0.83, 0.0, 0.0, 0.3, 0.85, 1.0, Dimensionless, Dimensionless; ",
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -233,22 +238,17 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
         state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum;
 
     bool InitFlag(true);
-    Real64 MaxONOFFCyclesperHour(4.0);
-    Real64 HPTimeConstant(0.1);
-    Real64 FanDelayTime(60.0);
     Real64 SensLoad(38000.0);
     Real64 LatentLoad(0.0);
     Real64 PartLoadRatio(1.0);
     int CyclingScheme(1);
     bool FirstHVACIteration(true);
-    Real64 RuntimeFrac(1.0);
     DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum = 1;
 
-    InitWatertoAirHP(
-        *state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
+    InitWatertoAirHP(*state, HPNum, InitFlag, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
 
-    CalcWatertoAirHPCooling(*state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
+    CalcWatertoAirHPCooling(*state, HPNum, CyclingScheme, FirstHVACIteration, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
 
     // make sure the coil is active
     EXPECT_NE(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSource, 0.0);
@@ -291,10 +291,9 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate = 15.0;
 
-    InitWatertoAirHP(
-        *state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
+    InitWatertoAirHP(*state, HPNum, InitFlag, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
 
-    CalcWatertoAirHPHeating(*state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
+    CalcWatertoAirHPHeating(*state, HPNum, CyclingScheme, FirstHVACIteration, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
 
     // make sure the coil is active
     EXPECT_NE(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSource, 0.0);

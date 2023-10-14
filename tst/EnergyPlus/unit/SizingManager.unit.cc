@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -305,7 +305,7 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     SizingManager::GetOARequirements(*state);
     SizingManager::GetZoneSizingInput(*state);
     ASSERT_EQ(1, state->dataSize->NumZoneSizingInput);
-    ASSERT_EQ(DOANeutralSup, state->dataSize->ZoneSizingInput(1).DOASControlStrategy);
+    ASSERT_TRUE(compare_enums(DOASControl::NeutralSup, state->dataSize->ZoneSizingInput(1).DOASControlStrategy));
     ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values
@@ -374,7 +374,7 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     SizingManager::GetOARequirements(*state);
     SizingManager::GetZoneSizingInput(*state);
     ASSERT_EQ(1, state->dataSize->NumZoneSizingInput);
-    ASSERT_EQ(DOANeutralSup, state->dataSize->ZoneSizingInput(1).DOASControlStrategy);
+    ASSERT_TRUE(compare_enums(DOASControl::NeutralSup, state->dataSize->ZoneSizingInput(1).DOASControlStrategy));
     ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values
@@ -400,7 +400,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     WarmupFlag = false;
     HourNum = 10;
     TimeStepNum = 1;
-    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
+    state->dataGlobal->KindOfSim = EnergyPlus::Constant::KindOfSim::RunPeriodDesign;
     state->dataGlobal->DayOfSim = 2;
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_TRUE(Answer);
@@ -410,7 +410,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     WarmupFlag = false;
     HourNum = 10;
     TimeStepNum = 1;
-    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::DesignDay;
+    state->dataGlobal->KindOfSim = EnergyPlus::Constant::KindOfSim::DesignDay;
     state->dataGlobal->DayOfSim = 1;
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_TRUE(Answer);
@@ -420,7 +420,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     WarmupFlag = false;
     HourNum = 10;
     TimeStepNum = 1;
-    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
+    state->dataGlobal->KindOfSim = EnergyPlus::Constant::KindOfSim::RunPeriodDesign;
     state->dataGlobal->DayOfSim = 1;
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
@@ -430,7 +430,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     WarmupFlag = true;
     HourNum = 10;
     TimeStepNum = 1;
-    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
+    state->dataGlobal->KindOfSim = EnergyPlus::Constant::KindOfSim::RunPeriodDesign;
     state->dataGlobal->DayOfSim = 1;
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
@@ -440,7 +440,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     WarmupFlag = false;
     HourNum = 7;
     TimeStepNum = 1;
-    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
+    state->dataGlobal->KindOfSim = EnergyPlus::Constant::KindOfSim::RunPeriodDesign;
     state->dataGlobal->DayOfSim = 1;
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
@@ -450,7 +450,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     WarmupFlag = false;
     HourNum = 10;
     TimeStepNum = 2;
-    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::RunPeriodDesign;
+    state->dataGlobal->KindOfSim = EnergyPlus::Constant::KindOfSim::RunPeriodDesign;
     state->dataGlobal->DayOfSim = 1;
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
@@ -460,7 +460,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     WarmupFlag = false;
     HourNum = 10;
     TimeStepNum = 1;
-    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::DesignDay;
+    state->dataGlobal->KindOfSim = EnergyPlus::Constant::KindOfSim::DesignDay;
     state->dataGlobal->DayOfSim = 2;
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);
@@ -470,7 +470,7 @@ TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
     WarmupFlag = true;
     HourNum = 2;
     TimeStepNum = 7;
-    state->dataGlobal->KindOfSim = EnergyPlus::DataGlobalConstants::KindOfSim::DesignDay;
+    state->dataGlobal->KindOfSim = EnergyPlus::Constant::KindOfSim::DesignDay;
     state->dataGlobal->DayOfSim = 2;
     Answer = CalcdoLoadComponentPulseNow(*state, PulseSizing, WarmupFlag, HourNum, TimeStepNum, state->dataGlobal->KindOfSim);
     ASSERT_FALSE(Answer);

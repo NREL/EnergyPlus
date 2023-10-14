@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -59,10 +59,9 @@ import os
 import io  # For Python 2 compat
 import sys
 
-# note I am skipping docs for right now; I want to do those files
 DIRS_TO_SKIP = [
     '.git', 'build', 'builds', 'cmake-build-debug',
-    'cmake-build-release', 'design', 'doc', 'release', 'third_party'
+    'cmake-build-release', 'design', 'release',
 ]
 
 # these CC files purposefully have bad characters

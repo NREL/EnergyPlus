@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -143,6 +143,7 @@ def generate_mock_api(bare_mock_api_instance: Mock) -> Mock:
     bare_mock_api_instance.exchange.get_global_value.return_value = 3.14
     bare_mock_api_instance.exchange.set_global_value.return_value = None
     bare_mock_api_instance.exchange.year.return_value = 1
+    bare_mock_api_instance.exchange.calendarYear.return_value = 1
     bare_mock_api_instance.exchange.month.return_value = 1
     bare_mock_api_instance.exchange.day_of_month.return_value = 1
     bare_mock_api_instance.exchange.hour.return_value = 1

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -410,13 +410,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltrationAndVentilation)
     EXPECT_EQ("SPACE 1A", state->dataHeatBal->space(spaceNum).Name);
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
-    EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).floorArea);
+    EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).FloorArea);
 
     spaceNum = space1b;
     EXPECT_EQ("SPACE 1B", state->dataHeatBal->space(spaceNum).Name);
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
-    EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).floorArea);
+    EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).FloorArea);
 
     EXPECT_EQ("SOMESPACES", state->dataHeatBal->spaceList(1).Name);
     EXPECT_EQ(2, state->dataHeatBal->spaceList(1).spaces.size());
@@ -429,7 +429,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltrationAndVentilation)
     EXPECT_EQ("ZONE 2", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     // Defaults
     EXPECT_EQ(-99999, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
-    EXPECT_EQ(Zone2FloorArea, state->dataHeatBal->space(spaceNum).floorArea);
+    EXPECT_EQ(Zone2FloorArea, state->dataHeatBal->space(spaceNum).FloorArea);
 
     // Now get to the point and check the infiltration and ventilation setup
     // Expected number of infiltration and ventilation instances:
@@ -786,13 +786,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
     EXPECT_EQ("SPACE 1A", state->dataHeatBal->space(spaceNum).Name);
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
-    EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).floorArea);
+    EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).FloorArea);
 
     spaceNum = space1b;
     EXPECT_EQ("SPACE 1B", state->dataHeatBal->space(spaceNum).Name);
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
-    EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).floorArea);
+    EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).FloorArea);
 
     EXPECT_EQ("SOMESPACES", state->dataHeatBal->spaceList(1).Name);
     EXPECT_EQ(2, state->dataHeatBal->spaceList(1).spaces.size());
@@ -805,7 +805,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
     EXPECT_EQ("ZONE 2", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     // Defaults
     EXPECT_EQ(-99999, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
-    EXPECT_EQ(Zone2FloorArea, state->dataHeatBal->space(spaceNum).floorArea);
+    EXPECT_EQ(Zone2FloorArea, state->dataHeatBal->space(spaceNum).FloorArea);
 
     // Now get to the point and check the mixing setup
     // Expected number of mixing and crossmixing instances:
@@ -858,6 +858,64 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
         EXPECT_EQ(thisMixing.FromZone, fromZoneNums[itemNum]);
         EXPECT_EQ(thisCrossMixing.FromZone, fromZoneNums[itemNum]);
     }
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceAirManager_InitSimpleMixingConvectiveHeatGains_Test)
+{
+    Real64 expectedResult1;
+    Real64 expectedResult2;
+    Real64 constexpr allowedTolerance = 0.00001;
+
+    // Base line data that do not change between tests
+    state->dataHeatBal->TotRefDoorMixing = 0;
+    state->dataHeatBal->TotCrossMixing = 0;
+    state->dataHeatBal->TotMixing = 3;
+    state->dataHeatBal->Mixing.allocate(state->dataHeatBal->TotMixing);
+    state->dataHeatBal->Mixing(1).SchedPtr = -1; // this returns a value of one
+    state->dataHeatBal->Mixing(2).SchedPtr = -1; // this returns a value of one
+    state->dataHeatBal->Mixing(3).SchedPtr = -1; // this returns a value of one
+    state->dataHeatBal->Mixing(1).EMSSimpleMixingOn = false;
+    state->dataHeatBal->Mixing(2).EMSSimpleMixingOn = false;
+    state->dataHeatBal->Mixing(3).EMSSimpleMixingOn = false;
+    state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
+    state->dataHeatBal->MassConservation.allocate(2);
+    state->dataHeatBal->MassConservation(1).NumReceivingZonesMixingObject = 2;
+    state->dataHeatBal->MassConservation(2).NumReceivingZonesMixingObject = 0;
+    state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr.allocate(2);
+
+    // Test 1: not air flow flag--don't do anything
+    state->dataHeatBal->AirFlowFlag = false;
+    state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(1) = -9999.9;
+    state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(2) = -9999.9;
+    expectedResult1 = -9999.9;
+    expectedResult2 = -9999.9;
+    HeatBalanceAirManager::InitSimpleMixingConvectiveHeatGains(*state);
+    EXPECT_NEAR(expectedResult1, state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(1), allowedTolerance);
+    EXPECT_NEAR(expectedResult2, state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(2), allowedTolerance);
+
+    // Test 2: yes to air flow flag, but no mixing flow sum, set ZoneMixingReceivingFr to zero
+    state->dataHeatBal->AirFlowFlag = true;
+    state->dataHeatBal->Mixing(1).DesignLevel = 0.0;
+    state->dataHeatBal->Mixing(2).DesignLevel = 0.0;
+    state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(1) = -9999.9;
+    state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(2) = -9999.9;
+    expectedResult1 = 0.0;
+    expectedResult2 = 0.0;
+    HeatBalanceAirManager::InitSimpleMixingConvectiveHeatGains(*state);
+    EXPECT_NEAR(expectedResult1, state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(1), allowedTolerance);
+    EXPECT_NEAR(expectedResult2, state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(2), allowedTolerance);
+
+    // Test 3: yes to air flow flag, with mixing, ZoneMixingReceivingFr set to appropriate value
+    state->dataHeatBal->AirFlowFlag = true;
+    state->dataHeatBal->Mixing(1).DesignLevel = 100.0;
+    state->dataHeatBal->Mixing(2).DesignLevel = 300.0;
+    state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(1) = -9999.9;
+    state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(2) = -9999.9;
+    expectedResult1 = 0.25;
+    expectedResult2 = 0.75;
+    HeatBalanceAirManager::InitSimpleMixingConvectiveHeatGains(*state);
+    EXPECT_NEAR(expectedResult1, state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(1), allowedTolerance);
+    EXPECT_NEAR(expectedResult2, state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(2), allowedTolerance);
 }
 
 } // namespace EnergyPlus

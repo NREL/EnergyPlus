@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -136,13 +136,40 @@ void ReportCoilSelection::writeCoilSelectionOutput(EnergyPlusData &state)
 
     // make calls to fill out predefined tabular report entries for each coil selection report object
     for (auto &c : coilSelectionDataObjs) {
+
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilType, c->coilName_, c->coilObjName);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilLocation, c->coilName_, c->coilLocation);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilHVACType, c->coilName_, c->typeHVACname);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilHVACName, c->coilName_, c->userNameforHVACsystem);
 
+        // begin std 229 existing heating coil table adding new variables
+        if (c->isHeating) {
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchHeatCoilUsedAsSupHeat, c->coilName_, c->isSupplementalHeater ? "Yes" : "No");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchHeatCoilAirloopName,
+                                                     c->coilName_,
+                                                     c->airloopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchHeatCoilPlantloopName,
+                                                     c->coilName_,
+                                                     c->waterLoopNum > 0 ? state.dataPlnt->PlantLoop(c->waterLoopNum).Name : "N/A");
+        }
+        // end std 229 existing heating coil table adding new variables
+
+        // begin std 229 New coil connections table entries
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilName_CCs, c->coilName_, c->coilName_);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilType_CCs, c->coilName_, c->coilObjName);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilLoc_CCs, c->coilName_, c->coilLocation);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilHVACType_CCs, c->coilName_, c->typeHVACname);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilHVACName_CCs, c->coilName_, c->userNameforHVACsystem);
+        // end of std 229 New coil connections table entries
+
         if (c->zoneName.size() == 1) {
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilZoneName, c->coilName_, c->zoneName[0]);
+            // begin std 229 New coil connections table entries
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilZoneNames_CCs, c->coilName_, c->zoneName[0]);
+            // end of std 229 New coil connections table entries
         } else if (c->zoneName.size() > 1) {
             // make list of zone names
             std::string tmpZoneList;
@@ -150,8 +177,14 @@ void ReportCoilSelection::writeCoilSelectionOutput(EnergyPlusData &state)
                 tmpZoneList += c->zoneName[vecLoop] + "; ";
             }
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilZoneName, c->coilName_, tmpZoneList);
+            // begin std 229 New coil connections table entries
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilZoneNames_CCs, c->coilName_, tmpZoneList);
+            // end of std 229 New coil connections table entries
         } else {
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilZoneName, c->coilName_, "N/A");
+            // begin std 229 New coil connections table entries
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilZoneNames_CCs, c->coilName_, "N/A");
+            // end of std 229 New coil connections table entries
         }
 
         OutputReportPredefined::PreDefTableEntry(
@@ -185,7 +218,16 @@ void ReportCoilSelection::writeCoilSelectionOutput(EnergyPlusData &state)
 
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchFanAssociatedWithCoilName, c->coilName_, c->fanAssociatedWithCoilName);
+        // begin std 229 New coil connections table entries
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchCoilSupFanName_CCs, c->coilName_, c->fanAssociatedWithCoilName);
+        // end of std 229 New coil connections table entries
+
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAssociatedWithCoilType, c->coilName_, c->fanTypeName);
+        // begin std 229 New coil connections table entries
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilSupFanType_CCs, c->coilName_, c->fanTypeName);
+        // end of std 229 New coil connections table entries
+
         if (c->fanSizeMaxAirVolumeFlow == -999.0 || c->fanSizeMaxAirVolumeFlow == -99999.0) {
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchFanAssociatedVdotSize, c->coilName_, c->fanSizeMaxAirVolumeFlow, 1);
@@ -200,6 +242,15 @@ void ReportCoilSelection::writeCoilSelectionOutput(EnergyPlusData &state)
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchFanAssociatedMdotSize, c->coilName_, c->fanSizeMaxAirMassFlow, 8);
         }
+
+        // begin std 229 New coil connections table entries
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilPlantName_CCs, c->coilName_, c->plantLoopName);
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchCoilAirloopName_CCs,
+                                                 c->coilName_,
+                                                 c->airloopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).Name : "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilPlantloopName_CCs, c->coilName_, c->plantLoopName);
+        // end of std 229 New coil connections table entries
 
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchCoilDDnameSensIdealPeak, c->coilName_, c->desDayNameAtSensPeak);
@@ -600,42 +651,35 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
         c->userNameforHVACsystem = "Unknown";
         // now search equiment
         if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes == 1) { // this must be it, fill strings for type and name
-            c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(1);
+            c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeName(1);
             c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(1);
             c->coilLocation = "Zone Equipment";
-            c->zoneHVACTypeNum = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(1);
+            c->zoneHVACTypeNum = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(1);
             c->zoneHVACIndex = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipIndex(1);
         } else if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes > 1) {
             bool foundOne(false);
             for (int equipLoop = 1; equipLoop <= state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes; ++equipLoop) {
                 // go with the first ZoneHVAC device in the list
-                if ((state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                     DataHVACGlobals::ZoneEquipTypeOf_VariableRefrigerantFlow) ||
-                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                     DataHVACGlobals::ZoneEquipTypeOf_EnergyRecoveryVentilator) ||
-                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil) ||
-                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_OutdoorAirUnit) ||
-                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                     DataHVACGlobals::ZoneEquipTypeOf_PackagedTerminalAirConditioner) ||
-                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                     DataHVACGlobals::ZoneEquipTypeOf_PackagedTerminalHeatPump) ||
-                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_UnitHeater) ||
-                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_UnitVentilator) ||
-                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_VentilatedSlab) ||
-                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                     DataHVACGlobals::ZoneEquipTypeOf_WaterToAirHeatPump) ||
-                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                     DataHVACGlobals::ZoneEquipTypeOf_WindowAirConditioner) ||
-                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_DehumidifierDX)) {
+                DataZoneEquipment::ZoneEquipType equipType = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
+                if (equipType == DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal ||
+                    equipType == DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator ||
+                    equipType == DataZoneEquipment::ZoneEquipType::FourPipeFanCoil || equipType == DataZoneEquipment::ZoneEquipType::OutdoorAirUnit ||
+                    equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner ||
+                    equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump ||
+                    equipType == DataZoneEquipment::ZoneEquipType::UnitHeater || equipType == DataZoneEquipment::ZoneEquipType::UnitVentilator ||
+                    equipType == DataZoneEquipment::ZoneEquipType::VentilatedSlab ||
+                    equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir ||
+                    equipType == DataZoneEquipment::ZoneEquipType::WindowAirConditioner ||
+                    equipType == DataZoneEquipment::ZoneEquipType::DehumidifierDX) {
                     if (!foundOne) {
-                        c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
+                        c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeName(equipLoop);
                         c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
                         foundOne = true;
                         c->coilLocation = "Zone Equipment";
-                        c->zoneHVACTypeNum = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop);
+                        c->zoneHVACTypeNum = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
                         c->zoneHVACIndex = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipIndex(equipLoop);
                     } else { // or may have found another
-                        c->typeHVACname += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
+                        c->typeHVACname += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeName(equipLoop);
                         c->userNameforHVACsystem += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
                     }
                 }
@@ -655,51 +699,41 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
             c->coilLocation = "Unknown";
             c->typeHVACname = "Unknown";
             c->userNameforHVACsystem = "Unknown";
-            // now search equiment
-            if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes == 1) { // this must be it, fill strings for type and name
-                c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(1);
-                c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(1);
+            // now search equipment
+            auto const &zoneEquipList = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum);
+            if (zoneEquipList.NumOfEquipTypes == 1) { // this must be it, fill strings for type and name
+                c->typeHVACname = zoneEquipList.EquipTypeName(1);
+                c->userNameforHVACsystem = zoneEquipList.EquipName(1);
                 c->coilLocation = "Zone Equipment";
-            } else if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes > 1) {
+            } else if (zoneEquipList.NumOfEquipTypes > 1) {
                 bool foundOne(false);
-                for (int equipLoop = 1; equipLoop <= state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes; ++equipLoop) {
+                for (int equipLoop = 1; equipLoop <= zoneEquipList.NumOfEquipTypes; ++equipLoop) {
                     // go with the first ZoneHVAC device in the list
-                    if ((state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                         DataHVACGlobals::ZoneEquipTypeOf_VariableRefrigerantFlow) ||
-                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                         DataHVACGlobals::ZoneEquipTypeOf_EnergyRecoveryVentilator) ||
-                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                         DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil) ||
-                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                         DataHVACGlobals::ZoneEquipTypeOf_OutdoorAirUnit) ||
-                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                         DataHVACGlobals::ZoneEquipTypeOf_PackagedTerminalAirConditioner) ||
-                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                         DataHVACGlobals::ZoneEquipTypeOf_PackagedTerminalHeatPump) ||
-                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_UnitHeater) ||
-                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                         DataHVACGlobals::ZoneEquipTypeOf_UnitVentilator) ||
-                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                         DataHVACGlobals::ZoneEquipTypeOf_VentilatedSlab) ||
-                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                         DataHVACGlobals::ZoneEquipTypeOf_WaterToAirHeatPump) ||
-                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                         DataHVACGlobals::ZoneEquipTypeOf_WindowAirConditioner) ||
-                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(equipLoop) ==
-                         DataHVACGlobals::ZoneEquipTypeOf_DehumidifierDX)) {
+                    DataZoneEquipment::ZoneEquipType equipType = zoneEquipList.EquipType(equipLoop);
+                    if (equipType == DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal ||
+                        equipType == DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator ||
+                        equipType == DataZoneEquipment::ZoneEquipType::FourPipeFanCoil ||
+                        equipType == DataZoneEquipment::ZoneEquipType::OutdoorAirUnit ||
+                        equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner ||
+                        equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump ||
+                        equipType == DataZoneEquipment::ZoneEquipType::UnitHeater || equipType == DataZoneEquipment::ZoneEquipType::UnitVentilator ||
+                        equipType == DataZoneEquipment::ZoneEquipType::VentilatedSlab ||
+                        equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir ||
+                        equipType == DataZoneEquipment::ZoneEquipType::WindowAirConditioner ||
+                        equipType == DataZoneEquipment::ZoneEquipType::DehumidifierDX) {
                         if (!foundOne) {
-                            c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
-                            c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
+                            c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
+                            c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
                             foundOne = true;
                             c->coilLocation = "Zone Equipment";
                         } else { // or may have found another
-                            c->typeHVACname += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
-                            c->userNameforHVACsystem += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
+                            c->typeHVACname += " or " + zoneEquipList.EquipTypeName(equipLoop);
+                            c->userNameforHVACsystem += " or " + zoneEquipList.EquipName(equipLoop);
                         }
                     }
-                }
-            }
-        }
+                } // for (equipLoop)
+            }     // if (zoneEquipList.numOfEquipTypes > 0)
+        }         // if (c->ZoneEqNum > 0)
 
         if (c->airloopNum > 0 && c->zoneEqNum == 0) {
             c->coilLocation = "AirLoop";
@@ -769,7 +803,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         }
 
         // call psych routine to flush out moist air metrics from those available
-        if (c->coilDesEntTemp != -999.0) {
+        if (c->coilDesEntTemp != -999.0 && c->coilDesEntHumRat != -999.0) {
             c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                 state, c->coilDesEntTemp, c->coilDesEntHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::doFinalProcessingOfCoilData");
             if (c->coilDesEntHumRat != -999.0) {
@@ -784,16 +818,16 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         if (c->waterLoopNum > 0 && c->pltSizNum > 0) {
 
             c->plantLoopName = state.dataPlnt->PlantLoop(c->waterLoopNum).Name;
-            if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::SteamLoop) {
+            if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::TypeOfPlantLoop::Steam) {
                 c->rhoFluid = FluidProperties::GetDensityGlycol(state,
                                                                 state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
-                                                                DataGlobalConstants::InitConvTemp,
+                                                                Constant::InitConvTemp,
                                                                 state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                                 "ReportCoilSelection::doFinalProcessingOfCoilData");
 
                 c->cpFluid = FluidProperties::GetSpecificHeatGlycol(state,
                                                                     state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
-                                                                    DataGlobalConstants::InitConvTemp,
+                                                                    Constant::InitConvTemp,
                                                                     state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                                     "ReportCoilSelection::doFinalProcessingOfCoilData");
             } else { // steam loop
@@ -860,14 +894,14 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         if (c->pltSizNum > 0) {
             c->plantDesSupTemp = state.dataSize->PlantSizData(c->pltSizNum).ExitTemp;
             c->plantDesDeltaTemp = state.dataSize->PlantSizData(c->pltSizNum).DeltaT;
-            if (state.dataSize->PlantSizData(c->pltSizNum).LoopType == DataSizing::HeatingLoop) {
+            if (state.dataSize->PlantSizData(c->pltSizNum).LoopType == DataSizing::TypeOfPlantLoop::Heating) {
                 c->plantDesRetTemp = c->plantDesSupTemp - c->plantDesDeltaTemp;
-            } else if (state.dataSize->PlantSizData(c->pltSizNum).LoopType == DataSizing::CoolingLoop ||
-                       state.dataSize->PlantSizData(c->pltSizNum).LoopType == DataSizing::CondenserLoop) {
+            } else if (state.dataSize->PlantSizData(c->pltSizNum).LoopType == DataSizing::TypeOfPlantLoop::Cooling ||
+                       state.dataSize->PlantSizData(c->pltSizNum).LoopType == DataSizing::TypeOfPlantLoop::Condenser) {
                 c->plantDesRetTemp = c->plantDesSupTemp + c->plantDesDeltaTemp;
             }
 
-            if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::SteamLoop) {
+            if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::TypeOfPlantLoop::Steam) {
                 c->plantDesCapacity = c->cpFluid * c->rhoFluid * state.dataSize->PlantSizData(c->pltSizNum).DeltaT *
                                       state.dataSize->PlantSizData(c->pltSizNum).DesVolFlowRate;
             } else {
@@ -943,8 +977,10 @@ int ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName(EnergyPlusData &
                 } else {
                     // throw error  coil type does not match coil name, check for unique names across coil types
                     ShowWarningError(state,
-                                     "check for unique coil names across different coil types: " + coilName + " occurs in both " + coilType +
-                                         " and " + coilSelectionDataObjs[i]->coilObjName);
+                                     format("check for unique coil names across different coil types: {} occurs in both {} and {}",
+                                            coilName,
+                                            coilType,
+                                            coilSelectionDataObjs[i]->coilObjName));
                 }
             }
         }
@@ -974,7 +1010,7 @@ int ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName(EnergyPlusData &
     }
 
     if (index == -1) {
-        ShowFatalError(state, "getIndexForOrCreateDataObjFromCoilName: Developer error - not a coil: " + coilType + " = " + coilName);
+        ShowFatalError(state, format("getIndexForOrCreateDataObjFromCoilName: Developer error - not a coil: {} = {}", coilType, coilName));
     }
     return index;
 }
@@ -1079,16 +1115,16 @@ void ReportCoilSelection::setCoilWaterFlowPltSizNum(EnergyPlusData &state,
     }
 
     if (c->waterLoopNum > 0 && c->pltSizNum > 0) {
-        if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::SteamLoop) {
+        if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::TypeOfPlantLoop::Steam) {
             c->rhoFluid = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
-                                                            DataGlobalConstants::InitConvTemp,
+                                                            Constant::InitConvTemp,
                                                             state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                             "ReportCoilSelection::setCoilWaterFlow");
 
             c->cpFluid = FluidProperties::GetSpecificHeatGlycol(state,
                                                                 state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
-                                                                DataGlobalConstants::InitConvTemp,
+                                                                Constant::InitConvTemp,
                                                                 state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                                 "ReportCoilSelection::setCoilWaterFlow");
         } else { // steam loop
@@ -1264,20 +1300,16 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                                               SysSizPeakDDNum(curSysNum).TimeStepAtCoolFlowPk(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD));
         }
 
-        if (state.dataSize->FinalSysSizing(curSysNum).CoolingPeakLoadType == DataSizing::TotalCoolingLoad) {
-            c->isCoilSizingForTotalLoad = true;
-        } else {
-            c->isCoilSizingForTotalLoad = false;
-        }
-
-        c->oaPeakTemp = state.dataSize->FinalSysSizing(curSysNum).OutTempAtCoolPeak;
-        c->oaPeakVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesOutAirVolFlow;
-        c->oaPeakHumRat = state.dataSize->FinalSysSizing(curSysNum).OutHumRatAtCoolPeak;
-        c->raPeakTemp = state.dataSize->FinalSysSizing(curSysNum).RetTempAtCoolPeak;
-        c->raPeakHumRat = state.dataSize->FinalSysSizing(curSysNum).RetHumRatAtCoolPeak;
-        c->coilSizingMethodConcurrence = state.dataSize->FinalSysSizing(curSysNum).SizingOption;
-        c->coilSizingMethodCapacity = state.dataSize->FinalSysSizing(curSysNum).CoolingCapMethod;
-        c->coilSizingMethodAirFlow = state.dataSize->FinalSysSizing(curSysNum).ScaleCoolSAFMethod;
+        auto &finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
+        c->isCoilSizingForTotalLoad = (finalSysSizing.coolingPeakLoad == DataSizing::PeakLoad::TotalCooling);
+        c->oaPeakTemp = finalSysSizing.OutTempAtCoolPeak;
+        c->oaPeakVolFlow = finalSysSizing.DesOutAirVolFlow;
+        c->oaPeakHumRat = finalSysSizing.OutHumRatAtCoolPeak;
+        c->raPeakTemp = finalSysSizing.RetTempAtCoolPeak;
+        c->raPeakHumRat = finalSysSizing.RetHumRatAtCoolPeak;
+        c->coilSizingMethodConcurrence = finalSysSizing.SizingOption;
+        c->coilSizingMethodCapacity = finalSysSizing.CoolingCapMethod;
+        c->coilSizingMethodAirFlow = finalSysSizing.ScaleCoolSAFMethod;
         // DesOutAirVolFlow
 
         // loop over cooled zones attached to this airloop to find average Room condition
@@ -1290,34 +1322,36 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         // Decide what day and time to use for zone/room averages
         int SysPeakDDnum(0);
         int SysPeakTimeStepInDay(0);
-        if (state.dataSize->FinalSysSizing(curSysNum).CoolingPeakLoadType == DataSizing::TotalCoolingLoad) {
+        if (finalSysSizing.coolingPeakLoad == DataSizing::PeakLoad::TotalCooling) {
             SysPeakDDnum = SysSizPeakDDNum(curSysNum).TotCoolPeakDD;
             if (SysPeakDDnum > 0) SysPeakTimeStepInDay = SysSizPeakDDNum(curSysNum).TimeStepAtTotCoolPk(SysSizPeakDDNum(curSysNum).TotCoolPeakDD);
-        } else if (state.dataSize->FinalSysSizing(curSysNum).CoolingPeakLoadType == DataSizing::SensibleCoolingLoad) {
+        } else if (finalSysSizing.coolingPeakLoad == DataSizing::PeakLoad::SensibleCooling) {
             SysPeakDDnum = SysSizPeakDDNum(curSysNum).SensCoolPeakDD;
             if (SysPeakDDnum > 0) SysPeakTimeStepInDay = SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(SysSizPeakDDNum(curSysNum).SensCoolPeakDD);
         }
 
         if (SysPeakDDnum > 0 && SysPeakTimeStepInDay > 0) {
             for (auto &z : c->zoneNum) {
+                auto const &thisCalcZoneSizing = state.dataSize->CalcZoneSizing(SysPeakDDnum, z);
+                auto const &thisFinalZoneSizing = state.dataSize->FinalZoneSizing(z);
                 Real64 mult = state.dataHeatBal->Zone(z).Multiplier * state.dataHeatBal->Zone(z).ListMultiplier;
-                Real64 Tz = state.dataSize->CalcZoneSizing(SysPeakDDnum, z).CoolZoneTempSeq(SysPeakTimeStepInDay);
-                Real64 Vdot_z = state.dataSize->CalcZoneSizing(SysPeakDDnum, z).CoolFlowSeq(SysPeakTimeStepInDay);
+                Real64 Tz = thisCalcZoneSizing.CoolZoneTempSeq(SysPeakTimeStepInDay);
+                Real64 Vdot_z = thisCalcZoneSizing.CoolFlowSeq(SysPeakTimeStepInDay);
                 if (Vdot_z == 0.0) { // take value from final zone sizing
-                    Vdot_z = state.dataSize->FinalZoneSizing(z).CoolMassFlow;
+                    Vdot_z = thisFinalZoneSizing.CoolMassFlow;
                     if (Vdot_z == 0.0) {
-                        Vdot_z = state.dataSize->FinalSysSizing(curSysNum).DesCoolVolFlow * state.dataEnvrn->StdRhoAir / c->zoneNum.size();
+                        Vdot_z = finalSysSizing.DesCoolVolFlow * state.dataEnvrn->StdRhoAir / c->zoneNum.size();
                     }
                 }
-                Real64 Wz = state.dataSize->CalcZoneSizing(SysPeakDDnum, z).CoolZoneHumRatSeq(SysPeakTimeStepInDay);
+                Real64 Wz = thisCalcZoneSizing.CoolZoneHumRatSeq(SysPeakTimeStepInDay);
                 sumT_Vdot += Tz * Vdot_z * mult;
                 sumW_Vdot += Wz * Vdot_z * mult;
                 sumVdot += Vdot_z * mult;
-                Real64 Qdot_z = state.dataSize->CalcZoneSizing(SysPeakDDnum, z).CoolLoadSeq(SysPeakTimeStepInDay);
+                Real64 Qdot_z = thisCalcZoneSizing.CoolLoadSeq(SysPeakTimeStepInDay);
                 if (Qdot_z > 0.0) {
                     sumSensLoad += Qdot_z * mult;
                 } else {
-                    sumSensLoad += state.dataSize->FinalZoneSizing(z).DesCoolLoad * mult;
+                    sumSensLoad += thisFinalZoneSizing.DesCoolLoad * mult;
                 }
             }
         }
@@ -1333,7 +1367,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         }
 
         if (c->coilSizingMethodConcurrence == DataSizing::Coincident) {
-            c->rmSensibleAtPeak = state.dataSize->FinalSysSizing(curSysNum).SysCoolCoinSpaceSens;
+            c->rmSensibleAtPeak = finalSysSizing.SysCoolCoinSpaceSens;
         } else if (c->coilSizingMethodConcurrence == DataSizing::NonCoincident) {
             c->rmSensibleAtPeak = sumSensLoad;
         }
@@ -1341,19 +1375,19 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         // now set Coil Ent And Lvg Conditions
         if (curOASysNum > 0) {                 // then this system coil is part of OA system
             if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly
-                c->coilDesEntTemp = state.dataSize->FinalSysSizing(curSysNum).OutTempAtCoolPeak;
+                c->coilDesEntTemp = finalSysSizing.OutTempAtCoolPeak;
             }
             if (c->coilDesEntHumRat == -999.0) { // don't overwrite if already set directly
-                c->coilDesEntHumRat = state.dataSize->FinalSysSizing(curSysNum).OutHumRatAtCoolPeak;
+                c->coilDesEntHumRat = finalSysSizing.OutHumRatAtCoolPeak;
             }
             c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                 state, c->coilDesEntTemp, c->coilDesEntHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
             c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
             if (c->coilDesLvgTemp == -999.0) { // don't overwrite if already set directly
-                c->coilDesLvgTemp = state.dataSize->FinalSysSizing(curSysNum).PrecoolTemp;
+                c->coilDesLvgTemp = finalSysSizing.PrecoolTemp;
             }
             if (c->coilDesLvgHumRat == -999.0) { // don't overwrite if already set directly
-                c->coilDesLvgHumRat = state.dataSize->FinalSysSizing(curSysNum).PrecoolHumRat;
+                c->coilDesLvgHumRat = finalSysSizing.PrecoolHumRat;
             }
             c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                 state, c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
@@ -1361,19 +1395,19 @@ void ReportCoilSelection::setCoilCoolingCapacity(
 
         } else {                               // part of main air loop
             if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly
-                c->coilDesEntTemp = state.dataSize->FinalSysSizing(curSysNum).MixTempAtCoolPeak;
+                c->coilDesEntTemp = finalSysSizing.MixTempAtCoolPeak;
             }
             if (c->coilDesEntHumRat == -999.0) { // don't overwrite if already set directly
-                c->coilDesEntHumRat = state.dataSize->FinalSysSizing(curSysNum).MixHumRatAtCoolPeak;
+                c->coilDesEntHumRat = finalSysSizing.MixHumRatAtCoolPeak;
             }
             c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                 state, c->coilDesEntTemp, c->coilDesEntHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
             c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
             if (c->coilDesLvgTemp == -999.0) {
-                c->coilDesLvgTemp = state.dataSize->FinalSysSizing(curSysNum).CoolSupTemp;
+                c->coilDesLvgTemp = finalSysSizing.CoolSupTemp;
             }
             if (c->coilDesLvgHumRat == -999.0) { // don't overwrite if already set directly
-                c->coilDesLvgHumRat = state.dataSize->FinalSysSizing(curSysNum).CoolSupHumRat;
+                c->coilDesLvgHumRat = finalSysSizing.CoolSupHumRat;
             }
             c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                 state, c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
@@ -1388,24 +1422,22 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         c->zoneName.resize(1);
         c->zoneNum[0] = curZoneEqNum;
         if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneName[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName;
-        c->desDayNameAtSensPeak = state.dataSize->FinalZoneSizing(curZoneEqNum).CoolDesDay;
-        c->oaPeakTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).OutTempAtCoolPeak;
-        c->oaPeakHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).OutHumRatAtCoolPeak;
-        c->raPeakTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneTempAtCoolPeak;
-        c->raPeakHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneHumRatAtCoolPeak;
-        c->rmPeakTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneTempAtCoolPeak;
-        c->rmPeakHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneHumRatAtCoolPeak;
+        auto const &thisFinalZoneSizing = state.dataSize->FinalZoneSizing(curZoneEqNum);
+        c->desDayNameAtSensPeak = thisFinalZoneSizing.CoolDesDay;
+        c->oaPeakTemp = thisFinalZoneSizing.OutTempAtCoolPeak;
+        c->oaPeakHumRat = thisFinalZoneSizing.OutHumRatAtCoolPeak;
+        c->raPeakTemp = thisFinalZoneSizing.ZoneTempAtCoolPeak;
+        c->raPeakHumRat = thisFinalZoneSizing.ZoneHumRatAtCoolPeak;
+        c->rmPeakTemp = thisFinalZoneSizing.ZoneTempAtCoolPeak;
+        c->rmPeakHumRat = thisFinalZoneSizing.ZoneHumRatAtCoolPeak;
         c->rmPeakRelHum =
             Psychrometrics::PsyRhFnTdbWPb(state, c->rmPeakTemp, c->rmPeakHumRat, state.dataEnvrn->StdBaroPress) * 100.0; // convert to percentage
-        if (state.dataSize->FinalZoneSizing(curZoneEqNum).CoolDDNum > 0 &&
-            state.dataSize->FinalZoneSizing(curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-            c->coilSensePeakHrMin = PeakHrMinString(
-                state, state.dataSize->FinalZoneSizing(curZoneEqNum).CoolDDNum, state.dataSize->FinalZoneSizing(curZoneEqNum).TimeStepNumAtCoolMax);
-            c->airPeakHrMin = PeakHrMinString(
-                state, state.dataSize->FinalZoneSizing(curZoneEqNum).CoolDDNum, state.dataSize->FinalZoneSizing(curZoneEqNum).TimeStepNumAtCoolMax);
+        if (thisFinalZoneSizing.CoolDDNum > 0 && thisFinalZoneSizing.CoolDDNum <= state.dataEnvrn->TotDesDays) {
+            c->coilSensePeakHrMin = PeakHrMinString(state, thisFinalZoneSizing.CoolDDNum, thisFinalZoneSizing.TimeStepNumAtCoolMax);
+            c->airPeakHrMin = PeakHrMinString(state, thisFinalZoneSizing.CoolDDNum, thisFinalZoneSizing.TimeStepNumAtCoolMax);
         }
 
-        c->rmSensibleAtPeak = state.dataSize->FinalZoneSizing(curZoneEqNum).DesCoolLoad;
+        c->rmSensibleAtPeak = thisFinalZoneSizing.DesCoolLoad;
 
         if (ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
             c->oaPeakVolFlow = ZoneEqSizing(curZoneEqNum).OAVolFlow;
@@ -1431,33 +1463,33 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         } else if (state.dataSize->ZoneEqDXCoil) {
             if (ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                    c->coilDesEntTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).DesCoolCoilInTemp;
+                    c->coilDesEntTemp = thisFinalZoneSizing.DesCoolCoilInTemp;
                 }
                 if (c->coilDesEntHumRat == -999.0) { // don't overwrite if already set directly by setCoilEntAirHumRat
-                    c->coilDesEntHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).DesCoolCoilInHumRat;
+                    c->coilDesEntHumRat = thisFinalZoneSizing.DesCoolCoilInHumRat;
                 }
             } else {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                    c->coilDesEntTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneTempAtCoolPeak;
+                    c->coilDesEntTemp = thisFinalZoneSizing.ZoneTempAtCoolPeak;
                 }
                 if (c->coilDesEntHumRat == -999.0) { // don't overwrite if already set directly by setCoilEntAirHumRat
-                    c->coilDesEntHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneHumRatAtCoolPeak;
+                    c->coilDesEntHumRat = thisFinalZoneSizing.ZoneHumRatAtCoolPeak;
                 }
             }
         } else {
             if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                c->coilDesEntTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).DesCoolCoilInTemp;
+                c->coilDesEntTemp = thisFinalZoneSizing.DesCoolCoilInTemp;
             }
             if (c->coilDesEntHumRat == -999.0) { // don't overwrite if already set directly by setCoilEntAirHumRat
-                c->coilDesEntHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).DesCoolCoilInHumRat;
+                c->coilDesEntHumRat = thisFinalZoneSizing.DesCoolCoilInHumRat;
             }
         }
 
         if (c->coilDesLvgTemp == -999.0) { // don't overwrite if already set directly by setCoilLvgAirTemp
-            c->coilDesLvgTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).CoolDesTemp;
+            c->coilDesLvgTemp = thisFinalZoneSizing.CoolDesTemp;
         }
         if (c->coilDesLvgHumRat == -999.0) { // don't overwrite if already set directly by setCoilLvgAirHumRat
-            c->coilDesLvgHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).CoolDesHumRat;
+            c->coilDesLvgHumRat = thisFinalZoneSizing.CoolDesHumRat;
         }
         c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
             state, c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
@@ -1485,11 +1517,6 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     Real64 const DXFlowPerCapMaxRatio  // non dimensional ratio, capacity adjustment ratio max
 )
 {
-    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
-    auto &TermUnitSizing(state.dataSize->TermUnitSizing);
-    auto &OASysEqSizing(state.dataSize->OASysEqSizing);
-    auto &UnitarySysEqSizing(state.dataSize->UnitarySysEqSizing);
-
     int index = getIndexForOrCreateDataObjFromCoilName(state, coilName, coilType);
     auto &c(coilSelectionDataObjs[index]);
     c->capIsAutosized = isAutoSize;
@@ -1504,16 +1531,17 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     c->zoneEqNum = curZoneEqNum;
     //    if ( c->zoneEqNum > 0 ) doZoneEqSetup( index );
     if (curSysNum > 0 && c->zoneEqNum == 0 && allocated(state.dataSize->FinalSysSizing)) {
-        c->desDayNameAtSensPeak = state.dataSize->FinalSysSizing(curSysNum).HeatDesDay;
+        auto &finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
+        c->desDayNameAtSensPeak = finalSysSizing.HeatDesDay;
 
-        c->oaPeakTemp = state.dataSize->FinalSysSizing(curSysNum).HeatOutTemp;
-        c->oaPeakHumRat = state.dataSize->FinalSysSizing(curSysNum).HeatOutHumRat;
-        c->oaPeakVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesOutAirVolFlow;
-        c->raPeakTemp = state.dataSize->FinalSysSizing(curSysNum).HeatRetTemp;
-        c->raPeakHumRat = state.dataSize->FinalSysSizing(curSysNum).HeatRetHumRat;
-        c->coilSizingMethodConcurrence = state.dataSize->FinalSysSizing(curSysNum).SizingOption;
-        c->coilSizingMethodCapacity = state.dataSize->FinalSysSizing(curSysNum).HeatingCapMethod;
-        c->coilSizingMethodAirFlow = state.dataSize->FinalSysSizing(curSysNum).ScaleHeatSAFMethod;
+        c->oaPeakTemp = finalSysSizing.HeatOutTemp;
+        c->oaPeakHumRat = finalSysSizing.HeatOutHumRat;
+        c->oaPeakVolFlow = finalSysSizing.DesOutAirVolFlow;
+        c->raPeakTemp = finalSysSizing.HeatRetTemp;
+        c->raPeakHumRat = finalSysSizing.HeatRetHumRat;
+        c->coilSizingMethodConcurrence = finalSysSizing.SizingOption;
+        c->coilSizingMethodCapacity = finalSysSizing.HeatingCapMethod;
+        c->coilSizingMethodAirFlow = finalSysSizing.ScaleHeatSAFMethod;
 
         // Central Heating Coils are always sized at the conditions at the peak Sensible Heating Load
         c->isCoilSizingForTotalLoad = false;
@@ -1527,30 +1555,30 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         Real64 sumLoad(0.0);   // straight total for zone design loads
         Real64 sumVdot(0.0);   // denominator for zone-volume weighted averages
 
-        int SysPeakDDnum(0);
-        SysPeakDDnum = state.dataSize->FinalSysSizing(curSysNum).HeatDDNum;
-        int SysPeakTimeStepInDay(0);
-        SysPeakTimeStepInDay = state.dataSize->FinalSysSizing(curSysNum).SysHeatCoilTimeStepPk;
+        int SysPeakDDnum = finalSysSizing.HeatDDNum;
+        int SysPeakTimeStepInDay = finalSysSizing.SysHeatCoilTimeStepPk;
         if (SysPeakDDnum > 0 && SysPeakTimeStepInDay > 0) { // may be zero if no peak found because of zero system load
             for (auto &z : c->zoneNum) {
+                auto const &thisCalcZoneSizing = state.dataSize->CalcZoneSizing(SysPeakDDnum, z);
+                auto const &thisFinalZoneSizing = state.dataSize->FinalZoneSizing(z);
                 Real64 mult = state.dataHeatBal->Zone(z).Multiplier * state.dataHeatBal->Zone(z).ListMultiplier;
-                Real64 Tz = state.dataSize->CalcZoneSizing(SysPeakDDnum, z).HeatZoneTempSeq(SysPeakTimeStepInDay);
-                Real64 Vdot_z = state.dataSize->CalcZoneSizing(SysPeakDDnum, z).HeatFlowSeq(SysPeakTimeStepInDay);
+                Real64 Tz = thisCalcZoneSizing.HeatZoneTempSeq(SysPeakTimeStepInDay);
+                Real64 Vdot_z = thisCalcZoneSizing.HeatFlowSeq(SysPeakTimeStepInDay);
                 if (Vdot_z == 0.0) { // take value from final zone sizing
-                    Vdot_z = state.dataSize->FinalZoneSizing(z).HeatMassFlow;
+                    Vdot_z = thisFinalZoneSizing.HeatMassFlow;
                     if (Vdot_z == 0.0) {
-                        Vdot_z = state.dataSize->FinalSysSizing(curSysNum).DesHeatVolFlow * state.dataEnvrn->StdRhoAir / c->zoneNum.size();
+                        Vdot_z = finalSysSizing.DesHeatVolFlow * state.dataEnvrn->StdRhoAir / c->zoneNum.size();
                     }
                 }
-                Real64 Wz = state.dataSize->CalcZoneSizing(SysPeakDDnum, z).HeatZoneHumRatSeq(SysPeakTimeStepInDay);
+                Real64 Wz = thisCalcZoneSizing.HeatZoneHumRatSeq(SysPeakTimeStepInDay);
                 sumT_Vdot += Tz * Vdot_z * mult;
                 sumW_Vdot += Wz * Vdot_z * mult;
                 sumVdot += Vdot_z * mult;
-                Real64 Qdot_z = state.dataSize->CalcZoneSizing(SysPeakDDnum, z).HeatLoadSeq(SysPeakTimeStepInDay);
+                Real64 Qdot_z = thisCalcZoneSizing.HeatLoadSeq(SysPeakTimeStepInDay);
                 if (Qdot_z > 0.0) {
                     sumLoad += Qdot_z * mult;
                 } else {
-                    sumLoad += state.dataSize->FinalZoneSizing(z).DesHeatLoad * mult;
+                    sumLoad += thisFinalZoneSizing.DesHeatLoad * mult;
                 }
             }
         }
@@ -1567,44 +1595,41 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         }
 
         if (c->coilSizingMethodConcurrence == DataSizing::Coincident) {
-            c->rmSensibleAtPeak = state.dataSize->FinalSysSizing(curSysNum).SysHeatCoinSpaceSens;
+            c->rmSensibleAtPeak = finalSysSizing.SysHeatCoinSpaceSens;
         } else if (c->coilSizingMethodConcurrence == DataSizing::NonCoincident) {
             c->rmSensibleAtPeak = sumLoad;
         }
 
-        if (state.dataSize->FinalSysSizing(curSysNum).HeatDDNum > 0 &&
-            state.dataSize->FinalSysSizing(curSysNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-            c->coilSensePeakHrMin = PeakHrMinString(
-                state, state.dataSize->FinalSysSizing(curSysNum).HeatDDNum, state.dataSize->FinalSysSizing(curSysNum).SysHeatCoilTimeStepPk);
+        if (finalSysSizing.HeatDDNum > 0 && finalSysSizing.HeatDDNum <= state.dataEnvrn->TotDesDays) {
+            c->coilSensePeakHrMin = PeakHrMinString(state, finalSysSizing.HeatDDNum, finalSysSizing.SysHeatCoilTimeStepPk);
 
-            c->airPeakHrMin = PeakHrMinString(
-                state, state.dataSize->FinalSysSizing(curSysNum).HeatDDNum, state.dataSize->FinalSysSizing(curSysNum).SysHeatAirTimeStepPk);
+            c->airPeakHrMin = PeakHrMinString(state, finalSysSizing.HeatDDNum, finalSysSizing.SysHeatAirTimeStepPk);
 
-            c->desDayNameAtAirFlowPeak = state.dataWeatherManager->DesDayInput(state.dataSize->FinalSysSizing(curSysNum).HeatDDNum).Title;
+            c->desDayNameAtAirFlowPeak = state.dataWeatherManager->DesDayInput(finalSysSizing.HeatDDNum).Title;
         }
 
         // now set Coil Ent And Lvg Conditions
 
         if (curOASysNum > 0) { // then this system coil is part of OA system
-            if (c->coilDesEntTemp == -999.0) c->coilDesEntTemp = state.dataSize->FinalSysSizing(curSysNum).HeatOutTemp;
-            if (c->coilDesEntHumRat == -999.0) c->coilDesEntHumRat = state.dataSize->FinalSysSizing(curSysNum).HeatOutHumRat;
+            if (c->coilDesEntTemp == -999.0) c->coilDesEntTemp = finalSysSizing.HeatOutTemp;
+            if (c->coilDesEntHumRat == -999.0) c->coilDesEntHumRat = finalSysSizing.HeatOutHumRat;
             c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                 state, c->coilDesEntTemp, c->coilDesEntHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
             c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
-            if (c->coilDesLvgTemp == -999.0) c->coilDesLvgTemp = state.dataSize->FinalSysSizing(curSysNum).PreheatTemp;
-            if (c->coilDesLvgHumRat == -999.0) c->coilDesLvgHumRat = state.dataSize->FinalSysSizing(curSysNum).PreheatHumRat;
+            if (c->coilDesLvgTemp == -999.0) c->coilDesLvgTemp = finalSysSizing.PreheatTemp;
+            if (c->coilDesLvgHumRat == -999.0) c->coilDesLvgHumRat = finalSysSizing.PreheatHumRat;
             c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                 state, c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
             c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
 
         } else { // part of main air loop
-            if (c->coilDesEntTemp == -999.0) c->coilDesEntTemp = state.dataSize->FinalSysSizing(curSysNum).HeatMixTemp;
-            if (c->coilDesEntHumRat == -999.0) c->coilDesEntHumRat = state.dataSize->FinalSysSizing(curSysNum).HeatMixHumRat;
+            if (c->coilDesEntTemp == -999.0) c->coilDesEntTemp = finalSysSizing.HeatMixTemp;
+            if (c->coilDesEntHumRat == -999.0) c->coilDesEntHumRat = finalSysSizing.HeatMixHumRat;
             c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                 state, c->coilDesEntTemp, c->coilDesEntHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
             c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
-            if (c->coilDesLvgTemp == -999.0) c->coilDesLvgTemp = state.dataSize->FinalSysSizing(curSysNum).HeatSupTemp;
-            if (c->coilDesLvgHumRat == -999.0) c->coilDesLvgHumRat = state.dataSize->FinalSysSizing(curSysNum).HeatSupHumRat;
+            if (c->coilDesLvgTemp == -999.0) c->coilDesLvgTemp = finalSysSizing.HeatSupTemp;
+            if (c->coilDesLvgHumRat == -999.0) c->coilDesLvgHumRat = finalSysSizing.HeatSupHumRat;
             c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                 state, c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
             c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
@@ -1614,34 +1639,33 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         }
 
     } else if (curZoneEqNum > 0 && allocated(state.dataSize->FinalZoneSizing)) {
+        auto &finalZoneSizing = state.dataSize->FinalZoneSizing(curZoneEqNum);
         c->zoneNum.resize(1);
         c->zoneName.resize(1);
         c->zoneNum[0] = curZoneEqNum;
         if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneName[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName;
-        c->desDayNameAtSensPeak = state.dataSize->FinalZoneSizing(curZoneEqNum).HeatDesDay;
-        c->oaPeakTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).OutTempAtHeatPeak;
-        c->oaPeakHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).OutHumRatAtHeatPeak;
-        c->raPeakTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneRetTempAtHeatPeak;
-        c->raPeakHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneHumRatAtHeatPeak;
-        c->rmPeakTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneTempAtHeatPeak;
-        c->rmPeakHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneHumRatAtHeatPeak;
+        c->desDayNameAtSensPeak = finalZoneSizing.HeatDesDay;
+        c->oaPeakTemp = finalZoneSizing.OutTempAtHeatPeak;
+        c->oaPeakHumRat = finalZoneSizing.OutHumRatAtHeatPeak;
+        c->raPeakTemp = finalZoneSizing.ZoneRetTempAtHeatPeak;
+        c->raPeakHumRat = finalZoneSizing.ZoneHumRatAtHeatPeak;
+        c->rmPeakTemp = finalZoneSizing.ZoneTempAtHeatPeak;
+        c->rmPeakHumRat = finalZoneSizing.ZoneHumRatAtHeatPeak;
         c->rmPeakRelHum =
             Psychrometrics::PsyRhFnTdbWPb(state, c->rmPeakTemp, c->rmPeakHumRat, state.dataEnvrn->StdBaroPress) * 100.0; // convert to percentage
-        if (state.dataSize->FinalZoneSizing(curZoneEqNum).HeatDDNum > 0 &&
-            state.dataSize->FinalZoneSizing(curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-            c->coilSensePeakHrMin = PeakHrMinString(
-                state, state.dataSize->FinalZoneSizing(curZoneEqNum).HeatDDNum, state.dataSize->FinalZoneSizing(curZoneEqNum).TimeStepNumAtHeatMax);
-            c->airPeakHrMin = PeakHrMinString(
-                state, state.dataSize->FinalZoneSizing(curZoneEqNum).HeatDDNum, state.dataSize->FinalZoneSizing(curZoneEqNum).TimeStepNumAtHeatMax);
+        if (finalZoneSizing.HeatDDNum > 0 && finalZoneSizing.HeatDDNum <= state.dataEnvrn->TotDesDays) {
+            c->coilSensePeakHrMin = PeakHrMinString(state, finalZoneSizing.HeatDDNum, finalZoneSizing.TimeStepNumAtHeatMax);
+            c->airPeakHrMin = PeakHrMinString(state, finalZoneSizing.HeatDDNum, finalZoneSizing.TimeStepNumAtHeatMax);
         }
-        c->desDayNameAtAirFlowPeak = state.dataSize->FinalZoneSizing(curZoneEqNum).HeatDesDay;
+        c->desDayNameAtAirFlowPeak = finalZoneSizing.HeatDesDay;
 
-        c->rmSensibleAtPeak = state.dataSize->FinalZoneSizing(curZoneEqNum).DesHeatLoad;
+        c->rmSensibleAtPeak = finalZoneSizing.DesHeatLoad;
 
-        if (ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
-            c->oaPeakVolFlow = ZoneEqSizing(curZoneEqNum).OAVolFlow;
-        } else if (ZoneEqSizing(curZoneEqNum).ATMixerVolFlow > 0.0) {
-            c->oaPeakVolFlow = ZoneEqSizing(curZoneEqNum).ATMixerVolFlow;
+        auto &zoneEqSizing = state.dataSize->ZoneEqSizing(curZoneEqNum);
+        if (zoneEqSizing.OAVolFlow > 0.0) {
+            c->oaPeakVolFlow = zoneEqSizing.OAVolFlow;
+        } else if (zoneEqSizing.ATMixerVolFlow > 0.0) {
+            c->oaPeakVolFlow = zoneEqSizing.ATMixerVolFlow;
         } else {
             c->oaPeakVolFlow = 0.0;
         }
@@ -1649,66 +1673,70 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         // set typeof_Coil integer
         if (state.dataSize->TermUnitIU) {      // an unpowered induction terminal unit
             if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                c->coilDesEntTemp = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU;
-                c->coilDesEntHumRat = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInHumRatTU;
+                auto const &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum);
+                c->coilDesEntTemp = thisTermUnitFinalZoneSizing.DesHeatCoilInTempTU;
+                c->coilDesEntHumRat = thisTermUnitFinalZoneSizing.DesHeatCoilInHumRatTU;
             }
         } else if (state.dataSize->TermUnitSingDuct) {
             if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                c->coilDesEntTemp = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU;
-                c->coilDesEntHumRat = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInHumRatTU;
+                auto const &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum);
+                c->coilDesEntTemp = thisTermUnitFinalZoneSizing.DesHeatCoilInTempTU;
+                c->coilDesEntHumRat = thisTermUnitFinalZoneSizing.DesHeatCoilInHumRatTU;
             }
         } else if (state.dataSize->TermUnitPIU) {
-            Real64 MinPriFlowFrac = TermUnitSizing(state.dataSize->CurTermUnitSizingNum).MinFlowFrac;
-            if (TermUnitSizing(state.dataSize->CurTermUnitSizingNum).InducesPlenumAir) {
+            auto const &thisTermUnitSizing = state.dataSize->TermUnitSizing(state.dataSize->CurTermUnitSizingNum);
+            Real64 MinPriFlowFrac = thisTermUnitSizing.MinFlowFrac;
+            if (thisTermUnitSizing.InducesPlenumAir) {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                    c->coilDesEntTemp =
-                        (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU * MinPriFlowFrac) +
-                        (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneRetTempAtHeatPeak *
-                         (1.0 - MinPriFlowFrac));
-                    c->coilDesEntHumRat =
-                        (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInHumRatTU * MinPriFlowFrac) +
-                        (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneHumRatAtHeatPeak * (1.0 - MinPriFlowFrac));
+                    auto const &termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum);
+                    c->coilDesEntTemp = (termUnitFinalZoneSizing.DesHeatCoilInTempTU * MinPriFlowFrac) +
+                                        (termUnitFinalZoneSizing.ZoneRetTempAtHeatPeak * (1.0 - MinPriFlowFrac));
+                    c->coilDesEntHumRat = (termUnitFinalZoneSizing.DesHeatCoilInHumRatTU * MinPriFlowFrac) +
+                                          (termUnitFinalZoneSizing.ZoneHumRatAtHeatPeak * (1.0 - MinPriFlowFrac));
                 }
             } else {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                    c->coilDesEntTemp =
-                        (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU * MinPriFlowFrac) +
-                        (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - MinPriFlowFrac));
-                    c->coilDesEntHumRat =
-                        (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInHumRatTU * MinPriFlowFrac) +
-                        (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneHumRatAtHeatPeak * (1.0 - MinPriFlowFrac));
+                    auto const &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum);
+                    c->coilDesEntTemp = (thisTermUnitFinalZoneSizing.DesHeatCoilInTempTU * MinPriFlowFrac) +
+                                        (thisTermUnitFinalZoneSizing.ZoneTempAtHeatPeak * (1.0 - MinPriFlowFrac));
+                    c->coilDesEntHumRat = (thisTermUnitFinalZoneSizing.DesHeatCoilInHumRatTU * MinPriFlowFrac) +
+                                          (thisTermUnitFinalZoneSizing.ZoneHumRatAtHeatPeak * (1.0 - MinPriFlowFrac));
                 }
             }
         } else if (state.dataSize->ZoneEqFanCoil) {
             if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                Real64 desOAFlowFrac = state.dataSize->FinalZoneSizing(curZoneEqNum).DesHeatOAFlowFrac;
-                c->coilDesEntTemp = desOAFlowFrac * state.dataSize->FinalZoneSizing(curZoneEqNum).OutTempAtHeatPeak +
-                                    (1.0 - desOAFlowFrac) * state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneTempAtHeatPeak;
-                c->coilDesEntHumRat = desOAFlowFrac * state.dataSize->FinalZoneSizing(curZoneEqNum).OutHumRatAtHeatPeak +
-                                      (1.0 - desOAFlowFrac) * state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneHumRatAtHeatPeak;
+                Real64 desOAFlowFrac = 0.0;
+                if (zoneEqSizing.OAVolFlow > 0.0 && finalZoneSizing.DesHeatMassFlow > 0.0) {
+                    desOAFlowFrac = std::min(state.dataEnvrn->StdRhoAir * zoneEqSizing.OAVolFlow / finalZoneSizing.DesHeatMassFlow, 1.0);
+                } else {
+                    desOAFlowFrac = finalZoneSizing.DesHeatOAFlowFrac;
+                }
+                c->coilDesEntTemp = desOAFlowFrac * finalZoneSizing.OutTempAtHeatPeak + (1.0 - desOAFlowFrac) * finalZoneSizing.ZoneTempAtHeatPeak;
+                c->coilDesEntHumRat =
+                    desOAFlowFrac * finalZoneSizing.OutHumRatAtHeatPeak + (1.0 - desOAFlowFrac) * finalZoneSizing.ZoneHumRatAtHeatPeak;
             }
         } else if (state.dataSize->ZoneEqDXCoil) {
-            if (ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
+            if (zoneEqSizing.OAVolFlow > 0.0) {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                    c->coilDesEntTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).DesHeatCoilInTemp;
+                    c->coilDesEntTemp = finalZoneSizing.DesHeatCoilInTemp;
                 }
                 if (c->coilDesEntHumRat == -999.0) { // don't overwrite if already set directly by setCoilEntAirHumRat
-                    c->coilDesEntHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).DesHeatCoilInHumRat;
+                    c->coilDesEntHumRat = finalZoneSizing.DesHeatCoilInHumRat;
                 }
             } else {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                    c->coilDesEntTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneTempAtHeatPeak;
+                    c->coilDesEntTemp = finalZoneSizing.ZoneTempAtHeatPeak;
                 }
                 if (c->coilDesEntHumRat == -999.0) { // don't overwrite if already set directly by setCoilEntAirHumRat
-                    c->coilDesEntHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneHumRatAtHeatPeak;
+                    c->coilDesEntHumRat = finalZoneSizing.ZoneHumRatAtHeatPeak;
                 }
             }
         } else {
             if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
-                c->coilDesEntTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).DesHeatCoilInTemp;
+                c->coilDesEntTemp = finalZoneSizing.DesHeatCoilInTemp;
             }
             if (c->coilDesEntHumRat == -999.0) { // don't overwrite if already set directly by setCoilEntAirHumRat
-                c->coilDesEntHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).DesHeatCoilInHumRat;
+                c->coilDesEntHumRat = finalZoneSizing.DesHeatCoilInHumRat;
             }
         }
 
@@ -1719,10 +1747,10 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         }
 
         if (c->coilDesLvgTemp == -999.0) { // don't overwrite if already set directly by setCoilLvgAirTemp
-            c->coilDesLvgTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).HeatDesTemp;
+            c->coilDesLvgTemp = finalZoneSizing.HeatDesTemp;
         }
         if (c->coilDesLvgHumRat == -999.0) { // don't overwrite if already set directly by setCoilLvgAirHumRat
-            c->coilDesLvgHumRat = state.dataSize->FinalZoneSizing(curZoneEqNum).HeatDesHumRat;
+            c->coilDesLvgHumRat = finalZoneSizing.HeatDesHumRat;
         }
         c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
             state, c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
@@ -1738,47 +1766,52 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     if (c->coilDesVolFlow <= 0.0) {
         if (state.dataSize->DataFlowUsedForSizing > 0.0) { // flow has been set in global, so use it
             c->coilDesVolFlow = state.dataSize->DataFlowUsedForSizing;
-        } else if ((curZoneEqNum > 0) && allocated(state.dataSize->FinalZoneSizing) &&
-                   (state.dataSize->FinalZoneSizing(curZoneEqNum).DesHeatMassFlow >= DataHVACGlobals::SmallMassFlow)) {
-            c->coilDesMassFlow = state.dataSize->FinalZoneSizing(curZoneEqNum).DesHeatMassFlow;
-            c->coilDesVolFlow = c->coilDesMassFlow / state.dataEnvrn->StdRhoAir;
+        } else if (curZoneEqNum > 0 && allocated(state.dataSize->FinalZoneSizing)) {
+            auto &finalZoneSizing = state.dataSize->FinalZoneSizing(curZoneEqNum);
+            if (finalZoneSizing.DesHeatMassFlow >= DataHVACGlobals::SmallMassFlow) {
+                c->coilDesMassFlow = finalZoneSizing.DesHeatMassFlow;
+                c->coilDesVolFlow = c->coilDesMassFlow / state.dataEnvrn->StdRhoAir;
+            }
         } else if (curSysNum > 0 && allocated(state.dataSize->FinalSysSizing)) {
-            if (curOASysNum > 0 && allocated(OASysEqSizing)) {
-                if (OASysEqSizing(curOASysNum).AirFlow) {
-                    c->coilDesVolFlow = OASysEqSizing(curOASysNum).AirVolFlow;
-                } else if (OASysEqSizing(curOASysNum).HeatingAirFlow) {
-                    c->coilDesVolFlow = OASysEqSizing(curOASysNum).HeatingAirVolFlow;
+            auto &finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
+            if (curOASysNum > 0 && allocated(state.dataSize->OASysEqSizing)) {
+                auto &oASysEqSizing = state.dataSize->OASysEqSizing(curSysNum);
+                if (oASysEqSizing.AirFlow) {
+                    c->coilDesVolFlow = oASysEqSizing.AirVolFlow;
+                } else if (oASysEqSizing.HeatingAirFlow) {
+                    c->coilDesVolFlow = oASysEqSizing.HeatingAirVolFlow;
                 } else {
-                    c->coilDesVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesOutAirVolFlow;
+                    c->coilDesVolFlow = finalSysSizing.DesOutAirVolFlow;
                 }
             } else {
                 if (state.dataSize->DataFlowUsedForSizing > 0.0) {
                     c->coilDesVolFlow = state.dataSize->DataFlowUsedForSizing;
-                } else if (UnitarySysEqSizing(curSysNum).AirFlow) {
-                    c->coilDesVolFlow = UnitarySysEqSizing(curSysNum).AirVolFlow;
-                } else if (UnitarySysEqSizing(curSysNum).HeatingAirFlow) {
-                    c->coilDesVolFlow = UnitarySysEqSizing(curSysNum).HeatingAirVolFlow;
+                } else if (curSysNum > 0 && allocated(state.dataSize->UnitarySysEqSizing)) {
+                    auto &unitarySysEqSizing = state.dataSize->UnitarySysEqSizing(curSysNum);
+                    if (unitarySysEqSizing.AirFlow) {
+                        c->coilDesVolFlow = unitarySysEqSizing.AirVolFlow;
+                    } else if (unitarySysEqSizing.HeatingAirFlow) {
+                        c->coilDesVolFlow = unitarySysEqSizing.HeatingAirVolFlow;
+                    }
                 } else {
                     if (state.dataSize->CurDuctType == DataHVACGlobals::AirDuctType::Main) {
-                        if (state.dataSize->FinalSysSizing(curSysNum).SysAirMinFlowRat > 0.0 && !state.dataSize->DataDesicRegCoil) {
-                            c->coilDesVolFlow =
-                                state.dataSize->FinalSysSizing(curSysNum).SysAirMinFlowRat * state.dataSize->FinalSysSizing(curSysNum).DesMainVolFlow;
+                        if (finalSysSizing.SysAirMinFlowRat > 0.0 && !state.dataSize->DataDesicRegCoil) {
+                            c->coilDesVolFlow = finalSysSizing.SysAirMinFlowRat * finalSysSizing.DesMainVolFlow;
                         } else {
-                            c->coilDesVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesMainVolFlow;
+                            c->coilDesVolFlow = finalSysSizing.DesMainVolFlow;
                         }
                     } else if (state.dataSize->CurDuctType == DataHVACGlobals::AirDuctType::Cooling) {
-                        if (state.dataSize->FinalSysSizing(curSysNum).SysAirMinFlowRat > 0.0 && !state.dataSize->DataDesicRegCoil) {
-                            c->coilDesVolFlow =
-                                state.dataSize->FinalSysSizing(curSysNum).SysAirMinFlowRat * state.dataSize->FinalSysSizing(curSysNum).DesCoolVolFlow;
+                        if (finalSysSizing.SysAirMinFlowRat > 0.0 && !state.dataSize->DataDesicRegCoil) {
+                            c->coilDesVolFlow = finalSysSizing.SysAirMinFlowRat * finalSysSizing.DesCoolVolFlow;
                         } else {
-                            c->coilDesVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesCoolVolFlow;
+                            c->coilDesVolFlow = finalSysSizing.DesCoolVolFlow;
                         }
                     } else if (state.dataSize->CurDuctType == DataHVACGlobals::AirDuctType::Heating) {
-                        c->coilDesVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesHeatVolFlow;
+                        c->coilDesVolFlow = finalSysSizing.DesHeatVolFlow;
                     } else if (state.dataSize->CurDuctType == DataHVACGlobals::AirDuctType::Other) {
-                        c->coilDesVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesMainVolFlow;
+                        c->coilDesVolFlow = finalSysSizing.DesMainVolFlow;
                     } else {
-                        c->coilDesVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesMainVolFlow;
+                        c->coilDesVolFlow = finalSysSizing.DesMainVolFlow;
                     }
                 }
             }

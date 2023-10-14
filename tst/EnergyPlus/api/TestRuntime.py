@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -56,6 +56,7 @@
 import sys
 from pyenergyplus.api import EnergyPlusAPI
 
+progressValue = 0
 
 def environment_handler(_state) -> None:
     print("OH HAI ENVIRONMENT")
@@ -68,6 +69,8 @@ def common_callback_handler(_state) -> None:
 
 
 def progress_handler(progress: int) -> None:
+    global progressValue
+    progressValue = progress
     if 49 < progress < 51:
         print("HALFWAY THERE!!")
         sys.stdout.flush()
@@ -91,6 +94,7 @@ v = api.runtime.run_energyplus(state, sys.argv[1:])
 if v != 0:
     print("EnergyPlus Failed!")
     sys.exit(1)
+assert(progressValue == 100)
 
 print("MUTING CONSOLE OUTPUT")
 state2 = api.state_manager.new_state()
@@ -102,5 +106,17 @@ v = api.runtime.run_energyplus(state2, sys.argv[1:])
 if v != 0:
     print("EnergyPlus Failed!")
     sys.exit(1)
-
 print("MUTED E+ RUN DONE")
+
+print("Attempting a run that kills EnergyPlus")
+state3 = api.state_manager.new_state()
+new_api = EnergyPlusAPI()
+def callback_that_kills(_state) -> None:
+    print("Going to call stop_simulation!")
+    api.runtime.stop_simulation(_state)
+api.runtime.callback_begin_system_timestep_before_predictor(state3, callback_that_kills)
+v = api.runtime.run_energyplus(state3, sys.argv[1:])
+if v != 0:
+    print("EnergyPlus Failed to Abort Cleanly; Task Succeeded Unsuccessfully!")
+    sys.exit(1)
+print("Killed EnergyPlus Run completed!")

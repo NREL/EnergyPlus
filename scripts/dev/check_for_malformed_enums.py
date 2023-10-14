@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -130,7 +130,7 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
         # exceptions listed by <FILE>:<ENUM NAME>
         exceptions = [
             "HVACInterfaceManager.cc:UpdateType",
-            "IdfParser.hh:Token"
+            "IdfParser.hh:Token",
         ]
         if f"{file_name}:{name}" not in exceptions:
             error_str += "\tMissing 'Num' at position N\n"
@@ -148,7 +148,10 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
 
     # check for proper casing
     if str(name[0]).islower():
-        error_str += "\tenum name must begin with upper case letter\n"
+        # exceptions listed by <FILE>:<ENUM NAME>
+        exceptions = ["DataGlobalConstants.hh:eResource", "DataGlobalConstants.hh:eFuel", "DataGlobalConstants.hh:ePollutant"]
+        if f"{file_name}:{name}" not in exceptions:
+            error_str += "\tenum name must begin with upper case letter\n"
 
     if "ENUM" in str(name).upper():
         error_str += "\tenum name should not contain 'enum'\n"

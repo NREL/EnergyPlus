@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -292,14 +292,12 @@ void VecRound(Vector &vec, Real64 const roundto)
     vec.z = nint64(vec.z * roundto) / roundto;
 }
 
-void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf,       // Surface Definition
-                             [[maybe_unused]] int const NSides, // Number of sides to surface
-                             Real64 &Azimuth,                   // Outward Normal Azimuth Angle
-                             Real64 &Tilt,                      // Tilt angle of surface
+void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf, // Surface Definition
+                             Real64 &Azimuth,             // Outward Normal Azimuth Angle
+                             Real64 &Tilt,                // Tilt angle of surface
                              Vector &lcsx,
                              Vector &lcsy,
                              Vector &lcsz,
-                             [[maybe_unused]] Real64 const surfaceArea,
                              Vector const &NewellSurfaceNormalVector)
 {
 
@@ -310,113 +308,36 @@ void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf,       // Surface Defin
     // REFERENCE:
     // Discussions and examples from Bill Carroll, LBNL.
 
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    //  TYPE(Vector) :: x3,y3,z3,v12
-    //  TYPE(Vector) :: y2
+    // LOCAL VARIABLE DECLARATIONS:
     Real64 costheta;
     Real64 rotang_0;
-    //  REAL(r64) rotang_2
 
     Real64 az;
-    //   REAL(r64) azm
     Real64 tlt;
-    //  REAL(r64) newtlt
-    //  REAL(r64) roundval
-    //   REAL(r64) xcomp
-    //   REAL(r64) ycomp
-    //   REAL(r64) zcomp
-    //   REAL(r64) proj
-    //   integer :: scount
-    //   integer :: nvert1
-    //  REAL(r64) :: tltcos
 
-    // Object Data
-    Vector x2;
-    Vector x3a;
-    Vector v12a;
-    Vector v0;
-    Vector v1;
-    Vector v2;
-    Vector cs3_2;
-    Vector cs3_0;
-    Vector cs3_1;
-    Vector z3;
-
-    //!!     x3=VecNormalize(Surf(2)-Surf(1))
-    //!!     v12=Surf(3)-Surf(2)
-
-    //!!     z3=VecNormalize(x3*v12)
-    //!!     y3=z3*x3
-    //!!     roundval=10000.d0
-    //!!     CALL VecRound(x3,roundval)
-    //!!     CALL VecRound(y3,roundval)
-    //!!     CALL VecRound(z3,roundval)
-
-    //!!!  Direction cosines, local coordinates.
-    //!!!      write(OUTPUT,*) 'lcs:'
-    //!!!      write(OUTPUT,*) 'x=',x3
-    //!!!      write(OUTPUT,*) 'y=',y3
-    //!!!      write(OUTPUT,*) 'z=',z3
-    x3a = VecNormalize(Surf(3) - Surf(2));
-    v12a = Surf(1) - Surf(2);
-
-    //!!     lcsx=x3a
-    //!!     lcsz=VecNormalize(x3a*v12a)
-    //!!     lcsy=lcsz*x3a
-
-    lcsx = x3a;
+    lcsx = VecNormalize(Surf(3) - Surf(2));
     lcsz = NewellSurfaceNormalVector;
-    lcsy = cross(lcsz, x3a);
+    lcsy = cross(lcsz, lcsx);
 
-    //!!
-
-    //    Vec3d    v0(p1 - p0);  ! BGL has different conventions...p0=surf(2), etc
-    v0 = Surf(3) - Surf(2);
-    //    Vec3d    v1(p2 - p0);
-    v1 = Surf(1) - Surf(2);
-
-    //    Vec3d    v2 = cross(v0,v1);
-    v2 = cross(v0, v1);
-    //    cs3[2] = norm(v2); // z
-    cs3_2 = VecNormalize(v2);
-    //    cs3[0] = norm(v0); // x
-    cs3_0 = VecNormalize(v0);
-    //    cs3[1] = cross(cs3[2],cs3[0]); // y
-    cs3_1 = cross(cs3_2, cs3_0);
-    //    Vec3d    z3 = cs3[2];
-    z3 = cs3_2;
-    //    double costheta = dot(z3,Ref_CS[2]);
-    costheta = dot(z3, ZUnit);
+    costheta = dot(lcsz, ZUnit);
 
     //    if ( fabs(costheta) < 1.0d0) { // normal cases
     if (std::abs(costheta) < 1.0 - 1.12e-16) { // Autodesk Added - 1.12e-16 to treat 1 bit from 1.0 as 1.0 to correct different behavior seen in
                                                // release vs debug build due to slight precision differences: May want larger epsilon here
-        //    // azimuth
-        //    Vec3d    x2 = cross(Ref_CS[2],z3); // order is important; x2 = x1
-        //    RotAng[0] = ATAN2(dot(x2,Ref_CS[1]),dot(x2,Ref_CS[0]));
-        x2 = cross(ZUnit, z3);
+        // azimuth
+        Vector x2 = cross(ZUnit, lcsz);
         rotang_0 = std::atan2(dot(x2, YUnit), dot(x2, XUnit));
-
     } else {
-
-        //    }
-        //    else { // special cases: tilt angle theta = 0, PI
-        //      // azimuth
-        //      RotAng[0] = ATAN2(dot(cs3[0],Ref_CS[1]),dot(cs3[0],Ref_CS[0]) );
-        rotang_0 = std::atan2(dot(cs3_0, YUnit), dot(cs3_0, XUnit));
+        // azimuth
+        rotang_0 = std::atan2(dot(lcsx, YUnit), dot(lcsx, XUnit));
     }
 
     tlt = std::acos(NewellSurfaceNormalVector.z);
-    tlt /= DataGlobalConstants::DegToRadians;
+    tlt /= Constant::DegToRadians;
 
     az = rotang_0;
 
-    az /= DataGlobalConstants::DegToRadians;
+    az /= Constant::DegToRadians;
     az = mod(450.0 - az, 360.0);
     az += 90.0;
     if (az < 0.0) az += 360.0;
