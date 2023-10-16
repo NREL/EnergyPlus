@@ -10303,24 +10303,25 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
         // no unit conversion, it is done at the reporting stage if necessary
         collapsedIndEndUse = 0.0;
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-            collapsedIndEndUse(1, jEndUse) = ort->gatherDemandIndEndUse(1, jEndUse);   // electricity
-            collapsedIndEndUse(2, jEndUse) = ort->gatherDemandIndEndUse(2, jEndUse);   // natural gas
-            collapsedIndEndUse(3, jEndUse) = ort->gatherDemandIndEndUse(6, jEndUse);   // gasoline
-            collapsedIndEndUse(4, jEndUse) = ort->gatherDemandIndEndUse(8, jEndUse);   // diesel
-            collapsedIndEndUse(5, jEndUse) = ort->gatherDemandIndEndUse(9, jEndUse);   // coal
-            collapsedIndEndUse(6, jEndUse) = ort->gatherDemandIndEndUse(10, jEndUse);  // fuel oil no 1
-            collapsedIndEndUse(7, jEndUse) = ort->gatherDemandIndEndUse(11, jEndUse);  // fuel oil no 2
-            collapsedIndEndUse(8, jEndUse) = ort->gatherDemandIndEndUse(12, jEndUse);  // propane
-            collapsedIndEndUse(9, jEndUse) = ort->gatherDemandIndEndUse(13, jEndUse);  // otherfuel1
-            collapsedIndEndUse(10, jEndUse) = ort->gatherDemandIndEndUse(14, jEndUse); // otherfuel2
-            collapsedIndEndUse(11, jEndUse) = ort->gatherDemandIndEndUse(3, jEndUse);  // purchased cooling
-            collapsedIndEndUse(12, jEndUse) = ort->gatherDemandIndEndUse(4, jEndUse);  // district heating water
-            collapsedIndEndUse(13, jEndUse) = ort->gatherDemandIndEndUse(5, jEndUse);  // district heating steam
-            collapsedIndEndUse(14, jEndUse) = ort->gatherDemandIndEndUse(7, jEndUse);  // water
+            collapsedIndEndUse(1, jEndUse) = ort->gatherDemandIndEndUse(1, jEndUse) * (1.0 / ipElectricityConversion); // electricity
+            collapsedIndEndUse(2, jEndUse) = ort->gatherDemandIndEndUse(2, jEndUse);                                   // natural gas
+            collapsedIndEndUse(3, jEndUse) = ort->gatherDemandIndEndUse(6, jEndUse);                                   // gasoline
+            collapsedIndEndUse(4, jEndUse) = ort->gatherDemandIndEndUse(8, jEndUse);                                   // diesel
+            collapsedIndEndUse(5, jEndUse) = ort->gatherDemandIndEndUse(9, jEndUse);                                   // coal
+            collapsedIndEndUse(6, jEndUse) = ort->gatherDemandIndEndUse(10, jEndUse);                                  // fuel oil no 1
+            collapsedIndEndUse(7, jEndUse) = ort->gatherDemandIndEndUse(11, jEndUse);                                  // fuel oil no 2
+            collapsedIndEndUse(8, jEndUse) = ort->gatherDemandIndEndUse(12, jEndUse);                                  // propane
+            collapsedIndEndUse(9, jEndUse) = ort->gatherDemandIndEndUse(13, jEndUse);                                  // otherfuel1
+            collapsedIndEndUse(10, jEndUse) = ort->gatherDemandIndEndUse(14, jEndUse);                                 // otherfuel2
+            collapsedIndEndUse(11, jEndUse) = ort->gatherDemandIndEndUse(3, jEndUse);                                  // purchased cooling
+            collapsedIndEndUse(12, jEndUse) = ort->gatherDemandIndEndUse(4, jEndUse);                                  // district heating water
+            collapsedIndEndUse(13, jEndUse) = ort->gatherDemandIndEndUse(5, jEndUse);                                  // district heating steam
+            collapsedIndEndUse(14, jEndUse) = ort->gatherDemandIndEndUse(7, jEndUse);                                  // water
         }
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
             for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                collapsedIndEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 1);   // electricity
+                collapsedIndEndUseSub(kEndUseSub, jEndUse, 1) =
+                    ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 1) * (1.0 / ipElectricityConversion);             // electricity
                 collapsedIndEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 2);   // natural gas
                 collapsedIndEndUseSub(kEndUseSub, jEndUse, 3) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 6);   // gasoline
                 collapsedIndEndUseSub(kEndUseSub, jEndUse, 4) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 8);   // diesel
