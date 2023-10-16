@@ -16459,58 +16459,7 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
 // apply unit conversions to the load components summary tables
 void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal, UnitsStyle unitsStyle_para)
 {
-    if (unitsStyle_para == UnitsStyle::InchPound) {
-        Real64 powerConversion = getSpecificUnitMultiplier(state, "W", "Btu/h");
-        Real64 areaConversion = getSpecificUnitMultiplier(state, "m2", "ft2");
-        Real64 powerPerAreaConversion = getSpecificUnitMultiplier(state, "W/m2", "Btu/h-ft2");
-        Real64 airFlowConversion = getSpecificUnitMultiplier(state, "m3/s", "ft3/min");
-        Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier(state, "m3/s-m2", "ft3/min-ft2");
-        Real64 powerPerFlowLiquidConversion = getSpecificUnitMultiplier(state, "W-s/m3", "W-min/gal");
-        for (int row = 1; row <= LoadCompRow::GrdTot; ++row) {
-            for (int col = 1; col <= LoadCompCol::Total; ++col) {
-                if (compLoadTotal.cellUsed(col, row)) {
-                    compLoadTotal.cells(col, row) *= powerConversion;
-                }
-            }
-            if (compLoadTotal.cellUsed(LoadCompCol::PerArea, row)) {
-                compLoadTotal.cells(LoadCompCol::PerArea, row) *= powerConversion;
-            }
-            if (compLoadTotal.cellUsed(LoadCompCol::Area, row)) {
-                compLoadTotal.cells(LoadCompCol::Area, row) *= areaConversion;
-            }
-            if (compLoadTotal.cellUsed(LoadCompCol::PerArea, row)) {
-                compLoadTotal.cells(LoadCompCol::PerArea, row) *= powerPerAreaConversion;
-            }
-        }
-        int tempConvIndx = getSpecificUnitIndex(state, "C", "F");
-        compLoadTotal.outsideDryBulb = ConvertIP(state, tempConvIndx, compLoadTotal.outsideDryBulb);
-        compLoadTotal.outsideWetBulb = ConvertIP(state, tempConvIndx, compLoadTotal.outsideWetBulb);
-        compLoadTotal.zoneDryBulb = ConvertIP(state, tempConvIndx, compLoadTotal.zoneDryBulb);
-        compLoadTotal.peakDesSensLoad *= powerConversion;
-
-        compLoadTotal.supAirTemp = ConvertIP(state, tempConvIndx, compLoadTotal.supAirTemp);
-        compLoadTotal.mixAirTemp = ConvertIP(state, tempConvIndx, compLoadTotal.mixAirTemp);
-        compLoadTotal.mainFanAirFlow *= airFlowConversion;
-        compLoadTotal.outsideAirFlow *= airFlowConversion;
-        compLoadTotal.designPeakLoad *= powerConversion;
-        compLoadTotal.diffDesignPeak *= powerConversion;
-
-        compLoadTotal.estInstDelSensLoad *= powerConversion;
-        compLoadTotal.diffPeakEst *= powerConversion;
-
-        compLoadTotal.airflowPerFlrArea *= airFlowPerAreaConversion;
-        if (powerConversion != 0.) {
-            compLoadTotal.airflowPerTotCap = compLoadTotal.airflowPerTotCap * airFlowPerAreaConversion / powerConversion;
-            compLoadTotal.areaPerTotCap = compLoadTotal.areaPerTotCap * areaConversion / powerConversion;
-        }
-        if (areaConversion != 0.) {
-            compLoadTotal.totCapPerArea = compLoadTotal.totCapPerArea * powerConversion / areaConversion;
-        }
-        compLoadTotal.chlPumpPerFlow *= powerPerFlowLiquidConversion;
-        compLoadTotal.cndPumpPerFlow *= powerPerFlowLiquidConversion;
-    } else if (unitsStyle_para == UnitsStyle::InchPoundExceptElectricity) {
-        // These variables are not strictly need to be different from InchPounds
-        // So leave these here (as a duplication for now)
+    if ((unitsStyle_para == UnitsStyle::InchPound) || (unitsStyle_para == UnitsStyle::InchPoundExceptElectricity)) {
         Real64 powerConversion = getSpecificUnitMultiplier(state, "W", "Btu/h");
         Real64 areaConversion = getSpecificUnitMultiplier(state, "m2", "ft2");
         Real64 powerPerAreaConversion = getSpecificUnitMultiplier(state, "W/m2", "Btu/h-ft2");
