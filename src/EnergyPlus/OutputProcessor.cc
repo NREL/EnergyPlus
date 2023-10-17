@@ -4287,7 +4287,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string_view const KeyedValue                 // Associated Key for this variable
 )
 {
-    SetupOutputVariable(state, VariableName, VariableUnit, ActualVariable, TimeStepTypeKey, VariableTypeKey, KeyedValue, {});
+    SetupOutputVariable(state, VariableName, VariableUnit, ActualVariable, TimeStepTypeKey, VariableTypeKey, KeyedValue, "");
 }
 
 void SetupOutputVariable(EnergyPlusData &state,
@@ -4630,7 +4630,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                         TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                         VariableTypeKey, // State, Average=1, NonState, Sum=2
                         KeyedValue,      // Associated Key for this variable
-                        {}               // Internal use -- causes reporting at this freqency
+                        ""               // Internal use -- causes reporting at this freqency
                                          // indexGroupKey // Group identifier for SQL output
     );
 }
