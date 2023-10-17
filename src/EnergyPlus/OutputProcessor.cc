@@ -4310,12 +4310,22 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string_view const SpaceType                  // Space type (applicable for Building group only)
 )
 {
+    std::string locResourceTypeKey = "";
+    std::string locEndUseKey = "";
+
     if (EndUseKey == Constant::EndUse::Invalid) {
         // Severe warning message
         ShowSevereError(state, "Invalid End Use Category Type.");
     } else if (ResourceTypeKey == Constant::eResource::Invalid) {
         ShowSevereError(state, "Invalid Resource Type.");
+    } else if (ResourceTypeKey == Constant::eResource::Num) {
+        locResourceTypeKey = "";
+    } else if (EndUseKey == Constant::EndUse::Num) {
+        locEndUseKey = "";
     } else {
+        locResourceTypeKey = Constant::eResourceNames[static_cast<int>(ResourceTypeKey)]; // or eResourceNamesUC
+        locEndUseKey = OutputProcessor::endUseCategoryNames[static_cast<int>(EndUseKey)];
+
         if (ReportFreq == OutputProcessor::ReportingFrequency::EachCall) // This is valid
         {
             SetupOutputVariable(state,
@@ -4326,8 +4336,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                                 VariableTypeKey,
                                 KeyedValue,
                                 "DETAILED",
-                                Constant::eResourceNames[static_cast<int>(ResourceTypeKey)], // or eResourceNamesUC
-                                OutputProcessor::endUseCategoryNames[static_cast<int>(EndUseKey)],
+                                locResourceTypeKey,
+                                locEndUseKey,
                                 EndUseSubKey,
                                 GroupKey,
                                 ZoneKey,
@@ -4345,8 +4355,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                                 VariableTypeKey,
                                 KeyedValue,
                                 OutputProcessor::ReportingFrequencyNames[static_cast<int>(ReportFreq)],
-                                Constant::eResourceNames[static_cast<int>(ResourceTypeKey)], // or eResourceNamesUC
-                                OutputProcessor::endUseCategoryNames[static_cast<int>(EndUseKey)],
+                                locResourceTypeKey,
+                                locEndUseKey,
                                 EndUseSubKey,
                                 GroupKey,
                                 ZoneKey,
