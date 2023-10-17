@@ -890,8 +890,6 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue                 // Associated Key for this variable
-                         // std::string_view const ReportFreq = {},           // Internal use -- causes reporting at this freqency
-                         // int const indexGroupKey = -999                    // Group identifier for SQL output
 );
 
 void SetupOutputVariable(EnergyPlusData &state,
