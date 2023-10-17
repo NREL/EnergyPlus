@@ -849,6 +849,15 @@ void SetupOutputVariable(EnergyPlusData &state,
                          Real64 &ActualVariable,                           // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue                 // Associated Key for this variable
+);
+
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,              // String Name of variable (with units)
+                         OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
+                         Real64 &ActualVariable,                           // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                // Associated Key for this variable
                          OutputProcessor::ReportingFrequency ReportFreq,   // Internal use -- causes reporting at this freqency
                          Constant::eResource ResourceTypeKey,              // Meter Resource Type (Electricity, Gas, etc)
@@ -870,7 +879,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                // Associated Key for this variable
-                         std::string_view const ReportFreq = {},           // Internal use -- causes reporting at this freqency
+                         std::string_view const ReportFreq,                // Internal use -- causes reporting at this freqency
                          std::string_view const ResourceTypeKey = {},      // Meter Resource Type (Electricity, Gas, etc)
                          std::string_view const EndUseKey = {},            // Meter End Use Key (Lights, Heating, Cooling, etc)
                          std::string_view const EndUseSubKey = {},         // Meter End Use Sub Key (General Lights, Task Lights, etc)
