@@ -4597,6 +4597,56 @@ void SetupOutputVariable(EnergyPlusData &state,
                          int &ActualVariable,                                    // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue                       // Associated Key for this variable
+)
+{
+    std::string_view ReportFreq = "";
+    SetupOutputVariable(state,
+                        VariableName,    // String Name of variable
+                        VariableUnit,    // Actual units corresponding to the actual variable
+                        ActualVariable,  // Actual Variable, used to set up pointer
+                        TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                        VariableTypeKey, // State, Average=1, NonState, Sum=2
+                        KeyedValue,      // Associated Key for this variable
+                        ReportFreq       // Internal use -- causes reporting at this freqency
+                                         // indexGroupKey // Group identifier for SQL output
+    );
+}
+
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,                    // String Name of variable
+                         OutputProcessor::Unit const VariableUnit,               // Actual units corresponding to the actual variable
+                         int &ActualVariable,                                    // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue,                      // Associated Key for this variable
+                         OutputProcessor::ReportingFrequency const ReportFreq,         // Internal use -- causes reporting at this freqency
+                         int const indexGroupKey                                 // Group identifier for SQL output
+)
+{
+    if (ReportFreq == OutputProcessor::ReportingFrequency::EachCall) // This is valid
+    {
+        SetupOutputVariable(
+            state, VariableName, VariableUnit, ActualVariable, TimeStepTypeKey, VariableTypeKey, KeyedValue, "DETAILED", indexGroupKey);
+    } else {
+        SetupOutputVariable(state,
+                            VariableName,
+                            VariableUnit,
+                            ActualVariable,
+                            TimeStepTypeKey,
+                            VariableTypeKey,
+                            KeyedValue,
+                            OutputProcessor::ReportingFrequencyNames[static_cast<int>(ReportFreq)],
+                            indexGroupKey);
+    }
+}
+
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,                    // String Name of variable
+                         OutputProcessor::Unit const VariableUnit,               // Actual units corresponding to the actual variable
+                         int &ActualVariable,                                    // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                      // Associated Key for this variable
                          std::string_view const ReportFreq,                      // Internal use -- causes reporting at this freqency
                          int const indexGroupKey                                 // Group identifier for SQL output

@@ -889,8 +889,30 @@ void SetupOutputVariable(EnergyPlusData &state,
                          int &ActualVariable,                              // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue                 // Associated Key for this variable
+                         // std::string_view const ReportFreq = {},           // Internal use -- causes reporting at this freqency
+                         // int const indexGroupKey = -999                    // Group identifier for SQL output
+);
+
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,              // String Name of variable
+                         OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
+                         int &ActualVariable,                              // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                // Associated Key for this variable
-                         std::string_view const ReportFreq = {},           // Internal use -- causes reporting at this freqency
+                         OutputProcessor::ReportingFrequency ReportFreq,   // Internal use -- causes reporting at this freqency
+                         int const indexGroupKey = -999                    // Group identifier for SQL output
+);
+
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,              // String Name of variable
+                         OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
+                         int &ActualVariable,                              // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue,                // Associated Key for this variable
+                         std::string_view const ReportFreq,                // Internal use -- causes reporting at this freqency
                          int const indexGroupKey = -999                    // Group identifier for SQL output
 );
 
