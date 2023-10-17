@@ -4313,13 +4313,13 @@ void SetupOutputVariable(EnergyPlusData &state,
     std::string locResourceTypeKey = "";
     std::string locEndUseKey = "";
 
-    if (EndUseKey == Constant::EndUse::Invalid) {
-        // Severe warning message
-        ShowSevereError(state, "Invalid End Use Category Type.");
-    } else if (ResourceTypeKey == Constant::eResource::Invalid) {
+    if (ResourceTypeKey == Constant::eResource::Invalid) {
         ShowSevereError(state, "Invalid Resource Type.");
     } else if (ResourceTypeKey == Constant::eResource::Num) {
         locResourceTypeKey = "";
+    } else if (EndUseKey == Constant::EndUse::Invalid) {
+        // Severe warning message
+        ShowSevereError(state, "Invalid End Use Category Type.");
     } else if (EndUseKey == Constant::EndUse::Num) {
         locEndUseKey = "";
     } else {
