@@ -50,25 +50,35 @@
 
 using namespace EnergyPlus;
 
-void EnergyPlusLogger::error(const std::string_view message)
-{
-    const std::pair<EnergyPlusData *, std::string> &contextPair = *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
-    std::string fullMessage = fmt::format("{}: {}", contextPair.second, message);
-    ShowSevereError(*contextPair.first, fullMessage);
+EnergyPlusLogger::EnergyPlusLogger(log_level minimum_level_to_log)
+        : Courierr::Courierr(), minimum_level(minimum_level_to_log) {}
+
+void EnergyPlusLogger::error(const std::string_view message) {
+    if (log_level::error >= minimum_level) {
+        const std::pair<EnergyPlusData *, std::string> &contextPair = *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
+        std::string fullMessage = fmt::format("{}: {}", contextPair.second, message);
+        ShowSevereError(*contextPair.first, fullMessage);
+    }
 }
-void EnergyPlusLogger::warning(const std::string_view message)
-{
-    const std::pair<EnergyPlusData *, std::string> &contextPair = *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
-    std::string fullMessage = fmt::format("{}: {}", contextPair.second, message);
-    ShowWarningError(*contextPair.first, fullMessage);
+
+void EnergyPlusLogger::warning(const std::string_view message) {
+    if (log_level::warning >= minimum_level) {
+        const std::pair<EnergyPlusData *, std::string> &contextPair = *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
+        std::string fullMessage = fmt::format("{}: {}", contextPair.second, message);
+        ShowWarningError(*contextPair.first, fullMessage);
+    }
 }
-void EnergyPlusLogger::info(const std::string_view message)
-{
-    const std::pair<EnergyPlusData *, std::string> &contextPair = *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
-    std::string fullMessage = fmt::format("{}: {}", contextPair.second, message);
-    ShowMessage(*contextPair.first, fullMessage);
+
+void EnergyPlusLogger::info(const std::string_view message) {
+    if (log_level::info >= minimum_level) {
+        const std::pair<EnergyPlusData *, std::string> &contextPair = *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
+        std::string fullMessage = fmt::format("{}: {}", contextPair.second, message);
+        ShowMessage(*contextPair.first, fullMessage);
+    }
 }
-void EnergyPlusLogger::debug(const std::string_view message)
-{
-    info(message);
+
+void EnergyPlusLogger::debug(const std::string_view message) {
+    if (log_level::debug >= minimum_level) {
+        info(message);
+    }
 }

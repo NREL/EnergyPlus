@@ -494,7 +494,7 @@ void GetShadowingInput(EnergyPlusData &state)
             state.dataIPShortCut->cAlphaArgs(aNum) = "PolygonClipping";
 #else
             if (Penumbra::Penumbra::is_valid_context()) {
-                std::shared_ptr<EnergyPlusLogger> penumbra_logger = std::make_shared<EnergyPlusLogger>();
+                std::shared_ptr<EnergyPlusLogger> penumbra_logger = std::make_shared<EnergyPlusLogger>(EnergyPlusLogger::log_level::info);
                 state.dataSolarShading->LoggerContext = std::make_pair<EnergyPlusData *, std::string>(&state, "");
                 penumbra_logger->set_message_context(&state.dataSolarShading->LoggerContext);
                 state.dataSolarShading->penumbra = std::make_unique<Penumbra::Penumbra>(pixelRes, penumbra_logger);
