@@ -55,7 +55,7 @@ class EnergyPlusLogger : public Courierr::Courierr
 public:
     enum class Log_level
     {
-        Invalid = 0,
+        Invalid = -1,
         Debug,
         Info,
         Warning,
