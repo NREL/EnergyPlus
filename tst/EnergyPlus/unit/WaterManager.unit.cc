@@ -315,7 +315,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
 
 TEST_F(EnergyPlusFixture, WaterManager_MainsWater_Meter_Test)
 {
-    // Test for #10235: A mainswater meter with a blank Water Quality Subcategory 
+    // Test for #10235: A mainswater meter with a blank Water Quality Subcategory
     // should add a "General" mainswater meter
     std::string const idf_objects = delimited_string({
 

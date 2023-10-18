@@ -474,54 +474,98 @@ Current resource types are shown in the table below:
 
 % table 38
 \begin{longtable}[c]{@{}l@{}}
-\caption{Table of Metered Resource  Types \label{table:table-of-metered-resource-types}} \tabularnewline
-\toprule
-Utility/Fuel Types \tabularnewline
-\midrule
-\endfirsthead
-
-\caption[]{Table of Metered Resource  Types} \tabularnewline
-\toprule
-Utility/Fuel Types \tabularnewline
-\midrule
-\endhead
-
-Electricity \tabularnewline
-NaturalGas \tabularnewline
-Gasoline \tabularnewline
-Diesel \tabularnewline
-Coal \tabularnewline
-FuelOilNo1 \tabularnewline
-FuelOilNo2 \tabularnewline
-Propane \tabularnewline
-OtherFuel1 \tabularnewline
-OtherFuel2 \tabularnewline
-DistrictCooling \tabularnewline
-DistrictHeatingWater \tabularnewline
-DistrictHeatingSteam \tabularnewline
-Water \tabularnewline
-\bottomrule
+	\caption{Table of Metered Resource Types---Fuels \label{table:table-of-metered-resource-types}} \tabularnewline
+	\toprule
+	Utility/Fuel Resource Types \tabularnewline
+	\midrule
+	\endfirsthead
+	
+	\caption[]{Table of Metered Resource Types---Fuels \label{table:table-of-metered-resource-types-Fuels}} \tabularnewline
+	\toprule
+	Utility/Fuel Resource Types \tabularnewline
+	\midrule
+	\endhead
+	
+	Electricity \tabularnewline
+	NaturalGas \tabularnewline
+	Gasoline \tabularnewline
+	Diesel \tabularnewline
+	Coal \tabularnewline
+	FuelOilNo1 \tabularnewline
+	FuelOilNo2 \tabularnewline
+	Propane \tabularnewline
+	OtherFuel1 \tabularnewline
+	OtherFuel2 \tabularnewline
+	DistrictCooling \tabularnewline
+	DistrictHeatingWater \tabularnewline
+	DistrictHeatingSteam \tabularnewline
+	Water \tabularnewline
+	\bottomrule
 \end{longtable}
 
 \begin{longtable}[c]{@{}l@{}}
-\toprule
-Other Resource Types \tabularnewline
-\midrule
-\endfirsthead
+	\caption{Table of Metered Resource Types---Pollutants \label{table:table-of-metered-resource-types-pollutants}} \tabularnewline
+	\toprule
+	Pollutant Resource Types \tabularnewline
+	\midrule
+	\endfirsthead
+	
+	\caption[]{Table of Metered Resource Types---Pollutants} \tabularnewline
+	\toprule
+	Pollutant Resource Types \tabularnewline
+	\midrule
+	\endhead
+	
+	SO2 \tabularnewline
+	NOx \tabularnewline
+	N2O \tabularnewline
+	PM \tabularnewline
+	PM2{\textunderscore}5 \tabularnewline
+	PM10 \tabularnewline
+	CO \tabularnewline
+	CO2 \tabularnewline
+	CH4 \tabularnewline
+	NH3 \tabularnewline
+	NMVOC \tabularnewline
+	Hg \tabularnewline
+	Pb \tabularnewline
+	NuclearHigh \tabularnewline
+	NuclearLow \tabularnewline
+	\bottomrule
+\end{longtable}
+	
+\begin{longtable}[c]{@{}l@{}}
+	\caption{Table of Metered Resource Types---Others \label{table:table-of-metered-resource-types-others}} \tabularnewline
+	\toprule
+	Pollutant Resource Types \tabularnewline
+	\midrule
+	\endfirsthead
 
-\toprule
-Other Resource Types \tabularnewline
-\midrule
-\endhead
-
-EnergyTransfer \tabularnewline
-$cdots$ \tabularnewline
-ElectricityProduced \tabularnewline
-ElectricityPurchased \tabularnewline
-ElectricitySurplusSold \tabularnewline
-ElectricityNet \tabularnewline
-$\cdots$ \tabularnewline
-\bottomrule
+	\caption[]{Table of Metered Resource Types---Others} \tabularnewline
+	\toprule
+	Other Resource Types \tabularnewline
+	\midrule
+	\endhead
+	
+	EnergyTransfer \tabularnewline
+	ElectricityProduced \tabularnewline
+	ElectricityPurchased \tabularnewline
+	ElectricitySurplusSold \tabularnewline
+	ElectricityNet \tabularnewline
+	SolarWater \tabularnewline
+	SolarAir \tabularnewline
+	CarbonEquivalent \tabularnewline
+	PlantLoopHeatingDemand \tabularnewline
+	PlantLoopCoolingDemand \tabularnewline
+	OnSiteWater \tabularnewline
+	MainsWater \tabularnewline
+	RainWater \tabularnewline
+	WellWater \tabularnewline
+	Condensate \tabularnewline
+	WaterEnvironmentalFactors \tabularnewline
+	Source \tabularnewline
+	Generic \tabularnewline
+	\bottomrule
 \end{longtable}
 
 The end use types are shown in the following table (note that certain end use types apply only to the EnergyTransfer resource):
@@ -615,7 +659,7 @@ Facility = \sum {\left( {Building + HVAC + Plant + Exterior} \right)}
 Building = \sum\limits_1^{NumberOfZones} {Zone} = \sum\limits_1^{NumberOfSpaceTypes} {SpaceType}
 \end{equation}
 
-There are also some special purpose meters used to describe electricity resource flows in greater detail.~ Electricity metering is tracked in more detail to accommodate the complexities of onsite electricity generation.~ There are three variations on the electricity resource type including:~ (1) ``ElectrictyProduced'' which is the quantity of electricity generated onsite and is always positive, (2) ``ElectrictyPurchased'' which is the quantity of electricity purchased and is always positive, (3) ``ElectricitySold'' which is the quantity of electricity exported by the building, that which is typically ``sold'' back to the power company, and is always positive, and (4) ``ElectricityNet'' which is the net electricity demand considering all sources of onsite generation and demand and can be either positive or negative.
+There are also some special purpose meters used to describe electricity resource flows in greater detail.~ Electricity metering is tracked in more detail to accommodate the complexities of onsite electricity generation.~ There are three variations on the electricity resource type including:~ (1) ``ElectrictyProduced'' which is the quantity of electricity generated onsite and is always non-negative (zero or positive), (2) ``ElectrictyPurchased'' which is the quantity of electricity purchased and is always non-negative (zero or positive), (3) ``ElectricitySold'' which is the quantity of electricity exported by the building, that which is typically ``sold'' back to the power company, and is always non-negative (zero or positive), and (4) ``ElectricityNet'' which is the net electricity demand considering all sources of onsite generation and demand and can be either positive or negative (or zero).
 
 \subsubsection{Field: Reporting Frequency}\label{field-reporting-frequency-1}
 
@@ -657,24 +701,28 @@ Users will enter environmental impact factors for each Fuel Type or FuelFactor. 
 The energy is obtained internally from the following facility meters:
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule
-%Electricity:Facility & Diesel:Facility \tabularnewline
-%\midrule
-%\endfirsthead
-%
-%\toprule
-%Electricity:Facility & Diesel:Facility \tabularnewline
-%\midrule
-%\endhead
-%
-Electricity:Facility & Diesel:Facility \tabularnewline
-DistrictCooling:Facility & DistrictHeatingWater:Facility \tabularnewline
-NaturalGas:Facility & Gasoline:Facility \tabularnewline
-Coal:Facility & FuelOilNo1:Facility \tabularnewline
-FuelOilNo2:Facility & Propane:Facility \tabularnewline
-ElectricityProduced:Facility & Steam:Facility \tabularnewline
-OtherFuel1:Facility & OtherFuel2:Facility \tabularnewline
-\bottomrule
+	\caption{Facility Meters \label{table:facility-meters}} \tabularnewline
+	\toprule
+	%Electricity:Facility & Diesel:Facility \tabularnewline
+	Facility Meters & \tabularnewline
+	\midrule
+	\endfirsthead
+
+	\caption[]{Facility Meters} \tabularnewline
+	\toprule
+	%Electricity:Facility & Diesel:Facility \tabularnewline
+	Facility Meters & \tabularnewline
+	\midrule
+	\endhead
+
+	Electricity:Facility & Diesel:Facility \tabularnewline
+	DistrictCooling:Facility & DistrictHeatingWater:Facility \tabularnewline
+	NaturalGas:Facility & Gasoline:Facility \tabularnewline
+	Coal:Facility & FuelOilNo1:Facility \tabularnewline
+	FuelOilNo2:Facility & Propane:Facility \tabularnewline
+	ElectricityProduced:Facility & DistrictHeatingSteam:Facility \tabularnewline
+	OtherFuel1:Facility & OtherFuel2:Facility \tabularnewline
+	\bottomrule
 \end{longtable}
 
 For the pollutant calculation only the total off-site or purchased electric energy is calculated using Electricity Factors. Off-Site Electricity = Electricity:Facility - ElectricityProduced:Facility, pollutants for the fuel type used by the on-site generator will be calculated, for example Diesel, in these cases.
