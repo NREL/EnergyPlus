@@ -50,11 +50,11 @@
 
 using namespace EnergyPlus;
 
-EnergyPlusLogger::EnergyPlusLogger(log_level minimum_level_to_log)
+EnergyPlusLogger::EnergyPlusLogger(Log_level minimum_level_to_log)
         : Courierr::Courierr(), minimum_level(minimum_level_to_log) {}
 
 void EnergyPlusLogger::error(const std::string_view message) {
-    if (log_level::error >= minimum_level) {
+    if (Log_level::Error >= minimum_level) {
         const std::pair<EnergyPlusData *, std::string> &contextPair = *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
         std::string fullMessage = fmt::format("{}: {}", contextPair.second, message);
         ShowSevereError(*contextPair.first, fullMessage);
@@ -62,7 +62,7 @@ void EnergyPlusLogger::error(const std::string_view message) {
 }
 
 void EnergyPlusLogger::warning(const std::string_view message) {
-    if (log_level::warning >= minimum_level) {
+    if (Log_level::Warning >= minimum_level) {
         const std::pair<EnergyPlusData *, std::string> &contextPair = *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
         std::string fullMessage = fmt::format("{}: {}", contextPair.second, message);
         ShowWarningError(*contextPair.first, fullMessage);
@@ -70,7 +70,7 @@ void EnergyPlusLogger::warning(const std::string_view message) {
 }
 
 void EnergyPlusLogger::info(const std::string_view message) {
-    if (log_level::info >= minimum_level) {
+    if (Log_level::Info >= minimum_level) {
         const std::pair<EnergyPlusData *, std::string> &contextPair = *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
         std::string fullMessage = fmt::format("{}: {}", contextPair.second, message);
         ShowMessage(*contextPair.first, fullMessage);
@@ -78,7 +78,7 @@ void EnergyPlusLogger::info(const std::string_view message) {
 }
 
 void EnergyPlusLogger::debug(const std::string_view message) {
-    if (log_level::debug >= minimum_level) {
+    if (Log_level::Debug >= minimum_level) {
         info(message);
     }
 }

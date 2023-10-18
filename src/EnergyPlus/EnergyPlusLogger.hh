@@ -53,15 +53,24 @@
 class EnergyPlusLogger : public Courierr::Courierr
 {
 public:
-    enum class log_level { debug = 0, info, warning, error };
+    enum class Log_level
+    {
+        Invalid = 0,
+        Debug,
+        Info,
+        Warning,
+        Error,
+        Num
+    };
 
-    EnergyPlusLogger(log_level maximum_level_to_log = log_level::warning);
+    EnergyPlusLogger(Log_level maximum_level_to_log = Log_level::Warning);
     void error(const std::string_view message) override;
     void warning(const std::string_view message) override;
     void info(const std::string_view message) override;
     void debug(const std::string_view message) override;
+
 private:
-    log_level minimum_level {log_level::warning};
+    Log_level minimum_level{Log_level::Warning};
 };
 
 #endif // ENERGYPLUSLOGGER_HH_INCLUDED
