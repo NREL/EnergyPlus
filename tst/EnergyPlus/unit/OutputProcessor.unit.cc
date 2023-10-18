@@ -6042,9 +6042,9 @@ namespace OutputProcessor {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             "Cool-1",
-                            {},
-                            "ELECTRICITY",
-                            "Cooling",
+                            {}, // OutputProcessor::ReportingFrequency ReportFreq,
+                            Constant::eResource::Electricity,
+                            Constant::EndUse::Cooling,
                             {}, // EndUseSubKey
                             "Plant");
 
@@ -6057,8 +6057,8 @@ namespace OutputProcessor {
                             OutputProcessor::SOVStoreType::Summed,
                             "LIGHTS 1",
                             {},
-                            "Electricity",
-                            "InteriorLights",
+                            Constant::eResource::Electricity,
+                            Constant::EndUse::InteriorLights,
                             "RailroadCrossing", // EndUseSubKey
                             "Building",
                             "SPACE1-1",
@@ -6146,8 +6146,8 @@ namespace OutputProcessor {
 
         std::vector<std::vector<std::string>> reportDataDictionary(
             {{"1", "0", "Avg", "Zone", "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", "Run Period", "", "C"},
-             {"2", "0", "Sum", "System", "HVAC System", "Cool-1", "Chiller Electricity Energy", "Run Period", "", "J"},
-             {"51", "0", "Sum", "Zone", "Zone", "LIGHTS 1", "Lights Electricity Energy", "Run Period", "", "J"},
+             {"2", "0", "Sum", "System", "HVAC System", "Cool-1", "Chiller Electricity Energy", "Zone Timestep", "", "J"},
+             {"51", "0", "Sum", "Zone", "Zone", "LIGHTS 1", "Lights Electricity Energy", "Zone Timestep", "", "J"},
              {"124", "0", "Sum", "System", "HVAC System", "Site", "Environmental Impact Fuel Oil No 2 CO2 Emissions Mass", "Run Period", "", "kg"}});
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
     }
