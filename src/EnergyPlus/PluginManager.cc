@@ -201,7 +201,7 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                         sUpdateFreq,
                                         sAvgOrSum,
                                         thisObjectName,
-                                        {},
+                                        "",
                                         {},
                                         {},
                                         {},
