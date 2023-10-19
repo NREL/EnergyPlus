@@ -6020,6 +6020,8 @@ namespace OutputProcessor {
             "Output:Variable,*,Chiller Electricity Energy,runperiod;",
             "Output:Variable,*,Lights Electricity Energy,runperiod;",
             "Output:Variable,*,Environmental Impact Fuel Oil No 2 CO2 Emissions Mass,runperiod;",
+            "Output:Variable,*,Chiller Electricity Energy,hourly;",
+            "Output:Variable,*,Lights Electricity Energy,timestep;",
         });
 
         ASSERT_TRUE(process_idf(idf_objects));
@@ -6147,11 +6149,12 @@ namespace OutputProcessor {
         std::vector<std::vector<std::string>> reportDataDictionary(
             {{"1", "0", "Avg", "Zone", "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", "Run Period", "", "C"},
              {"2", "0", "Sum", "System", "HVAC System", "Cool-1", "Chiller Electricity Energy", "Run Period", "", "J"},
-             {"51", "0", "Sum", "Zone", "Zone", "LIGHTS 1", "Lights Electricity Energy", "Run Period", "", "J"},
-             {"124", "0", "Sum", "System", "HVAC System", "Site", "Environmental Impact Fuel Oil No 2 CO2 Emissions Mass", "Run Period", "", "kg"}});
+             {"51", "0", "Sum", "System", "HVAC System", "Cool-1", "Chiller Electricity Energy", "Hourly", "", "J"},
+             {"52", "0", "Sum", "Zone", "Zone", "LIGHTS 1", "Lights Electricity Energy", "Run Period", "", "J"},
+             {"125", "0", "Sum", "Zone", "Zone", "LIGHTS 1", "Lights Electricity Energy", "Zone Timestep", "", "J"},
+             {"126", "0", "Sum", "System", "HVAC System", "Site", "Environmental Impact Fuel Oil No 2 CO2 Emissions Mass", "Run Period", "", "kg"}});
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
     }
-
 } // namespace OutputProcessor
 
 } // namespace EnergyPlus
