@@ -6046,7 +6046,7 @@ namespace OutputProcessor {
                             eResourceSOV::Electricity,
                             EndUseCatSOV::Cooling,
                             {}, // EndUseSubKey
-                            "Plant");
+                            GroupSOV::Plant);
 
         Real64 light_consumption = 0.;
         SetupOutputVariable(*state,
@@ -6060,7 +6060,7 @@ namespace OutputProcessor {
                             eResourceSOV::Electricity,
                             EndUseCatSOV::InteriorLights,
                             "RailroadCrossing", // EndUseSubKey
-                            "Building",
+                            GroupSOV::Building,
                             "SPACE1-1",
                             1,
                             1);
