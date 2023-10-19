@@ -267,12 +267,12 @@ namespace IndoorGreen {
                 ErrorsFound = true;
             }
         }
-        state.dataIPShortCut->cAlphaFieldNames.deallocate();
-        state.dataIPShortCut->cAlphaArgs.deallocate();
-        state.dataIPShortCut->lAlphaFieldBlanks.deallocate();
-        state.dataIPShortCut->cNumericFieldNames.deallocate();
-        state.dataIPShortCut->rNumericArgs.deallocate();
-        state.dataIPShortCut->lNumericFieldBlanks.deallocate();
+        //state.dataIPShortCut->cAlphaFieldNames.deallocate();
+        //state.dataIPShortCut->cAlphaArgs.deallocate();
+        //state.dataIPShortCut->lAlphaFieldBlanks.deallocate();
+        //state.dataIPShortCut->cNumericFieldNames.deallocate();
+        //state.dataIPShortCut->rNumericArgs.deallocate();
+        //state.dataIPShortCut->lNumericFieldBlanks.deallocate();
         // Set up output variables
         for (IndoorGreenNum = 1; IndoorGreenNum <= state.dataIndoorGreen->NumIndoorGreen; ++IndoorGreenNum) {
             SetupOutputVariable(state,
