@@ -843,6 +843,161 @@ namespace OutputProcessor {
 // within the OutputProcessor.
 // *****************************************************************************
 
+enum class ReportFreqSOV
+{
+    EachCall = -1, // Write out each time UpdatedataandReport is called
+    Empty,
+    TimeStep,   // Write out at 'EndTimeStepFlag'
+    Hourly,     // Write out at 'EndHourFlag'
+    Daily,      // Write out at 'EndDayFlag'
+    Monthly,    // Write out at end of month (must be determined)
+    Simulation, // Write out once per environment 'EndEnvrnFlag'
+    Yearly,     // Write out at 'EndYearFlag'
+    Num
+};
+static constexpr std::array<std::string_view, ((int)ReportFreqSOV::Num)> ReporFreqSOVNames = {
+    "", "TIMESTEP", "HOURLY", "DAILY", "MONTHLY", "SIMULATION", "YEARLY"};
+
+enum class eResourceSOV
+{
+    Invalid = -1,
+    Empty,
+    Electricity,
+    NaturalGas,
+    Gasoline,
+    Diesel,
+    Coal,
+    Propane,
+    FuelOilNo1,
+    FuelOilNo2,
+    OtherFuel1,
+    OtherFuel2,
+    DistrictCooling,
+    DistrictHeatingWater,
+    DistrictHeatingSteam,
+    Water,
+    None, // used for OtherEquipment object
+    EnergyTransfer,
+    ElectricityProduced,
+    ElectricityPurchased,
+    ElectricitySurplusSold,
+    ElectricityNet,
+    SolarWater,
+    SolarAir,
+    CarbonEquivalent,
+    PlantLoopHeatingDemand,
+    PlantLoopCoolingDemand,
+    OnSiteWater,
+    MainsWater,
+    RainWater,
+    WellWater,
+    Condensate,
+    WaterEnvironmentalFactors,
+    Source,
+    Generic, // only used by custom meters
+    SO2,
+    NOx,
+    N2O,
+    PM,
+    PM2_5,
+    PM10,
+    CO,
+    CO2,
+    CH4,
+    NH3,
+    NMVOC,
+    Hg,
+    Pb,
+    NuclearHigh,
+    NuclearLow,
+    Num
+};
+static constexpr std::array<std::string_view, static_cast<int>(eResourceSOV::Num)> eResourceSOVNames = {"",
+                                                                                                        "Electricity",
+                                                                                                        "NaturalGas",
+                                                                                                        "Gasoline",
+                                                                                                        "Diesel",
+                                                                                                        "Coal",
+                                                                                                        "Propane",
+                                                                                                        "FuelOilNo1",
+                                                                                                        "FuelOilNo2",
+                                                                                                        "OtherFuel1",
+                                                                                                        "OtherFuel2",
+                                                                                                        "DistrictCooling",
+                                                                                                        "DistrictHeatingWater",
+                                                                                                        "DistrictHeatingSteam",
+                                                                                                        "Water",
+                                                                                                        "None",
+                                                                                                        "EnergyTransfer",
+                                                                                                        "ElectricityProduced",
+                                                                                                        "ElectricityPurchased",
+                                                                                                        "ElectricitySurplusSold",
+                                                                                                        "ElectricityNet",
+                                                                                                        "SolarWater",
+                                                                                                        "SolarAir",
+                                                                                                        "Carbon Equivalent",
+                                                                                                        "PlantLoopHeatingDemand",
+                                                                                                        "PlantLoopCoolingDemand",
+                                                                                                        "OnSiteWater",
+                                                                                                        "MainsWater",
+                                                                                                        "RainWater",
+                                                                                                        "WellWater",
+                                                                                                        "Condensate",
+                                                                                                        "WaterEnvironmentalFactors",
+                                                                                                        "Source",
+                                                                                                        "Generic",
+                                                                                                        "SO2",
+                                                                                                        "NOx",
+                                                                                                        "N2O",
+                                                                                                        "PM",
+                                                                                                        "PM2.5",
+                                                                                                        "PM10",
+                                                                                                        "CO",
+                                                                                                        "CO2",
+                                                                                                        "CH4",
+                                                                                                        "NH3",
+                                                                                                        "NMVOC",
+                                                                                                        "Hg",
+                                                                                                        "Pb",
+                                                                                                        "Nuclear High",
+                                                                                                        "Nuclear Low"};
+
+enum class EndUseCatSOV
+{
+    Invalid = -1,
+    Empty,
+    Heating,
+    Cooling,
+    InteriorLights,
+    ExteriorLights,
+    InteriorEquipment,
+    ExteriorEquipment,
+    Fans,
+    Pumps,
+    HeatRejection,
+    Humidification,
+    HeatRecovery,
+    WaterSystem,
+    Refrigeration,
+    Cogeneration,
+    Num
+};
+static constexpr std::array<std::string_view, (int)EndUseCatSOV::Num> endUseCatSOVNames = {"",
+                                                                                           "HEATING",
+                                                                                           "COOLING",
+                                                                                           "INTERIORLIGHTS",
+                                                                                           "EXTERIORLIGHTS",
+                                                                                           "INTERIOREQUIPMENT",
+                                                                                           "EXTERIOREQUIPMENT",
+                                                                                           "FANS",
+                                                                                           "PUMPS",
+                                                                                           "HEATREJECTION",
+                                                                                           "HUMIDIFIER",
+                                                                                           "HEATRECOVERY",
+                                                                                           "WATERSYSTEMS",
+                                                                                           "REFRIGERATION",
+                                                                                           "COGENERATION"};
+
 void SetupOutputVariable(EnergyPlusData &state,
                          std::string_view const VariableName,              // String Name of variable (with units)
                          OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
