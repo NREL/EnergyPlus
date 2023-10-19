@@ -1033,7 +1033,7 @@ static constexpr std::array<std::string_view, (int)EndUseCatSOV::Num> endUseCatS
     "HEATRECOVERY",
     "WATERSYSTEMS",
     "REFRIGERATION",
-    "COGENERATION"
+    "COGENERATION",
     "BASEBOARD",
     "BOILERS",
     "CARBONEQUIVALENTEMISSIONS",
