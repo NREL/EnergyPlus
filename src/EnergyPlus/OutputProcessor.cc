@@ -4328,25 +4328,19 @@ void SetupOutputVariable(EnergyPlusData &state,
     if (ResourceTypeKey == eResourceSOV::Invalid || ResourceTypeKey == eResourceSOV::Num) {
         // Fatal error warning message
         ShowFatalError(state, "Invalid Resource Type.");
-    } else if (ResourceTypeKey == eResourceSOV::Empty) {
-        locResourceTypeKey = "";
     } else {
-        locResourceTypeKey = eResourceSOVNames[static_cast<int>(ResourceTypeKey)]; // or eResourceNamesUC
+        locResourceTypeKey = eResourceSOVNames[static_cast<int>(ResourceTypeKey)];
     }
 
     if (EndUseKey == EndUseCatSOV::Invalid || EndUseKey == EndUseCatSOV::Num) {
         // Fatal error warning message
-        ShowFatalError(state, "Invalid End Use Category Type.");
-    } else if (EndUseKey == EndUseCatSOV::Empty) {
-        locEndUseKey = "";
+        ShowFatalError(state, "Invalid End Use Category.");
     } else {
         locEndUseKey = endUseCatSOVNames[static_cast<int>(EndUseKey)];
     }
 
     if (GroupKey == GroupSOV::Invalid || GroupKey == GroupSOV::Num) {
         ShowFatalError(state, "Invalid Group Type.");
-    } else if (GroupKey == GroupSOV::Empty) {
-        locGroupKey = "";
     } else {
         locGroupKey = GroupSOVNames[static_cast<int>(GroupKey)];
     }
