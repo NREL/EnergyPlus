@@ -4297,9 +4297,9 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                // Associated Key for this variable
-                         OutputProcessor::ReportingFrequency ReportFreq,   // Internal use -- causes reporting at this freqency
-                         Constant::eResource ResourceTypeKey,              // Meter Resource Type (Electricity, Gas, etc)
-                         Constant::EndUse EndUseKey,                       // Meter End Use Key (Lights, Heating, Cooling, etc)
+                         ReportFreqSOV ReportFreq,                         // Internal use -- causes reporting at this freqency
+                         eResourceSOV ResourceTypeKey,                     // Meter Resource Type (Electricity, Gas, etc)
+                         EndUseCatSOV EndUseKey,                           // Meter End Use Key (Lights, Heating, Cooling, etc)
                          std::string_view const EndUseSubKey,              // Meter End Use Sub Key (General Lights, Task Lights, etc)
                          std::string_view const GroupKey,                  // Meter Super Group Key (Building, System, Plant)
                          std::string_view const ZoneKey,                   // Meter Zone Key (zone name)
@@ -4313,21 +4313,21 @@ void SetupOutputVariable(EnergyPlusData &state,
     std::string locResourceTypeKey = "";
     std::string locEndUseKey = "";
 
-    if (ResourceTypeKey == Constant::eResource::Invalid) {
+    if (ResourceTypeKey == eResourceSOV::Invalid || ResourceTypeKey == eResourceSOV::Num) {
         // Fatal error warning message
         ShowFatalError(state, "Invalid Resource Type.");
-    } else if (ResourceTypeKey == Constant::eResource::Num) {
+    } else if (ResourceTypeKey == eResourceSOV::Empty) {
         locResourceTypeKey = "";
-    } else if (EndUseKey == Constant::EndUse::Invalid) {
+    } else if (EndUseKey == EndUseCatSOV::Invalid || EndUseKey == EndUseCatSOV::Num) {
         // Fatal error warning message
         ShowFatalError(state, "Invalid End Use Category Type.");
-    } else if (EndUseKey == Constant::EndUse::Num) {
+    } else if (EndUseKey == EndUseCatSOV::Empty) {
         locEndUseKey = "";
     } else {
-        locResourceTypeKey = Constant::eResourceNames[static_cast<int>(ResourceTypeKey)]; // or eResourceNamesUC
-        locEndUseKey = OutputProcessor::endUseCategoryNames[static_cast<int>(EndUseKey)];
+        locResourceTypeKey = eResourceSOVNames[static_cast<int>(ResourceTypeKey)]; // or eResourceNamesUC
+        locEndUseKey = endUseCatSOVNames[static_cast<int>(EndUseKey)];
 
-        if (ReportFreq == OutputProcessor::ReportingFrequency::EachCall) // This is valid
+        if (ReportFreq == ReportFreqSOV::EachCall) // This is valid
         {
             SetupOutputVariable(state,
                                 VariableName,

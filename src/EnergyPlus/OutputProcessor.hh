@@ -1008,23 +1008,23 @@ void SetupOutputVariable(EnergyPlusData &state,
 );
 
 void SetupOutputVariable(EnergyPlusData &state,
-                         std::string_view const VariableName,                            // String Name of variable (with units)
-                         OutputProcessor::Unit VariableUnit,                             // Actual units corresponding to the actual variable
-                         Real64 &ActualVariable,                                         // Actual Variable, used to set up pointer
-                         OutputProcessor::SOVTimeStepType TimeStepTypeKey,               // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         OutputProcessor::SOVStoreType VariableTypeKey,                  // State, Average=1, NonState, Sum=2
-                         std::string_view const KeyedValue,                              // Associated Key for this variable
-                         OutputProcessor::ReportingFrequency ReportFreq,                 // Internal use -- causes reporting at this freqency
-                         Constant::eResource ResourceTypeKey = Constant::eResource::Num, // Meter Resource Type (Electricity, Gas, etc)
-                         Constant::EndUse EndUseKey = Constant::EndUse::Num,             // Meter End Use Key (Lights, Heating, Cooling, etc)
-                         std::string_view const EndUseSubKey = {},                       // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                         std::string_view const GroupKey = {},                           // Meter Super Group Key (Building, System, Plant)
-                         std::string_view const ZoneKey = {},                            // Meter Zone Key (zone name)
-                         int const ZoneMult = 1,                                         // Zone Multiplier, defaults to 1
-                         int const ZoneListMult = 1,                                     // Zone List Multiplier, defaults to 1
-                         int const indexGroupKey = -999,                                 // Group identifier for SQL output
-                         std::string_view const customUnitName = {},                     // the custom name for the units from EMS definition of units
-                         std::string_view const SpaceType = {}                           // Space type (applicable for Building group only)
+                         std::string_view const VariableName,                // String Name of variable (with units)
+                         OutputProcessor::Unit VariableUnit,                 // Actual units corresponding to the actual variable
+                         Real64 &ActualVariable,                             // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType TimeStepTypeKey,   // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType VariableTypeKey,      // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue,                  // Associated Key for this variable
+                         ReportFreqSOV ReportFreq,                           // Internal use -- causes reporting at this freqency
+                         eResourceSOV ResourceTypeKey = eResourceSOV::Empty, // Meter Resource Type (Electricity, Gas, etc)
+                         EndUseCatSOV EndUseKey = EndUseCatSOV::Empty,       // Meter End Use Key (Lights, Heating, Cooling, etc)
+                         std::string_view const EndUseSubKey = {},           // Meter End Use Sub Key (General Lights, Task Lights, etc)
+                         std::string_view const GroupKey = {},               // Meter Super Group Key (Building, System, Plant)
+                         std::string_view const ZoneKey = {},                // Meter Zone Key (zone name)
+                         int const ZoneMult = 1,                             // Zone Multiplier, defaults to 1
+                         int const ZoneListMult = 1,                         // Zone List Multiplier, defaults to 1
+                         int const indexGroupKey = -999,                     // Group identifier for SQL output
+                         std::string_view const customUnitName = {},         // the custom name for the units from EMS definition of units
+                         std::string_view const SpaceType = {}               // Space type (applicable for Building group only)
 );
 
 void SetupOutputVariable(EnergyPlusData &state,
