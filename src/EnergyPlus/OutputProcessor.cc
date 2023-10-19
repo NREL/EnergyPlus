@@ -4301,7 +4301,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          eResourceSOV ResourceTypeKey,                     // Meter Resource Type (Electricity, Gas, etc)
                          EndUseCatSOV EndUseKey,                           // Meter End Use Key (Lights, Heating, Cooling, etc)
                          std::string_view const EndUseSubKey,              // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                         std::string_view const GroupKey,                  // Meter Super Group Key (Building, System, Plant)
+                         GroupSOV GroupKey,                                // Meter Super Group Key (Building, System, Plant)
                          std::string_view const ZoneKey,                   // Meter Zone Key (zone name)
                          int const ZoneMult,                               // Zone Multiplier, defaults to 1
                          int const ZoneListMult,                           // Zone List Multiplier, defaults to 1
@@ -4310,64 +4310,65 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string_view const SpaceType                  // Space type (applicable for Building group only)
 )
 {
+    std::string locReportFreq = "";
     std::string locResourceTypeKey = "";
     std::string locEndUseKey = "";
+    std::string locGroupKey = "";
+
+    if (ReportFreq == ReportFreqSOV::Num) {
+        // Fatal error warning message
+        ShowFatalError(state, "Invalid Resource Type.");
+    } else if (ReportFreq == ReportFreqSOV::EachCall) // This is valid
+    {
+        locReportFreq = "DETAILED";
+    } else {
+        locReportFreq = ReporFreqSOVNames[static_cast<int>(ReportFreq)];
+    }
 
     if (ResourceTypeKey == eResourceSOV::Invalid || ResourceTypeKey == eResourceSOV::Num) {
         // Fatal error warning message
         ShowFatalError(state, "Invalid Resource Type.");
     } else if (ResourceTypeKey == eResourceSOV::Empty) {
         locResourceTypeKey = "";
-    } else if (EndUseKey == EndUseCatSOV::Invalid || EndUseKey == EndUseCatSOV::Num) {
+    } else {
+        locResourceTypeKey = eResourceSOVNames[static_cast<int>(ResourceTypeKey)]; // or eResourceNamesUC
+    }
+
+    if (EndUseKey == EndUseCatSOV::Invalid || EndUseKey == EndUseCatSOV::Num) {
         // Fatal error warning message
         ShowFatalError(state, "Invalid End Use Category Type.");
     } else if (EndUseKey == EndUseCatSOV::Empty) {
         locEndUseKey = "";
     } else {
-        locResourceTypeKey = eResourceSOVNames[static_cast<int>(ResourceTypeKey)]; // or eResourceNamesUC
         locEndUseKey = endUseCatSOVNames[static_cast<int>(EndUseKey)];
-
-        if (ReportFreq == ReportFreqSOV::EachCall) // This is valid
-        {
-            SetupOutputVariable(state,
-                                VariableName,
-                                VariableUnit,
-                                ActualVariable,
-                                TimeStepTypeKey,
-                                VariableTypeKey,
-                                KeyedValue,
-                                "DETAILED",
-                                locResourceTypeKey,
-                                locEndUseKey,
-                                EndUseSubKey,
-                                GroupKey,
-                                ZoneKey,
-                                ZoneMult,
-                                ZoneListMult,
-                                indexGroupKey,
-                                customUnitName,
-                                SpaceType);
-        } else {
-            SetupOutputVariable(state,
-                                VariableName,
-                                VariableUnit,
-                                ActualVariable,
-                                TimeStepTypeKey,
-                                VariableTypeKey,
-                                KeyedValue,
-                                ReporFreqSOVNames[static_cast<int>(ReportFreq)],
-                                locResourceTypeKey,
-                                locEndUseKey,
-                                EndUseSubKey,
-                                GroupKey,
-                                ZoneKey,
-                                ZoneMult,
-                                ZoneListMult,
-                                indexGroupKey,
-                                customUnitName,
-                                SpaceType);
-        }
     }
+
+    if (GroupKey == GroupSOV::Invalid || GroupKey == GroupSOV::Num) {
+        ShowFatalError(state, "Invalid Group Type.");
+    } else if (GroupKey == GroupSOV::Empty) {
+        locGroupKey = "";
+    } else {
+        locGroupKey = GroupSOVNames[static_cast<int>(GroupKey)];
+    }
+
+    SetupOutputVariable(state,
+                        VariableName,
+                        VariableUnit,
+                        ActualVariable,
+                        TimeStepTypeKey,
+                        VariableTypeKey,
+                        KeyedValue,
+                        locReportFreq,
+                        locResourceTypeKey,
+                        locEndUseKey,
+                        EndUseSubKey,
+                        locGroupKey,
+                        ZoneKey,
+                        ZoneMult,
+                        ZoneListMult,
+                        indexGroupKey,
+                        customUnitName,
+                        SpaceType);
 }
 
 // TODO: Probably move these to a different location

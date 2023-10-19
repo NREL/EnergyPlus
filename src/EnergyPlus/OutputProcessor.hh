@@ -1103,7 +1103,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          eResourceSOV ResourceTypeKey = eResourceSOV::Empty, // Meter Resource Type (Electricity, Gas, etc)
                          EndUseCatSOV EndUseKey = EndUseCatSOV::Empty,       // Meter End Use Key (Lights, Heating, Cooling, etc)
                          std::string_view const EndUseSubKey = {},           // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                         std::string_view const GroupKey = {},               // Meter Super Group Key (Building, System, Plant)
+                         GroupSOV GroupKey = GroupSOV::Empty,                // Meter Super Group Key (Building, System, Plant)
                          std::string_view const ZoneKey = {},                // Meter Zone Key (zone name)
                          int const ZoneMult = 1,                             // Zone Multiplier, defaults to 1
                          int const ZoneListMult = 1,                         // Zone List Multiplier, defaults to 1
