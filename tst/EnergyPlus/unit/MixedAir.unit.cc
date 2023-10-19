@@ -917,10 +917,354 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     state->dataEnvrn->StdRhoAir = 1.2;
     oaController.MixMassFlow = 1.7 * state->dataEnvrn->StdRhoAir;
     oaController.MaxOAMassFlowRate = 1.7 * state->dataEnvrn->StdRhoAir;
-    state->dataAirLoop->AirLoopFlow(1).DesSupply = 1.7;
+    state->dataAirLoop->AirLoopFlow(1).DesSupply = 1.7 * state->dataEnvrn->StdRhoAir;
+
+    // From peeking inside the CO2 limit calcs
+    Real64 zoneCO2Max = 431.08678;
+    Real64 zoneCO2Min = 400.0;
+
+    // Case 1 - Zone CO2 greater than CO2 Max, so OA flow is flow/area+flow/person
+    state->dataContaminantBalance->ZoneAirCO2(1) = 600.0;
+    Real64 expectedOAMassFlow = (oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea +
+                                 oaRequirements.OAFlowPerPerson * state->dataHeatBal->Zone(1).TotOccupants) *
+                                state->dataEnvrn->StdRhoAir;
     oaController.CalcOAController(*state, 1, true);
-    EXPECT_NEAR(0.0194644, oaController.OAMassFlow, 0.00001);
-    EXPECT_NEAR(0.009541, oaController.MinOAFracLimit, 0.00001);
+    EXPECT_NEAR(expectedOAMassFlow, oaController.OAMassFlow, 0.00001);
+    EXPECT_NEAR(expectedOAMassFlow / oaController.MixMassFlow, oaController.MinOAFracLimit, 0.00001);
+
+    // Case 2 - Zone CO2 greater than CO2 Min, so OA flow is flow/area
+    state->dataContaminantBalance->ZoneAirCO2(1) = 200.0;
+    expectedOAMassFlow = oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea * state->dataEnvrn->StdRhoAir;
+    oaController.CalcOAController(*state, 1, true);
+    EXPECT_NEAR(expectedOAMassFlow, oaController.OAMassFlow, 0.00001);
+    EXPECT_NEAR(expectedOAMassFlow / oaController.MixMassFlow, oaController.MinOAFracLimit, 0.00001);
+
+    // Case 3 - Zone CO2 in between CO2 Max and Min, so OA flow is flow/area + proportionate flow/person
+    state->dataContaminantBalance->ZoneAirCO2(1) = zoneCO2Min + 0.3 * (zoneCO2Max - zoneCO2Min);
+    expectedOAMassFlow = (oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea +
+                          0.3 * oaRequirements.OAFlowPerPerson * state->dataHeatBal->Zone(1).TotOccupants) *
+                         state->dataEnvrn->StdRhoAir;
+    oaController.CalcOAController(*state, 1, true);
+    EXPECT_NEAR(expectedOAMassFlow, oaController.OAMassFlow, 0.00001);
+    EXPECT_NEAR(expectedOAMassFlow / oaController.MixMassFlow, oaController.MinOAFracLimit, 0.00001);
+}
+
+TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest3Zone)
+{
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr = 1;
+
+    std::string const idf_objects = delimited_string({
+        "  OutdoorAir:Node,",
+        "    Outside Air Inlet Node; !- Name",
+        "  Schedule:Constant,",
+        "    VentSchedule, !- Name",
+        "     , !- Schedule Type Limits Name",
+        "     1; !- Hourly value",
+        "  Schedule:Constant,",
+        "    ZoneADEffSch, !- Name",
+        "     , !- Schedule Type Limits Name",
+        "     1; !- Hourly value",
+        "  Schedule:Constant,",
+        "    OAFractionSched, !- Name",
+        "     , !- Schedule Type Limits Name",
+        "     1; !- Hourly value",
+        "  Schedule:Constant,",
+        "    CO2AvailSchedule, !- Name",
+        "     , !- Schedule Type Limits Name",
+        "     1.0; !- Hourly value",
+        "People,",
+        "    West Zone People,           !- Name",
+        "    West Zone,                  !- Zone or ZoneList Name",
+        "    OCCUPY-1,                !- Number of People Schedule Name",
+        "    people,                  !- Number of People Calculation Method",
+        "    11,                      !- Number of People",
+        "    ,                        !- People per Zone Floor Area {person/m2}",
+        "    ,                        !- Zone Floor Area per Person {m2/person}",
+        "    0.3,                     !- Fraction Radiant",
+        "    ,                        !- Sensible Heat Fraction",
+        "    ActSchd;                 !- Activity Level Schedule Name",
+        "People,",
+        "    North Zone People,           !- Name",
+        "    North Zone,                  !- Zone or ZoneList Name",
+        "    OCCUPY-1,                !- Number of People Schedule Name",
+        "    people,                  !- Number of People Calculation Method",
+        "    11,                      !- Number of People",
+        "    ,                        !- People per Zone Floor Area {person/m2}",
+        "    ,                        !- Zone Floor Area per Person {m2/person}",
+        "    0.3,                     !- Fraction Radiant",
+        "    ,                        !- Sensible Heat Fraction",
+        "    ActSchd;                 !- Activity Level Schedule Name",
+        "People,",
+        "    East Zone People,           !- Name",
+        "    East Zone,                  !- Zone or ZoneList Name",
+        "    OCCUPY-1,                !- Number of People Schedule Name",
+        "    people,                  !- Number of People Calculation Method",
+        "    11,                      !- Number of People",
+        "    ,                        !- People per Zone Floor Area {person/m2}",
+        "    ,                        !- Zone Floor Area per Person {m2/person}",
+        "    0.3,                     !- Fraction Radiant",
+        "    ,                        !- Sensible Heat Fraction",
+        "    ActSchd;                 !- Activity Level Schedule Name",
+        "Schedule:Compact,",
+        "    OCCUPY-1,                !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: WeekDays SummerDesignDay CustomDay1 CustomDay2,  !- Field 2",
+        "    Until: 8:00, 0.0,        !- Field 4",
+        "    Until: 11:00, 1.00,      !- Field 6",
+        "    Until: 12:00, 0.80,      !- Field 8",
+        "    Until: 13:00, 0.40,      !- Field 10",
+        "    Until: 14:00, 0.80,      !- Field 12",
+        "    Until: 18:00, 1.00,      !- Field 14",
+        "    Until: 19:00, 0.50,      !- Field 16",
+        "    Until: 21:00, 0.10,      !- Field 18",
+        "    Until: 24:00, 0.0,       !- Field 20",
+        "    For: Weekends WinterDesignDay Holiday,  !- Field 21",
+        "    Until: 24:00, 0.0;       !- Field 23",
+        "Schedule:Compact,",
+        "    ActSchd,                 !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00, 117.239997864;",
+        "                             !- Field 4",
+        "  Controller:OutdoorAir,",
+        "    OA Controller 1, !- Name",
+        "    Relief Air Outlet Node, !- Relief Air Outlet Node Name",
+        "    Outdoor Air Mixer Inlet Node, !- Return Air Node Name",
+        "    Mixed Air Node, !- Mixed Air Node Name",
+        "    Outside Air Inlet Node, !- Actuator Node Name",
+        "    0.0, !- Minimum Outdoor Air Flow Rate{ m3 / s }",
+        "    1.7, !- Maximum Outdoor Air Flow Rate{ m3 / s }",
+        "    NoEconomizer, !- Economizer Control Type",
+        "    ModulateFlow, !- Economizer Control Action Type",
+        "    , !- Economizer Maximum Limit Dry - Bulb Temperature{ C }",
+        "    , !- Economizer Maximum Limit Enthalpy{ J / kg }",
+        "    , !- Economizer Maximum Limit Dewpoint Temperature{ C }",
+        "    , !- Electronic Enthalpy Limit Curve Name",
+        "    , !- Economizer Minimum Limit Dry - Bulb Temperature{ C }",
+        "    NoLockout, !- Lockout Type",
+        "    FixedMinimum, !- Minimum Limit Type",
+        "    OAFractionSched, !- Minimum Outdoor Air Schedule Name",
+        "    , !- Minimum Fraction of Outdoor Air Schedule Name",
+        "    , !- Maximum Fraction of Outdoor Air Schedule Name",
+        "    DCVObject;               !- Mechanical Ventilation Controller Name",
+        "  Controller:MechanicalVentilation,",
+        "    DCVObject, !- Name",
+        "    VentSchedule, !- Availability Schedule Name",
+        "    Yes, !- Demand Controlled Ventilation",
+        "    ProportionalControlBasedonDesignOccupancy, !- System Outdoor Air Method",
+        "     , !- Zone Maximum Outdoor Air Fraction{ dimensionless }",
+        "    West Zone, !- Zone 1 Name",
+        "    CM DSOA West Zone, !- Design Specification Outdoor Air Object Name 1",
+        "    CM DSZAD West Zone, !- Design Specification Zone Air Distribution Object Name 1",
+        "    North Zone, !- Zone 2 Name",
+        "    CM DSOA West Zone, !- Design Specification Outdoor Air Object Name 1",
+        "    CM DSZAD West Zone, !- Design Specification Zone Air Distribution Object Name 1",
+        "    East Zone, !- Zone 3 Name",
+        "    CM DSOA West Zone, !- Design Specification Outdoor Air Object Name 1",
+        "    CM DSZAD West Zone; !- Design Specification Zone Air Distribution Object Name 1",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataAirLoop->AirLoopControlInfo.allocate(1);
+    state->dataAirLoop->AirLoopControlInfo(1).LoopFlowRateSet = true;
+    state->dataSize->OARequirements.allocate(1);
+    auto &oaRequirements = state->dataSize->OARequirements(1);
+    oaRequirements.Name = "CM DSOA WEST ZONE";
+    oaRequirements.OAFlowMethod = OAFlowCalcMethod::Sum;
+    oaRequirements.OAFlowPerPerson = 0.003149;
+    oaRequirements.OAFlowPerArea = 0.000407;
+
+    state->dataSize->ZoneAirDistribution.allocate(1);
+    state->dataSize->ZoneAirDistribution(1).Name = "CM DSZAD WEST ZONE";
+    state->dataSize->ZoneAirDistribution(1).ZoneADEffSchPtr = 4;
+
+    state->dataHeatBal->Zone.allocate(3);
+    state->dataHeatBal->Zone(1).Name = "WEST ZONE";
+    state->dataHeatBal->Zone(1).FloorArea = 10.0;
+    state->dataHeatBal->Zone(1).ZoneContamControllerSchedIndex = 4;
+    state->dataHeatBal->Zone(1).numSpaces = 1;
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->Zone(2).Name = "NORTH ZONE";
+    state->dataHeatBal->Zone(2).FloorArea = 10.0;
+    state->dataHeatBal->Zone(2).ZoneContamControllerSchedIndex = 4;
+    state->dataHeatBal->Zone(2).numSpaces = 1;
+    state->dataHeatBal->Zone(2).spaceIndexes.emplace_back(2);
+    state->dataHeatBal->Zone(3).Name = "EAST ZONE";
+    state->dataHeatBal->Zone(3).FloorArea = 10.0;
+    state->dataHeatBal->Zone(3).ZoneContamControllerSchedIndex = 4;
+    state->dataHeatBal->Zone(3).numSpaces = 1;
+    state->dataHeatBal->Zone(3).spaceIndexes.emplace_back(3);
+    state->dataGlobal->NumOfZones = 3;
+    state->dataHeatBal->space.allocate(3);
+    state->dataHeatBal->space(1).Name = "WEST ZONE";
+    state->dataHeatBal->space(1).FloorArea = 10.0;
+    state->dataHeatBal->space(1).zoneNum = 1;
+    state->dataHeatBal->space(2).Name = "NORTH ZONE";
+    state->dataHeatBal->space(2).FloorArea = 10.0;
+    state->dataHeatBal->space(2).zoneNum = 2;
+    state->dataHeatBal->space(3).Name = "EAST ZONE";
+    state->dataHeatBal->space(3).FloorArea = 10.0;
+    state->dataHeatBal->space(3).zoneNum = 3;
+    state->dataGlobal->numSpaces = 3;
+    DataHeatBalance::AllocateIntGains(*state);
+    state->dataAirLoop->AirLoopFlow.allocate(1);
+    state->dataAirLoop->AirLoopFlow(1).OAFrac = 0.01;    // DataAirLoop variable (AirloopHVAC)
+    state->dataAirLoop->AirLoopFlow(1).OAMinFrac = 0.01; // DataAirLoop variable (AirloopHVAC)
+
+    state->dataGlobal->NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    GetOAControllerInputs(*state);
+
+    auto &oaController = state->dataMixedAir->OAController(1);
+    auto &ventMechanical = state->dataMixedAir->VentilationMechanical(1);
+    EXPECT_EQ(SysOAMethod::ProportionalControlDesOcc, ventMechanical.SystemOAMethod);
+    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(*state, oaController.OANode));
+    EXPECT_NEAR(0.00314899, ventMechanical.VentMechZone(1).ZoneOAPeopleRate, 0.00001);
+    EXPECT_NEAR(0.000407, ventMechanical.VentMechZone(1).ZoneOAAreaRate, 0.00001);
+    EXPECT_NEAR(0.00314899, ventMechanical.VentMechZone(2).ZoneOAPeopleRate, 0.00001);
+    EXPECT_NEAR(0.000407, ventMechanical.VentMechZone(2).ZoneOAAreaRate, 0.00001);
+    EXPECT_NEAR(0.00314899, ventMechanical.VentMechZone(3).ZoneOAPeopleRate, 0.00001);
+    EXPECT_NEAR(0.000407, ventMechanical.VentMechZone(3).ZoneOAAreaRate, 0.00001);
+
+    ventMechanical.SchPtr = 1;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+
+    ventMechanical.VentMechZone(1).ZoneADEffSchPtr = 2;
+    ventMechanical.VentMechZone(2).ZoneADEffSchPtr = 2;
+    ventMechanical.VentMechZone(3).ZoneADEffSchPtr = 2;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 1.0;
+    state->dataHeatBal->Zone(1).TotOccupants = 3;
+    state->dataHeatBal->Zone(2).TotOccupants = 3;
+    state->dataHeatBal->Zone(3).TotOccupants = 3;
+    state->dataScheduleMgr->Schedule(4).CurrentValue = 1.0;
+    state->dataContaminantBalance->ZoneCO2GainFromPeople.allocate(3);
+    state->dataContaminantBalance->ZoneCO2GainFromPeople(1) = 3.82E-8;
+    state->dataContaminantBalance->ZoneCO2GainFromPeople(2) = 3.82E-8;
+    state->dataContaminantBalance->ZoneCO2GainFromPeople(3) = 3.82E-8;
+    state->dataContaminantBalance->OutdoorCO2 = 400;
+    state->dataContaminantBalance->ZoneAirCO2.allocate(3);
+    state->dataContaminantBalance->ZoneAirCO2(1) = 600.0;
+    state->dataContaminantBalance->ZoneAirCO2(2) = 600.0;
+    state->dataContaminantBalance->ZoneAirCO2(3) = 600.0;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(3);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool(1).InNode = 10;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 10;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).AirDistUnitCool(1).InNode = 11;
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(1) = 11;
+    state->dataZoneEquip->ZoneEquipConfig(3).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(3).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(3).AirDistUnitCool(1).InNode = 12;
+    state->dataZoneEquip->ZoneEquipConfig(3).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(3).InletNode(1) = 12;
+    state->dataLoopNodes->Node.allocate(12);
+    state->dataLoopNodes->Node(10).Temp = 13.00;
+    state->dataLoopNodes->Node(10).HumRat = 0.008;
+    state->dataLoopNodes->Node(10).MassFlowRate = 1.7 * state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(11) = state->dataLoopNodes->Node(10);
+    state->dataLoopNodes->Node(12) = state->dataLoopNodes->Node(10);
+    state->dataEnvrn->OutBaroPress = 101325;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(3);
+
+    oaRequirements.OAFlowMethod = OAFlowCalcMethod::PCDesOcc;
+    ventMechanical.VentMechZone(1).ZoneOAFlowMethod = oaRequirements.OAFlowMethod;
+    ventMechanical.VentMechZone(2).ZoneOAFlowMethod = oaRequirements.OAFlowMethod;
+    ventMechanical.VentMechZone(3).ZoneOAFlowMethod = oaRequirements.OAFlowMethod;
+    state->dataAirLoop->NumOASystems = 1;
+
+    state->dataAirLoop->OutsideAirSys.allocate(1);
+    auto &OASys = state->dataAirLoop->OutsideAirSys(1);
+    OASys.Name = "AIRLOOP OASYSTEM";
+    OASys.NumControllers = 1;
+    OASys.ControllerName.allocate(1);
+    OASys.ControllerName(1) = "OA CONTROLLER 1";
+    OASys.ComponentType.allocate(1);
+    OASys.ComponentType(1) = "OutdoorAir:Mixer";
+    OASys.ComponentName.allocate(1);
+    OASys.ComponentName(1) = "OAMixer";
+    state->dataMixedAir->OAMixer.allocate(1);
+    state->dataMixedAir->OAMixer(1).Name = "OAMixer";
+    state->dataMixedAir->OAMixer(1).InletNode = 2;
+
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    auto &airSys = state->dataAirSystemsData->PrimaryAirSystems(1);
+    airSys.Name = "PrimaryAirLoop";
+    airSys.NumBranches = 1;
+    airSys.Branch.allocate(1);
+    airSys.Branch(1).TotalComponents = 1;
+    airSys.Branch(1).Comp.allocate(1);
+    airSys.Branch(1).Comp(1).Name = state->dataAirLoop->OutsideAirSys(1).Name;
+    airSys.Branch(1).Comp(1).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
+
+    state->dataAirLoop->AirLoopZoneInfo.allocate(1);
+    state->dataAirLoop->AirLoopZoneInfo(1).NumZones = 3;
+    state->dataAirLoop->AirLoopZoneInfo(1).ActualZoneNumber.allocate(3);
+    state->dataAirLoop->AirLoopZoneInfo(1).ActualZoneNumber(1) = 1;
+    state->dataAirLoop->AirLoopZoneInfo(1).ActualZoneNumber(2) = 2;
+    state->dataAirLoop->AirLoopZoneInfo(1).ActualZoneNumber(3) = 3;
+
+    InitOAController(*state, 1, true, 1);
+    EXPECT_EQ("ProportionalControlBasedOnDesignOccupancy",
+              DataSizing::OAFlowCalcMethodNames[static_cast<int>(ventMechanical.VentMechZone(1).ZoneOAFlowMethod)]);
+    EXPECT_EQ("ProportionalControlBasedOnDesignOccupancy",
+              DataSizing::OAFlowCalcMethodNames[static_cast<int>(ventMechanical.VentMechZone(2).ZoneOAFlowMethod)]);
+    EXPECT_EQ("ProportionalControlBasedOnDesignOccupancy",
+              DataSizing::OAFlowCalcMethodNames[static_cast<int>(ventMechanical.VentMechZone(3).ZoneOAFlowMethod)]);
+
+    state->dataEnvrn->StdRhoAir = 1.2;
+    oaController.MixMassFlow = 1.7 * state->dataEnvrn->StdRhoAir;
+    oaController.MaxOAMassFlowRate = 1.7 * state->dataEnvrn->StdRhoAir;
+    state->dataAirLoop->AirLoopFlow(1).DesSupply = 1.7 * state->dataEnvrn->StdRhoAir;
+
+    // From peeking inside the CO2 limit calcs
+    Real64 zoneCO2Max = 431.08678;
+    Real64 zoneCO2Min = 400.0;
+
+    // Case 1 - Zone CO2 greater than CO2 Max, so OA flow is flow/area+flow/person
+    state->dataContaminantBalance->ZoneAirCO2(1) = 600.0;
+    state->dataContaminantBalance->ZoneAirCO2(2) = 600.0;
+    state->dataContaminantBalance->ZoneAirCO2(3) = 600.0;
+    Real64 expectedOAMassFlow = (oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea +
+                                 oaRequirements.OAFlowPerPerson * state->dataHeatBal->Zone(1).TotOccupants) *
+                                state->dataEnvrn->StdRhoAir;
+    oaController.CalcOAController(*state, 1, true);
+    // 3 identical zones should produce 3x OA flow
+    EXPECT_NEAR(3 * expectedOAMassFlow, oaController.OAMassFlow, 0.00001);
+    EXPECT_NEAR(3 * expectedOAMassFlow / oaController.MixMassFlow, oaController.MinOAFracLimit, 0.00001);
+
+    // Case 2 - Zone CO2 less than CO2 Min, so OA flow is flow/area
+    state->dataContaminantBalance->ZoneAirCO2(1) = 200.0;
+    state->dataContaminantBalance->ZoneAirCO2(2) = 200.0;
+    state->dataContaminantBalance->ZoneAirCO2(3) = 200.0;
+    expectedOAMassFlow = oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea * state->dataEnvrn->StdRhoAir;
+    oaController.CalcOAController(*state, 1, true);
+    // 3 identical zones should produce 3x OA flow
+    EXPECT_NEAR(3 * expectedOAMassFlow, oaController.OAMassFlow, 0.00001);
+    EXPECT_NEAR(3 * expectedOAMassFlow / oaController.MixMassFlow, oaController.MinOAFracLimit, 0.00001);
+
+    // Case 3 - Zone CO2 in between CO2 Max and Min, so OA flow is flow/area + proportionate flow/person
+    state->dataContaminantBalance->ZoneAirCO2(1) = zoneCO2Min + 0.3 * (zoneCO2Max - zoneCO2Min);
+    state->dataContaminantBalance->ZoneAirCO2(2) = zoneCO2Min + 0.3 * (zoneCO2Max - zoneCO2Min);
+    state->dataContaminantBalance->ZoneAirCO2(3) = zoneCO2Min + 0.3 * (zoneCO2Max - zoneCO2Min);
+    expectedOAMassFlow = (oaRequirements.OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea +
+                          0.3 * oaRequirements.OAFlowPerPerson * state->dataHeatBal->Zone(1).TotOccupants) *
+                         state->dataEnvrn->StdRhoAir;
+    oaController.CalcOAController(*state, 1, true);
+    // 3 identical zones should produce 3x OA flow
+    EXPECT_NEAR(3 * expectedOAMassFlow, oaController.OAMassFlow, 0.00001);
+    EXPECT_NEAR(3 * expectedOAMassFlow / oaController.MixMassFlow, oaController.MinOAFracLimit, 0.00001);
 }
 
 TEST_F(EnergyPlusFixture, MissingDesignOccupancyTest)
