@@ -1072,6 +1072,17 @@ static constexpr std::array<std::string_view, (int)EndUseCatSOV::Num> endUseCatS
     "WINDTURBINE",
 };
 
+enum class GroupSOV
+{
+    Invalid = -1,
+    Empty,
+    Building,
+    HVAC,
+    Plant,
+    Num
+};
+static constexpr std::array<std::string_view, (int)GroupSOV::Num> GroupSOVNames = {"", "Building", "HVAC", "Plant"};
+
 void SetupOutputVariable(EnergyPlusData &state,
                          std::string_view const VariableName,              // String Name of variable (with units)
                          OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
