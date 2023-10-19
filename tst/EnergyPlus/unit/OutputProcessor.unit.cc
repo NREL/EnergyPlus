@@ -6076,10 +6076,10 @@ namespace OutputProcessor {
                             OutputProcessor::SOVStoreType::Summed,
                             "Site",
                             {},
-                            "CO2",
-                            "FuelOilNo2Emissions",
+                            eResourceSOV::CO2,
+                            EndUseCatSOV::FuelOilNo2Emissions,
                             {}, // EndUseSubKey
-                            "");
+                            GroupSOV::Empty);
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
