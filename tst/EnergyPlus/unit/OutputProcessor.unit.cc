@@ -6014,7 +6014,12 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_SetupOutputVariable_enum)
     {
-        // Test SOV calls for PR 10231
+        // Test SOV calls for PR 10231 for extended tests on Calling SOV using new enum parameter drivers, upon different varieties such as:
+        // 1). SOV calls for average, summed variables (regular and meters etc.)
+        // 2). SOV handling on Output:variable processed results
+        // 3). Wild cards
+        // 4). Report frequencies;
+        // 5). Emissions categories;
         std::string const idf_objects = delimited_string({
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
             "Output:Variable,*,Chiller Electricity Energy,runperiod;",
