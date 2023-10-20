@@ -9396,7 +9396,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             rowHead(1) = "Tolerance for Zone Heating Setpoint Not Met Time";
             rowHead(2) = "Tolerance for Zone Cooling Setpoint Not Met Time";
 
-            if ((unitsStyle_cur != UnitsStyle::InchPound) || (unitsStyle_cur != UnitsStyle::InchPoundExceptElectricity)) {
+            if ((unitsStyle_cur != UnitsStyle::InchPound) && (unitsStyle_cur != UnitsStyle::InchPoundExceptElectricity)) {
                 tableBody(1, 1) = RealToStr(std::abs(state.dataHVACGlobal->deviationFromSetPtThresholdHtg), 2);
                 tableBody(1, 2) = RealToStr(state.dataHVACGlobal->deviationFromSetPtThresholdClg, 2);
             } else {
@@ -16393,9 +16393,7 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
 {
     auto const &ort = state.dataOutRptTab;
 
-    if (ort->unitsStyle != UnitsStyle::InchPound) {
-        return;
-    } else if (ort->unitsStyle != UnitsStyle::InchPoundExceptElectricity) {
+    if ((ort->unitsStyle != UnitsStyle::InchPound) && (ort->unitsStyle != UnitsStyle::InchPoundExceptElectricity)) {
         return;
     }
 
@@ -16627,16 +16625,7 @@ void OutputCompLoadSummary(EnergyPlusData &state,
         rowHead(LoadCompRow::GrdTot) = "Grand Total";
 
         columnHead.allocate(LoadCompCol::PerArea);
-        if (unitsStyle_para != UnitsStyle::InchPound) {
-            columnHead(LoadCompCol::SensInst) = "Sensible - Instant [W]";
-            columnHead(LoadCompCol::SensDelay) = "Sensible - Delayed [W]";
-            columnHead(LoadCompCol::SensRA) = "Sensible - Return Air [W]";
-            columnHead(LoadCompCol::Latent) = "Latent [W]";
-            columnHead(LoadCompCol::Total) = "Total [W]";
-            columnHead(LoadCompCol::Perc) = "%Grand Total";
-            columnHead(LoadCompCol::Area) = "Related Area [m2]";
-            columnHead(LoadCompCol::PerArea) = "Total per Area [W/m2]";
-        } else if (unitsStyle_para != UnitsStyle::InchPoundExceptElectricity) {
+        if ((unitsStyle_para != UnitsStyle::InchPound) && (unitsStyle_para != UnitsStyle::InchPoundExceptElectricity)) {
             columnHead(LoadCompCol::SensInst) = "Sensible - Instant [W]";
             columnHead(LoadCompCol::SensDelay) = "Sensible - Delayed [W]";
             columnHead(LoadCompCol::SensRA) = "Sensible - Return Air [W]";
@@ -16685,26 +16674,7 @@ void OutputCompLoadSummary(EnergyPlusData &state,
         tableBody = "";
 
         columnHead(1) = "Value";
-        if (unitsStyle_para != UnitsStyle::InchPound) {
-            rowHead(1) = "Time of Peak Load";
-            rowHead(2) = "Outside Dry Bulb Temperature [C]";
-            rowHead(3) = "Outside Wet Bulb Temperature [C]";
-            rowHead(4) = "Outside Humidity Ratio at Peak [kgWater/kgDryAir]";
-            rowHead(5) = "Zone Dry Bulb Temperature [C]";
-            rowHead(6) = "Zone Relative Humidity [%]";
-            rowHead(7) = "Zone Humidity Ratio at Peak [kgWater/kgDryAir]";
-
-            rowHead(8) = "Supply Air Temperature [C]";
-            rowHead(9) = "Mixed Air Temperature [C]";
-            rowHead(10) = "Main Fan Air Flow [m3/s]";
-            rowHead(11) = "Outside Air Flow [m3/s]";
-            rowHead(12) = "Peak Sensible Load with Sizing Factor [W]";
-            rowHead(13) = "Difference Due to Sizing Factor [W]";
-
-            rowHead(14) = "Peak Sensible Load [W]";
-            rowHead(15) = "Estimated Instant + Delayed Sensible Load [W]";
-            rowHead(16) = "Difference Between Peak and Estimated Sensible Load [W]";
-        } else if (unitsStyle_para != UnitsStyle::InchPoundExceptElectricity) {
+        if ((unitsStyle_para != UnitsStyle::InchPound) && (unitsStyle_para != UnitsStyle::InchPoundExceptElectricity)) {
             rowHead(1) = "Time of Peak Load";
             rowHead(2) = "Outside Dry Bulb Temperature [C]";
             rowHead(3) = "Outside Wet Bulb Temperature [C]";
@@ -16793,16 +16763,7 @@ void OutputCompLoadSummary(EnergyPlusData &state,
         tableBody = "";
 
         columnHead(1) = "Value";
-        if (unitsStyle_para != UnitsStyle::InchPound) {
-            rowHead(1) = "Outside Air Fraction [fraction]";
-            rowHead(2) = "Airflow per Floor Area [m3/s-m2]";
-            rowHead(3) = "Airflow per Total Capacity [m3/s-W]";
-            rowHead(4) = "Floor Area per Total Capacity [m2/W]";
-            rowHead(5) = "Total Capacity per Floor Area [W/m2]";
-            // rowHead( 6 ) = "Chiller Pump Power per Flow [W-s/m3]"; // facility only
-            // rowHead( 7 ) = "Condenser Pump Power per Flor [W-s/m3]"; // facility only
-            rowHead(6) = "Number of People";
-        } else if (unitsStyle_para != UnitsStyle::InchPoundExceptElectricity) {
+        if ((unitsStyle_para != UnitsStyle::InchPound) && (unitsStyle_para != UnitsStyle::InchPoundExceptElectricity)) {
             rowHead(1) = "Outside Air Fraction [fraction]";
             rowHead(2) = "Airflow per Floor Area [m3/s-m2]";
             rowHead(3) = "Airflow per Total Capacity [m3/s-W]";
