@@ -13225,7 +13225,6 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummaryperArea_IPExceptElec)
     }
 }
 
-
 TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_IPUnitExceptElec)
 {
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");

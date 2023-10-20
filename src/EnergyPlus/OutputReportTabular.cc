@@ -13130,9 +13130,7 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
 
     Real64 degreeHourConversion;
     UnitsStyle unitsStyle_cur = ort->unitsStyle;
-    if (unitsStyle_cur == UnitsStyle::InchPound) {
-        degreeHourConversion = getSpecificUnitMultiplier(state, "°C·hr", "°F·hr");
-    } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+    if ((unitsStyle_cur == UnitsStyle::InchPound) || (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
         degreeHourConversion = getSpecificUnitMultiplier(state, "°C·hr", "°F·hr");
     } else {
         degreeHourConversion = 1.0;
@@ -13149,13 +13147,7 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
     tableBody.allocate(numColumnThermalTbl, state.dataGlobal->NumOfZones + 4);
     Array1D_string columnHeadStr(numColumnThermalTbl);
 
-    if (unitsStyle_cur == UnitsStyle::InchPound) {
-        columnHeadStr(1) = "Safe (≤ 80.1°F) [hr]";
-        columnHeadStr(2) = "Caution (> 80.1°F, ≤ 90.0°F) [hr]";
-        columnHeadStr(3) = "Extreme Caution (> 90.0°F, ≤ 102.9°F) [hr]";
-        columnHeadStr(4) = "Danger (> 102.9, ≤ 125.1°F) [hr]";
-        columnHeadStr(5) = "Extreme Danger (> 125.1°F) [hr]";
-    } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+    if ((unitsStyle_cur == UnitsStyle::InchPound) || (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
         columnHeadStr(1) = "Safe (≤ 80.1°F) [hr]";
         columnHeadStr(2) = "Caution (> 80.1°F, ≤ 90.0°F) [hr]";
         columnHeadStr(3) = "Extreme Caution (> 90.0°F, ≤ 102.9°F) [hr]";
@@ -13226,13 +13218,7 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
     }
 
     if (hasPierceSET) {
-        if (unitsStyle_cur == UnitsStyle::InchPound) {
-            columnHeadStr(1) = "SET > 86°F Degree-Hours [°F·hr]";
-            columnHeadStr(2) = "SET > 86°F Occupant-Weighted Degree-Hours [°F·hr]";
-            columnHeadStr(3) = "SET > 86°F Occupied Degree-Hours [°F·hr]";
-            columnHeadStr(4) = "Longest SET > 86°F Duration for Occupied Period [hr]";
-            columnHeadStr(5) = "Start Time of the Longest SET > 86°F Duration for Occupied Period";
-        } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+        if ((unitsStyle_cur == UnitsStyle::InchPound) || (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
             columnHeadStr(1) = "SET > 86°F Degree-Hours [°F·hr]";
             columnHeadStr(2) = "SET > 86°F Occupant-Weighted Degree-Hours [°F·hr]";
             columnHeadStr(3) = "SET > 86°F Occupied Degree-Hours [°F·hr]";
@@ -13567,10 +13553,7 @@ void WriteHeatEmissionTable(EnergyPlusData &state)
             tableBody.allocate(6, 1);
 
             Real64 energyconversion = 1.0;
-            if (unitsStyle_cur == UnitsStyle::InchPound) {
-                rowHead(1) = "Heat Emissions [kBtu]";
-                energyconversion = 1.0 / getSpecificUnitDivider(state, "GJ", "kBtu"); // 1054351.84 J to kBtu
-            } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+            if ((unitsStyle_cur == UnitsStyle::InchPound) || (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
                 rowHead(1) = "Heat Emissions [kBtu]";
                 energyconversion = 1.0 / getSpecificUnitDivider(state, "GJ", "kBtu"); // 1054351.84 J to kBtu
             } else if (unitsStyle_cur == UnitsStyle::JtoGJ) {
