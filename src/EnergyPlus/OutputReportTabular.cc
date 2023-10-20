@@ -3343,12 +3343,7 @@ void WriteTableOfContents(EnergyPlusData &state)
                         for (int jTable = 1; jTable <= ort->OutputTableBinned(iInput).numTables; ++jTable) {
                             int const curTable = ort->OutputTableBinned(iInput).resIndex + (jTable - 1);
                             std::string curName;
-                            if (ort->unitsStyle == UnitsStyle::InchPound) {
-                                std::string origName =
-                                    ort->OutputTableBinned(iInput).varOrMeter + unitEnumToStringBrackets(ort->OutputTableBinned(iInput).units);
-                                [[maybe_unused]] int indexUnitConv = -1;
-                                LookupSItoIP(state, origName, indexUnitConv, curName);
-                            } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                            if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                                 std::string origName =
                                     ort->OutputTableBinned(iInput).varOrMeter + unitEnumToStringBrackets(ort->OutputTableBinned(iInput).units);
                                 [[maybe_unused]] int indexUnitConv = -1;
@@ -5992,14 +5987,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
         } break;
         case StatLineType::WithCDDLine: { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
             if (storeASHRAECDD != "") {
-                if (ort->unitsStyle == UnitsStyle::InchPound) {
-                    curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
-                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchWthrVal,
-                                     curNameAndUnits,
-                                     RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(storeASHRAECDD)), 1));
-                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                     curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
@@ -6011,10 +5999,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", storeASHRAECDD);
                 }
             } else {
-                if (ort->unitsStyle == UnitsStyle::InchPound) {
-                    PreDefTableEntry(
-                        state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found");
-                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                     PreDefTableEntry(
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found");
                 } else {
@@ -7578,14 +7563,7 @@ void WriteTimeBinTables(EnergyPlusData &state)
                     repMean = ort->BinStatistics(repIndex).sum / ort->BinStatistics(repIndex).n;
                 }
 
-                if (unitsStyle_cur == UnitsStyle::InchPound) {
-                    tableBodyStat(1, 1) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).minimum), 2);
-                    tableBodyStat(1, 2) = RealToStr(ConvertIP(state, indexUnitConv, repMean - 2 * repStDev), 2);
-                    tableBodyStat(1, 3) = RealToStr(ConvertIP(state, indexUnitConv, repMean), 2);
-                    tableBodyStat(1, 4) = RealToStr(ConvertIP(state, indexUnitConv, repMean + 2 * repStDev), 2);
-                    tableBodyStat(1, 5) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).maximum), 2);
-                    tableBodyStat(1, 6) = RealToStr(ConvertIPdelta(state, indexUnitConv, repStDev), 2);
-                } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+                if ((unitsStyle_cur == UnitsStyle::InchPound) || (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
                     tableBodyStat(1, 1) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).minimum), 2);
                     tableBodyStat(1, 2) = RealToStr(ConvertIP(state, indexUnitConv, repMean - 2 * repStDev), 2);
                     tableBodyStat(1, 3) = RealToStr(ConvertIP(state, indexUnitConv, repMean), 2);
@@ -10741,13 +10719,7 @@ void WriteCompCostTable(EnergyPlusData &state)
         rowHead(7) = "Permits, Bonds, Insurance (~~$~~)";
         rowHead(8) = "Commissioning (~~$~~)";
         rowHead(9) = "Cost Estimate Total (~~$~~)";
-        if (unitsStyle_cur == UnitsStyle::InchPound) {
-            std::string const SIunit = "[m2]";
-            std::string m2_unitName;
-            LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWCCT, m2_unitName);
-            state.dataOutRptTab->m2_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWCCT, 1.0);
-            rowHead(10) = "Cost Per Conditioned Building Area (~~$~~/ft2)";
-        } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+        if ((unitsStyle_cur == UnitsStyle::InchPound) || (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
             std::string const SIunit = "[m2]";
             std::string m2_unitName;
             LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWCCT, m2_unitName);
@@ -10882,25 +10854,7 @@ void WriteCompCostTable(EnergyPlusData &state)
         for (int item = 1; item <= (int)state.dataCostEstimateManager->CostLineItem.size(); ++item) {
             tableBody(1, item) = fmt::to_string(state.dataCostEstimateManager->CostLineItem(item).LineNumber);
             tableBody(2, item) = state.dataCostEstimateManager->CostLineItem(item).LineName;
-            if (unitsStyle_cur == UnitsStyle::InchPound) {
-                std::string IPunitName;
-                LookupSItoIP(state, state.dataCostEstimateManager->CostLineItem(item).Units, state.dataOutRptTab->unitConvIndexWCCT, IPunitName);
-                if (state.dataOutRptTab->unitConvIndexWCCT != 0) {
-                    Real64 const IPqty =
-                        ConvertIP(state, state.dataOutRptTab->unitConvIndexWCCT, state.dataCostEstimateManager->CostLineItem(item).Qty);
-                    tableBody(3, item) = RealToStr(IPqty, 2);
-                    tableBody(4, item) = IPunitName;
-                    Real64 const IPsingleValue = ConvertIP(state, state.dataOutRptTab->unitConvIndexWCCT, 1.0);
-                    if (IPsingleValue != 0.0) {
-                        Real64 const IPvaluePer = state.dataCostEstimateManager->CostLineItem(item).ValuePer / IPsingleValue;
-                        tableBody(5, item) = RealToStr(IPvaluePer, 2);
-                    }
-                } else {
-                    tableBody(3, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).Qty, 2);
-                    tableBody(4, item) = state.dataCostEstimateManager->CostLineItem(item).Units;
-                    tableBody(5, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).ValuePer, 2);
-                }
-            } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+            if ((unitsStyle_cur == UnitsStyle::InchPound) || (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
                 std::string IPunitName;
                 LookupSItoIP(state, state.dataCostEstimateManager->CostLineItem(item).Units, state.dataOutRptTab->unitConvIndexWCCT, IPunitName);
                 if (state.dataOutRptTab->unitConvIndexWCCT != 0) {
@@ -12360,9 +12314,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
     Real64 degreeHourConversion;
     UnitsStyle unitsStyle_cur = ort->unitsStyle;
 
-    if (unitsStyle_cur == UnitsStyle::InchPound) {
-        degreeHourConversion = getSpecificUnitMultiplier(state, "°C·hr", "°F·hr");
-    } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+    if ((unitsStyle_cur == UnitsStyle::InchPound) || (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
         degreeHourConversion = getSpecificUnitMultiplier(state, "°C·hr", "°F·hr");
     } else {
         degreeHourConversion = 1.0;

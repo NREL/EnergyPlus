@@ -1298,11 +1298,7 @@ void AnnualTable::convertUnitForDeferredResults(EnergyPlusData &state,
     Real64 curIP;
     Real64 energyUnitsConversionFactor = AnnualTable::setEnergyUnitStringAndFactor(unitsStyle, energyUnitsString);
     // do the unit conversions
-    if (unitsStyle == OutputReportTabular::UnitsStyle::InchPound) {
-        varNameWithUnits = fldStIt->m_variMeter + " [" + unitEnumToString(fldStIt->m_varUnits) + ']';
-        OutputReportTabular::LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
-        OutputReportTabular::GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
-    } else if (unitsStyle == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
+    if ((unitsStyle == OutputReportTabular::UnitsStyle::InchPound) || (unitsStyle == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity)) {
         varNameWithUnits = fldStIt->m_variMeter + " [" + unitEnumToString(fldStIt->m_varUnits) + ']';
         OutputReportTabular::LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
         OutputReportTabular::GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
