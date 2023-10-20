@@ -9384,12 +9384,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             }
 
             std::string const curNameWithSIUnits = "Degrees [deltaC]";
-            if (unitsStyle_cur == UnitsStyle::InchPound) {
-                int indexUnitConv = -1;
-                std::string curNameAndUnits;
-                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                columnHead(1) = curNameAndUnits;
-            } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+            if ((unitsStyle_cur == UnitsStyle::InchPound) || (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
                 int indexUnitConv = -1;
                 std::string curNameAndUnits;
                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
