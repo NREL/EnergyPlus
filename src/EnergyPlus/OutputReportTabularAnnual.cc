@@ -718,8 +718,8 @@ void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::UnitsSt
             curAggString = " {" + trim(curAggString) + '}';
         }
         // do the unit conversions
-        if ((unitsStyle == OutputReportTabular::UnitsStyle::InchPound) || (unitsStyle == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity))
-        {
+        if ((unitsStyle == OutputReportTabular::UnitsStyle::InchPound) ||
+            (unitsStyle == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity)) {
             varNameWithUnits = fldStIt->m_variMeter + unitEnumToStringBrackets(fldStIt->m_varUnits);
             OutputReportTabular::LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
             OutputReportTabular::GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
