@@ -73,7 +73,8 @@ effectiveness at different relative airflow, using the performance at 75% and
 relative airflow from 50% to 130%. However, some heat exchangers could have
 non-linear performance curves as shown in Figure 1.
 
-![Figure 1](9-Comparison-of-effect-of-airflow-rate-on-heat-exchanger-effectiveness-for-cooling-and.png width=400)
+<img src="9-Comparison-of-effect-of-airflow-rate-on-heat-exchanger-effectiveness-for-cooling-and.png" alt="alt text" width="400px">
+</img>
 
 Figure 1. An example of a heat exchanger with non-linear performance curves at different airflow conditions [1]
 
