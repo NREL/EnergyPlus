@@ -73,7 +73,7 @@ effectiveness at different relative airflow, using the performance at 75% and
 relative airflow from 50% to 130%. However, some heat exchangers could have
 non-linear performance curves as shown in Figure 1.
 
-![Figure 1](9-Comparison-of-effect-of-airflow-rate-on-heat-exchanger-effectiveness-for-cooling-and.png)
+![Figure 1](9-Comparison-of-effect-of-airflow-rate-on-heat-exchanger-effectiveness-for-cooling-and.png width=400)
 
 Figure 1. An example of a heat exchanger with non-linear performance curves at different airflow conditions [1]
 
@@ -235,7 +235,7 @@ specified curves all cover the range of relative airflow below 50% and above
           \default Yes
           \note Yes means that the heat exchanger will be locked out (off)
           \note when the economizer is operating or high humidity control is active
-      A11, \field Sensible Effectiveness of Heating Air Flow Curve Name
+      A11, \field Sensible Effectiveness of Heating Air Flow Curve Name                 <- start of the added fields
           \note optional
           \note if this field has value, then field N2 and N4 will be ignored
           \type object-list
@@ -250,119 +250,11 @@ specified curves all cover the range of relative airflow below 50% and above
           \note if this field has value, then field N6 and N8 will be ignored
           \type object-list
           \object-list UnivariateFunctions
-      A14; \field Latent Effectiveness of Cooling Air Flow Curve Name
+      A14; \field Latent Effectiveness of Cooling Air Flow Curve Name                  <- end of the added fields
           \note optional
           \note if this field has value, then field N7 and N9 will be ignored
           \type object-list
           \object-list UnivariateFunctions
-
-
-## IDD Object changes
-
-A field (N4) will be added to the ZoneHVAC:EvaporativeCoolerUnit
-
-    ZoneHVAC:EvaporativeCoolerUnit,
-        \memo Zone evaporative cooler. Forced-convection cooling-only unit with supply fan,
-        \memo 100% outdoor air supply. Optional relief exhaust node
-        \min-fields 15
-    A1 , \field Name
-        \required-field
-        \reference ZoneEquipmentNames
-    A2 , \field Availability Schedule Name
-        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
-        \note If this field is blank, the system is always available.
-        \type object-list
-        \object-list ScheduleNames
-    A3,  \field Availability Manager List Name
-        \note Enter the name of an AvailabilityManagerAssignmentList object.
-        \type object-list
-        \object-list SystemAvailabilityManagerLists
-    A4 , \field Outdoor Air Inlet Node Name
-        \required-field
-        \type node
-        \note this is an outdoor air node
-    A5 , \field Cooler Outlet Node Name
-        \required-field
-        \type node
-        \note this is a zone inlet node
-    A6 , \field Zone Relief Air Node Name
-        \type node
-        \note this is a zone exhaust node, optional if flow is being balanced elsewhere
-    A7 , \field Supply Air Fan Object Type
-        \required-field
-        \type choice
-        \key Fan:SystemModel
-        \key Fan:ComponentModel
-        \key Fan:ConstantVolume
-        \key Fan:OnOff
-        \key Fan:VariableVolume
-    A8 , \field Supply Air Fan Name
-        \required-field
-        \type object-list
-        \object-list Fans
-    N1 , \field Design Supply Air Flow Rate
-        \required-field
-        \units m3/s
-        \minimum> 0
-        \autosizable
-    A9 , \field Fan Placement
-        \required-field
-        \type choice
-        \key BlowThrough
-        \key DrawThrough
-    A10, \field Cooler Unit Control Method
-        \required-field
-        \type choice
-        \key ZoneTemperatureDeadbandOnOffCycling
-        \key ZoneCoolingLoadOnOffCycling
-        \key ZoneCoolingLoadVariableSpeedFan
-    N2 , \field Throttling Range Temperature Difference
-        \note used for ZoneTemperatureDeadbandOnOffCycling hystersis range for thermostatic control
-        \type real
-        \units deltaC
-        \default 1.0
-        \minimum> 0.0
-    N3 , \field Cooling Load Control Threshold Heat Transfer Rate
-        \type real
-        \units W
-        \default 100.0
-        \note Sign convention is that positive values indicate a cooling load
-        \minimum> 0.0
-    A11, \field First Evaporative Cooler Object Type
-        \required-field
-        \type choice
-        \key EvaporativeCooler:Direct:CelDekPad
-        \key EvaporativeCooler:Direct:ResearchSpecial
-        \key EvaporativeCooler:Indirect:CelDekPad
-        \key EvaporativeCooler:Indirect:WetCoil
-        \key EvaporativeCooler:Indirect:ResearchSpecial
-    A12, \field First Evaporative Cooler Object Name
-        \required-field
-        \type object-list
-        \object-list EvapCoolerNames
-    A13, \field Second Evaporative Cooler Object Type                           <- added new fields starts here
-        \note optional, used for direct/indirect configurations
-        \note second cooler must be immediately downstream of first cooler, if present
-        \type choice
-        \key EvaporativeCooler:Direct:CelDekPad
-        \key EvaporativeCooler:Direct:ResearchSpecial
-        \key EvaporativeCooler:Indirect:CelDekPad
-        \key EvaporativeCooler:Indirect:WetCoil
-        \key EvaporativeCooler:Indirect:ResearchSpecial
-    A14, \field Second Evaporative Cooler Name
-        \note optional, used for direct/indirect configurations
-        \type object-list
-        \object-list EvapCoolerNames
-    A15, \field Design Specification ZoneHVAC Sizing Object Name
-        \note Enter the name of a DesignSpecificationZoneHVACSizing object.
-        \type object-list
-        \object-list DesignSpecificationZoneHVACSizingName
-    N4; \field Shut Off Relative Humidity
-        \note Zone relative humidity above which the evap cooler is shut off.
-        \type real
-        \minimum 0.00
-        \maximum 100.00
-        \units percent                                                          <- added new fields ends here
 
 ## Testing/Validation/Data Source(s)
 
