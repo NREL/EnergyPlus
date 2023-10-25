@@ -614,6 +614,7 @@ void ManageSizing(EnergyPlusData &state)
     if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
         state.dataSize->SpaceSizing.deallocate();
     }
+
     if (state.dataSize->SysSizingRunDone) {
         for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             curName = FinalSysSizing(AirLoopNum).AirPriLoopName;
@@ -707,6 +708,16 @@ void ManageSizing(EnergyPlusData &state)
         }
         // Deallocate arrays no longer needed
         state.dataSize->SysSizing.deallocate();
+    }
+
+    // Size SpaceHVAC fractions
+    if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+        for (auto &thisSpaceHVACSplitter : state.dataZoneEquip->zoneEquipSplitter) {
+            thisSpaceHVACSplitter.size(state);
+        }
+        for (auto &thisSpaceHVACMixer : state.dataZoneEquip->zoneEquipMixer) {
+            thisSpaceHVACMixer.size(state);
+        }
     }
 
     if ((state.dataGlobal->DoPlantSizing) && (state.dataSize->NumPltSizInput == 0)) {
