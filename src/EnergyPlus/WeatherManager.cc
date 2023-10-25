@@ -2865,7 +2865,7 @@ namespace Weather {
                     state.dataWeather->wvarsMissing.OpaqueSkyCover = OpaqueSkyCover;
                     state.dataWeather->wvarsMissing.Visibility = Visibility;
                     state.dataWeather->wvarsMissing.Ceiling = CeilHeight;
-                    state.dataWeather->wvarsMissing.LiquidPrecip = PrecipWater;
+                    state.dataWeather->wvarsMissing.WaterPrecip = PrecipWater;
                     state.dataWeather->wvarsMissing.AerOptDepth = AerosolOptDepth;
                     state.dataWeather->wvarsMissing.SnowDepth = SnowDepth;
                     state.dataWeather->wvarsMissing.DaysLastSnow = DaysSinceLastSnow;
