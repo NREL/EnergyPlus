@@ -3508,7 +3508,12 @@ namespace Weather {
             print(state.files.eio, "{:.1R},", AVSC);
             print(state.files.eio, "{:.2R},", designDay.EquationOfTime * 60.0);
             print(state.files.eio, "{:.1R},", std::asin(designDay.SinSolarDeclinAngle) / Constant::DegToRadians);
-            print(state.files.eio, "{}\n", DesDaySolarModelNames[(int)desDayInput.solarModel]);
+
+            // Why have a different string for "Schedule" here than the one used for input? Really, why? 
+            static constexpr std::array<std::string_view, (int)DesDaySolarModel::Num> DesDaySolarModelStrings = {
+                "ASHRAEClearSky", "ZhangHuang", "User supplied beam/diffuse from schedules", "ASHRAETau", "ASHRAETau2017" };
+
+            print(state.files.eio, "{}\n", DesDaySolarModelStrings[(int)desDayInput.solarModel]);
         }
 
         // Must set up weather values for Design Day.  User can specify the "humidity indicator" as
