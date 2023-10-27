@@ -3141,11 +3141,11 @@ namespace HeatBalanceManager {
             if (thisZoneHB.ZTAV < state.dataHeatBalMgr->MinTempZone(ZoneNum)) {
                 state.dataHeatBalMgr->MinTempZone(ZoneNum) = thisZoneHB.ZTAV;
             }
-            if (thisZoneSysEnergyDemand.ZoneSNLoadHeatRate > state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum)) {
-                state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) = thisZoneSysEnergyDemand.ZoneSNLoadHeatRate;
+            if (thisZoneSysEnergyDemand.airSysHeatRate > state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum)) {
+                state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) = thisZoneSysEnergyDemand.airSysHeatRate;
             }
-            if (thisZoneSysEnergyDemand.ZoneSNLoadCoolRate > state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum)) {
-                state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) = thisZoneSysEnergyDemand.ZoneSNLoadCoolRate;
+            if (thisZoneSysEnergyDemand.airSysCoolRate > state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum)) {
+                state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) = thisZoneSysEnergyDemand.airSysCoolRate;
             }
 
             // Record temperature and load for individual zone
@@ -3154,8 +3154,7 @@ namespace HeatBalanceManager {
             state.dataHeatBalMgr->TempZonePrevDay(ZoneNum) = state.dataHeatBalMgr->TempZone(ZoneNum);
             state.dataHeatBalMgr->LoadZonePrevDay(ZoneNum) = state.dataHeatBalMgr->LoadZone(ZoneNum);
             state.dataHeatBalMgr->TempZone(ZoneNum) = thisZoneHB.ZTAV;
-            state.dataHeatBalMgr->LoadZone(ZoneNum) =
-                max(thisZoneSysEnergyDemand.ZoneSNLoadHeatRate, std::abs(thisZoneSysEnergyDemand.ZoneSNLoadCoolRate));
+            state.dataHeatBalMgr->LoadZone(ZoneNum) = max(thisZoneSysEnergyDemand.airSysHeatRate, std::abs(thisZoneSysEnergyDemand.airSysCoolRate));
 
             // Calculate differences in temperature and load for the last two warmup days
             if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DayOfSim == 1 &&
@@ -4707,8 +4706,8 @@ namespace HeatBalanceManager {
         // This subroutine only gets called once in the GetConstructionData subroutine
 
         // ASHRAE Handbook Fundamental 2005
-        // Thermal resistance of the inside air film, m2.K/W. Average of 0.14 (heat flow up) and 0.11 (heat flow down)
-        Real64 constexpr Rfilm_in(0.125);
+        // Thermal resistance of the inside air film, m2.K/W. Average of 0.16 (heat flow down) and 0.11 (heat flow up)
+        Real64 constexpr Rfilm_in(0.135);
         // Thermal resistance of the outside air film used in calculating the Ffactor, m2.K/W. 0.17/5.678
         Real64 constexpr Rfilm_out(0.03);
 

@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,23.2;
+  Version,24.1;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -11031,8 +11031,6 @@
     AirLoop DataCenter Basement Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop DataCenter Basement,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
-    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -11043,8 +11041,12 @@
     WAHPCoolCapCurveTot 1,   !- Total Cooling Capacity Curve Name
     WAHPCoolCapCurveSens 1,  !- Sensible Cooling Capacity Curve Name
     WAHPCoolPowCurve 1,      !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Cooling:WaterToAirHeatPump:EquationFit,
     Heat Pump Cooling Mode AirLoop DataCenter bot,  !- Name
@@ -11053,8 +11055,6 @@
     AirLoop DataCenter bot Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop DataCenter bot,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
-    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -11065,8 +11065,12 @@
     WAHPCoolCapCurveTot 2,   !- Total Cooling Capacity Curve Name
     WAHPCoolCapCurveSens 2,  !- Sensible Cooling Capacity Curve Name
     WAHPCoolPowCurve 2,      !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Cooling:WaterToAirHeatPump:EquationFit,
     Heat Pump Cooling Mode AirLoop DataCenter mid,  !- Name
@@ -11075,8 +11079,6 @@
     AirLoop DataCenter mid Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop DataCenter mid,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
-    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -11087,8 +11089,12 @@
     WAHPCoolCapCurveTot 3,   !- Total Cooling Capacity Curve Name
     WAHPCoolCapCurveSens 3,  !- Sensible Cooling Capacity Curve Name
     WAHPCoolPowCurve 3,      !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Cooling:WaterToAirHeatPump:EquationFit,
     Heat Pump Cooling Mode AirLoop DataCenter top,  !- Name
@@ -11097,8 +11103,6 @@
     AirLoop DataCenter top Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop DataCenter top,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
-    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -11109,9 +11113,12 @@
     WAHPCoolCapCurveTot 4,   !- Total Cooling Capacity Curve Name
     WAHPCoolCapCurveSens 4,  !- Sensible Cooling Capacity Curve Name
     WAHPCoolPowCurve 4,      !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 !-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT ===========
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
@@ -11128,7 +11135,8 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     WAHPHeatCapCurve 1,      !- Heating Capacity Curve Name
-    WAHPHeatPowCurve 1;      !- Heating Power Consumption Curve Name
+    WAHPHeatPowCurve 1,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     Heat Pump HEATING Mode AirLoop DataCenter bot,  !- Name
@@ -11144,7 +11152,8 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     WAHPHeatCapCurve 2,      !- Heating Capacity Curve Name
-    WAHPHeatPowCurve 2;      !- Heating Power Consumption Curve Name
+    WAHPHeatPowCurve 2,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     Heat Pump HEATING Mode AirLoop DataCenter mid,  !- Name
@@ -11160,7 +11169,8 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     WAHPHeatCapCurve 3,      !- Heating Capacity Curve Name
-    WAHPHeatPowCurve 3;      !- Heating Power Consumption Curve Name
+    WAHPHeatPowCurve 3,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     Heat Pump HEATING Mode AirLoop DataCenter top,  !- Name
@@ -11176,7 +11186,8 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     WAHPHeatCapCurve 4,      !- Heating Capacity Curve Name
-    WAHPHeatPowCurve 4;      !- Heating Power Consumption Curve Name
+    WAHPHeatPowCurve 4,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
 !-   ===========  ALL OBJECTS IN CLASS: HUMIDIFIER:STEAM:ELECTRIC ===========
 
@@ -11207,10 +11218,6 @@
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
     Heat Pump Cooling Mode AirLoop DataCenter Basement,  !- Cooling Coil Name
     0.001,                   !- Cooling Convergence
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AirLoop DataCenter Basement,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -11234,10 +11241,6 @@
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
     Heat Pump Cooling Mode AirLoop DataCenter bot,  !- Cooling Coil Name
     0.001,                   !- Cooling Convergence
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AirLoop DataCenter bot,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -11261,10 +11264,6 @@
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
     Heat Pump Cooling Mode AirLoop DataCenter mid,  !- Cooling Coil Name
     0.001,                   !- Cooling Convergence
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AirLoop DataCenter mid,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -11288,10 +11287,6 @@
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
     Heat Pump Cooling Mode AirLoop DataCenter top,  !- Cooling Coil Name
     0.001,                   !- Cooling Convergence
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil AirLoop DataCenter top,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -16296,6 +16291,22 @@
     0.0,                     !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     1;                       !- Maximum Value of x
+
+  Curve:Quadratic,
+    HPACCOOLPLFFPLR,         !- Name
+    0.75,                    !- Coefficient1 Constant
+    0.25,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    HPACHEATPLFFPLR,         !- Name
+    0.75,                    !- Coefficient1 Constant
+    0.25,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
 
 !-   ===========  ALL OBJECTS IN CLASS: CURVE:CUBIC ===========
 

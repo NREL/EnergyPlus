@@ -649,6 +649,7 @@ void ReadEnergyMeters(EnergyPlusData &state)
             GetInstantMeterValue(state, pm->facilityMeterNums[iMeter], OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
             GetInstantMeterValue(state, pm->facilityMeterNums[iMeter], OutputProcessor::TimeStepType::System);
     }
+
     // Now these fuel types have to be sorted and summed into categories that we have pollution factors for.
     // The Off-Site Electricity is the total needed by the facility minus the amount generated on-site.
     // The on-site pollutants will end up being other fuel types used by the generators.
@@ -730,19 +731,19 @@ void GetFuelFactorInfo(EnergyPlusData &state,
         fuelSourceFactor = pollFuelFactors[(int)pollFuel];
     }
 
-    if (fuel == Constant::eFuel::DistrictHeating) {
+    if (fuel == Constant::eFuel::DistrictHeatingWater) {
         fuelSourceFactor /= pm->PurchHeatEffic;
     } else if (fuel == Constant::eFuel::DistrictCooling) {
         fuelSourceFactor /= pm->PurchCoolCOP;
-    } else if (fuel == Constant::eFuel::Steam) {
+    } else if (fuel == Constant::eFuel::DistrictHeatingSteam) {
         fuelSourceFactor = 0.3 / pm->SteamConvEffic;
     }
 }
 
 void GetEnvironmentalImpactFactorInfo(EnergyPlusData &state,
-                                      Real64 &efficiencyDistrictHeating, // if entered, the efficiency of District Heating
-                                      Real64 &efficiencyDistrictCooling, // if entered, the efficiency of District Cooling
-                                      Real64 &sourceFactorSteam          // if entered, the source factor for Steam
+                                      Real64 &efficiencyDistrictHeatingWater,  // if entered, the efficiency of District Heating Water
+                                      Real64 &efficiencyDistrictCooling,       // if entered, the efficiency of District Cooling
+                                      Real64 &sourceFactorDistrictHeatingSteam // if entered, the source factor for Dictrict Heating Steam
 )
 {
 
@@ -761,9 +762,9 @@ void GetEnvironmentalImpactFactorInfo(EnergyPlusData &state,
     }
 
     if (pm->NumEnvImpactFactors > 0) {
-        efficiencyDistrictHeating = pm->PurchHeatEffic;
+        efficiencyDistrictHeatingWater = pm->PurchHeatEffic;
+        sourceFactorDistrictHeatingSteam = pm->SteamConvEffic;
         efficiencyDistrictCooling = pm->PurchCoolCOP;
-        sourceFactorSteam = pm->SteamConvEffic;
     }
 }
 

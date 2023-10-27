@@ -66,7 +66,7 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
         "      Monthly;                 !- Reporting Frequency",
         "",
         "    EnvironmentalImpactFactors,",
-        "      0.3,                     !- District Heating Efficiency",
+        "      0.3,                     !- District Heating Water Efficiency",
         "      3.0,                     !- District Cooling COP {W/W}",
         "      0.25,                    !- Steam Conversion Efficiency",
         "      80.7272,                 !- Total Carbon Equivalent Emission Factor From N2O {kg/kg}",

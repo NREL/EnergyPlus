@@ -90,9 +90,10 @@ namespace Constant {
         OtherFuel1,
         OtherFuel2,
         DistrictCooling,
-        DistrictHeating,
-        Steam,
+        DistrictHeatingWater,
+        DistrictHeatingSteam,
         Water,
+        None, // used for OtherEquipment object
         EnergyTransfer,
         ElectricityProduced,
         ElectricityPurchased,
@@ -143,8 +144,10 @@ namespace Constant {
         OtherFuel1,
         OtherFuel2,
         DistrictCooling,
-        DistrictHeating,
-        Steam,
+        DistrictHeatingWater,
+        DistrictHeatingSteam,
+        Water,
+        None, // used for OtherEquipment object
         Num
     };
 
@@ -169,17 +172,54 @@ namespace Constant {
         Num
     };
 
-    constexpr std::array<eFuel, static_cast<int>(eResource::Num)> eResource2eFuel = {
-        eFuel::Electricity,     eFuel::NaturalGas,      eFuel::Gasoline,   eFuel::Diesel,     eFuel::Coal,
-        eFuel::Propane,         eFuel::FuelOilNo1,      eFuel::FuelOilNo2, eFuel::OtherFuel1, eFuel::OtherFuel2,
-        eFuel::DistrictCooling, eFuel::DistrictHeating, eFuel::Steam,      eFuel::Invalid,    eFuel::Invalid,
-        eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
-        eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
-        eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
-        eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
-        eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
-        eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
-        eFuel::Invalid,         eFuel::Invalid};
+    constexpr std::array<eFuel, static_cast<int>(eResource::Num)> eResource2eFuel = {eFuel::Electricity,
+                                                                                     eFuel::NaturalGas,
+                                                                                     eFuel::Gasoline,
+                                                                                     eFuel::Diesel,
+                                                                                     eFuel::Coal,
+                                                                                     eFuel::Propane,
+                                                                                     eFuel::FuelOilNo1,
+                                                                                     eFuel::FuelOilNo2,
+                                                                                     eFuel::OtherFuel1,
+                                                                                     eFuel::OtherFuel2,
+                                                                                     eFuel::DistrictCooling,
+                                                                                     eFuel::DistrictHeatingWater,
+                                                                                     eFuel::DistrictHeatingSteam,
+                                                                                     eFuel::Water,
+                                                                                     eFuel::None,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid,
+                                                                                     eFuel::Invalid};
 
     constexpr std::array<eResource, static_cast<int>(eFuel::Num)> eFuel2eResource = {eResource::Electricity,
                                                                                      eResource::NaturalGas,
@@ -192,18 +232,20 @@ namespace Constant {
                                                                                      eResource::OtherFuel1,
                                                                                      eResource::OtherFuel2,
                                                                                      eResource::DistrictCooling,
-                                                                                     eResource::DistrictHeating,
-                                                                                     eResource::Steam};
+                                                                                     eResource::DistrictHeatingWater,
+                                                                                     eResource::DistrictHeatingSteam,
+                                                                                     eResource::Water,
+                                                                                     eResource::None};
 
     constexpr std::array<ePollutant, static_cast<int>(eResource::Num)> eResource2ePollutant = {
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid,
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid,
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid,
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid,
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,   ePollutant::Invalid,
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::SO2,     ePollutant::NOx,         ePollutant::N2O,       ePollutant::PM,
-        ePollutant::PM2_5,   ePollutant::PM10,    ePollutant::CO,      ePollutant::CO2,         ePollutant::CH4,       ePollutant::NH3,
-        ePollutant::NMVOC,   ePollutant::Hg,      ePollutant::Pb,      ePollutant::NuclearHigh, ePollutant::NuclearLow};
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,
+        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::SO2,     ePollutant::NOx,         ePollutant::N2O,
+        ePollutant::PM,      ePollutant::PM2_5,   ePollutant::PM10,    ePollutant::CO,      ePollutant::CO2,         ePollutant::CH4,
+        ePollutant::NH3,     ePollutant::NMVOC,   ePollutant::Hg,      ePollutant::Pb,      ePollutant::NuclearHigh, ePollutant::NuclearLow};
 
     constexpr std::array<eResource, static_cast<int>(ePollutant::Num)> ePollutant2eResource = {eResource::SO2,
                                                                                                eResource::NOx,
@@ -232,9 +274,10 @@ namespace Constant {
                                                                                                         "OTHERFUEL1",
                                                                                                         "OTHERFUEL2",
                                                                                                         "DISTRICTCOOLING",
-                                                                                                        "DISTRICTHEATING",
-                                                                                                        "STEAM",
+                                                                                                        "DISTRICTHEATINGWATER",
+                                                                                                        "DISTRICTHEATINGSTEAM",
                                                                                                         "WATER",
+                                                                                                        "NONE",
                                                                                                         "ENERGYTRANSFER",
                                                                                                         "ELECTRICITYPRODUCED",
                                                                                                         "ELECTRICITYPURCHASED",
@@ -280,9 +323,10 @@ namespace Constant {
                                                                                                       "OtherFuel1",
                                                                                                       "OtherFuel2",
                                                                                                       "DistrictCooling",
-                                                                                                      "DistrictHeating",
-                                                                                                      "Steam",
+                                                                                                      "DistrictHeatingWater",
+                                                                                                      "DistrictHeatingSteam",
                                                                                                       "Water",
+                                                                                                      "None",
                                                                                                       "EnergyTransfer",
                                                                                                       "ElectricityProduced",
                                                                                                       "ElectricityPurchased",
@@ -329,8 +373,10 @@ namespace Constant {
         eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::OtherFuel1)])],
         eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::OtherFuel2)])],
         eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::DistrictCooling)])],
-        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::DistrictHeating)])],
-        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Steam)])]};
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::DistrictHeatingWater)])],
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::DistrictHeatingSteam)])],
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Water)])],
+        eResourceNamesUC[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::None)])]};
 
     static constexpr std::array<std::string_view, static_cast<int>(eFuel::Num)> eFuelNames = {
         eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Electricity)])],
@@ -344,8 +390,10 @@ namespace Constant {
         eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::OtherFuel1)])],
         eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::OtherFuel2)])],
         eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::DistrictCooling)])],
-        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::DistrictHeating)])],
-        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Steam)])]};
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::DistrictHeatingWater)])],
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::DistrictHeatingSteam)])],
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Water)])],
+        eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::None)])]};
 
     static constexpr std::array<std::string_view, static_cast<int>(ePollutant::Num)> ePollutantNamesUC = {
         eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::SO2)])],

@@ -20,7 +20,7 @@ jobs:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        name: [x64, x86, x64_hardened]
+        name: [x64, x64_hardened]  # removed x86 because it won't build packages now
         include:
         - name: x64
           arch: x64
@@ -28,12 +28,12 @@ jobs:
           vs-generator: x64
           package-arch: x86_64
           enable_hardened_runtime: OFF
-        - name: x86
-          arch: x86
-          allow_failure: false
-          vs-generator: Win32
-          package-arch: i386
-          enable_hardened_runtime: OFF
+        # - name: x86
+        #   arch: x86
+        #   allow_failure: false
+        #   vs-generator: Win32
+        #   package-arch: i386
+        #   enable_hardened_runtime: OFF
         - name: x64_hardened
           arch: x64
           allow_failure: false
@@ -72,8 +72,8 @@ jobs:
         set -x
         echo "Downloading MiKTeX CLI installer"
         # We download from a specific miror already # TODO: Should store this setup package somewhere ourselves
-        curl -L -O https://ctan.math.illinois.edu/systems/win32/miktex/setup/windows-x64/miktexsetup-5.2.0%2Bb8f430f-x64.zip
-        unzip miktexsetup-5.2.0%2Bb8f430f-x64.zip
+        curl -L -O https://ctan.math.illinois.edu/systems/win32/miktex/setup/windows-x64/miktexsetup-5.5.0%2B1763023-x64.zip
+        unzip miktexsetup-5.5.0%2B1763023-x64.zip
 
         echo "Setting up the local package directory via download"
         ./miktexsetup_standalone --verbose \

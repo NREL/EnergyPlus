@@ -830,7 +830,10 @@ TEST_F(ConvectionCoefficientsFixture, initIntConvCoeffAdjRatio)
     state->dataHeatBalSurf->SurfTempInTmp.dimension(7, 20.0);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.006;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.006;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).MAT = 25.0;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).airHumRatAvg = 0.006;
     state->dataHeatBalSurf->SurfHConvInt.allocate(7);
     state->dataHeatBalSurf->SurfHConvInt(7) = 0.0;
 
@@ -940,6 +943,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
 
     // Case 1 - Zone air warmer than surfaces
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 30.0;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).MAT = 30.0;
 
     Convect::DynamicIntConvSurfaceClassification(*state, 1);
     EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(1).convClass, Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
@@ -989,6 +993,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
 
     // Case 2 - Zone air colder than surfaces
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 10.0;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).MAT = 10.0;
 
     Convect::DynamicIntConvSurfaceClassification(*state, 1);
     EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(1).convClass, Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
@@ -1057,6 +1062,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     state->dataLoopNodes->Node.allocate(1);
 
     state->dataSurface->Surface(SurfNum).Zone = 1;
+    state->dataSurface->Surface(SurfNum).spaceNum = 1;
     state->dataSurface->Surface(SurfNum).Construction = 1;
     state->dataSurface->SurfTAirRef.allocate(1);
     state->dataSurface->SurfTAirRefRpt.allocate(1);
@@ -1076,6 +1082,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 30.0;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).MAT = 30.0;
 
     // Case 1 - Low ACH (should default to CalcASHRAETARPNatural)
     Real64 ACH = 0.25;

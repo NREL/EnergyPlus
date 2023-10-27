@@ -104,6 +104,13 @@ namespace HighTempRadiantSystem {
         Array1D_int SurfacePtr;            // Surface number in the list of surfaces heater sends radiation to
         Array1D<Real64> FracDistribToSurf; // Fraction of fraction radiant incident on the surface
         // Other parameters
+        Real64 ZeroHTRSourceSumHATsurf; // used in baseboard energy balance
+        Real64 QHTRRadSource;           // Need to keep the last value in case we are still iterating
+        Real64 QHTRRadSrcAvg;           // Need to keep the last value in case we are still iterating
+        Real64 LastSysTimeElapsed;      // Need to keep the last value in case we are still iterating
+        Real64 LastTimeStepSys;         // Need to keep the last value in case we are still iterating
+        Real64 LastQHTRRadSrc;          // Need to keep the last value in case we are still iterating
+
         // Report data
         Real64 ElecPower;                              // system electric consumption in Watts
         Real64 ElecEnergy;                             // system electric consumption in Joules
@@ -121,8 +128,9 @@ namespace HighTempRadiantSystem {
         HighTempRadiantSystemData()
             : SchedPtr(0), ZonePtr(0), HeaterType(Constant::eResource::Invalid), MaxPowerCapac(0.0), CombustionEffic(0.0), FracRadiant(0.0),
               FracLatent(0.0), FracLost(0.0), FracConvect(0.0), ControlType(RadControlType::Invalid), ThrottlRange(0.0), SetptSchedPtr(0),
-              FracDistribPerson(0.0), TotSurfToDistrib(0), ElecPower(0.0), ElecEnergy(0.0), GasPower(0.0), GasEnergy(0.0), HeatPower(0.0),
-              HeatEnergy(0.0), HeatingCapMethod(DataSizing::DesignSizingType::Invalid), ScaledHeatingCapacity(0.0)
+              FracDistribPerson(0.0), TotSurfToDistrib(0), ZeroHTRSourceSumHATsurf(0.0), QHTRRadSource(0.0), QHTRRadSrcAvg(0.0),
+              LastSysTimeElapsed(0.0), LastTimeStepSys(0.0), LastQHTRRadSrc(0.0), ElecPower(0.0), ElecEnergy(0.0), GasPower(0.0), GasEnergy(0.0),
+              HeatPower(0.0), HeatEnergy(0.0), HeatingCapMethod(DataSizing::DesignSizingType::Invalid), ScaledHeatingCapacity(0.0)
         {
         }
     };
@@ -180,14 +188,7 @@ struct HighTempRadiantSystemData : BaseGlobalStruct
 {
 
     // Standard, run-of-the-mill variables...
-    int NumOfHighTempRadSys = 0;          // Number of hydronic low tempererature radiant systems
-    Array1D<Real64> QHTRadSource;         // Need to keep the last value in case we are still iterating
-    Array1D<Real64> QHTRadSrcAvg;         // Need to keep the last value in case we are still iterating
-    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
-    // Record keeping variables used to calculate QHTRadSrcAvg locally
-    Array1D<Real64> LastQHTRadSrc;      // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    int NumOfHighTempRadSys = 0; // Number of hydronic low tempererature radiant systems
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
 
@@ -203,12 +204,6 @@ struct HighTempRadiantSystemData : BaseGlobalStruct
     void clear_state() override
     {
         NumOfHighTempRadSys = 0;
-        QHTRadSource.clear();
-        QHTRadSrcAvg.clear();
-        ZeroSourceSumHATsurf.clear();
-        LastQHTRadSrc.clear();
-        LastSysTimeElapsed.clear();
-        LastTimeStepSys.clear();
         MySizeFlag.clear();
         CheckEquipName.clear();
 

@@ -655,8 +655,6 @@ namespace OutputProcessor {
 
     void UpdateMeters(EnergyPlusData &state, int TimeStamp); // Current TimeStamp (for max/min)
 
-    void ResetAccumulationWhenWarmupComplete(EnergyPlusData &state);
-
     void ReportTSMeters(EnergyPlusData &state,
                         Real64 StartMinute,      // Start Minute for TimeStep
                         Real64 EndMinute,        // End Minute for TimeStep

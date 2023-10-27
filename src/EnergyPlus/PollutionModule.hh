@@ -308,9 +308,9 @@ namespace Pollution {
     );
 
     void GetEnvironmentalImpactFactorInfo(EnergyPlusData &state,
-                                          Real64 &efficiencyDistrictHeating, // if entered, the efficiency of District Heating
-                                          Real64 &efficiencyDistrictCooling, // if entered, the efficiency of District Cooling
-                                          Real64 &sourceFactorSteam          // if entered, the source factor for Steam
+                                          Real64 &efficiencyDistrictHeatingWater,  // if entered, the efficiency of District Heating Water
+                                          Real64 &efficiencyDistrictCooling,       // if entered, the efficiency of District Cooling
+                                          Real64 &sourceFactorDistrictHeatingSteam // if entered, the source factor for Dictrict Heating Steam
     );
 
 } // namespace Pollution

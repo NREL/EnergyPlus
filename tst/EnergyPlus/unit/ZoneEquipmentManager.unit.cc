@@ -47,6 +47,9 @@
 
 // EnergyPlus::ZoneEquipmentManager Unit Tests
 
+// C++ Headers
+#include <iostream>
+
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -56,6 +59,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -401,11 +405,11 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MAT = 23.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MAT = 24.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(5).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(5).ZoneAirHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(5).airHumRat = 0.001;
 
     state->dataHeatBal->AirFlowFlag = true;
     state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "MIXINGAVAILSCHED")).CurrentValue = 1.0;
@@ -1854,7 +1858,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(NumEquip);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(NumEquip);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
-    auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
+    auto &energy = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum);
+    auto &moisture = state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum);
     state->dataZoneEquipmentManager->PrioritySimOrder.allocate(NumEquip);
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
@@ -1909,7 +1914,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     Real64 SysOutputProvided = 100.0;
     Real64 LatOutputProvided = 0.0;
     int EquipNum = 1;
-    UpdateSystemOutputRequired(*state, ZoneNum, SysOutputProvided, LatOutputProvided, EquipNum);
+    updateSystemOutputRequired(*state, ZoneNum, SysOutputProvided, LatOutputProvided, energy, moisture, EquipNum);
 
     // Expect next sequenced load #2 to be Total minus SysOutputProvided here, others unchanged
     Real64 expectedHeatLoad = energy.OutputRequiredToHeatingSP - SysOutputProvided;
@@ -2079,7 +2084,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(NumEquip);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(NumEquip);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
-    auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
+    auto &energy = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum);
+    auto &moisture = state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum);
     state->dataZoneEquipmentManager->PrioritySimOrder.allocate(NumEquip);
 
     state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "AIR TERMINAL 1 ADU COOLING FRACTION")).CurrentValue = 0.3;
@@ -2137,7 +2143,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     Real64 SysOutputProvided = 100.0;
     Real64 LatOutputProvided = 0.0;
     int EquipNum = 1;
-    UpdateSystemOutputRequired(*state, ZoneNum, SysOutputProvided, LatOutputProvided, EquipNum);
+    updateSystemOutputRequired(*state, ZoneNum, SysOutputProvided, LatOutputProvided, energy, moisture, EquipNum);
 
     // Expect next sequenced load fractions to be applied here on the first and second equipments
     Real64 expectedHeatLoad = energy.UnadjRemainingOutputReqToHeatSP * 0.6;
@@ -2165,8 +2171,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
     state->dataSize->CalcZoneSizing.allocate(totDesDays, state->dataGlobal->NumOfZones);
     state->dataSize->FinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
     state->dataSize->CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
     for (int CtrlZoneNum = 1; CtrlZoneNum <= state->dataGlobal->NumOfZones; ++CtrlZoneNum) {
+        state->dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled = true;
         for (int DesDayNum = 1; DesDayNum <= state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
             auto &thisSizingType(state->dataSize->ZoneSizing(DesDayNum, CtrlZoneNum));
             thisSizingType.ZoneName = "test";
@@ -4392,8 +4400,8 @@ TEST_F(EnergyPlusFixture, CalcAirFlowSimple_CO2andGCforRefrigerationDoorsTest)
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 21.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 22.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.0021;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.0022;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.0021;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.0022;
 
     state->dataHeatBal->TotRefDoorMixing = 1;
     state->dataHeatBal->TotMixing = 0;
@@ -4496,6 +4504,7 @@ TEST_F(EnergyPlusFixture, CZoeEquipmentManager_CalcZoneLeavingConditions_Test)
     state->dataHeatBal->Zone(1).NoHeatToReturnAir = false;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
@@ -4559,6 +4568,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataZoneEnergyDemand->DeadBandOrSetback(1) = true;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 4;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
@@ -4578,10 +4588,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataZoneEquipmentManager->SizeZoneEquipmentOneTimeFlag = false;
     SizeZoneEquipment(*state);
     UpdateZoneSizing(*state, Constant::CallIndicator::BeginDay);
-    state->dataSize->ZoneSizThermSetPtHi.allocate(state->dataGlobal->NumOfZones);
-    state->dataSize->ZoneSizThermSetPtLo.allocate(state->dataGlobal->NumOfZones);
-    state->dataSize->ZoneSizThermSetPtHi(1) = 24;
-    state->dataSize->ZoneSizThermSetPtLo(1) = 22;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -4709,7 +4715,7 @@ TEST_F(EnergyPlusFixture, CalcAirFlowSimple_WindAndStackArea)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
     thisZoneHB.MAT = 21.0;
-    thisZoneHB.ZoneAirHumRat = 0.0021;
+    thisZoneHB.airHumRat = 0.0021;
     thisZoneHB.MixingMAT = 20.0;
 
     state->dataHeatBal->TotRefDoorMixing = 0;
@@ -4848,6 +4854,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_DOASLoadTest)
     state->dataZoneEnergyDemand->DeadBandOrSetback(1) = true;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 4;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
@@ -4870,10 +4877,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_DOASLoadTest)
     state->dataZoneEquipmentManager->SizeZoneEquipmentOneTimeFlag = false;
     SizeZoneEquipment(*state);
     UpdateZoneSizing(*state, Constant::CallIndicator::BeginDay);
-    state->dataSize->ZoneSizThermSetPtHi.allocate(state->dataGlobal->NumOfZones);
-    state->dataSize->ZoneSizThermSetPtLo.allocate(state->dataGlobal->NumOfZones);
-    state->dataSize->ZoneSizThermSetPtHi(1) = 23.5;
-    state->dataSize->ZoneSizThermSetPtLo(1) = 22.5;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
@@ -4949,4 +4952,319 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_DOASLoadTest)
     // check sensible and total doas zone loads
     EXPECT_NEAR(SensibleOutput, -4091.6, 0.1); // W
     EXPECT_NEAR(TotalOutput, -4091.6, 0.1);    // W
+}
+
+TEST_F(EnergyPlusFixture, ZoneAirLoopEquipmentGetInputTest)
+{
+    std::string_view constexpr idf_objects = R"IDF(
+	
+	  ZoneHVAC:AirDistributionUnit,
+		ADU CV HW Rht,           !- Name
+		Node 5,                  !- Air Distribution Unit Outlet Node Name
+		AirTerminal:SingleDuct:ConstantVolume:Reheat,  !- Air Terminal Object Type
+		CV HW Rht,               !- Air Terminal Name
+		0.05,                    !- Nominal Upstream Leakage Fraction
+		0.07;                    !- Constant Downstream Leakage Fraction
+
+	  AirTerminal:SingleDuct:ConstantVolume:Reheat,
+		CV HW Rht,               !- Name
+		Always On Discrete,      !- Availability Schedule Name
+		Node 5,                  !- Air Outlet Node Name
+		Node 9,                  !- Air Inlet Node Name
+		Autosize,                !- Maximum Air Flow Rate {m3/s}
+		Coil:Heating:Water,      !- Reheat Coil Object Type
+		CV HW Rht Coil,          !- Reheat Coil Name
+		Autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
+		0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}
+		0.001,                   !- Convergence Tolerance
+		50;                      !- Maximum Reheat Air Temperature {C}
+	
+      ZoneHVAC:AirDistributionUnit,
+        ADU VAV Rht,             !- Name
+        Node 5,                  !- Air Distribution Unit Outlet Node Name
+        AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type
+        VAV with Rht AT,         !- Air Terminal Name
+        0.05,                    !- Nominal Upstream Leakage Fraction
+        0.07;                    !- Constant Downstream Leakage Fraction
+
+      AirTerminal:SingleDuct:VAV:Reheat,
+        VAV with Rht AT,         !- Name
+        Always On Discrete,      !- Availability Schedule Name
+        VAV with Rht AT Damper Outlet,  !- Damper Air Outlet Node Name
+        Node 9,                  !- Air Inlet Node Name
+        Autosize,                !- Maximum Air Flow Rate {m3/s}
+        Constant,                !- Zone Minimum Air Flow Input Method
+        0.3,                     !- Constant Minimum Air Flow Fraction
+        ,                        !- Fixed Minimum Air Flow Rate {m3/s}
+        ,                        !- Minimum Air Flow Fraction Schedule Name
+        Coil:Heating:Water,      !- Reheat Coil Object Type
+        VAV HW Rht Coil,         !- Reheat Coil Name
+        Autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
+        0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}
+        Node 5,                  !- Air Outlet Node Name
+        0.001,                   !- Convergence Tolerance
+        Normal,                  !- Damper Heating Action
+        Autocalculate,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+        Autocalculate,           !- Maximum Flow Fraction During Reheat
+        50;                      !- Maximum Reheat Air Temperature {C}
+
+    )IDF";
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    int AirDistCompUnitNum = 1;
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
+    auto &airDistUnit_CV = state->dataDefineEquipment->AirDistUnit(AirDistCompUnitNum);
+    EXPECT_EQ(airDistUnit_CV.EquipType(1), "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT");
+    EXPECT_TRUE(compare_enums(airDistUnit_CV.EquipTypeEnum(1), DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolReheat));
+    EXPECT_FALSE(airDistUnit_CV.IsConstLeakageRate);
+
+    AirDistCompUnitNum = 2;
+    auto &airDistUnit_VAV = state->dataDefineEquipment->AirDistUnit(AirDistCompUnitNum);
+    EXPECT_EQ(airDistUnit_VAV.EquipType(1), "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT");
+    EXPECT_TRUE(compare_enums(airDistUnit_VAV.EquipTypeEnum(1), DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheat));
+    EXPECT_TRUE(airDistUnit_VAV.IsConstLeakageRate);
+}
+
+TEST_F(EnergyPlusFixture, SpaceHVACSplitterTest)
+{
+    state->dataZoneEquip->zoneEquipSplitter.resize(1);
+    auto &thisSplitter = state->dataZoneEquip->zoneEquipSplitter[0];
+    // Assume 3 spaces are served by this splitter
+    state->dataZoneEquip->zoneEquipSplitter[0].spaces.resize(3);
+    auto &splitSpace1 = state->dataZoneEquip->zoneEquipSplitter[0].spaces[0];
+    auto &splitSpace2 = state->dataZoneEquip->zoneEquipSplitter[0].spaces[1];
+    auto &splitSpace3 = state->dataZoneEquip->zoneEquipSplitter[0].spaces[2];
+    splitSpace1.fraction = 0.2;
+    splitSpace2.fraction = 0.5;
+    splitSpace3.fraction = 0.3;
+    splitSpace1.spaceIndex = 1;
+    splitSpace2.spaceIndex = 3;
+    splitSpace3.spaceIndex = 2;
+    splitSpace1.spaceNodeNum = 11;
+    splitSpace2.spaceNodeNum = 12;
+    splitSpace3.spaceNodeNum = 13;
+    state->dataLoopNodes->Node.allocate(13);
+    thisSplitter.tstatControl = ZoneEquipTstatControl::Ideal;
+    thisSplitter.zoneEquipOutletNodeNum = 1;
+    auto &equipOutletNode = state->dataLoopNodes->Node(thisSplitter.zoneEquipOutletNodeNum);
+    auto &splitSpace1Node = state->dataLoopNodes->Node(splitSpace1.spaceNodeNum);
+    auto &splitSpace2Node = state->dataLoopNodes->Node(splitSpace2.spaceNodeNum);
+    auto &splitSpace3Node = state->dataLoopNodes->Node(splitSpace3.spaceNodeNum);
+
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->spaceSysEnergyDemand.allocate(3);
+    state->dataZoneEnergyDemand->spaceSysMoistureDemand.allocate(3);
+    auto &zone1Energy = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1);
+    auto &zone1Moist = state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1);
+    auto &space1Energy = state->dataZoneEnergyDemand->spaceSysEnergyDemand(1);
+    auto &space2Energy = state->dataZoneEnergyDemand->spaceSysEnergyDemand(2);
+    auto &space3Energy = state->dataZoneEnergyDemand->spaceSysEnergyDemand(3);
+    zone1Energy.SequencedOutputRequired.allocate(1);
+    zone1Energy.SequencedOutputRequiredToCoolingSP.allocate(1);
+    zone1Energy.SequencedOutputRequiredToHeatingSP.allocate(1);
+    zone1Moist.SequencedOutputRequired.allocate(1);
+    zone1Moist.SequencedOutputRequiredToDehumidSP.allocate(1);
+    zone1Moist.SequencedOutputRequiredToHumidSP.allocate(1);
+
+    zone1Energy.RemainingOutputRequired = -100.0;
+    zone1Energy.RemainingOutputReqToCoolSP = -100.0;
+    zone1Energy.RemainingOutputReqToHeatSP = -200.0;
+    zone1Energy.SequencedOutputRequired(1) = 10.0;
+    zone1Energy.SequencedOutputRequiredToCoolingSP(1) = 100.0;
+    zone1Energy.SequencedOutputRequiredToHeatingSP(1) = 10.0;
+
+    space1Energy.RemainingOutputRequired = -20.0;
+    space2Energy.RemainingOutputRequired = -40.0;
+    space3Energy.RemainingOutputRequired = 10.0;
+
+    int zone1Num = 1;
+    int equipNum = 1;
+
+    // Case 1 - Ideal Control
+    thisSplitter.adjustLoads(*state, zone1Num, equipNum);
+
+    Real64 expectedRatio = 1.0;
+
+    EXPECT_NEAR(zone1Energy.RemainingOutputRequired, -100.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.RemainingOutputReqToCoolSP, -100.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.RemainingOutputReqToHeatSP, -200.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.SequencedOutputRequired(1), 10.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.SequencedOutputRequiredToCoolingSP(1), 100.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.SequencedOutputRequiredToHeatingSP(1), 10.0 * expectedRatio, 0.001);
+
+    // Case 2 - SingleSpace Control
+    thisSplitter.tstatControl = ZoneEquipTstatControl::SingleSpace;
+    thisSplitter.controlSpaceIndex = 3;
+    thisSplitter.controlSpaceNumber = 1; // this is a zero-based value, so it's for the 2nd space, which is splitSpace2, space3
+    // Set expectedRatio before zone loads get adjusted
+    expectedRatio = space3Energy.RemainingOutputRequired / (splitSpace2.fraction * zone1Energy.RemainingOutputRequired);
+    thisSplitter.adjustLoads(*state, zone1Num, equipNum);
+
+    EXPECT_NEAR(zone1Energy.RemainingOutputRequired, -100.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.RemainingOutputReqToCoolSP, -100.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.RemainingOutputReqToHeatSP, -200.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.SequencedOutputRequired(1), 10.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.SequencedOutputRequiredToCoolingSP(1), 100.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.SequencedOutputRequiredToHeatingSP(1), 10.0 * expectedRatio, 0.001);
+
+    Real64 sysOutputProvided = -90.0;
+    Real64 latOutputProvided = 0.0;
+    Real64 nonAirSysOutput = 10.0;
+    equipOutletNode.MassFlowRate = 0.1;
+    equipOutletNode.MassFlowRateMinAvail = 0.0;
+    equipOutletNode.MassFlowRateMaxAvail = 0.15;
+    equipOutletNode.Temp = 19.2;
+    equipOutletNode.HumRat = 0.005;
+    equipOutletNode.CO2 = 100.0;
+
+    // Stuff needed by updateSystemOutput which gets called by distributeOutput
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(3);
+    auto &spaceHB1 = state->dataZoneTempPredictorCorrector->spaceHeatBalance(1);
+    auto &spaceHB2 = state->dataZoneTempPredictorCorrector->spaceHeatBalance(2);
+    auto &spaceHB3 = state->dataZoneTempPredictorCorrector->spaceHeatBalance(3);
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipList.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(1).LoadDistScheme = DataZoneEquipment::LoadDist::Sequential;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+
+    thisSplitter.distributeOutput(*state, zone1Num, sysOutputProvided, latOutputProvided, nonAirSysOutput, equipNum);
+
+    // Check is zone loads have been restored
+    expectedRatio = 1.0;
+    EXPECT_NEAR(zone1Energy.RemainingOutputRequired, -100.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.RemainingOutputReqToCoolSP, -100.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.RemainingOutputReqToHeatSP, -200.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.SequencedOutputRequired(1), 10.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.SequencedOutputRequiredToCoolingSP(1), 100.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.SequencedOutputRequiredToHeatingSP(1), 10.0 * expectedRatio, 0.001);
+
+    // Check output distribution
+    EXPECT_NEAR(spaceHB1.NonAirSystemResponse, nonAirSysOutput * splitSpace1.fraction, 0.001);
+    EXPECT_NEAR(spaceHB3.NonAirSystemResponse, nonAirSysOutput * splitSpace2.fraction, 0.001);
+    EXPECT_NEAR(spaceHB2.NonAirSystemResponse, nonAirSysOutput * splitSpace3.fraction, 0.001);
+
+    EXPECT_EQ(splitSpace1Node.Temp, equipOutletNode.Temp);
+    EXPECT_EQ(splitSpace2Node.Temp, equipOutletNode.Temp);
+    EXPECT_EQ(splitSpace3Node.Temp, equipOutletNode.Temp);
+    EXPECT_EQ(splitSpace1Node.HumRat, equipOutletNode.HumRat);
+    EXPECT_EQ(splitSpace2Node.HumRat, equipOutletNode.HumRat);
+    EXPECT_EQ(splitSpace3Node.HumRat, equipOutletNode.HumRat);
+    EXPECT_EQ(splitSpace1Node.CO2, equipOutletNode.CO2);
+    EXPECT_EQ(splitSpace2Node.CO2, equipOutletNode.CO2);
+    EXPECT_EQ(splitSpace3Node.CO2, equipOutletNode.CO2);
+
+    EXPECT_NEAR(splitSpace1Node.MassFlowRate, equipOutletNode.MassFlowRate * splitSpace1.fraction, 0.0001);
+    EXPECT_NEAR(splitSpace2Node.MassFlowRate, equipOutletNode.MassFlowRate * splitSpace2.fraction, 0.0001);
+    EXPECT_NEAR(splitSpace3Node.MassFlowRate, equipOutletNode.MassFlowRate * splitSpace3.fraction, 0.0001);
+    EXPECT_NEAR(splitSpace1Node.MassFlowRateMinAvail, equipOutletNode.MassFlowRateMinAvail * splitSpace1.fraction, 0.0001);
+    EXPECT_NEAR(splitSpace2Node.MassFlowRateMinAvail, equipOutletNode.MassFlowRateMinAvail * splitSpace2.fraction, 0.0001);
+    EXPECT_NEAR(splitSpace3Node.MassFlowRateMinAvail, equipOutletNode.MassFlowRateMinAvail * splitSpace3.fraction, 0.0001);
+    EXPECT_NEAR(splitSpace1Node.MassFlowRateMaxAvail, equipOutletNode.MassFlowRateMaxAvail * splitSpace1.fraction, 0.0001);
+    EXPECT_NEAR(splitSpace2Node.MassFlowRateMaxAvail, equipOutletNode.MassFlowRateMaxAvail * splitSpace2.fraction, 0.0001);
+    EXPECT_NEAR(splitSpace3Node.MassFlowRateMaxAvail, equipOutletNode.MassFlowRateMaxAvail * splitSpace3.fraction, 0.0001);
+
+    // Case 3 - Max Control
+    thisSplitter.tstatControl = ZoneEquipTstatControl::Maximum;
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(1);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(1);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 18.0;
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 24.0;
+    spaceHB1.T1 = 20.0; // Heating delta = 18-20=-2, cooling delta = 20-24=-4
+    spaceHB2.T1 = 16.0; // Heating delta = 18-16=2, cooling delta = 16-24=-8 - This zone is the winner, space2, splitSpace3
+    spaceHB3.T1 = 24.0; // Heating delta = 18-24=-6, cooling delta = 24-24=0
+
+    // Set expectedRatio before zone loads get adjusted
+    expectedRatio = space2Energy.RemainingOutputRequired / (splitSpace3.fraction * zone1Energy.RemainingOutputRequired);
+    thisSplitter.adjustLoads(*state, zone1Num, equipNum);
+    EXPECT_NEAR(zone1Energy.RemainingOutputRequired, -100.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.RemainingOutputReqToCoolSP, -100.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.RemainingOutputReqToHeatSP, -200.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.SequencedOutputRequired(1), 10.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.SequencedOutputRequiredToCoolingSP(1), 100.0 * expectedRatio, 0.001);
+    EXPECT_NEAR(zone1Energy.SequencedOutputRequiredToHeatingSP(1), 10.0 * expectedRatio, 0.001);
+}
+
+TEST_F(EnergyPlusFixture, SpaceHVACMixerTest)
+{
+    state->dataZoneEquip->zoneEquipMixer.resize(1);
+    auto &thisMixer = state->dataZoneEquip->zoneEquipMixer[0];
+    // Assume 3 spaces are served by this mixter
+    state->dataZoneEquip->zoneEquipMixer[0].spaces.resize(3);
+    auto &mixSpace1 = state->dataZoneEquip->zoneEquipMixer[0].spaces[0];
+    auto &mixSpace2 = state->dataZoneEquip->zoneEquipMixer[0].spaces[1];
+    auto &mixSpace3 = state->dataZoneEquip->zoneEquipMixer[0].spaces[2];
+    mixSpace1.fraction = 0.2;
+    mixSpace2.fraction = 0.5;
+    mixSpace3.fraction = 0.3;
+    mixSpace1.spaceIndex = 1;
+    mixSpace2.spaceIndex = 3;
+    mixSpace3.spaceIndex = 2;
+    mixSpace1.spaceNodeNum = 11;
+    mixSpace2.spaceNodeNum = 12;
+    mixSpace3.spaceNodeNum = 13;
+    state->dataLoopNodes->Node.allocate(13);
+    thisMixer.zoneEquipInletNodeNum = 1;
+    auto &equipInletNode = state->dataLoopNodes->Node(thisMixer.zoneEquipInletNodeNum);
+    auto &mixSpace1Node = state->dataLoopNodes->Node(mixSpace1.spaceNodeNum);
+    auto &mixSpace2Node = state->dataLoopNodes->Node(mixSpace2.spaceNodeNum);
+    auto &mixSpace3Node = state->dataLoopNodes->Node(mixSpace3.spaceNodeNum);
+
+    // Case 1
+
+    mixSpace1Node.Temp = 15.0;
+    mixSpace2Node.Temp = 15.0;
+    mixSpace3Node.Temp = 15.0;
+
+    mixSpace1Node.HumRat = 0.004;
+    mixSpace2Node.HumRat = 0.001;
+    mixSpace3Node.HumRat = 0.080;
+
+    mixSpace1Node.Enthalpy = Psychrometrics::PsyHFnTdbW(mixSpace1Node.Temp, mixSpace1Node.HumRat);
+    mixSpace2Node.Enthalpy = Psychrometrics::PsyHFnTdbW(mixSpace2Node.Temp, mixSpace2Node.HumRat);
+
+    mixSpace1Node.Press = 100000.0;
+    mixSpace2Node.Press = 100020.0;
+    mixSpace3Node.Press = 99400.0;
+
+    equipInletNode.Temp = 19.2;
+    equipInletNode.HumRat = 0.005;
+    equipInletNode.CO2 = 100.0;
+
+    thisMixer.setOutletConditions(*state);
+    Real64 expectedInletEnthalpy =
+        mixSpace1Node.Enthalpy * mixSpace1.fraction + mixSpace2Node.Enthalpy * mixSpace2.fraction + mixSpace3Node.Enthalpy * mixSpace3.fraction;
+    Real64 expectedInletHumRat =
+        mixSpace1Node.HumRat * mixSpace1.fraction + mixSpace2Node.HumRat * mixSpace2.fraction + mixSpace3Node.HumRat * mixSpace3.fraction;
+    Real64 expectedInletCO2 =
+        mixSpace1Node.CO2 * mixSpace1.fraction + mixSpace2Node.CO2 * mixSpace2.fraction + mixSpace3Node.CO2 * mixSpace3.fraction;
+    Real64 expectedInletPress =
+        mixSpace1Node.Press * mixSpace1.fraction + mixSpace2Node.Press * mixSpace2.fraction + mixSpace3Node.Press * mixSpace3.fraction;
+    Real64 expectedInletTemp = Psychrometrics::PsyTdbFnHW(expectedInletEnthalpy, expectedInletHumRat);
+
+    EXPECT_NEAR(expectedInletEnthalpy, equipInletNode.Enthalpy, 0.0001);
+    EXPECT_NEAR(expectedInletTemp, equipInletNode.Temp, 0.0001);
+    EXPECT_NEAR(expectedInletHumRat, equipInletNode.HumRat, 0.0001);
+    EXPECT_NEAR(expectedInletCO2, equipInletNode.CO2, 0.0001);
+    EXPECT_NEAR(expectedInletPress, equipInletNode.Press, 0.0001);
+
+    equipInletNode.MassFlowRate = 0.1;
+    equipInletNode.MassFlowRateMinAvail = 0.0;
+    equipInletNode.MassFlowRateMaxAvail = 0.15;
+
+    thisMixer.setInletFlows(*state);
+
+    EXPECT_NEAR(mixSpace1Node.MassFlowRate, equipInletNode.MassFlowRate * mixSpace1.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace2Node.MassFlowRate, equipInletNode.MassFlowRate * mixSpace2.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace3Node.MassFlowRate, equipInletNode.MassFlowRate * mixSpace3.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace1Node.MassFlowRateMinAvail, equipInletNode.MassFlowRateMinAvail * mixSpace1.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace2Node.MassFlowRateMinAvail, equipInletNode.MassFlowRateMinAvail * mixSpace2.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace3Node.MassFlowRateMinAvail, equipInletNode.MassFlowRateMinAvail * mixSpace3.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace1Node.MassFlowRateMaxAvail, equipInletNode.MassFlowRateMaxAvail * mixSpace1.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace2Node.MassFlowRateMaxAvail, equipInletNode.MassFlowRateMaxAvail * mixSpace2.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace3Node.MassFlowRateMaxAvail, equipInletNode.MassFlowRateMaxAvail * mixSpace3.fraction, 0.0001);
 }

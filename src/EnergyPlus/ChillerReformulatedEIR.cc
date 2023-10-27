@@ -553,12 +553,6 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
                 ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12)));
                 ErrorsFound = true;
             }
-            if (thisChiller.CondenserType != DataPlant::CondenserType::WaterCooled) {
-                ShowSevereError(state,
-                                format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(state, "Heat Recovery requires a Water Cooled Condenser.");
-                ErrorsFound = true;
-            }
 
             BranchNodeConnections::TestCompSet(state,
                                                state.dataIPShortCut->cCurrentModuleObject,
@@ -1276,7 +1270,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
         }
     }
 
-    if (PltSizCondNum > 0 && PltSizNum > 0) {
+    if (PltSizCondNum > 0 && PltSizNum > 0 && this->CondenserType == DataPlant::CondenserType::WaterCooled) {
         if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
@@ -1343,13 +1337,21 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
             }
         }
     } else {
-        if (this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
+        if (this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize &&
+            this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             ShowSevereError(state, "Autosizing of Reformulated Electric EIR Chiller condenser flow rate requires a condenser");
             ShowContinueError(state, "loop Sizing:Plant object");
             ShowContinueError(state, format("Occurs in Reformulated Electric EIR Chiller object={}", this->Name));
             ErrorsFound = true;
         }
-        if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
+        tmpCondVolFlowRate = this->CondVolFlowRateWasAutoSized ? this->RefCap * 0.000114 : this->CondVolFlowRate;
+        if (this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (tmpCondVolFlowRate > 0.0) &&
+            this->CondenserType != DataPlant::CondenserType::WaterCooled) {
+            this->CondVolFlowRate = tmpCondVolFlowRate;
+            BaseSizer::reportSizerOutput(
+                state, "Chiller:Electric:ReformulatedEIR", this->Name, "Design Size Reference Condenser Air Flow Rate [m3/s]", this->CondVolFlowRate);
+        } else if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0) &&
+                   this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             BaseSizer::reportSizerOutput(state,
                                          "Chiller:Electric:ReformulatedEIR",
                                          this->Name,
@@ -1358,11 +1360,23 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
         }
     }
 
-    // save the reference condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
-    PlantUtilities::RegisterPlantCompDesignFlow(state, this->CondInletNodeNum, tmpCondVolFlowRate);
+    if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
+        // save the reference condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->CondInletNodeNum, tmpCondVolFlowRate);
+    }
 
     if (this->HeatRecActive) {
-        Real64 tmpHeatRecVolFlowRate = tmpCondVolFlowRate * this->HeatRecCapacityFraction;
+        Real64 tmpHeatRecVolFlowRate;
+        if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
+            tmpHeatRecVolFlowRate = tmpCondVolFlowRate * this->HeatRecCapacityFraction;
+        } else {
+            if (this->EvapVolFlowRateWasAutoSized) {
+                tmpHeatRecVolFlowRate = tmpEvapVolFlowRate;
+            } else {
+                tmpHeatRecVolFlowRate = this->EvapVolFlowRate;
+            }
+            tmpHeatRecVolFlowRate *= (1.0 + (1.0 / this->RefCOP)) * this->CompPowerToCondenserFrac * this->HeatRecCapacityFraction;
+        }
         if (!this->DesignHeatRecVolFlowRateWasAutoSized) tmpHeatRecVolFlowRate = this->DesignHeatRecVolFlowRate;
         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
             if (this->DesignHeatRecVolFlowRateWasAutoSized) {
@@ -1418,6 +1432,10 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
 
     std::string equipName; // Name of chiller
     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+
+        Real64 IPLVSI_rpt_std229 = 0.0;
+        Real64 IPLVIP_rpt_std229 = 0.0;
+
         if (this->MySizeFlag) {
             Real64 IPLVSI = 0.0;
             Real64 IPLVIP = 0.0;
@@ -1436,6 +1454,10 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                                              this->CondVolFlowRate,
                                              this->CDPlantLoc.loopNum,
                                              this->CompPowerToCondenserFrac);
+
+            IPLVSI_rpt_std229 = IPLVSI;
+            IPLVIP_rpt_std229 = IPLVIP;
+
             this->MySizeFlag = false;
         }
         // create predefined report
@@ -1443,6 +1465,69 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, equipName, "Chiller:Electric:ReformulatedEIR");
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, equipName, this->RefCOP);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, equipName, this->RefCap);
+
+        // std 229 new Chiller table
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerType, this->Name, "Chiller:Electric:ReformulatedEIR");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefCap, this->Name, this->RefCap);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEff, this->Name, this->RefCOP); // Eff == COP?
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRatedCap, this->Name, this->RefCap); // did not find rated cap
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRatedEff, this->Name, this->RefCOP); // did not find rated eff or cop ; also Eff == COP?
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinSI, this->Name, IPLVSI_rpt_std229);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinIP, this->Name, IPLVIP_rpt_std229);
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerPlantloopName,
+                                                 this->Name,
+                                                 this->CWPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).Name : "N/A");
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchChillerPlantloopBranchName,
+            this->Name,
+            this->CWPlantLoc.loopNum > 0
+                ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).Branch(this->CWPlantLoc.branchNum).Name
+                : "N/A");
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerCondLoopName,
+                                                 this->Name,
+                                                 this->CDPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).Name : "N/A");
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
+            this->Name,
+            this->CDPlantLoc.loopNum > 0
+                ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).LoopSide(this->CDPlantLoc.loopSideNum).Branch(this->CDPlantLoc.branchNum).Name
+                : "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerMinPLR, this->Name, this->ChillerEIRFPLRPLRMin);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerFuelType, this->Name, "Electricity");
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRatedEntCondTemp, this->Name, this->TempRefCondIn); // Rated==Ref?
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRatedLevEvapTemp, this->Name, this->TempRefEvapOut); // Rated==Ref?
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEntCondTemp, this->Name, this->TempRefCondIn);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefLevEvapTemp, this->Name, this->TempRefEvapOut);
+
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerDesSizeRefCHWFlowRate,
+                                                 this->Name,
+                                                 this->EvapMassFlowRateMax); // flowrate Max==DesignSizeRef flowrate?
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerDesSizeRefCondFluidFlowRate,
+                                                 this->Name,
+                                                 this->CondMassFlowRateMax); // Cond flowrate Max==DesignSizeRef Cond flowrate?
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerHeatRecPlantloopName,
+                                                 this->Name,
+                                                 this->HRPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).Name : "N/A");
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchChillerHeatRecPlantloopBranchName,
+            this->Name,
+            this->HRPlantLoc.loopNum > 0
+                ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).LoopSide(this->HRPlantLoc.loopSideNum).Branch(this->HRPlantLoc.branchNum).Name
+                : "N/A");
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRecRelCapFrac, this->Name, this->HeatRecCapacityFraction);
     }
 
     // Only check performance curves if Capacity and volumetric flow rate are greater than 0
@@ -1775,11 +1860,16 @@ void ReformulatedEIRChillerSpecs::calcHeatRecovery(EnergyPlusData &state,
                                                               heatRecInletTemp,
                                                               state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                               RoutineName);
-    Real64 CpCond = FluidProperties::GetSpecificHeatGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                           condInletTemp,
-                                                           state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
-                                                           RoutineName);
+    Real64 CpCond;
+    if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
+        CpCond = FluidProperties::GetSpecificHeatGlycol(state,
+                                                        state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
+                                                        condInletTemp,
+                                                        state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
+                                                        RoutineName);
+    } else {
+        CpCond = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(this->HeatRecInletNodeNum).HumRat);
+    }
 
     // Before we modify the QCondenser, the total or original value is transferred to QTot
     Real64 QTotal = QCond;
