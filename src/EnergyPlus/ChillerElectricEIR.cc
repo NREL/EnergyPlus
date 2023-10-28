@@ -766,7 +766,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 {
     SetupOutputVariable(state,
                         "Chiller Part Load Ratio",
-                        OutputProcessor::Unit::None,
+                        Constant::Units::None,
                         this->ChillerPartLoadRatio,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -774,7 +774,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Cycling Ratio",
-                        OutputProcessor::Unit::None,
+                        Constant::Units::None,
                         this->ChillerCyclingRatio,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -782,7 +782,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Electricity Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->Power,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -790,20 +790,20 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->Energy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         {},
-                        "ELECTRICITY",
+                        Constant::eResource::Electricity, 
                         "Cooling",
                         this->EndUseSubcategory,
                         "Plant");
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Cooling Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->QEvaporator,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -811,20 +811,20 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Cooling Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->EvapEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         {},
-                        "ENERGYTRANSFER",
+                        Constant::eResource::EnergyTransfer,
                         "CHILLERS",
                         {},
                         "Plant");
 
     SetupOutputVariable(state,
                         "Chiller False Load Heat Transfer Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->ChillerFalseLoadRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -832,7 +832,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller False Load Heat Transfer Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->ChillerFalseLoad,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
@@ -840,7 +840,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->EvapInletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -848,7 +848,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->EvapOutletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -856,7 +856,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->EvapMassFlowRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -864,7 +864,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Condenser Heat Transfer Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->QCondenser,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -872,20 +872,20 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Condenser Heat Transfer Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->CondEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         {},
-                        "ENERGYTRANSFER",
+                        Constant::eResource::EnergyTransfer,
                         "HEATREJECTION",
                         {},
                         "Plant");
 
     SetupOutputVariable(state,
                         "Chiller COP",
-                        OutputProcessor::Unit::W_W,
+                        Constant::Units::W_W,
                         this->ActualCOP,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -893,7 +893,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Capacity Temperature Modifier Multiplier",
-                        OutputProcessor::Unit::None,
+                        Constant::Units::None,
                         this->ChillerCapFT,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -901,7 +901,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller EIR Temperature Modifier Multiplier",
-                        OutputProcessor::Unit::None,
+                        Constant::Units::None,
                         this->ChillerEIRFT,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -909,7 +909,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller EIR Part Load Modifier Multiplier",
-                        OutputProcessor::Unit::None,
+                        Constant::Units::None,
                         this->ChillerEIRFPLR,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -919,7 +919,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
     if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
         SetupOutputVariable(state,
                             "Chiller Condenser Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->CondInletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -927,7 +927,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Chiller Condenser Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->CondOutletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -935,7 +935,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Chiller Condenser Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             this->CondMassFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -945,7 +945,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
         if (this->HeatRecActive) {
             SetupOutputVariable(state,
                                 "Chiller Total Recovered Heat Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->QHeatRecovered,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -953,20 +953,20 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 "Chiller Total Recovered Heat Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->EnergyHeatRecovery,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 {},
-                                "ENERGYTRANSFER",
+                                Constant::eResource::EnergyTransfer, 
                                 "HEATRECOVERY",
                                 {},
                                 "Plant");
 
             SetupOutputVariable(state,
                                 "Chiller Heat Recovery Inlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->HeatRecInletTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -974,7 +974,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 "Chiller Heat Recovery Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->HeatRecOutletTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -982,7 +982,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 "Chiller Heat Recovery Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 this->HeatRecMassFlow,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -990,7 +990,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 "Chiller Effective Heat Rejection Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->ChillerCondAvgTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1000,7 +1000,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
     } else {
         SetupOutputVariable(state,
                             "Chiller Condenser Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->CondInletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1009,7 +1009,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
         if (this->CondenserFanPowerRatio > 0) {
             SetupOutputVariable(state,
                                 "Chiller Condenser Fan Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->CondenserFanPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1017,13 +1017,13 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 "Chiller Condenser Fan Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->CondenserFanEnergyConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 {},
-                                "ELECTRICITY",
+                                Constant::eResource::Electricity, 
                                 "Cooling",
                                 {},
                                 "Plant");
@@ -1031,26 +1031,26 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
         if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             SetupOutputVariable(state,
                                 "Chiller Evaporative Condenser Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 this->EvapWaterConsump,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 {},
-                                "Water",
+                                Constant::eResource::Water, 
                                 "Cooling",
                                 {},
                                 "System");
 
             SetupOutputVariable(state,
                                 "Chiller Evaporative Condenser Mains Supply Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 this->EvapWaterConsump,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 {},
-                                "MainsWater",
+                                Constant::eResource::MainsWater, 
                                 "Cooling",
                                 {},
                                 "System");
@@ -1058,7 +1058,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(state,
                                     "Chiller Basin Heater Electricity Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->BasinHeaterPower,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -1066,13 +1066,13 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 
                 SetupOutputVariable(state,
                                     "Chiller Basin Heater Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     this->BasinHeaterConsumption,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
                                     {},
-                                    "Electricity",
+                                    Constant::eResource::Electricity, 
                                     "CHILLERS",
                                     {},
                                     "Plant");

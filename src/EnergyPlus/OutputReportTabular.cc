@@ -573,7 +573,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
     OutputProcessor::VariableType TypeVar;
     OutputProcessor::StoreType AvgSumVar;
     OutputProcessor::TimeStepType StepTypeVar;
-    OutputProcessor::Unit UnitsVar = OutputProcessor::Unit::None; // Units enum
+    Constant::Units UnitsVar = Constant::Units::None; // Units enum
     Array1D_string UniqueKeyNames;
     int found;
     auto &ort = state.dataOutRptTab;
@@ -617,7 +617,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             // call the key count function but only need count during this pass
             int KeyCount = 0;
             GetVariableKeyCountandType(state, curVariMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
-            if (TypeVar == OutputProcessor::VariableType::NotFound) {
+            if (TypeVar == OutputProcessor::VariableType::Invalid) {
                 ShowWarningError(
                     state, format("In Output:Table:Monthly '{}' invalid Variable or Meter Name '{}'", ort->MonthlyInput(TabNum).name, curVariMeter));
             }
@@ -635,9 +635,13 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             GetVariableKeys(state,
                             curVariMeter,
                             TypeVar,
-                            ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys,
                             ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar);
 
+            for (int i = 1; i <= KeyCount; ++i) { 
+                ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(i) =
+                        state.dataOutputProcessor->outVars[ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar(i)]->keyUC;
+            }
+            
             // save these values to use later -- noel
             ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeterUpper = curVariMeter;
             ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).typeOfVar = TypeVar;
@@ -709,10 +713,10 @@ void InitializeTabularMonthly(EnergyPlusData &state)
     for (auto &e : ort->MonthlyColumns) {
         e.varName.clear();
         e.varNum = 0;
-        e.typeOfVar = OutputProcessor::VariableType::NotFound;
+        e.typeOfVar = OutputProcessor::VariableType::Invalid;
         e.avgSum = OutputProcessor::StoreType::Averaged;
         e.stepType = OutputProcessor::TimeStepType::Zone;
-        e.units = OutputProcessor::Unit::None;
+        e.units = Constant::Units::None;
         e.aggType = AggType::Invalid;
     }
     for (int colNum = 1; colNum <= ort->MonthlyColumnsCount; ++colNum) {
@@ -940,10 +944,10 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                     }
                     ort->MonthlyColumns(mColumn).varName = curVariMeter;
                     ort->MonthlyColumns(mColumn).varNum = 0;
-                    ort->MonthlyColumns(mColumn).typeOfVar = OutputProcessor::VariableType::NotFound;
+                    ort->MonthlyColumns(mColumn).typeOfVar = OutputProcessor::VariableType::Invalid;
                     ort->MonthlyColumns(mColumn).avgSum = OutputProcessor::StoreType::Averaged;
                     ort->MonthlyColumns(mColumn).stepType = OutputProcessor::TimeStepType::Zone;
-                    ort->MonthlyColumns(mColumn).units = OutputProcessor::Unit::None;
+                    ort->MonthlyColumns(mColumn).units = Constant::Units::None;
                     ort->MonthlyColumns(mColumn).aggType = AggType::SumOrAvg;
                 }
                 // #ifdef ITM_KEYCACHE
@@ -1060,8 +1064,9 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
     int IOStat = -1;              // IO Status when calling get input subroutine
     Real64 constexpr bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
 
-    Array1D_string objNames;
     Array1D_int objVarIDs;
+    Array1D_string objNames;
+    
     auto &ort = state.dataOutRptTab;
 
     if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
@@ -1153,7 +1158,7 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
                                    ort->OutputTableBinned(iInObj).avgSum,
                                    ort->OutputTableBinned(iInObj).stepType,
                                    ort->OutputTableBinned(iInObj).units);
-        if (ort->OutputTableBinned(iInObj).typeOfVar == OutputProcessor::VariableType::NotFound) {
+        if (ort->OutputTableBinned(iInObj).typeOfVar == OutputProcessor::VariableType::Invalid) {
             ShowWarningError(
                 state, format("{}: User specified meter or variable not found: {}", CurrentModuleObject, ort->OutputTableBinned(iInObj).varOrMeter));
         }
@@ -1177,16 +1182,20 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
     for (int iInObj = 1; iInObj <= ort->OutputTableBinnedCount; ++iInObj) {
         int firstReport = ort->OutputTableBinned(iInObj).resIndex;
         // allocate the arrays to the number of objects
-        objNames.allocate(ort->OutputTableBinned(iInObj).numTables);
         objVarIDs.allocate(ort->OutputTableBinned(iInObj).numTables);
-        GetVariableKeys(state, ort->OutputTableBinned(iInObj).varOrMeter, ort->OutputTableBinned(iInObj).typeOfVar, objNames, objVarIDs);
+        objNames.allocate(ort->OutputTableBinned(iInObj).numTables);
+        GetVariableKeys(state, ort->OutputTableBinned(iInObj).varOrMeter, ort->OutputTableBinned(iInObj).typeOfVar, objVarIDs);
+        for (int iTable = 1; iTable <= ort->OutputTableBinned(iInObj).numTables; ++iTable) {
+            objNames(iTable) = state.dataOutputProcessor->outVars[objVarIDs(iTable)]->keyUC;
+        }
         if (ort->OutputTableBinned(iInObj).keyValue == "*") {
             for (int iTable = 1; iTable <= ort->OutputTableBinned(iInObj).numTables; ++iTable) {
                 int repIndex = firstReport + (iTable - 1);
                 ort->BinObjVarID(repIndex).namesOfObj = objNames(iTable);
                 ort->BinObjVarID(repIndex).varMeterNum = objVarIDs(iTable);
                 // check if valid meter or number
-                if (objVarIDs(iTable) == 0) {
+                // Why is this here?
+                if (objVarIDs(iTable) == -1) {
                     ShowWarningError(state, format("{}: Specified variable or meter not found: {}", CurrentModuleObject, objNames(iTable)));
                 }
             }
@@ -1791,17 +1800,16 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->endUseNames(static_cast<int>(Constant::EndUse::Refrigeration) + 1) = "Refrigeration";
         ort->endUseNames(static_cast<int>(Constant::EndUse::Cogeneration) + 1) = "Cogeneration";
 
+        auto &op = state.dataOutputProcessor;
         // End use subs must be dynamically allocated to accomodate the end use with the most subcategories
-        ort->meterNumEndUseSubBEPS.allocate(
-            state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
-        ort->meterNumEndUseSpTypeBEPS.allocate(
-            state.dataOutputProcessor->maxNumEndUseSpaceTypes, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
+        ort->meterNumEndUseSubBEPS.allocate(op->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
+        ort->meterNumEndUseSpTypeBEPS.allocate(op->maxNumEndUseSpaceTypes, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         for (int endUse = 1; endUse <= static_cast<int>(Constant::EndUse::Num); ++endUse) {
             for (int resType = 1; resType <= numResourceTypes; ++resType) {
-                for (int subCat = 1; subCat <= state.dataOutputProcessor->MaxNumSubcategories; ++subCat) {
+                for (int subCat = 1; subCat <= op->MaxNumSubcategories; ++subCat) {
                     ort->meterNumEndUseSubBEPS(subCat, endUse, resType) = 0;
                 }
-                for (int spType = 1; spType <= state.dataOutputProcessor->maxNumEndUseSpaceTypes; ++spType) {
+                for (int spType = 1; spType <= op->maxNumEndUseSpaceTypes; ++spType) {
                     ort->meterNumEndUseSpTypeBEPS(spType, endUse, resType) = 0;
                 }
             }
@@ -1818,15 +1826,15 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
                 meterNumber = GetMeterIndex(state, meterName);
                 ort->meterNumEndUseBEPS(iResource, jEndUse) = meterNumber;
 
-                for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                    meterName = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub) + ':' + ort->endUseNames(jEndUse) +
+                for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                    meterName = op->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub) + ':' + ort->endUseNames(jEndUse) +
                                 ':' + ort->resourceTypeNames(iResource);
                     meterNumber = GetMeterIndex(state, meterName);
                     ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource) = meterNumber;
                 }
-                for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
+                for (int kEndUseSpType = 1; kEndUseSpType <= op->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
                     meterName = ort->endUseNames(jEndUse) + ':' + ort->resourceTypeNames(iResource) +
-                                ":SpaceType:" + state.dataOutputProcessor->EndUseCategory(jEndUse).spaceTypeName(kEndUseSpType);
+                                ":SpaceType:" + op->EndUseCategory(jEndUse).spaceTypeName(kEndUseSpType);
                     meterNumber = GetMeterIndex(state, meterName);
                     ort->meterNumEndUseSpTypeBEPS(kEndUseSpType, jEndUse, iResource) = meterNumber;
                 }
@@ -1846,16 +1854,13 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->gatherEndUseBEPS = 0.0;
         ort->gatherEndUseBySourceBEPS = 0.0;
         // End use subs must be dynamically allocated to accommodate the end use with the most subcategories
-        ort->gatherEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
+        ort->gatherEndUseSubBEPS.allocate(op->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         ort->gatherEndUseSubBEPS = 0.0;
-        ort->gatherEndUseSpTypeBEPS.allocate(
-            state.dataOutputProcessor->maxNumEndUseSpaceTypes, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
+        ort->gatherEndUseSpTypeBEPS.allocate(op->maxNumEndUseSpaceTypes, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         ort->gatherEndUseSpTypeBEPS = 0.0;
-        ort->gatherDemandEndUseSub.allocate(
-            state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
+        ort->gatherDemandEndUseSub.allocate(op->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         ort->gatherDemandEndUseSub = 0.0;
-        ort->gatherDemandIndEndUseSub.allocate(
-            state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
+        ort->gatherDemandIndEndUseSub.allocate(op->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), numResourceTypes);
         ort->gatherDemandIndEndUseSub = 0.0;
 
         // get meter numbers for other meters relating to electric load components
@@ -3355,12 +3360,12 @@ void WriteTableOfContents(EnergyPlusData &state)
                             int const curTable = ort->OutputTableBinned(iInput).resIndex + (jTable - 1);
                             std::string curName;
                             if (ort->unitsStyle == UnitsStyle::InchPound) {
-                                std::string origName =
-                                    ort->OutputTableBinned(iInput).varOrMeter + unitEnumToStringBrackets(ort->OutputTableBinned(iInput).units);
+                                std::string origName = format("{} [{}]", ort->OutputTableBinned(iInput).varOrMeter,
+                                                              Constant::unitNames[(int)ort->OutputTableBinned(iInput).units]);
                                 [[maybe_unused]] int indexUnitConv = -1;
                                 LookupSItoIP(state, origName, indexUnitConv, curName);
                             } else {
-                                curName = ort->OutputTableBinned(iInput).varOrMeter + unitEnumToStringBrackets(ort->OutputTableBinned(iInput).units);
+                                curName = format("{}[{}]", ort->OutputTableBinned(iInput).varOrMeter, Constant::unitNames[(int)ort->OutputTableBinned(iInput).units]);
                             }
                             if (ort->OutputTableBinned(iInput).scheduleIndex == 0) {
                                 tbl_stream << "<a href=\"#" << MakeAnchorName(curName, ort->BinObjVarID(curTable).namesOfObj) << "\">"
@@ -3898,7 +3903,7 @@ void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSt
     using DataStringGlobals::CharTab;
 
     auto &ort = state.dataOutRptTab;
-
+    auto &op = state.dataOutputProcessor;
     // if no beps report is called then skip
 
     if ((ort->displayTabularBEPS || ort->displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::Zone)) {
@@ -3928,14 +3933,14 @@ void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSt
                     Real64 curEndUseMeterValue = GetCurrentMeterValue(state, curEndUseMeterNumber);
                     ort->gatherEndUseBEPS(iResource, jEndUse) += curEndUseMeterValue;
 
-                    for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                    for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         int curSubMeterNumber = ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
                         if (curSubMeterNumber > 0) {
                             Real64 curSubMeterValue = GetCurrentMeterValue(state, curSubMeterNumber);
                             ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, iResource) += curSubMeterValue;
                         }
                     }
-                    for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
+                    for (int kEndUseSpType = 1; kEndUseSpType <= op->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
                         int curSpTypeMeterNumber = ort->meterNumEndUseSpTypeBEPS(kEndUseSpType, jEndUse, iResource);
                         if (curSpTypeMeterNumber > 0) {
                             Real64 curSpTypeMeterValue = GetCurrentMeterValue(state, curSpTypeMeterNumber);
@@ -4180,6 +4185,7 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     assert(state.dataGlobal->TimeStepZoneSec > 0.0);
     auto &ort = state.dataOutRptTab;
+    auto &op = state.dataOutputProcessor;
 
     if ((ort->displayDemandEndUse) && (t_timeStepType == OutputProcessor::TimeStepType::Zone)) {
         // loop through all of the resources and end uses for the entire facility
@@ -4204,7 +4210,7 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
                         if (curMeterNumber > 0) {
                             curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                             ort->gatherDemandEndUse(iResource, jEndUse) = curDemandValue;
-                            for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
+                            for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories;
                                  ++kEndUseSub) {
                                 curMeterNumber = ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
                                 if (curMeterNumber > 0) {
@@ -4230,7 +4236,7 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
                     if (curDemandValue > ort->gatherDemandIndEndUse(iResource, jEndUse)) {
                         ort->gatherDemandIndEndUse(iResource, jEndUse) = curDemandValue;
                     }
-                    for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                    for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         curMeterNumber = ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
                         if (curMeterNumber > 0) {
                             curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
@@ -7069,20 +7075,17 @@ void WriteMonthlyTables(EnergyPlusData &state)
                     }
                     // do the unit conversions
                     if (unitsStyle_cur == UnitsStyle::InchPound) {
-                        varNameWithUnits = ort->MonthlyColumns(curCol).varName + unitEnumToStringBrackets(ort->MonthlyColumns(curCol).units);
+                        varNameWithUnits = format("{} [{}]", ort->MonthlyColumns(curCol).varName, Constant::unitNames[(int)ort->MonthlyColumns(curCol).units]);
                         LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
                         GetUnitConversion(state, indexUnitConv, curConversionFactor, state.dataOutRptTab->curConversionOffset, curUnits);
-                    } else { // just do the Joule conversion
-                        // if units is in Joules, convert if specified
-                        if (UtilityRoutines::SameString(unitEnumToString(ort->MonthlyColumns(curCol).units), "J")) {
-                            curUnits = energyUnitsString;
-                            curConversionFactor = energyUnitsConversionFactor;
-                            state.dataOutRptTab->curConversionOffset = 0.0;
-                        } else { // if not joules don't perform conversion
-                            curUnits = unitEnumToString(ort->MonthlyColumns(curCol).units);
-                            curConversionFactor = 1.0;
-                            state.dataOutRptTab->curConversionOffset = 0.0;
-                        }
+                    } else if (UtilityRoutines::SameString(Constant::unitNames[(int)ort->MonthlyColumns(curCol).units], "J")) {
+                        curUnits = energyUnitsString;
+                        curConversionFactor = energyUnitsConversionFactor;
+                        state.dataOutRptTab->curConversionOffset = 0.0;
+                    } else { // if not joules don't perform conversion
+                        curUnits = Constant::unitNames[(int)ort->MonthlyColumns(curCol).units];
+                        curConversionFactor = 1.0;
+                        state.dataOutRptTab->curConversionOffset = 0.0;
                     }
                     switch (ort->MonthlyColumns(curCol).aggType) {
                     case AggType::SumOrAvg:
@@ -7420,7 +7423,8 @@ void WriteTimeBinTables(EnergyPlusData &state)
 
         for (int iInObj = 1; iInObj <= ort->OutputTableBinnedCount; ++iInObj) {
             int const firstReport = ort->OutputTableBinned(iInObj).resIndex;
-            curNameWithSIUnits = ort->OutputTableBinned(iInObj).varOrMeter + unitEnumToStringBrackets(ort->OutputTableBinned(iInObj).units);
+            curNameWithSIUnits = format("{} [{}]", ort->OutputTableBinned(iInObj).varOrMeter,
+                                        Constant::unitNames[(int)ort->OutputTableBinned(iInObj).units]);
             Real64 curIntervalStart;
             Real64 curIntervalSize;
             int indexUnitConv = -1;
@@ -7637,6 +7641,7 @@ void WriteBEPSTable(EnergyPlusData &state)
 
     Real64 constexpr SmallValue(1.e-14);
     auto &ort = state.dataOutRptTab;
+    auto &op = state.dataOutputProcessor;
 
     if (!ort->displayTabularBEPS && !ort->displayLEEDSummary) {
         return;
@@ -7653,9 +7658,9 @@ void WriteBEPSTable(EnergyPlusData &state)
     Array2D<Real64> normalVal(13, 4);
     Array1D<Real64> collapsedTotal(13);
     Array2D<Real64> collapsedEndUse(13, static_cast<int>(Constant::EndUse::Num));
-    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), 13);
+    Array3D<Real64> collapsedEndUseSub(op->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), 13);
     Array2D<Real64> endUseSubOther(13, static_cast<int>(Constant::EndUse::Num));
-    Array3D<Real64> collapsedEndUseSpType(state.dataOutputProcessor->maxNumEndUseSpaceTypes, static_cast<int>(Constant::EndUse::Num), 13);
+    Array3D<Real64> collapsedEndUseSpType(op->maxNumEndUseSpaceTypes, static_cast<int>(Constant::EndUse::Num), 13);
 
     // Jan 2021: Added temp storage
     Real64 gtPowerFuelFireGen = ort->gatherPowerFuelFireGen;
@@ -7753,7 +7758,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             }
         }
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-            for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+            for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                 collapsedEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 1);   // electricity
                 collapsedEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 2);   // natural gas
                 collapsedEndUseSub(kEndUseSub, jEndUse, 3) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 6);   // gasoline
@@ -7771,7 +7776,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 collapsedEndUseSub(kEndUseSub, jEndUse, 13) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 7); // water
             }
 
-            for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
+            for (int kEndUseSpType = 1; kEndUseSpType <= op->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
                 collapsedEndUseSpType(kEndUseSpType, jEndUse, 1) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 1);   // electricity
                 collapsedEndUseSpType(kEndUseSpType, jEndUse, 2) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 2);   // natural gas
                 collapsedEndUseSpType(kEndUseSpType, jEndUse, 3) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 6);   // gasoline
@@ -7820,10 +7825,10 @@ void WriteBEPSTable(EnergyPlusData &state)
         for (int iResource = 1; iResource <= 12; ++iResource) { // don't do water
             for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
-                for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, iResource) /= largeConversionFactor;
                 }
-                for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
+                for (int kEndUseSpType = 1; kEndUseSpType <= op->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
                     collapsedEndUseSpType(kEndUseSpType, jEndUse, iResource) /= largeConversionFactor;
                 }
             }
@@ -7832,10 +7837,10 @@ void WriteBEPSTable(EnergyPlusData &state)
         // do water
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
             collapsedEndUse(13, jEndUse) /= waterConversionFactor;
-            for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+            for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                 collapsedEndUseSub(kEndUseSub, jEndUse, 13) /= waterConversionFactor;
             }
-            for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
+            for (int kEndUseSpType = 1; kEndUseSpType <= op->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
                 collapsedEndUseSpType(kEndUseSpType, jEndUse, 13) /= waterConversionFactor;
             }
         }
@@ -8779,13 +8784,13 @@ void WriteBEPSTable(EnergyPlusData &state)
         for (int iResource = 1; iResource <= 12; ++iResource) {
             int i = 1;
             for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                    for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                if (op->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                    for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         if (produceTabular) {
                             PreDefTableEntry(state,
                                              resource_entry_map(iResource),
-                                             state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- " +
-                                                 state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
+                                             op->EndUseCategory(jEndUse).DisplayName + " -- " +
+                                                 op->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
                                              unconvert * collapsedEndUseSub(kEndUseSub, jEndUse, iResource));
                         }
                         ++i;
@@ -8795,7 +8800,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                         if (produceTabular) {
                             PreDefTableEntry(state,
                                              resource_entry_map(iResource),
-                                             state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other",
+                                             op->EndUseCategory(jEndUse).DisplayName + " -- Other",
                                              unconvert * endUseSubOther(iResource, jEndUse));
                         }
                         ++i;
@@ -8804,7 +8809,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                     if (produceTabular) {
                         PreDefTableEntry(state,
                                          resource_entry_map(iResource),
-                                         state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
+                                         op->EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
                                          unconvert * collapsedEndUse(iResource, jEndUse));
                     }
                     ++i;
@@ -9416,6 +9421,7 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
                                         const bool produceSQLite)
 {
     auto const &ort = state.dataOutRptTab;
+    auto &op = state.dataOutputProcessor;
     constexpr int numCol = 14;
     Array1D_string columnHead;
     Array1D_int columnWidth;
@@ -9488,9 +9494,9 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
     for (int iResource = 1; iResource <= 13; ++iResource) {
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
             if (tableType == EndUseSubTableType::BySubCategory) {
-                numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
+                numSubCatOrTypes = op->EndUseCategory(jEndUse).NumSubcategories;
             } else if (tableType == EndUseSubTableType::BySpaceType) {
-                numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
+                numSubCatOrTypes = op->EndUseCategory(jEndUse).numSpaceTypes;
             }
             if (numSubCatOrTypes > 0) {
                 // set the value to the total for the end use
@@ -9513,9 +9519,9 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
 
     for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
         if (tableType == EndUseSubTableType::BySubCategory) {
-            numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
+            numSubCatOrTypes = op->EndUseCategory(jEndUse).NumSubcategories;
         } else if (tableType == EndUseSubTableType::BySpaceType) {
-            numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
+            numSubCatOrTypes = op->EndUseCategory(jEndUse).numSpaceTypes;
         }
         if (numSubCatOrTypes > 0) {
             for (int kEndUseSub = 1; kEndUseSub <= numSubCatOrTypes; ++kEndUseSub) {
@@ -9545,17 +9551,17 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
         int i = 1;
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
             if (tableType == EndUseSubTableType::BySubCategory) {
-                numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
+                numSubCatOrTypes = op->EndUseCategory(jEndUse).NumSubcategories;
             } else if (tableType == EndUseSubTableType::BySpaceType) {
-                numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
+                numSubCatOrTypes = op->EndUseCategory(jEndUse).numSpaceTypes;
             }
-            rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
+            rowHead(i) = op->EndUseCategory(jEndUse).DisplayName;
             if (numSubCatOrTypes > 0) {
                 for (int kEndUseSub = 1; kEndUseSub <= numSubCatOrTypes; ++kEndUseSub) {
                     if (tableType == EndUseSubTableType::BySubCategory) {
-                        tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
+                        tableBody(1, i) = op->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
                     } else if (tableType == EndUseSubTableType::BySpaceType) {
-                        tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).spaceTypeName(kEndUseSub);
+                        tableBody(1, i) = op->EndUseCategory(jEndUse).spaceTypeName(kEndUseSub);
                     }
                     ++i;
                 }
@@ -9579,9 +9585,9 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
         int i = 1;
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
             if (tableType == EndUseSubTableType::BySubCategory) {
-                numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
+                numSubCatOrTypes = op->EndUseCategory(jEndUse).NumSubcategories;
             } else if (tableType == EndUseSubTableType::BySpaceType) {
-                numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
+                numSubCatOrTypes = op->EndUseCategory(jEndUse).numSpaceTypes;
             }
             if (numSubCatOrTypes > 0) {
                 for (int kEndUseSub = 1; kEndUseSub <= numSubCatOrTypes; ++kEndUseSub) {
@@ -9657,6 +9663,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
     //   Create arrays for the call to WriteTable and then call it.
 
     auto &ort = state.dataOutRptTab;
+    auto &op = state.dataOutputProcessor;
 
     if (!ort->displaySourceEnergyEndUseSummary) {
         return;
@@ -9672,7 +9679,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
     Array2D<Real64> useVal(13, 15);
     Array1D<Real64> collapsedTotal(13);
     Array2D<Real64> collapsedEndUse(13, static_cast<int>(Constant::EndUse::Num));
-    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), 13);
+    Array3D<Real64> collapsedEndUseSub(op->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), 13);
 
     // show the headers of the report
     WriteReportHeaders(state, "Source Energy End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
@@ -10017,6 +10024,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
     //   its own call to WriteTable.
 
     auto &ort = state.dataOutRptTab;
+    auto &op = state.dataOutputProcessor;
 
     if (!ort->displayDemandEndUse) {
         return;
@@ -10034,8 +10042,8 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
     Array2D<Real64> collapsedEndUse(13, static_cast<int>(Constant::EndUse::Num));
     Array2D<Real64> collapsedIndEndUse(13, static_cast<int>(Constant::EndUse::Num));
     Array1D_int collapsedTimeStep(13);
-    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), 13);
-    Array3D<Real64> collapsedIndEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), 13);
+    Array3D<Real64> collapsedEndUseSub(op->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), 13);
+    Array3D<Real64> collapsedIndEndUseSub(op->MaxNumSubcategories, static_cast<int>(Constant::EndUse::Num), 13);
     Array2D<Real64> endUseSubOther(13, static_cast<int>(Constant::EndUse::Num));
 
     // show the headers of the report
@@ -10119,7 +10127,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
             collapsedEndUse(13, jEndUse) = ort->gatherDemandEndUse(7, jEndUse) * flowConversion;                  // water
         }
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-            for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+            for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                 collapsedEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 1) * powerConversion;   // electricity
                 collapsedEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 2) * powerConversion;   // natural gas
                 collapsedEndUseSub(kEndUseSub, jEndUse, 3) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 6) * powerConversion;   // gasoline
@@ -10156,7 +10164,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
             collapsedIndEndUse(13, jEndUse) = ort->gatherDemandIndEndUse(7, jEndUse);                 // water
         }
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-            for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+            for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                 collapsedIndEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 1);   // electricity
                 collapsedIndEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 2);   // natural gas
                 collapsedIndEndUseSub(kEndUseSub, jEndUse, 3) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 6);   // gasoline
@@ -10292,8 +10300,8 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
         //---- End Uses By Subcategory Sub-Table
         int numRows = 0;
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-            if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+            if (op->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     ++numRows;
                 }
             } else {
@@ -10314,10 +10322,10 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
         {
             int i = 1;
             for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-                rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
-                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                    for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
+                rowHead(i) = op->EndUseCategory(jEndUse).DisplayName;
+                if (op->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                    for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                        tableBody(1, i) = op->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
                         ++i;
                     }
                 } else {
@@ -10374,8 +10382,8 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
         for (int iResource = 1; iResource <= 13; ++iResource) {
             int i = 1;
             for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                    for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                if (op->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                    for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
                         ++i;
                     }
@@ -10427,11 +10435,11 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
     for (int iResource = 1; iResource <= 13; ++iResource) {
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
             if (ort->needOtherRowLEED45(jEndUse)) {
-                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories == 0) {
+                if (op->EndUseCategory(jEndUse).NumSubcategories == 0) {
                     endUseSubOther(iResource, jEndUse) = collapsedIndEndUse(iResource, jEndUse); // often the case that no subcategories are defined
                 } else {
                     Real64 sumOfSubcategories = 0.;
-                    for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                    for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         sumOfSubcategories += collapsedIndEndUseSub(kEndUseSub, jEndUse, iResource);
                     }
                     endUseSubOther(iResource, jEndUse) = collapsedIndEndUse(iResource, jEndUse) - sumOfSubcategories;
@@ -10461,12 +10469,12 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
     for (int iResource = 1; iResource <= 12; ++iResource) {
         int i = 1;
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-            if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+            if (op->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     PreDefTableEntry(state,
                                      resource_entry_map(iResource),
-                                     state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- " +
-                                         state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
+                                     op->EndUseCategory(jEndUse).DisplayName + " -- " +
+                                         op->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
                                      collapsedIndEndUseSub(kEndUseSub, jEndUse, iResource));
                     ++i;
                 }
@@ -10474,14 +10482,14 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 if (ort->needOtherRowLEED45(jEndUse)) {
                     PreDefTableEntry(state,
                                      resource_entry_map(iResource),
-                                     state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other",
+                                     op->EndUseCategory(jEndUse).DisplayName + " -- Other",
                                      endUseSubOther(iResource, jEndUse));
                     ++i;
                 }
             } else {
                 PreDefTableEntry(state,
                                  resource_entry_map(iResource),
-                                 state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
+                                 op->EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
                                  collapsedIndEndUse(iResource, jEndUse));
                 ++i;
             }

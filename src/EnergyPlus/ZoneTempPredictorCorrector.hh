@@ -226,7 +226,7 @@ namespace ZoneTempPredictorCorrector {
 
         void beginEnvironmentInit(EnergyPlusData &state);
 
-        void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name);
+        void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string const &key);
 
         void predictSystemLoad(EnergyPlusData &state,
                                bool shortenTimeStepSys,

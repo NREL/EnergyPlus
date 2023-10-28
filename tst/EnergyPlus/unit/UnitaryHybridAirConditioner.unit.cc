@@ -422,47 +422,39 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     std::string TypeOfComp = "ZoneHVAC:HybridUnitaryHVAC";
     std::string NameOfComp = thisUnitary.Name;
     int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
-    Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
-    Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
-    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
-    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-    Array1D<Constant::eResource> ResourceTypes(NumVariables);        // ResourceTypes for each variable
-    Array1D_string EndUses(NumVariables);                            // EndUses for each variable
-    Array1D_string Groups(NumVariables);                             // Groups for each variable
-    Array1D_string Names(NumVariables);                              // Variable Names for each variable
+    Array1D<OutputProcessor::MeteredVar> meteredVars(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
 
-    GetMeteredVariables(
-        *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+    NumFound = GetMeteredVariables(*state, NameOfComp, meteredVars);
 
     // output results
     Real64 MaxFlow = thisUnitary.ScaledSystemMaximumSupplyAirVolumeFlowRate;
 
     // Check the meters associated with the ZoneHVAC:HybridUnitaryHVAC outputs
     EXPECT_EQ(14, NumFound);
-    EXPECT_TRUE(compare_enums(ResourceTypes(1), Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER - Cooling
-    EXPECT_EQ(EndUses(1), "COOLINGCOILS");
-    EXPECT_EQ(Groups(1), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes(2), Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER - Heating
-    EXPECT_EQ(EndUses(2), "HEATINGCOILS");
-    EXPECT_EQ(Groups(2), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes(3), Constant::eResource::Electricity)); // ELECTRIC - Cooling Energy
-    EXPECT_EQ(EndUses(3), "COOLING");
-    EXPECT_EQ(Groups(3), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes(4), Constant::eResource::Electricity)); // ELECTRIC - Fan Energy
-    EXPECT_EQ(EndUses(4), "FANS");
-    EXPECT_EQ(Groups(4), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes(5),
+    EXPECT_TRUE(compare_enums(meteredVars(1).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER - Cooling
+    EXPECT_EQ(meteredVars(1).endUse, "COOLINGCOILS");
+    EXPECT_EQ(meteredVars(1).group, "HVAC");
+    EXPECT_TRUE(compare_enums(meteredVars(2).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER - Heating
+    EXPECT_EQ(meteredVars(2).endUse, "HEATINGCOILS");
+    EXPECT_EQ(meteredVars(2).group, "HVAC");
+    EXPECT_TRUE(compare_enums(meteredVars(3).resource, Constant::eResource::Electricity)); // ELECTRIC - Cooling Energy
+    EXPECT_EQ(meteredVars(3).endUse, "COOLING");
+    EXPECT_EQ(meteredVars(3).group, "HVAC");
+    EXPECT_TRUE(compare_enums(meteredVars(4).resource, Constant::eResource::Electricity)); // ELECTRIC - Fan Energy
+    EXPECT_EQ(meteredVars(4).endUse, "FANS");
+    EXPECT_EQ(meteredVars(4).group, "HVAC");
+    EXPECT_TRUE(compare_enums(meteredVars(5).resource,
                               Constant::eResource::NaturalGas)); // NATURALGAS - Secondary Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
-    EXPECT_EQ(EndUses(5), "COOLING");
-    EXPECT_EQ(Groups(5), "HVAC");
+    EXPECT_EQ(meteredVars(5).endUse, "COOLING");
+    EXPECT_EQ(meteredVars(5).group, "HVAC");
     EXPECT_TRUE(
-        compare_enums(ResourceTypes(6),
+        compare_enums(meteredVars(6).resource,
                       Constant::eResource::DistrictCooling)); // DISTRICTCOOLING - Third Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
-    EXPECT_EQ(EndUses(6), "COOLING");
-    EXPECT_EQ(Groups(6), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes(7), Constant::eResource::Water)); // WATER - Cooling Water Use
-    EXPECT_EQ(EndUses(7), "COOLING");
-    EXPECT_EQ(Groups(7), "HVAC");
+    EXPECT_EQ(meteredVars(6).endUse, "COOLING");
+    EXPECT_EQ(meteredVars(6).group, "HVAC");
+    EXPECT_TRUE(compare_enums(meteredVars(7).resource, Constant::eResource::Water)); // WATER - Cooling Water Use
+    EXPECT_EQ(meteredVars(7).endUse, "COOLING");
+    EXPECT_EQ(meteredVars(7).group, "HVAC");
 
     // Check that unit is included in Component Sizing Summary Report
     EXPECT_EQ("ZoneHVAC:HybridUnitaryHVAC", state->dataOutRptPredefined->CompSizeTableEntry(1).typeField);

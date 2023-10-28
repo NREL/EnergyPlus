@@ -3516,35 +3516,35 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
 
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "General");
 
@@ -3584,35 +3584,35 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "General");
 
@@ -3628,8 +3628,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::Zone].TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep = 60;
 
     GetInputOutputTableSummaryReports(*state);
 
@@ -3665,23 +3665,31 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 {
     // Glazer - Sep 2017
-
+    auto &op = state->dataOutputProcessor;
+        
     state->dataOutRptTab->displayDemandEndUse = true;
     state->dataOutRptTab->displayLEEDSummary = true;
     state->dataGlobal->TimeStepZoneSec = 900.0;
 
     int resourceNum = 1;
-    int totalMeterNum = 2;
-    int endUseMeterNum = 3;
-    int subEndUseMeterNum = 4;
 
+    Meter *meterTotal = new Meter("Total");
+    Meter *meterEndUse = new Meter("EndUse");
+    Meter *meterSubEndUse = new Meter("SubEndUse");
+
+    op->meters.push_back(meterTotal);
+    int totalMeterNum = (int)op->meters.size();
+    state->dataOutputProcessor->meters.push_back(meterEndUse);
+    int endUseMeterNum = (int)op->meters.size();
+    state->dataOutputProcessor->meters.push_back(meterSubEndUse);
+    int subEndUseMeterNum = (int)op->meters.size();
+    
     int endUseNum = 1;
     int subEndUseNum = 1;
 
     state->dataOutRptTab->meterNumEndUseSubBEPS.allocate(10, 10, 10);
     state->dataOutRptTab->gatherDemandEndUseSub.allocate(10, 10, 10);
     state->dataOutRptTab->gatherDemandIndEndUseSub.allocate(10, 10, 10);
-    state->dataOutputProcessor->EnergyMeters.allocate(100);
 
     state->dataOutputProcessor->EndUseCategory.allocate(endUseNum);
     state->dataOutputProcessor->EndUseCategory(endUseNum).NumSubcategories = 1;
@@ -3699,11 +3707,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // first "timestep"
 
-    state->dataOutputProcessor->EnergyMeters(totalMeterNum).CurTSValue =
+    op->meters[totalMeterNum]->CurTSValue =
         123.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the total meter
-    state->dataOutputProcessor->EnergyMeters(endUseMeterNum).CurTSValue =
+    op->meters[endUseMeterNum]->CurTSValue =
         47.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the end use meter
-    state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
+    op->meters[subEndUseMeterNum]->CurTSValue =
         28.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
@@ -3718,11 +3726,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // next "timestep" total higher
 
-    state->dataOutputProcessor->EnergyMeters(totalMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[totalMeterNum]->CurTSValue =
         133.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the total meter
-    state->dataOutputProcessor->EnergyMeters(endUseMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[endUseMeterNum]->CurTSValue =
         57.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the end use meter
-    state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[subEndUseMeterNum]->CurTSValue =
         38.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
@@ -3737,11 +3745,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // next "timestep" total lower but end use higher and sub end use higher
 
-    state->dataOutputProcessor->EnergyMeters(totalMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[totalMeterNum]->CurTSValue =
         103.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the total meter
-    state->dataOutputProcessor->EnergyMeters(endUseMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[endUseMeterNum]->CurTSValue =
         61.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the end use meter
-    state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[subEndUseMeterNum]->CurTSValue =
         42.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
@@ -3756,11 +3764,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // next "timestep" total higher but end use lower and sub end use lower
 
-    state->dataOutputProcessor->EnergyMeters(totalMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[totalMeterNum]->CurTSValue =
         143.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the total meter
-    state->dataOutputProcessor->EnergyMeters(endUseMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[endUseMeterNum]->CurTSValue =
         59.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the end use meter
-    state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[subEndUseMeterNum]->CurTSValue =
         39.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
@@ -6534,35 +6542,35 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
 
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "General");
 
@@ -7387,7 +7395,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     for (int i = 0; i < 2; ++i) {
         SetupOutputVariable(*state,
                             "Zone Mean Air Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             zoneTemp,
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Average,
@@ -7395,28 +7403,28 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
 
         SetupOutputVariable(*state,
                             "Zone Heating Setpoint Not Met Time",
-                            OutputProcessor::Unit::hr,
+                            Constant::Units::hr,
                             timeNotMet,
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             ZoneNames[i]);
         SetupOutputVariable(*state,
                             "Zone Heating Setpoint Not Met While Occupied Time",
-                            OutputProcessor::Unit::hr,
+                            Constant::Units::hr,
                             timeNotMet,
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             ZoneNames[i]);
         SetupOutputVariable(*state,
                             "Zone Cooling Setpoint Not Met Time",
-                            OutputProcessor::Unit::hr,
+                            Constant::Units::hr,
                             timeNotMet,
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             ZoneNames[i]);
         SetupOutputVariable(*state,
                             "Zone Cooling Setpoint Not Met While Occupied Time",
-                            OutputProcessor::Unit::hr,
+                            Constant::Units::hr,
                             timeNotMet,
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
@@ -8024,68 +8032,68 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "AnotherEndUseSubCat");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "General");
     SetupOutputVariable(*state,
                         "Heating Coal Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         CoalHeating,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite4",
                         {},
-                        "Coal",
+                        Constant::eResource::Coal,
                         "Heating",
                         "General");
     SetupOutputVariable(*state,
                         "Heating Gasoline Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         GasolineHeating,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite5",
                         {},
-                        "Gasoline",
+                        Constant::eResource::Gasoline,
                         "Heating",
                         "General");
     SetupOutputVariable(*state,
                         "Heating Propane Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         PropaneHeating,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite6",
                         {},
-                        "Propane",
+                        Constant::eResource::Propane,
                         "Heating",
                         "General");
     state->dataGlobal->DoWeathSim = true;
@@ -8100,8 +8108,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::Zone].TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep = 60;
 
     GetInputOutputTableSummaryReports(*state);
 
@@ -8583,24 +8591,24 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
 
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "General");
 
@@ -8610,20 +8618,14 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
 
     InitializeOutput(*state);
 
-    int meter_array_ptr = -1;
-    bool errors_found = false;
-
-    std::string resourceType("NaturalGas");
+    Constant::eResource resource = Constant::eResource::NaturalGas;
     std::string endUse("Heating");
     std::string endUseSub("");
     std::string group("");
     std::string const zoneName("");
     std::string const spaceType("");
 
-    AttachMeters(*state, OutputProcessor::Unit::J, resourceType, endUse, endUseSub, group, zoneName, spaceType, 1, meter_array_ptr, errors_found);
-
-    EXPECT_FALSE(errors_found);
-    EXPECT_EQ(3, meter_array_ptr); // 2 meters were setup via SetupOutputVariable already
+    AttachMeters(*state, Constant::Units::J, resource, endUse, endUseSub, group, zoneName, spaceType, -1);
 
     OutputReportTabular::GetInputTabularMonthly(*state);
     OutputReportTabular::InitializeTabularMonthly(*state);
@@ -9557,68 +9559,68 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
 
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "AnotherEndUseSubCat");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         {},
-                        "Electricity",
+                        Constant::eResource::Electricity,
                         "Exterior Lights",
                         "General");
     SetupOutputVariable(*state,
                         "Heating Coal Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         CoalHeating,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite4",
                         {},
-                        "Coal",
+                        Constant::eResource::Coal,
                         "Heating",
                         "General");
     SetupOutputVariable(*state,
                         "Heating Gasoline Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         GasolineHeating,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite5",
                         {},
-                        "Gasoline",
+                        Constant::eResource::Gasoline,
                         "Heating",
                         "General");
     SetupOutputVariable(*state,
                         "Heating Propane Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         PropaneHeating,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite6",
                         {},
-                        "Propane",
+                        Constant::eResource::Propane,
                         "Heating",
                         "General");
     state->dataGlobal->DoWeathSim = true;
@@ -9633,8 +9635,8 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::Zone].TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep = 60;
 
     GetInputOutputTableSummaryReports(*state);
 
@@ -10056,9 +10058,8 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataOutputProcessor->NumEnergyMeters = 1;
-    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
-    state->dataOutputProcessor->EnergyMeters(1).Name = "Electricity:Facility";
+    Meter *meter = new Meter("Electricity:Facility");
+    state->dataOutputProcessor->meters.push_back(meter);
 
     // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
     state->dataGlobal->DoWeathSim = true; // flag to trick tabular reports to scan meters

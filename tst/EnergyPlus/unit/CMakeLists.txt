@@ -217,7 +217,6 @@ set(test_src
     SizingAnalysisObjects.unit.cc
     SizingManager.unit.cc
     SolarShading.unit.cc
-    SortAndStringUtilities.unit.cc
     Standard621SimplifiedProcedure.unit.cc
     StandardRatings.unit.cc
     StringUtilities.unit.cc

@@ -126,7 +126,7 @@ namespace ExternalInterface {
 
         // Default Constructor
         eplusOutputVariableType()
-            : Name(std::string()), VarKey(std::string()), RTSValue(0.0), ITSValue(0), VarIndex(0), VarType(OutputProcessor::VariableType::NotFound),
+            : Name(std::string()), VarKey(std::string()), RTSValue(0.0), ITSValue(0), VarIndex(0), VarType(OutputProcessor::VariableType::Invalid),
               VarUnits(std::string())
         {
         }

@@ -54,7 +54,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
-#include <ObjexxFCL/Reference.hh>
 
 #include <nlohmann/json.hpp>
 
@@ -75,6 +74,9 @@ struct JsonOutputFilePaths;
 namespace ResultsFramework {
 
     using json = nlohmann::json;
+
+    using OutputProcessor::ReportFreq;
+    using OutputProcessor::TimeStepType;
 
     // trim string
     std::string trim(std::string_view const s);
@@ -114,23 +116,23 @@ namespace ResultsFramework {
     public:
         Variable() = default;
         Variable(const std::string &VarName,
-                 const OutputProcessor::ReportingFrequency reportFrequency,
+                 const ReportFreq reportFrequency,
                  const OutputProcessor::TimeStepType timeStepType,
                  const int ReportID,
-                 OutputProcessor::Unit units);
+                 Constant::Units units);
         Variable(const std::string &VarName,
-                 const OutputProcessor::ReportingFrequency reportFrequency,
+                 const ReportFreq reportFrequency,
                  const OutputProcessor::TimeStepType timeStepType,
                  const int ReportID,
-                 OutputProcessor::Unit units,
+                 Constant::Units units,
                  const std::string &customUnits);
 
         std::string variableName() const;
         void setVariableName(const std::string &VarName);
 
         std::string sReportFrequency() const;
-        OutputProcessor::ReportingFrequency iReportFrequency() const;
-        void setReportFrequency(const OutputProcessor::ReportingFrequency reportFrequency);
+        ReportFreq iReportFrequency() const;
+        void setReportFrequency(const ReportFreq reportFrequency);
 
         OutputProcessor::TimeStepType timeStepType() const;
         void setTimeStepType(const OutputProcessor::TimeStepType timeStepType);
@@ -138,8 +140,8 @@ namespace ResultsFramework {
         int reportID() const;
         void setReportID(const int Id);
 
-        OutputProcessor::Unit units() const;
-        void setUnits(OutputProcessor::Unit units);
+        Constant::Units units() const;
+        void setUnits(Constant::Units units);
 
         std::string customUnits() const;
         void setCustomUnits(const std::string &customUnits);
@@ -151,30 +153,29 @@ namespace ResultsFramework {
         virtual json getJSON() const;
 
     protected:
-        std::string varName;
-        std::string sReportFreq;
-        OutputProcessor::ReportingFrequency iReportFreq = OutputProcessor::ReportingFrequency::EachCall;
+        std::string m_varName;
+        ReportFreq m_reportFreq = ReportFreq::EachCall;
         OutputProcessor::TimeStepType m_timeStepType = OutputProcessor::TimeStepType::Zone;
-        int rptID = -1;
-        OutputProcessor::Unit Units;
+        int m_rptID = -1;
+        Constant::Units m_units;
         std::string m_customUnits;
-        std::vector<double> Values;
+        std::vector<double> m_values;
     };
 
     class OutputVariable : public Variable
     {
     public:
         OutputVariable(const std::string &VarName,
-                       const OutputProcessor::ReportingFrequency reportFrequency,
+                       const ReportFreq reportFrequency,
                        const OutputProcessor::TimeStepType timeStepType,
                        const int ReportID,
-                       OutputProcessor::Unit units);
+                       Constant::Units units);
 
         OutputVariable(const std::string &VarName,
-                       const OutputProcessor::ReportingFrequency reportFrequency,
+                       const ReportFreq reportFrequency,
                        const OutputProcessor::TimeStepType timeStepType,
                        const int ReportID,
-                       OutputProcessor::Unit units,
+                       Constant::Units units,
                        const std::string &customUnits);
     };
 
@@ -183,9 +184,9 @@ namespace ResultsFramework {
     public:
         MeterVariable() = default;
         MeterVariable(const std::string &VarName,
-                      const OutputProcessor::ReportingFrequency reportFrequency,
+                      const ReportFreq reportFrequency,
                       const int ReportID,
-                      OutputProcessor::Unit units,
+                      Constant::Units units,
                       const bool MeterOnly,
                       const bool Acculumative = false);
 
@@ -211,17 +212,13 @@ namespace ResultsFramework {
 
         void addVariable(Variable const &var);
 
-        void setRDataFrameEnabled(bool state);
-        void setIDataFrameEnabled(bool state);
+        void setDataFrameEnabled(bool state);
 
-        bool rDataFrameEnabled() const;
-        bool iDataFrameEnabled() const;
+        bool dataFrameEnabled() const;
 
-        void setRVariablesScanned(bool state);
-        void setIVariablesScanned(bool state);
+        void setVariablesScanned(bool state);
 
-        bool rVariablesScanned() const;
-        bool iVariablesScanned() const;
+        bool variablesScanned() const;
 
         void newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin, int calendarYear);
         //        void newRow(const std::string &ts);
@@ -239,10 +236,8 @@ namespace ResultsFramework {
         bool beginningOfInterval = false;
 
     protected:
-        bool IDataFrameEnabled = false;
-        bool RDataFrameEnabled = false;
-        bool RVariablesScanned = false;
-        bool IVariablesScanned = false;
+        bool DataFrameEnabled = false;
+        bool VariablesScanned = false;
         int lastHour = 0;
         int lastMinute = 0;
         std::string ReportFrequency;
@@ -340,19 +335,19 @@ namespace ResultsFramework {
         void parseTSOutputs(EnergyPlusData &state,
                             json const &data,
                             std::vector<std::string> const &outputVariables,
-                            OutputProcessor::ReportingFrequency reportingFrequency);
+                            ReportFreq reportingFrequency);
 
     private:
         friend class EnergyPlus::EnergyPlusFixture;
         friend class EnergyPlus::ResultsFrameworkFixture;
 
         char s[129] = {0};
-        OutputProcessor::ReportingFrequency smallestReportingFrequency = OutputProcessor::ReportingFrequency::Yearly;
+        ReportFreq smallestReportFreq = ReportFreq::Year;
         std::map<std::string, std::vector<std::string>> outputs;
         std::vector<bool> outputVariableIndices;
 
         static std::string &convertToMonth(std::string &datetime);
-        void updateReportingFrequency(OutputProcessor::ReportingFrequency reportingFrequency);
+        void updateReportFreq(ReportFreq reportingFrequency);
         // void readRVI();
         // void readMVI();
     };
@@ -376,78 +371,68 @@ namespace ResultsFramework {
 
         bool MsgPackEnabled() const;
 
-        void initializeRTSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
-                                    const Array1D<OutputProcessor::RealVariableType> &RVariableTypes,
-                                    const int NumOfRVariable,
-                                    const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::Zone);
+        void initializeTSDataFrame(const ReportFreq reportFrequency,
+                                   const std::vector<OutputProcessor::OutVar*> &Variables,
+                                   const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::Zone);
+            
+        void initializeMeters(const std::vector<OutputProcessor::Meter*> &EnergyMeters, const ReportFreq reportFrequency);
 
-        void initializeITSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
-                                    const Array1D<OutputProcessor::IntegerVariableType> &IVariableTypes,
-                                    const int NumOfIVariable,
-                                    const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::Zone);
+        std::array<DataFrame, (int)TimeStepType::Num> detailedTSData = {
+            DataFrame("Detailed-Zone"), 
+            DataFrame("Detailed-HVAC")
+        };
 
-        void initializeMeters(const Array1D<OutputProcessor::MeterType> &EnergyMeters, const OutputProcessor::ReportingFrequency reportFrequency);
+        std::array<DataFrame, (int)ReportFreq::Num> freqTSData = {
+            DataFrame("Each Call"),
+            DataFrame("TimeStep"),
+            DataFrame("Hourly"),
+            DataFrame("Daily"),
+            DataFrame("Monthly"),
+            DataFrame("RunPeriod"),
+            DataFrame("Yearly")
+        };
 
-        DataFrame RIDetailedZoneTSData = DataFrame("Detailed-Zone");
-        DataFrame RIDetailedHVACTSData = DataFrame("Detailed-HVAC");
-        DataFrame RITimestepTSData = DataFrame("TimeStep");
-        DataFrame RIHourlyTSData = DataFrame("Hourly");
-        DataFrame RIDailyTSData = DataFrame("Daily");
-        DataFrame RIMonthlyTSData = DataFrame("Monthly");
-        DataFrame RIRunPeriodTSData = DataFrame("RunPeriod");
-        DataFrame RIYearlyTSData = DataFrame("Yearly");
-        MeterDataFrame TSMeters = MeterDataFrame("TimeStep");
-        MeterDataFrame HRMeters = MeterDataFrame("Hourly");
-        MeterDataFrame DYMeters = MeterDataFrame("Daily");
-        MeterDataFrame MNMeters = MeterDataFrame("Monthly");
-        MeterDataFrame SMMeters = MeterDataFrame("RunPeriod");
-        MeterDataFrame YRMeters = MeterDataFrame("Yearly");
+        std::array<MeterDataFrame, (int)ReportFreq::Num> Meters = {
+            MeterDataFrame("Each Call"),
+            MeterDataFrame("TimeStep"),
+            MeterDataFrame("Hourly"),
+            MeterDataFrame("Daily"),
+            MeterDataFrame("Monthly"),
+            MeterDataFrame("RunPeriod"),
+            MeterDataFrame("Yearly")
+        };
 
         void setISO8601(const bool value)
         {
             rewriteTimestamp = !value;
-            RIDetailedZoneTSData.iso8601 = value;
-            RIDetailedHVACTSData.iso8601 = value;
-            RITimestepTSData.iso8601 = value;
-            RIHourlyTSData.iso8601 = value;
-            RIDailyTSData.iso8601 = value;
-            RIMonthlyTSData.iso8601 = value;
-            RIRunPeriodTSData.iso8601 = value;
-            RIYearlyTSData.iso8601 = value;
-            TSMeters.iso8601 = value;
-            HRMeters.iso8601 = value;
-            DYMeters.iso8601 = value;
-            MNMeters.iso8601 = value;
-            SMMeters.iso8601 = value;
-            YRMeters.iso8601 = value;
+            for (int iTimeStep = (int)TimeStepType::Zone; iTimeStep < (int)TimeStepType::Num; ++iTimeStep) {
+                detailedTSData[iTimeStep].iso8601 = value;
+            }
+
+            for (int iFreq = (int)ReportFreq::TimeStep; iFreq < (int)ReportFreq::Num; ++iFreq) {
+                freqTSData[iFreq].iso8601 = Meters[iFreq].iso8601 = value;
+            }
         }
 
         void setBeginningOfInterval(const bool value)
         {
-            RIDetailedZoneTSData.beginningOfInterval = value;
-            RIDetailedHVACTSData.beginningOfInterval = value;
-            RITimestepTSData.beginningOfInterval = value;
-            RIHourlyTSData.beginningOfInterval = value;
-            RIDailyTSData.beginningOfInterval = value;
-            RIMonthlyTSData.beginningOfInterval = value;
-            RIRunPeriodTSData.beginningOfInterval = value;
-            RIYearlyTSData.beginningOfInterval = value;
-            TSMeters.beginningOfInterval = value;
-            HRMeters.beginningOfInterval = value;
-            DYMeters.beginningOfInterval = value;
-            MNMeters.beginningOfInterval = value;
-            SMMeters.beginningOfInterval = value;
-            YRMeters.beginningOfInterval = value;
+            for (int iTimeStep = 0; iTimeStep < (int)TimeStepType::Num; ++iTimeStep) {
+                detailedTSData[iTimeStep].beginningOfInterval = value;
+            }
+
+            for (int iFreq = 0; iFreq < (int)ReportFreq::Num; ++iFreq) {
+                freqTSData[iFreq].beginningOfInterval = Meters[iFreq].beginningOfInterval = value;
+            }
         }
 
         void writeOutputs(EnergyPlusData &state);
 
         void addReportVariable(std::string_view const keyedValue,
                                std::string_view const variableName,
-                               std::string const &units,
-                               OutputProcessor::ReportingFrequency const reportingInterval);
+                               std::string_view const units,
+                               ReportFreq const reportingInterval);
 
-        void addReportMeter(std::string const &meter, std::string const &units, OutputProcessor::ReportingFrequency const reportingInterval);
+        void addReportMeter(std::string const &meter, std::string_view const units, ReportFreq const reportingInterval);
 
         SimInfo SimulationInformation;
 
@@ -475,90 +460,117 @@ namespace ResultsFramework {
         friend class EnergyPlus::ResultsFrameworkFixture;
 
     protected:
+
+        inline bool hasDetailedTSData(TimeStepType timeStepType) const {
+            return detailedTSData[(int)timeStepType].dataFrameEnabled();
+        }
+
+        inline bool hasFreqTSData(ReportFreq freq) const {
+            return freqTSData[(int)freq].dataFrameEnabled();
+        }
+
+#ifdef GET_OUT            
         inline bool hasRIDetailedZoneTSData() const
         {
-            return RIDetailedZoneTSData.iDataFrameEnabled() || RIDetailedZoneTSData.rDataFrameEnabled();
+            return detailedTSData[(int)TimeStepType::Zone].iDataFrameEnabled() || detailedTSData[(int)TimeStepType::Zone].rDataFrameEnabled();
         };
 
         inline bool hasRIDetailedHVACTSData() const
         {
-            return RIDetailedHVACTSData.iDataFrameEnabled() || RIDetailedHVACTSData.rDataFrameEnabled();
+            return detailedTSData[(int)TimeStepType::System].iDataFrameEnabled() || detailedTSData[(int)TimeStepType::System].rDataFrameEnabled();
         };
 
+        // This API can be condensed in an obvious way
         inline bool hasRITimestepTSData() const
         {
-            return RITimestepTSData.iDataFrameEnabled() || RITimestepTSData.rDataFrameEnabled();
+            return freqTSData[(int)ReportFreq::TimeStep].iDataFrameEnabled() || freqTSData[(int)ReportFreq::TimeStep].rDataFrameEnabled();
         };
 
         inline bool hasRIHourlyTSData() const
         {
-            return RIHourlyTSData.iDataFrameEnabled() || RIHourlyTSData.rDataFrameEnabled();
+            return freqTSData[(int)ReportFreq::Hour].iDataFrameEnabled() || freqTSData[(int)ReportFreq::Hour].rDataFrameEnabled();
         };
 
         inline bool hasRIDailyTSData() const
         {
-            return RIDailyTSData.iDataFrameEnabled() || RIDailyTSData.rDataFrameEnabled();
+            return freqTSData[(int)ReportFreq::Day].iDataFrameEnabled() || freqTSData[(int)ReportFreq::Day].rDataFrameEnabled();
         };
 
         inline bool hasRIMonthlyTSData() const
         {
-            return RIMonthlyTSData.iDataFrameEnabled() || RIMonthlyTSData.rDataFrameEnabled();
+            return freqTSData[(int)ReportFreq::Month].iDataFrameEnabled() || freqTSData[(int)ReportFreq::Month].rDataFrameEnabled();
         };
 
         inline bool hasRIRunPeriodTSData() const
         {
-            return RIRunPeriodTSData.iDataFrameEnabled() || RIRunPeriodTSData.rDataFrameEnabled();
+            return freqTSData[(int)ReportFreq::Simulation].iDataFrameEnabled() || freqTSData[(int)ReportFreq::Simulation].rDataFrameEnabled();
         };
 
         inline bool hasRIYearlyTSData() const
         {
-            return RIYearlyTSData.iDataFrameEnabled() || RIYearlyTSData.rDataFrameEnabled();
+            return freqTSData[(int)ReportFreq::Year].iDataFrameEnabled() || freqTSData[(int)ReportFreq::Year].rDataFrameEnabled();
         };
 
         inline bool hasTSMeters() const
         {
-            return TSMeters.rDataFrameEnabled();
+            return Meters[(int)ReportFreq::TimeStep].dataFrameEnabled();
         };
 
         inline bool hasHRMeters() const
         {
-            return HRMeters.rDataFrameEnabled();
+            return Meters[(int)ReportFreq::Hour].dataFrameEnabled();
         };
 
         inline bool hasDYMeters() const
         {
-            return DYMeters.rDataFrameEnabled();
+            return Meters[(int)ReportFreq::Day].dataFrameEnabled();
         };
 
         inline bool hasMNMeters() const
         {
-            return MNMeters.rDataFrameEnabled();
+            return Meters[(int)ReportFreq::Month].dataFrameEnabled();
         };
 
         inline bool hasSMMeters() const
         {
-            return SMMeters.rDataFrameEnabled();
+            return Meters[(int)ReportFreq::Simulation].dataFrameEnabled();
         };
 
         inline bool hasYRMeters() const
         {
-            return YRMeters.rDataFrameEnabled();
+            return Meters[(int)ReportFreq::Year].dataFrameEnabled();
         };
 
+#endif // 
+        inline bool hasMeters(ReportFreq freq) const
+        {
+            return Meters[(int)freq].dataFrameEnabled();
+        }
+            
         inline bool hasMeterData() const
         {
-            return hasTSMeters() || hasHRMeters() || hasDYMeters() || hasMNMeters() || hasSMMeters() || hasYRMeters();
+            return hasMeters(ReportFreq::TimeStep) || hasMeters(ReportFreq::Hour) || hasMeters(ReportFreq::Day) ||
+                    hasMeters(ReportFreq::Month) || hasMeters(ReportFreq::Simulation) || hasMeters(ReportFreq::Year);
         };
 
-        inline bool hasTSData() const
+        inline bool hasTSData(ReportFreq freq, TimeStepType timeStepType = TimeStepType::Invalid) const
         {
-            return hasRIDetailedZoneTSData() || hasRIDetailedHVACTSData() || hasRITimestepTSData() || hasRIHourlyTSData() || hasRIDailyTSData() ||
-                   hasRIMonthlyTSData() || hasRIRunPeriodTSData() || hasRIYearlyTSData();
+            assert(freq != ReportFreq::Invalid && (freq != ReportFreq::EachCall || timeStepType != TimeStepType::Invalid));
+            return (freq == ReportFreq::EachCall) ? detailedTSData[(int)timeStepType].dataFrameEnabled() : freqTSData[(int)freq].dataFrameEnabled();
+        };
+
+        inline bool hasAnyTSData() const
+        {
+            for (int iTimeStep = 0; iTimeStep < (int)TimeStepType::Num; ++iTimeStep)
+                if (detailedTSData[iTimeStep].dataFrameEnabled()) return true;
+            for (int iFreq = (int)ReportFreq::TimeStep; iFreq < (int)ReportFreq::Num; ++iFreq)
+                if (freqTSData[iFreq].dataFrameEnabled()) return true;
+            return false;
         };
 
         inline bool hasOutputData() const
         {
-            return hasTSData() || hasMeterData();
+            return hasAnyTSData() || hasMeterData();
         };
     };
 
@@ -571,35 +583,12 @@ struct ResultsFrameworkData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->resultsFramework->DYMeters.setRDataFrameEnabled(false);
-        this->resultsFramework->DYMeters.setRVariablesScanned(false);
-        this->resultsFramework->DYMeters.setIVariablesScanned(false);
-        this->resultsFramework->DYMeters.setIDataFrameEnabled(false);
-
-        this->resultsFramework->TSMeters.setRVariablesScanned(false);
-        this->resultsFramework->TSMeters.setRDataFrameEnabled(false);
-        this->resultsFramework->TSMeters.setIDataFrameEnabled(false);
-        this->resultsFramework->TSMeters.setIVariablesScanned(false);
-
-        this->resultsFramework->HRMeters.setRVariablesScanned(false);
-        this->resultsFramework->HRMeters.setRDataFrameEnabled(false);
-        this->resultsFramework->HRMeters.setIDataFrameEnabled(false);
-        this->resultsFramework->HRMeters.setIVariablesScanned(false);
-
-        this->resultsFramework->MNMeters.setRVariablesScanned(false);
-        this->resultsFramework->MNMeters.setRDataFrameEnabled(false);
-        this->resultsFramework->MNMeters.setIDataFrameEnabled(false);
-        this->resultsFramework->MNMeters.setIVariablesScanned(false);
-
-        this->resultsFramework->SMMeters.setRVariablesScanned(false);
-        this->resultsFramework->SMMeters.setRDataFrameEnabled(false);
-        this->resultsFramework->SMMeters.setIDataFrameEnabled(false);
-        this->resultsFramework->SMMeters.setIVariablesScanned(false);
-
-        this->resultsFramework->YRMeters.setRVariablesScanned(false);
-        this->resultsFramework->YRMeters.setRDataFrameEnabled(false);
-        this->resultsFramework->YRMeters.setIDataFrameEnabled(false);
-        this->resultsFramework->YRMeters.setIVariablesScanned(false);
+        using OutputProcessor::ReportFreq;
+        for (int iFreq = (int)ReportFreq::TimeStep; iFreq < (int)ReportFreq::Num; ++iFreq) {
+            auto &meters = this->resultsFramework->Meters[iFreq];
+            meters.setDataFrameEnabled(false);
+            meters.setVariablesScanned(false);
+        }
     }
 };
 

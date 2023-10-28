@@ -1380,7 +1380,7 @@ void GetAirPathData(EnergyPlusData &state)
     for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
         SetupOutputVariable(state,
                             "Air System Simulation Cycle On Off Status",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataAirLoop->PriAirSysAvailMgr(AirSysNum).AvailStatus,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Average,
@@ -2447,21 +2447,21 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
     if (!state.dataSimAirServingZones->OutputSetupFlag) {
         SetupOutputVariable(state,
                             "Air System Simulation Maximum Iteration Count",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataSimAirServingZones->salIterMax,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
                             "SimAir");
         SetupOutputVariable(state,
                             "Air System Simulation Iteration Count",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataSimAirServingZones->salIterTot,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
                             "SimAir");
         SetupOutputVariable(state,
                             "Air System Component Model Simulation Calls",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataSimAirServingZones->NumCallsTot,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,

@@ -56,7 +56,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
-#include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -254,7 +253,7 @@ namespace DataRuntimeLanguage {
         //  INTEGER                                 :: VarType       = 0
 
         // Default Constructor
-        OutputVarSensorType() : CheckedOkay(false), VariableType(OutputProcessor::VariableType::NotFound), Index(0), VariableNum(0), SchedNum(0)
+        OutputVarSensorType() : CheckedOkay(false), VariableType(OutputProcessor::VariableType::Invalid), Index(0), VariableNum(0), SchedNum(0)
         {
         }
     };

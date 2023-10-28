@@ -432,33 +432,33 @@ namespace BaseboardRadiator {
             auto &thisBaseboard = state.dataBaseboardRadiator->baseboards(BaseboardNum);
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisBaseboard.Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipID,
                                 {},
-                                "ENERGYTRANSFER",
-                                "BASEBOARD",
+                                Constant::eResource::EnergyTransfer,
+                                "BASEBOARD", // ENDUSE
                                 {},
                                 "System");
 
             SetupOutputVariable(state,
                                 "Baseboard Hot Water Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisBaseboard.Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipID,
                                 {},
-                                "PLANTLOOPHEATINGDEMAND",
-                                "BASEBOARD",
+                                Constant::eResource::PlantLoopHeatingDemand,
+                                "BASEBOARD", 
                                 {},
                                 "System");
 
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisBaseboard.Power,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -466,7 +466,7 @@ namespace BaseboardRadiator {
 
             SetupOutputVariable(state,
                                 "Baseboard Hot Water Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisBaseboard.WaterMassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -474,7 +474,7 @@ namespace BaseboardRadiator {
 
             SetupOutputVariable(state,
                                 "Baseboard Air Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisBaseboard.AirMassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -482,7 +482,7 @@ namespace BaseboardRadiator {
 
             SetupOutputVariable(state,
                                 "Baseboard Air Inlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisBaseboard.AirInletTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -490,7 +490,7 @@ namespace BaseboardRadiator {
 
             SetupOutputVariable(state,
                                 "Baseboard Air Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisBaseboard.AirOutletTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -498,7 +498,7 @@ namespace BaseboardRadiator {
 
             SetupOutputVariable(state,
                                 "Baseboard Water Inlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisBaseboard.WaterInletTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -506,7 +506,7 @@ namespace BaseboardRadiator {
 
             SetupOutputVariable(state,
                                 "Baseboard Water Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisBaseboard.WaterOutletTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,

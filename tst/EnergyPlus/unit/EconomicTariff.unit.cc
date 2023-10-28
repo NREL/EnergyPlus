@@ -257,10 +257,9 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Create a water meter
-    state->dataOutputProcessor->NumEnergyMeters = 1;
-    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
-    state->dataOutputProcessor->EnergyMeters(1).Name = "WATER:FACILITY";
-    state->dataOutputProcessor->EnergyMeters(1).ResourceType = "WATER";
+    OutputProcessor::Meter *meter = new Meter("WATER:FACILITY");
+    state->dataOutputProcessor->meters.push_back(meter);
+    meter->resource = Constant::eResource::Water;
 
     UpdateUtilityBills(*state);
 
@@ -300,13 +299,11 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Create a water meter
-    state->dataOutputProcessor->NumEnergyMeters = 1;
-    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
-    state->dataOutputProcessor->EnergyMeters(1).Name = "WATER:FACILITY";
-    state->dataOutputProcessor->EnergyMeters(1).ResourceType = "WATER";
+    OutputProcessor::Meter *meter = new Meter("WATER:FACILITY");
+    state->dataOutputProcessor->meters.push_back(meter);
+    meter->resource = Constant::eResource::Water;
 
     UpdateUtilityBills(*state);
-    ;
 
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
@@ -341,10 +338,9 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Create a water meter
-    state->dataOutputProcessor->NumEnergyMeters = 1;
-    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
-    state->dataOutputProcessor->EnergyMeters(1).Name = "NATURALGAS:FACILITY";
-    state->dataOutputProcessor->EnergyMeters(1).ResourceType = "NATURALGAS";
+    OutputProcessor::Meter *meter = new Meter("NATURALGAS:FACILITY");
+    state->dataOutputProcessor->meters.push_back(meter);
+    meter->resource = Constant::eResource::NaturalGas;
 
     UpdateUtilityBills(*state);
     ;
@@ -383,10 +379,9 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Create a water meter
-    state->dataOutputProcessor->NumEnergyMeters = 1;
-    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
-    state->dataOutputProcessor->EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
-    state->dataOutputProcessor->EnergyMeters(1).ResourceType = "ELECTRICITY";
+    OutputProcessor::Meter *meter = new Meter("ELECTRICITY:FACILITY");
+    state->dataOutputProcessor->meters.push_back(meter);
+    meter->resource = Constant::eResource::Electricity;
 
     UpdateUtilityBills(*state);
     ;
@@ -408,12 +403,10 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
 
 TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)
 {
-    state->dataOutputProcessor->NumEnergyMeters = 4;
-    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
-    state->dataOutputProcessor->EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
-    state->dataOutputProcessor->EnergyMeters(2).Name = "NATURALGAS:FACILITY";
-    state->dataOutputProcessor->EnergyMeters(3).Name = "DISTRICTCOOLING:FACILITY";
-    state->dataOutputProcessor->EnergyMeters(4).Name = "DISTRICTHEATING:FACILITY";
+    state->dataOutputProcessor->meters.push_back(new Meter("ELECTRICITY:FACILITY"));
+    state->dataOutputProcessor->meters.push_back(new Meter("NATURALGAS:FACILITY"));
+    state->dataOutputProcessor->meters.push_back(new Meter("DISTRICTCOOLING:FACILITY"));
+    state->dataOutputProcessor->meters.push_back(new Meter("DISTRICTHEATING:FACILITY"));
 
     state->dataEconTariff->numTariff = 4;
     state->dataEconTariff->tariff.allocate(state->dataEconTariff->numTariff);
@@ -1396,16 +1389,14 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariff_with_Custom_Meter)
 
     EXPECT_FALSE(errors_found);
 
-    state->dataOutputProcessor->NumEnergyMeters = 7;
-    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
-    state->dataOutputProcessor->EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
-    state->dataOutputProcessor->EnergyMeters(2).Name = "ElectricitySurplusSold:Facility";
+    state->dataOutputProcessor->meters.push_back(new Meter("ELECTRICITY:FACILITY"));
+    state->dataOutputProcessor->meters.push_back(new Meter("ElectricitySurplusSold:Facility"));
 
-    state->dataOutputProcessor->EnergyMeters(3).Name = "NATURALGAS:FACILITY";
-    state->dataOutputProcessor->EnergyMeters(4).Name = "DISTRICTCOOLING:FACILITY";
-    state->dataOutputProcessor->EnergyMeters(5).Name = "DISTRICTHEATING:FACILITY";
-    state->dataOutputProcessor->EnergyMeters(6).Name = "WATER:FACILITY";
-    state->dataOutputProcessor->EnergyMeters(7).Name = "Building Natural Gas";
+    state->dataOutputProcessor->meters.push_back(new Meter("NATURALGAS:FACILITY"));
+    state->dataOutputProcessor->meters.push_back(new Meter("DISTRICTCOOLING:FACILITY"));
+    state->dataOutputProcessor->meters.push_back(new Meter("DISTRICTHEATING:FACILITY"));
+    state->dataOutputProcessor->meters.push_back(new Meter("WATER:FACILITY"));
+    state->dataOutputProcessor->meters.push_back(new Meter("Building Natural Gas"));
 
     // int elecFacilMeter = GetMeterIndex(*state, "ELECTRICITY:FACILITY");
     // int gasFacilMeter = GetMeterIndex(*state, "NATURALGAS:FACILITY");

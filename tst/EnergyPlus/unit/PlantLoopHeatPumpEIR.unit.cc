@@ -2962,29 +2962,20 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     thisCoolingPLHP->onInitLoopEquip(*state, myLoadLocation);
 
     int NumFound;
-
     std::string TypeOfComp = "HeatPump:PlantLoop:EIR:Cooling";
     std::string NameOfComp = thisCoolingPLHP->name;
     int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
-    Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
-    Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
-    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
-    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-    Array1D<Constant::eResource> ResourceTypes(NumVariables);        // ResourceTypes for each variable
-    Array1D_string EndUses(NumVariables);                            // EndUses for each variable
-    Array1D_string Groups(NumVariables);                             // Groups for each variable
-    Array1D_string Names(NumVariables);                              // Variable Names for each variable
+    Array1D<OutputProcessor::MeteredVar> meteredVars(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
 
-    GetMeteredVariables(
-        *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+    NumFound = GetMeteredVariables(*state, NameOfComp, meteredVars);
 
     EXPECT_EQ(2, NumFound);
-    EXPECT_TRUE(compare_enums(ResourceTypes(1), Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER
-    EXPECT_EQ(EndUses(1), "");
-    EXPECT_EQ(Groups(1), "PLANT");
-    EXPECT_TRUE(compare_enums(ResourceTypes(2), Constant::eResource::Electricity)); // Electric
-    EXPECT_EQ(EndUses(2), "COOLING");
-    EXPECT_EQ(Groups(2), "PLANT");
+    EXPECT_TRUE(compare_enums(meteredVars(1).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER
+    EXPECT_EQ(meteredVars(1).endUse, "");
+    EXPECT_EQ(meteredVars(1).group, "PLANT");
+    EXPECT_TRUE(compare_enums(meteredVars(2).resource, Constant::eResource::Electricity)); // Electric
+    EXPECT_EQ(meteredVars(2).endUse, "COOLING");
+    EXPECT_EQ(meteredVars(2).group, "PLANT");
 }
 
 TEST_F(EnergyPlusFixture, HeatingMetering)
@@ -3063,25 +3054,19 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     std::string TypeOfComp = "HeatPump:PlantLoop:EIR:Heating";
     std::string NameOfComp = thisHeatingPLHP->name;
     int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
-    Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
-    Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
-    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
-    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-    Array1D<Constant::eResource> ResourceTypes(NumVariables);        // ResourceTypes for each variable
-    Array1D_string EndUses(NumVariables);                            // EndUses for each variable
-    Array1D_string Groups(NumVariables);                             // Groups for each variable
-    Array1D_string Names(NumVariables);                              // Variable Names for each variable
 
-    GetMeteredVariables(
-        *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+    Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
+    Array1D<OutputProcessor::MeteredVar> meteredVars(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
+
+    NumFound = GetMeteredVariables(*state, NameOfComp, meteredVars);
 
     EXPECT_EQ(2, NumFound);
-    EXPECT_TRUE(compare_enums(ResourceTypes(1), Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER
-    EXPECT_EQ(EndUses(1), "");
-    EXPECT_EQ(Groups(1), "PLANT");
-    EXPECT_TRUE(compare_enums(ResourceTypes(2), Constant::eResource::Electricity)); // Electric
-    EXPECT_EQ(EndUses(2), "HEATING");
-    EXPECT_EQ(Groups(2), "PLANT");
+    EXPECT_TRUE(compare_enums(meteredVars(1).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER
+    EXPECT_EQ(meteredVars(1).endUse, "");
+    EXPECT_EQ(meteredVars(1).group, "PLANT");
+    EXPECT_TRUE(compare_enums(meteredVars(2).resource, Constant::eResource::Electricity)); // Electric
+    EXPECT_EQ(meteredVars(2).endUse, "HEATING");
+    EXPECT_EQ(meteredVars(2).group, "PLANT");
 }
 
 TEST_F(EnergyPlusFixture, TestOperatingFlowRates_FullyAutosized_AirSource)

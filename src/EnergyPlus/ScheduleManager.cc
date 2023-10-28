@@ -2897,7 +2897,7 @@ namespace ScheduleManager {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // This function returns the internal pointer to Schedule "ScheduleName".
+        // This function returns the internal pointer to Schedule "ScheduleName" (actually, it doesn't do that)
 
         // METHODOLOGY EMPLOYED:
         // na
@@ -4581,7 +4581,7 @@ namespace ScheduleManager {
                 // Set Up Reporting
                 SetupOutputVariable(state,
                                     "Schedule Value",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataScheduleMgr->Schedule(ScheduleIndex).CurrentValue,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,

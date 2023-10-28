@@ -2827,7 +2827,6 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     bool Found;
     OutputProcessor::SOVTimeStepType FreqString; // temporary
     OutputProcessor::SOVStoreType VarTypeString; // temporary
-    std::string ResourceTypeString;
     std::string GroupTypeString;
     std::string EndUseTypeString;
     std::string EndUseSubCatString;
@@ -2852,7 +2851,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     std::string::size_type lbracket;
     std::string UnitsA;
     std::string UnitsB;
-    OutputProcessor::Unit curUnit(OutputProcessor::Unit::None);
+    Constant::Units curUnit(Constant::Units::None);
     std::string::size_type ptr;
 
     if (state.dataRuntimeLangProcessor->GetInput) { // GetInput check is redundant with the InitializeRuntimeLanguage routine
@@ -3423,7 +3422,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                         ShowContinueError(state, format("...Units entered in {} (deprecated use)=\"{}\"", cAlphaFieldNames(1), UnitsA));
                     }
                 }
-                curUnit = OutputProcessor::unitStringToEnum(UnitsB);
+                curUnit = static_cast<Constant::Units>(getEnumerationValue(Constant::unitNamesUC, UtilityRoutines::MakeUPPERCase(UnitsB)));
 
                 state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Name = cAlphaArgs(1);
 
@@ -3499,7 +3498,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     }
                 }
 
-                if (curUnit != OutputProcessor::Unit::unknown) {
+                if (curUnit != Constant::Units::unknown) {
                     SetupOutputVariable(state,
                                         cAlphaArgs(1),
                                         curUnit,
@@ -3510,7 +3509,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 } else {
                     SetupOutputVariable(state,
                                         cAlphaArgs(1),
-                                        OutputProcessor::Unit::customEMS,
+                                        Constant::Units::customEMS,
                                         state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Value,
                                         FreqString,
                                         VarTypeString,
@@ -3604,8 +3603,8 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                         ShowContinueError(state, format("...Units entered in {} (deprecated use)=\"{}\"", cAlphaFieldNames(1), UnitsA));
                     }
                 }
-                curUnit = OutputProcessor::unitStringToEnum(UnitsB);
-
+                curUnit = static_cast<Constant::Units>(getEnumerationValue(Constant::unitNamesUC, UtilityRoutines::MakeUPPERCase(UnitsB)));
+                
                 state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Name = cAlphaArgs(1);
 
                 if (!lAlphaFieldBlanks(4)) {
@@ -3667,60 +3666,13 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 }
 
                 // Resource Type
-                {
-                    std::string const &SELECT_CASE_var = cAlphaArgs(5);
+                Constant::eResource resource = static_cast<Constant::eResource>
+                    (getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(15))));
 
-                    if (SELECT_CASE_var == "ELECTRICITY") {
-                        ResourceTypeString = "Electricity";
-                    } else if (SELECT_CASE_var == "NATURALGAS") {
-                        ResourceTypeString = "NaturalGas";
-                    } else if (SELECT_CASE_var == "GASOLINE") {
-                        ResourceTypeString = "Gasoline";
-                    } else if (SELECT_CASE_var == "DIESEL") {
-                        ResourceTypeString = "Diesel";
-                    } else if (SELECT_CASE_var == "COAL") {
-                        ResourceTypeString = "Coal";
-                    } else if (SELECT_CASE_var == "FUELOILNO1") {
-                        ResourceTypeString = "FuelOilNo1";
-                    } else if (SELECT_CASE_var == "FUELOILNO2") {
-                        ResourceTypeString = "FuelOilNo2";
-                    } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                        ResourceTypeString = "OtherFuel1";
-                    } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                        ResourceTypeString = "OtherFuel2";
-                    } else if (SELECT_CASE_var == "PROPANE") {
-                        ResourceTypeString = "Propane";
-                    } else if (SELECT_CASE_var == "WATERUSE") {
-                        ResourceTypeString = "Water";
-                    } else if (SELECT_CASE_var == "ONSITEWATERPRODUCED") {
-                        ResourceTypeString = "OnSiteWater";
-                    } else if (SELECT_CASE_var == "MAINSWATERSUPPLY") {
-                        ResourceTypeString = "MainsWater";
-                    } else if (SELECT_CASE_var == "RAINWATERCOLLECTED") {
-                        ResourceTypeString = "RainWater";
-                    } else if (SELECT_CASE_var == "WELLWATERDRAWN") {
-                        ResourceTypeString = "WellWater";
-                    } else if (SELECT_CASE_var == "CONDENSATEWATERCOLLECTED") {
-                        ResourceTypeString = "Condensate";
-                    } else if (SELECT_CASE_var == "ENERGYTRANSFER") {
-                        ResourceTypeString = "EnergyTransfer";
-                    } else if (SELECT_CASE_var == "STEAM") {
-                        ResourceTypeString = "Steam";
-                    } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
-                        ResourceTypeString = "DistrictCooling";
-                    } else if (SELECT_CASE_var == "DISTRICTHEATING") {
-                        ResourceTypeString = "DistrictHeating";
-                    } else if (SELECT_CASE_var == "ELECTRICITYPRODUCEDONSITE") {
-                        ResourceTypeString = "ElectricityProduced";
-                    } else if (SELECT_CASE_var == "SOLARWATERHEATING") {
-                        ResourceTypeString = "SolarWater";
-                    } else if (SELECT_CASE_var == "SOLARAIRHEATING") {
-                        ResourceTypeString = "SolarAir";
-                    } else {
-                        ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                        ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(5), cAlphaArgs(5)));
-                        ErrorsFound = true;
-                    }
+                if (resource == Constant::eResource::Invalid) {
+                    ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(5), cAlphaArgs(5)));
+                    ErrorsFound = true;
                 }
 
                 // Group Type
@@ -3796,7 +3748,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 }
 
                 // Additional End Use Types Only Used for EnergyTransfer
-                if ((ResourceTypeString != "EnergyTransfer") &&
+                if ((resource != Constant::eResource::EnergyTransfer) &&
                     (EndUseTypeString == "HeatingCoils" || EndUseTypeString == "CoolingCoils" || EndUseTypeString == "Chillers" ||
                      EndUseTypeString == "Boilers" || EndUseTypeString == "Baseboard" || EndUseTypeString == "HeatRecoveryForCooling" ||
                      EndUseTypeString == "HeatRecoveryForHeating")) {
@@ -3804,7 +3756,6 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("Invalid {}={} for {}={}", cAlphaFieldNames(5), cAlphaArgs(5), cAlphaFieldNames(7), cAlphaArgs(7)));
                     ShowContinueError(state, format("Field {} is reset from {} to EnergyTransfer", cAlphaFieldNames(5), cAlphaArgs(5)));
-                    ResourceTypeString = "EnergyTransfer";
                 }
 
                 if (!lAlphaFieldBlanks(8)) {
@@ -3818,7 +3769,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         VarTypeString,
                                         "EMS",
                                         {},
-                                        ResourceTypeString,
+                                        Constant::eResource::EnergyTransfer,
                                         EndUseTypeString,
                                         EndUseSubCatString,
                                         GroupTypeString);
@@ -3831,7 +3782,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         VarTypeString,
                                         "EMS",
                                         {},
-                                        ResourceTypeString,
+                                        resource, 
                                         EndUseTypeString,
                                         {},
                                         GroupTypeString);

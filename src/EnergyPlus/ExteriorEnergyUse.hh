@@ -85,6 +85,57 @@ namespace ExteriorEnergyUse {
         Num
     };
 
+    static constexpr std::array<std::string_view, (int)ExteriorFuelUsage::Num> exteriorFuelNames = {
+        "Electricity",
+        "NaturalGas",
+        "Water",
+        "Coal",
+        "FuelOilNo1", 
+        "FuelOilNo2", 
+        "Propane",
+        "Gasoline",
+        "Diesel", 
+        "Steam", 
+        "DistrictCooling", 
+        "DistrictHeating", 
+        "OtherFuel1",
+        "OtherFuel2"
+    };
+
+    static constexpr std::array<std::string_view, (int)ExteriorFuelUsage::Num> exteriorFuelNamesUC = {
+        "ELECTRICITY",
+        "NATURALGAS",
+        "WATER",
+        "COAL",
+        "FUELOILNO1", 
+        "FUELOILNO2", 
+        "PROPANE",
+        "GASOLINE",
+        "DIESEL", 
+        "STEAM", 
+        "DISTRICTCOOLING", 
+        "DISTRICTHEATING", 
+        "OTHERFUEL1",
+        "OTHERFUEL2"
+    };
+        
+    static constexpr std::array<Constant::eResource, (int)ExteriorFuelUsage::Num> exteriorFuel2eResource = {
+        Constant::eResource::Electricity,
+        Constant::eResource::NaturalGas,
+        Constant::eResource::Water,
+        Constant::eResource::Coal,
+        Constant::eResource::FuelOilNo1,
+        Constant::eResource::FuelOilNo2,
+        Constant::eResource::Propane,
+        Constant::eResource::Gasoline,
+        Constant::eResource::Diesel,
+        Constant::eResource::Steam,
+        Constant::eResource::DistrictCooling,
+        Constant::eResource::DistrictHeating,
+        Constant::eResource::OtherFuel1,
+        Constant::eResource::OtherFuel2
+    };
+                
     enum class LightControlType
     {
         Invalid = -1,
@@ -139,15 +190,6 @@ namespace ExteriorEnergyUse {
     void ManageExteriorEnergyUse(EnergyPlusData &state);
 
     void GetExteriorEnergyUseInput(EnergyPlusData &state);
-
-    void ValidateFuelType(EnergyPlusData &state,
-                          ExteriorEnergyUse::ExteriorFuelUsage &FuelTypeNumber, // Fuel Type to be set in structure.
-                          std::string const &FuelTypeAlpha,                     // Fuel Type String
-                          std::string &FuelTypeString,                          // Standardized Fuel Type String (for variable naming)
-                          std::string_view CurrentModuleObject,                 // object being parsed
-                          std::string const &CurrentField,                      // current field being parsed
-                          std::string const &CurrentName                        // current object name being parsed
-    );
 
     void ReportExteriorEnergyUse(EnergyPlusData &state);
 

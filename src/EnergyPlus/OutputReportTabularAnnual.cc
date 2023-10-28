@@ -176,10 +176,10 @@ void AnnualTable::setupGathering(EnergyPlusData &state)
 // input fields, and ems variables are gathered.
 {
     int keyCount = 0;
-    OutputProcessor::VariableType typeVar = OutputProcessor::VariableType::NotFound;
+    OutputProcessor::VariableType typeVar = OutputProcessor::VariableType::Invalid;
     OutputProcessor::StoreType avgSumVar;
     OutputProcessor::TimeStepType stepTypeVar;
-    OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;
+    Constant::Units unitsVar = Constant::Units::None;
     Array1D_string namesOfKeys;   // keyNames
     Array1D_int indexesForKeyVar; // keyVarIndexes
     std::list<std::string> allKeys;
@@ -719,17 +719,17 @@ void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::UnitsSt
         }
         // do the unit conversions
         if (unitsStyle == OutputReportTabular::UnitsStyle::InchPound) {
-            varNameWithUnits = fldStIt->m_variMeter + unitEnumToStringBrackets(fldStIt->m_varUnits);
+            varNameWithUnits = format("{} [{}]", fldStIt->m_variMeter, Constant::unitNames[(int)fldStIt->m_varUnits]);
             OutputReportTabular::LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
             OutputReportTabular::GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
         } else { // just do the Joule conversion
             // if units is in Joules, convert if specified
-            if (fldStIt->m_varUnits == OutputProcessor::Unit::J) {
+            if (fldStIt->m_varUnits == Constant::Units::J) {
                 curUnits = energyUnitsString;
                 curConversionFactor = energyUnitsConversionFactor;
                 curConversionOffset = 0.0;
             } else { // if not joules don't perform conversion
-                curUnits = unitEnumToString(fldStIt->m_varUnits);
+                curUnits = Constant::unitNames[(int)fldStIt->m_varUnits];
                 curConversionFactor = 1.0;
                 curConversionOffset = 0.0;
             }
@@ -1298,17 +1298,17 @@ void AnnualTable::convertUnitForDeferredResults(EnergyPlusData &state,
     Real64 energyUnitsConversionFactor = AnnualTable::setEnergyUnitStringAndFactor(unitsStyle, energyUnitsString);
     // do the unit conversions
     if (unitsStyle == OutputReportTabular::UnitsStyle::InchPound) {
-        varNameWithUnits = fldStIt->m_variMeter + " [" + unitEnumToString(fldStIt->m_varUnits) + ']';
+        varNameWithUnits = format("{} [{}]", fldStIt->m_variMeter, Constant::unitNames[(int)fldStIt->m_varUnits]);
         OutputReportTabular::LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
         OutputReportTabular::GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     } else { // just do the Joule conversion
         // if units is in Joules, convert if specified
-        if (fldStIt->m_varUnits == OutputProcessor::Unit::J) {
+        if (fldStIt->m_varUnits == Constant::Units::J) {
             curUnits = energyUnitsString;
             curConversionFactor = energyUnitsConversionFactor;
             curConversionOffset = 0.0;
         } else { // if not joules don't perform conversion
-            curUnits = unitEnumToString(fldStIt->m_varUnits);
+            curUnits = Constant::unitNames[(int)fldStIt->m_varUnits];
             curConversionFactor = 1.0;
             curConversionOffset = 0.0;
         }
@@ -1368,9 +1368,9 @@ void AnnualTable::columnHeadersToTitleCase(EnergyPlusData &state)
             if (fldStIt->m_indexesForKeyVar.size() > 0) {
                 int varNum = fldStIt->m_indexesForKeyVar[0];
                 if (fldStIt->m_typeOfVar == OutputProcessor::VariableType::Real) {
-                    fldStIt->m_colHead = state.dataOutputProcessor->RVariableTypes(varNum).VarNameOnly;
+                    fldStIt->m_colHead = state.dataOutputProcessor->outVars[varNum]->name;
                 } else if (fldStIt->m_typeOfVar == OutputProcessor::VariableType::Meter) {
-                    fldStIt->m_colHead = state.dataOutputProcessor->EnergyMeters(varNum).Name;
+                    fldStIt->m_colHead = state.dataOutputProcessor->meters[varNum]->Name;
                 }
             }
         }
@@ -1407,17 +1407,17 @@ std::vector<std::string> AnnualTable::inspectTableFieldSets(int fldIndex)
     fldSt = m_annualFields[fldIndex];
     ret.push_back(fldSt.m_colHead);
     ret.push_back(fldSt.m_variMeter);
-    ret.push_back(unitEnumToString(fldSt.m_varUnits));
+    ret.push_back(std::string(Constant::unitNames[(int)fldSt.m_varUnits]));
     std::string outStr = std::to_string(fldSt.m_showDigits);
     // ints
     ret.push_back(outStr);
-    outStr = std::to_string(static_cast<int>(fldSt.m_typeOfVar));
+    outStr = std::to_string((int)fldSt.m_typeOfVar);
     ret.push_back(outStr);
     outStr = std::to_string(fldSt.m_keyCount);
     ret.push_back(outStr);
-    outStr = std::to_string(static_cast<int>(fldSt.m_varAvgSum));
+    outStr = std::to_string((int)fldSt.m_varAvgSum);
     ret.push_back(outStr);
-    outStr = std::to_string(static_cast<int>(fldSt.m_varStepType));
+    outStr = std::to_string((int)fldSt.m_varStepType);
     ret.push_back(outStr);
     outStr = std::to_string(fldSt.m_aggregate);
     ret.push_back(outStr);

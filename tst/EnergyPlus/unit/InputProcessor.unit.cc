@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/SortAndStringUtilities.hh>
 
 #include <map>
 #include <sstream>

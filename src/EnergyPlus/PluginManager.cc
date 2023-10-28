@@ -175,16 +175,16 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
             if (updateFreq == "SYSTEMTIMESTEP") {
                 sUpdateFreq = OutputProcessor::SOVTimeStepType::System;
             }
-            OutputProcessor::Unit thisUnit = OutputProcessor::Unit::None;
+            OutputProcessor::Unit thisUnit = Constant::Units::None;
             if (!units.empty()) {
                 thisUnit = OutputProcessor::unitStringToEnum(units);
-                if (thisUnit == OutputProcessor::Unit::unknown) {
-                    thisUnit = OutputProcessor::Unit::customEMS;
+                if (thisUnit == Constant::Units::unknown) {
+                    thisUnit = Constant::Units::customEMS;
                 }
             }
             if (!isMetered) {
                 // regular output variable, ignore the meter/resource stuff and register the variable
-                if (thisUnit != OutputProcessor::Unit::customEMS) {
+                if (thisUnit != Constant::Units::customEMS) {
                     SetupOutputVariable(state,
                                         sOutputVariable,
                                         thisUnit,

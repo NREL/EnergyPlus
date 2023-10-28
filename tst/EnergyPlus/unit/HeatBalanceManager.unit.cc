@@ -682,10 +682,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
     EXPECT_FALSE(ErrorsFound);
 
     // first 2 have indexes swapped now since they are in lexicigraphical order now according to the new input processor
-    EXPECT_EQ("WEST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", state->dataOutputProcessor->RVariableTypes(1).VarName);
-    EXPECT_EQ("EAST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", state->dataOutputProcessor->RVariableTypes(2).VarName);
-    EXPECT_EQ(1, state->dataOutputProcessor->RVariableTypes(1).ReportID);
-    EXPECT_EQ(2, state->dataOutputProcessor->RVariableTypes(2).ReportID);
+    EXPECT_EQ("WEST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", state->dataOutputProcessor->outVars[0]->keyColonName);
+    EXPECT_EQ("EAST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", state->dataOutputProcessor->outVars[1]->keyColonName);
+    EXPECT_EQ(1, state->dataOutputProcessor->outVars[0]->ReportID);
+    EXPECT_EQ(2, state->dataOutputProcessor->outVars[1]->ReportID);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)

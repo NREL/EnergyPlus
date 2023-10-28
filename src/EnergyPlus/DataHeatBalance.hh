@@ -54,7 +54,6 @@
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Array4D.hh>
 #include <ObjexxFCL/Optional.hh>
-#include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/ConvectionConstants.hh>
@@ -477,7 +476,7 @@ namespace DataHeatBalance {
         Real64 maxOccupants = 0.0;     // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
         bool isRemainderSpace = false; // True if this space is auto-generated "-Remainder" space
         std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this space
-        std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this space
+        // std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this space
 
         // Pointers to Surface Data Structure
         // |AllSurfF                                                                      |AllSurfL
@@ -1510,7 +1509,7 @@ namespace DataHeatBalance {
         Real64 SumEnthalpyM = 0.0;           // Zone sum of EnthalpyM
         Real64 SumEnthalpyH = 0.0;           // Zone sum of EnthalpyH
 
-        void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name);
+        void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string const &name);
     };
 
     struct ZonePreDefRepType

@@ -2546,7 +2546,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     AllocateSurfaceHeatBalArrays(*state); // allocates a host of variables related to CTF calculations
     OutputProcessor::GetReportVariableInput(*state);
 
-    EXPECT_EQ(state->dataOutputProcessor->ReqRepVars(2).VarName, "SURFACE CONSTRUCTION INDEX");
+    EXPECT_EQ(state->dataOutputProcessor->reqVars[1]->name, "SURFACE CONSTRUCTION INDEX");
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceAddSourceTerm)

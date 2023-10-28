@@ -417,7 +417,7 @@ namespace HVACDXHeatPumpSystem {
             // Setup Report variables for the DXHeatingSystem that is not reported in the components themselves
             SetupOutputVariable(state,
                                 "Coil System Part Load Ratio",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 DXHeatPumpSystem(DXHeatSysNum).PartLoadFrac,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,

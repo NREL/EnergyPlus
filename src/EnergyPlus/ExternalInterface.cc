@@ -2401,35 +2401,32 @@ void GetReportVariableKey(
     // Gets the sensor key index and type for the specified variable key and name
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    OutputProcessor::VariableType varType(OutputProcessor::VariableType::NotFound); // 0=not found, 1=integer, 2=real, 3=meter
+    OutputProcessor::VariableType varType(OutputProcessor::VariableType::Invalid); // 0=not found, 1=integer, 2=real, 3=meter
     int numKeys(0);                                                                 // Number of keys found
     OutputProcessor::StoreType varAvgSum(OutputProcessor::StoreType::Averaged);     // Variable  is Averaged=1 or Summed=2
     OutputProcessor::TimeStepType varStepType(OutputProcessor::TimeStepType::Zone); // Variable time step is Zone=1 or HVAC=2
-    OutputProcessor::Unit varUnits(OutputProcessor::Unit::None);                    // Units sting, may be blank
+    Constant::Units varUnits(Constant::Units::None);                    // Units sting, may be blank
     Array1D_int keyIndexes;                                                         // Array index for
-    Array1D_string NamesOfKeys;                                                     // Specific key name
     int Loop, iKey;                                                                 // Loop counters
 
     // Get pointers for variables to be sent to Ptolemy
     for (Loop = 1; Loop <= numberOfKeys; ++Loop) {
         GetVariableKeyCountandType(state, VarNames(Loop), numKeys, varType, varAvgSum, varStepType, varUnits);
-        if (varType != OutputProcessor::VariableType::NotFound) {
-            NamesOfKeys.allocate(numKeys);
+        if (varType != OutputProcessor::VariableType::Invalid) {
             keyIndexes.allocate(numKeys);
-            GetVariableKeys(state, VarNames(Loop), varType, NamesOfKeys, keyIndexes);
+            GetVariableKeys(state, VarNames(Loop), varType, keyIndexes);
             // Find key index whose keyName is equal to keyNames(Loop)
-            int max(NamesOfKeys.size());
+            int max(keyIndexes.size());
             for (iKey = 1; iKey <= max; ++iKey) {
-                if (NamesOfKeys(iKey) == varKeys(Loop)) {
+                 if (state.dataOutputProcessor->outVars[keyIndexes(iKey)]->keyUC == varKeys(Loop)) {
                     keyVarIndexes(Loop) = keyIndexes(iKey);
                     varTypes(Loop) = varType;
                     break;
                 }
             }
             keyIndexes.deallocate();
-            NamesOfKeys.deallocate();
         }
-        if ((varType == OutputProcessor::VariableType::NotFound) || (iKey > numKeys)) {
+        if ((varType == OutputProcessor::VariableType::Invalid) || (iKey > numKeys)) {
             ShowSevereError(state,
                             format("ExternalInterface: Simulation model has no variable \"{}\" with key \"{}\".", VarNames(Loop), varKeys(Loop)));
             state.dataExternalInterface->ErrorsFound = true;

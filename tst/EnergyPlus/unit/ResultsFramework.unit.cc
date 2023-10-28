@@ -175,7 +175,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_VariableInfo)
     OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
     int repordId = 1;
 
-    Variable var("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, repordId, Unit::C);
+    Variable var("SALESFLOOR INLET NODE:System Node Temperature", ReportFreq::TimeStep, indexType, repordId, Constant::Units::C);
 
     std::string expected_result = "{\n         \"Frequency\": \"TimeStep\",\n         \"Name\": \"SALESFLOOR INLET NODE:System Node Temperature\",\n "
                                   "        \"Units\": \"C\"\n}";
@@ -192,19 +192,20 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_VariableInfo)
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo1)
 {
-
+    auto &rf = state->dataResultsFramework->resultsFramework;
     json OutputVars;
     OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
     int reportId = 1;
 
-    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
+    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportFreq::TimeStep, indexType, reportId, Constant::Units::C);
     reportId++;
-    Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", ReportingFrequency::TimeStep, indexType, reportId, Unit::kgWater_kgDryAir);
+    Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", ReportFreq::TimeStep, indexType, reportId, Constant::Units::kgWater_kgDryAir);
 
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var1);
+    auto &dataTS = rf->freqTSData[(int)ReportFreq::TimeStep];
+    dataTS.addVariable(var0);
+    dataTS.addVariable(var1);
 
-    OutputVars["TimeStep"] = state->dataResultsFramework->resultsFramework->RITimestepTSData.getVariablesJSON();
+    OutputVars["TimeStep"] = dataTS.getVariablesJSON();
 
     json expectedObject = R"( {
             "TimeStep": [
@@ -226,32 +227,34 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo1)
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
 {
-
+    auto &rf = state->dataResultsFramework->resultsFramework;
     json OutputData;
     OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
     int reportId = 1;
 
-    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute
+    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportFreq::TimeStep, indexType, reportId, Constant::Units::C);
+    auto &dataTS = rf->freqTSData[(int)ReportFreq::TimeStep];
+    
+    dataTS.addVariable(var0);
+    dataTS.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute
+    dataTS.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute
+    dataTS.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute
+    dataTS.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute
 
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 3.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 4.0);
+    dataTS.pushVariableValue(reportId, 1.0);
+    dataTS.pushVariableValue(reportId, 2.0);
+    dataTS.pushVariableValue(reportId, 3.0);
+    dataTS.pushVariableValue(reportId, 4.0);
 
     reportId++;
-    Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", ReportingFrequency::TimeStep, indexType, reportId, Unit::kgWater_kgDryAir);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var1);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 5.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 6.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 7.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 8.0);
+    Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", ReportFreq::TimeStep, indexType, reportId, Constant::Units::kgWater_kgDryAir);
+    dataTS.addVariable(var1);
+    dataTS.pushVariableValue(reportId, 5.0);
+    dataTS.pushVariableValue(reportId, 6.0);
+    dataTS.pushVariableValue(reportId, 7.0);
+    dataTS.pushVariableValue(reportId, 8.0);
 
-    OutputData["TimeStep"] = state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON();
+    OutputData["TimeStep"] = dataTS.getJSON();
 
     json expectedObject = R"( {
             "TimeStep": {
@@ -279,13 +282,13 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
 
     // If add one more, it also should go to the top of json cols array
     reportId++;
-    Variable var2("SALESFLOOR OUTLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var2);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 9.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 10.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 11.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 12.0);
-    OutputData["TimeStep"] = state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON();
+    Variable var2("SALESFLOOR OUTLET NODE:System Node Temperature", ReportFreq::TimeStep, indexType, reportId, Constant::Units::C);
+    dataTS.addVariable(var2);
+    dataTS.pushVariableValue(reportId, 9.0);
+    dataTS.pushVariableValue(reportId, 10.0);
+    dataTS.pushVariableValue(reportId, 11.0);
+    dataTS.pushVariableValue(reportId, 12.0);
+    OutputData["TimeStep"] = dataTS.getJSON();
 
     expectedObject = R"( {
             "TimeStep": {
@@ -498,30 +501,30 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_convertToMonth)
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_CSV_Timestamp_Beginning)
 {
-
+    auto &rf = state->dataResultsFramework->resultsFramework;
+    auto &dataTS = rf->freqTSData[(int)ReportFreq::TimeStep];
     json OutputData;
     OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
     int reportId = 1;
 
-    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
-    state->dataResultsFramework->resultsFramework->addReportVariable(
-        "SALESFLOOR INLET NODE", "System Node Temperature", "C", ReportingFrequency::TimeStep);
-    state->dataResultsFramework->resultsFramework->setBeginningOfInterval(true);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute,year
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute,year
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute,year
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute,year
+    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportFreq::TimeStep, indexType, reportId, Constant::Units::C);
+    dataTS.addVariable(var0);
+    rf->addReportVariable("SALESFLOOR INLET NODE", "System Node Temperature", "C", ReportFreq::TimeStep);
+    rf->setBeginningOfInterval(true);
+    dataTS.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute,year
+    dataTS.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute,year
+    dataTS.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute,year
+    dataTS.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute,year
 
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 3.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 4.0);
+    dataTS.pushVariableValue(reportId, 1.0);
+    dataTS.pushVariableValue(reportId, 2.0);
+    dataTS.pushVariableValue(reportId, 3.0);
+    dataTS.pushVariableValue(reportId, 4.0);
 
     auto outputs = getCSVOutputs(*state,
-                                 state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON(),
+                                 dataTS.getJSON(),
                                  *state->dataResultsFramework->resultsFramework,
-                                 OutputProcessor::ReportingFrequency::TimeStep);
+                                 OutputProcessor::ReportFreq::TimeStep);
 
     std::map<std::string, std::vector<std::string>> expected_output = {
         {"02/25 00:00:00", {"1.0"}}, {"02/25 00:45:00", {"2.0"}}, {"02/25 01:00:00", {"3.0"}}, {"02/25 23:45:00", {"4.0"}}};
@@ -531,29 +534,29 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_CSV_Timestamp_Beginning)
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_CSV_Timestamp)
 {
-
+    auto &rf = state->dataResultsFramework->resultsFramework;
+    auto &dataTS = rf->freqTSData[(int)ReportFreq::TimeStep];
     json OutputData;
     OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
     int reportId = 1;
 
-    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
-    state->dataResultsFramework->resultsFramework->addReportVariable(
-        "SALESFLOOR INLET NODE", "System Node Temperature", "C", ReportingFrequency::TimeStep);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute,year
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute,year
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute,year
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute,year
+    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportFreq::TimeStep, indexType, reportId, Constant::Units::C);
+    dataTS.addVariable(var0);
+    rf->addReportVariable("SALESFLOOR INLET NODE", "System Node Temperature", "C", ReportFreq::TimeStep);
+    dataTS.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute,year
+    dataTS.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute,year
+    dataTS.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute,year
+    dataTS.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute,year
 
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 3.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 4.0);
+    dataTS.pushVariableValue(reportId, 1.0);
+    dataTS.pushVariableValue(reportId, 2.0);
+    dataTS.pushVariableValue(reportId, 3.0);
+    dataTS.pushVariableValue(reportId, 4.0);
 
     auto outputs = getCSVOutputs(*state,
-                                 state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON(),
+                                 dataTS.getJSON(),
                                  *state->dataResultsFramework->resultsFramework,
-                                 OutputProcessor::ReportingFrequency::TimeStep);
+                                 OutputProcessor::ReportFreq::TimeStep);
 
     std::map<std::string, std::vector<std::string>> expected_output = {
         {"02/25 00:45:00", {"1.0"}}, {"02/25 01:00:00", {"2.0"}}, {"02/25 23:45:00", {"3.0"}}, {"02/25 24:00:00", {"4.0"}}};
@@ -563,30 +566,30 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_CSV_Timestamp)
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_CSV_Timestamp_8601_End)
 {
-
+    auto &rf = state->dataResultsFramework->resultsFramework;
+    auto &dataTS = rf->freqTSData[(int)ReportFreq::TimeStep];
     json OutputData;
     OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
     int reportId = 1;
 
-    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
-    state->dataResultsFramework->resultsFramework->addReportVariable(
-        "SALESFLOOR INLET NODE", "System Node Temperature", "C", ReportingFrequency::TimeStep);
-    state->dataResultsFramework->resultsFramework->setISO8601(true);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute,year
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute,year
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute,year
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute,year
+    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportFreq::TimeStep, indexType, reportId, Constant::Units::C);
+    dataTS.addVariable(var0);
+    rf->addReportVariable("SALESFLOOR INLET NODE", "System Node Temperature", "C", ReportFreq::TimeStep);
+    rf->setISO8601(true);
+    dataTS.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute,year
+    dataTS.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute,year
+    dataTS.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute,year
+    dataTS.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute,year
 
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 3.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 4.0);
+    dataTS.pushVariableValue(reportId, 1.0);
+    dataTS.pushVariableValue(reportId, 2.0);
+    dataTS.pushVariableValue(reportId, 3.0);
+    dataTS.pushVariableValue(reportId, 4.0);
 
     auto outputs = getCSVOutputs(*state,
-                                 state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON(),
-                                 *state->dataResultsFramework->resultsFramework,
-                                 OutputProcessor::ReportingFrequency::TimeStep);
+                                 dataTS.getJSON(),
+                                 *rf,
+                                 OutputProcessor::ReportFreq::TimeStep);
 
     std::map<std::string, std::vector<std::string>> expected_output = {
         {"2017-02-25T00:45:00", {"1.0"}}, {"2017-02-25T01:00:00", {"2.0"}}, {"2017-02-25T23:45:00", {"3.0"}}, {"2017-02-25T24:00:00", {"4.0"}}};
@@ -596,31 +599,31 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_CSV_Timestamp_8601_End)
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_CSV_Timestamp_8601_Beginning)
 {
-
+    auto &rf = state->dataResultsFramework->resultsFramework;
+    auto &dataTS = rf->freqTSData[(int)ReportFreq::TimeStep];
     json OutputData;
     OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
     int reportId = 1;
 
-    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
-    state->dataResultsFramework->resultsFramework->addReportVariable(
-        "SALESFLOOR INLET NODE", "System Node Temperature", "C", ReportingFrequency::TimeStep);
-    state->dataResultsFramework->resultsFramework->setISO8601(true);
-    state->dataResultsFramework->resultsFramework->setBeginningOfInterval(true);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute,year
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute,year
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute,year
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute,year
+    Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportFreq::TimeStep, indexType, reportId, Constant::Units::C);
+    dataTS.addVariable(var0);
+    rf->addReportVariable("SALESFLOOR INLET NODE", "System Node Temperature", "C", ReportFreq::TimeStep);
+    rf->setISO8601(true);
+    rf->setBeginningOfInterval(true);
+    dataTS.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute,year
+    dataTS.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute,year
+    dataTS.newRow(2, 25, 24, 45, 2017); // month,day,hour,minute,year
+    dataTS.newRow(2, 25, 24, 60, 2017); // month,day,hour,minute,year
 
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 3.0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 4.0);
+    dataTS.pushVariableValue(reportId, 1.0);
+    dataTS.pushVariableValue(reportId, 2.0);
+    dataTS.pushVariableValue(reportId, 3.0);
+    dataTS.pushVariableValue(reportId, 4.0);
 
     auto outputs = getCSVOutputs(*state,
-                                 state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON(),
-                                 *state->dataResultsFramework->resultsFramework,
-                                 OutputProcessor::ReportingFrequency::TimeStep);
+                                 dataTS.getJSON(),
+                                 *rf,
+                                 OutputProcessor::ReportFreq::TimeStep);
 
     std::map<std::string, std::vector<std::string>> expected_output = {
         {"2017-02-25T00:00:00", {"1.0"}}, {"2017-02-25T00:45:00", {"2.0"}}, {"2017-02-25T01:00:00", {"3.0"}}, {"2017-02-25T23:45:00", {"4.0"}}};

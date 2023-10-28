@@ -1814,7 +1814,7 @@ namespace FaultsManager {
 
                         SetupOutputVariable(state,
                                             "Coil Fouling Factor",
-                                            OutputProcessor::Unit::K_W,
+                                            Constant::Units::K_W,
                                             state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFactor,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
@@ -1825,7 +1825,7 @@ namespace FaultsManager {
                         if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) {
                             SetupOutputVariable(state,
                                                 "Cooling Coil Total U Factor Times Area Value",
-                                                OutputProcessor::Unit::W_K,
+                                                Constant::Units::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Average,
@@ -1833,7 +1833,7 @@ namespace FaultsManager {
 
                             SetupOutputVariable(state,
                                                 "Cooling Coil External U Factor Times Area Value",
-                                                OutputProcessor::Unit::W_K,
+                                                Constant::Units::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Average,
@@ -1841,7 +1841,7 @@ namespace FaultsManager {
 
                             SetupOutputVariable(state,
                                                 "Cooling Coil Internal U Factor Times Area Value",
-                                                OutputProcessor::Unit::W_K,
+                                                Constant::Units::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Average,
@@ -1849,7 +1849,7 @@ namespace FaultsManager {
 
                             SetupOutputVariable(state,
                                                 "Cooling Coil Total U Factor Times Area Value Before Fouling",
-                                                OutputProcessor::Unit::W_K,
+                                                Constant::Units::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilVariable,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Average,
@@ -1857,7 +1857,7 @@ namespace FaultsManager {
 
                             SetupOutputVariable(state,
                                                 "Cooling Coil External U Factor Times Area Value Before Fouling",
-                                                OutputProcessor::Unit::W_K,
+                                                Constant::Units::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilExternal,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Average,
@@ -1865,7 +1865,7 @@ namespace FaultsManager {
 
                             SetupOutputVariable(state,
                                                 "Cooling Coil Internal U Factor Times Area Value Before Fouling",
-                                                OutputProcessor::Unit::W_K,
+                                                Constant::Units::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilInternal,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Average,
@@ -1874,7 +1874,7 @@ namespace FaultsManager {
                         } else {
                             SetupOutputVariable(state,
                                                 "Heating Coil U Factor Times Area Value Before Fouling",
-                                                OutputProcessor::Unit::W_K,
+                                                Constant::Units::W_K,
                                                 state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilVariable,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Average,

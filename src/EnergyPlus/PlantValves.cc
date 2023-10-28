@@ -231,7 +231,7 @@ namespace PlantValves {
 
             SetupOutputVariable(state,
                                 "Tempering Valve Flow Fraction",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 state.dataPlantValves->TemperValve(Item).FlowDivFract,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,

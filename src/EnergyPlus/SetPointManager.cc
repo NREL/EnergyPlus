@@ -3158,14 +3158,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum) {
         SetupOutputVariable(state,
                             "Setpoint Manager Warmest Temperature Critical Zone Number",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).CritZoneNum,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Name);
         SetupOutputVariable(state,
                             "Setpoint Manager Warmest Temperature Turndown Flow Fraction",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Turndown,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -8359,16 +8359,8 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
     std::string TypeOfComp;
     std::string NameOfComp;
 
-    Array1D_int VarIndexes;                            // Variable Numbers
-    Array1D<OutputProcessor::VariableType> VarTypes;   // Variable Types (1=integer, 2=real, 3=meter)
-    Array1D<OutputProcessor::TimeStepType> IndexTypes; // Variable Index Types (1=Zone,2=HVAC)
-    Array1D<OutputProcessor::Unit> unitsForVar;        // units from enum for each variable
-    Array1D<Constant::eResource> ResourceTypes;        // ResourceTypes for each variable
-    Array1D_string EndUses;                            // EndUses for each variable
-    Array1D_string Groups;                             // Groups for each variable
-    Array1D_string Names;                              // Variable Names for each variable
+    Array1D<OutputProcessor::MeteredVar> meteredVars;
     int NumVariables;
-    int NumFound;
 
     // Chiller and ChW pump location, assumes supply side
     int ChillerLoopNum(this->LoopIndexPlantSide);         // Chiller loop number
@@ -8385,37 +8377,21 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
     TypeOfComp = state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(LoopSideLocation::Supply).Branch(ChillerBranchNum).Comp(ChillerNum).TypeOf;
     NameOfComp = state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(LoopSideLocation::Supply).Branch(ChillerBranchNum).Comp(ChillerNum).Name;
     NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
-    VarIndexes.allocate(NumVariables);
-    VarTypes.allocate(NumVariables);
-    IndexTypes.allocate(NumVariables);
-    unitsForVar.allocate(NumVariables);
-    ResourceTypes.allocate(NumVariables);
-    EndUses.allocate(NumVariables);
-    Groups.allocate(NumVariables);
-    Names.allocate(NumVariables);
+    meteredVars.allocate(NumVariables);
 
-    GetMeteredVariables(
-        state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
-    this->ChllrVarType = VarTypes(1);
-    this->ChllrVarIndex = VarIndexes(1);
+    GetMeteredVariables(state, NameOfComp, meteredVars);
+    this->ChllrVarType = meteredVars(1).varType;
+    this->ChllrVarIndex = meteredVars(1).num;
 
     TypeOfComp =
         state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(LoopSideLocation::Supply).Branch(ChilledPumpBranchNum).Comp(ChilledPumpNum).TypeOf;
     NameOfComp = state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(LoopSideLocation::Supply).Branch(ChilledPumpBranchNum).Comp(ChilledPumpNum).Name;
     NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
-    VarIndexes.allocate(NumVariables);
-    VarTypes.allocate(NumVariables);
-    IndexTypes.allocate(NumVariables);
-    unitsForVar.allocate(NumVariables);
-    ResourceTypes.allocate(NumVariables);
-    EndUses.allocate(NumVariables);
-    Groups.allocate(NumVariables);
-    Names.allocate(NumVariables);
+    meteredVars.allocate(NumVariables);
 
-    GetMeteredVariables(
-        state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
-    this->ChlPumpVarType = VarTypes(1);
-    this->ChlPumpVarIndex = VarIndexes(1);
+    GetMeteredVariables(state, NameOfComp, meteredVars);
+    this->ChlPumpVarType = meteredVars(1).varType;
+    this->ChlPumpVarIndex = meteredVars(1).num;
 
     for (int i = 1; i <= this->numTowers; i++) {
         TypeOfComp = state.dataPlnt->PlantLoop(TowerLoopNum)
@@ -8429,37 +8405,21 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
                          .Comp(this->TowerNum(i))
                          .Name;
         NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
-        VarIndexes.allocate(NumVariables);
-        VarTypes.allocate(NumVariables);
-        IndexTypes.allocate(NumVariables);
-        unitsForVar.allocate(NumVariables);
-        ResourceTypes.allocate(NumVariables);
-        EndUses.allocate(NumVariables);
-        Groups.allocate(NumVariables);
-        Names.allocate(NumVariables);
+        meteredVars.allocate(NumVariables);
 
-        GetMeteredVariables(
-            state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
-        this->ClTowerVarType.push_back(VarTypes(1));
-        this->ClTowerVarIndex.push_back(VarIndexes(1));
+        GetMeteredVariables(state, NameOfComp, meteredVars);
+        this->ClTowerVarType.push_back(meteredVars(1).varType);
+        this->ClTowerVarIndex.push_back(meteredVars(1).num);
     }
 
     TypeOfComp = state.dataPlnt->PlantLoop(TowerLoopNum).LoopSide(LoopSideLocation::Supply).Branch(CondPumpBranchNum).Comp(CondPumpNum).TypeOf;
     NameOfComp = state.dataPlnt->PlantLoop(TowerLoopNum).LoopSide(LoopSideLocation::Supply).Branch(CondPumpBranchNum).Comp(CondPumpNum).Name;
     NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
-    VarIndexes.allocate(NumVariables);
-    VarTypes.allocate(NumVariables);
-    IndexTypes.allocate(NumVariables);
-    unitsForVar.allocate(NumVariables);
-    ResourceTypes.allocate(NumVariables);
-    EndUses.allocate(NumVariables);
-    Groups.allocate(NumVariables);
-    Names.allocate(NumVariables);
+    meteredVars.allocate(NumVariables);
 
-    GetMeteredVariables(
-        state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
-    this->CndPumpVarType = VarTypes(1);
-    this->CndPumpVarIndex = VarIndexes(1);
+    GetMeteredVariables(state, NameOfComp, meteredVars);
+    this->CndPumpVarType = meteredVars(1).varType;
+    this->CndPumpVarIndex = meteredVars(1).num;
 }
 
 void DefineSysNodeResetSetPointManager::calculate(EnergyPlusData &state)

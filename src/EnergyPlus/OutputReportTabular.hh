@@ -265,13 +265,13 @@ namespace OutputReportTabular {
         OutputProcessor::VariableType typeOfVar;
         OutputProcessor::StoreType avgSum;      // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType stepType; // Variable time step is Zone=1 or HVAC=2
-        OutputProcessor::Unit units;            // the units enumeration
+        Constant::Units units;            // the units enumeration
         std::string ScheduleName;               // the name of the schedule
         int scheduleIndex;                      // index to the schedule specified - if no schedule use zero
 
         // Default Constructor
         OutputTableBinnedType()
-            : intervalStart(0.0), intervalSize(0.0), intervalCount(0), resIndex(0), numTables(0), typeOfVar(OutputProcessor::VariableType::NotFound),
+            : intervalStart(0.0), intervalSize(0.0), intervalCount(0), resIndex(0), numTables(0), typeOfVar(OutputProcessor::VariableType::Invalid),
               avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::Zone), scheduleIndex(0)
         {
         }
@@ -350,7 +350,7 @@ namespace OutputReportTabular {
         std::string variMeter;          // the name of the variable or meter
         std::string colHead;            // the column header to use instead of the variable name (only for predefined)
         AggType aggregate;              // the type of aggregation for the variable (see aggType parameters)
-        OutputProcessor::Unit varUnits; // Units enumeration
+        Constant::Units varUnits; // Units enumeration
         std::string variMeterUpper;     // the name of the variable or meter uppercased
         OutputProcessor::VariableType typeOfVar;
         int keyCount;                              // noel
@@ -361,7 +361,7 @@ namespace OutputReportTabular {
 
         // Default Constructor
         MonthlyFieldSetInputType()
-            : aggregate(AggType::Invalid), varUnits(OutputProcessor::Unit::None), typeOfVar(OutputProcessor::VariableType::NotFound), keyCount(0),
+            : aggregate(AggType::Invalid), varUnits(Constant::Units::None), typeOfVar(OutputProcessor::VariableType::Invalid), keyCount(0),
               varAvgSum(OutputProcessor::StoreType::Averaged), varStepType(OutputProcessor::TimeStepType::Zone)
         {
         }
@@ -389,7 +389,7 @@ namespace OutputReportTabular {
         OutputProcessor::VariableType typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
         OutputProcessor::StoreType avgSum;       // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType stepType;  // Variable time step is Zone=1 or HVAC=2
-        OutputProcessor::Unit units;             // the units string, may be blank
+        Constant::Units units;             // the units string, may be blank
         AggType aggType;                         // index to the type of aggregation (see list of parameters)
         Array1D<Real64> reslt;                   // monthly results
         Array1D<Real64> duration;                // the time during which results are summed for use in averages
@@ -399,8 +399,8 @@ namespace OutputReportTabular {
 
         // Default Constructor
         MonthlyColumnsType()
-            : varNum(0), typeOfVar(OutputProcessor::VariableType::NotFound), avgSum(OutputProcessor::StoreType::Averaged),
-              stepType(OutputProcessor::TimeStepType::Zone), units(OutputProcessor::Unit::None), aggType(AggType::Invalid), reslt(12, 0.0),
+            : varNum(0), typeOfVar(OutputProcessor::VariableType::Invalid), avgSum(OutputProcessor::StoreType::Averaged),
+              stepType(OutputProcessor::TimeStepType::Zone), units(Constant::Units::None), aggType(AggType::Invalid), reslt(12, 0.0),
               duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
         {
         }
@@ -1050,6 +1050,8 @@ struct OutputReportTabularData : BaseGlobalStruct
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
     // arrays that hold the meter numbers that are initialized at get input
+
+
     Array1D_int meterNumTotalsBEPS = Array1D_int(OutputReportTabular::numResourceTypes, 0);
     Array1D_int meterNumTotalsSource = Array1D_int(OutputReportTabular::numSourceTypes, 0);
     Array1D_bool fuelfactorsused = Array1D_bool(OutputReportTabular::numSourceTypes, false);

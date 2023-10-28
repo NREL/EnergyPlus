@@ -196,7 +196,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
                     // Setup output variable
                     SetupOutputVariable(state,
                                         "Plant Branch Pressure Difference",
-                                        OutputProcessor::Unit::Pa,
+                                        Constant::Units::Pa,
                                         branch.PressureDrop,
                                         OutputProcessor::SOVTimeStepType::Plant,
                                         OutputProcessor::SOVStoreType::Average,
@@ -210,7 +210,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
 
                     SetupOutputVariable(state,
                                         "Plant Demand Side Loop Pressure Difference",
-                                        OutputProcessor::Unit::Pa,
+                                        Constant::Units::Pa,
                                         loop_side.PressureDrop,
                                         OutputProcessor::SOVTimeStepType::Plant,
                                         OutputProcessor::SOVStoreType::Average,
@@ -220,7 +220,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
 
                     SetupOutputVariable(state,
                                         "Plant Supply Side Loop Pressure Difference",
-                                        OutputProcessor::Unit::Pa,
+                                        Constant::Units::Pa,
                                         loop_side.PressureDrop,
                                         OutputProcessor::SOVTimeStepType::Plant,
                                         OutputProcessor::SOVStoreType::Average,
@@ -237,7 +237,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
 
             SetupOutputVariable(state,
                                 "Plant Loop Pressure Difference",
-                                OutputProcessor::Unit::Pa,
+                                Constant::Units::Pa,
                                 loop.PressureDrop,
                                 OutputProcessor::SOVTimeStepType::Plant,
                                 OutputProcessor::SOVStoreType::Average,

@@ -227,9 +227,17 @@ struct ErrorObjectHeader
     std::string_view objectName;
 };
 
+void ShowSevereDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh);
+void ShowSevereEmptyField(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName);
 void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
 void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
-
+void ShowSevereCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg);
+void ShowWarningDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh);
+void ShowWarningEmptyField(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName);
+void ShowWarningItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
+void ShowWarningInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
+void ShowWarningCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg);
+        
 namespace UtilityRoutines {
 
     static constexpr std::array<std::string_view, 12> MonthNamesCC{

@@ -614,9 +614,9 @@ namespace EMSManager {
                 } else {
                     // Search for variable names
                     GetVariableTypeAndIndex(state, cAlphaArgs(3), cAlphaArgs(2), VarType, VarIndex);
-                    if (VarType != OutputProcessor::VariableType::NotFound) {
+                    if (VarType != OutputProcessor::VariableType::Invalid) {
                         thisSensor.VariableType = VarType;
-                        if (VarIndex != 0) {
+                        if (VarIndex != -1) {
                             thisSensor.Index = VarIndex;
                             thisSensor.CheckedOkay = true;
                         }
@@ -963,7 +963,7 @@ namespace EMSManager {
                                         state.dataRuntimeLang->Sensor(SensorNum).UniqueKeyName,
                                         VarType,
                                         VarIndex);
-                if (VarType == OutputProcessor::VariableType::NotFound) {
+                if (VarType == OutputProcessor::VariableType::Invalid) {
                     if (reportErrors) {
                         ShowSevereError(
                             state,
@@ -1209,36 +1209,29 @@ namespace EMSManager {
         int NumKeys;
         OutputProcessor::StoreType AvgOrSum;
         OutputProcessor::TimeStepType StepType;
-        OutputProcessor::Unit Units(OutputProcessor::Unit::None);
-        Array1D_string KeyName;
+        Constant::Units units = Constant::Units::None;
         Array1D_int KeyIndex;
 
-        VarType = OutputProcessor::VariableType::NotFound;
-        VarIndex = 0;
-        GetVariableKeyCountandType(state, VarName, NumKeys, VarType, AvgOrSum, StepType, Units);
+        VarType = OutputProcessor::VariableType::Invalid;
+        VarIndex = -1;
+        GetVariableKeyCountandType(state, VarName, NumKeys, VarType, AvgOrSum, StepType, units);
 
         // note that schedules are not getting VarType set right...
 
         if (NumKeys > 0) {
-            KeyName.allocate(NumKeys);
             KeyIndex.allocate(NumKeys);
-            GetVariableKeys(state, VarName, VarType, KeyName, KeyIndex);
+            GetVariableKeys(state, VarName, VarType, KeyIndex);
 
-            if (KeyName(1) == "ENVIRONMENT") {
+            if (VarType == OutputProcessor::VariableType::Schedule) {
                 VarIndex = KeyIndex(1);
             } else {
-                int KeyNum;
-                bool Found = false;
-                for (KeyNum = 1; KeyNum <= NumKeys; ++KeyNum) {
-                    if (KeyName(KeyNum) == VarKeyName) {
-                        Found = true;
+                for (int KeyNum = 1; KeyNum <= NumKeys; ++KeyNum) {
+                    if (state.dataOutputProcessor->outVars[KeyIndex(KeyNum)]->keyUC == VarKeyName) {
+                        VarIndex = KeyIndex(KeyNum);
                         break;
                     }
                 }
-                if (Found) VarIndex = KeyIndex(KeyNum);
             }
-
-            KeyName.deallocate();
             KeyIndex.deallocate();
         }
     }

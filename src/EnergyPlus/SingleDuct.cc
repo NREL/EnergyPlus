@@ -758,14 +758,14 @@ void GetSysInput(EnergyPlusData &state)
         // Setup the Average damper Position output variable
         SetupOutputVariable(state,
                             "Zone Air Terminal VAV Damper Position",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
         SetupOutputVariable(state,
                             "Zone Air Terminal Minimum Air Flow Fraction",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracReport,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1070,7 +1070,7 @@ void GetSysInput(EnergyPlusData &state)
         // Setup the Average damper Position output variable
         SetupOutputVariable(state,
                             "Zone Air Terminal VAV Damper Position",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1786,14 +1786,14 @@ void GetSysInput(EnergyPlusData &state)
         // Setup the Average damper Position output variable
         SetupOutputVariable(state,
                             "Zone Air Terminal VAV Damper Position",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
         SetupOutputVariable(state,
                             "Zone Air Terminal Minimum Air Flow Fraction",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracReport,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1984,7 +1984,7 @@ void GetSysInput(EnergyPlusData &state)
         // Setup the Average damper Position output variable
         SetupOutputVariable(state,
                             "Zone Air Terminal VAV Damper Position",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -2424,7 +2424,7 @@ void GetSysInput(EnergyPlusData &state)
         // Setup the Average damper Position output variable
         SetupOutputVariable(state,
                             "Zone Air Terminal VAV Damper Position",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -2435,7 +2435,7 @@ void GetSysInput(EnergyPlusData &state)
     for (int sdIndex = 1; sdIndex <= state.dataSingleDuct->NumSDAirTerminal; ++sdIndex) {
         SetupOutputVariable(state,
                             "Zone Air Terminal Outdoor Air Volume Flow Rate",
-                            OutputProcessor::Unit::m3_s,
+                            Constant::Units::m3_s,
                             state.dataSingleDuct->sd_airterminal(sdIndex).OutdoorAirFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,

@@ -1649,6 +1649,17 @@ void ShowRecurringErrors(EnergyPlusData &state)
     }
 }
 
+void ShowSevereDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh)
+{
+    ShowSevereError(state, format("{}: {} = {}, duplicate name.", eoh.routineName, eoh.objectType, eoh.objectName));
+}
+        
+void ShowSevereEmptyField(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} field is empty.", fieldName));
+}
+
 void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
 {
     ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
@@ -1659,6 +1670,24 @@ void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, s
 {
     ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
     ShowContinueError(state, format("{} = {}, invalid key", fieldName, fieldVal));
+}
+
+void ShowSevereCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{}", msg));
+}
+
+void ShowWarningItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
+{
+    ShowWarningError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, item not found", fieldName, fieldVal));
+}
+
+void ShowWarningCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{}", msg));
 }
 
 } // namespace EnergyPlus
