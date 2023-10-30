@@ -344,7 +344,7 @@ void BaseSizer::selectSizerOutput(EnergyPlusData &state, bool &errorsFound)
             this->autoSizedValue = this->dataEMSOverride;
             this->reportSizerOutput(
                 state, this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
-        } else if (this->hardSizeNoDesignRun && !this->wasAutoSized && UtilityRoutines::SameString(this->compType, "Fan:ZoneExhaust")) {
+        } else if (this->hardSizeNoDesignRun && !this->wasAutoSized && Util::SameString(this->compType, "Fan:ZoneExhaust")) {
             this->autoSizedValue = this->originalValue;
         } else if (this->wasAutoSized && this->dataFractionUsedForSizing > 0.0 && this->dataConstantUsedForSizing > 0.0) {
             this->autoSizedValue = this->dataFractionUsedForSizing * this->dataConstantUsedForSizing;
@@ -353,7 +353,7 @@ void BaseSizer::selectSizerOutput(EnergyPlusData &state, bool &errorsFound)
         } else if (!this->wasAutoSized &&
                    (this->autoSizedValue == this->originalValue || this->autoSizedValue == 0.0)) { // no sizing run done or autosizes to 0
             this->autoSizedValue = this->originalValue;
-            if (this->dataAutosizable || (!this->sizingDesRunThisZone && UtilityRoutines::SameString(this->compType, "Fan:ZoneExhaust"))) {
+            if (this->dataAutosizable || (!this->sizingDesRunThisZone && Util::SameString(this->compType, "Fan:ZoneExhaust"))) {
                 this->reportSizerOutput(
                     state, this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
             }
@@ -441,7 +441,7 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &erro
         if (this->dataEMSOverrideON) { // EMS overrides value
             this->reportSizerOutput(
                 state, this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
-            if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+            if (Util::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
                 this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
                 this->reportSizerOutput(state,
                                         this->compType,
@@ -453,7 +453,7 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &erro
             this->autoSizedValue = this->originalValue;
             this->reportSizerOutput(
                 state, this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
-            if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+            if (Util::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
                 this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
                 this->reportSizerOutput(state,
                                         this->compType,
@@ -465,7 +465,7 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &erro
             this->autoSizedValue = this->originalValue;
             this->reportSizerOutput(
                 state, this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
-            if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+            if (Util::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
                 this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
                 this->reportSizerOutput(state,
                                         this->compType,
@@ -482,7 +482,7 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &erro
             } else {
                 this->reportSizerOutput(state, this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
             }
-            if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+            if (Util::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
                 this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
                 this->reportSizerOutput(
                     state, this->compType, this->compName, "Design Size " + this->sizingString + " ( non-bypassed )", this->autoSizedValue);
@@ -496,7 +496,7 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &erro
                                         this->autoSizedValue,
                                         "User-Specified " + this->sizingStringScalable + this->sizingString,
                                         this->originalValue);
-                if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+                if (Util::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
                     this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
                     this->originalValue *= (1 - this->dataBypassFrac);  // now reapply for second message and remianing simulation calcs
                     this->reportSizerOutput(state,
@@ -508,12 +508,12 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &erro
                                             this->originalValue);
                 }
             } else {
-                if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+                if (Util::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
                     this->autoSizedValue /= (1 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
                 }
                 this->reportSizerOutput(
                     state, this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->originalValue);
-                if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+                if (Util::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
                     this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
                     this->reportSizerOutput(state,
                                             this->compType,
@@ -574,7 +574,7 @@ bool BaseSizer::isValidCoilType(std::string const &_compType)
     int coilNum = 0;
     for (auto const &coilType : DataHVACGlobals::cAllCoilTypes) {
         coilNum += 1;
-        if (UtilityRoutines::SameString(_compType, coilType)) {
+        if (Util::SameString(_compType, coilType)) {
             this->coilType_Num = coilNum;
             return true;
         }
@@ -586,15 +586,15 @@ bool BaseSizer::isValidCoilType(std::string const &_compType)
 bool BaseSizer::isValidFanType(std::string const &_compType)
 {
     // if compType name is one of the fan objects, then return true
-    if (UtilityRoutines::SameString(_compType, "Fan:SystemModel")) {
+    if (Util::SameString(_compType, "Fan:SystemModel")) {
         return true;
-    } else if (UtilityRoutines::SameString(_compType, "Fan:ComponentModel")) {
+    } else if (Util::SameString(_compType, "Fan:ComponentModel")) {
         return true;
-    } else if (UtilityRoutines::SameString(_compType, "Fan:OnOff")) {
+    } else if (Util::SameString(_compType, "Fan:OnOff")) {
         return true;
-    } else if (UtilityRoutines::SameString(_compType, "Fan:ConstantVolume")) {
+    } else if (Util::SameString(_compType, "Fan:ConstantVolume")) {
         return true;
-    } else if (UtilityRoutines::SameString(_compType, "Fan:VariableVolume")) {
+    } else if (Util::SameString(_compType, "Fan:VariableVolume")) {
         return true;
     } else {
         return false;

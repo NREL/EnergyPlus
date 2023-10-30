@@ -455,7 +455,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         auto &thisZoneAirBalance = state.dataHeatBal->ZoneAirBalance(Loop);
         thisZoneAirBalance.Name = cAlphaArgs(1);
         thisZoneAirBalance.ZoneName = cAlphaArgs(2);
-        thisZoneAirBalance.ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+        thisZoneAirBalance.ZonePtr = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
         if (thisZoneAirBalance.ZonePtr == 0) {
             ShowSevereError(state,
                             format(R"({}{}="{}", invalid (not found) {}="{}".)",
@@ -485,7 +485,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         {
             thisZoneAirBalance.BalanceMethod = static_cast<DataHeatBalance::AirBalance>(
                 getEnumValue(DataHeatBalance::AirBalanceTypeNamesUC,
-                             UtilityRoutines::makeUPPER(cAlphaArgs(3)))); // Air balance method type character input-->convert to enum
+                             Util::makeUPPER(cAlphaArgs(3)))); // Air balance method type character input-->convert to enum
             if (thisZoneAirBalance.BalanceMethod == DataHeatBalance::AirBalance::Invalid) {
                 thisZoneAirBalance.BalanceMethod = DataHeatBalance::AirBalance::None;
                 ShowWarningError(state,
@@ -2717,9 +2717,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     ErrorsFound = true;
                 }
 
-                thisMixing.fromSpaceIndex = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->space);
+                thisMixing.fromSpaceIndex = Util::FindItemInList(cAlphaArgs(5), state.dataHeatBal->space);
                 if (thisMixing.fromSpaceIndex == 0) {
-                    thisMixing.FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
+                    thisMixing.FromZone = Util::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
                 } else {
                     thisMixing.FromZone = state.dataHeatBal->space(thisMixing.fromSpaceIndex).zoneNum;
                 }
@@ -3337,9 +3337,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     ErrorsFound = true;
                 }
 
-                thisMixing.fromSpaceIndex = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->space);
+                thisMixing.fromSpaceIndex = Util::FindItemInList(cAlphaArgs(5), state.dataHeatBal->space);
                 if (thisMixing.fromSpaceIndex == 0) {
-                    thisMixing.FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
+                    thisMixing.FromZone = Util::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
                 } else {
                     thisMixing.FromZone = state.dataHeatBal->space(thisMixing.fromSpaceIndex).zoneNum;
                 }
@@ -3802,7 +3802,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             NameThisObject = cAlphaArgs(1);
 
             int AlphaNum = 2;
-            int Zone1Num = UtilityRoutines::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->Zone);
+            int Zone1Num = Util::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->Zone);
             if (Zone1Num == 0) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", invalid (not found) {}=\"{}\".",
@@ -3815,7 +3815,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             }
 
             ++AlphaNum; // 3
-            int Zone2Num = UtilityRoutines::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->Zone);
+            int Zone2Num = Util::FindItemInList(cAlphaArgs(AlphaNum), state.dataHeatBal->Zone);
             if (Zone2Num == 0) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", invalid (not found) {}=\"{}\".",
@@ -4591,7 +4591,7 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                                                                  _,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
+        ZoneNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
         if (ZoneNum != 0) {
             if (!state.dataRoomAir->AirModel(ZoneNum).Name.empty()) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));

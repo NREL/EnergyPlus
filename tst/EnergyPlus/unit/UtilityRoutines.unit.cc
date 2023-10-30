@@ -147,12 +147,12 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
     fs::remove(state->dataStrGlobals->outputPerfLogFilePath);
 
     // make sure the static variables are cleared
-    UtilityRoutines::appendPerfLog(*state, "RESET", "RESET");
+    Util::appendPerfLog(*state, "RESET", "RESET");
 
     // add headers and values
-    UtilityRoutines::appendPerfLog(*state, "header1", "value1-1");
-    UtilityRoutines::appendPerfLog(*state, "header2", "value1-2");
-    UtilityRoutines::appendPerfLog(*state, "header3", "value1-3", true);
+    Util::appendPerfLog(*state, "header1", "value1-1");
+    Util::appendPerfLog(*state, "header2", "value1-2");
+    Util::appendPerfLog(*state, "header3", "value1-3", true);
 
     std::ifstream perfLogFile;
     std::stringstream perfLogStrSteam;
@@ -174,7 +174,7 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
 TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
 {
     // make sure the static variables are cleared
-    UtilityRoutines::appendPerfLog(*state, "RESET", "RESET");
+    Util::appendPerfLog(*state, "RESET", "RESET");
 
     state->dataStrGlobals->outputPerfLogFilePath = "eplusout_2_perflog.csv";
 
@@ -186,9 +186,9 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
     initPerfLogFile.close();
 
     // without deleting file add headers and values again
-    UtilityRoutines::appendPerfLog(*state, "ignored1", "value2-1");
-    UtilityRoutines::appendPerfLog(*state, "ignored2", "value2-2");
-    UtilityRoutines::appendPerfLog(*state, "ignored3", "value2-3", true);
+    Util::appendPerfLog(*state, "ignored1", "value2-1");
+    Util::appendPerfLog(*state, "ignored2", "value2-2");
+    Util::appendPerfLog(*state, "ignored3", "value2-3", true);
 
     std::ifstream perfLogFile;
     std::stringstream perfLogStrSteam;
@@ -214,50 +214,50 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_ProcessNumber)
     std::string goodString{"3.14159"};
     double expectedVal{3.14159};
     bool expectedError{false};
-    EXPECT_NEAR(UtilityRoutines::ProcessNumber(goodString, expectedError), expectedVal, 1E-5);
+    EXPECT_NEAR(Util::ProcessNumber(goodString, expectedError), expectedVal, 1E-5);
     EXPECT_FALSE(expectedError);
 
     goodString = "3.14159+E0";
-    EXPECT_NEAR(UtilityRoutines::ProcessNumber(goodString, expectedError), expectedVal, 1E-5);
+    EXPECT_NEAR(Util::ProcessNumber(goodString, expectedError), expectedVal, 1E-5);
     EXPECT_FALSE(expectedError);
 
     goodString = "3.14159+e0";
-    EXPECT_NEAR(UtilityRoutines::ProcessNumber(goodString, expectedError), expectedVal, 1E-5);
+    EXPECT_NEAR(Util::ProcessNumber(goodString, expectedError), expectedVal, 1E-5);
     EXPECT_FALSE(expectedError);
 
     goodString = "3.14159+D0";
-    EXPECT_NEAR(UtilityRoutines::ProcessNumber(goodString, expectedError), expectedVal, 1E-5);
+    EXPECT_NEAR(Util::ProcessNumber(goodString, expectedError), expectedVal, 1E-5);
     EXPECT_FALSE(expectedError);
 
     goodString = "3.14159+d0";
-    EXPECT_NEAR(UtilityRoutines::ProcessNumber(goodString, expectedError), expectedVal, 1E-5);
+    EXPECT_NEAR(Util::ProcessNumber(goodString, expectedError), expectedVal, 1E-5);
     EXPECT_FALSE(expectedError);
 
     // invalid strings
     std::string badString{"É.14159"};
     expectedVal = 0.0;
-    EXPECT_NEAR(UtilityRoutines::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
+    EXPECT_NEAR(Util::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
     EXPECT_TRUE(expectedError);
 
     badString = "3.14159É0";
     expectedVal = 0.0;
-    EXPECT_NEAR(UtilityRoutines::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
+    EXPECT_NEAR(Util::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
     EXPECT_TRUE(expectedError);
 
     badString = "3.14159 0";
     expectedVal = 0.0;
-    EXPECT_NEAR(UtilityRoutines::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
+    EXPECT_NEAR(Util::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
     EXPECT_TRUE(expectedError);
 
     // invalid argument
     badString = "E3.14159";
     expectedVal = 0.0;
-    EXPECT_NEAR(UtilityRoutines::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
+    EXPECT_NEAR(Util::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
     EXPECT_TRUE(expectedError);
 
     // out of range
     badString = "1E5000";
     expectedVal = 0.0;
-    EXPECT_NEAR(UtilityRoutines::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
+    EXPECT_NEAR(Util::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
     EXPECT_TRUE(expectedError);
 }

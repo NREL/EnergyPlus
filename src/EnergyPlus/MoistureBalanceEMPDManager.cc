@@ -199,7 +199,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
         // Load the material derived type from the input data.
-        MaterNum = UtilityRoutines::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
+        MaterNum = Util::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
         if (MaterNum == 0) {
             ShowSevereError(state,
                             format("{}: invalid {} entered={}, must match to a valid Material name.",
@@ -566,27 +566,26 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     Taver = SurfTempIn;
     // Calculate average vapor density [kg/m^3], and RH for use in material property calculations.
     RVaver = rv_surface_old;
-    RHaver = RVaver * 461.52 * (Taver + Constant::KelvinConv) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
+    RHaver = RVaver * 461.52 * (Taver + Constant::Kelvin) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
 
     // Calculate the saturated vapor pressure, surface vapor pressure and dewpoint. Used to check for condensation in HeatBalanceSurfaceManager
     PVsat = PsyPsatFnTemp(state, Taver, RoutineName);
     PVsurf = RHaver * std::exp(23.7093 - 4111.0 / (Taver + 237.7));
-    TempSat = 4111.0 / (23.7093 - std::log(PVsurf)) + 35.45 - Constant::KelvinConv;
+    TempSat = 4111.0 / (23.7093 - std::log(PVsurf)) + 35.45 - Constant::Kelvin;
 
     // Convert vapor resistance factor (user input) to diffusivity. Evaluate at local surface temperature.
     // 2e-7*T^0.81/P = vapor diffusivity in air. [kg/m-s-Pa]
     // 461.52 = universal gas constant for water [J/kg-K]
     // EMPDdiffusivity = [m^2/s]
-    EMPDdiffusivity = (2.0e-7 * pow(Taver + Constant::KelvinConv, 0.81) / state.dataEnvrn->OutBaroPress) / material->EMPDmu * 461.52 *
-                      (Taver + Constant::KelvinConv);
+    EMPDdiffusivity =
+        (2.0e-7 * pow(Taver + Constant::Kelvin, 0.81) / state.dataEnvrn->OutBaroPress) / material->EMPDmu * 461.52 * (Taver + Constant::Kelvin);
 
     // Calculate slope of moisture sorption curve at current RH. [kg/kg-RH]
     dU_dRH = material->MoistACoeff * material->MoistBCoeff * pow(RHaver, material->MoistBCoeff - 1) +
              material->MoistCCoeff * material->MoistDCoeff * pow(RHaver, material->MoistDCoeff - 1);
 
     // Convert vapor density and temperature of zone air to RH
-    RHZone =
-        rho_vapor_air_in * 461.52 * (TempZone + Constant::KelvinConv) * std::exp(-23.7093 + 4111.0 / ((TempZone + Constant::KelvinConv) - 35.45));
+    RHZone = rho_vapor_air_in * 461.52 * (TempZone + Constant::Kelvin) * std::exp(-23.7093 + 4111.0 / ((TempZone + Constant::Kelvin) - 35.45));
 
     // Convert stored vapor density from previous timestep to RH.
     RH_deep_layer_old = PsyRhFnTdbRhov(state, Taver, rv_deep_old);
@@ -598,7 +597,7 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
         Rcoating = 0;
     } else {
         Rcoating = material->EMPDCoatingThickness * material->EMPDmuCoating * state.dataEnvrn->OutBaroPress /
-                   (2.0e-7 * pow(Taver + Constant::KelvinConv, 0.81) * 461.52 * (Taver + Constant::KelvinConv));
+                   (2.0e-7 * pow(Taver + Constant::Kelvin, 0.81) * 461.52 * (Taver + Constant::Kelvin));
     }
 
     // Calculate mass-transfer coefficient between zone air and center of surface layer. [m/s]

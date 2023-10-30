@@ -99,9 +99,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     FanCoolLoad = state.dataSize->DataCoilSizingFanCoolLoad;
                     TotCapTempModFac = state.dataSize->DataCoilSizingCapFT;
                 } else {
-                    if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER") ||
-                        UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ||
-                        UtilityRoutines::SameString(this->compType, "ZONEHVAC:IDEALLOADSAIRSYSTEM")) {
+                    if (Util::SameString(this->compType, "COIL:COOLING:WATER") ||
+                        Util::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ||
+                        Util::SameString(this->compType, "ZONEHVAC:IDEALLOADSAIRSYSTEM")) {
                         if (this->termUnitIU && (this->curTermUnitSizingNum > 0)) {
                             this->autoSizedValue = this->termUnitSizing(this->curTermUnitSizingNum).DesCoolingLoad;
                         } else if (this->zoneEqFanCoil) {
@@ -229,9 +229,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         ShowContinueError(state,
                                           format("...Capacity passed by parent object to size child component = {:.2T} [W]", this->autoSizedValue));
                     } else {
-                        if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER") ||
-                            UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ||
-                            UtilityRoutines::SameString(this->compType, "ZONEHVAC:IDEALLOADSAIRSYSTEM")) {
+                        if (Util::SameString(this->compType, "COIL:COOLING:WATER") ||
+                            Util::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ||
+                            Util::SameString(this->compType, "ZONEHVAC:IDEALLOADSAIRSYSTEM")) {
                             if (this->termUnitIU || this->zoneEqFanCoil) {
                                 ShowContinueError(
                                     state, format("...Capacity passed by parent object to size child component = {:.2T} [W]", this->autoSizedValue));
@@ -505,8 +505,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
             // Note: the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil model, which implements variable flow fans and
             // determines capacity using physical calculations instead of emperical curves
             bool FlagCheckVolFlowPerRatedTotCap = true;
-            if (UtilityRoutines::SameString(this->compType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl") ||
-                UtilityRoutines::SameString(this->compType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl"))
+            if (Util::SameString(this->compType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl") ||
+                Util::SameString(this->compType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl"))
                 FlagCheckVolFlowPerRatedTotCap = false;
 
             if (this->dataIsDXCoil && FlagCheckVolFlowPerRatedTotCap) {

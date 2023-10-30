@@ -135,7 +135,7 @@ namespace HVACDuct {
 
         // Get the duct component index
         if (CompIndex == 0) {
-            DuctNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACDuct->Duct);
+            DuctNum = Util::FindItemInList(CompName, state.dataHVACDuct->Duct);
             if (DuctNum == 0) {
                 ShowFatalError(state, format("SimDuct: Component not found={}", CompName));
             }

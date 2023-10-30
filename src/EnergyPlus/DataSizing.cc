@@ -547,8 +547,7 @@ void GetCoilDesFlowT(EnergyPlusData &state,
     auto &sysSizPeakDDNum = state.dataSize->SysSizPeakDDNum(SysNum);
     auto &calcSysSizing = state.dataSize->CalcSysSizing(SysNum);
 
-    int sysSizIndex =
-        UtilityRoutines::FindItemInList(finalSysSizing.AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+    int sysSizIndex = Util::FindItemInList(finalSysSizing.AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
     if (sysSizIndex == 0) sysSizIndex = 1;
     auto &sysSizInput = state.dataSize->SysSizInput(sysSizIndex);
 

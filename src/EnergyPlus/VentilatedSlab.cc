@@ -165,7 +165,7 @@ namespace VentilatedSlab {
 
         // Find the correct VentilatedSlabInput
         if (CompIndex == 0) {
-            Item = UtilityRoutines::FindItemInList(CompName, state.dataVentilatedSlab->VentSlab);
+            Item = Util::FindItemInList(CompName, state.dataVentilatedSlab->VentSlab);
             if (Item == 0) {
                 ShowFatalError(state, format("SimVentilatedSlab: system not found={}", CompName));
             }
@@ -325,7 +325,7 @@ namespace VentilatedSlab {
 
             state.dataVentilatedSlab->VentSlabNumericFields(Item).FieldNames.allocate(NumNumbers);
             state.dataVentilatedSlab->VentSlabNumericFields(Item).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
             auto &ventSlab = state.dataVentilatedSlab->VentSlab(Item);
 
             ventSlab.Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -341,7 +341,7 @@ namespace VentilatedSlab {
                 ErrorsFound = true;
             }
 
-            ventSlab.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
+            ventSlab.ZonePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
             if (ventSlab.ZonePtr == 0) {
                 if (lAlphaBlanks(3)) {
                     ShowSevereError(
@@ -359,9 +359,9 @@ namespace VentilatedSlab {
 
             ventSlab.SurfListName = state.dataIPShortCut->cAlphaArgs(4);
             SurfListNum = 0;
-            //    IF (NumOfSlabLists > 0) SurfListNum = UtilityRoutines::FindItemInList(VentSlab(Item)%SurfListName, SlabList%Name, NumOfSlabLists)
+            //    IF (NumOfSlabLists > 0) SurfListNum = Util::FindItemInList(VentSlab(Item)%SurfListName, SlabList%Name, NumOfSlabLists)
             if (state.dataSurfLists->NumOfSurfListVentSlab > 0)
-                SurfListNum = UtilityRoutines::FindItemInList(ventSlab.SurfListName, state.dataSurfLists->SlabList);
+                SurfListNum = Util::FindItemInList(ventSlab.SurfListName, state.dataSurfLists->SlabList);
             if (SurfListNum > 0) { // Found a valid surface list
                 ventSlab.NumOfSurfaces = state.dataSurfLists->SlabList(SurfListNum).NumOfSurfaces;
                 ventSlab.ZName.allocate(ventSlab.NumOfSurfaces);
@@ -397,7 +397,7 @@ namespace VentilatedSlab {
                 ventSlab.SurfaceFlowFrac.allocate(ventSlab.NumOfSurfaces);
                 state.dataVentilatedSlab->MaxCloNumOfSurfaces = max(state.dataVentilatedSlab->MaxCloNumOfSurfaces, ventSlab.NumOfSurfaces);
                 ventSlab.SurfaceName(1) = ventSlab.SurfListName;
-                ventSlab.SurfacePtr(1) = UtilityRoutines::FindItemInList(ventSlab.SurfaceName(1), state.dataSurface->Surface);
+                ventSlab.SurfacePtr(1) = Util::FindItemInList(ventSlab.SurfaceName(1), state.dataSurface->Surface);
                 ventSlab.SurfaceFlowFrac(1) = 1.0;
                 // Error checking for single surfaces
                 if (ventSlab.SurfacePtr(1) == 0) {
@@ -485,8 +485,8 @@ namespace VentilatedSlab {
             ventSlab.MinOutAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
             ventSlab.OutAirVolFlow = state.dataIPShortCut->rNumericArgs(3);
 
-            ventSlab.outsideAirControlType = static_cast<OutsideAirControlType>(
-                getEnumValue(OutsideAirControlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
+            ventSlab.outsideAirControlType =
+                static_cast<OutsideAirControlType>(getEnumValue(OutsideAirControlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
 
             switch (ventSlab.outsideAirControlType) {
             case OutsideAirControlType::VariablePercent: {
@@ -563,8 +563,8 @@ namespace VentilatedSlab {
             }
 
             // System Configuration:
-            ventSlab.SysConfg = static_cast<VentilatedSlabConfig>(
-                getEnumValue(VentilatedSlabConfigNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
+            ventSlab.SysConfg =
+                static_cast<VentilatedSlabConfig>(getEnumValue(VentilatedSlabConfigNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
 
             if (ventSlab.SysConfg == VentilatedSlabConfig::Invalid) {
                 ShowSevereError(
@@ -579,7 +579,7 @@ namespace VentilatedSlab {
             ventSlab.CoreLength = state.dataIPShortCut->rNumericArgs(5);
             ventSlab.CoreNumbers = state.dataIPShortCut->rNumericArgs(6);
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "SurfaceListNames")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), "SurfaceListNames")) {
                 if (!lNumericBlanks(4)) {
                     ShowWarningError(state,
                                      format("{}=\"{}\"  Core Diameter is not needed for the series slabs configuration- ignored.",
@@ -589,7 +589,7 @@ namespace VentilatedSlab {
                 }
             }
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "SurfaceListNames")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), "SurfaceListNames")) {
                 if (!lNumericBlanks(5)) {
                     ShowWarningError(state,
                                      format("{}=\"{}\"  Core Length is not needed for the series slabs configuration- ignored.",
@@ -599,7 +599,7 @@ namespace VentilatedSlab {
                 }
             }
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "SurfaceListNames")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), "SurfaceListNames")) {
                 if (!lNumericBlanks(6)) {
                     ShowWarningError(state,
                                      format("{}=\"{}\"  Core Numbers is not needed for the series slabs configuration- ignored.",
@@ -610,8 +610,7 @@ namespace VentilatedSlab {
             }
 
             // Process the temperature control type
-            ventSlab.controlType =
-                static_cast<ControlType>(getEnumValue(ControlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
+            ventSlab.controlType = static_cast<ControlType>(getEnumValue(ControlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
 
             if (ventSlab.controlType == ControlType::Invalid) {
                 ShowSevereError(
@@ -986,8 +985,7 @@ namespace VentilatedSlab {
 
             // Coil options assign
 
-            ventSlab.coilOption =
-                static_cast<CoilType>(getEnumValue(CoilTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(26))));
+            ventSlab.coilOption = static_cast<CoilType>(getEnumValue(CoilTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(26))));
 
             if (ventSlab.coilOption == CoilType::Invalid) {
                 ShowSevereError(
@@ -1015,8 +1013,8 @@ namespace VentilatedSlab {
                     ventSlab.heatingCoilTypeCh = state.dataIPShortCut->cAlphaArgs(27);
                     errFlag = false;
 
-                    ventSlab.hCoilType = static_cast<HeatingCoilType>(
-                        getEnumValue(HeatingCoilTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(27))));
+                    ventSlab.hCoilType =
+                        static_cast<HeatingCoilType>(getEnumValue(HeatingCoilTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(27))));
 
                     switch (ventSlab.hCoilType) {
 
@@ -1131,9 +1129,8 @@ namespace VentilatedSlab {
                     ventSlab.coolingCoilTypeCh = state.dataIPShortCut->cAlphaArgs(30);
                     errFlag = false;
 
-                    ventSlab.cCoilType = static_cast<CoolingCoilType>(
-                        getEnumValue(CoolingCoilTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(30))));
-
+                    ventSlab.cCoilType =
+                        static_cast<CoolingCoilType>(getEnumValue(CoolingCoilTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(30))));
                     switch (ventSlab.cCoilType) {
                     case CoolingCoilType::WaterCooling: {
                         ventSlab.coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
@@ -1152,9 +1149,9 @@ namespace VentilatedSlab {
                                              ErrorsFound,
                                              ventSlab.coolingCoilPlantType,
                                              ventSlab.coolingCoilPlantName);
-                        if (UtilityRoutines::SameString(ventSlab.coolingCoilPlantType, "Coil:Cooling:Water")) {
+                        if (Util::SameString(ventSlab.coolingCoilPlantType, "Coil:Cooling:Water")) {
                             ventSlab.coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
-                        } else if (UtilityRoutines::SameString(ventSlab.coolingCoilPlantType, "Coil:Cooling:Water:DetailedGeometry")) {
+                        } else if (Util::SameString(ventSlab.coolingCoilPlantType, "Coil:Cooling:Water:DetailedGeometry")) {
                             ventSlab.coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
                         } else {
                             ShowSevereError(state, format("GetVentilatedSlabInput: {}=\"{}\", invalid", CurrentModuleObject, ventSlab.Name));
@@ -1235,7 +1232,7 @@ namespace VentilatedSlab {
 
             ventSlab.HVACSizingIndex = 0;
             if (!lAlphaBlanks(34)) {
-                ventSlab.HVACSizingIndex = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(34), state.dataSize->ZoneHVACSizing);
+                ventSlab.HVACSizingIndex = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(34), state.dataSize->ZoneHVACSizing);
                 if (ventSlab.HVACSizingIndex == 0) {
                     ShowSevereError(state, format("{} = {} not found.", cAlphaFields(34), state.dataIPShortCut->cAlphaArgs(34)));
                     ShowContinueError(state, format("Occurs in {} = {}", cMO_VentilatedSlab, ventSlab.Name));

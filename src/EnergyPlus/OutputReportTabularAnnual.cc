@@ -1089,45 +1089,45 @@ AnnualFieldSet::AggregationKind stringToAggKind(EnergyPlusData &state, std::stri
 {
     AnnualFieldSet::AggregationKind outAggType;
 
-    if (UtilityRoutines::SameString(inString, "SumOrAverage")) {
+    if (Util::SameString(inString, "SumOrAverage")) {
         outAggType = AnnualFieldSet::AggregationKind::sumOrAvg;
-    } else if (UtilityRoutines::SameString(inString, "Maximum")) {
+    } else if (Util::SameString(inString, "Maximum")) {
         outAggType = AnnualFieldSet::AggregationKind::maximum;
-    } else if (UtilityRoutines::SameString(inString, "Minimum")) {
+    } else if (Util::SameString(inString, "Minimum")) {
         outAggType = AnnualFieldSet::AggregationKind::minimum;
-    } else if (UtilityRoutines::SameString(inString, "ValueWhenMaximumOrMinimum")) {
+    } else if (Util::SameString(inString, "ValueWhenMaximumOrMinimum")) {
         outAggType = AnnualFieldSet::AggregationKind::valueWhenMaxMin;
-    } else if (UtilityRoutines::SameString(inString, "HoursZero")) {
+    } else if (Util::SameString(inString, "HoursZero")) {
         outAggType = AnnualFieldSet::AggregationKind::hoursZero;
-    } else if (UtilityRoutines::SameString(inString, "HoursNonzero")) {
+    } else if (Util::SameString(inString, "HoursNonzero")) {
         outAggType = AnnualFieldSet::AggregationKind::hoursNonZero;
-    } else if (UtilityRoutines::SameString(inString, "HoursPositive")) {
+    } else if (Util::SameString(inString, "HoursPositive")) {
         outAggType = AnnualFieldSet::AggregationKind::hoursPositive;
-    } else if (UtilityRoutines::SameString(inString, "HoursNonpositive")) {
+    } else if (Util::SameString(inString, "HoursNonpositive")) {
         outAggType = AnnualFieldSet::AggregationKind::hoursNonPositive;
-    } else if (UtilityRoutines::SameString(inString, "HoursNegative")) {
+    } else if (Util::SameString(inString, "HoursNegative")) {
         outAggType = AnnualFieldSet::AggregationKind::hoursNegative;
-    } else if (UtilityRoutines::SameString(inString, "HoursNonNegative")) {
+    } else if (Util::SameString(inString, "HoursNonNegative")) {
         outAggType = AnnualFieldSet::AggregationKind::hoursNonNegative;
-    } else if (UtilityRoutines::SameString(inString, "HoursInTenPercentBins")) {
+    } else if (Util::SameString(inString, "HoursInTenPercentBins")) {
         outAggType = AnnualFieldSet::AggregationKind::hoursInTenPercentBins;
-    } else if (UtilityRoutines::SameString(inString, "HourInTenBinsMinToMax")) {
+    } else if (Util::SameString(inString, "HourInTenBinsMinToMax")) {
         outAggType = AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax;
-    } else if (UtilityRoutines::SameString(inString, "HourInTenBinsZeroToMax")) {
+    } else if (Util::SameString(inString, "HourInTenBinsZeroToMax")) {
         outAggType = AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax;
-    } else if (UtilityRoutines::SameString(inString, "HourInTenBinsMinToZero")) {
+    } else if (Util::SameString(inString, "HourInTenBinsMinToZero")) {
         outAggType = AnnualFieldSet::AggregationKind::hoursInTenBinsMinToZero;
-    } else if (UtilityRoutines::SameString(inString, "HoursInTenBinsPlusMinusTwoStdDev")) {
+    } else if (Util::SameString(inString, "HoursInTenBinsPlusMinusTwoStdDev")) {
         outAggType = AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusTwoStdDev;
-    } else if (UtilityRoutines::SameString(inString, "HoursInTenBinsPlusMinusThreeStdDev")) {
+    } else if (Util::SameString(inString, "HoursInTenBinsPlusMinusThreeStdDev")) {
         outAggType = AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev;
-    } else if (UtilityRoutines::SameString(inString, "NoAggregation")) {
+    } else if (Util::SameString(inString, "NoAggregation")) {
         outAggType = AnnualFieldSet::AggregationKind::noAggregation;
-    } else if (UtilityRoutines::SameString(inString, "SumOrAverageDuringHoursShown")) {
+    } else if (Util::SameString(inString, "SumOrAverageDuringHoursShown")) {
         outAggType = AnnualFieldSet::AggregationKind::sumOrAverageHoursShown;
-    } else if (UtilityRoutines::SameString(inString, "MaximumDuringHoursShown")) {
+    } else if (Util::SameString(inString, "MaximumDuringHoursShown")) {
         outAggType = AnnualFieldSet::AggregationKind::maximumDuringHoursShown;
-    } else if (UtilityRoutines::SameString(inString, "MinimumDuringHoursShown")) {
+    } else if (Util::SameString(inString, "MinimumDuringHoursShown")) {
         outAggType = AnnualFieldSet::AggregationKind::minimumDuringHoursShown;
     } else {
         outAggType = AnnualFieldSet::AggregationKind::sumOrAvg;
