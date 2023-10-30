@@ -6110,13 +6110,13 @@ namespace OutputProcessor {
         EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(2).NumSubcategories);
         EXPECT_EQ("General", state->dataOutputProcessor->EndUseCategory(2).SubcategoryName(1));
 
-        found = UtilityRoutines::FindItem("Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("Cooling", state->dataOutputProcessor->EnergyMeters(found).EndUse);
         EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
 
-        found = UtilityRoutines::FindItem("General:Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("General:Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("Cooling", state->dataOutputProcessor->EnergyMeters(found).EndUse);
@@ -6127,16 +6127,16 @@ namespace OutputProcessor {
         EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(3).NumSubcategories); // lighting end use
         EXPECT_EQ("RailroadCrossing", state->dataOutputProcessor->EndUseCategory(3).SubcategoryName(1));
 
-        found = UtilityRoutines::FindItem("InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("InteriorLights", state->dataOutputProcessor->EnergyMeters(found).EndUse);
         EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
 
-        found = UtilityRoutines::FindItem("General:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("General:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_EQ(0, found); // should not find this
 
-        found = UtilityRoutines::FindItem("RailroadCrossing:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("RailroadCrossing:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("InteriorLights", state->dataOutputProcessor->EnergyMeters(found).EndUse);
@@ -6144,7 +6144,7 @@ namespace OutputProcessor {
 
         // fuel oil CO2 emissions
         // testing a non-ABUPS end use with no sub end use specified
-        found = UtilityRoutines::FindItem("FuelOilNo2Emissions:CO2", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("FuelOilNo2Emissions:CO2", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("CO2", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("FuelOilNo2Emissions", state->dataOutputProcessor->EnergyMeters(found).EndUse);
