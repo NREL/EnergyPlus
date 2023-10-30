@@ -106,10 +106,10 @@ struct OutputsData : BaseGlobalStruct
     std::map<std::string,
              std::map<std::string,
                       DataOutputs::OutputReportingVariables,
-                      // UtilityRoutines::case_insensitive_hasher,
-                      UtilityRoutines::case_insensitive_comparator>,
-             // UtilityRoutines::case_insensitive_hasher,
-             UtilityRoutines::case_insensitive_comparator>
+                      // Util::case_insensitive_hasher,
+                      Util::case_insensitive_comparator>,
+             // Util::case_insensitive_hasher,
+             Util::case_insensitive_comparator>
         OutputVariablesForSimulation;
 
     void clear_state() override

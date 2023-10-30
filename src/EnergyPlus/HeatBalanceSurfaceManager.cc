@@ -5636,7 +5636,7 @@ void CalcThermalResilience(EnergyPlusData &state)
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             Real64 const ZoneW = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).airHumRatAvg;
             Real64 const ZoneT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZTAV;
-            Real64 const TDewPointK = Psychrometrics::PsyTdpFnWPb(state, ZoneW, state.dataEnvrn->OutBaroPress) + Constant::KelvinConv;
+            Real64 const TDewPointK = Psychrometrics::PsyTdpFnWPb(state, ZoneW, state.dataEnvrn->OutBaroPress) + Constant::Kelvin;
             Real64 const e = 6.11 * std::exp(5417.7530 * ((1 / 273.16) - (1 / TDewPointK)));
             Real64 const h = 5.0 / 9.0 * (e - 10.0);
             Real64 const Humidex = ZoneT + h;
@@ -5649,17 +5649,16 @@ void ReportThermalResilience(EnergyPlusData &state)
 {
 
     Array1D_bool reportPeriodFlags;
-    if (state.dataWeatherManager->TotReportPers > 0) {
-        reportPeriodFlags.dimension(state.dataWeatherManager->TotThermalReportPers, false);
-        General::findReportPeriodIdx(
-            state, state.dataWeatherManager->ThermalReportPeriodInput, state.dataWeatherManager->TotThermalReportPers, reportPeriodFlags);
+    if (state.dataWeather->TotReportPers > 0) {
+        reportPeriodFlags.dimension(state.dataWeather->TotThermalReportPers, false);
+        General::findReportPeriodIdx(state, state.dataWeather->ThermalReportPeriodInput, state.dataWeather->TotThermalReportPers, reportPeriodFlags);
     }
 
     auto &ort = state.dataOutRptTab;
-    for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+    for (int i = 1; i <= state.dataWeather->TotThermalReportPers; i++) {
         if (reportPeriodFlags(i)) {
             int curResMeterNumber = ort->meterNumTotalsBEPS(1);
-            state.dataWeatherManager->ThermalReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
+            state.dataWeather->ThermalReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
         }
     }
 
@@ -5681,7 +5680,7 @@ void ReportThermalResilience(EnergyPlusData &state)
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             // the whole period
             // user specified reporting period
-            for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+            for (int i = 1; i <= state.dataWeather->TotThermalReportPers; i++) {
                 state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
@@ -5842,7 +5841,7 @@ void ReportThermalResilience(EnergyPlusData &state)
                 }
             }
 
-            for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+            for (int i = 1; i <= state.dataWeather->TotThermalReportPers; i++) {
                 if (reportPeriodFlags(i)) {
                     int ReportPeriodIdx = i;
                     ColdTempThresh = state.dataHeatBal->People(iPeople).ColdStressTempThresh;
@@ -6049,7 +6048,7 @@ void ReportThermalResilience(EnergyPlusData &state)
                 }
             }
 
-            for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+            for (int i = 1; i <= state.dataWeather->TotThermalReportPers; i++) {
                 if (reportPeriodFlags(i)) {
                     int ReportPeriodIdx = i;
 
@@ -6224,7 +6223,7 @@ void ReportCO2Resilience(EnergyPlusData &state)
     if (state.dataHeatBalSurfMgr->reportCO2ResilienceFirstTime) {
         int NoBins = 3;
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
+            for (int i = 1; i <= state.dataWeather->TotCO2ReportPers; i++) {
                 state.dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
@@ -6252,17 +6251,16 @@ void ReportCO2Resilience(EnergyPlusData &state)
         }
 
         Array1D_bool reportPeriodFlags;
-        if (state.dataWeatherManager->TotReportPers > 0) {
-            reportPeriodFlags.dimension(state.dataWeatherManager->TotCO2ReportPers, false);
-            General::findReportPeriodIdx(
-                state, state.dataWeatherManager->CO2ReportPeriodInput, state.dataWeatherManager->TotCO2ReportPers, reportPeriodFlags);
+        if (state.dataWeather->TotReportPers > 0) {
+            reportPeriodFlags.dimension(state.dataWeather->TotCO2ReportPers, false);
+            General::findReportPeriodIdx(state, state.dataWeather->CO2ReportPeriodInput, state.dataWeather->TotCO2ReportPers, reportPeriodFlags);
         }
 
         auto &ort = state.dataOutRptTab;
-        for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
+        for (int i = 1; i <= state.dataWeather->TotCO2ReportPers; i++) {
             if (reportPeriodFlags(i)) {
                 int curResMeterNumber = ort->meterNumTotalsBEPS(1);
-                state.dataWeatherManager->CO2ReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
+                state.dataWeather->CO2ReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
             }
         }
 
@@ -6283,7 +6281,7 @@ void ReportCO2Resilience(EnergyPlusData &state)
                 state.dataHeatBal->Resilience(ZoneNum).ZoneCO2LevelOccuHourBins[2] += NumOcc * state.dataGlobal->TimeStepZone;
                 state.dataHeatBal->Resilience(ZoneNum).ZoneCO2LevelOccupiedHourBins[2] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             }
-            for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
+            for (int i = 1; i <= state.dataWeather->TotCO2ReportPers; i++) {
                 if (reportPeriodFlags(i)) {
                     int ReportPeriodIdx = i;
                     if (ZoneAirCO2 <= 1000) {
@@ -6316,7 +6314,7 @@ void ReportVisualResilience(EnergyPlusData &state)
     if (state.dataHeatBalSurfMgr->reportVisualResilienceFirstTime) {
         int NoBins = 4;
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
+            for (int i = 1; i <= state.dataWeather->TotVisualReportPers; i++) {
                 state.dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
@@ -6362,17 +6360,17 @@ void ReportVisualResilience(EnergyPlusData &state)
         }
 
         Array1D_bool reportPeriodFlags;
-        if (state.dataWeatherManager->TotReportPers > 0) {
-            reportPeriodFlags.dimension(state.dataWeatherManager->TotVisualReportPers, false);
+        if (state.dataWeather->TotReportPers > 0) {
+            reportPeriodFlags.dimension(state.dataWeather->TotVisualReportPers, false);
             General::findReportPeriodIdx(
-                state, state.dataWeatherManager->VisualReportPeriodInput, state.dataWeatherManager->TotVisualReportPers, reportPeriodFlags);
+                state, state.dataWeather->VisualReportPeriodInput, state.dataWeather->TotVisualReportPers, reportPeriodFlags);
         }
 
         auto &ort = state.dataOutRptTab;
-        for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
+        for (int i = 1; i <= state.dataWeather->TotVisualReportPers; i++) {
             if (reportPeriodFlags(i)) {
                 int curResMeterNumber = ort->meterNumTotalsBEPS(1);
-                state.dataWeatherManager->VisualReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
+                state.dataWeather->VisualReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
             }
         }
 
@@ -6400,7 +6398,7 @@ void ReportVisualResilience(EnergyPlusData &state)
                 state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelOccuHourBins[3] += NumOcc * state.dataGlobal->TimeStepZone;
                 state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelOccupiedHourBins[3] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             }
-            for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
+            for (int i = 1; i <= state.dataWeather->TotVisualReportPers; i++) {
                 if (reportPeriodFlags(i)) {
                     int ReportPeriodIdx = i;
                     if (avgZoneIllum <= 100) {
@@ -7394,7 +7392,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
                         int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
                         // Absolute temperature of the outside surface of an exterior surface
-                        Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) + Constant::KelvinConv;
+                        Real64 TSurf = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) + Constant::Kelvin;
                         for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface;
                              SrdSurfNum++) {
                             // View factor of a surrounding surface
@@ -7403,7 +7401,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                             Real64 SrdSurfTempAbs =
                                 ScheduleManager::GetCurrentScheduleValue(
                                     state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                Constant::KelvinConv;
+                                Constant::Kelvin;
                             state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) +=
                                 Constant::StefanBoltzmann * AbsThermSurf * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TSurf));
                         }
@@ -7706,7 +7704,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
         if (state.dataHeatBal->AnyKiva) {
             for (auto const &kivaSurf : state.dataSurfaceGeometry->kivaManager.surfaceMap) {
-                state.dataHeatBalSurf->SurfTempIn(kivaSurf.first) = kivaSurf.second.results.Trad - Constant::KelvinConv;
+                state.dataHeatBalSurf->SurfTempIn(kivaSurf.first) = kivaSurf.second.results.Trad - Constant::Kelvin;
             }
         }
 
@@ -8040,7 +8038,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     } else if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::Kiva) {
                         // Read Kiva results for each surface
                         state.dataHeatBalSurf->SurfTempInTmp(SurfNum) =
-                            state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - Constant::KelvinConv;
+                            state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - Constant::Kelvin;
 
                         TH11 = 0.0;
                     }
@@ -8124,7 +8122,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                                          // time) | Convection and damping term
                 state.dataHeatBalSurf->SurfTempIn(SurfNum) = state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
 
-                Real64 const Sigma_Temp_4(Constant::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(SurfNum) + Constant::KelvinConv));
+                Real64 const Sigma_Temp_4(Constant::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(SurfNum) + Constant::Kelvin));
 
                 // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                 if (state.dataHeatBalSurf->AnyRadiantSystems(SurfNum))
@@ -8819,8 +8817,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                                                  // conduction from the outside surface | Coefficient for conduction (current
                                                                  // time) | Convection and damping term
                         state.dataHeatBalSurf->SurfTempIn(surfNum) = state.dataHeatBalSurf->SurfTempInTmp(surfNum);
-                        Real64 const Sigma_Temp_4(Constant::StefanBoltzmann *
-                                                  pow_4(state.dataHeatBalSurf->SurfTempIn(surfNum) + Constant::KelvinConv));
+                        Real64 const Sigma_Temp_4(Constant::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(surfNum) + Constant::Kelvin));
 
                         // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                         if (state.dataHeatBalSurf->AnyRadiantSystems(surfNum))
@@ -9771,14 +9768,14 @@ void GetGroundSurfacesTemperatureAverage(EnergyPlusData &state)
             if (GndSurfViewFactor == 0.0) continue;
             if (GndSurfsProperty.GndSurfs(gSurfNum).TempSchPtr == 0) continue;
             GndSurfaceTemp = ScheduleManager::GetCurrentScheduleValue(state, GndSurfsProperty.GndSurfs(gSurfNum).TempSchPtr);
-            GndSurfaceTempSum += GndSurfViewFactor * pow_4(GndSurfaceTemp + Constant::KelvinConv);
+            GndSurfaceTempSum += GndSurfViewFactor * pow_4(GndSurfaceTemp + Constant::Kelvin);
         }
         if (GndSurfaceTempSum == 0.0) {
             GndSurfsProperty.SurfsTempAvg = 0.0;
             state.dataSurface->Surface(SurfNum).UseSurfPropertyGndSurfTemp = false;
             continue;
         }
-        GndSurfsProperty.SurfsTempAvg = root_4(GndSurfaceTempSum / GndSurfsProperty.SurfsViewFactorSum) - Constant::KelvinConv;
+        GndSurfsProperty.SurfsTempAvg = root_4(GndSurfaceTempSum / GndSurfsProperty.SurfsViewFactorSum) - Constant::Kelvin;
     }
 }
 
@@ -9851,10 +9848,10 @@ void GetSurroundingSurfacesTemperatureAverage(EnergyPlusData &state)
         auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(surface.SurfSurroundingSurfacesNum);
         for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
             SrdSurfaceTemp =
-                ScheduleManager::GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::KelvinConv;
+                ScheduleManager::GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::Kelvin;
             SrdSurfaceTempSum += SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor * pow_4(SrdSurfaceTemp);
         }
-        surface.SrdSurfTemp = root_4(SrdSurfaceTempSum / surface.ViewFactorSrdSurfs) - Constant::KelvinConv;
+        surface.SrdSurfTemp = root_4(SrdSurfaceTempSum / surface.ViewFactorSrdSurfs) - Constant::Kelvin;
     }
 }
 } // namespace EnergyPlus::HeatBalanceSurfaceManager

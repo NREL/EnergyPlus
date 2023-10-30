@@ -143,7 +143,7 @@ namespace HighTempRadiantSystem {
 
         // Find the correct ZoneHVAC:HighTemperatureRadiant
         if (CompIndex == 0) {
-            RadSysNum = UtilityRoutines::FindItemInList(CompName, state.dataHighTempRadSys->HighTempRadSys);
+            RadSysNum = Util::FindItemInList(CompName, state.dataHighTempRadSys->HighTempRadSys);
             if (RadSysNum == 0) {
                 ShowFatalError(state, format("SimHighTempRadiantSystem: Unit not found={}", CompName));
             }
@@ -276,7 +276,7 @@ namespace HighTempRadiantSystem {
                 }
             }
 
-            highTempRadSys.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
+            highTempRadSys.ZonePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
             if (highTempRadSys.ZonePtr == 0) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));

@@ -807,13 +807,13 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     int constexpr CEN15251_CENTRAL(5);
 
     state->dataEnvrn->DayOfYear = 1;
-    state->dataWeatherManager->Envrn = 1;
-    state->dataWeatherManager->Environment.allocate(1);
-    state->dataWeatherManager->DesDayInput.allocate(1);
-    state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).KindOfEnvrn = Constant::KindOfSim::RunPeriodWeather;
-    state->dataWeatherManager->DesDayInput(state->dataWeatherManager->Envrn).DayType = summerDesignDayTypeIndex;
-    state->dataWeatherManager->DesDayInput(state->dataWeatherManager->Envrn).MaxDryBulb = 30.0;
-    state->dataWeatherManager->DesDayInput(state->dataWeatherManager->Envrn).DailyDBRange = 10.0;
+    state->dataWeather->Envrn = 1;
+    state->dataWeather->Environment.allocate(1);
+    state->dataWeather->DesDayInput.allocate(1);
+    state->dataWeather->Environment(state->dataWeather->Envrn).KindOfEnvrn = Constant::KindOfSim::RunPeriodWeather;
+    state->dataWeather->DesDayInput(state->dataWeather->Envrn).DayType = summerDesignDayTypeIndex;
+    state->dataWeather->DesDayInput(state->dataWeather->Envrn).MaxDryBulb = 30.0;
+    state->dataWeather->DesDayInput(state->dataWeather->Envrn).DailyDBRange = 10.0;
     Real64 ZoneAirSetPoint = 0.0;
 
     bool ErrorsFound(false); // If errors detected in input

@@ -180,7 +180,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
         thisEarthTubePars.nameParameters = state.dataIPShortCut->cAlphaArgs(1);
         // Check to make sure name is unique
         for (int otherParams = 1; otherParams < Loop; ++otherParams) {
-            if (UtilityRoutines::SameString(thisEarthTubePars.nameParameters, state.dataEarthTube->EarthTubePars(otherParams).nameParameters)) {
+            if (Util::SameString(thisEarthTubePars.nameParameters, state.dataEarthTube->EarthTubePars(otherParams).nameParameters)) {
                 ShowSevereError(state,
                                 format("{}: {} = {} is not a unique name.",
                                        cCurrentModuleObject,
@@ -219,7 +219,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
         // First Alpha is Zone Name
-        thisEarthTube.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
+        thisEarthTube.ZonePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
         if (thisEarthTube.ZonePtr == 0) {
             ShowSevereError(
                 state,
@@ -453,7 +453,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
             // Process the parameters based on the name (link via index)
             thisEarthTube.vertParametersPtr = 0;
             for (int parIndex = 1; parIndex <= totEarthTubePars; ++parIndex) {
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), state.dataEarthTube->EarthTubePars(parIndex).nameParameters)) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), state.dataEarthTube->EarthTubePars(parIndex).nameParameters)) {
                     thisEarthTube.vertParametersPtr = parIndex;
                     break;
                 }

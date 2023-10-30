@@ -685,7 +685,7 @@ void RegisterNodeConnection(EnergyPlusData &state,
     for (int Count = 1; Count <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Count) {
         if (state.dataBranchNodeConnections->NodeConnections(Count).NodeNumber != NodeNumber) continue;
         if (state.dataBranchNodeConnections->NodeConnections(Count).ObjectType != ObjectType) continue;
-        if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->NodeConnections(Count).ObjectName, ObjectName)) continue;
+        if (!Util::SameString(state.dataBranchNodeConnections->NodeConnections(Count).ObjectName, ObjectName)) continue;
         if (state.dataBranchNodeConnections->NodeConnections(Count).ConnectionType != ConnectionType) continue;
         if (state.dataBranchNodeConnections->NodeConnections(Count).FluidStream != FluidStream) continue;
         if ((state.dataBranchNodeConnections->NodeConnections(Count).ObjectIsParent && !IsParent) ||
@@ -730,10 +730,10 @@ void RegisterNodeConnection(EnergyPlusData &state,
             }
 
             // Check out AirTerminal inlet/outlet nodes
-            bool Found = UtilityRoutines::FindItemInList(NodeName,
-                                                         state.dataBranchNodeConnections->AirTerminalNodeConnections,
-                                                         &EqNodeConnectionDef::NodeName,
-                                                         state.dataBranchNodeConnections->NumOfAirTerminalNodes - 1);
+            bool Found = Util::FindItemInList(NodeName,
+                                              state.dataBranchNodeConnections->AirTerminalNodeConnections,
+                                              &EqNodeConnectionDef::NodeName,
+                                              state.dataBranchNodeConnections->NumOfAirTerminalNodes - 1);
             if (Found != 0) { // Nodename already used
                 ShowSevereError(state, fmt::format("{}{}=\"{}\" node name duplicated", RoutineName, ObjectType, ObjectName));
                 ShowContinueError(state, format("NodeName=\"{}\", entered as type={}", NodeName, conTypeStr));
@@ -809,7 +809,7 @@ void OverrideNodeConnectionType(
     for (int Count = 1; Count <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Count) {
         if (state.dataBranchNodeConnections->NodeConnections(Count).NodeNumber != NodeNumber) continue;
         if (state.dataBranchNodeConnections->NodeConnections(Count).ObjectType != ObjectType) continue;
-        if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->NodeConnections(Count).ObjectName, ObjectName)) continue;
+        if (!Util::SameString(state.dataBranchNodeConnections->NodeConnections(Count).ObjectName, ObjectName)) continue;
         if (state.dataBranchNodeConnections->NodeConnections(Count).FluidStream != FluidStream) continue;
         if ((state.dataBranchNodeConnections->NodeConnections(Count).ObjectIsParent != IsParent)) continue;
         Found = Count;
@@ -1432,18 +1432,18 @@ void GetParentData(EnergyPlusData &state,
         InletNodeName = state.dataBranchNodeConnections->ParentNodeList(Which).InletNodeName;
         OutletNodeName = state.dataBranchNodeConnections->ParentNodeList(Which).OutletNodeName;
         // Get Node Numbers
-        InletNodeNum = UtilityRoutines::FindItemInList(
-            InletNodeName, state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}), state.dataLoopNodes->NumOfNodes);
-        OutletNodeNum = UtilityRoutines::FindItemInList(
-            OutletNodeName, state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}), state.dataLoopNodes->NumOfNodes);
+        InletNodeNum =
+            Util::FindItemInList(InletNodeName, state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}), state.dataLoopNodes->NumOfNodes);
+        OutletNodeNum =
+            Util::FindItemInList(OutletNodeName, state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}), state.dataLoopNodes->NumOfNodes);
     } else if (IsParentObjectCompSet(state, ComponentType, ComponentName)) {
         Which = WhichCompSet(state, ComponentType, ComponentName);
         if (Which != 0) {
             InletNodeName = state.dataBranchNodeConnections->CompSets(Which).InletNodeName;
             OutletNodeName = state.dataBranchNodeConnections->CompSets(Which).OutletNodeName;
-            InletNodeNum = UtilityRoutines::FindItemInList(
+            InletNodeNum = Util::FindItemInList(
                 InletNodeName, state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}), state.dataLoopNodes->NumOfNodes);
-            OutletNodeNum = UtilityRoutines::FindItemInList(
+            OutletNodeNum = Util::FindItemInList(
                 OutletNodeName, state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}), state.dataLoopNodes->NumOfNodes);
         } else {
             ErrInObject = true;
@@ -1706,12 +1706,12 @@ void GetChildrenData(EnergyPlusData &state,
                     ChildInNodeName(CountNum) = state.dataBranchNodeConnections->CompSets(Loop).InletNodeName;
                     ChildOutNodeName(CountNum) = state.dataBranchNodeConnections->CompSets(Loop).OutletNodeName;
                     // Get Node Numbers
-                    ChildInNodeNum(CountNum) = UtilityRoutines::FindItemInList(ChildInNodeName(CountNum),
-                                                                               state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}),
-                                                                               state.dataLoopNodes->NumOfNodes);
-                    ChildOutNodeNum(CountNum) = UtilityRoutines::FindItemInList(ChildOutNodeName(CountNum),
-                                                                                state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}),
-                                                                                state.dataLoopNodes->NumOfNodes);
+                    ChildInNodeNum(CountNum) = Util::FindItemInList(ChildInNodeName(CountNum),
+                                                                    state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}),
+                                                                    state.dataLoopNodes->NumOfNodes);
+                    ChildOutNodeNum(CountNum) = Util::FindItemInList(ChildOutNodeName(CountNum),
+                                                                     state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}),
+                                                                     state.dataLoopNodes->NumOfNodes);
                 }
             }
             if (CountNum != NumChildren) {
@@ -1798,8 +1798,8 @@ void SetUpCompSets(EnergyPlusData &state,
     // inlet/outlet nodes have been input.  This routine assumes that identical
     // "CompSets" cannot be used in multiple places and issues a warning if they are.
 
-    std::string ParentTypeUC = UtilityRoutines::makeUPPER(ParentType);
-    std::string CompTypeUC = UtilityRoutines::makeUPPER(CompType);
+    std::string ParentTypeUC = Util::makeUPPER(ParentType);
+    std::string CompTypeUC = Util::makeUPPER(CompType);
     // TODO: Refactor this away by passing in enums
     DataLoopNode::ConnectionObjectType ParentTypeEnum =
         static_cast<DataLoopNode::ConnectionObjectType>(getEnumValue(ConnectionObjectTypeNamesUC, ParentTypeUC));
@@ -1965,9 +1965,11 @@ void SetUpCompSets(EnergyPlusData &state,
         state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).ComponentObjectType = ComponentTypeEnum;
         state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).CName = CompName;
         state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).InletNodeName =
-            UtilityRoutines::makeUPPER(InletNode); // TODO: Fix this....
+
+            Util::makeUPPER(InletNode); // TODO: Fix this....
         state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).OutletNodeName =
-            UtilityRoutines::makeUPPER(OutletNode); // TODO: Fix this....
+            Util::makeUPPER(OutletNode); // TODO: Fix this....
+
         if (!Description.empty()) {
             state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).Description = Description;
         } else {
@@ -2100,7 +2102,8 @@ void TestCompSet(EnergyPlusData &state,
     //   c)  If not found, call SetUpCompSets (with parent type and name UNDEFINED)
     //       to add a new item in the CompSets array
 
-    std::string CompTypeUC = UtilityRoutines::makeUPPER(CompType);
+    std::string CompTypeUC = Util::makeUPPER(CompType);
+
     // TODO: Refactor this away by passing in enums
     DataLoopNode::ConnectionObjectType ComponentTypeEnum =
         static_cast<DataLoopNode::ConnectionObjectType>(getEnumValue(ConnectionObjectTypeNamesUC, CompTypeUC));

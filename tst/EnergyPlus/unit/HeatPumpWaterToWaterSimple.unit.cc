@@ -755,7 +755,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     state->dataGlobal->KickOffSimulation = false;
 
@@ -765,7 +765,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
+        Weather::GetNextEnvironment(*state, Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -816,7 +816,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                         }
                     }
 
-                    WeatherManager::ManageWeather(*state);
+                    Weather::ManageWeather(*state);
 
                     HeatBalanceManager::ManageHeatBalance(*state);
 
@@ -1534,7 +1534,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     state->dataGlobal->KickOffSimulation = false;
 

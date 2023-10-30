@@ -85,7 +85,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
     thisModel->developMesh();
 
     // Setting weather data manually here
-    thisModel->weatherDataArray.dimension(state->dataWeatherManager->NumDaysInYear);
+    thisModel->weatherDataArray.dimension(state->dataWeather->NumDaysInYear);
 
     Real64 drybulb_minTemp = 5;
     Real64 drybulb_amp = 10;
@@ -94,11 +94,11 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
     Real64 solar_min = 100;
     Real64 solar_amp = 100;
 
-    for (int day = 1; day <= state->dataWeatherManager->NumDaysInYear; ++day) {
+    for (int day = 1; day <= state->dataWeather->NumDaysInYear; ++day) {
         auto &tdwd = thisModel->weatherDataArray(day); // "This day weather data"
 
-        Real64 theta = 2 * Constant::Pi * day / state->dataWeatherManager->NumDaysInYear;
-        Real64 omega = 2 * Constant::Pi * 130 / state->dataWeatherManager->NumDaysInYear; // Shifts min to around the end of Jan
+        Real64 theta = 2 * Constant::Pi * day / state->dataWeather->NumDaysInYear;
+        Real64 omega = 2 * Constant::Pi * 130 / state->dataWeather->NumDaysInYear; // Shifts min to around the end of Jan
 
         tdwd.dryBulbTemp = drybulb_amp * std::sin(theta - omega) + (drybulb_minTemp + drybulb_amp);
         tdwd.relativeHumidity = relHum_const;
@@ -174,9 +174,9 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_NoWeather)
 TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather)
 {
 
-    // I have to actually specify the RunPerod and SizingPeriods because in getWeatherData calls state->dataWeatherManager->GetNextEnvironment
+    // I have to actually specify the RunPerod and SizingPeriods because in getWeatherData calls state->dataWeather->GetNextEnvironment
     // I cannot hard set WeatherManager's GetBranchInputOneTimeFlag (in anonymous namespace) to false,
-    // so it'll end up calling >state->dataWeatherManager->ReadUserWeatherInput which calls the inputProcessor to set the NumOfEnvrn in particular.
+    // so it'll end up calling >state->dataWeather->ReadUserWeatherInput which calls the inputProcessor to set the NumOfEnvrn in particular.
     std::string const idf_objects = delimited_string({
 
         "Timestep,4;"
@@ -271,7 +271,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Set an actual weather file to Chicago EPW
-    state->dataWeatherManager->WeatherFileExists = true;
+    state->dataWeather->WeatherFileExists = true;
     state->files.inputWeatherFilePath.filePath = fs::path(configured_source_directory()) / "weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
 
     // Read the project data, such as Timestep
@@ -286,9 +286,9 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather)
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(state->dataWeatherManager->NumOfEnvrn, 3);
+    EXPECT_EQ(state->dataWeather->NumOfEnvrn, 3);
     EXPECT_EQ(state->dataEnvrn->TotDesDays, 2);
-    EXPECT_EQ(state->dataWeatherManager->TotRunPers, 1);
+    EXPECT_EQ(state->dataWeather->TotRunPers, 1);
 
     std::shared_ptr<EnergyPlus::FiniteDiffGroundTempsModel> thisModel(new EnergyPlus::FiniteDiffGroundTempsModel());
 
@@ -305,9 +305,9 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather)
     thisModel->getWeatherData(*state);
 
     // It should have reverted the added period
-    EXPECT_EQ(state->dataWeatherManager->NumOfEnvrn, 3);
+    EXPECT_EQ(state->dataWeather->NumOfEnvrn, 3);
     EXPECT_EQ(state->dataEnvrn->TotDesDays, 2);
-    EXPECT_EQ(state->dataWeatherManager->TotRunPers, 1);
+    EXPECT_EQ(state->dataWeather->TotRunPers, 1);
 
     // And should have populated a 365-day array of averages
     EXPECT_EQ(365u, thisModel->weatherDataArray.size());

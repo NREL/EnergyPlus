@@ -313,7 +313,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         // This method allows downstream heating coils to size individually.Probably should do this for all air loop equipment
                         // ChangoverBypass model always sets AirLoopControlInfo%UnitarySys to FALSE so heating coil can individually size
                         if (this->airLoopControlInfo(this->curSysNum).UnitarySysSimulating &&
-                            !UtilityRoutines::SameString(this->compType, "COIL:HEATING:WATER")) {
+                            !Util::SameString(this->compType, "COIL:HEATING:WATER")) {
                             NominalCapacityDes = this->unitaryHeatCap;
                         } else {
                             if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
@@ -374,8 +374,8 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
             // Note: the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil model, which implements variable flow fans and
             // determines capacity using physical calculations instead of emperical curves
             bool FlagCheckVolFlowPerRatedTotCap = true;
-            if (UtilityRoutines::SameString(this->compType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl") ||
-                UtilityRoutines::SameString(this->compType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl")) {
+            if (Util::SameString(this->compType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl") ||
+                Util::SameString(this->compType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl")) {
                 FlagCheckVolFlowPerRatedTotCap = false;
             }
 

@@ -156,7 +156,7 @@ namespace UnitHeater {
 
         // Find the correct Unit Heater Equipment
         if (CompIndex == 0) {
-            UnitHeatNum = UtilityRoutines::FindItemInList(CompName, state.dataUnitHeaters->UnitHeat);
+            UnitHeatNum = Util::FindItemInList(CompName, state.dataUnitHeaters->UnitHeat);
             if (UnitHeatNum == 0) {
                 ShowFatalError(state, format("SimUnitHeater: Unit not found={}", CompName));
             }
@@ -297,7 +297,7 @@ namespace UnitHeater {
             state.dataUnitHeaters->UnitHeatNumericFields(UnitHeatNum).FieldNames.allocate(NumNumbers);
             state.dataUnitHeaters->UnitHeatNumericFields(UnitHeatNum).FieldNames = "";
             state.dataUnitHeaters->UnitHeatNumericFields(UnitHeatNum).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name = Alphas(1);
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedName = Alphas(2);
@@ -354,7 +354,7 @@ namespace UnitHeater {
                 ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name));
                 ErrorsFound = true;
             } else {
-                if (!UtilityRoutines::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType, "Fan:SystemModel")) {
+                if (!Util::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType, "Fan:SystemModel")) {
                     GetFanType(state,
                                state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
                                state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num,
@@ -427,7 +427,7 @@ namespace UnitHeater {
                                               state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
                                               errFlag);
                     }
-                } else if (UtilityRoutines::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType, "Fan:SystemModel")) {
+                } else if (Util::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType, "Fan:SystemModel")) {
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     state.dataHVACFan->fanObjs.emplace_back(
                         new HVACFan::FanSystem(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName)); // call constructor
@@ -469,7 +469,7 @@ namespace UnitHeater {
             // Heating coil information:
             {
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type =
-                    static_cast<HCoilType>(getEnumValue(HCoilTypeNamesUC, UtilityRoutines::makeUPPER(Alphas(7))));
+                    static_cast<HCoilType>(getEnumValue(HCoilTypeNamesUC, Util::makeUPPER(Alphas(7))));
                 switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
                 case HCoilType::WaterHeatingCoil:
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatingCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
@@ -559,12 +559,12 @@ namespace UnitHeater {
             }
 
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOperatesDuringNoHeating = Alphas(10);
-            if ((!UtilityRoutines::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOperatesDuringNoHeating, "Yes")) &&
-                (!UtilityRoutines::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOperatesDuringNoHeating, "No"))) {
+            if ((!Util::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOperatesDuringNoHeating, "Yes")) &&
+                (!Util::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOperatesDuringNoHeating, "No"))) {
                 ErrorsFound = true;
                 ShowSevereError(state, format("Illegal {} = {}", cAlphaFields(10), Alphas(10)));
                 ShowContinueError(state, format("Occurs in {}={}", CurrentModuleObject, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name));
-            } else if (UtilityRoutines::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOperatesDuringNoHeating, "No")) {
+            } else if (Util::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOperatesDuringNoHeating, "No")) {
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOffNoHeating = true;
             }
 
@@ -585,8 +585,7 @@ namespace UnitHeater {
 
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex = 0;
             if (!lAlphaBlanks(12)) {
-                state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex =
-                    UtilityRoutines::FindItemInList(Alphas(12), state.dataSize->ZoneHVACSizing);
+                state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex = Util::FindItemInList(Alphas(12), state.dataSize->ZoneHVACSizing);
                 if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex == 0) {
                     ShowSevereError(state, format("{} = {} not found.", cAlphaFields(12), Alphas(12)));
                     ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name));
