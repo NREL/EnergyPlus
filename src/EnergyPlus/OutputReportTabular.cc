@@ -7873,14 +7873,14 @@ void WriteBEPSTable(EnergyPlusData &state)
             ort->gatherElecSurplusSold = gtElecSurplusSold;
         }
         // convert to GJ
-        ort->gatherPowerFuelFireGen /= largeConversionFactor;
-        ort->gatherPowerPV /= largeConversionFactor;
-        ort->gatherPowerWind /= largeConversionFactor;
-        ort->gatherPowerHTGeothermal /= largeConversionFactor;
-        ort->gatherPowerConversion /= largeConversionFactor;
-        ort->gatherElecProduced /= largeConversionFactor;
-        ort->gatherElecPurchased /= largeConversionFactor;
-        ort->gatherElecSurplusSold /= largeConversionFactor;
+        ort->gatherPowerFuelFireGen /= (largeConversionFactor / ipElectricityConversionFactor);
+        ort->gatherPowerPV /= (largeConversionFactor / ipElectricityConversionFactor);
+        ort->gatherPowerWind /= (largeConversionFactor / ipElectricityConversionFactor);
+        ort->gatherPowerHTGeothermal /= (largeConversionFactor / ipElectricityConversionFactor);
+        ort->gatherPowerConversion /= (largeConversionFactor / ipElectricityConversionFactor);
+        ort->gatherElecProduced /= (largeConversionFactor / ipElectricityConversionFactor);
+        ort->gatherElecPurchased /= (largeConversionFactor / ipElectricityConversionFactor);
+        ort->gatherElecSurplusSold /= (largeConversionFactor / ipElectricityConversionFactor);
 
         // get change in overall state of charge for electrical storage devices.
         if (state.dataElectPwrSvcMgr->facilityElectricServiceObj->numElecStorageDevices > 0) {
@@ -7888,7 +7888,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             // necessary OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum(
             // ElecStorage.ThisTimeStepStateOfCharge() ) ) + gatherElecStorage;
             ort->OverallNetEnergyFromStorage = ort->gatherElecStorage;
-            ort->OverallNetEnergyFromStorage /= largeConversionFactor;
+            ort->OverallNetEnergyFromStorage /= (largeConversionFactor / ipElectricityConversionFactor);
         } else {
             ort->OverallNetEnergyFromStorage = 0.0;
         }
@@ -8493,48 +8493,51 @@ void WriteBEPSTable(EnergyPlusData &state)
         }
 
         Real64 const unconvert = largeConversionFactor / 1000000000.0; // to avoid double converting, the values for the LEED report should be in GJ
+        Real64 const unconvert_ipExceptElec = (largeConversionFactor / ipElectricityConversionFactor) /
+                                              1000000000.0; // to avoid double converting, the values for the LEED report should be in GJ
+
         //  Energy Use Intensities - Electricity
         if (ort->buildingGrossFloorArea > 0) {
             if (produceTabular) {
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchLeedEuiElec,
                                  "Interior Lighting (All)",
-                                 unconvert * 1000 * useVal(colElectricity, 3) / ort->buildingGrossFloorArea,
+                                 unconvert_ipExceptElec * 1000 * useVal(colElectricity, 3) / ort->buildingGrossFloorArea,
                                  2);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchLeedEuiElec,
                                  "Space Heating",
-                                 unconvert * 1000 * useVal(colElectricity, 1) / ort->buildingGrossFloorArea,
+                                 unconvert_ipExceptElec * 1000 * useVal(colElectricity, 1) / ort->buildingGrossFloorArea,
                                  2);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchLeedEuiElec,
                                  "Space Cooling",
-                                 unconvert * 1000 * useVal(colElectricity, 2) / ort->buildingGrossFloorArea,
+                                 unconvert_ipExceptElec * 1000 * useVal(colElectricity, 2) / ort->buildingGrossFloorArea,
                                  2);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchLeedEuiElec,
                                  "Fans (All)",
-                                 unconvert * 1000 * useVal(colElectricity, 7) / ort->buildingGrossFloorArea,
+                                 unconvert_ipExceptElec * 1000 * useVal(colElectricity, 7) / ort->buildingGrossFloorArea,
                                  2);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchLeedEuiElec,
                                  "Service Water Heating",
-                                 unconvert * 1000 * useVal(colElectricity, 12) / ort->buildingGrossFloorArea,
+                                 unconvert_ipExceptElec * 1000 * useVal(colElectricity, 12) / ort->buildingGrossFloorArea,
                                  2);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchLeedEuiElec,
                                  "Receptacle Equipment",
-                                 unconvert * 1000 * useVal(colElectricity, 5) / ort->buildingGrossFloorArea,
+                                 unconvert_ipExceptElec * 1000 * useVal(colElectricity, 5) / ort->buildingGrossFloorArea,
                                  2);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchLeedEuiElec,
                                  "Miscellaneous (All)",
-                                 unconvert * 1000 * (useVal(colElectricity, 15)) / ort->buildingGrossFloorArea,
+                                 unconvert_ipExceptElec * 1000 * (useVal(colElectricity, 15)) / ort->buildingGrossFloorArea,
                                  2);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchLeedEuiElec,
                                  "Subtotal",
-                                 unconvert * 1000 * useVal(colElectricity, 15) / ort->buildingGrossFloorArea,
+                                 unconvert_ipExceptElec * 1000 * useVal(colElectricity, 15) / ort->buildingGrossFloorArea,
                                  2);
             }
         }
@@ -8544,7 +8547,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchLeedEusProc,
                              "Electricity",
-                             unconvert * (useVal(colElectricity, 5) + useVal(colElectricity, 13)),
+                             unconvert_ipExceptElec * (useVal(colElectricity, 5) + useVal(colElectricity, 13)),
                              2);
         }
 
@@ -9093,11 +9096,11 @@ void WriteBEPSTable(EnergyPlusData &state)
         tableBody(1, 2) = RealToStr(ort->gatherPowerHTGeothermal, 3);
         tableBody(1, 3) = RealToStr(ort->gatherPowerPV, 3);
         if (produceTabular) {
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Photovoltaic", unconvert * ort->gatherPowerPV, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Photovoltaic", unconvert_ipExceptElec * ort->gatherPowerPV, 2);
         }
         tableBody(1, 4) = RealToStr(ort->gatherPowerWind, 3);
         if (produceTabular) {
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Wind", unconvert * ort->gatherPowerWind, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Wind", unconvert_ipExceptElec * ort->gatherPowerWind, 2);
         }
         tableBody(1, 5) = RealToStr(ort->gatherPowerConversion, 3);
         tableBody(1, 6) = RealToStr(ort->OverallNetEnergyFromStorage, 3);
