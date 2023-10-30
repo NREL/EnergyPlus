@@ -3517,7 +3517,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         FreqString,
                                         VarTypeString,
                                         "EMS",
-                                        "",
+                                        {},
                                         {},
                                         {},
                                         {},
