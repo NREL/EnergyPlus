@@ -815,7 +815,7 @@ namespace RoomAir {
                 SumSysM += MassFlowRate;
             }
             if (TotSysFlow > 0.0) {
-                TSupK = TSupK / SumSysM + Constant::KelvinConv;
+                TSupK = TSupK / SumSysM + Constant::Kelvin;
             } else {
                 TSupK = 0.0;
             }
@@ -843,7 +843,7 @@ namespace RoomAir {
         Real64 NumberOfPlumes = (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) ? (PowerInPlumes / PowerPerPlume) : 1.0;
         Real64 NumDiffusersPerPlume = (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) ? (NumDiffusers / NumberOfPlumes) : 1.0;
 
-        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - Constant::KelvinConv) > thisZoneHB.MAT) {
+        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - Constant::Kelvin) > thisZoneHB.MAT) {
             // The system will mix
             HeightFrac = 0.0;
         } else {
@@ -1116,8 +1116,8 @@ namespace RoomAir {
         if (MIXFLAG) {
             state.dataRoomAir->Phi(ZoneNum) = 1.0;
         } else {
-            state.dataRoomAir->Phi(ZoneNum) = (state.dataRoomAir->ZTOC(ZoneNum) - (TSupK - Constant::KelvinConv)) /
-                                              (state.dataRoomAir->ZTMX(ZoneNum) - (TSupK - Constant::KelvinConv));
+            state.dataRoomAir->Phi(ZoneNum) =
+                (state.dataRoomAir->ZTOC(ZoneNum) - (TSupK - Constant::Kelvin)) / (state.dataRoomAir->ZTMX(ZoneNum) - (TSupK - Constant::Kelvin));
         }
 
         // Mixed for reporting purposes
@@ -1132,7 +1132,6 @@ namespace RoomAir {
 
     void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   January 2006
@@ -1238,7 +1237,7 @@ namespace RoomAir {
                 SumSysM += MassFlowRate;
             }
             if (TotSysFlow > 0.0) {
-                TSupK = TSupK / SumSysM + Constant::KelvinConv;
+                TSupK = TSupK / SumSysM + Constant::Kelvin;
             } else {
                 TSupK = 0.0;
             }
@@ -1271,7 +1270,7 @@ namespace RoomAir {
         Real64 NumberOfPlumes = (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) ? (PowerInPlumes / PowerPerPlume) : 1.0;
         Real64 NumDiffusersPerPlume = (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) ? (NumDiffusers / NumberOfPlumes) : 1.0;
 
-        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - Constant::KelvinConv) > thisZoneHB.MAT) {
+        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - Constant::Kelvin) > thisZoneHB.MAT) {
             // The system will mix
             HeightFrac = 0.0;
         } else {
@@ -1576,8 +1575,8 @@ namespace RoomAir {
         if (MIXFLAG) {
             state.dataRoomAir->Phi(ZoneNum) = 1.0;
         } else {
-            state.dataRoomAir->Phi(ZoneNum) = (state.dataRoomAir->ZTOC(ZoneNum) - (TSupK - Constant::KelvinConv)) /
-                                              (state.dataRoomAir->ZTMX(ZoneNum) - (TSupK - Constant::KelvinConv));
+            state.dataRoomAir->Phi(ZoneNum) =
+                (state.dataRoomAir->ZTOC(ZoneNum) - (TSupK - Constant::Kelvin)) / (state.dataRoomAir->ZTMX(ZoneNum) - (TSupK - Constant::Kelvin));
         }
 
         // Mixed for reporting purposes

@@ -175,7 +175,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     Real64 annualAveAirTemp_num;
 
     // Save current environment so we can revert back when done
-    int Envrn_reset = state.dataWeatherManager->Envrn;
+    int Envrn_reset = state.dataWeather->Envrn;
     Constant::KindOfSim KindOfSim_reset = state.dataGlobal->KindOfSim;
     int TimeStep_reset = state.dataGlobal->TimeStep;
     int HourOfDay_reset = state.dataGlobal->HourOfDay;
@@ -191,7 +191,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     bool BeginHourFlag_reset = state.dataGlobal->BeginHourFlag;
     bool EndHourFlag_reset = state.dataGlobal->EndHourFlag;
 
-    if (!state.dataWeatherManager->WeatherFileExists) {
+    if (!state.dataWeather->WeatherFileExists) {
         ShowSevereError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.");
         ShowContinueError(state,
                           "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
@@ -199,24 +199,24 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     }
 
     // We add a new period to force running all weather data
-    int originalNumOfEnvn = state.dataWeatherManager->NumOfEnvrn;
-    ++state.dataWeatherManager->NumOfEnvrn;
-    ++state.dataWeatherManager->TotRunPers;
-    state.dataWeatherManager->Environment.redimension(state.dataWeatherManager->NumOfEnvrn);
-    state.dataWeatherManager->RunPeriodInput.redimension(state.dataWeatherManager->TotRunPers);
-    state.dataWeatherManager->Environment(state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = Constant::KindOfSim::ReadAllWeatherData;
-    state.dataWeatherManager->RPReadAllWeatherData = true;
+    int originalNumOfEnvn = state.dataWeather->NumOfEnvrn;
+    ++state.dataWeather->NumOfEnvrn;
+    ++state.dataWeather->TotRunPers;
+    state.dataWeather->Environment.redimension(state.dataWeather->NumOfEnvrn);
+    state.dataWeather->RunPeriodInput.redimension(state.dataWeather->TotRunPers);
+    state.dataWeather->Environment(state.dataWeather->NumOfEnvrn).KindOfEnvrn = Constant::KindOfSim::ReadAllWeatherData;
+    state.dataWeather->RPReadAllWeatherData = true;
     state.dataGlobal->WeathSimReq = true;
     // RunPeriod is initialized to be one year of simulation
     // RunPeriodInput(TotRunPers).monWeekDay = 0; // Why do this?
 
-    WeatherManager::SetupEnvironmentTypes(state);
+    Weather::SetupEnvironmentTypes(state);
 
     // We reset the counter to the original number of run periods, so that GetNextEnvironment will fetch the one we added
-    state.dataWeatherManager->Envrn = originalNumOfEnvn;
+    state.dataWeather->Envrn = originalNumOfEnvn;
     Available = true;
     ErrorsFound = false;
-    WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
+    Weather::GetNextEnvironment(state, Available, ErrorsFound);
     if (ErrorsFound) {
         ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
     }
@@ -226,7 +226,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
         ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data, bad KindOfSim.");
     }
 
-    weatherDataArray.dimension(state.dataWeatherManager->NumDaysInYear);
+    weatherDataArray.dimension(state.dataWeather->NumDaysInYear);
 
     state.dataGlobal->BeginEnvrnFlag = true;
     state.dataGlobal->EndEnvrnFlag = false;
@@ -238,7 +238,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     annualAveAirTemp_num = 0.0;
 
-    while ((state.dataGlobal->DayOfSim < state.dataWeatherManager->NumDaysInYear) || (state.dataGlobal->WarmupFlag)) { // Begin day loop ...
+    while ((state.dataGlobal->DayOfSim < state.dataWeather->NumDaysInYear) || (state.dataGlobal->WarmupFlag)) { // Begin day loop ...
 
         ++state.dataGlobal->DayOfSim;
 
@@ -281,7 +281,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
                     }
                 }
 
-                WeatherManager::ManageWeather(state);
+                Weather::ManageWeather(state);
 
                 outDryBulbTemp_num += state.dataEnvrn->OutDryBulbTemp;
                 airDensity_num += state.dataEnvrn->OutAirDensity;
@@ -322,16 +322,16 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     } // ... End day loop.
 
-    annualAveAirTemp = annualAveAirTemp_num / state.dataWeatherManager->NumDaysInYear; // Used for initalizing domain
+    annualAveAirTemp = annualAveAirTemp_num / state.dataWeather->NumDaysInYear; // Used for initalizing domain
 
     // Reset Envrionment when done reading data
-    --state.dataWeatherManager->NumOfEnvrn; // May need better way of eliminating the extra envrionment that was added to read the data
-    --state.dataWeatherManager->TotRunPers;
+    --state.dataWeather->NumOfEnvrn; // May need better way of eliminating the extra envrionment that was added to read the data
+    --state.dataWeather->TotRunPers;
     state.dataGlobal->KindOfSim = KindOfSim_reset;
-    state.dataWeatherManager->RPReadAllWeatherData = false;
-    state.dataWeatherManager->Environment.redimension(state.dataWeatherManager->NumOfEnvrn);
-    state.dataWeatherManager->RunPeriodInput.redimension(state.dataWeatherManager->TotRunPers);
-    state.dataWeatherManager->Envrn = Envrn_reset;
+    state.dataWeather->RPReadAllWeatherData = false;
+    state.dataWeather->Environment.redimension(state.dataWeather->NumOfEnvrn);
+    state.dataWeather->RunPeriodInput.redimension(state.dataWeather->TotRunPers);
+    state.dataWeather->Envrn = Envrn_reset;
     state.dataGlobal->TimeStep = TimeStep_reset;
     state.dataGlobal->HourOfDay = HourOfDay_reset;
     state.dataGlobal->BeginEnvrnFlag = BeginEnvrnFlag_reset;
@@ -450,7 +450,7 @@ void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
     do {
 
         // loop over all days
-        for (state.dataGlobal->FDsimDay = 1; state.dataGlobal->FDsimDay <= state.dataWeatherManager->NumDaysInYear; ++state.dataGlobal->FDsimDay) {
+        for (state.dataGlobal->FDsimDay = 1; state.dataGlobal->FDsimDay <= state.dataWeather->NumDaysInYear; ++state.dataGlobal->FDsimDay) {
 
             bool iterationConverged = false;
 
@@ -823,7 +823,7 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     evaluateSoilRhoCp(_, true);
 
     // Initialize the groundTemps array
-    groundTemps.dimension({1, state.dataWeatherManager->NumDaysInYear}, {1, totalNumCells}, 0.0);
+    groundTemps.dimension({1, state.dataWeather->NumDaysInYear}, {1, totalNumCells}, 0.0);
 
     tempModel.reset();
 }
@@ -937,10 +937,10 @@ Real64 FiniteDiffGroundTempsModel::getGroundTemp(EnergyPlusData &state)
         // All depths within domain
         j1 = j0 + 1;
 
-        if (simTimeInDays <= 1 || simTimeInDays >= state.dataWeatherManager->NumDaysInYear) {
+        if (simTimeInDays <= 1 || simTimeInDays >= state.dataWeather->NumDaysInYear) {
             // First day of year, last day of year, and leap day
             // Interpolate between first and last day
-            i0 = state.dataWeatherManager->NumDaysInYear;
+            i0 = state.dataWeather->NumDaysInYear;
             i1 = 1;
 
             // Lookup ground temps
@@ -980,10 +980,10 @@ Real64 FiniteDiffGroundTempsModel::getGroundTemp(EnergyPlusData &state)
         j0 = totalNumCells;
         j1 = j0;
 
-        if (simTimeInDays <= 1 || simTimeInDays >= state.dataWeatherManager->NumDaysInYear) {
+        if (simTimeInDays <= 1 || simTimeInDays >= state.dataWeather->NumDaysInYear) {
             // First day of year, last day of year, and leap day
             // Interpolate between first and last day
-            i0 = state.dataWeatherManager->NumDaysInYear;
+            i0 = state.dataWeather->NumDaysInYear;
             i1 = 1;
 
             // Lookup ground temps
@@ -1025,8 +1025,8 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &
 
     simTimeInDays = seconds / Constant::SecsInDay;
 
-    if (simTimeInDays > state.dataWeatherManager->NumDaysInYear) {
-        simTimeInDays = remainder(simTimeInDays, state.dataWeatherManager->NumDaysInYear);
+    if (simTimeInDays > state.dataWeather->NumDaysInYear) {
+        simTimeInDays = remainder(simTimeInDays, state.dataWeather->NumDaysInYear);
     }
 
     return getGroundTemp(state);
@@ -1044,15 +1044,15 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &s
     // Returns ground temperature when input time is in months
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 const aveDaysInMonth = state.dataWeatherManager->NumDaysInYear / 12;
+    Real64 const aveDaysInMonth = state.dataWeather->NumDaysInYear / 12;
 
     depth = _depth;
 
     // Convert months to days. Puts time in middle of specified month
     simTimeInDays = aveDaysInMonth * ((month - 1) + 0.5);
 
-    if (simTimeInDays > state.dataWeatherManager->NumDaysInYear) {
-        simTimeInDays = remainder(simTimeInDays, state.dataWeatherManager->NumDaysInYear);
+    if (simTimeInDays > state.dataWeather->NumDaysInYear) {
+        simTimeInDays = remainder(simTimeInDays, state.dataWeather->NumDaysInYear);
     }
 
     // Get and return ground temperature

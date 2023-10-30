@@ -135,9 +135,9 @@ namespace GeneratorFuelSupply {
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
                 state.dataGenerator->FuelSupply(FuelSupNum).Name = AlphArray(1);
-                if (UtilityRoutines::SameString("TemperatureFromAirNode", AlphArray(2))) {
+                if (Util::SameString("TemperatureFromAirNode", AlphArray(2))) {
                     state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode = DataGenerators::FuelTemperatureMode::FuelInTempFromNode;
-                } else if (UtilityRoutines::SameString("Scheduled", AlphArray(2))) {
+                } else if (Util::SameString("Scheduled", AlphArray(2))) {
                     state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode = DataGenerators::FuelTemperatureMode::FuelInTempSchedule;
                 } else {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), AlphArray(2)));
@@ -177,9 +177,9 @@ namespace GeneratorFuelSupply {
                 for (auto &e : state.dataGenerator->FuelSupply)
                     e.CompPowerLossFactor = NumArray(1);
 
-                if (UtilityRoutines::SameString(AlphArray(6), "GaseousConstituents")) {
+                if (Util::SameString(AlphArray(6), "GaseousConstituents")) {
                     state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode = DataGenerators::FuelMode::GaseousConstituents;
-                } else if (UtilityRoutines::SameString(AlphArray(6), "LiquidGeneric")) {
+                } else if (Util::SameString(AlphArray(6), "LiquidGeneric")) {
                     state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode = DataGenerators::FuelMode::GenericLiquid;
                 } else {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(6), AlphArray(6)));
@@ -573,7 +573,7 @@ namespace GeneratorFuelSupply {
             for (int i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
 
                 std::string const &thisName = state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitName(i);
-                int thisGasID = UtilityRoutines::FindItem(
+                int thisGasID = Util::FindItem(
                     thisName, state.dataGenerator->GasPhaseThermoChemistryData, &DataGenerators::GasPropertyDataStruct::ConstituentName);
                 state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i) = thisGasID;
 
