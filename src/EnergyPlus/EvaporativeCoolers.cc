@@ -1229,7 +1229,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                  ++BranchComp) {
 
                 if (Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
-                                                thisEvapCond.Name)) {
+                                     thisEvapCond.Name)) {
                     CoolerOnMainAirLoop = true;
                 }
             }
@@ -1540,9 +1540,8 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                 for (int BranchComp = 1;
                      BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents;
                      ++BranchComp) {
-                    if (Util::SameString(
-                            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
-                            thisEvapCond.Name)) {
+                    if (Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
+                                         thisEvapCond.Name)) {
                         CoolerOnMainAirLoop = true;
                     }
                 }
@@ -3580,8 +3579,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
 
                 if (!lAlphaBlanks(14)) {
                     thisZoneEvapUnit.EvapCooler_2_Name = Alphas(14);
-                    thisZoneEvapUnit.EvapCooler_2_Index =
-                        Util::FindItemInList(Alphas(14), state.dataEvapCoolers->EvapCond, &EvapConditions::Name);
+                    thisZoneEvapUnit.EvapCooler_2_Index = Util::FindItemInList(Alphas(14), state.dataEvapCoolers->EvapCond, &EvapConditions::Name);
                     if (thisZoneEvapUnit.EvapCooler_2_Index == 0) {
                         ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
                         ShowContinueError(state, format("invalid, not found {}=\"{}\".", cAlphaFields(14), Alphas(14)));

@@ -613,8 +613,7 @@ namespace SplitterComponent {
         }
 
         if (SplitterNum == 0) {
-            WhichSplitter =
-                Util::FindItemInList(SplitterName, state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
+            WhichSplitter = Util::FindItemInList(SplitterName, state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
         } else {
             WhichSplitter = SplitterNum;
         }
@@ -664,8 +663,7 @@ namespace SplitterComponent {
         }
 
         if (SplitterNum == 0) {
-            WhichSplitter =
-                Util::FindItemInList(SplitterName, state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
+            WhichSplitter = Util::FindItemInList(SplitterName, state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
         } else {
             WhichSplitter = SplitterNum;
         }

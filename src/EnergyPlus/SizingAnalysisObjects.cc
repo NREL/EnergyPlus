@@ -326,8 +326,7 @@ int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData &state, Real64 
             tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * state.dataGlobal->NumOfTimeStepInHour;
         }
         if (state.dataWeather->Environment(i).KindOfEnvrn == Constant::KindOfSim::RunPeriodDesign) {
-            tmpLog.ztStepCountByEnvrnMap[i] =
-                HoursPerDay * state.dataGlobal->NumOfTimeStepInHour * state.dataWeather->Environment(i).TotalDays;
+            tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * state.dataGlobal->NumOfTimeStepInHour * state.dataWeather->Environment(i).TotalDays;
         }
     }
 

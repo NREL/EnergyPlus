@@ -407,8 +407,7 @@ namespace WaterManager {
                     objNameMsg = cCurrentModuleObject + " Named " + cAlphaArgs(1);
 
                     state.dataWaterData->RainCollector(Item).StorageTankName = cAlphaArgs(2);
-                    state.dataWaterData->RainCollector(Item).StorageTankID =
-                        Util::FindItemInList(cAlphaArgs(2), state.dataWaterData->WaterStorage);
+                    state.dataWaterData->RainCollector(Item).StorageTankID = Util::FindItemInList(cAlphaArgs(2), state.dataWaterData->WaterStorage);
                     if (state.dataWaterData->RainCollector(Item).StorageTankID == 0) {
                         ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(2), cAlphaArgs(2)));
                         ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
@@ -589,8 +588,8 @@ namespace WaterManager {
                     // setup tanks whose level is controlled by supply from another tank
                     if ((state.dataWaterData->WaterStorage(Item).ControlSupply == DataWater::ControlSupplyType::OtherTankFloatValve) ||
                         (state.dataWaterData->WaterStorage(Item).ControlSupply == DataWater::ControlSupplyType::TankMainsBackup)) {
-                        state.dataWaterData->WaterStorage(Item).SupplyTankID = Util::FindItemInList(
-                            state.dataWaterData->WaterStorage(Item).SupplyTankName, state.dataWaterData->WaterStorage);
+                        state.dataWaterData->WaterStorage(Item).SupplyTankID =
+                            Util::FindItemInList(state.dataWaterData->WaterStorage(Item).SupplyTankName, state.dataWaterData->WaterStorage);
                         if (state.dataWaterData->WaterStorage(Item).SupplyTankID == 0) {
                             ShowSevereError(state,
                                             format("Other tank called {} not found for {} Named {}",

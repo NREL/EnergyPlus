@@ -408,8 +408,7 @@ namespace CostEstimateManager {
                     ErrorsFound = true;
 
                 } else { // assume name is probably useful
-                    thisCoil = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName,
-                                                         state.dataHeatingCoils->HeatingCoil);
+                    thisCoil = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataHeatingCoils->HeatingCoil);
                     if (thisCoil == 0) {
                         ShowWarningError(state,
                                          format("ComponentCost:LineItem: \"{}\", Coil:Heating:Fuel, invalid coil specified",
@@ -466,8 +465,7 @@ namespace CostEstimateManager {
             } break;
             case ParentObject::ShadingZoneDetailed: {
                 if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                    ThisSurfID =
-                        Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataSurface->Surface);
+                    ThisSurfID = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataSurface->Surface);
                     if (ThisSurfID > 0) {
                         ThisZoneID = Util::FindItem(state.dataSurface->Surface(ThisSurfID).ZoneName, Zone);
                         if (ThisZoneID == 0) {
@@ -522,8 +520,7 @@ namespace CostEstimateManager {
             case ParentObject::GeneratorPhotovoltaic: {
                 if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap != 0.0) {
                     if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                        thisPV = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName,
-                                                           state.dataPhotovoltaic->PVarray);
+                        thisPV = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataPhotovoltaic->PVarray);
                         if (thisPV > 0) {
                             if (state.dataPhotovoltaic->PVarray(thisPV).PVModelType != DataPhotovoltaics::PVModel::Simple) {
                                 ShowSevereError(state,
@@ -793,8 +790,7 @@ namespace CostEstimateManager {
                 if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
                     WildcardObjNames = true;
                 } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                    thisCoil = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName,
-                                                         state.dataHeatingCoils->HeatingCoil);
+                    thisCoil = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataHeatingCoils->HeatingCoil);
                 }
 
                 if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) {
@@ -899,8 +895,7 @@ namespace CostEstimateManager {
             } break;
             case ParentObject::ShadingZoneDetailed: {
                 if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                    ThisSurfID =
-                        Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataSurface->Surface);
+                    ThisSurfID = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataSurface->Surface);
                     if (ThisSurfID > 0) {
                         ThisZoneID = Util::FindItem(state.dataSurface->Surface(ThisSurfID).ZoneName, Zone);
                         if (ThisZoneID > 0) {
@@ -946,11 +941,10 @@ namespace CostEstimateManager {
             case ParentObject::GeneratorPhotovoltaic: {
                 if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap != 0.0) {
                     if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                        thisPV = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName,
-                                                           state.dataPhotovoltaic->PVarray);
+                        thisPV = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataPhotovoltaic->PVarray);
                         if (thisPV > 0) {
-                            ThisZoneID = Util::FindItem(
-                                state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(thisPV).SurfacePtr).ZoneName, Zone);
+                            ThisZoneID =
+                                Util::FindItem(state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(thisPV).SurfacePtr).ZoneName, Zone);
                             if (ThisZoneID == 0) {
                                 Multipliers = 1.0;
                             } else {

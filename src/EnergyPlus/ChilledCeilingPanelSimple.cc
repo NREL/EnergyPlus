@@ -131,9 +131,9 @@ void SimCoolingPanel(
     // Find the correct Baseboard Equipment
     if (CompIndex == 0) {
         CoolingPanelNum = Util::FindItemInList(EquipName,
-                                                          state.dataChilledCeilingPanelSimple->CoolingPanel,
-                                                          &CoolingPanelParams::Name,
-                                                          (int)state.dataChilledCeilingPanelSimple->CoolingPanel.size());
+                                               state.dataChilledCeilingPanelSimple->CoolingPanel,
+                                               &CoolingPanelParams::Name,
+                                               (int)state.dataChilledCeilingPanelSimple->CoolingPanel.size());
         if (CoolingPanelNum == 0) {
             ShowFatalError(state, format("SimCoolingPanelSimple: Unit not found={}", EquipName));
         }

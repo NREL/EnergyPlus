@@ -605,9 +605,8 @@ namespace HVACMultiSpeedHeatPump {
                             for (int CompNum = 1;
                                  CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents;
                                  ++CompNum) {
-                                if (!Util::SameString(
-                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
-                                        thisMSHP.Name) ||
+                                if (!Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                                                      thisMSHP.Name) ||
                                     !Util::SameString(
                                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                         state.dataHVACMultiSpdHP->CurrentModuleObject))

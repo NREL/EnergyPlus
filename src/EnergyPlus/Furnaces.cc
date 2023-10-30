@@ -916,9 +916,8 @@ namespace Furnaces {
                             for (int CompNum = 1;
                                  CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents;
                                  ++CompNum) {
-                                if (!Util::SameString(
-                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
-                                        thisFurnace.Name) ||
+                                if (!Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                                                      thisFurnace.Name) ||
                                     !Util::SameString(
                                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                         CurrentModuleObject))
@@ -1054,8 +1053,7 @@ namespace Furnaces {
             HeatingCoilName = Alphas(11);
             thisFurnace.HeatingCoilType = HeatingCoilType;
             thisFurnace.HeatingCoilName = HeatingCoilName;
-            if (Util::SameString(HeatingCoilType, "Coil:Heating:Fuel") ||
-                Util::SameString(HeatingCoilType, "Coil:Heating:Electric")) {
+            if (Util::SameString(HeatingCoilType, "Coil:Heating:Fuel") || Util::SameString(HeatingCoilType, "Coil:Heating:Electric")) {
                 errFlag = false;
                 thisFurnace.HeatingCoilType_Num = HeatingCoils::GetHeatingCoilTypeNum(state, HeatingCoilType, HeatingCoilName, errFlag);
                 if (errFlag) {
@@ -1499,8 +1497,8 @@ namespace Furnaces {
                             for (int CompNum = 1;
                                  CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents;
                                  ++CompNum) {
-                                if (!Util::SameString(
-                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name, Alphas(1)) ||
+                                if (!Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                                                      Alphas(1)) ||
                                     !Util::SameString(
                                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                         CurrentModuleObject))
@@ -1637,8 +1635,7 @@ namespace Furnaces {
             HeatingCoilPLFCurveIndex = 0;
             thisFurnace.HeatingCoilType = HeatingCoilType;
             thisFurnace.HeatingCoilName = HeatingCoilName;
-            if (Util::SameString(HeatingCoilType, "Coil:Heating:Fuel") ||
-                Util::SameString(HeatingCoilType, "Coil:Heating:Electric")) {
+            if (Util::SameString(HeatingCoilType, "Coil:Heating:Fuel") || Util::SameString(HeatingCoilType, "Coil:Heating:Electric")) {
                 errFlag = false;
                 thisFurnace.HeatingCoilType_Num = HeatingCoils::GetHeatingCoilTypeNum(state, HeatingCoilType, HeatingCoilName, errFlag);
                 if (errFlag) {
@@ -2027,8 +2024,7 @@ namespace Furnaces {
                 ErrorsFound = true;
             }
 
-            if (Util::SameString(Alphas(14), "None") || Util::SameString(Alphas(14), "Multimode") ||
-                Util::SameString(Alphas(14), "CoolReheat")) {
+            if (Util::SameString(Alphas(14), "None") || Util::SameString(Alphas(14), "Multimode") || Util::SameString(Alphas(14), "CoolReheat")) {
                 AirNodeFound = false;
                 if (Util::SameString(Alphas(14), "Multimode")) {
                     thisFurnace.DehumidControlType_Num = DehumidificationControlMode::Multimode;
@@ -2102,8 +2098,7 @@ namespace Furnaces {
             thisFurnace.SuppHeatCoilName = ReheatingCoilName;
             errFlag = false;
             if (!lAlphaBlanks(15)) {
-                if (Util::SameString(ReheatingCoilType, "Coil:Heating:Fuel") ||
-                    Util::SameString(ReheatingCoilType, "Coil:Heating:Electric") ||
+                if (Util::SameString(ReheatingCoilType, "Coil:Heating:Fuel") || Util::SameString(ReheatingCoilType, "Coil:Heating:Electric") ||
                     Util::SameString(ReheatingCoilType, "Coil:Heating:Desuperheater")) {
 
                     thisFurnace.SuppHeatCoilType_Num = HeatingCoils::GetHeatingCoilTypeNum(state, ReheatingCoilType, ReheatingCoilName, errFlag);
@@ -2830,8 +2825,8 @@ namespace Furnaces {
                             for (int CompNum = 1;
                                  CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents;
                                  ++CompNum) {
-                                if (!Util::SameString(
-                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name, Alphas(1)) ||
+                                if (!Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                                                      Alphas(1)) ||
                                     !Util::SameString(
                                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                         CurrentModuleObject))
@@ -3162,8 +3157,7 @@ namespace Furnaces {
             thisFurnace.SuppHeatCoilType = SuppHeatCoilType;
             thisFurnace.SuppHeatCoilName = SuppHeatCoilName;
             errFlag = false;
-            if (Util::SameString(SuppHeatCoilType, "Coil:Heating:Fuel") ||
-                Util::SameString(SuppHeatCoilType, "Coil:Heating:Electric")) {
+            if (Util::SameString(SuppHeatCoilType, "Coil:Heating:Fuel") || Util::SameString(SuppHeatCoilType, "Coil:Heating:Electric")) {
 
                 thisFurnace.SuppHeatCoilType_Num = HeatingCoils::GetHeatingCoilTypeNum(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
                 if (errFlag) {
@@ -3359,8 +3353,7 @@ namespace Furnaces {
             }
 
             // Dehumidification Control Type
-            if (Util::SameString(Alphas(16), "None") || Util::SameString(Alphas(16), "Multimode") ||
-                Util::SameString(Alphas(16), "CoolReheat")) {
+            if (Util::SameString(Alphas(16), "None") || Util::SameString(Alphas(16), "Multimode") || Util::SameString(Alphas(16), "CoolReheat")) {
                 AirNodeFound = false;
                 if (Util::SameString(Alphas(16), "Multimode")) {
                     thisFurnace.DehumidControlType_Num = DehumidificationControlMode::Multimode;
@@ -3800,8 +3793,8 @@ namespace Furnaces {
                             for (int CompNum = 1;
                                  CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents;
                                  ++CompNum) {
-                                if (!Util::SameString(
-                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name, Alphas(1)) ||
+                                if (!Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                                                      Alphas(1)) ||
                                     !Util::SameString(
                                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                         CurrentModuleObject))
@@ -3981,8 +3974,7 @@ namespace Furnaces {
                 // get water flow mode info before CALL SetSimpleWSHPData
                 if (Util::SameString(Alphas(18), "Constant")) thisFurnace.WaterCyclingMode = DataHVACGlobals::WaterConstant;
                 if (Util::SameString(Alphas(18), "Cycling")) thisFurnace.WaterCyclingMode = DataHVACGlobals::WaterCycling;
-                if (Util::SameString(Alphas(18), "ConstantOnDemand"))
-                    thisFurnace.WaterCyclingMode = DataHVACGlobals::WaterConstantOnDemand;
+                if (Util::SameString(Alphas(18), "ConstantOnDemand")) thisFurnace.WaterCyclingMode = DataHVACGlobals::WaterConstantOnDemand;
                 // default to draw through if not specified in input
                 if (lAlphaBlanks(18)) thisFurnace.WaterCyclingMode = DataHVACGlobals::WaterCycling;
             } else {
@@ -4019,8 +4011,7 @@ namespace Furnaces {
             thisFurnace.SuppHeatCoilType = SuppHeatCoilType;
             thisFurnace.SuppHeatCoilName = SuppHeatCoilName;
             errFlag = false;
-            if (Util::SameString(SuppHeatCoilType, "Coil:Heating:Fuel") ||
-                Util::SameString(SuppHeatCoilType, "Coil:Heating:Electric")) {
+            if (Util::SameString(SuppHeatCoilType, "Coil:Heating:Fuel") || Util::SameString(SuppHeatCoilType, "Coil:Heating:Electric")) {
 
                 thisFurnace.SuppHeatCoilType_Num = HeatingCoils::GetHeatingCoilTypeNum(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
                 if (errFlag) {

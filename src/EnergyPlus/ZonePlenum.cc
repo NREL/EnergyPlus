@@ -123,8 +123,7 @@ void SimAirZonePlenum(EnergyPlusData &state,
     if (iCompType == DataZoneEquipment::AirLoopHVACZone::ReturnPlenum) { // 'AirLoopHVAC:ReturnPlenum'
         // Find the correct ZonePlenumNumber
         if (CompIndex == 0) {
-            ZonePlenumNum =
-                Util::FindItemInList(CompName, state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName);
+            ZonePlenumNum = Util::FindItemInList(CompName, state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName);
             if (ZonePlenumNum == 0) {
                 ShowFatalError(state, format("SimAirZonePlenum: AirLoopHVAC:ReturnPlenum not found={}", CompName));
             }
@@ -161,8 +160,7 @@ void SimAirZonePlenum(EnergyPlusData &state,
     } else if (iCompType == DataZoneEquipment::AirLoopHVACZone::SupplyPlenum) { // 'AirLoopHVAC:SupplyPlenum'
         // Find the correct ZonePlenumNumber
         if (CompIndex == 0) {
-            ZonePlenumNum =
-                Util::FindItemInList(CompName, state.dataZonePlenum->ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName);
+            ZonePlenumNum = Util::FindItemInList(CompName, state.dataZonePlenum->ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName);
             if (ZonePlenumNum == 0) {
                 ShowFatalError(state, format("SimAirZonePlenum: AirLoopHVAC:SupplyPlenum not found={}", CompName));
             }
@@ -304,8 +302,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
         thisRetPlenum.ZonePlenumName = AlphArray(1);
 
         // Check if this zone is also used in another return plenum
-        IOStat = Util::FindItemInList(
-            AlphArray(2), state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName, ZonePlenumNum - 1);
+        IOStat = Util::FindItemInList(AlphArray(2), state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName, ZonePlenumNum - 1);
         if (IOStat != 0) {
             ShowSevereError(state,
                             format("{}{} \"{}\" is used more than once as a {}.", RoutineName, cAlphaFields(2), AlphArray(2), CurrentModuleObject));
@@ -490,8 +487,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
         thisSupPlenum.ZonePlenumName = AlphArray(1);
 
         // Check if this zone is also used in another plenum
-        IOStat = Util::FindItemInList(
-            AlphArray(2), state.dataZonePlenum->ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZoneName, ZonePlenumNum - 1);
+        IOStat = Util::FindItemInList(AlphArray(2), state.dataZonePlenum->ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZoneName, ZonePlenumNum - 1);
         if (IOStat != 0) {
             ShowSevereError(state,
                             format("{}{} \"{}\" is used more than once as a {}.", RoutineName, cAlphaFields(2), AlphArray(2), CurrentModuleObject));

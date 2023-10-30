@@ -229,8 +229,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                 state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).WarmUpByTimeDelay = true;
                 state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).WarmUpByEngineTemp = false;
             }
-            if ((!(Util::SameString(AlphArray(7), "NominalEngineTemperature"))) &&
-                (!(Util::SameString(AlphArray(7), "TimeDelay")))) {
+            if ((!(Util::SameString(AlphArray(7), "NominalEngineTemperature"))) && (!(Util::SameString(AlphArray(7), "TimeDelay")))) {
                 ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(7), AlphArray(7)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
@@ -249,8 +248,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                 state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).MandatoryFullCoolDown = true;
                 state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).WarmRestartOkay = false;
             }
-            if ((!(Util::SameString(AlphArray(8), "MandatoryCoolDown"))) &&
-                (!(Util::SameString(AlphArray(8), "OptionalCoolDown")))) {
+            if ((!(Util::SameString(AlphArray(8), "MandatoryCoolDown"))) && (!(Util::SameString(AlphArray(8), "OptionalCoolDown")))) {
                 ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;

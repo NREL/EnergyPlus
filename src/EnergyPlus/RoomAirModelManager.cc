@@ -1317,8 +1317,7 @@ namespace RoomAir {
             }
             // control point node
 
-            roomAFNZoneInfo.ControlAirNodeID =
-                Util::FindItemInList(ipsc->cAlphaArgs(3), roomAFNZoneInfo.Node, roomAFNZoneInfo.NumOfAirNodes);
+            roomAFNZoneInfo.ControlAirNodeID = Util::FindItemInList(ipsc->cAlphaArgs(3), roomAFNZoneInfo.Node, roomAFNZoneInfo.NumOfAirNodes);
             if (roomAFNZoneInfo.ControlAirNodeID == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
                 ErrorsFound = true;

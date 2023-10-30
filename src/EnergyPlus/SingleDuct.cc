@@ -380,16 +380,13 @@ void GetSysInput(EnergyPlusData &state)
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp = Alphas(7);
         if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Fuel")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::Gas;
-        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
-                                               "Coil:Heating:Electric")) {
+        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Electric")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::Electric;
-        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
-                                               "Coil:Heating:Water")) {
+        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Water")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SimpleHeating;
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
                 DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
-                                               "Coil:Heating:Steam")) {
+        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Steam")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
                 DataPlant::PlantEquipmentType::CoilSteamAirHeating;
@@ -801,16 +798,13 @@ void GetSysInput(EnergyPlusData &state)
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp = Alphas(5);
         if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Fuel")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::Gas;
-        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
-                                               "Coil:Heating:Electric")) {
+        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Electric")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::Electric;
-        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
-                                               "Coil:Heating:Water")) {
+        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Water")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SimpleHeating;
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
                 DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
-                                               "Coil:Heating:Steam")) {
+        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Steam")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
                 DataPlant::PlantEquipmentType::CoilSteamAirHeating;
@@ -1107,16 +1101,13 @@ void GetSysInput(EnergyPlusData &state)
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp = Alphas(5);
         if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Fuel")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::Gas;
-        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
-                                               "Coil:Heating:Electric")) {
+        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Electric")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::Electric;
-        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
-                                               "Coil:Heating:Water")) {
+        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Water")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SimpleHeating;
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
                 DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
-                                               "Coil:Heating:Steam")) {
+        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Steam")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
                 DataPlant::PlantEquipmentType::CoilSteamAirHeating;
@@ -2041,8 +2032,7 @@ void GetSysInput(EnergyPlusData &state)
                                   format("Occurs for terminal unit {} = {}",
                                          state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                                          state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName));
-        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
-                                               "Coil:Heating:Electric")) {
+        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Electric")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::Electric;
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode =
                 GetHeatingCoilOutletNode(state,
@@ -2059,13 +2049,11 @@ void GetSysInput(EnergyPlusData &state)
                                   format("Occurs for terminal unit {} = {}",
                                          state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                                          state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName));
-        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
-                                               "Coil:Heating:Water")) {
+        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Water")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SimpleHeating;
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
                 DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp,
-                                               "Coil:Heating:Steam")) {
+        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp, "Coil:Heating:Steam")) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num = HeatingCoilType::SteamAirHeating;
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_PlantType =
                 DataPlant::PlantEquipmentType::CoilSteamAirHeating;
@@ -5870,10 +5858,9 @@ void GetATMixers(EnergyPlusData &state)
                     bool ZoneNodeFoundAgain = false;
                     for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                         for (int Num = 1; Num <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++Num) {
-                            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3),
-                                                            state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num)) &&
+                            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num)) &&
                                 Util::SameString(state.dataIPShortCut->cAlphaArgs(2),
-                                                            state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipTypeName(Num))) {
+                                                 state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipTypeName(Num))) {
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(ATMixerNum).ADUNum).ZoneEqNum = CtrlZone;
                                 state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = CtrlZone;
                                 // Must wait until InitATMixer to fill other zone equip config data because ultimate zone inlet node is not known yet

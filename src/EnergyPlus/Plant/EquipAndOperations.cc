@@ -294,8 +294,8 @@ namespace DataPlant {
                 for (int compNum = 1; compNum <= NumComps; ++compNum) {
                     auto &this_equip(this->CoolingOnlyEquipList(equipListNum).Comp(compNum));
                     PlantLocation compLoc;
-                    DataPlant::PlantEquipmentType Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
+                    DataPlant::PlantEquipmentType Type =
+                        static_cast<DataPlant::PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);
@@ -381,8 +381,7 @@ namespace DataPlant {
                     auto &this_equip(this->HeatingOnlyEquipList(equipListNum).Comp(compNum));
                     PlantLocation compLoc;
                     DataPlant::PlantEquipmentType Type;
-                    Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
+                    Type = static_cast<DataPlant::PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);
@@ -471,8 +470,7 @@ namespace DataPlant {
                     auto &this_equip(this->SimultHeatCoolCoolingEquipList(equipListNum).Comp(compNum));
                     PlantLocation compLoc;
                     DataPlant::PlantEquipmentType Type;
-                    Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
+                    Type = static_cast<DataPlant::PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);
@@ -560,8 +558,7 @@ namespace DataPlant {
                     auto &this_equip(this->SimultHeatCoolHeatingEquipList(equipListNum).Comp(compNum));
                     PlantLocation compLoc;
                     DataPlant::PlantEquipmentType Type;
-                    Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
+                    Type = static_cast<DataPlant::PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);

@@ -2212,8 +2212,8 @@ TEST_F(EnergyPlusFixture, HVACMSHP_UnitarySystemElectricityRateTest)
     zoneAirNode.HumRat = 0.0035;
     zoneAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneAirNode.Temp, zoneAirNode.HumRat);
     // set maixed air node conditions
-    auto &mixedAirNode = state->dataLoopNodes->Node(
-        Util::FindItemInList("AC-24 SF INLET AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    auto &mixedAirNode =
+        state->dataLoopNodes->Node(Util::FindItemInList("AC-24 SF INLET AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     mixedAirNode.Temp = 10.0;
     mixedAirNode.HumRat = 0.005;
     mixedAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(mixedAirNode.Temp, mixedAirNode.HumRat);

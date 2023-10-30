@@ -532,8 +532,7 @@ namespace ExhaustAirSystemManager {
                 Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate");
                 thisExhCtrl.DesignExhaustFlowRate = designExhaustFlowRate;
 
-                std::string flowControlTypeName =
-                    Util::makeUPPER(ip->getAlphaFieldValue(objectFields, objectSchemaProps, "flow_control_type"));
+                std::string flowControlTypeName = Util::makeUPPER(ip->getAlphaFieldValue(objectFields, objectSchemaProps, "flow_control_type"));
                 // std::string flowControlTypeName = Util::makeUPPER(fields.at("flow_control_type").get<std::string>());
                 thisExhCtrl.FlowControlOption =
                     static_cast<ZoneExhaustControl::FlowControlType>(getEnumValue(flowControlTypeNamesUC, flowControlTypeName));

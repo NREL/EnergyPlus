@@ -106,8 +106,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
         this->alternateMode.oneTimeInit(state); // oneTimeInit does not need to be delayed in this use case
     }
     // Validate fuel type input
-    this->compressorFuelType =
-        static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(input_data.compressor_fuel_type)));
+    this->compressorFuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(input_data.compressor_fuel_type)));
     if (this->compressorFuelType == Constant::eFuel::Invalid) {
         ShowSevereError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError(state, "...Compressor Fuel Type=\"" + input_data.compressor_fuel_type + "\".");

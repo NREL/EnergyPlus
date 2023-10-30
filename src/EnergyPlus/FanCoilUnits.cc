@@ -373,8 +373,7 @@ namespace FanCoilUnits {
             fanCoil.MinHotWaterVolFlow = Numbers(9);
             fanCoil.HotControlOffset = Numbers(10);
 
-            if (Util::SameString(Alphas(11), "Coil:Cooling:Water") ||
-                Util::SameString(Alphas(11), "Coil:Cooling:Water:DetailedGeometry") ||
+            if (Util::SameString(Alphas(11), "Coil:Cooling:Water") || Util::SameString(Alphas(11), "Coil:Cooling:Water:DetailedGeometry") ||
                 Util::SameString(Alphas(11), "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                 fanCoil.CCoilType = Alphas(11);
                 if (Util::SameString(Alphas(11), "Coil:Cooling:Water")) {

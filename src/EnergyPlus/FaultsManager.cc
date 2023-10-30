@@ -398,8 +398,8 @@ namespace FaultsManager {
                 }
 
                 // Check whether the evaporative cooler  name and type match each other;
-                int EvapCoolerNum = Util::FindItemInList(
-                    faultsECFouling.EvapCoolerName, state.dataEvapCoolers->EvapCond, &EvaporativeCoolers::EvapConditions::Name);
+                int EvapCoolerNum =
+                    Util::FindItemInList(faultsECFouling.EvapCoolerName, state.dataEvapCoolers->EvapCond, &EvaporativeCoolers::EvapConditions::Name);
                 if (EvapCoolerNum <= 0) {
                     ShowSevereError(
                         state,
@@ -484,7 +484,8 @@ namespace FaultsManager {
 
             // Chiller check
             int ChillerNum;
-            ChillerType ChillerTypeCheck = static_cast<ChillerType>(getEnumValue(ChillerTypeNamesUC, Util::makeUPPER(faultsChillerFouling.ChillerType)));
+            ChillerType ChillerTypeCheck =
+                static_cast<ChillerType>(getEnumValue(ChillerTypeNamesUC, Util::makeUPPER(faultsChillerFouling.ChillerType)));
             switch (ChillerTypeCheck) {
             case ChillerType::ChillerElectric: {
                 // Check whether the chiller name and chiller type match each other
@@ -561,8 +562,7 @@ namespace FaultsManager {
                 }
 
                 // Check whether the chiller name and chiller type match each other
-                ChillerNum =
-                    Util::FindItemInList(faultsChillerFouling.ChillerName, state.dataChillerReformulatedEIR->ElecReformEIRChiller);
+                ChillerNum = Util::FindItemInList(faultsChillerFouling.ChillerName, state.dataChillerReformulatedEIR->ElecReformEIRChiller);
                 if (ChillerNum <= 0) {
                     ShowSevereError(
                         state,
@@ -939,8 +939,8 @@ namespace FaultsManager {
                 }
                 // Check the controller name
                 int ControlNum = Util::FindItemInList(faultsCoilSATFouling.WaterCoilControllerName,
-                                                                 state.dataHVACControllers->ControllerProps,
-                                                                 &HVACControllers::ControllerPropsType::ControllerName);
+                                                      state.dataHVACControllers->ControllerProps,
+                                                      &HVACControllers::ControllerPropsType::ControllerName);
                 if (ControlNum <= 0) {
                     ShowSevereError(
                         state,
@@ -1104,9 +1104,8 @@ namespace FaultsManager {
                     state.dataCondenserLoopTowers->towers(TowerNum).FaultyTowerFoulingIndex = jFault_TowerFouling;
 
                     // Check the faulty tower type
-                    if (!Util::SameString(
-                            DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)],
-                            faultsTowerFouling.TowerType)) {
+                    if (!Util::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)],
+                                          faultsTowerFouling.TowerType)) {
                         ShowWarningError(
                             state,
                             format("{} = \"{}\" invalid {} = \"{}\" not match the type of {}. Tower type in the fault model is updated. ",
@@ -1225,9 +1224,8 @@ namespace FaultsManager {
                     state.dataCondenserLoopTowers->towers(TowerNum).FaultyCondenserSWTIndex = jFault_CondenserSWT;
 
                     // Check the faulty tower type
-                    if (!Util::SameString(
-                            DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)],
-                            faultsCondSWTFouling.TowerType)) {
+                    if (!Util::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)],
+                                          faultsCondSWTFouling.TowerType)) {
                         ShowWarningError(state,
                                          format("{} = \"{}\" invalid {} = \"{}\" not match the type of {}. Tower type is updated. ",
                                                 cFaultCurrentObject,

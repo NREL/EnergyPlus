@@ -272,8 +272,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
-        state.dataPipeHT->PipeHT(Item).ConstructionNum =
-            Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
+        state.dataPipeHT->PipeHT(Item).ConstructionNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
 
         if (state.dataPipeHT->PipeHT(Item).ConstructionNum == 0) {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -331,8 +330,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         switch (indoorType) {
         case PipeIndoorBoundaryType::Zone:
             state.dataPipeHT->PipeHT(Item).EnvironmentPtr = EnvrnPtr::ZoneEnv;
-            state.dataPipeHT->PipeHT(Item).EnvrZonePtr =
-                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataHeatBal->Zone);
+            state.dataPipeHT->PipeHT(Item).EnvrZonePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataHeatBal->Zone);
             if (state.dataPipeHT->PipeHT(Item).EnvrZonePtr == 0) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
                 ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -428,8 +426,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
-        state.dataPipeHT->PipeHT(Item).ConstructionNum =
-            Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
+        state.dataPipeHT->PipeHT(Item).ConstructionNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
 
         if (state.dataPipeHT->PipeHT(Item).ConstructionNum == 0) {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -565,8 +562,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
-        state.dataPipeHT->PipeHT(Item).ConstructionNum =
-            Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
+        state.dataPipeHT->PipeHT(Item).ConstructionNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
 
         if (state.dataPipeHT->PipeHT(Item).ConstructionNum == 0) {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -651,8 +647,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         // Also get the soil material name
         // A7,  \field Soil Material
         state.dataPipeHT->PipeHT(Item).SoilMaterial = state.dataIPShortCut->cAlphaArgs(6);
-        state.dataPipeHT->PipeHT(Item).SoilMaterialNum =
-            Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material);
+        state.dataPipeHT->PipeHT(Item).SoilMaterialNum = Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material);
         if (state.dataPipeHT->PipeHT(Item).SoilMaterialNum == 0) {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataPipeHT->PipeHT(Item).SoilMaterial));
             ShowContinueError(state, format("Found in {}={}", cCurrentModuleObject, state.dataPipeHT->PipeHT(Item).Name));

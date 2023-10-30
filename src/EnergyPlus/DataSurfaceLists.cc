@@ -300,8 +300,8 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
                 for (int SrfList = 1; SrfList <= NumOfSurfaceLists; ++SrfList) {
-                    NameConflict = Util::FindItemInList(
-                        SlabList(Item).SurfName(SurfNum), SurfList(SrfList).SurfName, SurfList(SrfList).NumOfSurfaces);
+                    NameConflict =
+                        Util::FindItemInList(SlabList(Item).SurfName(SurfNum), SurfList(SrfList).SurfName, SurfList(SrfList).NumOfSurfaces);
                     if (NameConflict > 0) { // A slab list includes a surface on a surface list--not allowed
                         ShowSevereError(state, format("{}{}", CurrentModuleObject2, "=\"" + SlabList(Item).Name + "\", invalid surface specified."));
                         ShowContinueError(state, format("Surface=\"{}\" is also on a Surface List.", SlabList(Item).SurfName(SurfNum)));

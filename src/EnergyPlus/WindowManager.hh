@@ -428,10 +428,10 @@ namespace WindowManager {
 struct WindowManagerData : BaseGlobalStruct
 {
 
-    static Real64 constexpr sigma = 5.6697e-8;              // Stefan-Boltzmann constant
+    static Real64 constexpr sigma = 5.6697e-8;          // Stefan-Boltzmann constant
     static Real64 constexpr TKelvin = Constant::Kelvin; // conversion from Kelvin to Celsius
-    static int constexpr nume = 107;                        // Number of wavelength values in solar spectrum
-    static int constexpr numt3 = 81;                        // Number of wavelength values in the photopic response
+    static int constexpr nume = 107;                    // Number of wavelength values in solar spectrum
+    static int constexpr numt3 = 81;                    // Number of wavelength values in the photopic response
 
     //                                      Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
     std::array<Real64, 8> const AirProps = {1.29, -0.4e-2, 2.41e-2, 7.6e-5, 1.73e-5, 1.0e-7, 0.72, 1.8e-3};

@@ -4703,8 +4703,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             daylightControl.AvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
         }
 
-        daylightControl.LightControlType =
-            static_cast<LtgCtrlType>(getEnumValue(LtgCtrlTypeNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(5))));
+        daylightControl.LightControlType = static_cast<LtgCtrlType>(getEnumValue(LtgCtrlTypeNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(5))));
         if (daylightControl.LightControlType == LtgCtrlType::Invalid) {
             ShowWarningError(state,
                              format("Invalid {} = {}, occurs in {}object for {}=\"{}",
@@ -4723,7 +4722,9 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             ipsc->rNumericArgs(4); // Field: Probability Lighting will be Reset When Needed in Manual Stepped Control
 
         if (!ipsc->lAlphaFieldBlanks(6)) { // Field: Glare Calculation Daylighting Reference Point Name
-            daylightControl.glareRefPtNumber = Util::FindItemInList(ipsc->cAlphaArgs(6), state.dataDaylightingData->DaylRefPt, &RefPointData::Name); // Field: Glare Calculation Daylighting Reference Point Name
+            daylightControl.glareRefPtNumber = Util::FindItemInList(ipsc->cAlphaArgs(6),
+                                                                    state.dataDaylightingData->DaylRefPt,
+                                                                    &RefPointData::Name); // Field: Glare Calculation Daylighting Reference Point Name
             if (daylightControl.glareRefPtNumber == 0) {
                 ShowSevereError(state,
                                 format("{}: invalid {}=\"{}\" for object named: {}",
@@ -4793,10 +4794,9 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
 
         int countRefPts = 0;
         for (int refPtNum = 1; refPtNum <= curTotalDaylRefPts; ++refPtNum) {
-            daylightControl.DaylRefPtNum(refPtNum) =
-                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(6 + refPtNum),
-                                                state.dataDaylightingData->DaylRefPt,
-                                                &RefPointData::Name); // Field: Daylighting Reference Point Name
+            daylightControl.DaylRefPtNum(refPtNum) = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(6 + refPtNum),
+                                                                          state.dataDaylightingData->DaylRefPt,
+                                                                          &RefPointData::Name); // Field: Daylighting Reference Point Name
             if (daylightControl.DaylRefPtNum(refPtNum) == 0) {
                 ShowSevereError(state,
                                 format("{}: invalid {}=\"{}\" for object named: {}",
@@ -5167,7 +5167,7 @@ void AssociateWindowShadingControlWithDaylighting(EnergyPlusData &state)
         int found = -1;
         for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
             if (Util::SameString(state.dataSurface->WindowShadingControl(iShadeCtrl).DaylightingControlName,
-                                            state.dataDaylightingData->daylightControl(daylightCtrlNum).Name)) {
+                                 state.dataDaylightingData->daylightControl(daylightCtrlNum).Name)) {
                 found = daylightCtrlNum;
                 break;
             }

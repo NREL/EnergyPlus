@@ -302,8 +302,7 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
         if (Util::SameString(PartLoadCurveType, "LeavingCondenserWaterTemperature") &&
             state.dataCurveManager->PerfCurve(thisChiller.ChillerEIRFPLRIndex)->numDims == 2) {
             thisChiller.PartLoadCurveType = PLR::LeavingCondenserWaterTemperature;
-        } else if (Util::SameString(PartLoadCurveType, "Lift") &&
-                   state.dataCurveManager->PerfCurve(thisChiller.ChillerEIRFPLRIndex)->numDims == 3) {
+        } else if (Util::SameString(PartLoadCurveType, "Lift") && state.dataCurveManager->PerfCurve(thisChiller.ChillerEIRFPLRIndex)->numDims == 3) {
             thisChiller.PartLoadCurveType = PLR::Lift;
         } else {
             ShowSevereError(state,

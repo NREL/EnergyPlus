@@ -1116,8 +1116,8 @@ namespace RoomAir {
         if (MIXFLAG) {
             state.dataRoomAir->Phi(ZoneNum) = 1.0;
         } else {
-            state.dataRoomAir->Phi(ZoneNum) = (state.dataRoomAir->ZTOC(ZoneNum) - (TSupK - Constant::Kelvin)) /
-                                              (state.dataRoomAir->ZTMX(ZoneNum) - (TSupK - Constant::Kelvin));
+            state.dataRoomAir->Phi(ZoneNum) =
+                (state.dataRoomAir->ZTOC(ZoneNum) - (TSupK - Constant::Kelvin)) / (state.dataRoomAir->ZTMX(ZoneNum) - (TSupK - Constant::Kelvin));
         }
 
         // Mixed for reporting purposes
@@ -1575,8 +1575,8 @@ namespace RoomAir {
         if (MIXFLAG) {
             state.dataRoomAir->Phi(ZoneNum) = 1.0;
         } else {
-            state.dataRoomAir->Phi(ZoneNum) = (state.dataRoomAir->ZTOC(ZoneNum) - (TSupK - Constant::Kelvin)) /
-                                              (state.dataRoomAir->ZTMX(ZoneNum) - (TSupK - Constant::Kelvin));
+            state.dataRoomAir->Phi(ZoneNum) =
+                (state.dataRoomAir->ZTOC(ZoneNum) - (TSupK - Constant::Kelvin)) / (state.dataRoomAir->ZTMX(ZoneNum) - (TSupK - Constant::Kelvin));
         }
 
         // Mixed for reporting purposes

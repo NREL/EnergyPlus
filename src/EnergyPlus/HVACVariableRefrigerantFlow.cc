@@ -2179,8 +2179,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         if (!lAlphaFieldBlanks(35)) {
             if (Util::SameString(cAlphaArgs(34), "AirCooled")) thisVrfSys.CondenserType = DataHeatBalance::RefrigCondenserType::Air;
-            if (Util::SameString(cAlphaArgs(34), "EvaporativelyCooled"))
-                thisVrfSys.CondenserType = DataHeatBalance::RefrigCondenserType::Evap;
+            if (Util::SameString(cAlphaArgs(34), "EvaporativelyCooled")) thisVrfSys.CondenserType = DataHeatBalance::RefrigCondenserType::Evap;
             if (Util::SameString(cAlphaArgs(34), "WaterCooled")) {
                 thisVrfSys.CondenserType = DataHeatBalance::RefrigCondenserType::Water;
                 thisVrfSys.VRFType = PlantEquipmentType::HeatPumpVRF;
@@ -2493,8 +2492,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             EnergyPlus::FluidProperties::GetFluidPropertiesData(state);
             state.dataFluidProps->GetInput = false;
         }
-        if (Util::FindItemInList(
-                thisVrfFluidCtrl.RefrigerantName, state.dataFluidProps->RefrigData, state.dataFluidProps->NumOfRefrigerants) == 0) {
+        if (Util::FindItemInList(thisVrfFluidCtrl.RefrigerantName, state.dataFluidProps->RefrigData, state.dataFluidProps->NumOfRefrigerants) == 0) {
             ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfFluidCtrl.Name);
             ShowContinueError(state, "Illegal " + cAlphaFieldNames(4) + " = " + cAlphaArgs(4));
             ErrorsFound = true;
@@ -2676,8 +2674,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         // Defrost
         if (!lAlphaFieldBlanks(8)) {
-            if (Util::SameString(cAlphaArgs(8), "ReverseCycle"))
-                thisVrfFluidCtrl.DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
+            if (Util::SameString(cAlphaArgs(8), "ReverseCycle")) thisVrfFluidCtrl.DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
             if (Util::SameString(cAlphaArgs(8), "Resistive")) thisVrfFluidCtrl.DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
             if (thisVrfFluidCtrl.DefrostStrategy == StandardRatings::DefrostStrat::Invalid) {
                 ShowSevereError(state,
@@ -2894,8 +2891,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             EnergyPlus::FluidProperties::GetFluidPropertiesData(state);
             state.dataFluidProps->GetInput = false;
         }
-        if (Util::FindItemInList(
-                thisVrfFluidCtrlHR.RefrigerantName, state.dataFluidProps->RefrigData, state.dataFluidProps->NumOfRefrigerants) == 0) {
+        if (Util::FindItemInList(thisVrfFluidCtrlHR.RefrigerantName, state.dataFluidProps->RefrigData, state.dataFluidProps->NumOfRefrigerants) ==
+            0) {
             ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfFluidCtrlHR.Name);
             ShowContinueError(state, "Illegal " + cAlphaFieldNames(4) + " = " + cAlphaArgs(4));
             ErrorsFound = true;
@@ -3127,10 +3124,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         // Defrost
         if (!lAlphaFieldBlanks(8)) {
-            if (Util::SameString(cAlphaArgs(8), "ReverseCycle"))
-                thisVrfFluidCtrlHR.DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
-            if (Util::SameString(cAlphaArgs(8), "Resistive"))
-                thisVrfFluidCtrlHR.DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
+            if (Util::SameString(cAlphaArgs(8), "ReverseCycle")) thisVrfFluidCtrlHR.DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
+            if (Util::SameString(cAlphaArgs(8), "Resistive")) thisVrfFluidCtrlHR.DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
             if (thisVrfFluidCtrlHR.DefrostStrategy == StandardRatings::DefrostStrat::Invalid) {
                 ShowSevereError(
                     state, cCurrentModuleObject + ", \"" + thisVrfFluidCtrlHR.Name + "\" " + cAlphaFieldNames(8) + " not found: " + cAlphaArgs(8));
@@ -3142,8 +3137,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         if (!lAlphaFieldBlanks(9)) {
             if (Util::SameString(cAlphaArgs(9), "Timed")) thisVrfFluidCtrlHR.DefrostControl = StandardRatings::HPdefrostControl::Timed;
-            if (Util::SameString(cAlphaArgs(9), "OnDemand"))
-                thisVrfFluidCtrlHR.DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
+            if (Util::SameString(cAlphaArgs(9), "OnDemand")) thisVrfFluidCtrlHR.DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
             if (thisVrfFluidCtrlHR.DefrostControl == StandardRatings::HPdefrostControl::Invalid) {
                 ShowSevereError(
                     state, cCurrentModuleObject + ", \"" + thisVrfFluidCtrlHR.Name + "\" " + cAlphaFieldNames(9) + " not found: " + cAlphaArgs(9));
@@ -3315,8 +3309,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfTU.Name = cAlphaArgs(1);
         for (int NumList = 1; NumList <= state.dataHVACVarRefFlow->NumVRFTULists; ++NumList) {
             int ZoneTerminalUnitListNum = Util::FindItemInList(thisVrfTU.Name,
-                                                                          state.dataHVACVarRefFlow->TerminalUnitList(NumList).ZoneTUName,
-                                                                          state.dataHVACVarRefFlow->TerminalUnitList(NumList).NumTUInList);
+                                                               state.dataHVACVarRefFlow->TerminalUnitList(NumList).ZoneTUName,
+                                                               state.dataHVACVarRefFlow->TerminalUnitList(NumList).NumTUInList);
             if (ZoneTerminalUnitListNum > 0) {
                 thisVrfTU.IndexToTUInTUList = ZoneTerminalUnitListNum;
                 state.dataHVACVarRefFlow->TerminalUnitList(NumList).ZoneTUPtr(ZoneTerminalUnitListNum) = VRFTUNum;
@@ -3592,7 +3586,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
 
                     if (Util::SameString(DataHVACGlobals::cAllCoilTypes(thisVrfTU.DXCoolCoilType_Num),
-                                                    DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling))) {
+                                         DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling))) {
                         errFlag = false;
                         if (thisVrfTU.TUListIndex > 0 && thisVrfTU.IndexToTUInTUList > 0) {
                             state.dataHVACVarRefFlow->TerminalUnitList(thisVrfTU.TUListIndex).CoolingCoilAvailSchPtr(thisVrfTU.IndexToTUInTUList) =
@@ -3687,7 +3681,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     // Algorithm Type: VRF model based on system curve
 
                     if (Util::SameString(DataHVACGlobals::cAllCoilTypes(thisVrfTU.DXCoolCoilType_Num),
-                                                    DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling))) {
+                                         DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling))) {
                         if (thisVrfTU.TUListIndex > 0 && thisVrfTU.IndexToTUInTUList > 0) {
                             state.dataHVACVarRefFlow->TerminalUnitList(thisVrfTU.TUListIndex).CoolingCoilAvailSchPtr(thisVrfTU.IndexToTUInTUList) =
                                 GetDXCoilAvailSchPtr(state, DXCoolingCoilType, cAlphaArgs(12), errFlag);
@@ -3772,7 +3766,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
 
                     if (Util::SameString(DataHVACGlobals::cAllCoilTypes(thisVrfTU.DXHeatCoilType_Num),
-                                                    DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Heating))) {
+                                         DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Heating))) {
                         errFlag = false;
                         if (thisVrfTU.TUListIndex > 0 && thisVrfTU.IndexToTUInTUList > 0) {
                             state.dataHVACVarRefFlow->TerminalUnitList(thisVrfTU.TUListIndex).HeatingCoilAvailSchPtr(thisVrfTU.IndexToTUInTUList) =
@@ -4026,7 +4020,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 } else {
                     // Algorithm Type: VRF model based on system curve
                     if (Util::SameString(DataHVACGlobals::cAllCoilTypes(thisVrfTU.DXHeatCoilType_Num),
-                                                    DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating))) {
+                                         DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating))) {
                         if (thisVrfTU.TUListIndex > 0 && thisVrfTU.IndexToTUInTUList > 0) {
                             state.dataHVACVarRefFlow->TerminalUnitList(thisVrfTU.TUListIndex).HeatingCoilAvailSchPtr(thisVrfTU.IndexToTUInTUList) =
                                 GetDXCoilAvailSchPtr(state, DXHeatingCoilType, cAlphaArgs(14), errFlag);
@@ -5872,10 +5866,10 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                     if (state.dataZoneEquip->ZoneEquipList(ELLoop).Name == "") continue;    // dimensioned by NumOfZones.  Only valid ones have names.
                     for (ListLoop = 1; ListLoop <= state.dataZoneEquip->ZoneEquipList(ELLoop).NumOfEquipTypes; ++ListLoop) {
                         if (!Util::SameString(state.dataZoneEquip->ZoneEquipList(ELLoop).EquipTypeName(ListLoop),
-                                                         DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUType_Num)))
+                                              DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUType_Num)))
                             continue;
                         if (!Util::SameString(state.dataZoneEquip->ZoneEquipList(ELLoop).EquipName(ListLoop),
-                                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).Name))
+                                              state.dataHVACVarRefFlow->VRFTU(TUIndex).Name))
                             continue;
                         state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum = ELLoop;
                         state.dataHVACVarRefFlow->VRFTU(TUIndex).isInZone = true;
@@ -5931,12 +5925,10 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                             for (int CompNum = 1;
                                  CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
                                  ++CompNum) {
-                                if (Util::SameString(
-                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
-                                        thisObjectName) &&
-                                    Util::SameString(
-                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
-                                        cCurrentModuleObject)) {
+                                if (Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                                     thisObjectName) &&
+                                    Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                                     cCurrentModuleObject)) {
                                     state.dataHVACVarRefFlow->VRFTU(TUIndex).airLoopNum = AirLoopNum;
                                     AirLoopFound = true;
                                     state.dataHVACVarRefFlow->VRFTU(TUIndex).isInAirLoop = true;
@@ -5995,9 +5987,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                     for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
                         for (int OACompNum = 1; OACompNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents; ++OACompNum) {
                             if (!Util::SameString(state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(OACompNum),
-                                                             state.dataHVACVarRefFlow->VRFTU(TUIndex).Name) ||
-                                !Util::SameString(state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(OACompNum),
-                                                             cCurrentModuleObject))
+                                                  state.dataHVACVarRefFlow->VRFTU(TUIndex).Name) ||
+                                !Util::SameString(state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(OACompNum), cCurrentModuleObject))
                                 continue;
                             state.dataHVACVarRefFlow->VRFTU(TUIndex).airLoopNum = 0; // need air loop number here?
                             state.dataHVACVarRefFlow->VRFTU(TUIndex).isInOASys = true;
@@ -10078,8 +10069,8 @@ void isVRFCoilPresent(EnergyPlusData &state, std::string_view VRFTUName, bool &C
         state.dataHVACVarRefFlow->GetVRFInputFlag = false;
     }
 
-    int WhichVRFTU = Util::FindItemInList(
-        VRFTUName, state.dataHVACVarRefFlow->VRFTU, &VRFTerminalUnitEquipment::Name, state.dataHVACVarRefFlow->NumVRFTU);
+    int WhichVRFTU =
+        Util::FindItemInList(VRFTUName, state.dataHVACVarRefFlow->VRFTU, &VRFTerminalUnitEquipment::Name, state.dataHVACVarRefFlow->NumVRFTU);
     if (WhichVRFTU != 0) {
         CoolCoilPresent = state.dataHVACVarRefFlow->VRFTU(WhichVRFTU).CoolingCoilPresent;
         HeatCoilPresent = state.dataHVACVarRefFlow->VRFTU(WhichVRFTU).HeatingCoilPresent;
@@ -10874,8 +10865,8 @@ int GetVRFTUOutAirNodeFromName(EnergyPlusData &state, std::string const &VRFTUNa
         state.dataHVACVarRefFlow->GetVRFInputFlag = false;
     }
 
-    int WhichVRFTU = Util::FindItemInList(
-        VRFTUName, state.dataHVACVarRefFlow->VRFTU, &VRFTerminalUnitEquipment::Name, state.dataHVACVarRefFlow->NumVRFTU);
+    int WhichVRFTU =
+        Util::FindItemInList(VRFTUName, state.dataHVACVarRefFlow->VRFTU, &VRFTerminalUnitEquipment::Name, state.dataHVACVarRefFlow->NumVRFTU);
     if (WhichVRFTU != 0) {
         NodeNum = state.dataHVACVarRefFlow->VRFTU(WhichVRFTU).VRFTUOutletNodeNum;
     } else {
@@ -10896,8 +10887,8 @@ int GetVRFTUInAirNodeFromName(EnergyPlusData &state, std::string const &VRFTUNam
         state.dataHVACVarRefFlow->GetVRFInputFlag = false;
     }
 
-    int WhichVRFTU = Util::FindItemInList(
-        VRFTUName, state.dataHVACVarRefFlow->VRFTU, &VRFTerminalUnitEquipment::Name, state.dataHVACVarRefFlow->NumVRFTU);
+    int WhichVRFTU =
+        Util::FindItemInList(VRFTUName, state.dataHVACVarRefFlow->VRFTU, &VRFTerminalUnitEquipment::Name, state.dataHVACVarRefFlow->NumVRFTU);
     if (WhichVRFTU != 0) {
         NodeNum = state.dataHVACVarRefFlow->VRFTU(WhichVRFTU).VRFTUInletNodeNum;
     } else {

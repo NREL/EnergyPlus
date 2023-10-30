@@ -509,16 +509,16 @@ TEST_F(EnergyPlusFixture, General_isReportPeriodBeginning)
     state->dataWeather->ReportPeriodInput(periodIdx).startHour = 8;
     state->dataWeather->ReportPeriodInput(periodIdx).startJulianDate =
         Weather::computeJulianDate(state->dataWeather->ReportPeriodInput(periodIdx).startYear,
-                                          state->dataWeather->ReportPeriodInput(periodIdx).startMonth,
-                                          state->dataWeather->ReportPeriodInput(periodIdx).startDay);
+                                   state->dataWeather->ReportPeriodInput(periodIdx).startMonth,
+                                   state->dataWeather->ReportPeriodInput(periodIdx).startDay);
     state->dataWeather->ReportPeriodInput(periodIdx).endYear = 0;
     state->dataWeather->ReportPeriodInput(periodIdx).endMonth = 1;
     state->dataWeather->ReportPeriodInput(periodIdx).endDay = 3;
     state->dataWeather->ReportPeriodInput(periodIdx).endHour = 18;
     state->dataWeather->ReportPeriodInput(periodIdx).endJulianDate =
         Weather::computeJulianDate(state->dataWeather->ReportPeriodInput(periodIdx).endYear,
-                                          state->dataWeather->ReportPeriodInput(periodIdx).endMonth,
-                                          state->dataWeather->ReportPeriodInput(periodIdx).endDay);
+                                   state->dataWeather->ReportPeriodInput(periodIdx).endMonth,
+                                   state->dataWeather->ReportPeriodInput(periodIdx).endDay);
     state->dataEnvrn->Year = 0;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 1;
@@ -557,32 +557,32 @@ TEST_F(EnergyPlusFixture, General_findReportPeriodIdx)
     state->dataWeather->ThermalReportPeriodInput(1).startHour = 8;
     state->dataWeather->ThermalReportPeriodInput(1).startJulianDate =
         Weather::computeJulianDate(state->dataWeather->ThermalReportPeriodInput(1).startYear,
-                                          state->dataWeather->ThermalReportPeriodInput(1).startMonth,
-                                          state->dataWeather->ThermalReportPeriodInput(1).startDay);
+                                   state->dataWeather->ThermalReportPeriodInput(1).startMonth,
+                                   state->dataWeather->ThermalReportPeriodInput(1).startDay);
     state->dataWeather->ThermalReportPeriodInput(1).endYear = 0;
     state->dataWeather->ThermalReportPeriodInput(1).endMonth = 1;
     state->dataWeather->ThermalReportPeriodInput(1).endDay = 10;
     state->dataWeather->ThermalReportPeriodInput(1).endHour = 18;
     state->dataWeather->ThermalReportPeriodInput(1).endJulianDate =
         Weather::computeJulianDate(state->dataWeather->ThermalReportPeriodInput(1).endYear,
-                                          state->dataWeather->ThermalReportPeriodInput(1).endMonth,
-                                          state->dataWeather->ThermalReportPeriodInput(1).endDay);
+                                   state->dataWeather->ThermalReportPeriodInput(1).endMonth,
+                                   state->dataWeather->ThermalReportPeriodInput(1).endDay);
     state->dataWeather->ThermalReportPeriodInput(2).startYear = 0;
     state->dataWeather->ThermalReportPeriodInput(2).startMonth = 2;
     state->dataWeather->ThermalReportPeriodInput(2).startDay = 1;
     state->dataWeather->ThermalReportPeriodInput(2).startHour = 8;
     state->dataWeather->ThermalReportPeriodInput(2).startJulianDate =
         Weather::computeJulianDate(state->dataWeather->ThermalReportPeriodInput(2).startYear,
-                                          state->dataWeather->ThermalReportPeriodInput(2).startMonth,
-                                          state->dataWeather->ThermalReportPeriodInput(2).startDay);
+                                   state->dataWeather->ThermalReportPeriodInput(2).startMonth,
+                                   state->dataWeather->ThermalReportPeriodInput(2).startDay);
     state->dataWeather->ThermalReportPeriodInput(2).endYear = 0;
     state->dataWeather->ThermalReportPeriodInput(2).endMonth = 3;
     state->dataWeather->ThermalReportPeriodInput(2).endDay = 10;
     state->dataWeather->ThermalReportPeriodInput(2).endHour = 18;
     state->dataWeather->ThermalReportPeriodInput(2).endJulianDate =
         Weather::computeJulianDate(state->dataWeather->ThermalReportPeriodInput(2).endYear,
-                                          state->dataWeather->ThermalReportPeriodInput(2).endMonth,
-                                          state->dataWeather->ThermalReportPeriodInput(2).endDay);
+                                   state->dataWeather->ThermalReportPeriodInput(2).endMonth,
+                                   state->dataWeather->ThermalReportPeriodInput(2).endDay);
 
     Array1D_bool reportPeriodFlags;
     reportPeriodFlags.allocate(state->dataWeather->TotThermalReportPers);
@@ -593,8 +593,7 @@ TEST_F(EnergyPlusFixture, General_findReportPeriodIdx)
     state->dataEnvrn->DayOfMonth = 1;
     state->dataGlobal->HourOfDay = 5;
     reportPeriodFlags = false;
-    findReportPeriodIdx(
-        *state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
+    findReportPeriodIdx(*state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
     EXPECT_FALSE(reportPeriodFlags(1));
     EXPECT_FALSE(reportPeriodFlags(2));
 
@@ -604,8 +603,7 @@ TEST_F(EnergyPlusFixture, General_findReportPeriodIdx)
     state->dataEnvrn->DayOfMonth = 8;
     state->dataGlobal->HourOfDay = 6;
     reportPeriodFlags = false;
-    findReportPeriodIdx(
-        *state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
+    findReportPeriodIdx(*state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
     EXPECT_TRUE(reportPeriodFlags(1));
     EXPECT_FALSE(reportPeriodFlags(2));
 
@@ -615,8 +613,7 @@ TEST_F(EnergyPlusFixture, General_findReportPeriodIdx)
     state->dataEnvrn->DayOfMonth = 15;
     state->dataGlobal->HourOfDay = 21;
     reportPeriodFlags = false;
-    findReportPeriodIdx(
-        *state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
+    findReportPeriodIdx(*state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
     EXPECT_FALSE(reportPeriodFlags(1));
     EXPECT_FALSE(reportPeriodFlags(2));
 
@@ -626,8 +623,7 @@ TEST_F(EnergyPlusFixture, General_findReportPeriodIdx)
     state->dataEnvrn->DayOfMonth = 1;
     state->dataGlobal->HourOfDay = 11;
     reportPeriodFlags = false;
-    findReportPeriodIdx(
-        *state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
+    findReportPeriodIdx(*state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
     EXPECT_FALSE(reportPeriodFlags(1));
     EXPECT_TRUE(reportPeriodFlags(2));
 
@@ -637,8 +633,7 @@ TEST_F(EnergyPlusFixture, General_findReportPeriodIdx)
     state->dataEnvrn->DayOfMonth = 1;
     state->dataGlobal->HourOfDay = 11;
     reportPeriodFlags = false;
-    findReportPeriodIdx(
-        *state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
+    findReportPeriodIdx(*state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
     EXPECT_FALSE(reportPeriodFlags(1));
     EXPECT_FALSE(reportPeriodFlags(2));
 
@@ -649,8 +644,8 @@ TEST_F(EnergyPlusFixture, General_findReportPeriodIdx)
     state->dataWeather->ThermalReportPeriodInput(1).endHour = 18;
     state->dataWeather->ThermalReportPeriodInput(1).endJulianDate =
         Weather::computeJulianDate(state->dataWeather->ThermalReportPeriodInput(1).endYear,
-                                          state->dataWeather->ThermalReportPeriodInput(1).endMonth,
-                                          state->dataWeather->ThermalReportPeriodInput(1).endDay);
+                                   state->dataWeather->ThermalReportPeriodInput(1).endMonth,
+                                   state->dataWeather->ThermalReportPeriodInput(1).endDay);
 
     // before the start of first period
     state->dataEnvrn->Year = 0;
@@ -658,8 +653,7 @@ TEST_F(EnergyPlusFixture, General_findReportPeriodIdx)
     state->dataEnvrn->DayOfMonth = 1;
     state->dataGlobal->HourOfDay = 5;
     reportPeriodFlags = false;
-    findReportPeriodIdx(
-        *state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
+    findReportPeriodIdx(*state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
     EXPECT_FALSE(reportPeriodFlags(1));
     EXPECT_FALSE(reportPeriodFlags(2));
 
@@ -669,8 +663,7 @@ TEST_F(EnergyPlusFixture, General_findReportPeriodIdx)
     state->dataEnvrn->DayOfMonth = 8;
     state->dataGlobal->HourOfDay = 6;
     reportPeriodFlags = false;
-    findReportPeriodIdx(
-        *state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
+    findReportPeriodIdx(*state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
     EXPECT_TRUE(reportPeriodFlags(1));
     EXPECT_FALSE(reportPeriodFlags(2));
 
@@ -680,8 +673,7 @@ TEST_F(EnergyPlusFixture, General_findReportPeriodIdx)
     state->dataEnvrn->DayOfMonth = 5;
     state->dataGlobal->HourOfDay = 21;
     reportPeriodFlags = false;
-    findReportPeriodIdx(
-        *state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
+    findReportPeriodIdx(*state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
     EXPECT_TRUE(reportPeriodFlags(1));
     EXPECT_TRUE(reportPeriodFlags(2));
 
@@ -691,8 +683,7 @@ TEST_F(EnergyPlusFixture, General_findReportPeriodIdx)
     state->dataEnvrn->DayOfMonth = 1;
     state->dataGlobal->HourOfDay = 11;
     reportPeriodFlags = false;
-    findReportPeriodIdx(
-        *state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
+    findReportPeriodIdx(*state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
     EXPECT_FALSE(reportPeriodFlags(1));
     EXPECT_TRUE(reportPeriodFlags(2));
 
@@ -702,8 +693,7 @@ TEST_F(EnergyPlusFixture, General_findReportPeriodIdx)
     state->dataEnvrn->DayOfMonth = 1;
     state->dataGlobal->HourOfDay = 11;
     reportPeriodFlags = false;
-    findReportPeriodIdx(
-        *state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
+    findReportPeriodIdx(*state, state->dataWeather->ThermalReportPeriodInput, state->dataWeather->TotThermalReportPers, reportPeriodFlags);
     EXPECT_FALSE(reportPeriodFlags(1));
     EXPECT_FALSE(reportPeriodFlags(2));
 }

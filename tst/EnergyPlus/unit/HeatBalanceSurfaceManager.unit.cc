@@ -2500,12 +2500,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     EXPECT_DOUBLE_EQ(0.25, state->dataSurface->Surface(3).ViewFactorSkyIR);
     EXPECT_DOUBLE_EQ(0.25, state->dataSurface->Surface(3).ViewFactorGroundIR);
     // Test if sky and grd view factor and temperature correctly overwritten
-    EXPECT_DOUBLE_EQ(
-        (Constant::StefanBoltzmann * 0.9 * 0.3 * (pow_4(20.0 + Constant::Kelvin) - pow_4(15.0 + Constant::Kelvin)) / (20.0 - 15.0)),
-        state->dataHeatBalSurf->SurfHSkyExt(1));
-    EXPECT_DOUBLE_EQ(
-        (Constant::StefanBoltzmann * 0.9 * 0.1 * (pow_4(20.0 + Constant::Kelvin) - pow_4(22.0 + Constant::Kelvin)) / (20.0 - 22.0)),
-        state->dataHeatBalSurf->SurfHGrdExt(1));
+    EXPECT_DOUBLE_EQ((Constant::StefanBoltzmann * 0.9 * 0.3 * (pow_4(20.0 + Constant::Kelvin) - pow_4(15.0 + Constant::Kelvin)) / (20.0 - 15.0)),
+                     state->dataHeatBalSurf->SurfHSkyExt(1));
+    EXPECT_DOUBLE_EQ((Constant::StefanBoltzmann * 0.9 * 0.1 * (pow_4(20.0 + Constant::Kelvin) - pow_4(22.0 + Constant::Kelvin)) / (20.0 - 22.0)),
+                     state->dataHeatBalSurf->SurfHGrdExt(1));
 
     // Test if LWR from surrounding surfaces correctly calculated
     EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 * 0.6 * (pow_4(25.0 + Constant::Kelvin) - pow_4(20.0 + Constant::Kelvin)),
@@ -3761,20 +3759,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportR
 
     state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
     state->dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
-    state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                          state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
     state->dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
                                                                               state->dataWeather->TotThermalReportPers);
-    state->dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                        state->dataWeather->TotThermalReportPers);
-    state->dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                            state->dataWeather->TotThermalReportPers);
-    state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                         state->dataWeather->TotThermalReportPers);
-    state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                         state->dataWeather->TotThermalReportPers);
-    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                        state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
     state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
                                                                                    state->dataWeather->TotThermalReportPers);
     state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,

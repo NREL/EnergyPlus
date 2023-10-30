@@ -775,8 +775,7 @@ namespace Psychrometrics {
         // REFERENCES:
         // ASHRAE handbook 1993 Fundamentals,
 
-        return RH / (461.52 * (Tdb + Constant::Kelvin)) *
-               std::exp(23.7093 - 4111.0 / ((Tdb + Constant::Kelvin) - 35.45)); // Vapor density in air
+        return RH / (461.52 * (Tdb + Constant::Kelvin)) * std::exp(23.7093 - 4111.0 / ((Tdb + Constant::Kelvin) - 35.45)); // Vapor density in air
     }
 
     inline Real64 PsyRhovFnTdbWPb(Real64 const Tdb, // dry-bulb temperature {C}
@@ -853,9 +852,8 @@ namespace Psychrometrics {
         ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricFunction::RhFnTdbRhovLBnd0C)];
 #endif
 
-        Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + Constant::Kelvin) *
-                                                  std::exp(-23.7093 + 4111.0 / ((Tdb + Constant::Kelvin) - 35.45))
-                                            : 0.0);
+        Real64 const RHValue(
+            Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + Constant::Kelvin) * std::exp(-23.7093 + 4111.0 / ((Tdb + Constant::Kelvin) - 35.45)) : 0.0);
 
         if ((RHValue < 0.0) || (RHValue > 1.0)) {
 #ifdef EP_psych_errors

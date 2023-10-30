@@ -8723,16 +8723,12 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
 
     // Simulation Order (1-based):
     //  SHADING SURFACES:
-    int siteShadeShadeFlatShadeSurface =
-        Util::FindItemInList(Util::makeUPPER("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
-    int mirSiteShadeFlatShadeSurface =
-        Util::FindItemInList("Mir-" + Util::makeUPPER("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
-    int buildingShadeTiltedShadeSurface =
-        Util::FindItemInList(Util::makeUPPER("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
+    int siteShadeShadeFlatShadeSurface = Util::FindItemInList(Util::makeUPPER("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
+    int mirSiteShadeFlatShadeSurface = Util::FindItemInList("Mir-" + Util::makeUPPER("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
+    int buildingShadeTiltedShadeSurface = Util::FindItemInList(Util::makeUPPER("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
     int mirBuildingShadeTiltedShadeSurface =
         Util::FindItemInList("Mir-" + Util::makeUPPER("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
-    int zoneShadeLivingSouthShade001 =
-        Util::FindItemInList(Util::makeUPPER("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
+    int zoneShadeLivingSouthShade001 = Util::FindItemInList(Util::makeUPPER("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
     int mirZoneShadeLivingSouthShade001 =
         Util::FindItemInList("Mir-" + Util::makeUPPER("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
     EXPECT_EQ(siteShadeShadeFlatShadeSurface, 1);
@@ -8751,8 +8747,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     int floorLivingFloor = Util::FindItemInList(Util::makeUPPER("Living:Floor"), state->dataSurface->Surface);
     int ceilingLivingCeiling = Util::FindItemInList(Util::makeUPPER("Living:Ceiling"), state->dataSurface->Surface);
     int doorWestDoor = Util::FindItemInList(Util::makeUPPER("WestDoor"), state->dataSurface->Surface);
-    int windowTubularDaylightingDiffuser1 =
-        Util::FindItemInList(Util::makeUPPER("TubularDaylightingDiffuser1"), state->dataSurface->Surface);
+    int windowTubularDaylightingDiffuser1 = Util::FindItemInList(Util::makeUPPER("TubularDaylightingDiffuser1"), state->dataSurface->Surface);
     int windowNorthWindow = Util::FindItemInList(Util::makeUPPER("NorthWindow"), state->dataSurface->Surface);
     int windowEastWindow = Util::FindItemInList(Util::makeUPPER("EastWindow"), state->dataSurface->Surface);
     int windowSouthWindow = Util::FindItemInList(Util::makeUPPER("SouthWindow"), state->dataSurface->Surface);
@@ -8814,8 +8809,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     int roofNorthRoof4 = Util::FindItemInList(Util::makeUPPER("NorthRoof4"), state->dataSurface->Surface);
     int roofEastRoof = Util::FindItemInList(Util::makeUPPER("EastRoof"), state->dataSurface->Surface);
     int roofWestRoof = Util::FindItemInList(Util::makeUPPER("WestRoof"), state->dataSurface->Surface);
-    int nonwindowTubularDaylightingDome1 =
-        Util::FindItemInList(Util::makeUPPER("TubularDaylightingDome1"), state->dataSurface->Surface);
+    int nonwindowTubularDaylightingDome1 = Util::FindItemInList(Util::makeUPPER("TubularDaylightingDome1"), state->dataSurface->Surface);
     int windowAtticSkylight = Util::FindItemInList(Util::makeUPPER("AtticSkylight"), state->dataSurface->Surface);
 
     EXPECT_EQ(wallEastGable, 27);

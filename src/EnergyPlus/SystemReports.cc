@@ -136,8 +136,7 @@ void InitEnergyReports(EnergyPlusData &state)
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);
             if (!thisZoneEquipConfig.IsControlled) continue;
-            thisZoneEquipConfig.EquipListIndex =
-                Util::FindItemInList(thisZoneEquipConfig.EquipListName, state.dataZoneEquip->ZoneEquipList);
+            thisZoneEquipConfig.EquipListIndex = Util::FindItemInList(thisZoneEquipConfig.EquipListName, state.dataZoneEquip->ZoneEquipList);
             auto &thisZoneEquipList = state.dataZoneEquip->ZoneEquipList(thisZoneEquipConfig.EquipListIndex);
             for (int ZoneInletNodeNum = 1; ZoneInletNodeNum <= thisZoneEquipConfig.NumInletNodes; ++ZoneInletNodeNum) {
                 int AirLoopNum = thisZoneEquipConfig.InletNodeAirLoopNum(ZoneInletNodeNum);
@@ -294,8 +293,7 @@ void InitEnergyReports(EnergyPlusData &state)
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);
             if (!thisZoneEquipConfig.IsControlled) continue;
-            thisZoneEquipConfig.EquipListIndex =
-                Util::FindItemInList(thisZoneEquipConfig.EquipListName, state.dataZoneEquip->ZoneEquipList);
+            thisZoneEquipConfig.EquipListIndex = Util::FindItemInList(thisZoneEquipConfig.EquipListName, state.dataZoneEquip->ZoneEquipList);
             int ListNum = thisZoneEquipConfig.EquipListIndex;
             // loop over the zone supply air path inlet nodes
             for (int ZoneInletNodeNum = 1; ZoneInletNodeNum <= thisZoneEquipConfig.NumInletNodes; ++ZoneInletNodeNum) {
@@ -4007,8 +4005,7 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     default:
         int found = 0;
         if (state.dataSysRpts->NumCompTypes > 0) {
-            found = Util::FindItemInList(
-                CompType, state.dataSysRpts->CompTypeErrors, &CompTypeError::CompType, state.dataSysRpts->NumCompTypes);
+            found = Util::FindItemInList(CompType, state.dataSysRpts->CompTypeErrors, &CompTypeError::CompType, state.dataSysRpts->NumCompTypes);
         }
         if (found == 0) {
             state.dataSysRpts->CompTypeErrors(++state.dataSysRpts->NumCompTypes).CompType = CompType;
@@ -4766,15 +4763,15 @@ void FindDemandSideMatch(EnergyPlusData &state,
                      state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).Branch(PassBranchNum).TotalComponents;
                      ++PassCompNum) {
                     if (Util::SameString(CompType,
-                                                    state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
-                                                        .Branch(PassBranchNum)
-                                                        .Comp(PassCompNum)
-                                                        .TypeOf) &&
+                                         state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
+                                             .Branch(PassBranchNum)
+                                             .Comp(PassCompNum)
+                                             .TypeOf) &&
                         Util::SameString(CompName,
-                                                    state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
-                                                        .Branch(PassBranchNum)
-                                                        .Comp(PassCompNum)
-                                                        .Name)) {
+                                         state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
+                                             .Branch(PassBranchNum)
+                                             .Comp(PassCompNum)
+                                             .Name)) {
                         // Found a match on the plant demand side--increment the counter
                         MatchFound = true;
                         MatchLoopType = 1;
@@ -4800,15 +4797,15 @@ void FindDemandSideMatch(EnergyPlusData &state,
                      state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).Branch(PassBranchNum).TotalComponents;
                      ++PassCompNum) {
                     if (Util::SameString(CompType,
-                                                    state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
-                                                        .Branch(PassBranchNum)
-                                                        .Comp(PassCompNum)
-                                                        .TypeOf) &&
+                                         state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
+                                             .Branch(PassBranchNum)
+                                             .Comp(PassCompNum)
+                                             .TypeOf) &&
                         Util::SameString(CompName,
-                                                    state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
-                                                        .Branch(PassBranchNum)
-                                                        .Comp(PassCompNum)
-                                                        .Name)) {
+                                         state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
+                                             .Branch(PassBranchNum)
+                                             .Comp(PassCompNum)
+                                             .Name)) {
                         // Found a match on the plant demand side--increment the counter
                         MatchFound = true;
                         MatchLoopType = 2;

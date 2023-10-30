@@ -171,8 +171,8 @@ namespace HeatBalFiniteDiffManager {
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(1)) {
                 {
-                    state.dataHeatBalFiniteDiffMgr->CondFDSchemeType = static_cast<CondFDScheme>(
-                        getEnumValue(CondFDSchemeTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(1))));
+                    state.dataHeatBalFiniteDiffMgr->CondFDSchemeType =
+                        static_cast<CondFDScheme>(getEnumValue(CondFDSchemeTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(1))));
                     if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::Invalid) {
                         ShowSevereError(state,
                                         format("{}: invalid {} entered={}, must match CrankNicholsonSecondOrder or FullyImplicitFirstOrder.",

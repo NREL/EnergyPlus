@@ -4341,8 +4341,7 @@ void GetTESCoilAirInletNode(
     }
 
     if (state.dataPackagedThermalStorageCoil->NumTESCoils > 0) {
-        CoilIndex =
-            Util::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
+        CoilIndex = Util::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
     } else {
         CoilIndex = 0;
     }
@@ -4381,8 +4380,7 @@ void GetTESCoilAirOutletNode(
     }
 
     if (state.dataPackagedThermalStorageCoil->NumTESCoils > 0) {
-        CoilIndex =
-            Util::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
+        CoilIndex = Util::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
     } else {
         CoilIndex = 0;
     }
@@ -4421,8 +4419,7 @@ void GetTESCoilCoolingCapacity(
     }
 
     if (state.dataPackagedThermalStorageCoil->NumTESCoils > 0) {
-        CoilIndex =
-            Util::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
+        CoilIndex = Util::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
     } else {
         CoilIndex = 0;
     }
@@ -4469,8 +4466,7 @@ void GetTESCoilCoolingAirFlowRate(
     }
 
     if (state.dataPackagedThermalStorageCoil->NumTESCoils > 0) {
-        CoilIndex =
-            Util::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
+        CoilIndex = Util::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
     } else {
         CoilIndex = 0;
     }

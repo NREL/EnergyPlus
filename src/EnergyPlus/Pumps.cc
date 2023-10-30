@@ -319,8 +319,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                    ObjectIsNotParent);
         TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
-        thisPump.PumpControl =
-            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
+        thisPump.PumpControl = static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
                              format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
@@ -486,8 +485,8 @@ void GetPumpInput(EnergyPlusData &state)
         }
 
         if (!thisInput->lAlphaFieldBlanks(14)) {
-            thisPump.powerSizingMethod = static_cast<PowerSizingMethod>(
-                getEnumValue(powerSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(14))));
+            thisPump.powerSizingMethod =
+                static_cast<PowerSizingMethod>(getEnumValue(powerSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(14))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
@@ -587,8 +586,7 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.Energy = 0.0;
         thisPump.Power = 0.0;
 
-        thisPump.PumpControl =
-            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
+        thisPump.PumpControl = static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
 
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
@@ -656,8 +654,8 @@ void GetPumpInput(EnergyPlusData &state)
         }
 
         if (!thisInput->lAlphaFieldBlanks(8)) {
-            thisPump.powerSizingMethod = static_cast<PowerSizingMethod>(
-                getEnumValue(powerSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
+            thisPump.powerSizingMethod =
+                static_cast<PowerSizingMethod>(getEnumValue(powerSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
@@ -789,8 +787,8 @@ void GetPumpInput(EnergyPlusData &state)
         }
 
         if (!thisInput->lAlphaFieldBlanks(6)) {
-            thisPump.powerSizingMethod = static_cast<PowerSizingMethod>(
-                getEnumValue(powerSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(6))));
+            thisPump.powerSizingMethod =
+                static_cast<PowerSizingMethod>(getEnumValue(powerSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(6))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
@@ -876,8 +874,7 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.SequencingScheme = PumpBankControlSeq::SequentialScheme;
         }
 
-        thisPump.PumpControl =
-            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
+        thisPump.PumpControl = static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
                              format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(5)));
@@ -935,8 +932,8 @@ void GetPumpInput(EnergyPlusData &state)
         }
 
         if (!thisInput->lAlphaFieldBlanks(8)) {
-            thisPump.powerSizingMethod = static_cast<PowerSizingMethod>(
-                getEnumValue(powerSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
+            thisPump.powerSizingMethod =
+                static_cast<PowerSizingMethod>(getEnumValue(powerSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
@@ -1022,8 +1019,7 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.SequencingScheme = PumpBankControlSeq::SequentialScheme;
         }
 
-        thisPump.PumpControl =
-            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
+        thisPump.PumpControl = static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
 
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
@@ -1079,8 +1075,8 @@ void GetPumpInput(EnergyPlusData &state)
             }
         }
         if (!thisInput->lAlphaFieldBlanks(8)) {
-            thisPump.powerSizingMethod = static_cast<PowerSizingMethod>(
-                getEnumValue(powerSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
+            thisPump.powerSizingMethod =
+                static_cast<PowerSizingMethod>(getEnumValue(powerSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",

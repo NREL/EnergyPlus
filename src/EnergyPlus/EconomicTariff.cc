@@ -226,8 +226,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         // Determine whether this meter is related to electricity, or water, or gas
         if (tariff(iInObj).reportMeterIndx != 0) {
 
-            std::string const &SELECT_CASE_var(
-                Util::makeUPPER(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType));
+            std::string const &SELECT_CASE_var(Util::makeUPPER(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType));
 
             // Various types of electricity meters
             if (SELECT_CASE_var == "ELECTRICITY") {
@@ -620,8 +619,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             tariff(iInObj).buyOrSell = buyFromUtility;
         }
         // check if meter is consistent with buy or sell option
-        if ((tariff(iInObj).buyOrSell == sellToUtility) &&
-            (!Util::SameString(tariff(iInObj).reportMeter, "ELECTRICITYSURPLUSSOLD:FACILITY"))) {
+        if ((tariff(iInObj).buyOrSell == sellToUtility) && (!Util::SameString(tariff(iInObj).reportMeter, "ELECTRICITYSURPLUSSOLD:FACILITY"))) {
             ShowWarningError(state, format("{}{}=\"{}\" atypical meter", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state,
                               format("The meter chosen \"{}\" is not typically used with the sellToUtility option.", tariff(iInObj).reportMeter));
@@ -664,9 +662,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         }
         // associate the resource number with each tariff
         if (tariff(iInObj).reportMeterIndx >= 1) {
-            tariff(iInObj).resource = static_cast<Constant::eResource>(
-                getEnumValue(Constant::eResourceNamesUC,
-                             Util::makeUPPER(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType)));
+            tariff(iInObj).resource = static_cast<Constant::eResource>(getEnumValue(
+                Constant::eResourceNamesUC, Util::makeUPPER(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType)));
         }
     }
 }

@@ -239,8 +239,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         state.dataContaminantBalance->ZoneContamGenericConstant(Loop).Name = AlphaName(1);
 
         state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ZoneName = AlphaName(2);
-        state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ActualZoneNum =
-            Util::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
+        state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ActualZoneNum = Util::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
                             format("{}{}=\"{}\", invalid {} entered={}",
@@ -570,8 +569,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).Name = AlphaName(1);
 
         state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ZoneName = AlphaName(2);
-        state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ActualZoneNum =
-            Util::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
+        state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ActualZoneNum = Util::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
                             format("{}{}=\"{}\", invalid {} entered={}",
@@ -708,8 +706,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         state.dataContaminantBalance->ZoneContamGenericDecay(Loop).Name = AlphaName(1);
 
         state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ZoneName = AlphaName(2);
-        state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ActualZoneNum =
-            Util::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
+        state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ActualZoneNum = Util::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
                             format("{}{}=\"{}\", invalid {} entered={}",
@@ -853,8 +850,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).Name = AlphaName(1);
 
         state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfName = AlphaName(2);
-        state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum =
-            Util::FindItemInList(AlphaName(2), state.dataSurface->Surface);
+        state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum = Util::FindItemInList(AlphaName(2), state.dataSurface->Surface);
         if (state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum == 0) {
             ShowSevereError(state,
                             format("{}{}=\"{}\", invalid {} entered={}",
@@ -1124,8 +1120,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         state.dataContaminantBalance->ZoneContamGenericDRS(Loop).Name = AlphaName(1);
 
         state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ZoneName = AlphaName(2);
-        state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ActualZoneNum =
-            Util::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
+        state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ActualZoneNum = Util::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
                             format("{}{}=\"{}\", invalid {} entered={}",

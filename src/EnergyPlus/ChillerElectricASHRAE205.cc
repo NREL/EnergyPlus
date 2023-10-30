@@ -295,8 +295,8 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
             }
         }
 
-        thisChiller.AmbientTempType = static_cast<AmbientTempIndicator>(getEnumValue(
-            AmbientTempNamesUC, Util::makeUPPER(ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_indicator"))));
+        thisChiller.AmbientTempType = static_cast<AmbientTempIndicator>(
+            getEnumValue(AmbientTempNamesUC, Util::makeUPPER(ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_indicator"))));
         switch (thisChiller.AmbientTempType) {
         case AmbientTempIndicator::Schedule: {
             std::string const ambient_temp_schedule = ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_schedule");

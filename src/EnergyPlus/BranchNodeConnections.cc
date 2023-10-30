@@ -731,9 +731,9 @@ void RegisterNodeConnection(EnergyPlusData &state,
 
             // Check out AirTerminal inlet/outlet nodes
             bool Found = Util::FindItemInList(NodeName,
-                                                         state.dataBranchNodeConnections->AirTerminalNodeConnections,
-                                                         &EqNodeConnectionDef::NodeName,
-                                                         state.dataBranchNodeConnections->NumOfAirTerminalNodes - 1);
+                                              state.dataBranchNodeConnections->AirTerminalNodeConnections,
+                                              &EqNodeConnectionDef::NodeName,
+                                              state.dataBranchNodeConnections->NumOfAirTerminalNodes - 1);
             if (Found != 0) { // Nodename already used
                 ShowSevereError(state, fmt::format("{}{}=\"{}\" node name duplicated", RoutineName, ObjectType, ObjectName));
                 ShowContinueError(state, format("NodeName=\"{}\", entered as type={}", NodeName, conTypeStr));
@@ -1432,10 +1432,10 @@ void GetParentData(EnergyPlusData &state,
         InletNodeName = state.dataBranchNodeConnections->ParentNodeList(Which).InletNodeName;
         OutletNodeName = state.dataBranchNodeConnections->ParentNodeList(Which).OutletNodeName;
         // Get Node Numbers
-        InletNodeNum = Util::FindItemInList(
-            InletNodeName, state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}), state.dataLoopNodes->NumOfNodes);
-        OutletNodeNum = Util::FindItemInList(
-            OutletNodeName, state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}), state.dataLoopNodes->NumOfNodes);
+        InletNodeNum =
+            Util::FindItemInList(InletNodeName, state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}), state.dataLoopNodes->NumOfNodes);
+        OutletNodeNum =
+            Util::FindItemInList(OutletNodeName, state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}), state.dataLoopNodes->NumOfNodes);
     } else if (IsParentObjectCompSet(state, ComponentType, ComponentName)) {
         Which = WhichCompSet(state, ComponentType, ComponentName);
         if (Which != 0) {
@@ -1707,11 +1707,11 @@ void GetChildrenData(EnergyPlusData &state,
                     ChildOutNodeName(CountNum) = state.dataBranchNodeConnections->CompSets(Loop).OutletNodeName;
                     // Get Node Numbers
                     ChildInNodeNum(CountNum) = Util::FindItemInList(ChildInNodeName(CountNum),
-                                                                               state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}),
-                                                                               state.dataLoopNodes->NumOfNodes);
+                                                                    state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}),
+                                                                    state.dataLoopNodes->NumOfNodes);
                     ChildOutNodeNum(CountNum) = Util::FindItemInList(ChildOutNodeName(CountNum),
-                                                                                state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}),
-                                                                                state.dataLoopNodes->NumOfNodes);
+                                                                     state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}),
+                                                                     state.dataLoopNodes->NumOfNodes);
                 }
             }
             if (CountNum != NumChildren) {

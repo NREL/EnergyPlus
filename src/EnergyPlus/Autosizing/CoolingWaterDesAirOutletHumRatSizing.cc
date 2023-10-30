@@ -96,8 +96,7 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &state, Real64 _
 
     if (this->wasAutoSized) {
         if (this->autoSizedValue > this->dataDesInletAirHumRat &&
-            (Util::SameString(this->compType, "COIL:COOLING:WATER") ||
-             Util::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
+            (Util::SameString(this->compType, "COIL:COOLING:WATER") || Util::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
             std::string msg =
                 this->callingRoutine + ":" + " Coil=\"" + this->compName + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.";
             this->addErrorMessage(msg);
@@ -126,8 +125,7 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &state, Real64 _
         Real64 desHumRatAtWaterInTemp = Psychrometrics::PsyWFnTdbH(state, this->dataDesInletWaterTemp, desSatEnthAtWaterInTemp, this->callingRoutine);
         if (this->autoSizedValue < this->dataDesInletAirHumRat && desHumRatAtWaterInTemp > this->dataDesInletAirHumRat) {
             if (this->autoSizedValue < this->dataDesInletAirHumRat &&
-                (Util::SameString(this->compType, "COIL:COOLING:WATER") ||
-                 Util::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
+                (Util::SameString(this->compType, "COIL:COOLING:WATER") || Util::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
                 std::string msg = this->callingRoutine + ":" + " Coil=\"" + this->compName +
                                   "\", Cooling Coil is running dry for sizing and has minimum humidity ratio at saturation for inlet chilled water "
                                   "temperature > design air entering humidity ratio.";

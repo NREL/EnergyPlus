@@ -1116,9 +1116,9 @@ namespace HVACUnitaryBypassVAV {
                     for (int CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
                          ++CompNum) {
                         if (!Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
-                                                         thisCBVAV.Name) ||
-                            !Util::SameString(
-                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf, thisCBVAV.UnitType))
+                                              thisCBVAV.Name) ||
+                            !Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                              thisCBVAV.UnitType))
                             continue;
                         thisCBVAV.AirLoopNumber = AirLoopNum;
                         //         Should EXIT here or do other checking?

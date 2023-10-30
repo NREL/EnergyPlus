@@ -423,8 +423,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 if (TStatObjects(Item).ZoneListActive) {
                     cAlphaArgs(2) = Zone(ZoneList(TStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
                 }
-                int ZoneAssigned = Util::FindItemInList(
-                    cAlphaArgs(2), TempControlledZone, &DataZoneControls::ZoneTempControls::ZoneName, TempControlledZoneNum - 1);
+                int ZoneAssigned =
+                    Util::FindItemInList(cAlphaArgs(2), TempControlledZone, &DataZoneControls::ZoneTempControls::ZoneName, TempControlledZoneNum - 1);
                 if (ZoneAssigned == 0) {
                     TempControlledZone(TempControlledZoneNum).ZoneName = cAlphaArgs(2);
                     TempControlledZone(TempControlledZoneNum).ActualZoneNum = Util::FindItemInList(cAlphaArgs(2), Zone);
@@ -544,7 +544,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 if (TempControlledZone(TempControlledZoneNum).DeltaTCutSet > 0.0) {
                     for (ControlTypeNum = 1; ControlTypeNum <= TempControlledZone(TempControlledZoneNum).NumControlTypes; ++ControlTypeNum) {
                         if (Util::SameString(TempControlledZone(TempControlledZoneNum).ControlType(ControlTypeNum),
-                                                        "ThermostatSetpoint:SingleHeatingOrCooling")) {
+                                             "ThermostatSetpoint:SingleHeatingOrCooling")) {
                             ShowWarningError(state,
                                              format("{}=\"{}: The choice of Temperature Difference Between Cutout And Setpoint will not be applied "
                                                     "to ThermostatSetpoint:SingleHeatingOrCooling.",
@@ -697,26 +697,24 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
         for (int ct = 1; ct <= state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).NumControlTypes; ct++) {
             switch (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ControlTypeEnum(ct)) {
             case DataHVACGlobals::ThermostatType::SingleHeating:
-                setPointObjectArrayIndex =
-                    Util::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(ct), SetPointSingleHeating);
+                setPointObjectArrayIndex = Util::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(ct), SetPointSingleHeating);
                 TempControlledZone(TempControlledZoneNum).SchIndx_SingleHeatSetPoint =
                     state.dataZoneTempPredictorCorrector->SetPointSingleHeating(setPointObjectArrayIndex).TempSchedIndex;
                 break;
             case DataHVACGlobals::ThermostatType::SingleCooling:
-                setPointObjectArrayIndex =
-                    Util::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(ct), SetPointSingleCooling);
+                setPointObjectArrayIndex = Util::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(ct), SetPointSingleCooling);
                 TempControlledZone(TempControlledZoneNum).SchIndx_SingleCoolSetPoint =
                     state.dataZoneTempPredictorCorrector->SetPointSingleCooling(setPointObjectArrayIndex).TempSchedIndex;
                 break;
             case DataHVACGlobals::ThermostatType::SingleHeatCool:
                 setPointObjectArrayIndex = Util::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(ct),
-                                                                     state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool);
+                                                          state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool);
                 TempControlledZone(TempControlledZoneNum).SchIndx_SingleHeatCoolSetPoint =
                     state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(setPointObjectArrayIndex).TempSchedIndex;
                 break;
             case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
                 setPointObjectArrayIndex = Util::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(ct),
-                                                                     state.dataZoneTempPredictorCorrector->SetPointDualHeatCool);
+                                                          state.dataZoneTempPredictorCorrector->SetPointDualHeatCool);
                 TempControlledZone(TempControlledZoneNum).SchIndx_DualSetPointWDeadBandHeat =
                     state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(setPointObjectArrayIndex).HeatTempSchedIndex;
                 TempControlledZone(TempControlledZoneNum).SchIndx_DualSetPointWDeadBandCool =
@@ -1259,9 +1257,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     ComfortControlledZone(ComfortControlledZoneNum).ControlType(ControlTypeNum) = cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 5));
                     ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ControlTypeNum) = cAlphaArgs(nint(2.0 * ControlTypeNum + 5));
                     if (ComfortControlledZone(ComfortControlledZoneNum).ControlType(ControlTypeNum) != "") {
-                        CTIndex =
-                            getEnumValue(ValidComfortControlTypesUC,
-                                         Util::makeUPPER(ComfortControlledZone(ComfortControlledZoneNum).ControlType(ControlTypeNum)));
+                        CTIndex = getEnumValue(ValidComfortControlTypesUC,
+                                               Util::makeUPPER(ComfortControlledZone(ComfortControlledZoneNum).ControlType(ControlTypeNum)));
                         if (CTIndex == 0) {
                             ShowSevereError(state,
                                             format("{}=\"{}\" invalid {}=\"{}\"",
@@ -1488,47 +1485,46 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     for (ComfortControlledZoneNum = 1; ComfortControlledZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++ComfortControlledZoneNum) {
 
         int ComfortIndex = Util::FindItem(ValidComfortControlTypes[static_cast<int>(DataHVACGlobals::ThermostatType::SingleHeating)],
-                                                     ComfortControlledZone(ComfortControlledZoneNum).ControlType,
-                                                     ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
+                                          ComfortControlledZone(ComfortControlledZoneNum).ControlType,
+                                          ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
         ComfortControlledZone(ComfortControlledZoneNum).SchIndx_SingleHeating = ComfortIndex;
         if (ComfortIndex > 0) {
             ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex) =
                 Util::FindItem(ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex),
-                                          state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger);
+                               state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger);
             TComfortControlTypes(ComfortControlledZoneNum).MustHave[static_cast<int>(DataHVACGlobals::ThermostatType::SingleHeating)] = true;
         }
 
         ComfortIndex = Util::FindItem(ValidComfortControlTypes[static_cast<int>(DataHVACGlobals::ThermostatType::SingleCooling)],
-                                                 ComfortControlledZone(ComfortControlledZoneNum).ControlType,
-                                                 ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
+                                      ComfortControlledZone(ComfortControlledZoneNum).ControlType,
+                                      ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
         ComfortControlledZone(ComfortControlledZoneNum).SchIndx_SingleCooling = ComfortIndex;
         if (ComfortIndex > 0) {
             ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex) =
                 Util::FindItem(ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex),
-                                          state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger);
+                               state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger);
             TComfortControlTypes(ComfortControlledZoneNum).MustHave[static_cast<int>(DataHVACGlobals::ThermostatType::SingleCooling)] = true;
         }
 
         ComfortIndex = Util::FindItem(ValidComfortControlTypes[static_cast<int>(DataHVACGlobals::ThermostatType::SingleHeatCool)],
-                                                 ComfortControlledZone(ComfortControlledZoneNum).ControlType,
-                                                 ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
+                                      ComfortControlledZone(ComfortControlledZoneNum).ControlType,
+                                      ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
         ComfortControlledZone(ComfortControlledZoneNum).SchIndx_SingleHeatCool = ComfortIndex;
         if (ComfortIndex > 0) {
             ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex) =
                 Util::FindItem(ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex),
-                                          state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger);
+                               state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger);
             TComfortControlTypes(ComfortControlledZoneNum).MustHave[static_cast<int>(DataHVACGlobals::ThermostatType::SingleHeatCool)] = true;
         }
 
-        ComfortIndex =
-            Util::FindItem(ValidComfortControlTypes[static_cast<int>(DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand)],
+        ComfortIndex = Util::FindItem(ValidComfortControlTypes[static_cast<int>(DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand)],
                                       ComfortControlledZone(ComfortControlledZoneNum).ControlType,
                                       ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
         ComfortControlledZone(ComfortControlledZoneNum).SchIndx_DualSetPointWithDeadBand = ComfortIndex;
         if (ComfortIndex > 0) {
             ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex) =
                 Util::FindItem(ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex),
-                                          state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger);
+                               state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger);
             TComfortControlTypes(ComfortControlledZoneNum).MustHave[static_cast<int>(DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand)] =
                 true;
         }
@@ -2000,8 +1996,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                         TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled = true;
                     }
                     if (Item == 1) {
-                        if ((!(Util::SameString(cAlphaArgs(2), "Scheduled"))) &&
-                            (!(Util::SameString(cAlphaArgs(2), "Constant")))) {
+                        if ((!(Util::SameString(cAlphaArgs(2), "Scheduled"))) && (!(Util::SameString(cAlphaArgs(2), "Constant")))) {
                             ShowSevereError(
                                 state, format("{}={} invalid {}=\"{}\".", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
                             ErrorsFound = true;
@@ -2234,8 +2229,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                         TempControlledZone(TempControlledZoneNum).OvercoolCntrlModeScheduled = false;
                     }
                     if (Item == 1) {
-                        if ((!(Util::SameString(cAlphaArgs(4), "Scheduled"))) &&
-                            (!(Util::SameString(cAlphaArgs(4), "Constant")))) {
+                        if ((!(Util::SameString(cAlphaArgs(4), "Scheduled"))) && (!(Util::SameString(cAlphaArgs(4), "Constant")))) {
                             ShowSevereError(
                                 state, format("{}={} invalid {}=\"{}\".", cCurrentModuleObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
                             ErrorsFound = true;
@@ -2723,10 +2717,9 @@ void CalculateAdaptiveComfortSetPointSchl(EnergyPlusData &state, Array1D<Real64>
     for (size_t i = 1; i <= state.dataWeather->DesDayInput.size(); i++) {
         // Summer design day
         if (state.dataWeather->DesDayInput(i).DayType == summerDesignDayTypeIndex) {
-            GrossApproxAvgDryBulbDesignDay =
-                (state.dataWeather->DesDayInput(i).MaxDryBulb +
-                 (state.dataWeather->DesDayInput(i).MaxDryBulb - state.dataWeather->DesDayInput(i).DailyDBRange)) /
-                2.0;
+            GrossApproxAvgDryBulbDesignDay = (state.dataWeather->DesDayInput(i).MaxDryBulb +
+                                              (state.dataWeather->DesDayInput(i).MaxDryBulb - state.dataWeather->DesDayInput(i).DailyDBRange)) /
+                                             2.0;
             if (GrossApproxAvgDryBulbDesignDay > 10 && GrossApproxAvgDryBulbDesignDay < 33.5) {
                 AdapComfortSetPointSummerDesDay[0] = 0.31 * GrossApproxAvgDryBulbDesignDay + 17.8;
                 AdapComfortSetPointSummerDesDay[1] = 0.31 * GrossApproxAvgDryBulbDesignDay + 20.3;
@@ -3839,7 +3832,7 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
             for (int iFault = 1; iFault <= state.dataFaultsMgr->NumFaultyThermostat; ++iFault) {
 
                 if (Util::SameString(TempControlledZone(RelativeZoneNum).Name,
-                                                state.dataFaultsMgr->FaultsThermostatOffset(iFault).FaultyThermostatName)) {
+                                     state.dataFaultsMgr->FaultsThermostatOffset(iFault).FaultyThermostatName)) {
 
                     // Check fault availability schedules
                     if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFault).AvaiSchedPtr) > 0.0) {
@@ -3920,11 +3913,9 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
             //  loop through the FaultsHumidistatOffset objects to find the one for the zone
             for (int iFault = 1; iFault <= state.dataFaultsMgr->NumFaultyHumidistat; ++iFault) {
 
-                if (Util::SameString(humidityControlZone.ControlName,
-                                                state.dataFaultsMgr->FaultsHumidistatOffset(iFault).FaultyHumidistatName)) {
+                if (Util::SameString(humidityControlZone.ControlName, state.dataFaultsMgr->FaultsHumidistatOffset(iFault).FaultyHumidistatName)) {
 
-                    if (Util::SameString(state.dataFaultsMgr->FaultsHumidistatOffset(iFault).FaultyHumidistatType,
-                                                    "ThermostatOffsetDependent")) {
+                    if (Util::SameString(state.dataFaultsMgr->FaultsHumidistatOffset(iFault).FaultyHumidistatType, "ThermostatOffsetDependent")) {
                         // For Humidistat Offset Type I: ThermostatOffsetDependent
 
                         bool IsThermostatFound = false;
@@ -3941,7 +3932,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
                             for (int iFaultThermo = 1; iFaultThermo <= state.dataFaultsMgr->NumFaultyThermostat; ++iFaultThermo) {
 
                                 if (Util::SameString(state.dataFaultsMgr->FaultsHumidistatOffset(iFault).FaultyThermostatName,
-                                                                state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).Name)) {
+                                                     state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).Name)) {
                                     IsThermostatFound = true;
 
                                     // Check fault availability schedules
@@ -4051,8 +4042,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
         for (size_t zoneEqConfigNum = 1; zoneEqConfigNum <= state.dataZoneEquip->ZoneEquipConfig.size(); ++zoneEqConfigNum) {
             auto &zoneEqConfig = state.dataZoneEquip->ZoneEquipConfig(zoneEqConfigNum);
             if (!zoneEqConfig.IsControlled) continue;
-            int ZoneSizNum =
-                Util::FindItemInList(zoneEqConfig.ZoneName, state.dataSize->ZoneSizingInput, &DataSizing::ZoneSizingInputData::ZoneName);
+            int ZoneSizNum = Util::FindItemInList(zoneEqConfig.ZoneName, state.dataSize->ZoneSizingInput, &DataSizing::ZoneSizingInputData::ZoneName);
             // should use the first Sizing:Zone object if not found
             if (ZoneSizNum == 0 && !state.dataSize->ZoneSizingInput.empty()) ZoneSizNum = 1;
             if (ZoneSizNum > 0) {

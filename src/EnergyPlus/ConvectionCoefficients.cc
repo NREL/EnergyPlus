@@ -1596,8 +1596,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(i), ipsc->cAlphaArgs(i));
                 ErrorsFound = true;
             } else if (intAlgo.intConvClassEqNums[iInConvClass] == HcInt::UserCurve) {
-                intAlgo.intConvClassUserCurveNums[iInConvClass] =
-                    Util::FindItemInList(ipsc->cAlphaArgs(i + 1), state.dataConvect->hcIntUserCurve);
+                intAlgo.intConvClassUserCurveNums[iInConvClass] = Util::FindItemInList(ipsc->cAlphaArgs(i + 1), state.dataConvect->hcIntUserCurve);
                 if (intAlgo.intConvClassUserCurveNums[iInConvClass] == 0) {
                     ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(i + 1), ipsc->cAlphaArgs(i + 1));
                     ErrorsFound = true;
@@ -1635,8 +1634,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                 ErrorsFound = true;
 
             } else if (extAlgo.extConvClass2EqNums[iOutConvClass] == HcExt::UserCurve) {
-                extAlgo.extConvClass2UserCurveNums[iOutConvClass] =
-                    Util::FindItemInList(ipsc->cAlphaArgs(i + 1), state.dataConvect->hcExtUserCurve);
+                extAlgo.extConvClass2UserCurveNums[iOutConvClass] = Util::FindItemInList(ipsc->cAlphaArgs(i + 1), state.dataConvect->hcExtUserCurve);
                 if (extAlgo.extConvClass2UserCurveNums[iOutConvClass] == 0) {
                     ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(i + 1), ipsc->cAlphaArgs(i + 1));
                     ErrorsFound = true;

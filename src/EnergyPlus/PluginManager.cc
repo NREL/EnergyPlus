@@ -464,8 +464,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
             std::string workingDirFlagUC = "YES";
             try {
-                workingDirFlagUC =
-                    EnergyPlus::Util::makeUPPER(fields.at("add_current_working_directory_to_search_path").get<std::string>());
+                workingDirFlagUC = EnergyPlus::Util::makeUPPER(fields.at("add_current_working_directory_to_search_path").get<std::string>());
             } catch (nlohmann::json::out_of_range &e) {
                 // defaulted to YES
             }

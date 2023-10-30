@@ -188,16 +188,13 @@ namespace LowTempRadiantSystem {
             SystemType = state.dataLowTempRadSys->RadSysTypes(RadSysNum).SystemType;
             switch (SystemType) {
             case LowTempRadiantSystem::SystemType::HydronicSystem: {
-                state.dataLowTempRadSys->RadSysTypes(RadSysNum).CompIndex =
-                    Util::FindItemInList(CompName, state.dataLowTempRadSys->HydrRadSys);
+                state.dataLowTempRadSys->RadSysTypes(RadSysNum).CompIndex = Util::FindItemInList(CompName, state.dataLowTempRadSys->HydrRadSys);
             } break;
             case LowTempRadiantSystem::SystemType::ConstantFlowSystem: {
-                state.dataLowTempRadSys->RadSysTypes(RadSysNum).CompIndex =
-                    Util::FindItemInList(CompName, state.dataLowTempRadSys->CFloRadSys);
+                state.dataLowTempRadSys->RadSysTypes(RadSysNum).CompIndex = Util::FindItemInList(CompName, state.dataLowTempRadSys->CFloRadSys);
             } break;
             case LowTempRadiantSystem::SystemType::ElectricSystem: {
-                state.dataLowTempRadSys->RadSysTypes(RadSysNum).CompIndex =
-                    Util::FindItemInList(CompName, state.dataLowTempRadSys->ElecRadSys);
+                state.dataLowTempRadSys->RadSysTypes(RadSysNum).CompIndex = Util::FindItemInList(CompName, state.dataLowTempRadSys->ElecRadSys);
             } break;
             default:
                 break;

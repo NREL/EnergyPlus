@@ -1490,9 +1490,9 @@ namespace AirflowNetwork {
                 Real64 D{fields.at("air_path_hydraulic_diameter")};
 
                 DisSysCompCoilData(i).name = Util::makeUPPER(coil_name); // Name of associated EPlus coil component
-                DisSysCompCoilData(i).EPlusType = coil_type;                            // coil type
-                DisSysCompCoilData(i).L = L;                                            // Air path length
-                DisSysCompCoilData(i).hydraulicDiameter = D;                            // Air path hydraulic diameter
+                DisSysCompCoilData(i).EPlusType = coil_type;             // coil type
+                DisSysCompCoilData(i).L = L;                             // Air path length
+                DisSysCompCoilData(i).hydraulicDiameter = D;             // Air path hydraulic diameter
 
                 // Add the element to the lookup table, check for name overlaps
                 if (elements.find(DisSysCompCoilData(i).name) == elements.end()) {
@@ -1530,9 +1530,9 @@ namespace AirflowNetwork {
                 Real64 D{fields.at("air_path_hydraulic_diameter")};
 
                 DisSysCompHXData(i).name = Util::makeUPPER(hx_name); // Name of associated EPlus heat exchange component
-                DisSysCompHXData(i).EPlusType = hx_type;                            // coil type
-                DisSysCompHXData(i).L = L;                                          // Air path length
-                DisSysCompHXData(i).hydraulicDiameter = D;                          // Air path hydraulic diameter
+                DisSysCompHXData(i).EPlusType = hx_type;             // coil type
+                DisSysCompHXData(i).L = L;                           // Air path length
+                DisSysCompHXData(i).hydraulicDiameter = D;           // Air path hydraulic diameter
                 DisSysCompHXData(i).CoilParentExists = HVACHXAssistedCoolingCoil::VerifyHeatExchangerParent(m_state, hx_type, hx_name);
 
                 // Add the element to the lookup table, check for name overlaps
@@ -1570,9 +1570,9 @@ namespace AirflowNetwork {
                 Real64 D{fields.at("air_path_hydraulic_diameter")};
 
                 DisSysCompTermUnitData(i).name = Util::makeUPPER(tu_name); // Name of associated EPlus coil component
-                DisSysCompTermUnitData(i).EPlusType = tu_type;                            // Terminal unit type
-                DisSysCompTermUnitData(i).L = L;                                          // Air path length
-                DisSysCompTermUnitData(i).hydraulicDiameter = D;                          // Air path hydraulic diameter
+                DisSysCompTermUnitData(i).EPlusType = tu_type;             // Terminal unit type
+                DisSysCompTermUnitData(i).L = L;                           // Air path length
+                DisSysCompTermUnitData(i).hydraulicDiameter = D;           // Air path hydraulic diameter
 
                 // Add the element to the lookup table, check for name overlaps
                 if (elements.find(DisSysCompTermUnitData(i).name) == elements.end()) {
@@ -2133,8 +2133,7 @@ namespace AirflowNetwork {
                 }
             } else if (Util::SameString(simulation_control.WPCCntr, "SurfaceAverageCalculation")) {
                 simulation_control.iWPCCnt = iWPCCntr::SurfAvg;
-                if (!(Util::SameString(simulation_control.BldgType, "LowRise") ||
-                      Util::SameString(simulation_control.BldgType, "HighRise"))) {
+                if (!(Util::SameString(simulation_control.BldgType, "LowRise") || Util::SameString(simulation_control.BldgType, "HighRise"))) {
                     ShowSevereError(m_state,
                                     format(RoutineName) + CurrentModuleObject + " object, " + cAlphaFields(5) + " = " + Alphas(5) + " is invalid.");
                     ShowContinueError(m_state,
@@ -2351,18 +2350,13 @@ namespace AirflowNetwork {
                         ErrorsFound = true;
                     }
                 }
-                if (Util::SameString(MultizoneZoneData(i).VentControl, "Temperature"))
-                    MultizoneZoneData(i).VentCtrNum = VentControlType::Temp;
-                if (Util::SameString(MultizoneZoneData(i).VentControl, "Enthalpy"))
-                    MultizoneZoneData(i).VentCtrNum = VentControlType::Enth;
-                if (Util::SameString(MultizoneZoneData(i).VentControl, "Constant"))
-                    MultizoneZoneData(i).VentCtrNum = VentControlType::Const;
-                if (Util::SameString(MultizoneZoneData(i).VentControl, "ASHRAE55Adaptive"))
-                    MultizoneZoneData(i).VentCtrNum = VentControlType::ASH55;
+                if (Util::SameString(MultizoneZoneData(i).VentControl, "Temperature")) MultizoneZoneData(i).VentCtrNum = VentControlType::Temp;
+                if (Util::SameString(MultizoneZoneData(i).VentControl, "Enthalpy")) MultizoneZoneData(i).VentCtrNum = VentControlType::Enth;
+                if (Util::SameString(MultizoneZoneData(i).VentControl, "Constant")) MultizoneZoneData(i).VentCtrNum = VentControlType::Const;
+                if (Util::SameString(MultizoneZoneData(i).VentControl, "ASHRAE55Adaptive")) MultizoneZoneData(i).VentCtrNum = VentControlType::ASH55;
                 if (Util::SameString(MultizoneZoneData(i).VentControl, "CEN15251Adaptive"))
                     MultizoneZoneData(i).VentCtrNum = VentControlType::CEN15251;
-                if (Util::SameString(MultizoneZoneData(i).VentControl, "NoVent"))
-                    MultizoneZoneData(i).VentCtrNum = VentControlType::NoVent;
+                if (Util::SameString(MultizoneZoneData(i).VentControl, "NoVent")) MultizoneZoneData(i).VentCtrNum = VentControlType::NoVent;
 
                 if (MultizoneZoneData(i).VentCtrNum < NumOfVentCtrTypes) {
                     if (NumAlphas >= 4 && (!lAlphaBlanks(4))) {
@@ -2409,8 +2403,7 @@ namespace AirflowNetwork {
                 ShowContinueError(m_state, ".. in " + cAlphaFields(1) + " = \"" + MultizoneZoneData(i).ZoneName + "\"");
                 ErrorsFound = true;
             }
-            if (Util::SameString(MultizoneZoneData(i).VentControl, "Temperature") ||
-                Util::SameString(MultizoneZoneData(i).VentControl, "Enthalpy")) {
+            if (Util::SameString(MultizoneZoneData(i).VentControl, "Temperature") || Util::SameString(MultizoneZoneData(i).VentControl, "Enthalpy")) {
                 // .or. &
                 // Util::SameString(MultizoneZoneData(i)%VentControl,'ASHRAE55Adaptive') .or. &
                 // Util::SameString(MultizoneZoneData(i)%VentControl,'CEN15251Adaptive')) then
@@ -3706,8 +3699,8 @@ namespace AirflowNetwork {
                     // Perform simple test first.The comprehensive input validation will occur later
                     // Check valid surface name
                     IntraZoneLinkageData(i).SurfaceName = Alphas(5);
-                    IntraZoneLinkageData(i).LinkNum = Util::FindItemInList(
-                        Alphas(5), MultizoneSurfaceData, &MultizoneSurfaceProp::SurfName, AirflowNetworkNumOfSurfaces);
+                    IntraZoneLinkageData(i).LinkNum =
+                        Util::FindItemInList(Alphas(5), MultizoneSurfaceData, &MultizoneSurfaceProp::SurfName, AirflowNetworkNumOfSurfaces);
                     if (IntraZoneLinkageData(i).LinkNum == 0) {
                         ShowSevereError(m_state,
                                         format(RoutineName) + CurrentModuleObject + "='" + Alphas(1) + "': Invalid " + cAlphaFields(5) +
@@ -3932,10 +3925,8 @@ namespace AirflowNetwork {
                 DisSysNodeData(i).Height = Numbers(1);   // Nodal height
                 DisSysNodeData(i).EPlusNodeNum = 0;      // EPlus node number
                 // verify EnergyPlus object type
-                if (Util::SameString(Alphas(3), "AirLoopHVAC:ZoneMixer") ||
-                    Util::SameString(Alphas(3), "AirLoopHVAC:ZoneSplitter") ||
-                    Util::SameString(Alphas(3), "AirLoopHVAC:OutdoorAirSystem") ||
-                    Util::SameString(Alphas(3), "OAMixerOutdoorAirStreamNode") ||
+                if (Util::SameString(Alphas(3), "AirLoopHVAC:ZoneMixer") || Util::SameString(Alphas(3), "AirLoopHVAC:ZoneSplitter") ||
+                    Util::SameString(Alphas(3), "AirLoopHVAC:OutdoorAirSystem") || Util::SameString(Alphas(3), "OAMixerOutdoorAirStreamNode") ||
                     Util::SameString(Alphas(3), "OutdoorAir:NodeList") || Util::SameString(Alphas(3), "OutdoorAir:Node") ||
                     Util::SameString(Alphas(3), "Other") || lAlphaBlanks(3)) {
                 } else {
@@ -4036,8 +4027,7 @@ namespace AirflowNetwork {
 
                 for (int surfNum = 1; surfNum < NumAlphas; ++surfNum) {
                     this_VF_object.LinkageSurfaceData(surfNum).SurfaceName = Alphas(surfNum + 1); // Surface name
-                    this_VF_object.LinkageSurfaceData(surfNum).SurfaceNum =
-                        Util::FindItemInList(Alphas(surfNum + 1), m_state.dataSurface->Surface);
+                    this_VF_object.LinkageSurfaceData(surfNum).SurfaceNum = Util::FindItemInList(Alphas(surfNum + 1), m_state.dataSurface->Surface);
 
                     if (this_VF_object.LinkageSurfaceData(surfNum).SurfaceNum == 0) {
                         ShowFatalError(
@@ -10197,8 +10187,7 @@ namespace AirflowNetwork {
         }
         // Validate EPlus Node names and types
         for (int i = 1; i <= DisSysNumOfNodes; ++i) {
-            if (Util::SameString(DisSysNodeData(i).EPlusName, "") || Util::SameString(DisSysNodeData(i).EPlusName, "Other"))
-                continue;
+            if (Util::SameString(DisSysNodeData(i).EPlusName, "") || Util::SameString(DisSysNodeData(i).EPlusName, "Other")) continue;
             LocalError = false;
             for (int j = 1; j <= m_state.dataLoopNodes->NumOfNodes; ++j) { // NodeID
                 if (DisSysNodeData(i).EPlusName == m_state.dataLoopNodes->NodeID(j)) {
@@ -11056,12 +11045,9 @@ namespace AirflowNetwork {
             NumOfFans = 0;
             FanNames = "";
             for (int CompNum = 1; CompNum <= m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).TotalComponents; ++CompNum) {
-                if (Util::SameString(m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).TypeOf,
-                                                "Fan:ConstantVolume") ||
-                    Util::SameString(m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).TypeOf,
-                                                "Fan:OnOff") ||
-                    Util::SameString(m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).TypeOf,
-                                                "Fan:VariableVolume")) {
+                if (Util::SameString(m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).TypeOf, "Fan:ConstantVolume") ||
+                    Util::SameString(m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).TypeOf, "Fan:OnOff") ||
+                    Util::SameString(m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).TypeOf, "Fan:VariableVolume")) {
                     NumOfFans++;
                     if (NumOfFans > 1) {
                         FanNames += m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Comp(CompNum).Name;
@@ -11436,8 +11422,8 @@ namespace AirflowNetwork {
                     if (m_state.dataSurface->Surface(MultizoneSurfaceData(SrfNum).SurfNum).ExtBoundCond ==
                         ExternalEnvironment) { // check if outdoor boundary condition
                         MZDZoneNum = Util::FindItemInList(m_state.dataSurface->Surface(MultizoneSurfaceData(SrfNum).SurfNum).ZoneName,
-                                                                     MultizoneZoneData,
-                                                                     &MultizoneZoneProp::ZoneName);
+                                                          MultizoneZoneData,
+                                                          &MultizoneZoneProp::ZoneName);
                         if (MZDZoneNum == AFNZnNum) {
                             // This is terrible, should not do it this way
                             auto afe = elements.find(MultizoneSurfaceData(SrfNum).OpeningName);

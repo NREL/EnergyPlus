@@ -1004,10 +1004,8 @@ namespace OutputProcessor {
                     AddMeter(state, state.dataIPShortCut->cAlphaArgs(1), UnitsVar, std::string(), std::string(), std::string(), std::string());
                     op->EnergyMeters(op->NumEnergyMeters).TypeOfMeter = MtrType::Custom;
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
-                    GetStandardMeterResourceType(state,
-                                                 op->EnergyMeters(op->NumEnergyMeters).ResourceType,
-                                                 Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(2)),
-                                                 errFlag);
+                    GetStandardMeterResourceType(
+                        state, op->EnergyMeters(op->NumEnergyMeters).ResourceType, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(2)), errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("..on {}=\"{}\".", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         BigErrorsFound = true;
@@ -1259,10 +1257,8 @@ namespace OutputProcessor {
                     op->EnergyMeters(op->NumEnergyMeters).SourceMeter = WhichMeter;
 
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
-                    GetStandardMeterResourceType(state,
-                                                 op->EnergyMeters(op->NumEnergyMeters).ResourceType,
-                                                 Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(2)),
-                                                 errFlag);
+                    GetStandardMeterResourceType(
+                        state, op->EnergyMeters(op->NumEnergyMeters).ResourceType, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(2)), errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("..on {}=\"{}\".", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         BigErrorsFound = true;
@@ -1676,8 +1672,7 @@ namespace OutputProcessor {
                         }
                     }
                     if (!SpaceType.empty()) {
-                        Found =
-                            Util::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
+                        Found = Util::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
                         if (Found != 0) {
                             ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                             op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
@@ -6149,8 +6144,7 @@ int GetMeterIndex(EnergyPlusData &state, std::string const &MeterName)
         op->GetMeterIndexFirstCall = false;
     }
 
-    MeterIndex =
-        Util::FindItemInSortedList(MeterName, state.dataOutputProcessor->ValidMeterNames, state.dataOutputProcessor->NumValidMeters);
+    MeterIndex = Util::FindItemInSortedList(MeterName, state.dataOutputProcessor->ValidMeterNames, state.dataOutputProcessor->NumValidMeters);
     if (MeterIndex != 0) MeterIndex = state.dataOutputProcessor->iValidMeterNames(MeterIndex);
 
     return MeterIndex;
@@ -6692,8 +6686,8 @@ void GetMeteredVariables(EnergyPlusData &state,
             TimeStepTypes(NumVariables) = op->RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = op->RVariableTypes(Loop).units;
 
-            ResourceTypes(NumVariables) = static_cast<Constant::eResource>(
-                getEnumValue(Constant::eResourceNamesUC, Util::makeUPPER(op->EnergyMeters(MeterPtr).ResourceType)));
+            ResourceTypes(NumVariables) =
+                static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, Util::makeUPPER(op->EnergyMeters(MeterPtr).ResourceType)));
             Names(NumVariables) = op->RVariableTypes(Loop).VarNameUC;
 
             for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
@@ -6774,8 +6768,8 @@ void GetMeteredVariables(EnergyPlusData &state,
             TimeStepTypes(NumVariables) = op->RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = op->RVariableTypes(Loop).units;
 
-            ResourceTypes(NumVariables) = static_cast<Constant::eResource>(
-                getEnumValue(Constant::eResourceNamesUC, Util::makeUPPER(op->EnergyMeters(MeterPtr).ResourceType)));
+            ResourceTypes(NumVariables) =
+                static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, Util::makeUPPER(op->EnergyMeters(MeterPtr).ResourceType)));
             Names(NumVariables) = op->RVariableTypes(Loop).VarNameUC;
 
             for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {

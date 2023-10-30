@@ -439,11 +439,10 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
                     auto &thisManager = thisDemandMgrList.Manager(MgrNum);
                     // Validate DEMAND MANAGER Type
-                    ManagerType MgrType = static_cast<ManagerType>(
-                        getEnumValue(ManagerNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5))));
+                    ManagerType MgrType =
+                        static_cast<ManagerType>(getEnumValue(ManagerNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5))));
                     if (MgrType != ManagerType::Invalid) {
-                        thisManager =
-                            Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6), state.dataDemandManager->DemandMgr);
+                        thisManager = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6), state.dataDemandManager->DemandMgr);
                         if (thisManager == 0) {
                             ShowSevereError(state,
                                             format("{} = \"{}\" invalid {} = \"{}\" not found.",

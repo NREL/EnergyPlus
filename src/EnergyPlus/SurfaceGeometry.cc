@@ -1403,8 +1403,8 @@ namespace SurfaceGeometry {
             } else {
                 // subsurface
                 Found = Util::FindItemInList("iz-" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurfName,
-                                                        state.dataSurfaceGeometry->SurfaceTmp,
-                                                        FirstTotalSurfaces + CurNewSurf - 1);
+                                             state.dataSurfaceGeometry->SurfaceTmp,
+                                             FirstTotalSurfaces + CurNewSurf - 1);
                 if (Found > 0) {
                     state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).BaseSurfName =
                         "iz-" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurfName;
@@ -1443,13 +1443,12 @@ namespace SurfaceGeometry {
             if (!state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HeatTransSurf) continue;
 
             // why are we doing this again?  this should have already been done.
-            if (Util::SameString(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurfName,
-                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name)) {
+            if (Util::SameString(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurfName, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name)) {
                 Found = SurfNum;
             } else {
                 Found = Util::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurfName,
-                                                        state.dataSurfaceGeometry->SurfaceTmp,
-                                                        state.dataSurface->TotSurfaces);
+                                             state.dataSurfaceGeometry->SurfaceTmp,
+                                             state.dataSurface->TotSurfaces);
             }
             if (Found > 0) {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf = Found;
@@ -1780,8 +1779,7 @@ namespace SurfaceGeometry {
                     if (state.dataSurface->Surface(SurfNum).ExtBoundCondName == state.dataSurface->Surface(SurfNum).Name) {
                         Found = SurfNum;
                     } else {
-                        Found = Util::FindItemInList(
-                            state.dataSurface->Surface(SurfNum).ExtBoundCondName, state.dataSurface->Surface, MovedSurfs);
+                        Found = Util::FindItemInList(state.dataSurface->Surface(SurfNum).ExtBoundCondName, state.dataSurface->Surface, MovedSurfs);
                     }
                     if (Found != 0) {
                         state.dataSurface->Surface(SurfNum).ExtBoundCond = Found;
@@ -4348,8 +4346,7 @@ namespace SurfaceGeometry {
         for (int i = 1; i <= SurfNum; i++) {
             if (state.dataSurfaceGeometry->SurfaceTmp(i).ExtBoundCond == UnreconciledZoneSurface &&
                 state.dataSurfaceGeometry->SurfaceTmp(i).ExtBoundCondName != "") {
-                ExtSurfNum =
-                    Util::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(i).ExtBoundCondName, state.dataSurfaceGeometry->SurfaceTmp);
+                ExtSurfNum = Util::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(i).ExtBoundCondName, state.dataSurfaceGeometry->SurfaceTmp);
                 // If we cannot find the referenced surface
                 if (ExtSurfNum == 0) {
                     ShowSevereError(state,
@@ -4533,8 +4530,8 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name = state.dataIPShortCut->cAlphaArgs(1); // Set the Surface Name in the Derived Type
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = BaseSurfIDs(ClassItem);             // Set class number
 
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction = Util::FindItemInList(
-                    state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
+                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction =
+                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
 
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction == 0) {
                     ErrorsFound = true;
@@ -5110,8 +5107,8 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SubSurfIDs(ValidChk); // Set class number
             }
 
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction = Util::FindItemInList(
-                state.dataIPShortCut->cAlphaArgs(3), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
+            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction =
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
 
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction == 0) {
                 ShowSevereError(state,
@@ -5551,8 +5548,8 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name = state.dataIPShortCut->cAlphaArgs(1); // Set the Surface Name in the Derived Type
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SubSurfIDs(ClassItem);              // Set class number
 
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction = Util::FindItemInList(
-                    state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
+                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction =
+                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
 
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction == 0) {
                     ErrorsFound = true;
@@ -5608,8 +5605,8 @@ namespace SurfaceGeometry {
                 //  Exterior conditions, Zone, etc.
                 //  We can figure out the base surface though, because they've all been entered
                 Found = Util::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurfName,
-                                                        state.dataSurfaceGeometry->SurfaceTmp,
-                                                        state.dataSurface->TotSurfaces);
+                                             state.dataSurfaceGeometry->SurfaceTmp,
+                                             state.dataSurface->TotSurfaces);
                 if (Found > 0) {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf = Found;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = state.dataSurfaceGeometry->SurfaceTmp(Found).ExtBoundCond;
@@ -6784,8 +6781,8 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::Shading;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HeatTransSurf = false;
                 // this object references a window or door....
-                Found = Util::FindItemInList(
-                    state.dataIPShortCut->cAlphaArgs(2), state.dataSurfaceGeometry->SurfaceTmp, state.dataSurface->TotSurfaces);
+                Found =
+                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurfaceGeometry->SurfaceTmp, state.dataSurface->TotSurfaces);
                 if (Found > 0) {
                     BaseSurfNum = state.dataSurfaceGeometry->SurfaceTmp(Found).BaseSurf;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurfName = state.dataSurfaceGeometry->SurfaceTmp(Found).BaseSurfName;
@@ -7226,8 +7223,8 @@ namespace SurfaceGeometry {
 
             state.dataSurface->IntMassObjects(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataSurface->IntMassObjects(Item).GrossArea = state.dataIPShortCut->rNumericArgs(1);
-            state.dataSurface->IntMassObjects(Item).Construction = Util::FindItemInList(
-                state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
+            state.dataSurface->IntMassObjects(Item).Construction =
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
             state.dataSurface->IntMassObjects(Item).ZoneOrZoneListName = state.dataIPShortCut->cAlphaArgs(3);
             int Item1 = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             int ZLItem = 0;
@@ -7539,8 +7536,7 @@ namespace SurfaceGeometry {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            SurfNum =
-                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
+            SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             if (SurfNum == 0) {
                 ShowWarningError(state, format("{}=\"{}\", invalid specification", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
@@ -7575,8 +7571,8 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfShadowDiffuseVisRefl(SurfNum) =
                 (1.0 - state.dataIPShortCut->rNumericArgs(3)) * state.dataIPShortCut->rNumericArgs(2);
             if (state.dataIPShortCut->rNumericArgs(3) > 0.0) {
-                GlConstrNum = Util::FindItemInList(
-                    state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
+                GlConstrNum =
+                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
                 if (GlConstrNum == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", {} not found={}",
@@ -7590,8 +7586,7 @@ namespace SurfaceGeometry {
                 }
                 state.dataSurface->SurfShadowGlazingConstruct(SurfNum) = GlConstrNum;
             }
-            SurfNum = Util::FindItemInList(
-                "Mir-" + state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
+            SurfNum = Util::FindItemInList("Mir-" + state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             if (SurfNum == 0) continue;
             state.dataSurface->SurfShadowGlazingFrac(SurfNum) = state.dataIPShortCut->rNumericArgs(3);
             state.dataSurface->SurfShadowDiffuseSolRefl(SurfNum) =
@@ -7599,8 +7594,8 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfShadowDiffuseVisRefl(SurfNum) =
                 (1.0 - state.dataIPShortCut->rNumericArgs(3)) * state.dataIPShortCut->rNumericArgs(2);
             if (state.dataIPShortCut->rNumericArgs(3) > 0.0) {
-                GlConstrNum = Util::FindItemInList(
-                    state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
+                GlConstrNum =
+                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
                 if (GlConstrNum != 0) {
                     state.dataConstruction->Construct(GlConstrNum).IsUsed = true;
                 }
@@ -7717,12 +7712,12 @@ namespace SurfaceGeometry {
             IsBlank = false;
 
             Util::VerifyName(state,
-                                        state.dataIPShortCut->cAlphaArgs(1),
-                                        state.dataHeatBal->ExtVentedCavity,
-                                        Item - 1,
-                                        ErrorInName,
-                                        IsBlank,
-                                        cCurrentModuleObject + " Name");
+                             state.dataIPShortCut->cAlphaArgs(1),
+                             state.dataHeatBal->ExtVentedCavity,
+                             Item - 1,
+                             ErrorInName,
+                             IsBlank,
+                             cCurrentModuleObject + " Name");
             if (ErrorInName) {
                 ShowContinueError(state, "...cannot not duplicate other names");
                 ErrorsFound = true;
@@ -7732,8 +7727,7 @@ namespace SurfaceGeometry {
 
             state.dataHeatBal->ExtVentedCavity(Item).OSCMName = state.dataIPShortCut->cAlphaArgs(2);
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                Found = Util::FindItemInList(
-                    state.dataHeatBal->ExtVentedCavity(Item).OSCMName, state.dataSurface->OSCM, state.dataSurface->TotOSCM);
+                Found = Util::FindItemInList(state.dataHeatBal->ExtVentedCavity(Item).OSCMName, state.dataSurface->OSCM, state.dataSurface->TotOSCM);
                 if (Found == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", invalid {}=\"{}\".",
@@ -8024,8 +8018,7 @@ namespace SurfaceGeometry {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            int Found =
-                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
+            int Found = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             if (Found == 0) {
                 ShowSevereError(state, format("{}=\"{}\", did not find matching surface", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
@@ -8301,8 +8294,7 @@ namespace SurfaceGeometry {
 
                 // Assign surrounding surfaces object number;
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    int SurroundingSurfsNum =
-                        Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataSurface->SurroundingSurfsProperty);
+                    int SurroundingSurfsNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataSurface->SurroundingSurfsProperty);
                     if (SurroundingSurfsNum == 0) {
                         ShowSevereError(state,
                                         format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
@@ -8996,8 +8988,7 @@ namespace SurfaceGeometry {
 
             for (Item1 = 3; Item1 <= NumAlphas; ++Item1) {
 
-                Found = Util::FindItemInList(
-                    state.dataIPShortCut->cAlphaArgs(Item1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
+                Found = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(Item1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
 
                 if (Found == 0) {
                     ShowSevereError(state,
@@ -9056,8 +9047,7 @@ namespace SurfaceGeometry {
                 }
             }
 
-            Found = Util::FindItemInList(
-                state.dataIPShortCut->cAlphaArgs(3), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
+            Found = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
             if (Found == 0) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {}=\"{}",
@@ -10034,12 +10024,12 @@ namespace SurfaceGeometry {
             ErrorInName = false;
             IsBlank = false;
             Util::VerifyName(state,
-                                        state.dataIPShortCut->cAlphaArgs(1),
-                                        state.dataSurface->WindowShadingControl,
-                                        ControlNum,
-                                        ErrorInName,
-                                        IsBlank,
-                                        cCurrentModuleObject + " Name");
+                             state.dataIPShortCut->cAlphaArgs(1),
+                             state.dataSurface->WindowShadingControl,
+                             ControlNum,
+                             ErrorInName,
+                             IsBlank,
+                             cCurrentModuleObject + " Name");
             if (ErrorInName) {
                 ErrorsFound = true;
                 continue;
@@ -10065,10 +10055,10 @@ namespace SurfaceGeometry {
             windowShadingControl.SequenceNumber = int(state.dataIPShortCut->rNumericArgs(1));
             // WindowShadingControl().getInputShadedConstruction is only used during GetInput process and is ultimately stored in
             // Surface().shadedConstructionList
-            windowShadingControl.getInputShadedConstruction = Util::FindItemInList(
-                state.dataIPShortCut->cAlphaArgs(4), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
-            windowShadingControl.ShadingDevice = Util::FindItemInPtrList(
-                state.dataIPShortCut->cAlphaArgs(9), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
+            windowShadingControl.getInputShadedConstruction =
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
+            windowShadingControl.ShadingDevice =
+                Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(9), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
             windowShadingControl.Schedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
             windowShadingControl.SetPoint = state.dataIPShortCut->rNumericArgs(2);
             windowShadingControl.SetPoint2 = state.dataIPShortCut->rNumericArgs(3);
@@ -10079,8 +10069,8 @@ namespace SurfaceGeometry {
             // store the string for now and associate it after daylighting control objects are read
             windowShadingControl.DaylightingControlName = state.dataIPShortCut->cAlphaArgs(12);
 
-            windowShadingControl.multiSurfaceControl = static_cast<MultiSurfaceControl>(
-                getEnumValue(MultiSurfaceControlNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(13))));
+            windowShadingControl.multiSurfaceControl =
+                static_cast<MultiSurfaceControl>(getEnumValue(MultiSurfaceControlNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(13))));
 
             if (windowShadingControl.multiSurfaceControl == MultiSurfaceControl::Invalid) {
                 windowShadingControl.multiSurfaceControl = MultiSurfaceControl::Sequential;
@@ -10518,7 +10508,7 @@ namespace SurfaceGeometry {
             int curShadedConstruction = state.dataSurface->WindowShadingControl(iShadeCtrl).getInputShadedConstruction;
             for (int jFeneRef = 1; jFeneRef <= state.dataSurface->WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
                 if (Util::SameString(state.dataSurface->WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef),
-                                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name)) {
+                                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name)) {
                     state.dataGlobal->AndShadingControlInModel = true;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HasShadeControl = true;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).windowShadingControlList.push_back(iShadeCtrl);
@@ -10560,10 +10550,9 @@ namespace SurfaceGeometry {
         // J.Glazer 2018 - operates on Surface array after final indices are known for windows and checks to make sure it is correct
         for (int iShadeCtrl = 1; iShadeCtrl <= state.dataSurface->TotWinShadingControl; ++iShadeCtrl) {
             for (int jFeneRef = 1; jFeneRef <= state.dataSurface->WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
-                int fenestrationIndex =
-                    Util::FindItemInList(state.dataSurface->WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef),
-                                                    state.dataSurface->Surface,
-                                                    state.dataSurface->TotSurfaces);
+                int fenestrationIndex = Util::FindItemInList(state.dataSurface->WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef),
+                                                             state.dataSurface->Surface,
+                                                             state.dataSurface->TotSurfaces);
                 if (std::find(state.dataSurface->Surface(fenestrationIndex).windowShadingControlList.begin(),
                               state.dataSurface->Surface(fenestrationIndex).windowShadingControlList.end(),
                               iShadeCtrl) != state.dataSurface->Surface(fenestrationIndex).windowShadingControlList.end()) {
@@ -10680,8 +10669,8 @@ namespace SurfaceGeometry {
             ++StormWinNum;
             state.dataSurface->StormWindow(StormWinNum).BaseWindowNum =
                 Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
-            state.dataSurface->StormWindow(StormWinNum).StormWinMaterialNum = Util::FindItemInPtrList(
-                state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
+            state.dataSurface->StormWindow(StormWinNum).StormWinMaterialNum =
+                Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
             state.dataSurface->StormWindow(StormWinNum).StormWinDistance = state.dataIPShortCut->rNumericArgs(1);
             state.dataSurface->StormWindow(StormWinNum).MonthOn = state.dataIPShortCut->rNumericArgs(2);
             state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn = state.dataIPShortCut->rNumericArgs(3);
@@ -10888,8 +10877,7 @@ namespace SurfaceGeometry {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            SurfNum =
-                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
+            SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             if (SurfNum == 0) {
                 ShowSevereError(state, format("{}=\"{}\" not found.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
@@ -11583,8 +11571,7 @@ namespace SurfaceGeometry {
                 numF++;
 
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(alpF)) {
-                    fndInput.wallConstructionIndex =
-                        Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataConstruction->Construct);
+                    fndInput.wallConstructionIndex = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(alpF), state.dataConstruction->Construct);
                     if (fndInput.wallConstructionIndex == 0) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -12231,10 +12218,8 @@ namespace SurfaceGeometry {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            SurfNum =
-                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
-            MaterNum = Util::FindItemInPtrList(
-                state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
+            SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
+            MaterNum = Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
             auto *thisMaterial = state.dataMaterial->Material(MaterNum);
             SchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             InsulationType insulationType = static_cast<InsulationType>(getEnumValue(insulationTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1)));
@@ -14072,10 +14057,9 @@ namespace SurfaceGeometry {
             const std::string ChrNum = fmt::to_string(StormWinNum);
             std::string ConstrNameSt = "BARECONSTRUCTIONWITHSTORMWIN:" + ChrNum; // Name of unshaded construction with storm window
             // If this construction name already exists, set the surface's storm window construction number to it
-            int ConstrNewSt =
-                Util::FindItemInList(ConstrNameSt,
-                                                state.dataConstruction->Construct,
-                                                state.dataHeatBal->TotConstructs); // Number of unshaded storm window construction that is created
+            int ConstrNewSt = Util::FindItemInList(ConstrNameSt,
+                                                   state.dataConstruction->Construct,
+                                                   state.dataHeatBal->TotConstructs); // Number of unshaded storm window construction that is created
             // If necessary, create new material corresponding to the air layer between the storm winddow and the rest of the window
             int MatNewStAir = createAirMaterialFromDistance(state, state.dataSurface->StormWindow(StormWinNum).StormWinDistance, "AIR:STORMWIN:");
             if (ConstrNewSt == 0) {
@@ -14205,10 +14189,9 @@ namespace SurfaceGeometry {
     // create a new construction with storm based on an old construction and storm and gap materials
     int createConstructionWithStorm(EnergyPlusData &state, int oldConstruction, std::string name, int stormMaterial, int gapMaterial)
     {
-        int newConstruct =
-            Util::FindItemInList(name,
-                                            state.dataConstruction->Construct,
-                                            state.dataHeatBal->TotConstructs); // Number of shaded storm window construction that is created
+        int newConstruct = Util::FindItemInList(name,
+                                                state.dataConstruction->Construct,
+                                                state.dataHeatBal->TotConstructs); // Number of shaded storm window construction that is created
         if (newConstruct == 0) {
             state.dataHeatBal->TotConstructs = state.dataHeatBal->TotConstructs + 1;
             newConstruct = state.dataHeatBal->TotConstructs;

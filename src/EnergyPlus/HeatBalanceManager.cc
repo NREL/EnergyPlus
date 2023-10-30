@@ -2036,8 +2036,7 @@ namespace HeatBalanceManager {
                 TMP = index(state.dataIPShortCut->cAlphaArgs(1), char(2));
             }
 
-            if (Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound))
-                continue;
+            if (Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) continue;
 
             ++ZoneLoop;
             ProcessZoneData(state,
@@ -3051,24 +3050,20 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->CrossedColdThreshRepPeriod = false;
         state.dataHeatBalFanSys->CrossedHeatThreshRepPeriod = false;
         if (state.dataWeather->TotThermalReportPers > 0) {
-            state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
-                                                                             state.dataWeather->TotThermalReportPers);
+            state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeather->TotThermalReportPers);
             state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
                                                                                      state.dataWeather->TotThermalReportPers);
             state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
                                                                                  state.dataWeather->TotThermalReportPers);
-            state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
-                                                                           state.dataWeather->TotThermalReportPers);
+            state.dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeather->TotThermalReportPers);
             state.dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
                                                                                    state.dataWeather->TotThermalReportPers);
-            state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
-                                                                               state.dataWeather->TotThermalReportPers);
+            state.dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeather->TotThermalReportPers);
             state.dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
                                                                                 state.dataWeather->TotThermalReportPers);
             state.dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
                                                                                 state.dataWeather->TotThermalReportPers);
-            state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
-                                                                               state.dataWeather->TotThermalReportPers);
+            state.dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeather->TotThermalReportPers);
             state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
                                                                                           state.dataWeather->TotThermalReportPers);
             state.dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
@@ -3077,8 +3072,7 @@ namespace HeatBalanceManager {
 
         if (state.dataWeather->TotCO2ReportPers > 0) {
             state.dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeather->TotCO2ReportPers);
-            state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
-                                                                                state.dataWeather->TotCO2ReportPers);
+            state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeather->TotCO2ReportPers);
             state.dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod.allocate(state.dataGlobal->NumOfZones,
                                                                                     state.dataWeather->TotCO2ReportPers);
         }
@@ -4923,8 +4917,7 @@ namespace HeatBalanceManager {
             thisConstruct.LayerPoint(2) = iFCConcreteLayer;
 
             // The fictitious insulation is the outside layer
-            MaterNum =
-                Util::FindItemInPtrList("~FC_Insulation_" + fmt::to_string(Loop + TotFfactorConstructs), state.dataMaterial->Material);
+            MaterNum = Util::FindItemInPtrList("~FC_Insulation_" + fmt::to_string(Loop + TotFfactorConstructs), state.dataMaterial->Material);
             thisConstruct.LayerPoint(1) = MaterNum;
 
             // CR 8886 Rsoil should be in SI unit. From ASHRAE 90.1-2010 SI
@@ -5789,12 +5782,10 @@ namespace HeatBalanceManager {
                 ShowContinueError(state, format("{} does not have assigned WindowMaterial:Gas or WindowMaterial:GasMixutre.", cCurrentModuleObject));
             }
             if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                thisMaterial->DeflectionStatePtr =
-                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->DeflectionState);
+                thisMaterial->DeflectionStatePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->DeflectionState);
             }
             if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                thisMaterial->SupportPillarPtr =
-                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->SupportPillar);
+                thisMaterial->SupportPillarPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->SupportPillar);
             }
         }
 

@@ -411,8 +411,8 @@ void GetPlantProfileInput(EnergyPlusData &state)
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).Type =
                 DataPlant::PlantEquipmentType::PlantLoadProfile; // parameter assigned in DataPlant
 
-            state.dataPlantLoadProfile->PlantProfile(ProfileNum).FluidType = static_cast<PlantLoopFluidType>(
-                getEnumValue(PlantLoopFluidTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(6))));
+            state.dataPlantLoadProfile->PlantProfile(ProfileNum).FluidType =
+                static_cast<PlantLoopFluidType>(getEnumValue(PlantLoopFluidTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(6))));
             if (state.dataPlantLoadProfile->PlantProfile(ProfileNum).FluidType == PlantLoopFluidType::Invalid) {
                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).FluidType = PlantLoopFluidType::Water;
             }

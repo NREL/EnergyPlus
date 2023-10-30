@@ -281,8 +281,8 @@ namespace WindTurbine {
                 }
             }
             // Select rotor type
-            windTurbine.rotorType = static_cast<RotorType>(
-                getEnumValue(WindTurbine::RotorNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
+            windTurbine.rotorType =
+                static_cast<RotorType>(getEnumValue(WindTurbine::RotorNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
             if (windTurbine.rotorType == RotorType::Invalid) {
                 if (state.dataIPShortCut->cAlphaArgs(3).empty()) {
                     windTurbine.rotorType = RotorType::HorizontalAxis;

@@ -5593,8 +5593,7 @@ void ReportThermalResilience(EnergyPlusData &state)
     Array1D_bool reportPeriodFlags;
     if (state.dataWeather->TotReportPers > 0) {
         reportPeriodFlags.dimension(state.dataWeather->TotThermalReportPers, false);
-        General::findReportPeriodIdx(
-            state, state.dataWeather->ThermalReportPeriodInput, state.dataWeather->TotThermalReportPers, reportPeriodFlags);
+        General::findReportPeriodIdx(state, state.dataWeather->ThermalReportPeriodInput, state.dataWeather->TotThermalReportPers, reportPeriodFlags);
     }
 
     auto &ort = state.dataOutRptTab;
@@ -6196,8 +6195,7 @@ void ReportCO2Resilience(EnergyPlusData &state)
         Array1D_bool reportPeriodFlags;
         if (state.dataWeather->TotReportPers > 0) {
             reportPeriodFlags.dimension(state.dataWeather->TotCO2ReportPers, false);
-            General::findReportPeriodIdx(
-                state, state.dataWeather->CO2ReportPeriodInput, state.dataWeather->TotCO2ReportPers, reportPeriodFlags);
+            General::findReportPeriodIdx(state, state.dataWeather->CO2ReportPeriodInput, state.dataWeather->TotCO2ReportPers, reportPeriodFlags);
         }
 
         auto &ort = state.dataOutRptTab;
@@ -8761,8 +8759,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                                                  // conduction from the outside surface | Coefficient for conduction (current
                                                                  // time) | Convection and damping term
                         state.dataHeatBalSurf->SurfTempIn(surfNum) = state.dataHeatBalSurf->SurfTempInTmp(surfNum);
-                        Real64 const Sigma_Temp_4(Constant::StefanBoltzmann *
-                                                  pow_4(state.dataHeatBalSurf->SurfTempIn(surfNum) + Constant::Kelvin));
+                        Real64 const Sigma_Temp_4(Constant::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(surfNum) + Constant::Kelvin));
 
                         // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                         if (state.dataHeatBalSurf->AnyRadiantSystems(surfNum))

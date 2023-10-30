@@ -131,8 +131,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
                                                                       cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            Util::VerifyName(
-                *state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            Util::VerifyName(*state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
                 if (IsBlank) {
                     continue;
@@ -297,8 +296,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
                                                                       cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            Util::VerifyName(
-                *state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            Util::VerifyName(*state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
                 if (IsBlank) {
                     continue;

@@ -345,8 +345,7 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
             if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "HotWater") ||
                 Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "HotWater")) {
                 thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Water;
-            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), fluidNameSteam) ||
-                       state.dataIPShortCut->cAlphaArgs(9).empty()) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), fluidNameSteam) || state.dataIPShortCut->cAlphaArgs(9).empty()) {
                 thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
             } else {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));

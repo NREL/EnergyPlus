@@ -603,8 +603,7 @@ namespace HVACSingleDuctInduc {
             int OutletNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode;
             IndRat = state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio;
             // set the mass flow rates from the input volume flow rates
-            if (Util::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
-                                            "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
+            if (Util::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirMassFlow =
                     RhoAir * state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow;
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxPriAirMassFlow =
@@ -677,7 +676,7 @@ namespace HVACSingleDuctInduc {
             if (ScheduleManager::GetCurrentScheduleValue(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr) > 0.0 &&
                 state.dataLoopNodes->Node(PriNode).MassFlowRate > 0.0) {
                 if (Util::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
-                                                "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
+                                     "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
                     state.dataLoopNodes->Node(PriNode).MassFlowRate = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxPriAirMassFlow;
                     state.dataLoopNodes->Node(SecNode).MassFlowRate = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxSecAirMassFlow;
                 }
@@ -689,7 +688,7 @@ namespace HVACSingleDuctInduc {
             if (ScheduleManager::GetCurrentScheduleValue(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr) > 0.0 &&
                 state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail > 0.0) {
                 if (Util::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
-                                                "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
+                                     "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
                     state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxPriAirMassFlow;
                     state.dataLoopNodes->Node(PriNode).MassFlowRateMinAvail = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxPriAirMassFlow;
                     state.dataLoopNodes->Node(SecNode).MassFlowRateMaxAvail = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxSecAirMassFlow;

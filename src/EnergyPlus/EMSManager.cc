@@ -740,12 +740,9 @@ namespace EMSManager {
                 int ActuatorVariableNum;
                 bool FoundActuatorName = false;
                 for (ActuatorVariableNum = 1; ActuatorVariableNum <= state.dataRuntimeLang->numEMSActuatorsAvailable; ++ActuatorVariableNum) {
-                    if (Util::SameString(state.dataRuntimeLang->EMSActuatorAvailable(ActuatorVariableNum).ComponentTypeName,
-                                                    cAlphaArgs(3))) {
-                        if (Util::SameString(state.dataRuntimeLang->EMSActuatorAvailable(ActuatorVariableNum).UniqueIDName,
-                                                        cAlphaArgs(2))) {
-                            if (Util::SameString(state.dataRuntimeLang->EMSActuatorAvailable(ActuatorVariableNum).ControlTypeName,
-                                                            cAlphaArgs(4))) {
+                    if (Util::SameString(state.dataRuntimeLang->EMSActuatorAvailable(ActuatorVariableNum).ComponentTypeName, cAlphaArgs(3))) {
+                        if (Util::SameString(state.dataRuntimeLang->EMSActuatorAvailable(ActuatorVariableNum).UniqueIDName, cAlphaArgs(2))) {
+                            if (Util::SameString(state.dataRuntimeLang->EMSActuatorAvailable(ActuatorVariableNum).ControlTypeName, cAlphaArgs(4))) {
                                 FoundActuatorName = true;
                                 break;
                             }
@@ -813,10 +810,8 @@ namespace EMSManager {
                     bool FoundObjectName = false;
                     int InternalVarAvailNum; // do loop counter for internal variables available (inner)
                     for (InternalVarAvailNum = 1; InternalVarAvailNum <= state.dataRuntimeLang->numEMSInternalVarsAvailable; ++InternalVarAvailNum) {
-                        if (Util::SameString(state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).DataTypeName,
-                                                        cAlphaArgs(3))) {
-                            if (Util::SameString(state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).UniqueIDName,
-                                                            cAlphaArgs(2))) {
+                        if (Util::SameString(state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).DataTypeName, cAlphaArgs(3))) {
+                            if (Util::SameString(state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).UniqueIDName, cAlphaArgs(2))) {
                                 FoundObjectName = true;
                                 break; // InternalVarAvailNum now holds needed index pointer
                             }
@@ -1039,13 +1034,13 @@ namespace EMSManager {
             FoundActuatorName = false;
             for (ActuatorVariableNum = 1; ActuatorVariableNum <= state.dataRuntimeLang->numEMSActuatorsAvailable; ++ActuatorVariableNum) {
                 if (Util::SameString(state.dataRuntimeLang->EMSActuatorAvailable(ActuatorVariableNum).ComponentTypeName,
-                                                state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ComponentTypeName)) {
+                                     state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ComponentTypeName)) {
                     FoundObjectType = true;
                     if (Util::SameString(state.dataRuntimeLang->EMSActuatorAvailable(ActuatorVariableNum).UniqueIDName,
-                                                    state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).UniqueIDName)) {
+                                         state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).UniqueIDName)) {
                         FoundObjectName = true;
                         if (Util::SameString(state.dataRuntimeLang->EMSActuatorAvailable(ActuatorVariableNum).ControlTypeName,
-                                                        state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ControlTypeName)) {
+                                             state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ControlTypeName)) {
                             FoundActuatorName = true;
                             break;
                         }
@@ -1117,8 +1112,7 @@ namespace EMSManager {
                 ++state.dataRuntimeLang->EMSActuatorAvailable(ActuatorVariableNum).handleCount;
 
                 // Warn if actuator applied to an air boundary surface
-                if (Util::SameString(state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ComponentTypeName,
-                                                "AIRFLOW NETWORK WINDOW/DOOR OPENING")) {
+                if (Util::SameString(state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ComponentTypeName, "AIRFLOW NETWORK WINDOW/DOOR OPENING")) {
                     int actuatedSurfNum =
                         Util::FindItemInList(state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).UniqueIDName, state.dataSurface->Surface);
                     if (actuatedSurfNum > 0) {
@@ -1140,10 +1134,10 @@ namespace EMSManager {
             FoundObjectName = false;
             for (InternalVarAvailNum = 1; InternalVarAvailNum <= state.dataRuntimeLang->numEMSInternalVarsAvailable; ++InternalVarAvailNum) {
                 if (Util::SameString(state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).DataTypeName,
-                                                state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).InternalDataTypeName)) {
+                                     state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).InternalDataTypeName)) {
                     FoundObjectType = true;
                     if (Util::SameString(state.dataRuntimeLang->EMSInternalVarsAvailable(InternalVarAvailNum).UniqueIDName,
-                                                    state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).UniqueIDName)) {
+                                         state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).UniqueIDName)) {
                         FoundObjectName = true;
                         break; // InternalVarAvailNum now holds needed index pointer
                     }
@@ -1465,10 +1459,9 @@ namespace EMSManager {
                                  state.dataLoopNodes->Node(NodeNum).EMSOverrideOutAirWindDir,
                                  state.dataLoopNodes->Node(NodeNum).EMSValueForOutAirWindDir);
                 for (int ActuatorUsedLoop = 1; ActuatorUsedLoop <= state.dataRuntimeLang->numActuatorsUsed; ActuatorUsedLoop++) {
-                    if (Util::SameString(state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).ComponentTypeName,
-                                                    "Outdoor Air System Node") &&
+                    if (Util::SameString(state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).ComponentTypeName, "Outdoor Air System Node") &&
                         Util::SameString(state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).UniqueIDName,
-                                                    state.dataLoopNodes->NodeID(NodeNum))) {
+                                         state.dataLoopNodes->NodeID(NodeNum))) {
                         state.dataLoopNodes->Node(NodeNum).IsLocalNode = true;
                         break;
                     }

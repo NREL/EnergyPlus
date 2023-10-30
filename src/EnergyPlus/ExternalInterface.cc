@@ -176,10 +176,10 @@ void GetExternalInterfaceInput(EnergyPlusData &state)
         if (Util::SameString(state.dataIPShortCut->cAlphaArgs(1), "PtolemyServer")) { // The BCVTB interface is activated.
             ++state.dataExternalInterface->NumExternalInterfacesBCVTB;
         } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(1),
-                                               "FunctionalMockupUnitImport")) { // The functional mock up unit import interface is activated.
+                                    "FunctionalMockupUnitImport")) { // The functional mock up unit import interface is activated.
             ++state.dataExternalInterface->NumExternalInterfacesFMUImport;
         } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(1),
-                                               "FunctionalMockupUnitExport")) { // The functional mock up unit export interface is activated.
+                                    "FunctionalMockupUnitExport")) { // The functional mock up unit export interface is activated.
             ++state.dataExternalInterface->NumExternalInterfacesFMUExport;
         }
     }

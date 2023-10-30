@@ -3291,8 +3291,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     CaseAndWalkInListNum = Util::FindItemInList(Alphas(AlphaNum), CaseAndWalkInList);
                 if (state.dataRefrigCase->NumSimulationCases > 0) CaseNum = Util::FindItemInList(Alphas(AlphaNum), RefrigCase);
                 if (state.dataRefrigCase->NumSimulationWalkIns > 0) WalkInNum = Util::FindItemInList(Alphas(AlphaNum), WalkIn);
-                if (state.dataRefrigCase->NumSimulationRefrigAirChillers > 0)
-                    CoilNum = Util::FindItemInList(Alphas(AlphaNum), WarehouseCoil);
+                if (state.dataRefrigCase->NumSimulationRefrigAirChillers > 0) CoilNum = Util::FindItemInList(Alphas(AlphaNum), WarehouseCoil);
                 int NumNameMatches = 0;
                 if (CaseAndWalkInListNum != 0) ++NumNameMatches;
                 if (CaseNum != 0) ++NumNameMatches;
@@ -4457,8 +4456,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         CaseAndWalkInListNum = Util::FindItemInList(Alphas(AlphaNum), CaseAndWalkInList);
                     if (state.dataRefrigCase->NumSimulationCases > 0) CaseNum = Util::FindItemInList(Alphas(AlphaNum), RefrigCase);
                     if (state.dataRefrigCase->NumSimulationWalkIns > 0) WalkInNum = Util::FindItemInList(Alphas(AlphaNum), WalkIn);
-                    if (state.dataRefrigCase->NumSimulationRefrigAirChillers > 0)
-                        CoilNum = Util::FindItemInList(Alphas(AlphaNum), WarehouseCoil);
+                    if (state.dataRefrigCase->NumSimulationRefrigAirChillers > 0) CoilNum = Util::FindItemInList(Alphas(AlphaNum), WarehouseCoil);
                     int NumNameMatches = 0;
                     if (CaseAndWalkInListNum != 0) ++NumNameMatches;
                     if (CaseNum != 0) ++NumNameMatches;
@@ -5284,7 +5282,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
 
                 // Get subcooler type
                 Subcooler(SubcoolerNum).subcoolerType = SubcoolerType::LiquidSuction; // default subcooler type
-                if (Util::SameString(Alphas(2), "Mechanical")) {           // set subcooler type
+                if (Util::SameString(Alphas(2), "Mechanical")) {                      // set subcooler type
                     Subcooler(SubcoolerNum).subcoolerType = SubcoolerType::Mechanical;
                     ++state.dataRefrigCase->NumSimulationMechSubcoolers;
                 } else if (Util::SameString(Alphas(2), "LiquidSuction")) {
@@ -5406,8 +5404,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     int AlphaListNum = 1 + NumLoad;
                     int LoadCascadeNum = 0;
                     int LoadSecondaryNum = 0;
-                    if (state.dataRefrigCase->NumRefrigCondensers > 0)
-                        LoadCascadeNum = Util::FindItemInList(Alphas(AlphaListNum), Condenser);
+                    if (state.dataRefrigCase->NumRefrigCondensers > 0) LoadCascadeNum = Util::FindItemInList(Alphas(AlphaListNum), Condenser);
                     if (state.dataRefrigCase->NumSimulationSecondarySystems > 0)
                         LoadSecondaryNum = Util::FindItemInList(Alphas(AlphaListNum), Secondary);
                     if ((LoadCascadeNum == 0) && (LoadSecondaryNum == 0)) {
@@ -5556,8 +5553,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     CaseAndWalkInListNum = Util::FindItemInList(Alphas(AlphaNum), CaseAndWalkInList);
                 if (state.dataRefrigCase->NumSimulationCases > 0) CaseNum = Util::FindItemInList(Alphas(AlphaNum), RefrigCase);
                 if (state.dataRefrigCase->NumSimulationWalkIns > 0) WalkInNum = Util::FindItemInList(Alphas(AlphaNum), WalkIn);
-                if (state.dataRefrigCase->NumSimulationRefrigAirChillers > 0)
-                    CoilNum = Util::FindItemInList(Alphas(AlphaNum), WarehouseCoil);
+                if (state.dataRefrigCase->NumSimulationRefrigAirChillers > 0) CoilNum = Util::FindItemInList(Alphas(AlphaNum), WarehouseCoil);
                 int NumNameMatches = 0;
                 if (CaseAndWalkInListNum != 0) ++NumNameMatches;
                 if (CaseNum != 0) ++NumNameMatches;
@@ -5699,8 +5695,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 int CascadeLoadNum = 0;
                 if (state.dataRefrigCase->NumSimulationTransferLoadLists > 0)
                     TransferLoadListNum = Util::FindItemInList(Alphas(AlphaNum), TransferLoadList);
-                if (state.dataRefrigCase->NumSimulationSecondarySystems > 0)
-                    SecondaryNum = Util::FindItemInList(Alphas(AlphaNum), Secondary);
+                if (state.dataRefrigCase->NumSimulationSecondarySystems > 0) SecondaryNum = Util::FindItemInList(Alphas(AlphaNum), Secondary);
                 if (state.dataRefrigCase->NumRefrigCondensers > 0) CascadeLoadNum = Util::FindItemInList(Alphas(AlphaNum), Condenser);
                 int NumNameMatches = 0;
                 if (TransferLoadListNum != 0) ++NumNameMatches;
@@ -7031,8 +7026,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
             TransSystem(TransRefrigSysNum).SumUASuctionPipingMT = 0.0;
             if (!lNumericBlanks(3) && !lAlphaBlanks(AlphaNum)) {
                 TransSystem(TransRefrigSysNum).SumUASuctionPipingMT = Numbers(3);
-                TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumMT =
-                    Util::FindItemInList(Alphas(AlphaNum), state.dataHeatBal->Zone);
+                TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumMT = Util::FindItemInList(Alphas(AlphaNum), state.dataHeatBal->Zone);
                 TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumMT =
                     DataZoneEquipment::GetSystemNodeNumberForZone(state, TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumMT);
                 if (TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumMT == 0) {
@@ -7076,8 +7070,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
             TransSystem(TransRefrigSysNum).SumUASuctionPipingLT = 0.0;
             if (!lNumericBlanks(4) && !lAlphaBlanks(AlphaNum)) {
                 TransSystem(TransRefrigSysNum).SumUASuctionPipingLT = Numbers(4);
-                TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumLT =
-                    Util::FindItemInList(Alphas(AlphaNum), state.dataHeatBal->Zone);
+                TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumLT = Util::FindItemInList(Alphas(AlphaNum), state.dataHeatBal->Zone);
                 TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumLT =
                     DataZoneEquipment::GetSystemNodeNumberForZone(state, TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumLT);
                 if (TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumLT == 0) {

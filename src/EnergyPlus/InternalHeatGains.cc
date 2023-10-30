@@ -9453,8 +9453,7 @@ namespace InternalHeatGains {
             return DeviceIndex;
         }
         for (DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-            if ((Util::SameString(state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompObjectName,
-                                             intGainName.data())) &&
+            if ((Util::SameString(state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompObjectName, intGainName.data())) &&
                 (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == intGainType)) {
                 DeviceIndex = DeviceNum;
                 break;

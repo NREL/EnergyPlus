@@ -303,8 +303,7 @@ namespace Photovoltaics {
             state.dataPhotovoltaic->PVarray(PVnum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
             state.dataPhotovoltaic->PVarray(PVnum).SurfaceName = state.dataIPShortCut->cAlphaArgs(2);
-            state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr =
-                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+            state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
             // required-surface
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -403,8 +402,8 @@ namespace Photovoltaics {
             case CellIntegration::TranspiredCollector:
             case CellIntegration::ExteriorVentedCavity: {
                 dupPtr = Util::FindItemInList(state.dataPhotovoltaic->PVarray(PVnum).SurfaceName,
-                                                         state.dataPhotovoltaic->PVarray({PVnum + 1, state.dataPhotovoltaic->NumPVs}),
-                                                         &PVArrayStruct::SurfaceName);
+                                              state.dataPhotovoltaic->PVarray({PVnum + 1, state.dataPhotovoltaic->NumPVs}),
+                                              &PVArrayStruct::SurfaceName);
                 if (dupPtr != 0) dupPtr += PVnum; // to correct for shortened array in find item
                 if (dupPtr != 0) {
                     auto &thisPVarray = state.dataPhotovoltaic->PVarray(dupPtr);
@@ -665,8 +664,8 @@ namespace Photovoltaics {
                 }
             } break;
             case PVModel::Sandia: {
-                ThisParamObj = Util::FindItemInList(
-                    state.dataPhotovoltaic->PVarray(PVnum).PerfObjName, tmpSNLModuleParams, &SNLModuleParamsStuct::name);
+                ThisParamObj =
+                    Util::FindItemInList(state.dataPhotovoltaic->PVarray(PVnum).PerfObjName, tmpSNLModuleParams, &SNLModuleParamsStuct::name);
                 if (ThisParamObj > 0) {
                     state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule = tmpSNLModuleParams(ThisParamObj); // entire structure assignment
                 } else {
@@ -786,8 +785,7 @@ namespace Photovoltaics {
         if (SurfNum > 0) {
             GetPVZone = state.dataSurface->Surface(SurfNum).Zone;
             if (GetPVZone == 0) { // might need to get the zone number from the name
-                GetPVZone = Util::FindItemInList(
-                    state.dataSurface->Surface(SurfNum).ZoneName, state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
+                GetPVZone = Util::FindItemInList(state.dataSurface->Surface(SurfNum).ZoneName, state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             }
         }
 

@@ -577,16 +577,15 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     // 2e-7*T^0.81/P = vapor diffusivity in air. [kg/m-s-Pa]
     // 461.52 = universal gas constant for water [J/kg-K]
     // EMPDdiffusivity = [m^2/s]
-    EMPDdiffusivity = (2.0e-7 * pow(Taver + Constant::Kelvin, 0.81) / state.dataEnvrn->OutBaroPress) / material->EMPDmu * 461.52 *
-                      (Taver + Constant::Kelvin);
+    EMPDdiffusivity =
+        (2.0e-7 * pow(Taver + Constant::Kelvin, 0.81) / state.dataEnvrn->OutBaroPress) / material->EMPDmu * 461.52 * (Taver + Constant::Kelvin);
 
     // Calculate slope of moisture sorption curve at current RH. [kg/kg-RH]
     dU_dRH = material->MoistACoeff * material->MoistBCoeff * pow(RHaver, material->MoistBCoeff - 1) +
              material->MoistCCoeff * material->MoistDCoeff * pow(RHaver, material->MoistDCoeff - 1);
 
     // Convert vapor density and temperature of zone air to RH
-    RHZone =
-        rho_vapor_air_in * 461.52 * (TempZone + Constant::Kelvin) * std::exp(-23.7093 + 4111.0 / ((TempZone + Constant::Kelvin) - 35.45));
+    RHZone = rho_vapor_air_in * 461.52 * (TempZone + Constant::Kelvin) * std::exp(-23.7093 + 4111.0 / ((TempZone + Constant::Kelvin) - 35.45));
 
     // Convert stored vapor density from previous timestep to RH.
     RH_deep_layer_old = PsyRhFnTdbRhov(state, Taver, rv_deep_old);

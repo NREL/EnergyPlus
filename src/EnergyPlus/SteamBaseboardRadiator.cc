@@ -143,8 +143,7 @@ namespace SteamBaseboardRadiator {
 
         // Find the correct Baseboard Equipment
         if (CompIndex == 0) {
-            BaseboardNum =
-                Util::FindItemInList(EquipName, state.dataSteamBaseboardRadiator->SteamBaseboard, &SteamBaseboardParams::EquipID);
+            BaseboardNum = Util::FindItemInList(EquipName, state.dataSteamBaseboardRadiator->SteamBaseboard, &SteamBaseboardParams::EquipID);
             if (BaseboardNum == 0) {
                 ShowFatalError(state, format("SimSteamBaseboard: Unit not found={}", EquipName));
             }
@@ -519,8 +518,7 @@ namespace SteamBaseboardRadiator {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            Util::IsNameEmpty(
-                state, state.dataIPShortCut->cAlphaArgs(1), state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam, ErrorsFound);
             state.dataSteamBaseboardRadiator->SteamBaseboardNumericFields(BaseboardNum).FieldNames.allocate(NumNumbers);
             state.dataSteamBaseboardRadiator->SteamBaseboardNumericFields(BaseboardNum).FieldNames = "";
             state.dataSteamBaseboardRadiator->SteamBaseboardNumericFields(BaseboardNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
@@ -540,7 +538,7 @@ namespace SteamBaseboardRadiator {
                 state.dataIPShortCut->cAlphaArgs(2); // Name of the design object for this baseboard
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).DesignObjectPtr =
                 Util::FindItemInList(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).designObjectName,
-                                                state.dataSteamBaseboardRadiator->SteamBaseboardDesignNames);
+                                     state.dataSteamBaseboardRadiator->SteamBaseboardDesignNames);
             SteamBaseboardDesignData SteamBaseboardDesignDataObject{
                 state.dataSteamBaseboardRadiator->SteamBaseboardDesign(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum)
                                                                            .DesignObjectPtr)}; // Contains the design data for steam baseboard object
@@ -1632,8 +1630,7 @@ namespace SteamBaseboardRadiator {
 
         // Find the correct baseboard
         if (CompIndex == 0) {
-            BaseboardNum =
-                Util::FindItemInList(BaseboardName, state.dataSteamBaseboardRadiator->SteamBaseboard, &SteamBaseboardParams::EquipID);
+            BaseboardNum = Util::FindItemInList(BaseboardName, state.dataSteamBaseboardRadiator->SteamBaseboard, &SteamBaseboardParams::EquipID);
             if (BaseboardNum == 0) {
                 ShowFatalError(state, format("UpdateSteamBaseboardPlantConnection: Specified baseboard not valid ={}", BaseboardName));
             }

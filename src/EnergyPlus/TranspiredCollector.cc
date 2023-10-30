@@ -540,14 +540,12 @@ namespace TranspiredCollector {
             // Select the correct Number for the associated ascii name for the roughness type
             if (Util::SameString(Roughness, "VeryRough"))
                 state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::VeryRough;
-            if (Util::SameString(Roughness, "Rough"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::Rough;
+            if (Util::SameString(Roughness, "Rough")) state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::Rough;
             if (Util::SameString(Roughness, "MediumRough"))
                 state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::MediumRough;
             if (Util::SameString(Roughness, "MediumSmooth"))
                 state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::MediumSmooth;
-            if (Util::SameString(Roughness, "Smooth"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::Smooth;
+            if (Util::SameString(Roughness, "Smooth")) state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::Smooth;
             if (Util::SameString(Roughness, "VerySmooth"))
                 state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::VerySmooth;
 

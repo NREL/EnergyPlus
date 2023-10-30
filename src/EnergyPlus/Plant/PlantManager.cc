@@ -2937,8 +2937,8 @@ void InitOneTimePlantSizingInfo(EnergyPlusData &state, int const LoopNum) // loo
 
     if (state.dataPlnt->PlantLoop(LoopNum).PlantSizNum == 0) {
         if (state.dataSize->NumPltSizInput > 0) {
-            PlantSizNum = Util::FindItemInList(
-                state.dataPlnt->PlantLoop(LoopNum).Name, state.dataSize->PlantSizData, &PlantSizingData::PlantLoopName);
+            PlantSizNum =
+                Util::FindItemInList(state.dataPlnt->PlantLoop(LoopNum).Name, state.dataSize->PlantSizData, &PlantSizingData::PlantLoopName);
             if (PlantSizNum > 0) {
                 state.dataPlnt->PlantLoop(LoopNum).PlantSizNum = PlantSizNum;
             }
@@ -2992,8 +2992,8 @@ void SizePlantLoop(EnergyPlusData &state,
         // PlantSizData(PlantSizNum)%DesVolFlowRate = 0.0D0 ! DSU2
     } else {
         if (state.dataSize->NumPltSizInput > 0) {
-            PlantSizNum = Util::FindItemInList(
-                state.dataPlnt->PlantLoop(LoopNum).Name, state.dataSize->PlantSizData, &PlantSizingData::PlantLoopName);
+            PlantSizNum =
+                Util::FindItemInList(state.dataPlnt->PlantLoop(LoopNum).Name, state.dataSize->PlantSizData, &PlantSizingData::PlantLoopName);
         }
     }
     state.dataPlnt->PlantLoop(LoopNum).PlantSizNum = PlantSizNum;

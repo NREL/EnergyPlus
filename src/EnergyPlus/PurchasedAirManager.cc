@@ -469,8 +469,7 @@ void GetPurchasedAir(EnergyPlusData &state)
 
             // get Design specification outdoor air object
             if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                PurchAir(PurchAirNum).OARequirementsPtr =
-                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(12), state.dataSize->OARequirements);
+                PurchAir(PurchAirNum).OARequirementsPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(12), state.dataSize->OARequirements);
                 if (PurchAir(PurchAirNum).OARequirementsPtr == 0) {
                     ShowSevereError(state, format("{}{}=\"{} invalid data", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(
@@ -603,8 +602,7 @@ void GetPurchasedAir(EnergyPlusData &state)
 
             PurchAir(PurchAirNum).HVACSizingIndex = 0;
             if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
-                PurchAir(PurchAirNum).HVACSizingIndex =
-                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(17), state.dataSize->ZoneHVACSizing);
+                PurchAir(PurchAirNum).HVACSizingIndex = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(17), state.dataSize->ZoneHVACSizing);
                 if (PurchAir(PurchAirNum).HVACSizingIndex == 0) {
                     ShowSevereError(state,
                                     format("{} = {} not found.", state.dataIPShortCut->cAlphaFieldNames(17), state.dataIPShortCut->cAlphaArgs(17)));

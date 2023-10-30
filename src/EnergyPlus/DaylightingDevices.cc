@@ -748,8 +748,7 @@ namespace Dayltg {
 
                     for (int TZoneNum = 1; TZoneNum <= state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones; ++TZoneNum) {
                         std::string const TZoneName = state.dataIPShortCut->cAlphaArgs(TZoneNum + 4);
-                        state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum) =
-                            Util::FindItemInList(TZoneName, state.dataHeatBal->Zone);
+                        state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum) = Util::FindItemInList(TZoneName, state.dataHeatBal->Zone);
                         if (state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum) == 0) {
                             ShowSevereError(
                                 state,

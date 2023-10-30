@@ -2122,10 +2122,8 @@ namespace VariableSpeedCoils {
                 }
             }
 
-            if (Util::SameString(AlphArray(7), "ReverseCycle"))
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostStrategy = ReverseCycle;
-            if (Util::SameString(AlphArray(7), "Resistive"))
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostStrategy = Resistive;
+            if (Util::SameString(AlphArray(7), "ReverseCycle")) state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostStrategy = ReverseCycle;
+            if (Util::SameString(AlphArray(7), "Resistive")) state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostStrategy = Resistive;
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostStrategy == 0) {
                 ShowSevereError(
                     state,
@@ -2136,8 +2134,7 @@ namespace VariableSpeedCoils {
             }
 
             if (Util::SameString(AlphArray(8), "Timed")) state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostControl = Timed;
-            if (Util::SameString(AlphArray(8), "OnDemand"))
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostControl = OnDemand;
+            if (Util::SameString(AlphArray(8), "OnDemand")) state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostControl = OnDemand;
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostControl == 0) {
                 ShowSevereError(
                     state,
@@ -7802,8 +7799,7 @@ namespace VariableSpeedCoils {
 
         if (Util::SameString(CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") ||
             Util::SameString(CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") ||
-            Util::SameString(CoilType, "COIL:COOLING:DX:VARIABLESPEED") ||
-            Util::SameString(CoilType, "COIL:HEATING:DX:VARIABLESPEED") ||
+            Util::SameString(CoilType, "COIL:COOLING:DX:VARIABLESPEED") || Util::SameString(CoilType, "COIL:HEATING:DX:VARIABLESPEED") ||
             Util::SameString(CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED")) {
             WhichCoil = Util::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
             if (WhichCoil != 0) {
@@ -7903,8 +7899,7 @@ namespace VariableSpeedCoils {
 
         if (Util::SameString(CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") ||
             Util::SameString(CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") ||
-            Util::SameString(CoilType, "COIL:COOLING:DX:VARIABLESPEED") ||
-            Util::SameString(CoilType, "COIL:HEATING:DX:VARIABLESPEED") ||
+            Util::SameString(CoilType, "COIL:COOLING:DX:VARIABLESPEED") || Util::SameString(CoilType, "COIL:HEATING:DX:VARIABLESPEED") ||
             Util::SameString(CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED")) {
             WhichCoil = Util::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
             if (WhichCoil != 0) {

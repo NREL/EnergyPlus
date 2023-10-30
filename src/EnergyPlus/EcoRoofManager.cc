@@ -285,7 +285,7 @@ namespace EcoRoofManager {
             // (Deardorff (1987)). Kelvin. based of the previous temperatures
             Tafk = (1.0 - sigmaf) * Tak + sigmaf * (0.3 * Tak + 0.6 * (Tif + Constant::Kelvin) + 0.1 * Tgk);
 
-            Taf = Tafk - Constant::Kelvin;                      // Air Temperature within canopy in Celcius (C).
+            Taf = Tafk - Constant::Kelvin;                          // Air Temperature within canopy in Celcius (C).
             Rhof = state.dataEcoRoofMgr->Pa / (Rair * Tafk);        // Density of air at the leaf temperature
             Rhoaf = (Rhoa + Rhof) / 2.0;                            // Average of air density
             Zd = 0.701 * std::pow(state.dataEcoRoofMgr->Zf, 0.979); // Zero displacement height
@@ -494,8 +494,7 @@ namespace EcoRoofManager {
                 // difference scheme this loop structure should be removed.
 
             } // This loop does an iterative solution of the simultaneous equations
-            state.dataEcoRoofMgr->Qsoil =
-                -1.0 * (Qsoilpart1 - Qsoilpart2 * (SoilTK - Constant::Kelvin)); // This is heat flux INTO top of the soil
+            state.dataEcoRoofMgr->Qsoil = -1.0 * (Qsoilpart1 - Qsoilpart2 * (SoilTK - Constant::Kelvin)); // This is heat flux INTO top of the soil
             state.dataEcoRoofMgr->Tfold = LeafTK - Constant::Kelvin;
             state.dataEcoRoofMgr->Tgold = SoilTK - Constant::Kelvin;
 

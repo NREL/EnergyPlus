@@ -171,25 +171,17 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
     Real64 DewPoint(16.7);
     Real64 RelHum(0.6);
 
-    EXPECT_NEAR(
-        0.832, CalcSkyEmissivity(*state, state->dataWeather->Environment(1).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(
-        0.862, CalcSkyEmissivity(*state, state->dataWeather->Environment(2).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(
-        0.867, CalcSkyEmissivity(*state, state->dataWeather->Environment(3).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(
-        0.862, CalcSkyEmissivity(*state, state->dataWeather->Environment(4).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.832, CalcSkyEmissivity(*state, state->dataWeather->Environment(1).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.862, CalcSkyEmissivity(*state, state->dataWeather->Environment(2).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.867, CalcSkyEmissivity(*state, state->dataWeather->Environment(3).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.862, CalcSkyEmissivity(*state, state->dataWeather->Environment(4).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
 
     DryBulb = 5.0;
     DewPoint = -2.13;
-    EXPECT_NEAR(
-        0.781, CalcSkyEmissivity(*state, state->dataWeather->Environment(1).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(
-        0.746, CalcSkyEmissivity(*state, state->dataWeather->Environment(2).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(
-        0.760, CalcSkyEmissivity(*state, state->dataWeather->Environment(3).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(
-        0.747, CalcSkyEmissivity(*state, state->dataWeather->Environment(4).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.781, CalcSkyEmissivity(*state, state->dataWeather->Environment(1).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.746, CalcSkyEmissivity(*state, state->dataWeather->Environment(2).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.760, CalcSkyEmissivity(*state, state->dataWeather->Environment(3).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.747, CalcSkyEmissivity(*state, state->dataWeather->Environment(4).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
 }
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
@@ -392,8 +384,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(
-        compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -433,8 +424,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest_Actual)
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(
-        compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -475,8 +465,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(
-        compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -530,8 +519,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest_Actual)
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(
-        compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -577,8 +565,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest_ActualBroken)
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(
-        compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -614,8 +601,7 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(
-        compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
     // for calculation method CorrelationFromWeatherFile these two parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -1052,41 +1038,41 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherZeroIRHoriz)
 
     for (auto WeatherDataLine : Lines) {
         Weather::InterpretWeatherDataLine(*state,
-                                                 WeatherDataLine,
-                                                 ErrorFound,
-                                                 WYear,
-                                                 WMonth,
-                                                 WDay,
-                                                 WHour,
-                                                 WMinute,
-                                                 DryBulb,
-                                                 DewPoint,
-                                                 RelHum,
-                                                 AtmPress,
-                                                 ETHoriz,
-                                                 ETDirect,
-                                                 IRHoriz,
-                                                 GLBHoriz,
-                                                 DirectRad,
-                                                 DiffuseRad,
-                                                 GLBHorizIllum,
-                                                 DirectNrmIllum,
-                                                 DiffuseHorizIllum,
-                                                 ZenLum,
-                                                 WindDir,
-                                                 WindSpeed,
-                                                 TotalSkyCover,
-                                                 OpaqueSkyCover,
-                                                 Visibility,
-                                                 CeilHeight,
-                                                 PresWeathObs,
-                                                 PresWeathConds,
-                                                 PrecipWater,
-                                                 AerosolOptDepth,
-                                                 SnowDepth,
-                                                 DaysSinceLastSnow,
-                                                 Albedo,
-                                                 LiquidPrecip);
+                                          WeatherDataLine,
+                                          ErrorFound,
+                                          WYear,
+                                          WMonth,
+                                          WDay,
+                                          WHour,
+                                          WMinute,
+                                          DryBulb,
+                                          DewPoint,
+                                          RelHum,
+                                          AtmPress,
+                                          ETHoriz,
+                                          ETDirect,
+                                          IRHoriz,
+                                          GLBHoriz,
+                                          DirectRad,
+                                          DiffuseRad,
+                                          GLBHorizIllum,
+                                          DirectNrmIllum,
+                                          DiffuseHorizIllum,
+                                          ZenLum,
+                                          WindDir,
+                                          WindSpeed,
+                                          TotalSkyCover,
+                                          OpaqueSkyCover,
+                                          Visibility,
+                                          CeilHeight,
+                                          PresWeathObs,
+                                          PresWeathConds,
+                                          PrecipWater,
+                                          AerosolOptDepth,
+                                          SnowDepth,
+                                          DaysSinceLastSnow,
+                                          Albedo,
+                                          LiquidPrecip);
 
         EXPECT_EQ(IRHoriz, 0.0);
     }
@@ -1686,18 +1672,16 @@ TEST_F(EnergyPlusFixture, WeatherManager_CopyReportPeriodObject)
     state->dataWeather->ReportPeriodInput(1).startMonth = 3;
     state->dataWeather->ReportPeriodInput(1).startDay = 5;
     state->dataWeather->ReportPeriodInput(1).startHour = 8;
-    state->dataWeather->ReportPeriodInput(1).startJulianDate =
-        Weather::computeJulianDate(state->dataWeather->ReportPeriodInput(1).startYear,
-                                          state->dataWeather->ReportPeriodInput(1).startMonth,
-                                          state->dataWeather->ReportPeriodInput(1).startDay);
+    state->dataWeather->ReportPeriodInput(1).startJulianDate = Weather::computeJulianDate(state->dataWeather->ReportPeriodInput(1).startYear,
+                                                                                          state->dataWeather->ReportPeriodInput(1).startMonth,
+                                                                                          state->dataWeather->ReportPeriodInput(1).startDay);
     state->dataWeather->ReportPeriodInput(1).endYear = 0;
     state->dataWeather->ReportPeriodInput(1).endMonth = 3;
     state->dataWeather->ReportPeriodInput(1).endDay = 10;
     state->dataWeather->ReportPeriodInput(1).endHour = 8;
-    state->dataWeather->ReportPeriodInput(1).endJulianDate =
-        Weather::computeJulianDate(state->dataWeather->ReportPeriodInput(1).endYear,
-                                          state->dataWeather->ReportPeriodInput(1).endMonth,
-                                          state->dataWeather->ReportPeriodInput(1).endDay);
+    state->dataWeather->ReportPeriodInput(1).endJulianDate = Weather::computeJulianDate(state->dataWeather->ReportPeriodInput(1).endYear,
+                                                                                        state->dataWeather->ReportPeriodInput(1).endMonth,
+                                                                                        state->dataWeather->ReportPeriodInput(1).endDay);
 
     state->dataWeather->ReportPeriodInput(2).title = "test period 2";
     state->dataWeather->ReportPeriodInput(2).reportName = "empty report 2";
@@ -1705,18 +1689,16 @@ TEST_F(EnergyPlusFixture, WeatherManager_CopyReportPeriodObject)
     state->dataWeather->ReportPeriodInput(2).startMonth = 6;
     state->dataWeather->ReportPeriodInput(2).startDay = 6;
     state->dataWeather->ReportPeriodInput(2).startHour = 8;
-    state->dataWeather->ReportPeriodInput(2).startJulianDate =
-        Weather::computeJulianDate(state->dataWeather->ReportPeriodInput(2).startYear,
-                                          state->dataWeather->ReportPeriodInput(2).startMonth,
-                                          state->dataWeather->ReportPeriodInput(2).startDay);
+    state->dataWeather->ReportPeriodInput(2).startJulianDate = Weather::computeJulianDate(state->dataWeather->ReportPeriodInput(2).startYear,
+                                                                                          state->dataWeather->ReportPeriodInput(2).startMonth,
+                                                                                          state->dataWeather->ReportPeriodInput(2).startDay);
     state->dataWeather->ReportPeriodInput(2).endYear = 0;
     state->dataWeather->ReportPeriodInput(2).endMonth = 7;
     state->dataWeather->ReportPeriodInput(2).endDay = 7;
     state->dataWeather->ReportPeriodInput(2).endHour = 8;
-    state->dataWeather->ReportPeriodInput(2).endJulianDate =
-        Weather::computeJulianDate(state->dataWeather->ReportPeriodInput(2).endYear,
-                                          state->dataWeather->ReportPeriodInput(2).endMonth,
-                                          state->dataWeather->ReportPeriodInput(2).endDay);
+    state->dataWeather->ReportPeriodInput(2).endJulianDate = Weather::computeJulianDate(state->dataWeather->ReportPeriodInput(2).endYear,
+                                                                                        state->dataWeather->ReportPeriodInput(2).endMonth,
+                                                                                        state->dataWeather->ReportPeriodInput(2).endDay);
 
     state->dataWeather->ReportPeriodInput(2) = state->dataWeather->ReportPeriodInput(1);
 
@@ -2112,41 +2094,41 @@ TEST_F(EnergyPlusFixture, DisplayWeatherMissingDataWarnings_TMYx)
             "10584,320,10.00,9,9,777.7,1050,0,909999999,37,0.0840,0,88,0.200,0.0,0.0";
 
         Weather::InterpretWeatherDataLine(*state,
-                                                 WeatherDataLine,
-                                                 ErrorFound,
-                                                 WYear,
-                                                 WMonth,
-                                                 WDay,
-                                                 WHour,
-                                                 WMinute,
-                                                 DryBulb,
-                                                 DewPoint,
-                                                 RelHum,
-                                                 AtmPress,
-                                                 ETHoriz,
-                                                 ETDirect,
-                                                 IRHoriz,
-                                                 GLBHoriz,
-                                                 DirectRad,
-                                                 DiffuseRad,
-                                                 GLBHorizIllum,
-                                                 DirectNrmIllum,
-                                                 DiffuseHorizIllum,
-                                                 ZenLum,
-                                                 WindDir,
-                                                 WindSpeed,
-                                                 TotalSkyCover,
-                                                 OpaqueSkyCover,
-                                                 Visibility,
-                                                 CeilHeight,
-                                                 PresWeathObs,
-                                                 PresWeathConds,
-                                                 PrecipWater,
-                                                 AerosolOptDepth,
-                                                 SnowDepth,
-                                                 DaysSinceLastSnow,
-                                                 Albedo,
-                                                 LiquidPrecip);
+                                          WeatherDataLine,
+                                          ErrorFound,
+                                          WYear,
+                                          WMonth,
+                                          WDay,
+                                          WHour,
+                                          WMinute,
+                                          DryBulb,
+                                          DewPoint,
+                                          RelHum,
+                                          AtmPress,
+                                          ETHoriz,
+                                          ETDirect,
+                                          IRHoriz,
+                                          GLBHoriz,
+                                          DirectRad,
+                                          DiffuseRad,
+                                          GLBHorizIllum,
+                                          DirectNrmIllum,
+                                          DiffuseHorizIllum,
+                                          ZenLum,
+                                          WindDir,
+                                          WindSpeed,
+                                          TotalSkyCover,
+                                          OpaqueSkyCover,
+                                          Visibility,
+                                          CeilHeight,
+                                          PresWeathObs,
+                                          PresWeathConds,
+                                          PrecipWater,
+                                          AerosolOptDepth,
+                                          SnowDepth,
+                                          DaysSinceLastSnow,
+                                          Albedo,
+                                          LiquidPrecip);
 
         EXPECT_FALSE(ErrorFound);
         EXPECT_EQ(0, PresWeathObs);
@@ -2236,41 +2218,41 @@ TEST_F(EnergyPlusFixture, DisplayWeatherMissingDataWarnings_TMYx)
                                       "54200,16400,2230,240,3.1,1,0,20.0,22000,9,999999999,0,0.1570,0,88,0.000,0.0,0.0";
 
         Weather::InterpretWeatherDataLine(*state,
-                                                 WeatherDataLine,
-                                                 ErrorFound,
-                                                 WYear,
-                                                 WMonth,
-                                                 WDay,
-                                                 WHour,
-                                                 WMinute,
-                                                 DryBulb,
-                                                 DewPoint,
-                                                 RelHum,
-                                                 AtmPress,
-                                                 ETHoriz,
-                                                 ETDirect,
-                                                 IRHoriz,
-                                                 GLBHoriz,
-                                                 DirectRad,
-                                                 DiffuseRad,
-                                                 GLBHorizIllum,
-                                                 DirectNrmIllum,
-                                                 DiffuseHorizIllum,
-                                                 ZenLum,
-                                                 WindDir,
-                                                 WindSpeed,
-                                                 TotalSkyCover,
-                                                 OpaqueSkyCover,
-                                                 Visibility,
-                                                 CeilHeight,
-                                                 PresWeathObs,
-                                                 PresWeathConds,
-                                                 PrecipWater,
-                                                 AerosolOptDepth,
-                                                 SnowDepth,
-                                                 DaysSinceLastSnow,
-                                                 Albedo,
-                                                 LiquidPrecip);
+                                          WeatherDataLine,
+                                          ErrorFound,
+                                          WYear,
+                                          WMonth,
+                                          WDay,
+                                          WHour,
+                                          WMinute,
+                                          DryBulb,
+                                          DewPoint,
+                                          RelHum,
+                                          AtmPress,
+                                          ETHoriz,
+                                          ETDirect,
+                                          IRHoriz,
+                                          GLBHoriz,
+                                          DirectRad,
+                                          DiffuseRad,
+                                          GLBHorizIllum,
+                                          DirectNrmIllum,
+                                          DiffuseHorizIllum,
+                                          ZenLum,
+                                          WindDir,
+                                          WindSpeed,
+                                          TotalSkyCover,
+                                          OpaqueSkyCover,
+                                          Visibility,
+                                          CeilHeight,
+                                          PresWeathObs,
+                                          PresWeathConds,
+                                          PrecipWater,
+                                          AerosolOptDepth,
+                                          SnowDepth,
+                                          DaysSinceLastSnow,
+                                          Albedo,
+                                          LiquidPrecip);
 
         EXPECT_FALSE(ErrorFound);
         EXPECT_EQ(9, PresWeathObs);
@@ -2361,41 +2343,41 @@ TEST_F(EnergyPlusFixture, DisplayWeatherMissingDataWarnings_TMYx)
             "10584,320,10.00,9,9,777.7,1050,0,909999999,37,0.0840";
 
         Weather::InterpretWeatherDataLine(*state,
-                                                 WeatherDataLine,
-                                                 ErrorFound,
-                                                 WYear,
-                                                 WMonth,
-                                                 WDay,
-                                                 WHour,
-                                                 WMinute,
-                                                 DryBulb,
-                                                 DewPoint,
-                                                 RelHum,
-                                                 AtmPress,
-                                                 ETHoriz,
-                                                 ETDirect,
-                                                 IRHoriz,
-                                                 GLBHoriz,
-                                                 DirectRad,
-                                                 DiffuseRad,
-                                                 GLBHorizIllum,
-                                                 DirectNrmIllum,
-                                                 DiffuseHorizIllum,
-                                                 ZenLum,
-                                                 WindDir,
-                                                 WindSpeed,
-                                                 TotalSkyCover,
-                                                 OpaqueSkyCover,
-                                                 Visibility,
-                                                 CeilHeight,
-                                                 PresWeathObs,
-                                                 PresWeathConds,
-                                                 PrecipWater,
-                                                 AerosolOptDepth,
-                                                 SnowDepth,
-                                                 DaysSinceLastSnow,
-                                                 Albedo,
-                                                 LiquidPrecip);
+                                          WeatherDataLine,
+                                          ErrorFound,
+                                          WYear,
+                                          WMonth,
+                                          WDay,
+                                          WHour,
+                                          WMinute,
+                                          DryBulb,
+                                          DewPoint,
+                                          RelHum,
+                                          AtmPress,
+                                          ETHoriz,
+                                          ETDirect,
+                                          IRHoriz,
+                                          GLBHoriz,
+                                          DirectRad,
+                                          DiffuseRad,
+                                          GLBHorizIllum,
+                                          DirectNrmIllum,
+                                          DiffuseHorizIllum,
+                                          ZenLum,
+                                          WindDir,
+                                          WindSpeed,
+                                          TotalSkyCover,
+                                          OpaqueSkyCover,
+                                          Visibility,
+                                          CeilHeight,
+                                          PresWeathObs,
+                                          PresWeathConds,
+                                          PrecipWater,
+                                          AerosolOptDepth,
+                                          SnowDepth,
+                                          DaysSinceLastSnow,
+                                          Albedo,
+                                          LiquidPrecip);
 
         EXPECT_FALSE(ErrorFound);
         EXPECT_EQ(0, PresWeathObs);

@@ -364,10 +364,8 @@ namespace DesiccantDehumidifiers {
                 ShowContinueError(state, "setting to LeavingMaximumHumidityRatioSetpoint");
                 desicDehum.controlType = DesicDehumCtrlType::FixedHumratBypass;
             }
-            if (Util::SameString(Alphas(7), "LeavingMaximumHumidityRatioSetpoint"))
-                desicDehum.controlType = DesicDehumCtrlType::FixedHumratBypass;
-            if (Util::SameString(Alphas(7), "SystemNodeMaximumHumidityRatioSetpoint"))
-                desicDehum.controlType = DesicDehumCtrlType::NodeHumratBypass;
+            if (Util::SameString(Alphas(7), "LeavingMaximumHumidityRatioSetpoint")) desicDehum.controlType = DesicDehumCtrlType::FixedHumratBypass;
+            if (Util::SameString(Alphas(7), "SystemNodeMaximumHumidityRatioSetpoint")) desicDehum.controlType = DesicDehumCtrlType::NodeHumratBypass;
             if (desicDehum.controlType == DesicDehumCtrlType::Invalid) {
                 ShowWarningError(state, format("{}{} = {}", RoutineName, CurrentModuleObject, desicDehum.Name));
                 ShowContinueError(state, format("Invalid {} = {}", cAlphaFields(7), Alphas(7)));
@@ -781,8 +779,7 @@ namespace DesiccantDehumidifiers {
             desicDehum.RegenFanType = Alphas(6);
             desicDehum.RegenFanName = Alphas(7);
 
-            if (Util::SameString(desicDehum.RegenFanType, "Fan:OnOff") ||
-                Util::SameString(desicDehum.RegenFanType, "Fan:ConstantVolume") ||
+            if (Util::SameString(desicDehum.RegenFanType, "Fan:OnOff") || Util::SameString(desicDehum.RegenFanType, "Fan:ConstantVolume") ||
                 Util::SameString(desicDehum.RegenFanType, "Fan:SystemModel")) {
                 ErrorsFound2 = false;
                 ValidateComponent(

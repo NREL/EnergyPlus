@@ -803,8 +803,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
 
         DesupHtr.TankType = cAlphaArgs(7);
 
-        if (!Util::SameString(DesupHtr.TankType, cMixedWHModuleObj) &&
-            !Util::SameString(DesupHtr.TankType, cStratifiedWHModuleObj)) {
+        if (!Util::SameString(DesupHtr.TankType, cMixedWHModuleObj) && !Util::SameString(DesupHtr.TankType, cStratifiedWHModuleObj)) {
 
             ShowSevereError(state, format("{} = {}:", cCurrentModuleObject, state.dataWaterThermalTanks->HPWaterHeater(DesuperheaterNum).Name));
             ShowContinueError(state, format("Desuperheater can only be used with {} or {}.", cMixedWHModuleObj, cStratifiedWHModuleObj));
@@ -1333,8 +1332,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
 
         // Inlet Air Configuration
-        HPWH.InletAirConfiguration =
-            static_cast<WTTAmbientTemp>(getEnumValue(HPWHAmbientTempNamesUC, Util::makeUPPER(hpwhAlpha[6 + nAlphaOffset])));
+        HPWH.InletAirConfiguration = static_cast<WTTAmbientTemp>(getEnumValue(HPWHAmbientTempNamesUC, Util::makeUPPER(hpwhAlpha[6 + nAlphaOffset])));
         switch (HPWH.InletAirConfiguration) {
         case WTTAmbientTemp::Schedule: {
 
@@ -1559,8 +1557,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
 
         // Compressor Location
-        HPWH.CrankcaseTempIndicator = static_cast<CrankcaseHeaterControlTemp>(
-            getEnumValue(CrankcaseHeaterControlTempNamesUC, Util::makeUPPER(hpwhAlpha[20 + nAlphaOffset])));
+        HPWH.CrankcaseTempIndicator =
+            static_cast<CrankcaseHeaterControlTemp>(getEnumValue(CrankcaseHeaterControlTempNamesUC, Util::makeUPPER(hpwhAlpha[20 + nAlphaOffset])));
         switch (HPWH.CrankcaseTempIndicator) {
         case CrankcaseHeaterControlTemp::Schedule: {
             if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
@@ -2771,8 +2769,8 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         }
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
-            Tank.SourceSideControlMode = static_cast<SourceSideControl>(
-                getEnumValue(SourceSideControlNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(18))));
+            Tank.SourceSideControlMode =
+                static_cast<SourceSideControl>(getEnumValue(SourceSideControlNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(18))));
             if (Tank.SourceSideControlMode == SourceSideControl::Invalid) {
                 ShowSevereError(state,
                                 format("{} = {}:  Invalid Control Mode entered={}",
@@ -2901,8 +2899,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
 
         // Validate Heater Priority Control
-        Tank.StratifiedControlMode = static_cast<PriorityControlMode>(
-            getEnumValue(PriorityControlModeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
+        Tank.StratifiedControlMode =
+            static_cast<PriorityControlMode>(getEnumValue(PriorityControlModeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
         if (Tank.StratifiedControlMode == PriorityControlMode::Invalid) {
             ShowSevereError(state,
                             format("{} = {}:  Invalid Heater Priority Control entered={}",
@@ -3405,8 +3403,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.SetupStratifiedNodes(state);
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(21)) {
-            Tank.SourceSideControlMode = static_cast<SourceSideControl>(
-                getEnumValue(SourceSideControlNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(21))));
+            Tank.SourceSideControlMode =
+                static_cast<SourceSideControl>(getEnumValue(SourceSideControlNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(21))));
             if (Tank.SourceSideControlMode == SourceSideControl::Invalid) {
                 ShowSevereError(state,
                                 format("{} = {}:  Invalid Control Mode entered={}",
@@ -4252,8 +4250,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                 auto &DesuperHtr = state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum);
                 for (int WtrHtrNum = 1; WtrHtrNum <= state.dataWaterThermalTanks->numWaterThermalTank; ++WtrHtrNum) {
                     auto &Tank = state.dataWaterThermalTanks->WaterThermalTank(WtrHtrNum);
-                    if (!Util::SameString(DesuperHtr.TankName, Tank.Name) || !Util::SameString(DesuperHtr.TankType, Tank.Type))
-                        continue;
+                    if (!Util::SameString(DesuperHtr.TankName, Tank.Name) || !Util::SameString(DesuperHtr.TankType, Tank.Type)) continue;
                     Tank.DesuperheaterNum = DesuperheaterNum;
                     DesuperHtr.WaterHeaterTankNum = WtrHtrNum;
                     DesuperHtr.TankTypeNum = Tank.WaterThermalTankType;
@@ -4523,8 +4520,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                             //                     check that tank has lower priority than all other non-HPWH objects in Zone
                             //                     Equipment List
                             for (int EquipmentTypeNum = 1; EquipmentTypeNum <= zoneEquipList.NumOfEquipTypes; ++EquipmentTypeNum) {
-                                if (Util::SameString(zoneEquipList.EquipTypeName(EquipmentTypeNum),
-                                                                state.dataIPShortCut->cCurrentModuleObject))
+                                if (Util::SameString(zoneEquipList.EquipTypeName(EquipmentTypeNum), state.dataIPShortCut->cCurrentModuleObject))
                                     continue;
                                 if (TankCoolingPriority > zoneEquipList.CoolingPriority(EquipmentTypeNum) ||
                                     TankHeatingPriority > zoneEquipList.HeatingPriority(EquipmentTypeNum)) {
@@ -4690,8 +4686,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                                                                          IOStat);
 
                 // find which water heater this object is for
-                int WaterThermalTankNum =
-                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataWaterThermalTanks->WaterThermalTank);
+                int WaterThermalTankNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataWaterThermalTanks->WaterThermalTank);
                 if (WaterThermalTankNum == 0) {
                     // did not match name throw warning.
                     ShowSevereError(state,
@@ -6693,7 +6688,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).NumOfSpeeds;
 
         } else if (Util::SameString(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilType,
-                                               "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed") &&
+                                    "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed") &&
                    (state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed == 0)) {
             VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                       std::string(),
@@ -12114,7 +12109,7 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                 state.dataHVACGlobal->HPWHCrankcaseDBTemp = this->AmbientTemp;
 
                 if (Util::SameString(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilType,
-                                                "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed") ||
+                                     "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed") ||
                     (state.dataWaterThermalTanks->HPWaterHeater(HPNum).bIsIHP)) {
                     bIsVSCoil = true;
                     std::string VSCoilName = state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName;

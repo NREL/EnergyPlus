@@ -64,11 +64,11 @@ struct EnergyPlusData;
 namespace ThermalComfort {
 
     Real64 constexpr TAbsConv = Constant::Kelvin; // Converter for absolute temperature
-    Real64 constexpr ActLevelConv = 58.2;             // Converter for activity level (1Met = 58.2 W/m2)
-    Real64 constexpr BodySurfArea = 1.8;              // Dubois body surface area of the human body (m2)
-    Real64 constexpr BodySurfAreaPierce = 1.8258;     // Pierce two node body surface area of the human body (m2)
-    Real64 constexpr RadSurfEff = 0.72;               // Fraction of surface effective for radiation
-    Real64 constexpr StefanBoltz = 5.6697e-8;         // Stefan-Boltzmann constant (W/m2K4)
+    Real64 constexpr ActLevelConv = 58.2;         // Converter for activity level (1Met = 58.2 W/m2)
+    Real64 constexpr BodySurfArea = 1.8;          // Dubois body surface area of the human body (m2)
+    Real64 constexpr BodySurfAreaPierce = 1.8258; // Pierce two node body surface area of the human body (m2)
+    Real64 constexpr RadSurfEff = 0.72;           // Fraction of surface effective for radiation
+    Real64 constexpr StefanBoltz = 5.6697e-8;     // Stefan-Boltzmann constant (W/m2K4)
 
     struct ThermalComfortDataType
     {

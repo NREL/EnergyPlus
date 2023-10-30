@@ -4440,8 +4440,8 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestGetDesignDayConditions)
     // test results using user entered design day pressure
     state->dataWeather->DesDayInput(2).PressureEntered = true;
     state->dataWeather->DesDayInput(2).PressBarom = 0.9 * DataEnvironment::StdPressureSeaLevel;
-    envrnCoolingHumRat = Psychrometrics::PsyWFnTdpPb(
-        *state, state->dataWeather->Environment(2).maxCoolingOADPSizing, state->dataWeather->DesDayInput(2).PressBarom);
+    envrnCoolingHumRat =
+        Psychrometrics::PsyWFnTdpPb(*state, state->dataWeather->Environment(2).maxCoolingOADPSizing, state->dataWeather->DesDayInput(2).PressBarom);
 
     thisDOAS.GetDesignDayConditions(*state);
 

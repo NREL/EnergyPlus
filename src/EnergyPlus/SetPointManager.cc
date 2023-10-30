@@ -1035,8 +1035,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         // get the actual zone number of the control zone
-        state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ControlZoneNum =
-            Util::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
+        state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ControlZoneNum = Util::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
         if (state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state, format("..invalid {}=\"{}\".", cAlphaFieldNames(3), cAlphaArgs(3)));
@@ -1154,8 +1153,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         // get the actual zone number of the control zone
-        state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ControlZoneNum =
-            Util::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
+        state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ControlZoneNum = Util::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
         if (state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state, format("..invalid {}=\"{}\".", cAlphaFieldNames(3), cAlphaArgs(3)));
@@ -1272,8 +1270,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         // get the actual zone number of the control zone
-        state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum =
-            Util::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
+        state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum = Util::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
         if (state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state, format("..invalid {}=\"{}\".", cAlphaFieldNames(3), cAlphaArgs(3)));
@@ -3025,7 +3022,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
         state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType = cAlphaArgs(3);
         if (Util::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType,
-                                        "Site:GroundTemperature:BuildingSurface")) {
+                             "Site:GroundTemperature:BuildingSurface")) {
             state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::BuildingSurface;
             if (state.dataSetPointManager->NoSurfaceGroundTempObjWarning) {
                 if (!state.dataEnvrn->GroundTempObjInput) {
@@ -3039,7 +3036,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->NoSurfaceGroundTempObjWarning = false;
             }
         } else if (Util::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType,
-                                               "Site:GroundTemperature:Shallow")) {
+                                    "Site:GroundTemperature:Shallow")) {
             state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::Shallow;
             if (state.dataSetPointManager->NoShallowGroundTempObjWarning) {
                 if (!state.dataEnvrn->GroundTemp_SurfaceObjInput) {
@@ -3053,8 +3050,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
                 state.dataSetPointManager->NoShallowGroundTempObjWarning = false;
             }
-        } else if (Util::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType,
-                                               "Site:GroundTemperature:Deep")) {
+        } else if (Util::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType, "Site:GroundTemperature:Deep")) {
             state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::Deep;
             if (state.dataSetPointManager->NoDeepGroundTempObjWarning) {
                 if (!state.dataEnvrn->GroundTemp_DeepObjInput) {
@@ -3069,7 +3065,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataSetPointManager->NoDeepGroundTempObjWarning = false;
             }
         } else if (Util::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType,
-                                               "Site:GroundTemperature:FCfactorMethod")) {
+                                    "Site:GroundTemperature:FCfactorMethod")) {
             state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::FCFactorMethod;
             if (state.dataSetPointManager->NoFCGroundTempObjWarning) {
                 if (!state.dataEnvrn->FCGroundTemps) {
@@ -4566,10 +4562,8 @@ void InitSetPointManagers(EnergyPlusData &state)
                                     LookForFan = true;
                                 }
                                 if (LookForFan) {
-                                    if (Util::SameString(CompType, "Fan:ConstantVolume") ||
-                                        Util::SameString(CompType, "Fan:VariableVolume") ||
-                                        Util::SameString(CompType, "Fan:OnOff") ||
-                                        Util::SameString(CompType, "Fan:ComponentModel")) {
+                                    if (Util::SameString(CompType, "Fan:ConstantVolume") || Util::SameString(CompType, "Fan:VariableVolume") ||
+                                        Util::SameString(CompType, "Fan:OnOff") || Util::SameString(CompType, "Fan:ComponentModel")) {
                                         FanNodeIn = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn;
                                         FanNodeOut =
                                             state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumOut;
@@ -4583,10 +4577,8 @@ void InitSetPointManagers(EnergyPlusData &state)
                             for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
                                  ++CompNum) {
                                 CompType = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
-                                if (Util::SameString(CompType, "Fan:ConstantVolume") ||
-                                    Util::SameString(CompType, "Fan:VariableVolume") ||
-                                    Util::SameString(CompType, "Fan:OnOff") ||
-                                    Util::SameString(CompType, "Fan:ComponentModel")) {
+                                if (Util::SameString(CompType, "Fan:ConstantVolume") || Util::SameString(CompType, "Fan:VariableVolume") ||
+                                    Util::SameString(CompType, "Fan:OnOff") || Util::SameString(CompType, "Fan:ComponentModel")) {
                                     FanNodeIn = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn;
                                     FanNodeOut = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumOut;
                                 }
@@ -4612,8 +4604,8 @@ void InitSetPointManagers(EnergyPlusData &state)
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumWarmestSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
                     AirLoopNum = Util::FindItemInList(state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).AirLoopName,
-                                                                 state.dataAirLoop->AirToZoneNodeInfo,
-                                                                 &AirLoopZoneEquipConnectData::AirLoopName);
+                                                      state.dataAirLoop->AirToZoneNodeInfo,
+                                                      &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid Air Loop specified:",
@@ -4650,8 +4642,8 @@ void InitSetPointManagers(EnergyPlusData &state)
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumColdestSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
                     AirLoopNum = Util::FindItemInList(state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).AirLoopName,
-                                                                 state.dataAirLoop->AirToZoneNodeInfo,
-                                                                 &AirLoopZoneEquipConnectData::AirLoopName);
+                                                      state.dataAirLoop->AirToZoneNodeInfo,
+                                                      &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid Air Loop specified:",
@@ -4690,8 +4682,8 @@ void InitSetPointManagers(EnergyPlusData &state)
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
                     AirLoopNum = Util::FindItemInList(state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopName,
-                                                                 state.dataAirLoop->AirToZoneNodeInfo,
-                                                                 &AirLoopZoneEquipConnectData::AirLoopName);
+                                                      state.dataAirLoop->AirToZoneNodeInfo,
+                                                      &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid Air Loop specified:",
@@ -4730,8 +4722,8 @@ void InitSetPointManagers(EnergyPlusData &state)
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumRABFlowSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
                     AirLoopNum = Util::FindItemInList(state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).AirLoopName,
-                                                                 state.dataAirLoop->AirToZoneNodeInfo,
-                                                                 &AirLoopZoneEquipConnectData::AirLoopName);
+                                                      state.dataAirLoop->AirToZoneNodeInfo,
+                                                      &AirLoopZoneEquipConnectData::AirLoopName);
                     state.dataSetPointManager->AllSetPtMgr(state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).AllSetPtMgrIndex).AirLoopNum =
                         AirLoopNum;
                     state.dataSetPointManager->AllSetPtMgr(state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).AllSetPtMgrIndex).AirLoopName =
@@ -4785,8 +4777,8 @@ void InitSetPointManagers(EnergyPlusData &state)
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZClgAverageSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
                     AirLoopNum = Util::FindItemInList(state.dataSetPointManager->MZAverageCoolingSetPtMgr(SetPtMgrNum).AirLoopName,
-                                                                 state.dataAirLoop->AirToZoneNodeInfo,
-                                                                 &AirLoopZoneEquipConnectData::AirLoopName);
+                                                      state.dataAirLoop->AirToZoneNodeInfo,
+                                                      &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid Air Loop specified:",
@@ -4824,8 +4816,8 @@ void InitSetPointManagers(EnergyPlusData &state)
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZHtgAverageSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
                     AirLoopNum = Util::FindItemInList(state.dataSetPointManager->MZAverageHeatingSetPtMgr(SetPtMgrNum).AirLoopName,
-                                                                 state.dataAirLoop->AirToZoneNodeInfo,
-                                                                 &AirLoopZoneEquipConnectData::AirLoopName);
+                                                      state.dataAirLoop->AirToZoneNodeInfo,
+                                                      &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid Air Loop specified:",
@@ -4859,8 +4851,8 @@ void InitSetPointManagers(EnergyPlusData &state)
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZAverageMinHumSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
                     AirLoopNum = Util::FindItemInList(state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopName,
-                                                                 state.dataAirLoop->AirToZoneNodeInfo,
-                                                                 &AirLoopZoneEquipConnectData::AirLoopName);
+                                                      state.dataAirLoop->AirToZoneNodeInfo,
+                                                      &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid Air Loop specified:",
@@ -4914,8 +4906,8 @@ void InitSetPointManagers(EnergyPlusData &state)
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZAverageMaxHumSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
                     AirLoopNum = Util::FindItemInList(state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopName,
-                                                                 state.dataAirLoop->AirToZoneNodeInfo,
-                                                                 &AirLoopZoneEquipConnectData::AirLoopName);
+                                                      state.dataAirLoop->AirToZoneNodeInfo,
+                                                      &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid Air Loop specified:",
@@ -4969,8 +4961,8 @@ void InitSetPointManagers(EnergyPlusData &state)
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZMinHumSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
                     AirLoopNum = Util::FindItemInList(state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).AirLoopName,
-                                                                 state.dataAirLoop->AirToZoneNodeInfo,
-                                                                 &AirLoopZoneEquipConnectData::AirLoopName);
+                                                      state.dataAirLoop->AirToZoneNodeInfo,
+                                                      &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid Air Loop specified:",
@@ -5023,8 +5015,8 @@ void InitSetPointManagers(EnergyPlusData &state)
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZMaxHumSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
                     AirLoopNum = Util::FindItemInList(state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopName,
-                                                                 state.dataAirLoop->AirToZoneNodeInfo,
-                                                                 &AirLoopZoneEquipConnectData::AirLoopName);
+                                                      state.dataAirLoop->AirToZoneNodeInfo,
+                                                      &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
                         ShowSevereError(state,
                                         format("{}=\"{}\", invalid Air Loop specified:",

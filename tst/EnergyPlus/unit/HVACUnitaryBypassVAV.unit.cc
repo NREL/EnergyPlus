@@ -1706,8 +1706,8 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_ParentElectricityRateTest)
     airInNode.HumRat = 0.005;
     airInNode.Enthalpy = Psychrometrics::PsyHFnTdbW(airInNode.Temp, airInNode.HumRat);
     // set outside air inlet node
-    auto &oaMixerAirInletNode = state->dataLoopNodes->Node(
-        Util::FindItemInList("OUTSIDE AIR INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    auto &oaMixerAirInletNode =
+        state->dataLoopNodes->Node(Util::FindItemInList("OUTSIDE AIR INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     // auto &oaMixerAirInletNode = state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode);
     oaMixerAirInletNode.Temp = state->dataEnvrn->OutDryBulbTemp;
     oaMixerAirInletNode.HumRat = state->dataEnvrn->OutHumRat;

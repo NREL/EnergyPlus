@@ -659,8 +659,7 @@ namespace UserDefinedComponents {
 
                         // find program manager for initial setup, begin environment and sizing of this plant connection
                         if (!lAlphaFieldBlanks(aArgCount + 4)) {
-                            int StackMngrNum =
-                                Util::FindItemInList(cAlphaArgs(aArgCount + 4), state.dataRuntimeLang->EMSProgramCallManager);
+                            int StackMngrNum = Util::FindItemInList(cAlphaArgs(aArgCount + 4), state.dataRuntimeLang->EMSProgramCallManager);
                             if (StackMngrNum > 0) { // found it
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlInitProgramMngr = StackMngrNum;
                             } else {
@@ -678,8 +677,7 @@ namespace UserDefinedComponents {
 
                         // find program to call for model simulations for just this plant connection
                         if (!lAlphaFieldBlanks(aArgCount + 5)) {
-                            int StackMngrNum =
-                                Util::FindItemInList(cAlphaArgs(aArgCount + 5), state.dataRuntimeLang->EMSProgramCallManager);
+                            int StackMngrNum = Util::FindItemInList(cAlphaArgs(aArgCount + 5), state.dataRuntimeLang->EMSProgramCallManager);
                             if (StackMngrNum > 0) { // found it
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlSimProgramMngr = StackMngrNum;
                             } else {

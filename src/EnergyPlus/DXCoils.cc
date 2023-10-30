@@ -15073,7 +15073,7 @@ void GetFanIndexForTwoSpeedCoil(
                     SimAirServingZones::CompType::DXSystem) {
 
                     if (Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
-                                                    state.dataDXCoils->DXCoil(CoolingCoilIndex).CoilSystemName)) {
+                                         state.dataDXCoils->DXCoil(CoolingCoilIndex).CoilSystemName)) {
                         FoundBranch = BranchNum;
                         FoundAirSysNum = AirSysNum;
                         break;
@@ -15083,7 +15083,7 @@ void GetFanIndexForTwoSpeedCoil(
                            SimAirServingZones::CompType::UnitarySystemModel) {
 
                     if (Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
-                                                    state.dataDXCoils->DXCoil(CoolingCoilIndex).CoilSystemName)) {
+                                         state.dataDXCoils->DXCoil(CoolingCoilIndex).CoilSystemName)) {
                         FoundBranch = BranchNum;
                         FoundAirSysNum = AirSysNum;
                         break;
@@ -15216,8 +15216,7 @@ Real64 GetCoilCapacity(EnergyPlusData &state,
         state.dataDXCoils->GetCoilsInputFlag = false;
     }
 
-    if (Util::SameString(CoilType, "Coil:Heating:DX:SingleSpeed") ||
-        Util::SameString(CoilType, "Coil:Cooling:DX:SingleSpeed")) {
+    if (Util::SameString(CoilType, "Coil:Heating:DX:SingleSpeed") || Util::SameString(CoilType, "Coil:Cooling:DX:SingleSpeed")) {
         WhichCoil = Util::FindItem(CoilName, state.dataDXCoils->DXCoil);
         if (WhichCoil != 0) {
             CoilCapacity = state.dataDXCoils->DXCoil(WhichCoil).RatedTotCap(1);
@@ -15232,8 +15231,7 @@ Real64 GetCoilCapacity(EnergyPlusData &state,
         if (WhichCoil != 0) {
             CoilCapacity = state.dataDXCoils->DXCoil(WhichCoil).RatedTotCap(1);
         }
-    } else if (Util::SameString(CoilType, "Coil:Cooling:DX:MultiSpeed") ||
-               Util::SameString(CoilType, "Coil:Heating:DX:MultiSpeed")) {
+    } else if (Util::SameString(CoilType, "Coil:Cooling:DX:MultiSpeed") || Util::SameString(CoilType, "Coil:Heating:DX:MultiSpeed")) {
         WhichCoil = Util::FindItem(CoilName, state.dataDXCoils->DXCoil);
         if (WhichCoil != 0) {
             CoilCapacity = state.dataDXCoils->DXCoil(WhichCoil).MSRatedTotCap(state.dataDXCoils->DXCoil(WhichCoil).NumOfSpeeds);
@@ -15651,8 +15649,7 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
             //       Search for Heat Exchanger Assisted DX cooling coils
             if (DXCoolingCoilIndex == 0) {
                 for (WhichHXAssistedComp = 1; WhichHXAssistedComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichHXAssistedComp) {
-                    if (!Util::SameString(state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).ParentCName,
-                                                     CompSetsParentName) ||
+                    if (!Util::SameString(state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).ParentCName, CompSetsParentName) ||
                         (state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).ComponentObjectType !=
                          DataLoopNode::ConnectionObjectType::CoilSystemCoolingDXHeatExchangerAssisted))
                         continue;
@@ -15660,13 +15657,12 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
                     HXCompSetsParentType = state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).ComponentObjectType;
                     std::string const &HXCompSetsParentName = state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).CName;
                     for (WhichCompanionComp = 1; WhichCompanionComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichCompanionComp) {
-                        if (!Util::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName,
-                                                         HXCompSetsParentName) ||
+                        if (!Util::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName, HXCompSetsParentName) ||
                             (state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ComponentObjectType !=
                              DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed))
                             continue;
-                        DXCoolingCoilIndex = Util::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName,
-                                                                             state.dataDXCoils->DXCoil);
+                        DXCoolingCoilIndex =
+                            Util::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName, state.dataDXCoils->DXCoil);
                         break;
                     }
                     break;

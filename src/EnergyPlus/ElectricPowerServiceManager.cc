@@ -1107,7 +1107,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3),
-                                            "LoadCenterPowerConditioning")) { // this is the right kind of transformer
+                                 "LoadCenterPowerConditioning")) { // this is the right kind of transformer
                 transformerObj = std::make_unique<ElectricTransformer>(state, transformerName_);
             } else {
                 ShowWarningError(

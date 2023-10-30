@@ -905,8 +905,7 @@ namespace BranchInputManager {
             ShowSevereError(state, format("GetFirstBranchInletNodeName: BranchList=\"{}\", not a valid BranchList Name", BranchListName));
             InletNodeName = "Invalid Node Name";
         } else {
-            int Found2 = Util::FindItemInList(state.dataBranchInputManager->BranchList(Found1).BranchNames(1),
-                                                         state.dataBranchInputManager->Branch);
+            int Found2 = Util::FindItemInList(state.dataBranchInputManager->BranchList(Found1).BranchNames(1), state.dataBranchInputManager->Branch);
             if (Found2 == 0) {
                 ShowSevereError(state,
                                 format("GetFirstBranchInletNodeName: BranchList=\"{}\", Branch=\"{}\" not a valid Branch Name",
@@ -1336,7 +1335,7 @@ namespace BranchInputManager {
                     }
                     if (!state.dataBranchInputManager->BranchList(BCount).BranchNames(Loop).empty()) {
                         Found = Util::FindItemInList(state.dataBranchInputManager->BranchList(BCount).BranchNames(Loop),
-                                                                state.dataBranchInputManager->Branch);
+                                                     state.dataBranchInputManager->Branch);
                         if (Found == 0) {
                             ShowSevereError(state,
                                             format("{}{}=\"{}\", invalid data.",
@@ -1524,7 +1523,7 @@ namespace BranchInputManager {
                     CurSplitter = true;
                     CurMixer = false;
                     SplitNum = Util::FindItemInList(state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop),
-                                                               state.dataBranchInputManager->Splitters);
+                                                    state.dataBranchInputManager->Splitters);
                     // Following code sets up branch names to be matched from Splitter/Mixer data structure
                     if (SplitNum == 0) {
                         ShowSevereError(state,
@@ -1541,7 +1540,7 @@ namespace BranchInputManager {
                     CurSplitter = true;
                     CurMixer = false;
                     MixerNum = Util::FindItemInList(state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop),
-                                                               state.dataBranchInputManager->Mixers);
+                                                    state.dataBranchInputManager->Mixers);
                     if (MixerNum == 0) {
                         ShowSevereError(state,
                                         format("Invalid Connector:Mixer(none)={}, referenced by {}={}",
@@ -1558,16 +1557,14 @@ namespace BranchInputManager {
                 }
                 // Try to match mixer to splitter
                 for (Loop1 = Loop + 1; Loop1 <= state.dataBranchInputManager->ConnectorLists(Count).NumOfConnectors; ++Loop1) {
-                    if (CurMixer && !Util::SameString(state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop1), cSPLITTER))
-                        continue;
-                    if (CurSplitter && !Util::SameString(state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop1), cMIXER))
-                        continue;
+                    if (CurMixer && !Util::SameString(state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop1), cSPLITTER)) continue;
+                    if (CurSplitter && !Util::SameString(state.dataBranchInputManager->ConnectorLists(Count).ConnectorType(Loop1), cMIXER)) continue;
                     if (state.dataBranchInputManager->ConnectorLists(Count).ConnectorMatchNo(Loop1) != 0) continue;
                     {
                         if (CurSplitter) {
                             // Current "item" is a splitter, candidate is a mixer.
                             MixerNum = Util::FindItemInList(state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop1),
-                                                                       state.dataBranchInputManager->Mixers);
+                                                            state.dataBranchInputManager->Mixers);
                             if (MixerNum == 0) continue;
                             if (state.dataBranchInputManager->Mixers(MixerNum).NumInletBranches != NumBranchNames) continue;
                             MatchFound = true;
@@ -1586,7 +1583,7 @@ namespace BranchInputManager {
                         } else {
                             // Current "item" is a splitter, candidate is a mixer.
                             SplitNum = Util::FindItemInList(state.dataBranchInputManager->ConnectorLists(Count).ConnectorName(Loop1),
-                                                                       state.dataBranchInputManager->Splitters);
+                                                            state.dataBranchInputManager->Splitters);
                             if (SplitNum == 0) continue;
                             if (state.dataBranchInputManager->Splitters(SplitNum).NumOutletBranches != NumBranchNames) continue;
                             MatchFound = true;
@@ -1734,8 +1731,7 @@ namespace BranchInputManager {
             state.dataBranchInputManager->GetBranchInputFlag = false;
         }
         for (Count = 1; Count <= NumSplitters; ++Count) {
-            int Found =
-                Util::FindItemInList(state.dataBranchInputManager->Splitters(Count).InletBranchName, state.dataBranchInputManager->Branch);
+            int Found = Util::FindItemInList(state.dataBranchInputManager->Splitters(Count).InletBranchName, state.dataBranchInputManager->Branch);
             if (Found == 0) {
                 ShowSevereError(state,
                                 format("GetSplitterInput: Invalid Branch={}, referenced as Inlet Branch to {}={}",
@@ -1746,7 +1742,7 @@ namespace BranchInputManager {
             }
             for (Loop = 1; Loop <= state.dataBranchInputManager->Splitters(Count).NumOutletBranches; ++Loop) {
                 Found = Util::FindItemInList(state.dataBranchInputManager->Splitters(Count).OutletBranchNames(Loop),
-                                                        state.dataBranchInputManager->Branch);
+                                             state.dataBranchInputManager->Branch);
                 if (Found == 0) {
                     ShowSevereError(state,
                                     fmt::format("GetSplitterInput: Invalid Branch={}, referenced as Outlet Branch # {} to {}={}",
@@ -1983,8 +1979,7 @@ namespace BranchInputManager {
             state.dataBranchInputManager->GetBranchInputFlag = false;
         }
         for (Count = 1; Count <= NumMixers; ++Count) {
-            int Found =
-                Util::FindItemInList(state.dataBranchInputManager->Mixers(Count).OutletBranchName, state.dataBranchInputManager->Branch);
+            int Found = Util::FindItemInList(state.dataBranchInputManager->Mixers(Count).OutletBranchName, state.dataBranchInputManager->Branch);
             if (Found == 0) {
                 ShowSevereError(state,
                                 format("GetMixerInput: Invalid Branch={}, referenced as Outlet Branch in {}={}",
@@ -1994,8 +1989,8 @@ namespace BranchInputManager {
                 ErrorsFound = true;
             }
             for (Loop = 1; Loop <= state.dataBranchInputManager->Mixers(Count).NumInletBranches; ++Loop) {
-                Found = Util::FindItemInList(state.dataBranchInputManager->Mixers(Count).InletBranchNames(Loop),
-                                                        state.dataBranchInputManager->Branch);
+                Found =
+                    Util::FindItemInList(state.dataBranchInputManager->Mixers(Count).InletBranchNames(Loop), state.dataBranchInputManager->Branch);
                 if (Found == 0) {
                     ShowSevereError(state,
                                     format("GetMixerInput: Invalid Branch={}, referenced as Inlet Branch # {} in {}={}",
@@ -2405,8 +2400,8 @@ namespace BranchInputManager {
             }
             for (BlNum = 1; BlNum <= (int)state.dataBranchInputManager->BranchList.size(); ++BlNum) {
                 Found = Util::FindItemInList(state.dataBranchInputManager->Branch(BrN).Name,
-                                                        state.dataBranchInputManager->BranchList(BlNum).BranchNames,
-                                                        state.dataBranchInputManager->BranchList(BlNum).NumOfBranchNames);
+                                             state.dataBranchInputManager->BranchList(BlNum).BranchNames,
+                                             state.dataBranchInputManager->BranchList(BlNum).NumOfBranchNames);
                 if (Found != 0) break;
             }
             if (Found != 0) continue;
@@ -2520,8 +2515,8 @@ namespace BranchInputManager {
             BranchPtrs.allocate(state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames + 2);
             BranchPtrs = 0;
             for (Count = 1; Count <= state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames; ++Count) {
-                Found = Util::FindItemInList(state.dataBranchInputManager->BranchList(BCount).BranchNames(Count),
-                                                        state.dataBranchInputManager->Branch);
+                Found =
+                    Util::FindItemInList(state.dataBranchInputManager->BranchList(BCount).BranchNames(Count), state.dataBranchInputManager->Branch);
                 if (Found > 0) {
                     NumNodesOnBranchList += state.dataBranchInputManager->Branch(Found).NumOfComponents * 2;
                     FoundBranches(Count) = Found;

@@ -100,16 +100,15 @@ using DataStringGlobals::CharComma;
 using DataStringGlobals::CharSpace;
 using DataStringGlobals::CharTab;
 
-constexpr std::array<std::string_view, (int)DataSizing::OAFlowCalcMethod::Num> OAFlowCalcMethodNamesUC{
-    "FLOW/PERSON",
-    "FLOW/ZONE",
-    "FLOW/AREA",
-    "AIRCHANGES/HOUR",
-    "SUM",
-    "MAXIMUM",
-    "INDOORAIRQUALITYPROCEDURE",
-    "PROPORTIONALCONTROLBASEDONOCCUPANCYSCHEDULE",
-    "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY"};
+constexpr std::array<std::string_view, (int)DataSizing::OAFlowCalcMethod::Num> OAFlowCalcMethodNamesUC{"FLOW/PERSON",
+                                                                                                       "FLOW/ZONE",
+                                                                                                       "FLOW/AREA",
+                                                                                                       "AIRCHANGES/HOUR",
+                                                                                                       "SUM",
+                                                                                                       "MAXIMUM",
+                                                                                                       "INDOORAIRQUALITYPROCEDURE",
+                                                                                                       "PROPORTIONALCONTROLBASEDONOCCUPANCYSCHEDULE",
+                                                                                                       "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY"};
 
 void ManageSizing(EnergyPlusData &state)
 {
@@ -1204,8 +1203,8 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
 
     // redo 62.1 zone calculations with final (or user) zone terminal flow sizes, only redo calculations that might change with final flows
     for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
-        int SysSizNum = Util::FindItemInList(
-            FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+        int SysSizNum =
+            Util::FindItemInList(FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
         if (FinalSysSizing(AirLoopNum).OAAutoSized &&
             (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::VRP ||
@@ -1458,8 +1457,8 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchS62svrClD, FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->DBySys(AirLoopNum), 4); // D
         // Origin of D
-        int SysSizNum = Util::FindItemInList(
-            FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+        int SysSizNum =
+            Util::FindItemInList(FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
         if (state.dataSize->SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
             OutputReportPredefined::PreDefTableEntry(
@@ -2022,8 +2021,8 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
     }
     // First get the design (max) level of people in all zones connected to air loop
     for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
-        int SysSizNum = Util::FindItemInList(
-            FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+        int SysSizNum =
+            Util::FindItemInList(FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
         // only retrieve data if the occupant density is set to be autosized
         if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
@@ -2117,8 +2116,8 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
 
     // compute D for standard 62.1 by system
     for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
-        int SysSizNum = Util::FindItemInList(
-            FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+        int SysSizNum =
+            Util::FindItemInList(FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
 
         // compute D if set to autosize
@@ -3000,8 +2999,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
 
                 // Getting zone OA parameters from Design Specification object
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    OAIndex = Util::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).DesignSpecOAObjName,
-                                                              state.dataSize->OARequirements);
+                    OAIndex = Util::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).DesignSpecOAObjName, state.dataSize->OARequirements);
                     if (OAIndex > 0) {
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneDesignSpecOAIndex = OAIndex;
                     } else {
@@ -3228,7 +3226,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneAirDistEffObjName = state.dataIPShortCut->cAlphaArgs(7);
                     ObjIndex = Util::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneAirDistEffObjName,
-                                                               state.dataSize->ZoneAirDistribution);
+                                                    state.dataSize->ZoneAirDistribution);
                     if (ObjIndex > 0) {
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneADEffCooling =
                             state.dataSize->ZoneAirDistribution(ObjIndex).ZoneADEffCooling;
@@ -3256,11 +3254,11 @@ void GetZoneSizingInput(EnergyPlusData &state)
 
                 constexpr static std::array<std::string_view, static_cast<int>(DataSizing::AirflowSizingMethod::Num)> AirflowSizingMethodNamesUC = {
                     "DESIGNDAY", "FLOW/ZONE", "DESIGNDAYWITHLIMIT"};
-                state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod = static_cast<AirflowSizingMethod>(
-                    getEnumValue(AirflowSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
+                state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod =
+                    static_cast<AirflowSizingMethod>(getEnumValue(AirflowSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
                 assert(state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod != AirflowSizingMethod::Invalid);
-                state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod = static_cast<AirflowSizingMethod>(
-                    getEnumValue(AirflowSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(6))));
+                state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod =
+                    static_cast<AirflowSizingMethod>(getEnumValue(AirflowSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(6))));
                 assert(state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod != AirflowSizingMethod::Invalid);
 
                 BooleanSwitch accountForDOAS = getYesNoValue(state.dataIPShortCut->cAlphaArgs(8));
@@ -3269,8 +3267,8 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 if (state.dataSize->ZoneSizingInput(ZoneSizIndex).AccountForDOAS) {
                     constexpr static std::array<std::string_view, static_cast<int>(DataSizing::DOASControl::Num)> DOASControlNamesUC = {
                         "NEUTRALSUPPLYAIR", "NEUTRALDEHUMIDIFIEDSUPPLYAIR", "COLDSUPPLYAIR"};
-                    state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy = static_cast<DataSizing::DOASControl>(
-                        getEnumValue(DOASControlNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
+                    state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy =
+                        static_cast<DataSizing::DOASControl>(getEnumValue(DOASControlNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
 
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint = state.dataIPShortCut->rNumericArgs(17);
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = state.dataIPShortCut->rNumericArgs(18);

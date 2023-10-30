@@ -451,125 +451,125 @@ namespace DataRuntimeLanguage {
         // Members
         // structure for operators and functions, used to look up information about each operator or function
         std::string_view symbol = ""; // string representation of operator or function (for reporting)
-        int numOperands = 0;    // count of operands or function arguments.
+        int numOperands = 0;          // count of operands or function arguments.
     };
 
     static constexpr std::array<std::string_view, (int)ErlFunc::Num> ErlFuncNamesUC = {
-        "",  // Null
-        "", // Literal
-        "-", // Negative
+        "",   // Null
+        "",   // Literal
+        "-",  // Negative
         "/",  // Divide
         "*",  // Multiply
         "-",  // Subtract
         "+",  // Add
-        "==",  // Equal
-        "<>",  // NotEqual
-        "<=",  // LessOrEqual
-        ">=",  // GreaterOrEqual
+        "==", // Equal
+        "<>", // NotEqual
+        "<=", // LessOrEqual
+        ">=", // GreaterOrEqual
         "<",  // LessThan
         ">",  // GreaterThan
         "^",  // RaiseToPower
-        "&&",  // LogicalAND
-        "||",  // LogicalOR
+        "&&", // LogicalAND
+        "||", // LogicalOR
         // note there is an important check "> 15" to distinguish operators from functions
         //  so be careful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
 
         // parameters for built-in Erl functions, these are processed like operators and numbering
         // must be sequential with the operators.
         // math functions
-        "@ROUND",  // Round
-        "@MOD",  // Mod
-        "@SIN",  // Sin
-        "@COS",  // Cos
-        "@ARCSIN",  // ArcSin
-        "@ARCCOS",  // ArcCos
-        "@DEGTORAD", // DegToRad
-        "@RADTODEG", // RadToDeg
-        "@EXP",      // Exp
-        "@LN",       // Ln
-        "@MAX",      // Max
-        "@MIN",      // Min
-        "@ABS",      // Abs
+        "@ROUND",          // Round
+        "@MOD",            // Mod
+        "@SIN",            // Sin
+        "@COS",            // Cos
+        "@ARCSIN",         // ArcSin
+        "@ARCCOS",         // ArcCos
+        "@DEGTORAD",       // DegToRad
+        "@RADTODEG",       // RadToDeg
+        "@EXP",            // Exp
+        "@LN",             // Ln
+        "@MAX",            // Max
+        "@MIN",            // Min
+        "@ABS",            // Abs
         "@RANDOMUNIFORMU", // RandU
         "@RANDOMGAUSSIAN", // RandG
-        "@SEEDRANDOM", // RandSeed
+        "@SEEDRANDOM",     // RandSeed
 
         // begin psychrometric routines
-        "@RHOAIRFNPBTDBW", // RhoAirFnPbTdbW
-        "@CPAIRFNW", // CpAirFnW
-        "@HFGAIRFNWTDB", // HfgAirFnWTdb
-        "@HGAIRFNWTDB", // HgAirFnWTdb
-        "@TDPFNTDBTWBPB", // TdpFnTdbTwbPb
-        "@TDPFNWPB", // TdpFnWPb
-        "@HFNTDBW", // HFnTdbW
-        "@HFNTDBRHPB", // HFnTdbRhPb
-        "@TDBFNHW", // TdbFnHW
-        "@RHOVFNTDBRH", // RhovFnTdbRh
+        "@RHOAIRFNPBTDBW",    // RhoAirFnPbTdbW
+        "@CPAIRFNW",          // CpAirFnW
+        "@HFGAIRFNWTDB",      // HfgAirFnWTdb
+        "@HGAIRFNWTDB",       // HgAirFnWTdb
+        "@TDPFNTDBTWBPB",     // TdpFnTdbTwbPb
+        "@TDPFNWPB",          // TdpFnWPb
+        "@HFNTDBW",           // HFnTdbW
+        "@HFNTDBRHPB",        // HFnTdbRhPb
+        "@TDBFNHW",           // TdbFnHW
+        "@RHOVFNTDBRH",       // RhovFnTdbRh
         "@RHOVFNTDBRHLBND0C", // RhovFnTdbRhLBnd0C
-        "@RHOVFNTDBWPB", // RhovFnTdbWPb
-        "@RHFNTDBRHOV", // RhFnTdbRhov
-        "@RHFNTDBRHOVBND0C", // RhFnTdbRhovLBnd0C
-        "@RHFNTDBWPB", // RhFnTdbWPb
-        "@TWBFNTDBWPB", // TwbFnTdbWPb
-        "@VFNTDBWPB", // VFnTdbWPb
-        "@WFNTDPPB", // WFnTdpPb
-        "@WFNTDBH", // WFnTdbH
-        "@WFNTDBTWBPB", // WFnTdbTwbPb
-        "@WFNTDBRHPB", // WFnTdbRhPb
-        "@PSATFNTEMP", // PsatFnTemp
-        "@TSATFNHPB", // TsatFnHPb
-        "@TSATFNPB", // TsatFnPb
-        "@CPCW", // CpCW
-        "@CPHW", // CpHW
-        "@RHOH2O", // RhoH2O
+        "@RHOVFNTDBWPB",      // RhovFnTdbWPb
+        "@RHFNTDBRHOV",       // RhFnTdbRhov
+        "@RHFNTDBRHOVBND0C",  // RhFnTdbRhovLBnd0C
+        "@RHFNTDBWPB",        // RhFnTdbWPb
+        "@TWBFNTDBWPB",       // TwbFnTdbWPb
+        "@VFNTDBWPB",         // VFnTdbWPb
+        "@WFNTDPPB",          // WFnTdpPb
+        "@WFNTDBH",           // WFnTdbH
+        "@WFNTDBTWBPB",       // WFnTdbTwbPb
+        "@WFNTDBRHPB",        // WFnTdbRhPb
+        "@PSATFNTEMP",        // PsatFnTemp
+        "@TSATFNHPB",         // TsatFnHPb
+        "@TSATFNPB",          // TsatFnPb
+        "@CPCW",              // CpCW
+        "@CPHW",              // CpHW
+        "@RHOH2O",            // RhoH2O
 
         // Simulation Management Functions
-        "@FATALHALTEP", // FatalHaltEp
+        "@FATALHALTEP",  // FatalHaltEp
         "@SEVEREWARNEP", // SevereWarnEp
-        "@WARNEP", // WarnEp
+        "@WARNEP",       // WarnEp
 
         // Trend variable handling Functions
-        "@TRENDVALUE", // TrendValue
-        "@TRENDAVERAGE", // TrendAverage
-        "@TRENDMAX", // TrendMax
-        "@TRENDMIN", // TrendMin
+        "@TRENDVALUE",     // TrendValue
+        "@TRENDAVERAGE",   // TrendAverage
+        "@TRENDMAX",       // TrendMax
+        "@TRENDMIN",       // TrendMin
         "@TRENDDIRECTION", // TrendDirection
-        "@TRENDSUM", // TrendSum
+        "@TRENDSUM",       // TrendSum
 
         // Curve and Table access function
         "@CURVEVALUE", // CurveValue
 
         // Weather data query functions
-        "@TODAYISRAIN", // TodayIsRain
-        "@TODAYISSNOW", // TodayIsSnow
-        "@TODAYOUTDRYBULBTEMP", // TodayOutDryBulbTemp
-        "@TODAYOUTDEWPOINTTEMP", // TodayOutDewPointTemp
-        "@TODAYOUTBAROPRESS", // TodayOutBaroPress
-        "@TODAYOUTRELHUM", // TodayOutRelHum
-        "@TODAYWINDSPEED", // TodayWindSpeed
-        "@TODAYWINDDIR", // TodayWindDir
-        "@TODAYSKYTEMP", // TodaySkyTemp
-        "@TODAYHORIZRSKY", // TodayHorizIRSky
-        "@TODAYBEAMSOLARRAD", // TodayBeamSolarRad
-        "@TODAYDIFSOLARRAD", // TodayDifSolarRad
-        "@TODAYALBEDO", // TodayAlbedo
-        "@TODAYLIQUIDPRECIP", // TodayLiquidPrecip
-        "@TOMORROWISRAIN", // TomorrowIsRain
-        "@TOMORROWISSNOW", // TomorrowIsSnow
-        "@TOMORROWOUTDRYBULBTEMP", // TomorrowOutDryBulbTemp
+        "@TODAYISRAIN",             // TodayIsRain
+        "@TODAYISSNOW",             // TodayIsSnow
+        "@TODAYOUTDRYBULBTEMP",     // TodayOutDryBulbTemp
+        "@TODAYOUTDEWPOINTTEMP",    // TodayOutDewPointTemp
+        "@TODAYOUTBAROPRESS",       // TodayOutBaroPress
+        "@TODAYOUTRELHUM",          // TodayOutRelHum
+        "@TODAYWINDSPEED",          // TodayWindSpeed
+        "@TODAYWINDDIR",            // TodayWindDir
+        "@TODAYSKYTEMP",            // TodaySkyTemp
+        "@TODAYHORIZRSKY",          // TodayHorizIRSky
+        "@TODAYBEAMSOLARRAD",       // TodayBeamSolarRad
+        "@TODAYDIFSOLARRAD",        // TodayDifSolarRad
+        "@TODAYALBEDO",             // TodayAlbedo
+        "@TODAYLIQUIDPRECIP",       // TodayLiquidPrecip
+        "@TOMORROWISRAIN",          // TomorrowIsRain
+        "@TOMORROWISSNOW",          // TomorrowIsSnow
+        "@TOMORROWOUTDRYBULBTEMP",  // TomorrowOutDryBulbTemp
         "@TOMORROWOUTDEWPOINTTEMP", // TomorrowOutDewPointTemp
-        "@TOMORROWOUTBAROPRESS", // TomorrowOutBaroPress
-        "@TOMORROWOUTRELHUM", // TomorrowOutRelHum
-        "@TOMORROWWINDSPEED", // TomorrowWindSpeed
-        "@TOMORROWWINDDIR", // TomorrowWindDir
-        "@TOMORROWSKYTEMP", // TomorrowSkyTemp
-        "@TOMORROWHORIZRSKY", // TomorrowHorizIRSky
-        "@TOMORROWBEAMSOLARRAD", // TomorrowBeamSolarRad
-        "@TOMORROWDIFSOLARRAD", // TomorrowDifSolarRad
-        "@TOMORROWALBEDO", // TomorrowAlbedo
-        "@TOMORROWLIQUIDPRECIP" // TomorrowLiquidPrecip
+        "@TOMORROWOUTBAROPRESS",    // TomorrowOutBaroPress
+        "@TOMORROWOUTRELHUM",       // TomorrowOutRelHum
+        "@TOMORROWWINDSPEED",       // TomorrowWindSpeed
+        "@TOMORROWWINDDIR",         // TomorrowWindDir
+        "@TOMORROWSKYTEMP",         // TomorrowSkyTemp
+        "@TOMORROWHORIZRSKY",       // TomorrowHorizIRSky
+        "@TOMORROWBEAMSOLARRAD",    // TomorrowBeamSolarRad
+        "@TOMORROWDIFSOLARRAD",     // TomorrowDifSolarRad
+        "@TOMORROWALBEDO",          // TomorrowAlbedo
+        "@TOMORROWLIQUIDPRECIP"     // TomorrowLiquidPrecip
     };
-        
+
     static constexpr std::array<int, (int)ErlFunc::Num> ErlFuncNumOperands = {
         0, // Null
         1, // Literal
@@ -677,7 +677,7 @@ namespace DataRuntimeLanguage {
         2, // TomorrowBeamSolarRad
         2, // TomorrowDifSolarRad
         2, // TomorrowAlbedo
-        2 // TomorrowLiquidPrecip
+        2  // TomorrowLiquidPrecip
     };
 
     struct TrendVariableType

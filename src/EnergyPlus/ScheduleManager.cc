@@ -695,8 +695,7 @@ namespace ScheduleManager {
             state.dataScheduleMgr->DaySchedule(Count).Name = Alphas(1);
             // Validate ScheduleType
             if (state.dataScheduleMgr->NumScheduleTypes > 0) {
-                CheckIndex =
-                    Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                CheckIndex = Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
@@ -783,8 +782,7 @@ namespace ScheduleManager {
             state.dataScheduleMgr->DaySchedule(Count).Name = Alphas(1);
             // Validate ScheduleType
             if (state.dataScheduleMgr->NumScheduleTypes > 0) {
-                CheckIndex =
-                    Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                CheckIndex = Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
@@ -903,8 +901,7 @@ namespace ScheduleManager {
             state.dataScheduleMgr->DaySchedule(Count).Name = Alphas(1);
             // Validate ScheduleType
             if (state.dataScheduleMgr->NumScheduleTypes > 0) {
-                CheckIndex =
-                    Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                CheckIndex = Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
@@ -1176,8 +1173,7 @@ namespace ScheduleManager {
             state.dataScheduleMgr->Schedule(LoopIndex).SchType = SchedType::ScheduleInput_year;
             // Validate ScheduleType
             if (state.dataScheduleMgr->NumScheduleTypes > 0) {
-                CheckIndex =
-                    Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                CheckIndex = Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
@@ -1320,8 +1316,7 @@ namespace ScheduleManager {
             state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_compact;
             // Validate ScheduleType
-            CheckIndex =
-                Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+            CheckIndex = Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state,
@@ -1689,8 +1684,7 @@ namespace ScheduleManager {
             if (state.dataScheduleMgr->NumScheduleTypes > 0) {
                 CheckIndex = 0;
                 if (!lAlphaBlanks(2))
-                    CheckIndex =
-                        Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                    CheckIndex = Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
@@ -2011,8 +2005,7 @@ namespace ScheduleManager {
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_constant;
             // Validate ScheduleType
             if (state.dataScheduleMgr->NumScheduleTypes > 0) {
-                CheckIndex =
-                    Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                CheckIndex = Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
@@ -2083,8 +2076,7 @@ namespace ScheduleManager {
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_external;
 
             // Validate ScheduleType
-            CheckIndex =
-                Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+            CheckIndex = Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state,
@@ -2161,8 +2153,7 @@ namespace ScheduleManager {
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_external;
 
             // Validate ScheduleType
-            CheckIndex =
-                Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+            CheckIndex = Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state,
@@ -2240,8 +2231,7 @@ namespace ScheduleManager {
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_external;
 
             // Validate ScheduleType
-            CheckIndex =
-                Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+            CheckIndex = Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state,
@@ -2861,8 +2851,7 @@ namespace ScheduleManager {
         }
 
         if (state.dataScheduleMgr->NumSchedules > 0) {
-            GetScheduleIndex =
-                Util::FindItemInList(ScheduleName, state.dataScheduleMgr->Schedule({1, state.dataScheduleMgr->NumSchedules}));
+            GetScheduleIndex = Util::FindItemInList(ScheduleName, state.dataScheduleMgr->Schedule({1, state.dataScheduleMgr->NumSchedules}));
             if (GetScheduleIndex > 0) {
                 if (!state.dataScheduleMgr->Schedule(GetScheduleIndex).Used) {
                     state.dataScheduleMgr->Schedule(GetScheduleIndex).Used = true;
@@ -2963,8 +2952,7 @@ namespace ScheduleManager {
         }
 
         if (state.dataScheduleMgr->NumDaySchedules > 0) {
-            GetDayScheduleIndex =
-                Util::FindItemInList(ScheduleName, state.dataScheduleMgr->DaySchedule({1, state.dataScheduleMgr->NumDaySchedules}));
+            GetDayScheduleIndex = Util::FindItemInList(ScheduleName, state.dataScheduleMgr->DaySchedule({1, state.dataScheduleMgr->NumDaySchedules}));
             if (GetDayScheduleIndex > 0) {
                 state.dataScheduleMgr->DaySchedule(GetDayScheduleIndex).Used = true;
             }

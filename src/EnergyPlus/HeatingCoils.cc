@@ -1517,9 +1517,7 @@ namespace HeatingCoils {
             switch (heatingCoil.ReclaimHeatingSource) {
             case HeatObjTypes::COMPRESSORRACK_REFRIGERATEDCASE: {
                 for (int RackNum = 1; RackNum <= state.dataRefrigCase->NumRefrigeratedRacks; ++RackNum) {
-                    if (!Util::SameString(state.dataHeatBal->HeatReclaimRefrigeratedRack(RackNum).Name,
-                                                     heatingCoil.ReclaimHeatingCoilName))
-                        continue;
+                    if (!Util::SameString(state.dataHeatBal->HeatReclaimRefrigeratedRack(RackNum).Name, heatingCoil.ReclaimHeatingCoilName)) continue;
                     heatingCoil.ReclaimHeatingSourceIndexNum = RackNum;
                     if (allocated(state.dataHeatBal->HeatReclaimRefrigeratedRack)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
@@ -1544,8 +1542,7 @@ namespace HeatingCoils {
             } break;
             case HeatObjTypes::CONDENSER_REFRIGERATION: {
                 for (int CondNum = 1; CondNum <= state.dataRefrigCase->NumRefrigCondensers; ++CondNum) {
-                    if (!Util::SameString(state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).Name, heatingCoil.ReclaimHeatingCoilName))
-                        continue;
+                    if (!Util::SameString(state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).Name, heatingCoil.ReclaimHeatingCoilName)) continue;
                     heatingCoil.ReclaimHeatingSourceIndexNum = CondNum;
                     if (allocated(state.dataHeatBal->HeatReclaimRefrigCondenser)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
@@ -1572,8 +1569,7 @@ namespace HeatingCoils {
             case HeatObjTypes::COIL_DX_MULTISPEED:
             case HeatObjTypes::COIL_DX_MULTIMODE: {
                 for (int DXCoilNum = 1; DXCoilNum <= state.dataDXCoils->NumDXCoils; ++DXCoilNum) {
-                    if (!Util::SameString(state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).Name, heatingCoil.ReclaimHeatingCoilName))
-                        continue;
+                    if (!Util::SameString(state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).Name, heatingCoil.ReclaimHeatingCoilName)) continue;
                     heatingCoil.ReclaimHeatingSourceIndexNum = DXCoilNum;
                     if (allocated(state.dataHeatBal->HeatReclaimDXCoil)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
@@ -1598,8 +1594,7 @@ namespace HeatingCoils {
             } break;
             case HeatObjTypes::COIL_DX_VARIABLE_COOLING: {
                 for (int DXCoilNum = 1; DXCoilNum <= state.dataVariableSpeedCoils->NumVarSpeedCoils; ++DXCoilNum) {
-                    if (!Util::SameString(state.dataHeatBal->HeatReclaimVS_DXCoil(DXCoilNum).Name, heatingCoil.ReclaimHeatingCoilName))
-                        continue;
+                    if (!Util::SameString(state.dataHeatBal->HeatReclaimVS_DXCoil(DXCoilNum).Name, heatingCoil.ReclaimHeatingCoilName)) continue;
                     heatingCoil.ReclaimHeatingSourceIndexNum = DXCoilNum;
                     if (allocated(state.dataHeatBal->HeatReclaimVS_DXCoil)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
@@ -3268,8 +3263,7 @@ namespace HeatingCoils {
         int CoilFound = 0;
 
         // note should eventually get rid of this string comparison
-        if (Util::SameString(CoilType, "COIL:COOLING:DX:SINGLESPEED") ||
-            Util::SameString(CoilType, "COIL:COOLING:DX:TWOSPEED") ||
+        if (Util::SameString(CoilType, "COIL:COOLING:DX:SINGLESPEED") || Util::SameString(CoilType, "COIL:COOLING:DX:TWOSPEED") ||
             Util::SameString(CoilType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
             bool SuppressWarning = true;
             DXCoils::GetDXCoilIndex(state, CoilName, CoilNum, GetCoilErrFlag, CoilType, SuppressWarning);

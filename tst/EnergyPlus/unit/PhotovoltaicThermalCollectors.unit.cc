@@ -268,13 +268,13 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
 
     // Set up conditions
     int InletNode = Util::FindItemInList("ZN_1_FLR_1_SEC_1:SYS_OAINLET NODE",
-                                                    state->dataLoopNodes->NodeID,
-                                                    state->dataLoopNodes->NumOfNodes); // HVAC node associated with inlet of BIPVT
-    state->dataLoopNodes->Node(InletNode).HumRat = 0.001;                              // inlet air humidity ratio (kgda/kg)
-    state->dataEnvrn->OutHumRat = 0.001;                                               // ambient humidity ratio (kg/kg)
-    state->dataEnvrn->SkyTemp = 0.0;                                                   // sky temperature (DegC)
-    state->dataEnvrn->WindSpeed = 5.0;                                                 // wind speed (m/s)
-    state->dataEnvrn->WindDir = 0.0;                                                   // wind direction (deg)
+                                         state->dataLoopNodes->NodeID,
+                                         state->dataLoopNodes->NumOfNodes); // HVAC node associated with inlet of BIPVT
+    state->dataLoopNodes->Node(InletNode).HumRat = 0.001;                   // inlet air humidity ratio (kgda/kg)
+    state->dataEnvrn->OutHumRat = 0.001;                                    // ambient humidity ratio (kg/kg)
+    state->dataEnvrn->SkyTemp = 0.0;                                        // sky temperature (DegC)
+    state->dataEnvrn->WindSpeed = 5.0;                                      // wind speed (m/s)
+    state->dataEnvrn->WindDir = 0.0;                                        // wind direction (deg)
     state->dataPhotovoltaic->PVarray(thisBIPVT.PVnum).TRNSYSPVcalc.ArrayEfficiency = 0.5;
     state->dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(thisBIPVT.SurfNum) = 0.0; // Exterior ground diffuse solar incident on surface (W/m2)
     state->dataHeatBal->SurfCosIncidenceAngle(thisBIPVT.SurfNum) = 0.5;           // Cosine of beam solar incidence angle

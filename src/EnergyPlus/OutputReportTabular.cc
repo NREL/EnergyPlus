@@ -847,8 +847,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                     // search through the keys for the currently active key "UniqueKeyNames(kUniqueKey)"
                     found = 0;
                     for (int iKey = 1; iKey <= KeyCount; ++iKey) {
-                        if (Util::SameString(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey),
-                                                        UniqueKeyNames(kUniqueKey))) {
+                        if (Util::SameString(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey), UniqueKeyNames(kUniqueKey))) {
                             found = iKey;
                             break;
                         }
@@ -3385,11 +3384,9 @@ void WriteTableOfContents(EnergyPlusData &state)
                 tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriodSummary, Entire_Facility) << "\">"
                            << "Reporting Period Summary"
                            << "</a>\n";
-                AddTOCReportPeriod(
-                    state.dataWeather->TotThermalReportPers, "Thermal", state.dataWeather->ThermalReportPeriodInput, tbl_stream);
+                AddTOCReportPeriod(state.dataWeather->TotThermalReportPers, "Thermal", state.dataWeather->ThermalReportPeriodInput, tbl_stream);
                 AddTOCReportPeriod(state.dataWeather->TotCO2ReportPers, "CO2", state.dataWeather->CO2ReportPeriodInput, tbl_stream);
-                AddTOCReportPeriod(
-                    state.dataWeather->TotVisualReportPers, "Visual", state.dataWeather->VisualReportPeriodInput, tbl_stream);
+                AddTOCReportPeriod(state.dataWeather->TotVisualReportPers, "Visual", state.dataWeather->VisualReportPeriodInput, tbl_stream);
             }
         }
     }
@@ -7732,14 +7729,14 @@ void WriteBEPSTable(EnergyPlusData &state)
                 Util::appendPerfLog(state, "Water ABUPS Total [m3]", format("{:.3R}", collapsedTotal(14)));
                 Util::appendPerfLog(state, "Values Gathered Over [hours]", format("{:.2R}", ort->gatherElapsedTimeBEPS));
                 Util::appendPerfLog(state,
-                                               "Facility Any Zone Oscillating Temperatures Time [hours]",
-                                               format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillate));
+                                    "Facility Any Zone Oscillating Temperatures Time [hours]",
+                                    format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillate));
                 Util::appendPerfLog(state,
-                                               "Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
-                                               format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateDuringOccupancy));
+                                    "Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
+                                    format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateDuringOccupancy));
                 Util::appendPerfLog(state,
-                                               "Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
-                                               format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateInDeadband));
+                                    "Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
+                                    format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateInDeadband));
             }
         }
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
@@ -12076,8 +12073,7 @@ void WriteReportPeriodTimeConsumption(EnergyPlusData &state)
     Array1D_int columnWidth;
     Array1D_string rowHead;
     Array2D_string tableBody;
-    int numRowsReportPeriod =
-        state.dataWeather->TotThermalReportPers + state.dataWeather->TotCO2ReportPers + state.dataWeather->TotVisualReportPers;
+    int numRowsReportPeriod = state.dataWeather->TotThermalReportPers + state.dataWeather->TotCO2ReportPers + state.dataWeather->TotVisualReportPers;
     rowHead.allocate(numRowsReportPeriod);
     columnHead.allocate(6);
     columnWidth.allocate(6);
@@ -13700,7 +13696,7 @@ void WriteComponentSizing(EnergyPlusData &state)
             for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
                 if (!state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written) {
                     if (Util::SameString(state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).typeField,
-                                                    state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField)) {
+                                         state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField)) {
                         state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active = true;
                     }
                 }

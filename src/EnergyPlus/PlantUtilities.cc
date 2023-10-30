@@ -1974,8 +1974,8 @@ int MyPlantSizingIndex(EnergyPlusData &state,
 
     if (MyPltLoopNum > 0) {
         if (state.dataSize->NumPltSizInput > 0) {
-            MyPltSizNum = Util::FindItemInList(
-                state.dataPlnt->PlantLoop(MyPltLoopNum).Name, state.dataSize->PlantSizData, &PlantSizingData::PlantLoopName);
+            MyPltSizNum =
+                Util::FindItemInList(state.dataPlnt->PlantLoop(MyPltLoopNum).Name, state.dataSize->PlantSizData, &PlantSizingData::PlantLoopName);
         }
         if (MyPltSizNum == 0) {
             if (PrintErrorFlag) {

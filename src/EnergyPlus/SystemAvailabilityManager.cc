@@ -625,8 +625,7 @@ namespace SystemAvailabilityManager {
                         nightCycleMgr.CtrlZonePtrs(1) = ZoneNum;
                     } else {
                         int zoneListNum = 0;
-                        if (state.dataHeatBal->NumOfZoneLists > 0)
-                            zoneListNum = Util::FindItemInList(cAlphaArgs(6), state.dataHeatBal->ZoneList);
+                        if (state.dataHeatBal->NumOfZoneLists > 0) zoneListNum = Util::FindItemInList(cAlphaArgs(6), state.dataHeatBal->ZoneList);
                         if (zoneListNum > 0) {
                             int NumZones = state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
                             nightCycleMgr.NumOfCtrlZones = NumZones;
@@ -667,8 +666,7 @@ namespace SystemAvailabilityManager {
                         nightCycleMgr.CoolingZonePtrs(1) = ZoneNum;
                     } else {
                         int zoneListNum = 0;
-                        if (state.dataHeatBal->NumOfZoneLists > 0)
-                            zoneListNum = Util::FindItemInList(cAlphaArgs(7), state.dataHeatBal->ZoneList);
+                        if (state.dataHeatBal->NumOfZoneLists > 0) zoneListNum = Util::FindItemInList(cAlphaArgs(7), state.dataHeatBal->ZoneList);
                         if (zoneListNum > 0) {
                             int NumZones = state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
                             nightCycleMgr.NumOfCoolingZones = NumZones;
@@ -699,8 +697,7 @@ namespace SystemAvailabilityManager {
                         nightCycleMgr.HeatingZonePtrs(1) = ZoneNum;
                     } else {
                         int zoneListNum = 0;
-                        if (state.dataHeatBal->NumOfZoneLists > 0)
-                            zoneListNum = Util::FindItemInList(cAlphaArgs(8), state.dataHeatBal->ZoneList);
+                        if (state.dataHeatBal->NumOfZoneLists > 0) zoneListNum = Util::FindItemInList(cAlphaArgs(8), state.dataHeatBal->ZoneList);
                         if (zoneListNum > 0) {
                             int NumZones = state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
                             nightCycleMgr.NumOfHeatingZones = NumZones;
@@ -731,8 +728,7 @@ namespace SystemAvailabilityManager {
                         nightCycleMgr.HeatZnFanZonePtrs(1) = ZoneNum;
                     } else {
                         int zoneListNum = 0;
-                        if (state.dataHeatBal->NumOfZoneLists > 0)
-                            zoneListNum = Util::FindItemInList(cAlphaArgs(9), state.dataHeatBal->ZoneList);
+                        if (state.dataHeatBal->NumOfZoneLists > 0) zoneListNum = Util::FindItemInList(cAlphaArgs(9), state.dataHeatBal->ZoneList);
                         if (zoneListNum > 0) {
                             int NumZones = state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
                             nightCycleMgr.NumOfHeatZnFanZones = NumZones;
@@ -4181,8 +4177,7 @@ namespace SystemAvailabilityManager {
             if (hybridVentMgr.SimpleControlTypeSchedPtr > 0) {
                 hybridVentMgr.VentilationName = state.dataIPShortCut->cAlphaArgs(10);
                 if (state.dataHeatBal->TotVentilation > 0) {
-                    hybridVentMgr.VentilationPtr =
-                        Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(10), state.dataHeatBal->Ventilation);
+                    hybridVentMgr.VentilationPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(10), state.dataHeatBal->Ventilation);
                     HybridVentSysAvailMaster(SysAvailNum) = hybridVentMgr.VentilationPtr;
                     SchedMax = GetScheduleMaxValue(state, hybridVentMgr.SimpleControlTypeSchedPtr);
                     if (hybridVentMgr.VentilationPtr <= 0 && int(SchedMax) == 1) {
@@ -4527,7 +4522,7 @@ namespace SystemAvailabilityManager {
                 AirLoopCount = 0;
                 for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
                     if (Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name,
-                                                    state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).AirLoopName)) {
+                                         state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).AirLoopName)) {
                         ++AirLoopCount;
                         if (AirLoopCount > 1) SysAvailIndex = SysAvailNum;
                     }

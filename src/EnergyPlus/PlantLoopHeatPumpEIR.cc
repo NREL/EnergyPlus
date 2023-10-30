@@ -1274,8 +1274,8 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 std::string condenserType = Util::makeUPPER(fields.at("condenser_type").get<std::string>());
                 std::string sourceSideInletNodeName = Util::makeUPPER(fields.at("source_side_inlet_node_name").get<std::string>());
                 std::string sourceSideOutletNodeName = Util::makeUPPER(fields.at("source_side_outlet_node_name").get<std::string>());
-                thisPLHP.companionCoilName = Util::makeUPPER(
-                    state.dataInputProcessing->inputProcessor->getAlphaFieldValue(fields, schemaProps, "companion_heat_pump_name"));
+                thisPLHP.companionCoilName =
+                    Util::makeUPPER(state.dataInputProcessing->inputProcessor->getAlphaFieldValue(fields, schemaProps, "companion_heat_pump_name"));
 
                 thisPLHP.loadSideDesignVolFlowRate =
                     state.dataInputProcessing->inputProcessor->getRealFieldValue(fields, schemaProps, "load_side_reference_flow_rate");
@@ -1299,24 +1299,23 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
                 thisPLHP.sizingFactor = state.dataInputProcessing->inputProcessor->getRealFieldValue(fields, schemaProps, "sizing_factor");
 
-                std::string const capFtName =
-                    Util::makeUPPER(fields.at("capacity_modifier_function_of_temperature_curve_name").get<std::string>());
+                std::string const capFtName = Util::makeUPPER(fields.at("capacity_modifier_function_of_temperature_curve_name").get<std::string>());
                 thisPLHP.capFuncTempCurveIndex = Curve::GetCurveIndex(state, capFtName);
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(state, format("Invalid curve name for EIR PLHP (name={}; entered curve name: {}", thisPLHP.name, capFtName));
                     errorsFound = true;
                 }
 
-                std::string const eirFtName = Util::makeUPPER(
-                    fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name").get<std::string>());
+                std::string const eirFtName =
+                    Util::makeUPPER(fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name").get<std::string>());
                 thisPLHP.powerRatioFuncTempCurveIndex = Curve::GetCurveIndex(state, eirFtName);
                 if (thisPLHP.powerRatioFuncTempCurveIndex == 0) {
                     ShowSevereError(state, format("Invalid curve name for EIR PLHP (name={}; entered curve name: {}", thisPLHP.name, eirFtName));
                     errorsFound = true;
                 }
 
-                std::string const eirFplrName = Util::makeUPPER(
-                    fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name").get<std::string>());
+                std::string const eirFplrName =
+                    Util::makeUPPER(fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name").get<std::string>());
                 thisPLHP.powerRatioFuncPLRCurveIndex = Curve::GetCurveIndex(state, eirFplrName);
                 if (thisPLHP.powerRatioFuncPLRCurveIndex == 0) {
                     ShowSevereError(state, format("Invalid curve name for EIR PLHP (name={}; entered curve name: {}", thisPLHP.name, eirFplrName));
@@ -1359,8 +1358,8 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     "HEATINGCAPACITY", "COOLINGCAPACITY", "GREATEROFHEATINGORCOOLING"};
                 auto const heatSizingType = fields.find("heat_pump_sizing_method");
                 if (heatSizingType != fields.end()) {
-                    thisPLHP.heatSizingMethod = static_cast<HeatSizingType>(
-                        getEnumValue(PLHPHeatSizTypeNamesUC, Util::makeUPPER(heatSizingType.value().get<std::string>())));
+                    thisPLHP.heatSizingMethod =
+                        static_cast<HeatSizingType>(getEnumValue(PLHPHeatSizTypeNamesUC, Util::makeUPPER(heatSizingType.value().get<std::string>())));
                 } else {
                     // revert to legacy sizing method, if no companion coil and this coil type is heating, set to heating
                     if (thisPLHP.companionCoilName.empty() && thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
@@ -1373,8 +1372,8 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 constexpr std::array<std::string_view, static_cast<int>(ControlType::Num)> PLHPCtrlTypeNamesUC = {"SETPOINT", "LOAD"};
                 auto const controlType = fields.find("control_type");
                 if (controlType != fields.end()) {
-                    thisPLHP.sysControlType = static_cast<ControlType>(
-                        getEnumValue(PLHPCtrlTypeNamesUC, Util::makeUPPER(controlType.value().get<std::string>())));
+                    thisPLHP.sysControlType =
+                        static_cast<ControlType>(getEnumValue(PLHPCtrlTypeNamesUC, Util::makeUPPER(controlType.value().get<std::string>())));
                 } else {
                     thisPLHP.sysControlType = ControlType::Load;
                 }
@@ -1422,8 +1421,8 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     }
                     auto const timedEmpiricalDefHeatLoadPenaltyCurveName = fields.find("timed_empirical_defrost_heat_load_penalty_curve_name");
                     if (timedEmpiricalDefHeatLoadPenaltyCurveName != fields.end()) {
-                        thisPLHP.defrostHeatLoadCurveIndex = Curve::GetCurveIndex(
-                            state, Util::makeUPPER(timedEmpiricalDefHeatLoadPenaltyCurveName.value().get<std::string>()));
+                        thisPLHP.defrostHeatLoadCurveIndex =
+                            Curve::GetCurveIndex(state, Util::makeUPPER(timedEmpiricalDefHeatLoadPenaltyCurveName.value().get<std::string>()));
                         thisPLHP.defrostLoadCurveDims = state.dataCurveManager->PerfCurve(thisPLHP.defrostHeatLoadCurveIndex)->numDims;
                     }
                     auto const defrostHeatEnergyCurveIndexCurveName = fields.find("timed_empirical_defrost_heat_input_energy_fraction_curve_name");
@@ -1435,8 +1434,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 } else if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) { // used for Timed or OnDemand
                     auto const defEIRFTCurveName = fields.find("defrost_energy_input_ratio_function_of_temperature_curve_name");
                     if (defEIRFTCurveName != fields.end()) {
-                        thisPLHP.defrostEIRFTIndex =
-                            Curve::GetCurveIndex(state, Util::makeUPPER(defEIRFTCurveName.value().get<std::string>()));
+                        thisPLHP.defrostEIRFTIndex = Curve::GetCurveIndex(state, Util::makeUPPER(defEIRFTCurveName.value().get<std::string>()));
                     }
                 }
 
@@ -2559,8 +2557,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 getEnumValue(DataPlant::FlowModeNamesUC, Util::makeUPPER(fields.at("flow_mode").get<std::string>())));
 
             // A9 outdoor_air_temperature_curve_input_variable
-            std::string oaTempCurveInputVar =
-                Util::makeUPPER(fields.at("outdoor_air_temperature_curve_input_variable").get<std::string>());
+            std::string oaTempCurveInputVar = Util::makeUPPER(fields.at("outdoor_air_temperature_curve_input_variable").get<std::string>());
             thisPLHP.oaTempCurveInputVar = static_cast<OATempCurveVar>(getEnumValue(OATempCurveVarNamesUC, oaTempCurveInputVar));
 
             // A10 water_temperature_curve_input_variable
@@ -2568,8 +2565,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             thisPLHP.waterTempCurveInputVar = static_cast<WaterTempCurveVar>(getEnumValue(WaterTempCurveVarNamesUC, waterTempCurveInputVar));
 
             // A11 normalized_capacity_function_of_temperature_curve_name
-            std::string const &capFtName =
-                Util::makeUPPER(fields.at("normalized_capacity_function_of_temperature_curve_name").get<std::string>());
+            std::string const &capFtName = Util::makeUPPER(fields.at("normalized_capacity_function_of_temperature_curve_name").get<std::string>());
 
             thisPLHP.capFuncTempCurveIndex = Curve::GetCurveIndex(state, capFtName);
             if (thisPLHP.capFuncTempCurveIndex == 0) {
@@ -2586,8 +2582,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 errorsFound = true;
             }
             // A13 fuel_energy_input_ratio_function_of_plr_curve_name
-            std::string const &eirFplrName =
-                Util::makeUPPER(fields.at("fuel_energy_input_ratio_function_of_plr_curve_name").get<std::string>());
+            std::string const &eirFplrName = Util::makeUPPER(fields.at("fuel_energy_input_ratio_function_of_plr_curve_name").get<std::string>());
             thisPLHP.powerRatioFuncPLRCurveIndex = Curve::GetCurveIndex(state, eirFplrName);
             if (thisPLHP.capFuncTempCurveIndex == 0) {
                 ShowSevereError(state, format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, eirFplrName));
@@ -2644,8 +2639,8 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
                 thisPLHP.defrostType = DefrostType::Invalid;
             } else {
-                thisPLHP.defrostType = static_cast<DefrostType>(
-                    getEnumValue(DefrostTypeNamesUC, Util::makeUPPER(fields.at("defrost_control_type").get<std::string>())));
+                thisPLHP.defrostType =
+                    static_cast<DefrostType>(getEnumValue(DefrostTypeNamesUC, Util::makeUPPER(fields.at("defrost_control_type").get<std::string>())));
                 if (thisPLHP.defrostType == DefrostType::Invalid) {
                     thisPLHP.defrostType = DefrostType::OnDemand; // set to default
                     thisPLHP.defrostOpTimeFrac = 0.0;

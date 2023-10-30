@@ -585,8 +585,7 @@ namespace UnitHeater {
 
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex = 0;
             if (!lAlphaBlanks(12)) {
-                state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex =
-                    Util::FindItemInList(Alphas(12), state.dataSize->ZoneHVACSizing);
+                state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex = Util::FindItemInList(Alphas(12), state.dataSize->ZoneHVACSizing);
                 if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex == 0) {
                     ShowSevereError(state, format("{} = {} not found.", cAlphaFields(12), Alphas(12)));
                     ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name));

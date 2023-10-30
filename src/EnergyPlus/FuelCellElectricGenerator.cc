@@ -348,7 +348,7 @@ namespace FuelCellElectricGenerator {
                 // check for other FuelCell using the same power module and fill
                 for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++otherFuelCell) {
                     if (Util::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).FCPM.Name,
-                                                    state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.Name)) {
+                                         state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.Name)) {
                         state.dataFuelCellElectGen->FuelCell(otherFuelCell).FCPM = state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM;
                     }
                 }
@@ -547,7 +547,7 @@ namespace FuelCellElectricGenerator {
                 // check for other FuelCell using the same Air Supply module and fill
                 for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++otherFuelCell) {
                     if (Util::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).AirSup.Name,
-                                                    state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.Name)) {
+                                         state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.Name)) {
                         state.dataFuelCellElectGen->FuelCell(otherFuelCell).AirSup = state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup;
                     }
                 }
@@ -561,8 +561,8 @@ namespace FuelCellElectricGenerator {
         for (int GeneratorNum = 1; GeneratorNum <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++GeneratorNum) {
             // find molar fraction of oxygen in air supply
             int thisConstituent = Util::FindItem("Oxygen",
-                                                            state.dataFuelCellElectGen->FuelCell(GeneratorNum).AirSup.ConstitName,
-                                                            state.dataFuelCellElectGen->FuelCell(GeneratorNum).AirSup.NumConstituents);
+                                                 state.dataFuelCellElectGen->FuelCell(GeneratorNum).AirSup.ConstitName,
+                                                 state.dataFuelCellElectGen->FuelCell(GeneratorNum).AirSup.NumConstituents);
             if (thisConstituent > 0)
                 state.dataFuelCellElectGen->FuelCell(GeneratorNum).AirSup.O2fraction =
                     state.dataFuelCellElectGen->FuelCell(GeneratorNum).AirSup.ConstitMolalFract(thisConstituent);
@@ -687,7 +687,7 @@ namespace FuelCellElectricGenerator {
                 // check for other FuelCell using the same Water Supply module and fill
                 for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++otherFuelCell) {
                     if (Util::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).WaterSup.Name,
-                                                    state.dataFuelCellElectGen->FuelCell(thisFuelCell).WaterSup.Name)) {
+                                         state.dataFuelCellElectGen->FuelCell(thisFuelCell).WaterSup.Name)) {
                         state.dataFuelCellElectGen->FuelCell(otherFuelCell).WaterSup = state.dataFuelCellElectGen->FuelCell(thisFuelCell).WaterSup;
                     }
                 }
@@ -743,8 +743,7 @@ namespace FuelCellElectricGenerator {
                 }
 
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.ZoneName = AlphArray(3);
-                state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.ZoneID =
-                    Util::FindItemInList(AlphArray(3), state.dataHeatBal->Zone);
+                state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.ZoneID = Util::FindItemInList(AlphArray(3), state.dataHeatBal->Zone);
                 if ((state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.ZoneID == 0) &&
                     (state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.SkinLossDestination ==
                      DataGenerators::LossDestination::SurroundingZone)) {
@@ -763,7 +762,7 @@ namespace FuelCellElectricGenerator {
                 // check for other FuelCell using the same Auxiliary Heating module and fill
                 for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++otherFuelCell) {
                     if (Util::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).AuxilHeat.Name,
-                                                    state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.Name)) {
+                                         state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.Name)) {
                         state.dataFuelCellElectGen->FuelCell(otherFuelCell).AuxilHeat = state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat;
                     }
                 }
@@ -930,7 +929,7 @@ namespace FuelCellElectricGenerator {
                 // check for other FuelCell using the same Electrical Storage and fill
                 for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++otherFuelCell) {
                     if (Util::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).ElecStorage.Name,
-                                                    state.dataFuelCellElectGen->FuelCell(thisFuelCell).ElecStorage.Name)) {
+                                         state.dataFuelCellElectGen->FuelCell(thisFuelCell).ElecStorage.Name)) {
                         state.dataFuelCellElectGen->FuelCell(otherFuelCell).ElecStorage =
                             state.dataFuelCellElectGen->FuelCell(thisFuelCell).ElecStorage;
                     }
@@ -995,7 +994,7 @@ namespace FuelCellElectricGenerator {
                 // check for other FuelCell using the same Inverter and fill
                 for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++otherFuelCell) {
                     if (Util::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).Inverter.Name,
-                                                    state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter.Name)) {
+                                         state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter.Name)) {
                         state.dataFuelCellElectGen->FuelCell(otherFuelCell).Inverter = state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter;
                     }
                 }
@@ -1024,8 +1023,7 @@ namespace FuelCellElectricGenerator {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                int thisFuelCell =
-                    Util::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameStackCooler);
+                int thisFuelCell = Util::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameStackCooler);
 
                 if (thisFuelCell > 0) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).Type = DataPlant::PlantEquipmentType::Generator_FCStackCooler;
@@ -2782,12 +2780,12 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        Real64 constexpr A = 29.0373;                                    // shomate coeff
-        Real64 constexpr B = 10.2573;                                    // shomate coeff
-        Real64 constexpr C = 2.81048;                                    // shomate coeff
-        Real64 constexpr D = -0.95914;                                   // shomate coeff
-        Real64 constexpr E = 0.11725;                                    // shomate coeff
-        Real64 constexpr F = -250.569;                                   // shomate coeff
+        Real64 constexpr A = 29.0373;                                // shomate coeff
+        Real64 constexpr B = 10.2573;                                // shomate coeff
+        Real64 constexpr C = 2.81048;                                // shomate coeff
+        Real64 constexpr D = -0.95914;                               // shomate coeff
+        Real64 constexpr E = 0.11725;                                // shomate coeff
+        Real64 constexpr F = -250.569;                               // shomate coeff
         Real64 const Tsho = (FluidTemp + Constant::Kelvin) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
         HGasWater = A * Tsho + B * pow_2(Tsho) / 2.0 + C * pow_3(Tsho) / 3.0 + D * pow_4(Tsho) / 4.0 - E / Tsho + F; //- H

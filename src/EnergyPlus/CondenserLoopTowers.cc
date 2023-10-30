@@ -1041,8 +1041,7 @@ namespace CondenserLoopTowers {
                                                                            DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
-            if ((Util::SameString(AlphArray(4), "CoolToolsUserDefined") ||
-                 Util::SameString(AlphArray(4), "YorkCalcUserDefined")) &&
+            if ((Util::SameString(AlphArray(4), "CoolToolsUserDefined") || Util::SameString(AlphArray(4), "YorkCalcUserDefined")) &&
                 state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                 ShowSevereError(state,
                                 format("{}, \"{}\" a {} must be specified when {} is specified as CoolToolsUserDefined or YorkCalcUserDefined",

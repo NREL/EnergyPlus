@@ -370,13 +370,13 @@ void ProcessDateString(EnergyPlusData &state,
 
 void DetermineDateTokens(EnergyPlusData &state,
                          std::string const &String,
-                         int &NumTokens,                     // Number of tokens found in string
-                         int &TokenDay,                      // Value of numeric field found
-                         int &TokenMonth,                    // Value of Month field found (1=Jan, 2=Feb, etc)
-                         int &TokenWeekday,                  // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
-                         Weather::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
-                         bool &ErrorsFound,                  // Set to true if cannot process this string as a date
-                         ObjexxFCL::Optional_int TokenYear   // Value of Year if one appears to be present and this argument is present
+                         int &NumTokens,                   // Number of tokens found in string
+                         int &TokenDay,                    // Value of numeric field found
+                         int &TokenMonth,                  // Value of Month field found (1=Jan, 2=Feb, etc)
+                         int &TokenWeekday,                // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
+                         Weather::DateType &DateType,      // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                         bool &ErrorsFound,                // Set to true if cannot process this string as a date
+                         ObjexxFCL::Optional_int TokenYear // Value of Year if one appears to be present and this argument is present
 )
 {
 
@@ -1132,7 +1132,8 @@ void ScanForReports(EnergyPlusData &state,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            ReportType checkReportType = static_cast<ReportType>(getEnumValue(ReportTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(1))));
+            ReportType checkReportType =
+                static_cast<ReportType>(getEnumValue(ReportTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(1))));
 
             switch (checkReportType) {
             case ReportType::DXF: {
@@ -1238,8 +1239,8 @@ void ScanForReports(EnergyPlusData &state,
             state.dataRuntimeLang->OutputEMSInternalVarsSmall = (CheckAvailRpt == AvailRpt::NotByUniqueKeyNames);
             state.dataRuntimeLang->OutputEMSInternalVarsFull = (CheckAvailRpt == AvailRpt::Verbose);
 
-            ERLdebugOutputLevel CheckERLlevel = static_cast<ERLdebugOutputLevel>(
-                getEnumValue(ERLdebugOutputLevelNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
+            ERLdebugOutputLevel CheckERLlevel =
+                static_cast<ERLdebugOutputLevel>(getEnumValue(ERLdebugOutputLevelNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
             state.dataRuntimeLang->OutputEMSErrors =
                 (CheckERLlevel == ERLdebugOutputLevel::ErrorsOnly || CheckERLlevel == ERLdebugOutputLevel::Verbose);
             state.dataRuntimeLang->OutputFullEMSTrace = (CheckERLlevel == ERLdebugOutputLevel::Verbose);

@@ -1008,8 +1008,8 @@ namespace AirLoopHVACDOAS {
                 this->SizingCoolOATemp = env.maxCoolingOATSizing;
                 // DesignDayNum = 0 for KindOfSim == RunPeriodDesign
                 if (env.KindOfEnvrn == Constant::KindOfSim::DesignDay && state.dataWeather->DesDayInput(env.DesignDayNum).PressureEntered) {
-                    this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdpPb(
-                        state, env.maxCoolingOADPSizing, state.dataWeather->DesDayInput(env.DesignDayNum).PressBarom);
+                    this->SizingCoolOAHumRat =
+                        Psychrometrics::PsyWFnTdpPb(state, env.maxCoolingOADPSizing, state.dataWeather->DesDayInput(env.DesignDayNum).PressBarom);
                 } else {
                     this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdpPb(state, env.maxCoolingOADPSizing, state.dataEnvrn->StdBaroPress);
                 }
@@ -1017,8 +1017,8 @@ namespace AirLoopHVACDOAS {
             if (env.minHeatingOATSizing < this->HeatOutTemp) {
                 this->HeatOutTemp = env.minHeatingOATSizing;
                 if (env.KindOfEnvrn == Constant::KindOfSim::DesignDay && state.dataWeather->DesDayInput(env.DesignDayNum).PressureEntered) {
-                    this->HeatOutHumRat = Psychrometrics::PsyWFnTdpPb(
-                        state, env.minHeatingOADPSizing, state.dataWeather->DesDayInput(env.DesignDayNum).PressBarom);
+                    this->HeatOutHumRat =
+                        Psychrometrics::PsyWFnTdpPb(state, env.minHeatingOADPSizing, state.dataWeather->DesDayInput(env.DesignDayNum).PressBarom);
                 } else {
                     this->HeatOutHumRat = Psychrometrics::PsyWFnTdpPb(state, env.minHeatingOADPSizing, state.dataEnvrn->StdBaroPress);
                 }

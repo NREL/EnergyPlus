@@ -1258,8 +1258,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
             //  loop through each fault for each OA controller and determine economizer faultys
             for (int i = 1; i <= state.dataFaultsMgr->NumFaultyEconomizer; ++i) {
                 if (state.dataFaultsMgr->FaultsEconomizer(i).ControllerTypeEnum != iController_AirEconomizer) continue;
-                if (Util::SameString(state.dataMixedAir->OAController(OutAirNum).Name,
-                                                state.dataFaultsMgr->FaultsEconomizer(i).ControllerName)) {
+                if (Util::SameString(state.dataMixedAir->OAController(OutAirNum).Name, state.dataFaultsMgr->FaultsEconomizer(i).ControllerName)) {
                     state.dataFaultsMgr->FaultsEconomizer(i).ControllerID = OutAirNum;
                     ++state.dataMixedAir->OAController(OutAirNum).NumFaultyEconomizer;
                 }
@@ -1269,8 +1268,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
             if (state.dataMixedAir->OAController(OutAirNum).NumFaultyEconomizer > 0) {
                 for (int j = 0, i = 1; i <= state.dataFaultsMgr->NumFaultyEconomizer; ++i) {
                     if (state.dataFaultsMgr->FaultsEconomizer(i).ControllerTypeEnum != iController_AirEconomizer) continue;
-                    if (Util::SameString(state.dataMixedAir->OAController(OutAirNum).Name,
-                                                    state.dataFaultsMgr->FaultsEconomizer(i).ControllerName)) {
+                    if (Util::SameString(state.dataMixedAir->OAController(OutAirNum).Name, state.dataFaultsMgr->FaultsEconomizer(i).ControllerName)) {
                         state.dataMixedAir->OAController(OutAirNum).EconmizerFaultNum(++j) = i;
                     }
                 }
@@ -1340,8 +1338,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
             }
 
             // System outdoor air method
-            thisVentilationMechanical.SystemOAMethod =
-                static_cast<DataSizing::SysOAMethod>(getEnumValue(SOAMNamesUC, Util::makeUPPER(AlphArray(4))));
+            thisVentilationMechanical.SystemOAMethod = static_cast<DataSizing::SysOAMethod>(getEnumValue(SOAMNamesUC, Util::makeUPPER(AlphArray(4))));
 
             if (thisVentilationMechanical.SystemOAMethod == DataSizing::SysOAMethod::IAQP ||
                 thisVentilationMechanical.SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlSchOcc ||
@@ -1415,8 +1412,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                 // Get zone air distribution details from design specification Zone Air Distribution object
                 if (!lAlphaBlanks((groupNum - 1) * 3 + 7)) {
                     state.dataMixedAir->DesignSpecZoneADObjName(groupNum) = AlphArray((groupNum - 1) * 3 + 7);
-                    int ObjIndex =
-                        Util::FindItemInList(state.dataMixedAir->DesignSpecZoneADObjName(groupNum), state.dataSize->ZoneAirDistribution);
+                    int ObjIndex = Util::FindItemInList(state.dataMixedAir->DesignSpecZoneADObjName(groupNum), state.dataSize->ZoneAirDistribution);
                     state.dataMixedAir->DesignSpecZoneADObjIndex(groupNum) = ObjIndex;
 
                     if (ObjIndex == 0) {
@@ -1434,8 +1430,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                 if (ZoneNum > 0) {
                     ++MechVentZoneCount;
                 } else {
-                    int ZoneListNum =
-                        Util::FindItemInList(state.dataMixedAir->VentMechZoneOrListName(groupNum), state.dataHeatBal->ZoneList);
+                    int ZoneListNum = Util::FindItemInList(state.dataMixedAir->VentMechZoneOrListName(groupNum), state.dataHeatBal->ZoneList);
                     if (ZoneListNum > 0) {
                         MechVentZoneCount += state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones;
                     } else {
@@ -1486,8 +1481,8 @@ void GetOAControllerInputs(EnergyPlusData &state)
                         } else {
                             if (state.dataGlobal->DoZoneSizing) {
                                 int ObjIndex = Util::FindItemInList(state.dataMixedAir->VentMechZoneOrListName(groupNum),
-                                                                               state.dataSize->ZoneSizingInput,
-                                                                               &ZoneSizingInputData::ZoneName);
+                                                                    state.dataSize->ZoneSizingInput,
+                                                                    &ZoneSizingInputData::ZoneName);
                                 if (ObjIndex > 0) {
                                     thisMechVentZone.ZoneDesignSpecOAObjName = state.dataSize->ZoneSizingInput(ObjIndex).DesignSpecOAObjName;
                                     thisMechVentZone.ZoneDesignSpecOAObjIndex = state.dataSize->ZoneSizingInput(ObjIndex).ZoneDesignSpecOAIndex;
@@ -1502,8 +1497,8 @@ void GetOAControllerInputs(EnergyPlusData &state)
                         } else {
                             if (state.dataGlobal->DoZoneSizing) {
                                 int ObjIndex = Util::FindItemInList(state.dataMixedAir->VentMechZoneOrListName(groupNum),
-                                                                               state.dataSize->ZoneSizingInput,
-                                                                               &ZoneSizingInputData::ZoneName);
+                                                                    state.dataSize->ZoneSizingInput,
+                                                                    &ZoneSizingInputData::ZoneName);
                                 if (ObjIndex > 0) {
                                     thisMechVentZone.ZoneDesignSpecADObjName = state.dataSize->ZoneSizingInput(ObjIndex).ZoneAirDistEffObjName;
                                     thisMechVentZone.ZoneDesignSpecADObjIndex = state.dataSize->ZoneSizingInput(ObjIndex).ZoneAirDistributionIndex;
@@ -1513,8 +1508,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                     }
                 } else {
                     //       Not a zone name, must be a zone list
-                    int ZoneListNum =
-                        Util::FindItemInList(state.dataMixedAir->VentMechZoneOrListName(groupNum), state.dataHeatBal->ZoneList);
+                    int ZoneListNum = Util::FindItemInList(state.dataMixedAir->VentMechZoneOrListName(groupNum), state.dataHeatBal->ZoneList);
                     if (ZoneListNum > 0) {
                         for (int ScanZoneListNum = 1; ScanZoneListNum <= state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones; ++ScanZoneListNum) {
                             // check to make sure zone name is unique (not listed more than once)...
@@ -1686,10 +1680,10 @@ void GetOAControllerInputs(EnergyPlusData &state)
                                 if (EquipListNum == EquipListIndex) {
                                     for (int EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(EquipListNum).NumOfEquipTypes; ++EquipNum) {
                                         if (Util::SameString(state.dataZoneEquip->ZoneEquipList(EquipListNum).EquipTypeName(EquipNum),
-                                                                        "ZONEHVAC:AIRDISTRIBUTIONUNIT")) {
+                                                             "ZONEHVAC:AIRDISTRIBUTIONUNIT")) {
                                             for (int ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                                                 if (Util::SameString(state.dataZoneEquip->ZoneEquipList(EquipListNum).EquipName(EquipNum),
-                                                                                state.dataDefineEquipment->AirDistUnit(ADUNum).Name)) {
+                                                                     state.dataDefineEquipment->AirDistUnit(ADUNum).Name)) {
                                                     if ((state.dataDefineEquipment->AirDistUnit(ADUNum).EquipTypeEnum(EquipNum) ==
                                                          DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheat) ||
                                                         (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipTypeEnum(EquipNum) ==
@@ -2250,10 +2244,9 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
                 int OASysIndex = 0;
                 for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
                     for (int OAControllerNum = 1; OAControllerNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumControllers; ++OAControllerNum) {
-                        if (!Util::SameString(state.dataAirLoop->OutsideAirSys(OASysNum).ControllerType(OAControllerNum),
-                                                         CurrentModuleObject) ||
+                        if (!Util::SameString(state.dataAirLoop->OutsideAirSys(OASysNum).ControllerType(OAControllerNum), CurrentModuleObject) ||
                             !Util::SameString(state.dataAirLoop->OutsideAirSys(OASysNum).ControllerName(OAControllerNum),
-                                                         state.dataMixedAir->OAController(OutAirNum).Name))
+                                              state.dataMixedAir->OAController(OutAirNum).Name))
                             continue;
                         OASysIndex = OASysNum;
                         OASysFound = true;
@@ -2269,9 +2262,8 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
                             for (int CompNum = 1;
                                  CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents;
                                  ++CompNum) {
-                                if (!Util::SameString(
-                                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
-                                        state.dataAirLoop->OutsideAirSys(OASysIndex).Name) ||
+                                if (!Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).Name,
+                                                      state.dataAirLoop->OutsideAirSys(OASysIndex).Name) ||
                                     !Util::SameString(
                                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).Comp(CompNum).TypeOf,
                                         "AirLoopHVAC:OutdoorAirSystem"))
@@ -2499,8 +2491,8 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
                 // find which OAsys has this controller
                 int found = Util::FindItemInList(thisOAController.Name,
-                                                            state.dataAirLoop->OutsideAirSys(OASysNum).ControllerName,
-                                                            isize(state.dataAirLoop->OutsideAirSys(OASysNum).ControllerName));
+                                                 state.dataAirLoop->OutsideAirSys(OASysNum).ControllerName,
+                                                 isize(state.dataAirLoop->OutsideAirSys(OASysNum).ControllerName));
                 if (found != 0) {
                     thisOASys = OASysNum;
                     state.dataAirLoop->OutsideAirSys(thisOASys).OAControllerIndex = GetOAController(state, thisOAController.Name);
@@ -2513,8 +2505,8 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 ErrorsFound = true;
             }
             int thisNumForMixer = Util::FindItem(CurrentModuleObjects[static_cast<int>(CMO::OAMixer)],
-                                                            state.dataAirLoop->OutsideAirSys(thisOASys).ComponentType,
-                                                            isize(state.dataAirLoop->OutsideAirSys(thisOASys).ComponentType));
+                                                 state.dataAirLoop->OutsideAirSys(thisOASys).ComponentType,
+                                                 isize(state.dataAirLoop->OutsideAirSys(thisOASys).ComponentType));
             if (thisNumForMixer != 0) {
                 std::string_view const equipName = state.dataAirLoop->OutsideAirSys(thisOASys).ComponentName(thisNumForMixer);
                 int thisMixerIndex = Util::FindItemInList(equipName, state.dataMixedAir->OAMixer);
@@ -2920,8 +2912,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
                     for (int OAControllerLoop2 = 1; OAControllerLoop2 <= state.dataAirLoop->OutsideAirSys(OASysNum).NumControllers;
                          ++OAControllerLoop2) {
-                        if (Util::SameString(state.dataAirLoop->OutsideAirSys(OASysNum).ControllerName(OAControllerLoop2),
-                                                        loopOAController.Name)) {
+                        if (Util::SameString(state.dataAirLoop->OutsideAirSys(OASysNum).ControllerName(OAControllerLoop2), loopOAController.Name)) {
                             thisOASys = OASysNum;
                             OASysFound = true;
                             break;
@@ -2942,12 +2933,10 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                             for (int CompNum = 1;
                                  CompNum <= state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(BranchNum).TotalComponents;
                                  ++CompNum) {
-                                if (!Util::SameString(
-                                        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(BranchNum).Comp(CompNum).Name,
-                                        state.dataAirLoop->OutsideAirSys(thisOASys).Name) ||
-                                    !Util::SameString(
-                                        state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(BranchNum).Comp(CompNum).TypeOf,
-                                        "AirLoopHVAC:OutdoorAirSystem"))
+                                if (!Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(BranchNum).Comp(CompNum).Name,
+                                                      state.dataAirLoop->OutsideAirSys(thisOASys).Name) ||
+                                    !Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                                      "AirLoopHVAC:OutdoorAirSystem"))
                                     continue;
                                 AirLoopFound = true;
                                 airLoopNum = thisAirLoop;
@@ -4809,8 +4798,7 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
         for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).NumComponents; ++CompNum) {
             std::string const &CompType = state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).ComponentType(CompNum);
             std::string const &CompName = state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).ComponentName(CompNum);
-            if (Util::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ||
-                Util::SameString(CompType, "COIL:HEATING:WATER") ||
+            if (Util::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") || Util::SameString(CompType, "COIL:HEATING:WATER") ||
                 Util::SameString(CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED")) {
                 if (Util::SameString(CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED")) {
                     CoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, CompType, CompName, ErrorsFound);
@@ -5242,8 +5230,8 @@ int FindOAMixerMatchForOASystem(EnergyPlusData &state, int const OASysNumber) //
     if (OASysNumber > 0 && OASysNumber <= state.dataAirLoop->NumOASystems) {
         for (int OACompNum = 1; OACompNum <= state.dataAirLoop->OutsideAirSys(OASysNumber).NumComponents; ++OACompNum) {
             if (Util::SameString(state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentType(OACompNum), "OUTDOORAIR:MIXER")) {
-                OAMixerNumber = Util::FindItemInList(state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentName(OACompNum),
-                                                                state.dataMixedAir->OAMixer);
+                OAMixerNumber =
+                    Util::FindItemInList(state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentName(OACompNum), state.dataMixedAir->OAMixer);
                 break;
             }
         }

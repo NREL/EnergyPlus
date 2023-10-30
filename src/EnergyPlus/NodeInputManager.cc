@@ -585,8 +585,7 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
             }
             state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop1) = AssignNodeNumber(
                 state, state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1), DataLoopNode::NodeFluidType::Blank, localErrorsFound);
-            if (Util::SameString(state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1),
-                                            state.dataNodeInputMgr->NodeLists(NCount).Name)) {
+            if (Util::SameString(state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1), state.dataNodeInputMgr->NodeLists(NCount).Name)) {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid node name in list.", RoutineName, CurrentModuleObject, cAlphas(1)));
                 ShowContinueError(state, format("... Node {} Name=\"{}\", duplicates NodeList Name.", Loop1, cAlphas(Loop1 + 1)));
                 localErrorsFound = true;
@@ -617,8 +616,7 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
         for (int Loop2 = 1; Loop2 <= state.dataNodeInputMgr->NodeLists(Loop).NumOfNodesInList; ++Loop2) {
             for (int Loop1 = 1; Loop1 <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop1) {
                 if (Loop == Loop1) continue; // within a nodelist have already checked to see if node name duplicates nodelist name
-                if (!Util::SameString(state.dataNodeInputMgr->NodeLists(Loop).NodeNames(Loop2),
-                                                 state.dataNodeInputMgr->NodeLists(Loop1).Name))
+                if (!Util::SameString(state.dataNodeInputMgr->NodeLists(Loop).NodeNames(Loop2), state.dataNodeInputMgr->NodeLists(Loop1).Name))
                     continue;
                 ShowSevereError(
                     state,

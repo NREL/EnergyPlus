@@ -1575,7 +1575,7 @@ int ProcessTokens(
                     }
                     break;
                 } else {
-                        ShowSevereError(state, format("The operator \"{}\" is missing the left-hand operand!", ErlFuncNamesUC[OperatorNum]));
+                    ShowSevereError(state, format("The operator \"{}\" is missing the left-hand operand!", ErlFuncNamesUC[OperatorNum]));
                     ShowContinueError(state, format("String being parsed=\"{}\".", ParsingString));
                     break;
                 }
@@ -2526,21 +2526,51 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                     ReturnValue.initialized = true;
                     ReturnValue.Type = Value::Number;
                     switch (state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator) {
-                    case ErlFunc::TodayIsRain: { ReturnValue.Number = today.IsRain ? 1.0 : 0.0; } break;
-                    case ErlFunc::TodayIsSnow: { ReturnValue.Number = today.IsSnow ? 1.0 : 0.0; } break;
-                    case ErlFunc::TodayOutDryBulbTemp: { ReturnValue.Number = today.OutDryBulbTemp; } break;
-                    case ErlFunc::TodayOutDewPointTemp: { ReturnValue.Number = today.OutDewPointTemp; } break;
-                    case ErlFunc::TodayOutBaroPress: { ReturnValue.Number = today.OutBaroPress; } break;
-                    case ErlFunc::TodayOutRelHum: { ReturnValue.Number = today.OutRelHum; } break;
-                    case ErlFunc::TodayWindSpeed: { ReturnValue.Number = today.WindSpeed; } break;
-                    case ErlFunc::TodayWindDir: { ReturnValue.Number = today.WindDir; } break;
-                    case ErlFunc::TodaySkyTemp: { ReturnValue.Number = today.SkyTemp; } break;
-                    case ErlFunc::TodayHorizIRSky: { ReturnValue.Number = today.HorizIRSky; } break;
-                    case ErlFunc::TodayBeamSolarRad: { ReturnValue.Number = today.BeamSolarRad; } break;
-                    case ErlFunc::TodayDifSolarRad: { ReturnValue.Number = today.DifSolarRad; } break;
-                    case ErlFunc::TodayAlbedo: { ReturnValue.Number = today.Albedo; } break;
-                    case ErlFunc::TodayLiquidPrecip: { ReturnValue.Number = today.LiquidPrecip; } break;
-                    default: { assert(false); } break;
+                    case ErlFunc::TodayIsRain: {
+                        ReturnValue.Number = today.IsRain ? 1.0 : 0.0;
+                    } break;
+                    case ErlFunc::TodayIsSnow: {
+                        ReturnValue.Number = today.IsSnow ? 1.0 : 0.0;
+                    } break;
+                    case ErlFunc::TodayOutDryBulbTemp: {
+                        ReturnValue.Number = today.OutDryBulbTemp;
+                    } break;
+                    case ErlFunc::TodayOutDewPointTemp: {
+                        ReturnValue.Number = today.OutDewPointTemp;
+                    } break;
+                    case ErlFunc::TodayOutBaroPress: {
+                        ReturnValue.Number = today.OutBaroPress;
+                    } break;
+                    case ErlFunc::TodayOutRelHum: {
+                        ReturnValue.Number = today.OutRelHum;
+                    } break;
+                    case ErlFunc::TodayWindSpeed: {
+                        ReturnValue.Number = today.WindSpeed;
+                    } break;
+                    case ErlFunc::TodayWindDir: {
+                        ReturnValue.Number = today.WindDir;
+                    } break;
+                    case ErlFunc::TodaySkyTemp: {
+                        ReturnValue.Number = today.SkyTemp;
+                    } break;
+                    case ErlFunc::TodayHorizIRSky: {
+                        ReturnValue.Number = today.HorizIRSky;
+                    } break;
+                    case ErlFunc::TodayBeamSolarRad: {
+                        ReturnValue.Number = today.BeamSolarRad;
+                    } break;
+                    case ErlFunc::TodayDifSolarRad: {
+                        ReturnValue.Number = today.DifSolarRad;
+                    } break;
+                    case ErlFunc::TodayAlbedo: {
+                        ReturnValue.Number = today.Albedo;
+                    } break;
+                    case ErlFunc::TodayLiquidPrecip: {
+                        ReturnValue.Number = today.LiquidPrecip;
+                    } break;
+                    default: {
+                        assert(false);
+                    } break;
                     }
                 } else {
                     ReturnValue.Type = DataRuntimeLanguage::Value::Error;
@@ -2548,9 +2578,9 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                                ErlFuncNamesUC[(int)state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator],
                                                Operand(1).Number,
                                                Operand(2).Number);
-                } 
+                }
             } break;
-                    
+
             case ErlFunc::TomorrowIsRain:
             case ErlFunc::TomorrowIsSnow:
             case ErlFunc::TomorrowOutDryBulbTemp:
@@ -2572,21 +2602,51 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                     ReturnValue.initialized = true;
                     ReturnValue.Type = Value::Number;
                     switch (state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator) {
-                    case ErlFunc::TomorrowIsRain: { ReturnValue.Number = tomorrow.IsRain ? 1.0 : 0.0; } break;
-                    case ErlFunc::TomorrowIsSnow: { ReturnValue.Number = tomorrow.IsSnow ? 1.0 : 0.0; } break;
-                    case ErlFunc::TomorrowOutDryBulbTemp: { ReturnValue.Number = tomorrow.OutDryBulbTemp; } break;
-                    case ErlFunc::TomorrowOutDewPointTemp: { ReturnValue.Number = tomorrow.OutDewPointTemp; } break;
-                    case ErlFunc::TomorrowOutBaroPress: { ReturnValue.Number = tomorrow.OutBaroPress; } break;
-                    case ErlFunc::TomorrowOutRelHum: { ReturnValue.Number = tomorrow.OutRelHum; } break;
-                    case ErlFunc::TomorrowWindSpeed: { ReturnValue.Number = tomorrow.WindSpeed; } break;
-                    case ErlFunc::TomorrowWindDir: { ReturnValue.Number = tomorrow.WindDir; } break;
-                    case ErlFunc::TomorrowSkyTemp: { ReturnValue.Number = tomorrow.SkyTemp; } break;
-                    case ErlFunc::TomorrowHorizIRSky: { ReturnValue.Number = tomorrow.HorizIRSky; } break;
-                    case ErlFunc::TomorrowBeamSolarRad: { ReturnValue.Number = tomorrow.BeamSolarRad; } break;
-                    case ErlFunc::TomorrowDifSolarRad: { ReturnValue.Number = tomorrow.DifSolarRad; } break;
-                    case ErlFunc::TomorrowAlbedo: { ReturnValue.Number = tomorrow.Albedo; } break;
-                    case ErlFunc::TomorrowLiquidPrecip: { ReturnValue.Number = tomorrow.LiquidPrecip; } break;
-                    default: { assert(false); } break;
+                    case ErlFunc::TomorrowIsRain: {
+                        ReturnValue.Number = tomorrow.IsRain ? 1.0 : 0.0;
+                    } break;
+                    case ErlFunc::TomorrowIsSnow: {
+                        ReturnValue.Number = tomorrow.IsSnow ? 1.0 : 0.0;
+                    } break;
+                    case ErlFunc::TomorrowOutDryBulbTemp: {
+                        ReturnValue.Number = tomorrow.OutDryBulbTemp;
+                    } break;
+                    case ErlFunc::TomorrowOutDewPointTemp: {
+                        ReturnValue.Number = tomorrow.OutDewPointTemp;
+                    } break;
+                    case ErlFunc::TomorrowOutBaroPress: {
+                        ReturnValue.Number = tomorrow.OutBaroPress;
+                    } break;
+                    case ErlFunc::TomorrowOutRelHum: {
+                        ReturnValue.Number = tomorrow.OutRelHum;
+                    } break;
+                    case ErlFunc::TomorrowWindSpeed: {
+                        ReturnValue.Number = tomorrow.WindSpeed;
+                    } break;
+                    case ErlFunc::TomorrowWindDir: {
+                        ReturnValue.Number = tomorrow.WindDir;
+                    } break;
+                    case ErlFunc::TomorrowSkyTemp: {
+                        ReturnValue.Number = tomorrow.SkyTemp;
+                    } break;
+                    case ErlFunc::TomorrowHorizIRSky: {
+                        ReturnValue.Number = tomorrow.HorizIRSky;
+                    } break;
+                    case ErlFunc::TomorrowBeamSolarRad: {
+                        ReturnValue.Number = tomorrow.BeamSolarRad;
+                    } break;
+                    case ErlFunc::TomorrowDifSolarRad: {
+                        ReturnValue.Number = tomorrow.DifSolarRad;
+                    } break;
+                    case ErlFunc::TomorrowAlbedo: {
+                        ReturnValue.Number = tomorrow.Albedo;
+                    } break;
+                    case ErlFunc::TomorrowLiquidPrecip: {
+                        ReturnValue.Number = tomorrow.LiquidPrecip;
+                    } break;
+                    default: {
+                        assert(false);
+                    } break;
                     }
                 } else {
                     ReturnValue.Type = DataRuntimeLanguage::Value::Error;
@@ -2594,9 +2654,8 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                                ErlFuncNamesUC[(int)state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator],
                                                Operand(1).Number,
                                                Operand(2).Number);
-                } 
+                }
             } break;
-                    
 
             case ErlFunc::Invalid:
             case ErlFunc::Null:

@@ -1073,8 +1073,7 @@ namespace SimulationManager {
                 std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
-                    state.dataGlobal->DoCoilDirectSolutions =
-                        Util::makeUPPER(fields.at("use_coil_direct_solutions").get<std::string>()) == "YES";
+                    state.dataGlobal->DoCoilDirectSolutions = Util::makeUPPER(fields.at("use_coil_direct_solutions").get<std::string>()) == "YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
                     state.dataHeatBalIntRadExchg->CarrollMethod =
@@ -1380,8 +1379,8 @@ namespace SimulationManager {
     // J.Glazer February 2020
     {
         Util::appendPerfLog(state,
-                                       "Program, Version, TimeStamp",
-                                       state.dataStrGlobals->VerStringVar); // this string already includes three portions and has commas
+                            "Program, Version, TimeStamp",
+                            state.dataStrGlobals->VerStringVar); // this string already includes three portions and has commas
         Util::appendPerfLog(state, "Use Coil Direct Solution", bool_to_string(state.dataGlobal->DoCoilDirectSolutions));
         if (state.dataHeatBalIntRadExchg->CarrollMethod) {
             Util::appendPerfLog(state, "Zone Radiant Exchange Algorithm", "CarrollMRT");

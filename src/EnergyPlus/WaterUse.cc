@@ -510,8 +510,8 @@ namespace WaterUse {
                         ErrorsFound = true;
                     }
 
-                    waterConnection.HeatRecoveryConfig = static_cast<HeatRecovConfig>(
-                        getEnumValue(HeatRecoveryConfigNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
+                    waterConnection.HeatRecoveryConfig =
+                        static_cast<HeatRecovConfig>(getEnumValue(HeatRecoveryConfigNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
                     if (waterConnection.HeatRecoveryConfig == HeatRecovConfig::Invalid) {
                         ShowSevereError(state,
                                         format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
@@ -525,8 +525,7 @@ namespace WaterUse {
                 waterConnection.myWaterEquipArr.allocate(NumAlphas - 9);
 
                 for (AlphaNum = 10; AlphaNum <= NumAlphas; ++AlphaNum) {
-                    int WaterEquipNum =
-                        Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(AlphaNum), state.dataWaterUse->WaterEquipment);
+                    int WaterEquipNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(AlphaNum), state.dataWaterUse->WaterEquipment);
 
                     if (WaterEquipNum == 0) {
                         ShowSevereError(

@@ -2648,19 +2648,15 @@ TEST_F(ConvectionCoefficientsFixture, TestSetAdaptiveConvectionAlgoCoefficient)
     int curve;
     int expected_curve;
 
-    Convect::HcInt algo =
-        state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[(int)Convect::IntConvClass::A3_SimpleBuoy_VertWalls];
+    Convect::HcInt algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[(int)Convect::IntConvClass::A3_SimpleBuoy_VertWalls];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::UserCurve));
-    curve = state->dataConvect->intAdaptiveConvAlgo
-                .intConvClassUserCurveNums[(int)Convect::IntConvClass::A3_SimpleBuoy_VertWalls];
+    curve = state->dataConvect->intAdaptiveConvAlgo.intConvClassUserCurveNums[(int)Convect::IntConvClass::A3_SimpleBuoy_VertWalls];
     expected_curve = Util::FindItemInList("ASHRAE VERT DUPLICATE", state->dataConvect->hcIntUserCurve);
     ASSERT_EQ(curve, expected_curve);
 
-    Convect::HcExt algo2 =
-        state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[(int)Convect::ExtConvClass2::WindConvection_WallWindward];
+    Convect::HcExt algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[(int)Convect::ExtConvClass2::WindConvection_WallWindward];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::UserCurve));
-    curve = state->dataConvect->extAdaptiveConvAlgo
-                .extConvClass2UserCurveNums[(int)Convect::ExtConvClass2::WindConvection_WallWindward];
+    curve = state->dataConvect->extAdaptiveConvAlgo.extConvClass2UserCurveNums[(int)Convect::ExtConvClass2::WindConvection_WallWindward];
     expected_curve = Util::FindItemInList("NUSSELTJURGESDUPCURVE", state->dataConvect->hcExtUserCurve);
 }
 

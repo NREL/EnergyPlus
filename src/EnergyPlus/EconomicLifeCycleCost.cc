@@ -496,8 +496,7 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \key MajorOverhaul
         //        \key OtherOperational
         //        \default Maintenance
-        elcc->RecurringCosts[iInObj].category =
-            static_cast<CostCategory>(getEnumValue(CostCategoryNamesUCNoSpace, Util::makeUPPER(AlphaArray(2))));
+        elcc->RecurringCosts[iInObj].category = static_cast<CostCategory>(getEnumValue(CostCategoryNamesUCNoSpace, Util::makeUPPER(AlphaArray(2))));
         bool isNotRecurringCost =
             (elcc->RecurringCosts[iInObj].category != CostCategory::Maintenance && elcc->RecurringCosts[iInObj].category != CostCategory::Repair &&
              elcc->RecurringCosts[iInObj].category != CostCategory::Operation && elcc->RecurringCosts[iInObj].category != CostCategory::Replacement &&
@@ -520,8 +519,7 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \key ServicePeriod
         //        \key BasePeriod
         //        \default ServicePeriod
-        elcc->RecurringCosts[iInObj].startOfCosts =
-            static_cast<StartCosts>(getEnumValue(StartCostNamesUC, Util::makeUPPER(AlphaArray(3))));
+        elcc->RecurringCosts[iInObj].startOfCosts = static_cast<StartCosts>(getEnumValue(StartCostNamesUC, Util::makeUPPER(AlphaArray(3))));
         if (elcc->RecurringCosts[iInObj].startOfCosts == StartCosts::Invalid) {
             elcc->RecurringCosts[iInObj].startOfCosts = StartCosts::ServicePeriod;
             ShowWarningError(state,
@@ -1783,8 +1781,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
             columnHead = "none";
             rowHead(1) = "";
             for (int iYear = 1; iYear <= numYears; ++iYear) {
-                rowHead(iYear + 1) =
-                    format("{} {}", Util::MonthNamesCC[static_cast<int>(elcc->serviceDateMonth)], elcc->serviceDateYear + iYear - 1);
+                rowHead(iYear + 1) = format("{} {}", Util::MonthNamesCC[static_cast<int>(elcc->serviceDateMonth)], elcc->serviceDateYear + iYear - 1);
             }
             for (int jObj = 1; jObj <= elcc->numUseAdjustment; ++jObj) { // loop through objects not columns to add names
                 columnHead(jObj) = elcc->UseAdjustment(jObj).name;
@@ -1819,8 +1816,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         tableBody = "";
         rowHead(1) = "";
         for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-            rowHead(iYear + 1) =
-                format("{} {}", Util::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
+            rowHead(iYear + 1) = format("{} {}", Util::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
         }
         for (int jObj = 0; jObj < (elcc->numRecurringCosts + elcc->numNonrecurringCost); ++jObj) {
             int curCashFlow = CostCategory::Num + jObj;
@@ -2297,8 +2293,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
 
             totalPV = 0.0;
             for (int iYear = 1; iYear <= elcc->lengthStudyYears; ++iYear) {
-                rowHead(iYear) =
-                    format("{} {}", Util::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
+                rowHead(iYear) = format("{} {}", Util::MonthNamesCC[static_cast<int>(elcc->baseDateMonth)], elcc->baseDateYear + iYear - 1);
                 tableBody(1, iYear) = OutputReportTabular::RealToStr(elcc->DepreciatedCapital(iYear), 2);
                 tableBody(2, iYear) = OutputReportTabular::RealToStr(elcc->TaxableIncome(iYear), 2);
                 tableBody(3, iYear) = OutputReportTabular::RealToStr(elcc->Taxes(iYear), 2);

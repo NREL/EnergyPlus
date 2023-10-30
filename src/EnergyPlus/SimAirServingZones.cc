@@ -505,8 +505,7 @@ void GetAirPathData(EnergyPlusData &state)
         }
 
         // work on unique nodes
-        test =
-            Util::FindItemInList(Alphas(6), TestUniqueNodes, &AirUniqueNodes::NodeName, state.dataSimAirServingZones->TestUniqueNodesNum);
+        test = Util::FindItemInList(Alphas(6), TestUniqueNodes, &AirUniqueNodes::NodeName, state.dataSimAirServingZones->TestUniqueNodesNum);
         if (test == 0) {
             ++state.dataSimAirServingZones->TestUniqueNodesNum;
             TestUniqueNodes(state.dataSimAirServingZones->TestUniqueNodesNum).NodeName = Alphas(6);
@@ -522,8 +521,7 @@ void GetAirPathData(EnergyPlusData &state)
             ErrorsFound = true;
         }
         if (!lAlphaBlanks(7)) {
-            test = Util::FindItemInList(
-                Alphas(7), TestUniqueNodes, &AirUniqueNodes::NodeName, state.dataSimAirServingZones->TestUniqueNodesNum);
+            test = Util::FindItemInList(Alphas(7), TestUniqueNodes, &AirUniqueNodes::NodeName, state.dataSimAirServingZones->TestUniqueNodesNum);
             if (test == 0) {
                 ++state.dataSimAirServingZones->TestUniqueNodesNum;
                 TestUniqueNodes(state.dataSimAirServingZones->TestUniqueNodesNum).NodeName = Alphas(7);
@@ -541,8 +539,7 @@ void GetAirPathData(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         }
-        test =
-            Util::FindItemInList(Alphas(8), TestUniqueNodes, &AirUniqueNodes::NodeName, state.dataSimAirServingZones->TestUniqueNodesNum);
+        test = Util::FindItemInList(Alphas(8), TestUniqueNodes, &AirUniqueNodes::NodeName, state.dataSimAirServingZones->TestUniqueNodesNum);
         if (test == 0) {
             ++state.dataSimAirServingZones->TestUniqueNodesNum;
             TestUniqueNodes(state.dataSimAirServingZones->TestUniqueNodesNum).NodeName = Alphas(8);
@@ -557,8 +554,7 @@ void GetAirPathData(EnergyPlusData &state)
                 format("...first used in {}=\"{}\" for {}", CurrentModuleObject, TestUniqueNodes(test).AirLoopName, TestUniqueNodes(test).FieldName));
             ErrorsFound = true;
         }
-        test =
-            Util::FindItemInList(Alphas(9), TestUniqueNodes, &AirUniqueNodes::NodeName, state.dataSimAirServingZones->TestUniqueNodesNum);
+        test = Util::FindItemInList(Alphas(9), TestUniqueNodes, &AirUniqueNodes::NodeName, state.dataSimAirServingZones->TestUniqueNodesNum);
         if (test == 0) {
             ++state.dataSimAirServingZones->TestUniqueNodesNum;
             TestUniqueNodes(state.dataSimAirServingZones->TestUniqueNodesNum).NodeName = Alphas(9);
@@ -876,8 +872,7 @@ void GetAirPathData(EnergyPlusData &state)
             if (ConListNum > 0) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(
                     state, "ConnectorList", ConListNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat);
-                if ((Util::SameString(Alphas(2), "Connector:Splitter")) ||
-                    (Util::SameString(Alphas(4), "Connector:Splitter"))) {
+                if ((Util::SameString(Alphas(2), "Connector:Splitter")) || (Util::SameString(Alphas(4), "Connector:Splitter"))) {
                     SplitterExists = true;
                 }
                 if ((Util::SameString(Alphas(2), "Connector:Mixer")) || (Util::SameString(Alphas(4), "Connector:Mixer"))) {
@@ -1107,13 +1102,11 @@ void GetAirPathData(EnergyPlusData &state)
                         //         If these node numbers match, the coil is in the main air loop and the lockout flag should be reset to FALSE
                         for (BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
                             for (CompNum = 1; CompNum <= primaryAirSystems.Branch(BranchNum).TotalComponents; ++CompNum) {
-                                if (Util::SameString(primaryAirSystems.Branch(BranchNum).Comp(CompNum).TypeOf,
-                                                                "AirloopHVAC:OutdoorAirSystem"))
+                                if (Util::SameString(primaryAirSystems.Branch(BranchNum).Comp(CompNum).TypeOf, "AirloopHVAC:OutdoorAirSystem"))
                                     continue;
                                 CompType = primaryAirSystems.Branch(BranchNum).Comp(CompNum).TypeOf;
                                 if (Util::SameString(CompType, "Coil:Cooling:Water:DetailedGeometry") ||
-                                    Util::SameString(CompType, "Coil:Heating:Water") ||
-                                    Util::SameString(CompType, "Coil:Cooling:Water")) {
+                                    Util::SameString(CompType, "Coil:Heating:Water") || Util::SameString(CompType, "Coil:Cooling:Water")) {
                                     WaterCoilNodeNum =
                                         GetCoilWaterInletNode(state, CompType, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name, ErrorsFound);
                                     if (WaterCoilNodeNum == ActuatorNodeNum) {
@@ -1462,8 +1455,8 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             for (int CompNum = 1; CompNum <= state.dataZoneEquip->SupplyAirPath(SupAirPath).NumOfComponents; ++CompNum) {
                 if (Util::SameString(state.dataZoneEquip->SupplyAirPath(SupAirPath).ComponentType(CompNum), "AirLoopHVAC:ZoneSplitter")) {
                     int SplitterNum = Util::FindItemInList(state.dataZoneEquip->SupplyAirPath(SupAirPath).ComponentName(CompNum),
-                                                                      state.dataSplitterComponent->SplitterCond,
-                                                                      &SplitterComponent::SplitterConditions::SplitterName);
+                                                           state.dataSplitterComponent->SplitterCond,
+                                                           &SplitterComponent::SplitterConditions::SplitterName);
                     if (SplitterNum == 0) {
                         ShowSevereError(
                             state,
@@ -1473,11 +1466,10 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                     }
                     state.dataZoneEquip->SupplyAirPath(SupAirPath).SplitterIndex(CompNum) = SplitterNum;
                     NumAllSupAirPathNodes += state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes + 1;
-                } else if (Util::SameString(state.dataZoneEquip->SupplyAirPath(SupAirPath).ComponentType(CompNum),
-                                                       "AirLoopHVAC:SupplyPlenum")) {
+                } else if (Util::SameString(state.dataZoneEquip->SupplyAirPath(SupAirPath).ComponentType(CompNum), "AirLoopHVAC:SupplyPlenum")) {
                     int PlenumNum = Util::FindItemInList(state.dataZoneEquip->SupplyAirPath(SupAirPath).ComponentName(CompNum),
-                                                                    state.dataZonePlenum->ZoneSupPlenCond,
-                                                                    &ZonePlenum::ZoneSupplyPlenumConditions::ZonePlenumName);
+                                                         state.dataZonePlenum->ZoneSupPlenCond,
+                                                         &ZonePlenum::ZoneSupplyPlenumConditions::ZonePlenumName);
                     if (PlenumNum == 0) {
                         ShowSevereError(
                             state,
@@ -4563,8 +4555,7 @@ void SizeSysOutdoorAir(EnergyPlusData &state)
         SysOAUnc = 0.0;
         ClgSupplyAirAdjustFactor = 1.0;
         HtgSupplyAirAdjustFactor = 1.0;
-        int SysSizNum =
-            Util::FindItemInList(finalSysSizing.AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+        int SysSizNum = Util::FindItemInList(finalSysSizing.AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
         if (finalSysSizing.OAAutoSized) {
             int NumZonesCooled = airToZoneNodeInfo.NumZonesCooled;
@@ -7552,8 +7543,7 @@ bool CheckWaterCoilSystemOnAirLoopOrOASystem(EnergyPlusData &state, SimAirServin
         // check if the water coil is placed on 'CoilSystem:Cooling:Water:HeatExchangerAssisted' object
         for (int HXASSCoilNum = 1; HXASSCoilNum <= state.dataHVACAssistedCC->TotalNumHXAssistedCoils; ++HXASSCoilNum) {
             std::string CompType = state.dataHVACAssistedCC->HXAssistedCoil(HXASSCoilNum).CoolingCoilType;
-            if ((Util::SameString(CompType, "Coil:Cooling:Water") ||
-                 Util::SameString(CompType, "Coil:Cooling:Water:DetailedGeometry")) &&
+            if ((Util::SameString(CompType, "Coil:Cooling:Water") || Util::SameString(CompType, "Coil:Cooling:Water:DetailedGeometry")) &&
                 Util::SameString(CompName, state.dataHVACAssistedCC->HXAssistedCoil(HXASSCoilNum).CoolingCoilName)) {
                 CoilSystemName = state.dataHVACAssistedCC->HXAssistedCoil(HXASSCoilNum).Name;
                 CoilSystemTypeNum = SimAirServingZones::CompType::WaterCoil_CoolingHXAsst;

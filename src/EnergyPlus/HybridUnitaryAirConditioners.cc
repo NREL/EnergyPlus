@@ -506,12 +506,12 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             IsNotOK = false;
             IsBlank = false;
             Util::VerifyName(state,
-                                        Alphas(1),
-                                        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner,
-                                        UnitLoop - 1,
-                                        IsNotOK,
-                                        IsBlank,
-                                        cCurrentModuleObject + " Name");
+                             Alphas(1),
+                             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner,
+                             UnitLoop - 1,
+                             IsNotOK,
+                             IsBlank,
+                             cCurrentModuleObject + " Name");
 
             // A1, \field Name
             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).Name = Alphas(1);

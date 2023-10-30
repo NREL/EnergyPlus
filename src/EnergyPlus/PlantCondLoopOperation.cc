@@ -1309,7 +1309,7 @@ void LoadEquipList(EnergyPlusData &state,
     // find name in set of possible list
     for (Num = 1; Num <= state.dataPlantCondLoopOp->TotNumLists; ++Num) {
         if (Util::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Name,
-                                        state.dataPlantCondLoopOp->EquipListsNameList(Num))) {
+                             state.dataPlantCondLoopOp->EquipListsNameList(Num))) {
             FoundIntendedList = true;
             // get object item for real this time
             {
@@ -1959,61 +1959,53 @@ void GetChillerHeaterChangeoverOpSchemeInput(EnergyPlusData &state,
                 for (int listNum = 1; listNum <= scheme.PlantOps.NumCoolingOnlyEquipLists; ++listNum) {
                     switch (listNum) {
                     case 1: {
-                        scheme.CoolingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_1_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_1_equipment_list_name").get<std::string>());
                         scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_1_lower_limit").get<Real64>();
                         scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_1_upper_limit").get<Real64>();
                     } break;
 
                     case 2: {
-                        scheme.CoolingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_2_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_2_equipment_list_name").get<std::string>());
                         scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_2_lower_limit").get<Real64>();
                         scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_2_upper_limit").get<Real64>();
 
                     } break;
 
                     case 3: {
-                        scheme.CoolingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_3_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_3_equipment_list_name").get<std::string>());
                         scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_3_lower_limit").get<Real64>();
                         scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_3_upper_limit").get<Real64>();
 
                     } break;
 
                     case 4: {
-                        scheme.CoolingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_4_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_4_equipment_list_name").get<std::string>());
                         scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_4_lower_limit").get<Real64>();
                         scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_4_upper_limit").get<Real64>();
 
                     } break;
                     case 5: {
-                        scheme.CoolingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_5_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_5_equipment_list_name").get<std::string>());
                         scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_5_lower_limit").get<Real64>();
                         scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_5_upper_limit").get<Real64>();
 
                     } break;
                     case 6: {
-                        scheme.CoolingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_6_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_6_equipment_list_name").get<std::string>());
                         scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_6_lower_limit").get<Real64>();
                         scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_6_upper_limit").get<Real64>();
 
                     } break;
 
                     case 7: {
-                        scheme.CoolingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_7_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_7_equipment_list_name").get<std::string>());
                         scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_7_lower_limit").get<Real64>();
                         scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_7_upper_limit").get<Real64>();
 
                     } break;
 
                     case 8: {
-                        scheme.CoolingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_8_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_8_equipment_list_name").get<std::string>());
                         scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_8_lower_limit").get<Real64>();
                         scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_8_upper_limit").get<Real64>();
 
@@ -2069,61 +2061,53 @@ void GetChillerHeaterChangeoverOpSchemeInput(EnergyPlusData &state,
                 for (int listNum = 1; listNum <= scheme.PlantOps.NumHeatingOnlyEquipLists; ++listNum) {
                     switch (listNum) {
                     case 1: {
-                        scheme.HeatingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_1_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_1_equipment_list_name").get<std::string>());
                         scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_1_lower_limit").get<Real64>();
                         scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_1_upper_limit").get<Real64>();
                     } break;
 
                     case 2: {
-                        scheme.HeatingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_2_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_2_equipment_list_name").get<std::string>());
                         scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_2_lower_limit").get<Real64>();
                         scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_2_upper_limit").get<Real64>();
 
                     } break;
 
                     case 3: {
-                        scheme.HeatingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_3_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_3_equipment_list_name").get<std::string>());
                         scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_3_lower_limit").get<Real64>();
                         scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_3_upper_limit").get<Real64>();
 
                     } break;
 
                     case 4: {
-                        scheme.HeatingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_4_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_4_equipment_list_name").get<std::string>());
                         scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_4_lower_limit").get<Real64>();
                         scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_4_upper_limit").get<Real64>();
 
                     } break;
                     case 5: {
-                        scheme.HeatingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_5_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_5_equipment_list_name").get<std::string>());
                         scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_5_lower_limit").get<Real64>();
                         scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_5_upper_limit").get<Real64>();
 
                     } break;
                     case 6: {
-                        scheme.HeatingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_6_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_6_equipment_list_name").get<std::string>());
                         scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_6_lower_limit").get<Real64>();
                         scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_6_upper_limit").get<Real64>();
 
                     } break;
 
                     case 7: {
-                        scheme.HeatingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_7_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_7_equipment_list_name").get<std::string>());
                         scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_7_lower_limit").get<Real64>();
                         scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_7_upper_limit").get<Real64>();
 
                     } break;
 
                     case 8: {
-                        scheme.HeatingOnlyEquipList(listNum).Name =
-                            Util::makeUPPER(fields.at("range_8_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_8_equipment_list_name").get<std::string>());
                         scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_8_lower_limit").get<Real64>();
                         scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_8_upper_limit").get<Real64>();
 
@@ -2628,8 +2612,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                     auto &this_equip_list = this_op_scheme.EquipList(ListNum);
                     for (int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum) {
                         auto &this_equip = this_equip_list.Comp(EquipNum);
-                        Type = static_cast<DataPlant::PlantEquipmentType>(
-                            getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
+                        Type = static_cast<DataPlant::PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
                         errFlag1 = false;
                         PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, plantLoc, errFlag1, _, _, NumSearchResults, _, LoopNum);
 
