@@ -507,7 +507,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     CondenserLoopTowers::GetTowerInput(*state);
 
@@ -900,7 +900,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     CondenserLoopTowers::GetTowerInput(*state);
 
@@ -1337,7 +1337,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     CondenserLoopTowers::GetTowerInput(*state);
 
@@ -1757,7 +1757,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     CondenserLoopTowers::GetTowerInput(*state);
 
@@ -2247,7 +2247,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     CondenserLoopTowers::GetTowerInput(*state);
 
@@ -2680,7 +2680,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     SimulationManager::SetupSimulation(*state, ErrorsFound);
 
     // get inputs of cooling tower object
@@ -4176,7 +4176,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_CoolingTowersDefaultValuesTest)
     CondenserLoopTowers::GetTowerInput(*state);
 
     int index; // index to cooling tower
-    index = UtilityRoutines::FindItemInList("SINGLESPEED COOLINGTOWER", state->dataCondenserLoopTowers->towers);
+    index = Util::FindItemInList("SINGLESPEED COOLINGTOWER", state->dataCondenserLoopTowers->towers);
     auto &singleSpd_tower = state->dataCondenserLoopTowers->towers(index);
     // some inputs and default values checks
     EXPECT_EQ(singleSpd_tower.Name, "SINGLESPEED COOLINGTOWER");
@@ -4202,7 +4202,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_CoolingTowersDefaultValuesTest)
     EXPECT_EQ(singleSpd_tower.cellCtrl, CondenserLoopTowers::CellCtrl::MaxCell);
     EXPECT_EQ(singleSpd_tower.EndUseSubcategory, "General");
 
-    index = UtilityRoutines::FindItemInList("TWOSPEED COOLINGTOWER", state->dataCondenserLoopTowers->towers);
+    index = Util::FindItemInList("TWOSPEED COOLINGTOWER", state->dataCondenserLoopTowers->towers);
     auto &twoSpd_tower = state->dataCondenserLoopTowers->towers(index);
     // some inputs and default values checks
     EXPECT_EQ(twoSpd_tower.Name, "TWOSPEED COOLINGTOWER");
@@ -4217,7 +4217,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_CoolingTowersDefaultValuesTest)
     EXPECT_EQ(twoSpd_tower.cellCtrl, CondenserLoopTowers::CellCtrl::MaxCell);
     EXPECT_EQ(twoSpd_tower.EndUseSubcategory, "General");
 
-    index = UtilityRoutines::FindItemInList("VARSPEED COOLINGTOWER", state->dataCondenserLoopTowers->towers);
+    index = Util::FindItemInList("VARSPEED COOLINGTOWER", state->dataCondenserLoopTowers->towers);
     auto &varSpd_tower = state->dataCondenserLoopTowers->towers(index);
     // some inputs and default values checks
     EXPECT_EQ(varSpd_tower.Name, "VARSPEED COOLINGTOWER");
@@ -4234,7 +4234,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_CoolingTowersDefaultValuesTest)
     EXPECT_EQ(varSpd_tower.PerformanceInputMethod_Num, CondenserLoopTowers::PIM::UFactor); // hard coded
     EXPECT_EQ(varSpd_tower.HeatRejectCapNomCapSizingRatio, 1.25);
 
-    index = UtilityRoutines::FindItemInList("VSMERKEL COOLINGTOWER", state->dataCondenserLoopTowers->towers);
+    index = Util::FindItemInList("VSMERKEL COOLINGTOWER", state->dataCondenserLoopTowers->towers);
     auto &vSpdMerkel_tower = state->dataCondenserLoopTowers->towers(index);
     // some inputs and default values checks
     EXPECT_EQ(vSpdMerkel_tower.Name, "VSMERKEL COOLINGTOWER");

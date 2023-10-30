@@ -65,12 +65,11 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::WeatherManager;
 using namespace EnergyPlus::ScheduleManager;
 
 TEST_F(EnergyPlusFixture, RunPeriod_Defaults)
 {
-    RunPeriodData runperiod;
+    Weather::RunPeriodData runperiod;
     EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Sunday, runperiod.startWeekDay));
 
     EXPECT_EQ(1, runperiod.startMonth);
@@ -199,48 +198,48 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_in_input(false);
     int totalrps(7);
-    WeatherManager::GetRunPeriodData(*state, totalrps, errors_in_input);
+    Weather::GetRunPeriodData(*state, totalrps, errors_in_input);
     EXPECT_FALSE(errors_in_input);
 
-    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Monday, state->dataWeatherManager->RunPeriodInput[0].startWeekDay));
-    EXPECT_EQ(2016, state->dataWeatherManager->RunPeriodInput[0].startYear);
-    EXPECT_EQ(2457448, state->dataWeatherManager->RunPeriodInput[0].startJulianDate);
-    EXPECT_EQ(2457451, state->dataWeatherManager->RunPeriodInput[0].endJulianDate);
+    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Monday, state->dataWeather->RunPeriodInput[0].startWeekDay));
+    EXPECT_EQ(2016, state->dataWeather->RunPeriodInput[0].startYear);
+    EXPECT_EQ(2457448, state->dataWeather->RunPeriodInput[0].startJulianDate);
+    EXPECT_EQ(2457451, state->dataWeather->RunPeriodInput[0].endJulianDate);
 
-    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Wednesday, state->dataWeatherManager->RunPeriodInput[1].startWeekDay));
-    EXPECT_EQ(2012, state->dataWeatherManager->RunPeriodInput[1].startYear);
-    EXPECT_EQ(2455987, state->dataWeatherManager->RunPeriodInput[1].startJulianDate);
-    EXPECT_EQ(2455990, state->dataWeatherManager->RunPeriodInput[1].endJulianDate);
+    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Wednesday, state->dataWeather->RunPeriodInput[1].startWeekDay));
+    EXPECT_EQ(2012, state->dataWeather->RunPeriodInput[1].startYear);
+    EXPECT_EQ(2455987, state->dataWeather->RunPeriodInput[1].startJulianDate);
+    EXPECT_EQ(2455990, state->dataWeather->RunPeriodInput[1].endJulianDate);
 
-    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Thursday, state->dataWeatherManager->RunPeriodInput[2].startWeekDay));
-    EXPECT_EQ(2015, state->dataWeatherManager->RunPeriodInput[2].startYear);
-    EXPECT_EQ(2457024, state->dataWeatherManager->RunPeriodInput[2].startJulianDate);
-    EXPECT_EQ(2457388, state->dataWeatherManager->RunPeriodInput[2].endJulianDate);
+    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Thursday, state->dataWeather->RunPeriodInput[2].startWeekDay));
+    EXPECT_EQ(2015, state->dataWeather->RunPeriodInput[2].startYear);
+    EXPECT_EQ(2457024, state->dataWeather->RunPeriodInput[2].startJulianDate);
+    EXPECT_EQ(2457388, state->dataWeather->RunPeriodInput[2].endJulianDate);
 
-    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Sunday, state->dataWeatherManager->RunPeriodInput[3].startWeekDay));
-    EXPECT_EQ(2017, state->dataWeatherManager->RunPeriodInput[3].startYear);
-    EXPECT_EQ(2457755, state->dataWeatherManager->RunPeriodInput[3].startJulianDate);
-    EXPECT_EQ(2458119, state->dataWeatherManager->RunPeriodInput[3].endJulianDate);
+    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Sunday, state->dataWeather->RunPeriodInput[3].startWeekDay));
+    EXPECT_EQ(2017, state->dataWeather->RunPeriodInput[3].startYear);
+    EXPECT_EQ(2457755, state->dataWeather->RunPeriodInput[3].startJulianDate);
+    EXPECT_EQ(2458119, state->dataWeather->RunPeriodInput[3].endJulianDate);
     // This is the default, check that it works properly
     std::array<Real64, 12> startDays{{1, 4, 4, 7, 2, 5, 7, 3, 6, 1, 4, 6}};
     for (size_t i = 0; i < 12; ++i) {
-        EXPECT_EQ(startDays[i], state->dataWeatherManager->RunPeriodInput[3].monWeekDay[i]);
+        EXPECT_EQ(startDays[i], state->dataWeather->RunPeriodInput[3].monWeekDay[i]);
     }
 
-    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Wednesday, state->dataWeatherManager->RunPeriodInput[4].startWeekDay));
-    EXPECT_EQ(2010, state->dataWeatherManager->RunPeriodInput[4].startYear);
-    EXPECT_EQ(2455427, state->dataWeatherManager->RunPeriodInput[4].startJulianDate);
-    EXPECT_EQ(2455562, state->dataWeatherManager->RunPeriodInput[4].endJulianDate);
+    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Wednesday, state->dataWeather->RunPeriodInput[4].startWeekDay));
+    EXPECT_EQ(2010, state->dataWeather->RunPeriodInput[4].startYear);
+    EXPECT_EQ(2455427, state->dataWeather->RunPeriodInput[4].startJulianDate);
+    EXPECT_EQ(2455562, state->dataWeather->RunPeriodInput[4].endJulianDate);
 
-    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Saturday, state->dataWeatherManager->RunPeriodInput[5].startWeekDay));
-    EXPECT_EQ(1992, state->dataWeatherManager->RunPeriodInput[5].startYear);
-    EXPECT_EQ(2448682, state->dataWeatherManager->RunPeriodInput[5].startJulianDate);
-    EXPECT_EQ(2448988, state->dataWeatherManager->RunPeriodInput[5].endJulianDate);
+    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Saturday, state->dataWeather->RunPeriodInput[5].startWeekDay));
+    EXPECT_EQ(1992, state->dataWeather->RunPeriodInput[5].startYear);
+    EXPECT_EQ(2448682, state->dataWeather->RunPeriodInput[5].startJulianDate);
+    EXPECT_EQ(2448988, state->dataWeather->RunPeriodInput[5].endJulianDate);
 
-    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Friday, state->dataWeatherManager->RunPeriodInput[6].startWeekDay));
-    EXPECT_EQ(2016, state->dataWeatherManager->RunPeriodInput[6].startYear);
-    EXPECT_EQ(2457389, state->dataWeatherManager->RunPeriodInput[6].startJulianDate);
-    EXPECT_EQ(2458940, state->dataWeatherManager->RunPeriodInput[6].endJulianDate);
+    EXPECT_TRUE(compare_enums(ScheduleManager::DayType::Friday, state->dataWeather->RunPeriodInput[6].startWeekDay));
+    EXPECT_EQ(2016, state->dataWeather->RunPeriodInput[6].startYear);
+    EXPECT_EQ(2457389, state->dataWeather->RunPeriodInput[6].startJulianDate);
+    EXPECT_EQ(2458940, state->dataWeather->RunPeriodInput[6].endJulianDate);
 }
 
 TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
@@ -268,7 +267,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_in_input(false);
     int totalrps(1);
-    WeatherManager::GetRunPeriodData(*state, totalrps, errors_in_input);
+    Weather::GetRunPeriodData(*state, totalrps, errors_in_input);
 
     EXPECT_TRUE(errors_in_input);
 }
@@ -334,7 +333,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
         ASSERT_TRUE(process_idf(idf_objects));
         bool ErrorsFound = false;
         int totalrps(1);
-        WeatherManager::GetRunPeriodData(*state, totalrps, ErrorsFound);
+        Weather::GetRunPeriodData(*state, totalrps, ErrorsFound);
         // This should just issue a warning
         EXPECT_FALSE(ErrorsFound);
 
@@ -368,7 +367,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
         ASSERT_TRUE(process_idf(idf_objects));
         bool ErrorsFound = false;
         int totalrps(1);
-        WeatherManager::GetRunPeriodData(*state, totalrps, ErrorsFound);
+        Weather::GetRunPeriodData(*state, totalrps, ErrorsFound);
         // This should issue a severe
         EXPECT_TRUE(ErrorsFound);
 
@@ -402,7 +401,7 @@ TEST_F(EnergyPlusFixture, SizingPeriod_WeatherFile)
 
         ASSERT_TRUE(process_idf(idf_objects));
         bool ErrorsFound = false;
-        WeatherManager::GetRunPeriodDesignData(*state, ErrorsFound);
+        Weather::GetRunPeriodDesignData(*state, ErrorsFound);
         // This should just issue a severe
         EXPECT_TRUE(ErrorsFound);
 
@@ -437,21 +436,21 @@ TEST_F(EnergyPlusFixture, RunPeriod_BadLeapDayFlagLogic)
     ASSERT_TRUE(process_idf(idf_objects));
     bool errors_in_input(false);
     int totalrps(1);
-    WeatherManager::GetRunPeriodData(*state, totalrps, errors_in_input);
+    Weather::GetRunPeriodData(*state, totalrps, errors_in_input);
 
     EXPECT_FALSE(errors_in_input);
 
-    state->dataWeatherManager->Environment.allocate(1);
+    state->dataWeather->Environment.allocate(1);
     // These may already be set, but do it anyway
     state->dataEnvrn->TotDesDays = 0;
-    state->dataWeatherManager->TotRunPers = 1;
-    state->dataWeatherManager->TotRunDesPers = 0;
+    state->dataWeather->TotRunPers = 1;
+    state->dataWeather->TotRunDesPers = 0;
 
-    state->dataWeatherManager->WFAllowsLeapYears = true; // This was hitting a bad bit of logic
-    WeatherManager::SetupEnvironmentTypes(*state);
+    state->dataWeather->WFAllowsLeapYears = true; // This was hitting a bad bit of logic
+    Weather::SetupEnvironmentTypes(*state);
 
-    EXPECT_FALSE(state->dataWeatherManager->Environment[0].IsLeapYear);
-    EXPECT_EQ(365, state->dataWeatherManager->Environment[0].TotalDays);
+    EXPECT_FALSE(state->dataWeather->Environment[0].IsLeapYear);
+    EXPECT_EQ(365, state->dataWeather->Environment[0].TotalDays);
 
-    state->dataWeatherManager->Environment.deallocate();
+    state->dataWeather->Environment.deallocate();
 }

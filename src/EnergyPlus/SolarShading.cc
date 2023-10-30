@@ -461,11 +461,11 @@ void GetShadowingInput(EnergyPlusData &state)
     int aNum = 1;
     unsigned pixelRes = 512u;
     if (NumAlphas >= aNum) {
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Scheduled")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Scheduled")) {
             state.dataSysVars->shadingMethod = ShadingMethod::Scheduled;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Scheduled";
             checkScheduledSurfacePresent(state);
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Imported")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Imported")) {
             if (state.dataScheduleMgr->ScheduleFileShadingProcessed) {
                 state.dataSysVars->shadingMethod = ShadingMethod::Imported;
                 state.dataIPShortCut->cAlphaArgs(aNum) = "Imported";
@@ -475,10 +475,10 @@ void GetShadowingInput(EnergyPlusData &state)
                                   format("Value entered=\"{}\" while no Schedule:File:Shading object is defined, InternalCalculation will be used.",
                                          state.dataIPShortCut->cAlphaArgs(aNum)));
             }
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "PolygonClipping")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "PolygonClipping")) {
             state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
             state.dataIPShortCut->cAlphaArgs(aNum) = "PolygonClipping";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "PixelCounting")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "PixelCounting")) {
             state.dataSysVars->shadingMethod = ShadingMethod::PixelCounting;
             state.dataIPShortCut->cAlphaArgs(aNum) = "PixelCounting";
             if (NumNumbers >= 3) {
@@ -526,10 +526,10 @@ void GetShadowingInput(EnergyPlusData &state)
 
     aNum++;
     if (NumAlphas >= aNum) {
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Periodic")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Periodic")) {
             state.dataSysVars->DetailedSolarTimestepIntegration = false;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Periodic";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Timestep")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Timestep")) {
             state.dataSysVars->DetailedSolarTimestepIntegration = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Timestep";
         } else {
@@ -545,13 +545,13 @@ void GetShadowingInput(EnergyPlusData &state)
 
     aNum++;
     if (NumAlphas >= aNum) {
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "SutherlandHodgman")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "SutherlandHodgman")) {
             state.dataSysVars->SutherlandHodgman = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "SutherlandHodgman";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "ConvexWeilerAtherton")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "ConvexWeilerAtherton")) {
             state.dataSysVars->SutherlandHodgman = false;
             state.dataIPShortCut->cAlphaArgs(aNum) = "ConvexWeilerAtherton";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "SlaterBarskyandSutherlandHodgman")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "SlaterBarskyandSutherlandHodgman")) {
             state.dataSysVars->SutherlandHodgman = true;
             state.dataSysVars->SlaterBarsky = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "SlaterBarskyandSutherlandHodgman";
@@ -593,10 +593,10 @@ void GetShadowingInput(EnergyPlusData &state)
 
     aNum++;
     if (NumAlphas >= aNum) {
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "SimpleSkyDiffuseModeling")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "SimpleSkyDiffuseModeling")) {
             state.dataSysVars->DetailedSkyDiffuseAlgorithm = false;
             state.dataIPShortCut->cAlphaArgs(aNum) = "SimpleSkyDiffuseModeling";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "DetailedSkyDiffuseModeling")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "DetailedSkyDiffuseModeling")) {
             state.dataSysVars->DetailedSkyDiffuseAlgorithm = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "DetailedSkyDiffuseModeling";
         } else if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
@@ -613,10 +613,10 @@ void GetShadowingInput(EnergyPlusData &state)
 
     aNum++;
     if (NumAlphas >= aNum) {
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
             state.dataSysVars->ReportExtShadingSunlitFrac = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Yes";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
             state.dataSysVars->ReportExtShadingSunlitFrac = false;
             state.dataIPShortCut->cAlphaArgs(aNum) = "No";
         } else {
@@ -649,10 +649,10 @@ void GetShadowingInput(EnergyPlusData &state)
 
     aNum++;
     if (NumAlphas >= aNum) {
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
             DisableSelfShadingWithinGroup = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Yes";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
             state.dataIPShortCut->cAlphaArgs(aNum) = "No";
         } else {
             ShowWarningError(state, format("{}: invalid {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(aNum)));
@@ -665,10 +665,10 @@ void GetShadowingInput(EnergyPlusData &state)
 
     aNum++;
     if (NumAlphas >= aNum) {
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
             DisableSelfShadingBetweenGroup = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Yes";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
             state.dataIPShortCut->cAlphaArgs(aNum) = "No";
         } else {
             ShowWarningError(state, format("{}: invalid {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(aNum)));
@@ -695,7 +695,7 @@ void GetShadowingInput(EnergyPlusData &state)
             NumOfShadingGroups = NumAlphas - (aNum - 1);
             DisableSelfShadingGroups.allocate(NumOfShadingGroups);
             for (int i = 1; i <= NumOfShadingGroups; i++) {
-                Found = UtilityRoutines::FindItemInList(
+                Found = Util::FindItemInList(
                     state.dataIPShortCut->cAlphaArgs(i + (aNum - 1)), state.dataHeatBal->ZoneList, state.dataHeatBal->NumOfZoneLists);
                 if (Found != 0) DisableSelfShadingGroups(i) = Found;
             }
