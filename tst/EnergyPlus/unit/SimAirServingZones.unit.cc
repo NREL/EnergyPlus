@@ -2419,9 +2419,9 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoop_ReturnFan_MinFlow)
     SimulationManager::ManageSimulation(*state); // run the design days
 
     int returnFanNode =
-        UtilityRoutines::FindItemInList("VSD RETURN FAN OUTLET TO MIXING BOX NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+        Util::FindItemInList("VSD RETURN FAN OUTLET TO MIXING BOX NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     EXPECT_GT(returnFanNode, 0);
-    int supplyOutletNode = UtilityRoutines::FindItemInList("SUPPLY SIDE OUTLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int supplyOutletNode = Util::FindItemInList("SUPPLY SIDE OUTLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     EXPECT_GT(returnFanNode, 0);
     EXPECT_GT(supplyOutletNode, 0);
 

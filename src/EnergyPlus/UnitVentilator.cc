@@ -155,7 +155,7 @@ namespace UnitVentilator {
 
         // Find the correct Unit Ventilator Equipment
         if (CompIndex == 0) {
-            UnitVentNum = UtilityRoutines::FindItemInList(CompName, state.dataUnitVentilators->UnitVent);
+            UnitVentNum = Util::FindItemInList(CompName, state.dataUnitVentilators->UnitVent);
             if (UnitVentNum == 0) {
                 ShowFatalError(state, format("SimUnitVentilator: Unit not found={}", CompName));
             }
@@ -275,7 +275,7 @@ namespace UnitVentilator {
             state.dataUnitVentilators->UnitVentNumericFields(UnitVentNum).FieldNames.allocate(NumNumbers);
             state.dataUnitVentilators->UnitVentNumericFields(UnitVentNum).FieldNames = "";
             state.dataUnitVentilators->UnitVentNumericFields(UnitVentNum).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             unitVent.Name = Alphas(1);
             if (lAlphaBlanks(2)) {
@@ -401,7 +401,7 @@ namespace UnitVentilator {
                 ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, unitVent.Name));
                 ErrorsFound = true;
             } else {
-                if (!UtilityRoutines::SameString(Alphas(11), "Fan:SystemModel")) {
+                if (!Util::SameString(Alphas(11), "Fan:SystemModel")) {
                     Fans::GetFanType(state, unitVent.FanName, unitVent.FanType_Num, errFlag, CurrentModuleObject, unitVent.Name);
 
                     {
@@ -451,7 +451,7 @@ namespace UnitVentilator {
                             ErrorsFound = true;
                         }
                     }
-                } else if (UtilityRoutines::SameString(Alphas(11), "Fan:SystemModel")) {
+                } else if (Util::SameString(Alphas(11), "Fan:SystemModel")) {
                     unitVent.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, unitVent.FanName)); // call constructor
                     unitVent.Fan_Index = HVACFan::getFanObjectVectorIndex(state, unitVent.FanName);           // zero-based
@@ -583,7 +583,7 @@ namespace UnitVentilator {
 
             unitVent.HVACSizingIndex = 0;
             if (!lAlphaBlanks(20)) {
-                unitVent.HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(20), state.dataSize->ZoneHVACSizing);
+                unitVent.HVACSizingIndex = Util::FindItemInList(Alphas(20), state.dataSize->ZoneHVACSizing);
                 if (unitVent.HVACSizingIndex == 0) {
                     ShowSevereError(state, format("{} = {} not found.", cAlphaFields(20), Alphas(20)));
                     ShowContinueError(state, format("Occurs in {} = \"{}\".", CurrentModuleObject, unitVent.Name));
@@ -682,9 +682,9 @@ namespace UnitVentilator {
                         unitVent.CCoilType = CoolCoilType::HXAssisted;
                         HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName(
                             state, cCoolingCoilType, Alphas(18), ErrorsFound, unitVent.CCoilPlantType, unitVent.CCoilPlantName);
-                        if (UtilityRoutines::SameString(unitVent.CCoilPlantType, "Coil:Cooling:Water")) {
+                        if (Util::SameString(unitVent.CCoilPlantType, "Coil:Cooling:Water")) {
                             unitVent.CoolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
-                        } else if (UtilityRoutines::SameString(unitVent.CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry")) {
+                        } else if (Util::SameString(unitVent.CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry")) {
                             unitVent.CoolingCoilType = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
                         } else {
                             ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));

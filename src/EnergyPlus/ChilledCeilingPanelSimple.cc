@@ -130,10 +130,10 @@ void SimCoolingPanel(
 
     // Find the correct Baseboard Equipment
     if (CompIndex == 0) {
-        CoolingPanelNum = UtilityRoutines::FindItemInList(EquipName,
-                                                          state.dataChilledCeilingPanelSimple->CoolingPanel,
-                                                          &CoolingPanelParams::Name,
-                                                          (int)state.dataChilledCeilingPanelSimple->CoolingPanel.size());
+        CoolingPanelNum = Util::FindItemInList(EquipName,
+                                               state.dataChilledCeilingPanelSimple->CoolingPanel,
+                                               &CoolingPanelParams::Name,
+                                               (int)state.dataChilledCeilingPanelSimple->CoolingPanel.size());
         if (CoolingPanelNum == 0) {
             ShowFatalError(state, format("SimCoolingPanelSimple: Unit not found={}", EquipName));
         }
@@ -385,7 +385,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
             thisCP.RatedWaterFlowRate = WaterMassFlowDefault;
         }
 
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "CoolingDesignCapacity")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "CoolingDesignCapacity")) {
             thisCP.CoolingCapMethod = DataSizing::CoolingDesignCapacity;
             if (!state.dataIPShortCut->lNumericFieldBlanks(4)) {
                 thisCP.ScaledCoolingCapacity = state.dataIPShortCut->rNumericArgs(4);
@@ -404,7 +404,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             }
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "CapacityPerFloorArea")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "CapacityPerFloorArea")) {
             thisCP.CoolingCapMethod = DataSizing::CapacityPerFloorArea;
             if (!state.dataIPShortCut->lNumericFieldBlanks(5)) {
                 thisCP.ScaledCoolingCapacity = state.dataIPShortCut->rNumericArgs(5);
@@ -428,7 +428,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                 ShowContinueError(state, format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(5)));
                 ErrorsFound = true;
             }
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "FractionOfAutosizedCoolingCapacity")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "FractionOfAutosizedCoolingCapacity")) {
             thisCP.CoolingCapMethod = DataSizing::FractionOfAutosizedCoolingCapacity;
             if (!state.dataIPShortCut->lNumericFieldBlanks(6)) {
                 thisCP.ScaledCoolingCapacity = state.dataIPShortCut->rNumericArgs(6);
@@ -472,19 +472,19 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         }
 
         // Process the temperature control type
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), MeanAirTemperature)) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), MeanAirTemperature)) {
             thisCP.controlType = ClgPanelCtrlType::MAT;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), MeanRadiantTemperature)) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), MeanRadiantTemperature)) {
             thisCP.controlType = ClgPanelCtrlType::MRT;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), OperativeTemperature)) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), OperativeTemperature)) {
             thisCP.controlType = ClgPanelCtrlType::Operative;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), OutsideAirDryBulbTemperature)) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), OutsideAirDryBulbTemperature)) {
             thisCP.controlType = ClgPanelCtrlType::ODB;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), OutsideAirWetBulbTemperature)) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), OutsideAirWetBulbTemperature)) {
             thisCP.controlType = ClgPanelCtrlType::OWB;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), ZoneTotalLoad)) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), ZoneTotalLoad)) {
             thisCP.controlType = ClgPanelCtrlType::ZoneTotalLoad;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), ZoneConvectiveLoad)) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), ZoneConvectiveLoad)) {
             thisCP.controlType = ClgPanelCtrlType::ZoneConvectiveLoad;
         } else {
             ShowWarningError(state, format("Invalid {} ={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
@@ -508,11 +508,11 @@ void GetCoolingPanelInput(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), Off)) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), Off)) {
             thisCP.CondCtrlType = CondCtrl::NONE;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), SimpleOff)) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), SimpleOff)) {
             thisCP.CondCtrlType = CondCtrl::SIMPLEOFF;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), VariableOff)) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), VariableOff)) {
             thisCP.CondCtrlType = CondCtrl::VARIEDOFF;
         } else {
             thisCP.CondCtrlType = CondCtrl::SIMPLEOFF;

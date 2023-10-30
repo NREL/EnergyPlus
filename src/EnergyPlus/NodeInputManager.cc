@@ -130,7 +130,7 @@ void GetNodeNums(EnergyPlusData &state,
     }
 
     if (!Name.empty()) {
-        int ThisOne = UtilityRoutines::FindItemInList(Name, state.dataNodeInputMgr->NodeLists);
+        int ThisOne = Util::FindItemInList(Name, state.dataNodeInputMgr->NodeLists);
         if (ThisOne != 0) {
             NumNodes = state.dataNodeInputMgr->NodeLists(ThisOne).NumOfNodesInList;
             NodeNumbers({1, NumNodes}) = state.dataNodeInputMgr->NodeLists(ThisOne).NodeNumbers({1, NumNodes});
@@ -552,7 +552,7 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
     for (int Loop = 1; Loop <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop) {
         state.dataInputProcessing->inputProcessor->getObjectItem(
             state, CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus);
-        if (UtilityRoutines::IsNameEmpty(state, cAlphas(1), CurrentModuleObject, localErrorsFound)) continue;
+        if (Util::IsNameEmpty(state, cAlphas(1), CurrentModuleObject, localErrorsFound)) continue;
 
         ++NCount;
         state.dataNodeInputMgr->NodeLists(NCount).Name = cAlphas(1);
@@ -585,8 +585,7 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
             }
             state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop1) = AssignNodeNumber(
                 state, state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1), DataLoopNode::NodeFluidType::Blank, localErrorsFound);
-            if (UtilityRoutines::SameString(state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1),
-                                            state.dataNodeInputMgr->NodeLists(NCount).Name)) {
+            if (Util::SameString(state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1), state.dataNodeInputMgr->NodeLists(NCount).Name)) {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid node name in list.", RoutineName, CurrentModuleObject, cAlphas(1)));
                 ShowContinueError(state, format("... Node {} Name=\"{}\", duplicates NodeList Name.", Loop1, cAlphas(Loop1 + 1)));
                 localErrorsFound = true;
@@ -617,8 +616,7 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
         for (int Loop2 = 1; Loop2 <= state.dataNodeInputMgr->NodeLists(Loop).NumOfNodesInList; ++Loop2) {
             for (int Loop1 = 1; Loop1 <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop1) {
                 if (Loop == Loop1) continue; // within a nodelist have already checked to see if node name duplicates nodelist name
-                if (!UtilityRoutines::SameString(state.dataNodeInputMgr->NodeLists(Loop).NodeNames(Loop2),
-                                                 state.dataNodeInputMgr->NodeLists(Loop1).Name))
+                if (!Util::SameString(state.dataNodeInputMgr->NodeLists(Loop).NodeNames(Loop2), state.dataNodeInputMgr->NodeLists(Loop1).Name))
                     continue;
                 ShowSevereError(
                     state,
@@ -675,7 +673,7 @@ int AssignNodeNumber(EnergyPlusData &state,
 
     int NumNode = 0;
     if (state.dataNodeInputMgr->NumOfUniqueNodeNames > 0) {
-        NumNode = UtilityRoutines::FindItemInList(
+        NumNode = Util::FindItemInList(
             Name, state.dataLoopNodes->NodeID({1, state.dataNodeInputMgr->NumOfUniqueNodeNames}), state.dataNodeInputMgr->NumOfUniqueNodeNames);
         if (NumNode > 0) {
             AssignNodeNumber = NumNode;
@@ -864,7 +862,7 @@ void CheckUniqueNodeNames(
     int Found;
 
     if (!CheckName.empty()) {
-        Found = UtilityRoutines::FindItemInList(CheckName, state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
+        Found = Util::FindItemInList(CheckName, state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
         if (Found != 0) {
             ShowSevereError(state, format("{}=\"{}\", duplicate node names found.", state.dataNodeInputMgr->CurCheckContextName, ObjectName));
             ShowContinueError(state, format("...for Node Type(s)={}, duplicate node name=\"{}\".", NodeTypes, CheckName));
@@ -907,7 +905,7 @@ void CheckUniqueNodeNumbers(
     int Found;
 
     if (CheckNumber != 0) {
-        Found = UtilityRoutines::FindItemInList(
+        Found = Util::FindItemInList(
             state.dataLoopNodes->NodeID(CheckNumber), state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
         if (Found != 0) {
             ShowSevereError(state, format("{}=\"{}\", duplicate node names found.", state.dataNodeInputMgr->CurCheckContextName, ObjectName));
@@ -1036,18 +1034,18 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
             nodeReportingStrings.push_back(std::string(NodeReportingCalc + state.dataLoopNodes->NodeID(iNode)));
             nodeFluidNames.push_back(FluidProperties::GetGlycolNameByIndex(state, state.dataLoopNodes->Node(iNode).FluidIndex));
             for (int iReq = 1; iReq <= state.dataOutputProcessor->NumOfReqVariables; ++iReq) {
-                if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).Key, state.dataLoopNodes->NodeID(iNode)) ||
+                if (Util::SameString(state.dataOutputProcessor->ReqRepVars(iReq).Key, state.dataLoopNodes->NodeID(iNode)) ||
                     state.dataOutputProcessor->ReqRepVars(iReq).Key.empty()) {
-                    if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Wetbulb Temperature")) {
+                    if (Util::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Wetbulb Temperature")) {
                         state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) = true;
                         NodeWetBulbSchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
-                    } else if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Relative Humidity")) {
+                    } else if (Util::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Relative Humidity")) {
                         NodeRelHumidityRepReq(iNode) = true;
                         NodeRelHumiditySchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
-                    } else if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Dewpoint Temperature")) {
+                    } else if (Util::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Dewpoint Temperature")) {
                         NodeDewPointRepReq(iNode) = true;
                         NodeDewPointSchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
-                    } else if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Specific Heat")) {
+                    } else if (Util::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Specific Heat")) {
                         NodeSpecificHeatRepReq(iNode) = true;
                         NodeSpecificHeatSchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
                     }

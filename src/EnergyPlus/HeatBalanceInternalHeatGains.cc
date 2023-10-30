@@ -122,7 +122,7 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     int constexpr DeviceAllocInc(100);
 
     bool FoundDuplicate = false;
-    std::string UpperCaseObjectName = UtilityRoutines::makeUPPER(cComponentName);
+    std::string UpperCaseObjectName = Util::makeUPPER(cComponentName);
 
     auto &thisIntGain = state.dataHeatBal->spaceIntGainDevices(spaceNum);
     for (int IntGainsNum = 1; IntGainsNum <= thisIntGain.numberOfDevices; ++IntGainsNum) {

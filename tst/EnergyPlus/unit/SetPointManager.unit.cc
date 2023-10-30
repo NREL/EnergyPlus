@@ -1241,8 +1241,8 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 10000.0;
 
-    int ZoneNodeNum = UtilityRoutines::FindItemInList("SPACE1-1 NODE", state->dataLoopNodes->NodeID);
-    int InletNodeNum = UtilityRoutines::FindItemInList("SPACE1-1 IN NODE", state->dataLoopNodes->NodeID);
+    int ZoneNodeNum = Util::FindItemInList("SPACE1-1 NODE", state->dataLoopNodes->NodeID);
+    int InletNodeNum = Util::FindItemInList("SPACE1-1 IN NODE", state->dataLoopNodes->NodeID);
     EXPECT_EQ(state->dataLoopNodes->NodeID(InletNodeNum), "SPACE1-1 IN NODE");
     EXPECT_EQ(state->dataLoopNodes->NodeID(ZoneNodeNum), "SPACE1-1 NODE");
 
@@ -1254,7 +1254,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     SetPointManager::SimSetPointManagers(*state);
     SetPointManager::UpdateSetPointManagers(*state);
 
-    int OutletNodeNum = UtilityRoutines::FindItemInList("VAV SYS 1 OUTLET NODE", state->dataLoopNodes->NodeID);
+    int OutletNodeNum = Util::FindItemInList("VAV SYS 1 OUTLET NODE", state->dataLoopNodes->NodeID);
     EXPECT_EQ(state->dataLoopNodes->NodeID(OutletNodeNum), "VAV SYS 1 OUTLET NODE");
     EXPECT_DOUBLE_EQ(16.0, state->dataSetPointManager->WarmestSetPtMgr(1).SetPt); // no cooling load, sets to maximum limit value
 
@@ -1265,7 +1265,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     ZoneSetPointTemp = state->dataLoopNodes->Node(ZoneNodeNum).Temp + state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired /
                                                                           (CpAir * state->dataLoopNodes->Node(InletNodeNum).MassFlowRateMax);
     // check the value of ZoneSetPointTemp matches to the value calculated by ColdestSetPtMgr
-    int HCOutletNodeNum = UtilityRoutines::FindItemInList("HCOIL OUTLET NODE", state->dataLoopNodes->NodeID);
+    int HCOutletNodeNum = Util::FindItemInList("HCOIL OUTLET NODE", state->dataLoopNodes->NodeID);
     EXPECT_EQ(state->dataLoopNodes->NodeID(HCOutletNodeNum), "HCOIL OUTLET NODE");
     EXPECT_DOUBLE_EQ(ZoneSetPointTemp, state->dataSetPointManager->ColdestSetPtMgr(1).SetPt);     // 29.74 deg C
     EXPECT_DOUBLE_EQ(ZoneSetPointTemp, state->dataLoopNodes->Node(HCOutletNodeNum).TempSetPoint); // 29.74 deg C
@@ -1546,13 +1546,13 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
-    int zoneNodeNum = UtilityRoutines::FindItemInList("ZSF1 NODE", state->dataLoopNodes->NodeID);
+    int zoneNodeNum = Util::FindItemInList("ZSF1 NODE", state->dataLoopNodes->NodeID);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = zoneNodeNum;
-    int inletNodeNum = UtilityRoutines::FindItemInList("ZSF1 INLET NODE", state->dataLoopNodes->NodeID);
+    int inletNodeNum = Util::FindItemInList("ZSF1 INLET NODE", state->dataLoopNodes->NodeID);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = inletNodeNum;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
-    int coolSPNodeNum = UtilityRoutines::FindItemInList("ZONE EQUIPMENT 1 INLET NODE", state->dataLoopNodes->NodeID);
-    int heatSPNodeNum = UtilityRoutines::FindItemInList("AIR LOOP 1 OUTLET NODE", state->dataLoopNodes->NodeID);
+    int coolSPNodeNum = Util::FindItemInList("ZONE EQUIPMENT 1 INLET NODE", state->dataLoopNodes->NodeID);
+    int heatSPNodeNum = Util::FindItemInList("AIR LOOP 1 OUTLET NODE", state->dataLoopNodes->NodeID);
 
     auto &zoneNode(state->dataLoopNodes->Node(zoneNodeNum));
     auto &inletNode(state->dataLoopNodes->Node(inletNodeNum));

@@ -137,7 +137,7 @@ namespace WaterToAirHeatPump {
         }
 
         if (CompIndex == 0) {
-            HPNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterToAirHeatPump->WatertoAirHP);
+            HPNum = Util::FindItemInList(CompName, state.dataWaterToAirHeatPump->WatertoAirHP);
             if (HPNum == 0) {
                 ShowFatalError(state, format("WaterToAir HP not found={}", CompName));
             }
@@ -355,7 +355,7 @@ namespace WaterToAirHeatPump {
             heatPump.PowerLosses = NumArray(10);
             heatPump.LossFactor = NumArray(11);
 
-            heatPump.compressorType = static_cast<CompressorType>(getEnumValue(CompressTypeNamesUC, UtilityRoutines::makeUPPER(AlphArray(2))));
+            heatPump.compressorType = static_cast<CompressorType>(getEnumValue(CompressTypeNamesUC, Util::makeUPPER(AlphArray(2))));
 
             switch (heatPump.compressorType) {
             case CompressorType::Reciprocating: {
@@ -602,7 +602,8 @@ namespace WaterToAirHeatPump {
             heatPump.PowerLosses = NumArray(7);
             heatPump.LossFactor = NumArray(8);
 
-            heatPump.compressorType = static_cast<CompressorType>(getEnumValue(CompressTypeNamesUC, UtilityRoutines::makeUPPER(AlphArray(2))));
+            heatPump.compressorType = static_cast<CompressorType>(getEnumValue(CompressTypeNamesUC, Util::makeUPPER(AlphArray(2))));
+
             switch (heatPump.compressorType) {
             case CompressorType::Reciprocating: {
                 heatPump.CompPistonDisp = NumArray(9);
@@ -2505,7 +2506,7 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->GetCoilsInputFlag = false;
         }
 
-        IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataWaterToAirHeatPump->WatertoAirHP);
+        IndexNum = Util::FindItemInList(CoilName, state.dataWaterToAirHeatPump->WatertoAirHP);
 
         if (IndexNum == 0) {
             ShowSevereError(state, format("Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
@@ -2549,11 +2550,11 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->GetCoilsInputFlag = false;
         }
 
-        if (UtilityRoutines::SameString(CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION") ||
-            UtilityRoutines::SameString(CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION")) {
-            WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataWaterToAirHeatPump->WatertoAirHP);
+        if (Util::SameString(CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION") ||
+            Util::SameString(CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION")) {
+            WhichCoil = Util::FindItemInList(CoilName, state.dataWaterToAirHeatPump->WatertoAirHP);
             if (WhichCoil != 0) {
-                if (UtilityRoutines::SameString(CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION")) {
+                if (Util::SameString(CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION")) {
                     CoilCapacity = state.dataWaterToAirHeatPump->WatertoAirHP(WhichCoil).HeatingCapacity;
                 } else {
                     CoilCapacity = state.dataWaterToAirHeatPump->WatertoAirHP(WhichCoil).CoolingCapacity;
@@ -2606,7 +2607,7 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->GetCoilsInputFlag = false;
         }
 
-        WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataWaterToAirHeatPump->WatertoAirHP);
+        WhichCoil = Util::FindItemInList(CoilName, state.dataWaterToAirHeatPump->WatertoAirHP);
         if (WhichCoil != 0) {
             NodeNumber = state.dataWaterToAirHeatPump->WatertoAirHP(WhichCoil).AirInletNodeNum;
         }
@@ -2654,7 +2655,7 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->GetCoilsInputFlag = false;
         }
 
-        WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataWaterToAirHeatPump->WatertoAirHP);
+        WhichCoil = Util::FindItemInList(CoilName, state.dataWaterToAirHeatPump->WatertoAirHP);
         if (WhichCoil != 0) {
             NodeNumber = state.dataWaterToAirHeatPump->WatertoAirHP(WhichCoil).AirOutletNodeNum;
         }

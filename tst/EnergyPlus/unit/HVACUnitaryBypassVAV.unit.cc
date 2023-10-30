@@ -1696,7 +1696,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_ParentElectricityRateTest)
     auto &BypassVAV = state->dataHVACUnitaryBypassVAV->CBVAV(1);
     // set zone air conditions
     auto &zoneAirNode =
-        state->dataLoopNodes->Node(UtilityRoutines::FindItemInList("ZONE 1 NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+        state->dataLoopNodes->Node(Util::FindItemInList("ZONE 1 NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     zoneAirNode.Temp = 20.0;
     zoneAirNode.HumRat = 0.005;
     zoneAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneAirNode.Temp, zoneAirNode.HumRat);
@@ -1706,8 +1706,8 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_ParentElectricityRateTest)
     airInNode.HumRat = 0.005;
     airInNode.Enthalpy = Psychrometrics::PsyHFnTdbW(airInNode.Temp, airInNode.HumRat);
     // set outside air inlet node
-    auto &oaMixerAirInletNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("OUTSIDE AIR INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    auto &oaMixerAirInletNode =
+        state->dataLoopNodes->Node(Util::FindItemInList("OUTSIDE AIR INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     // auto &oaMixerAirInletNode = state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode);
     oaMixerAirInletNode.Temp = state->dataEnvrn->OutDryBulbTemp;
     oaMixerAirInletNode.HumRat = state->dataEnvrn->OutHumRat;

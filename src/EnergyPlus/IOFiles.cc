@@ -330,7 +330,7 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
             auto found = fields.find(field_name);
             if (found != fields.end()) {
                 input = found.value().get<std::string>();
-                input = UtilityRoutines::makeUPPER(input);
+                input = Util::makeUPPER(input);
             } else {
                 state.dataInputProcessing->inputProcessor->getDefaultValue(state, "OutputControl:Files", field_name, input);
             }
