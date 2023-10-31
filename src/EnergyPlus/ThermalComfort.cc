@@ -1953,8 +1953,7 @@ namespace ThermalComfort {
 
             for (int SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
                 thisAngFacList.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 1);
-                thisAngFacList.SurfacePtr(SurfNum) =
-                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(SurfNum + 1), state.dataSurface->Surface);
+                thisAngFacList.SurfacePtr(SurfNum) = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(SurfNum + 1), state.dataSurface->Surface);
                 thisAngFacList.AngleFactor(SurfNum) = state.dataIPShortCut->rNumericArgs(SurfNum);
                 // Error trap for surfaces that do not exist or surfaces not in the zone
                 if (thisAngFacList.SurfacePtr(SurfNum) == 0) {
