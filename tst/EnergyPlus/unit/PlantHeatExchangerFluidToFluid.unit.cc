@@ -1077,7 +1077,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     state->dataGlobal->KickOffSimulation = false;
 
@@ -1087,7 +1087,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
+        Weather::GetNextEnvironment(*state, Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -1138,7 +1138,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                         }
                     }
 
-                    WeatherManager::ManageWeather(*state);
+                    Weather::ManageWeather(*state);
 
                     HeatBalanceManager::ManageHeatBalance(*state);
 
@@ -2169,7 +2169,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     state->dataGlobal->KickOffSimulation = false;
 
@@ -2179,7 +2179,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
+        Weather::GetNextEnvironment(*state, Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -2230,7 +2230,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                         }
                     }
 
-                    WeatherManager::ManageWeather(*state);
+                    Weather::ManageWeather(*state);
 
                     HeatBalanceManager::ManageHeatBalance(*state);
 

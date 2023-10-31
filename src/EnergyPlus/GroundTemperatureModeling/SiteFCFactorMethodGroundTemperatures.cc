@@ -118,10 +118,10 @@ std::shared_ptr<SiteFCFactorMethodGroundTemps> SiteFCFactorMethodGroundTemps::FC
                                     GroundTemperatureManager::groundTempModelNames[static_cast<int>(objType)]));
         errorsFound = true;
 
-    } else if (state.dataWeatherManager->wthFCGroundTemps) {
+    } else if (state.dataWeather->wthFCGroundTemps) {
 
         for (int i = 1; i <= 12; ++i) {
-            thisModel->fcFactorGroundTemps(i) = state.dataWeatherManager->GroundTempsFCFromEPWHeader(i);
+            thisModel->fcFactorGroundTemps(i) = state.dataWeather->GroundTempsFCFromEPWHeader(i);
         }
 
         state.dataEnvrn->FCGroundTemps = true;
@@ -174,7 +174,7 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusDat
     // Returns the ground temperature when input time is in seconds
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * Constant::SecsInDay / 12;
+    Real64 secPerMonth = state.dataWeather->NumDaysInYear * Constant::SecsInDay / 12;
 
     // Convert secs to months
     int month = ceil(_seconds / secPerMonth);

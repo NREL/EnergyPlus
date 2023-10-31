@@ -166,7 +166,7 @@ TEST_F(EnergyPlusFixture, DemandManagerAssignmentListGetInputTest)
     int dMgrIndex = 0;
     auto &DemandMgr(state->dataDemandManager->DemandMgr);
     // check lights demand manager name
-    dMgrIndex = UtilityRoutines::FindItemInList("EXT LIGHTS MANAGER", DemandMgr);
+    dMgrIndex = Util::FindItemInList("EXT LIGHTS MANAGER", DemandMgr);
     auto &lightsDmndMgr = state->dataDemandManager->DemandMgr(dMgrIndex);
     EXPECT_EQ("EXT LIGHTS MANAGER", lightsDmndMgr.Name);
     // test expected fatal error due to wrong demand manager objet name

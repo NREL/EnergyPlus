@@ -277,7 +277,7 @@ void GetPollutionFactorInput(EnergyPlusData &state)
 
         ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
         
-        Constant::eFuel fuel = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(1))));
+        Constant::eFuel fuel = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(1))));
 
         auto &pollCoeff = pm->pollCoeffs[(int)fuel];
         if (pollCoeff.used) {

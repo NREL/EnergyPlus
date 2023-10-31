@@ -262,7 +262,7 @@ namespace RoomAir {
 
                         AirNodeFoundFlag = false;
                         for (AirNodeNum = AirNodeBeginNum; AirNodeNum <= state.dataRoomAir->TotNumOfAirNodes; ++AirNodeNum) {
-                            if (UtilityRoutines::SameString(state.dataRoomAir->AirNode(AirNodeNum).ZoneName, thisZone.Name)) {
+                            if (Util::SameString(state.dataRoomAir->AirNode(AirNodeNum).ZoneName, thisZone.Name)) {
                                 state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType = state.dataRoomAir->AirNode(AirNodeNum).ClassType;
                                 state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).AirNodeName = state.dataRoomAir->AirNode(AirNodeNum).Name;
                                 state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).Height = state.dataRoomAir->AirNode(AirNodeNum).Height;

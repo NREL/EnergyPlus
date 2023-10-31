@@ -286,7 +286,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataWaterToAirHeatPump = std::make_unique<WaterToAirHeatPumpData>();
     this->dataWaterToAirHeatPumpSimple = std::make_unique<WaterToAirHeatPumpSimpleData>();
     this->dataWaterUse = std::make_unique<WaterUseData>();
-    this->dataWeatherManager = std::make_unique<WeatherManagerData>();
+    this->dataWeather = std::make_unique<WeatherManagerData>();
     this->dataWindTurbine = std::make_unique<WindTurbineData>();
     this->dataWindowAC = std::make_unique<WindowACData>();
     this->dataWindowComplexManager = std::make_unique<WindowComplexManagerData>();
@@ -542,7 +542,7 @@ void EnergyPlusData::clear_state()
     this->dataWaterToAirHeatPump->clear_state();
     this->dataWaterToAirHeatPumpSimple->clear_state();
     this->dataWaterUse->clear_state();
-    this->dataWeatherManager->clear_state();
+    this->dataWeather->clear_state();
     this->dataWindTurbine->clear_state();
     this->dataWindowAC->clear_state();
     this->dataWindowComplexManager->clear_state();

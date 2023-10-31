@@ -207,9 +207,9 @@ namespace ExteriorEnergyUse {
             }
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode = ExteriorEnergyUse::LightControlType::ScheduleOnly;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "ScheduleNameOnly")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "ScheduleNameOnly")) {
                 state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode = ExteriorEnergyUse::LightControlType::ScheduleOnly;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "AstronomicalClock")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "AstronomicalClock")) {
                 state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode = ExteriorEnergyUse::LightControlType::AstroClockOverride;
             } else {
                 ShowSevereError(state,

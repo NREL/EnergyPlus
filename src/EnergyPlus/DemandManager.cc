@@ -427,7 +427,7 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
             // Validate Demand Manager Priority
             thisDemandMgrList.ManagerPriority =
-                static_cast<ManagePriorityType>(getEnumValue(ManagePriorityNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(6))));
+                static_cast<ManagePriorityType>(getEnumValue(ManagePriorityNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(6))));
             ErrorsFound = ErrorsFound || (thisDemandMgrList.ManagerPriority == ManagePriorityType::Invalid);
 
             // Get DEMAND MANAGER Type and Name pairs
@@ -439,11 +439,10 @@ void GetDemandManagerListInput(EnergyPlusData &state)
 
                     auto &thisManager = thisDemandMgrList.Manager(MgrNum);
                     // Validate DEMAND MANAGER Type
-                    ManagerType MgrType = static_cast<ManagerType>(
-                        getEnumValue(ManagerNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5))));
+                    ManagerType MgrType =
+                        static_cast<ManagerType>(getEnumValue(ManagerNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 5))));
                     if (MgrType != ManagerType::Invalid) {
-                        thisManager =
-                            UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6), state.dataDemandManager->DemandMgr);
+                        thisManager = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(MgrNum * 2 + 6), state.dataDemandManager->DemandMgr);
                         if (thisManager == 0) {
                             ShowSevereError(state,
                                             format("{} = \"{}\" invalid {} = \"{}\" not found.",
@@ -676,7 +675,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             }
 
             // Validate Limiting Control
-            demandMgr.LimitControl = static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, UtilityRoutines::makeUPPER(AlphArray(3))));
+            demandMgr.LimitControl = static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, Util::makeUPPER(AlphArray(3))));
             ErrorsFound = ErrorsFound || (demandMgr.LimitControl == ManagerLimit::Invalid);
 
             if (NumArray(1) == 0.0)
@@ -687,8 +686,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             demandMgr.LowerLimit = NumArray(2);
 
             // Validate Selection Control
-            demandMgr.SelectionControl =
-                static_cast<ManagerSelection>(getEnumValue(ManagerSelectionNamesUC, UtilityRoutines::makeUPPER(AlphArray(4))));
+            demandMgr.SelectionControl = static_cast<ManagerSelection>(getEnumValue(ManagerSelectionNamesUC, Util::makeUPPER(AlphArray(4))));
             ErrorsFound = ErrorsFound || (demandMgr.SelectionControl == ManagerSelection::Invalid);
 
             if (NumArray(4) == 0.0)
@@ -702,7 +700,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 demandMgr.Load.allocate(demandMgr.NumOfLoads);
 
                 for (int LoadNum = 1; LoadNum <= demandMgr.NumOfLoads; ++LoadNum) {
-                    int LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataExteriorEnergyUse->ExteriorLights);
+                    int LoadPtr = Util::FindItemInList(AlphArray(LoadNum + 4), state.dataExteriorEnergyUse->ExteriorLights);
 
                     if (LoadPtr > 0) {
                         demandMgr.Load(LoadNum) = LoadPtr;
@@ -774,7 +772,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             }
 
             // Validate Limiting Control
-            demandMgr.LimitControl = static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, UtilityRoutines::makeUPPER(AlphArray(3))));
+            demandMgr.LimitControl = static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, Util::makeUPPER(AlphArray(3))));
             ErrorsFound = ErrorsFound || (demandMgr.LimitControl == ManagerLimit::Invalid);
 
             if (NumArray(1) == 0.0)
@@ -785,8 +783,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             demandMgr.LowerLimit = NumArray(2);
 
             // Validate Selection Control
-            demandMgr.SelectionControl =
-                static_cast<ManagerSelection>(getEnumValue(ManagerSelectionNamesUC, UtilityRoutines::makeUPPER(AlphArray(4))));
+            demandMgr.SelectionControl = static_cast<ManagerSelection>(getEnumValue(ManagerSelectionNamesUC, Util::makeUPPER(AlphArray(4))));
             ErrorsFound = ErrorsFound || (demandMgr.SelectionControl == ManagerSelection::Invalid);
 
             if (NumArray(4) == 0.0)
@@ -797,11 +794,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
             // Count actual pointers to controlled zones
             demandMgr.NumOfLoads = 0;
             for (int LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
-                int LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataInternalHeatGains->lightsObjects);
+                int LoadPtr = Util::FindItemInList(AlphArray(LoadNum + 4), state.dataInternalHeatGains->lightsObjects);
                 if (LoadPtr > 0) {
                     demandMgr.NumOfLoads += state.dataInternalHeatGains->lightsObjects(LoadPtr).numOfSpaces;
                 } else {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->Lights);
+                    LoadPtr = Util::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->Lights);
                     if (LoadPtr > 0) {
                         ++demandMgr.NumOfLoads;
                     } else {
@@ -822,14 +819,14 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 demandMgr.Load.allocate(demandMgr.NumOfLoads);
                 int LoadNum = 0;
                 for (int Item = 1; Item <= NumAlphas - 4; ++Item) {
-                    int LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataInternalHeatGains->lightsObjects);
+                    int LoadPtr = Util::FindItemInList(AlphArray(Item + 4), state.dataInternalHeatGains->lightsObjects);
                     if (LoadPtr > 0) {
                         for (int Item1 = 1; Item1 <= state.dataInternalHeatGains->lightsObjects(LoadPtr).numOfSpaces; ++Item1) {
                             ++LoadNum;
                             demandMgr.Load(LoadNum) = state.dataInternalHeatGains->lightsObjects(LoadPtr).spaceStartPtr + Item1 - 1;
                         }
                     } else {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->Lights);
+                        LoadPtr = Util::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->Lights);
                         if (LoadPtr > 0) {
                             ++LoadNum;
                             demandMgr.Load(LoadNum) = LoadPtr;
@@ -893,7 +890,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             }
 
             // Validate Limiting Control
-            demandMgr.LimitControl = static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, UtilityRoutines::makeUPPER(AlphArray(3))));
+            demandMgr.LimitControl = static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, Util::makeUPPER(AlphArray(3))));
             ErrorsFound = ErrorsFound || (demandMgr.LimitControl == ManagerLimit::Invalid);
 
             if (NumArray(1) == 0.0)
@@ -904,8 +901,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             demandMgr.LowerLimit = NumArray(2);
 
             // Validate Selection Control
-            demandMgr.SelectionControl =
-                static_cast<ManagerSelection>(getEnumValue(ManagerSelectionNamesUC, UtilityRoutines::makeUPPER(AlphArray(4))));
+            demandMgr.SelectionControl = static_cast<ManagerSelection>(getEnumValue(ManagerSelectionNamesUC, Util::makeUPPER(AlphArray(4))));
             ErrorsFound = ErrorsFound || (demandMgr.SelectionControl == ManagerSelection::Invalid);
 
             if (NumArray(4) == 0.0)
@@ -916,11 +912,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
             // Count actual pointers to controlled zones
             demandMgr.NumOfLoads = 0;
             for (int LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
-                int LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataInternalHeatGains->zoneElectricObjects);
+                int LoadPtr = Util::FindItemInList(AlphArray(LoadNum + 4), state.dataInternalHeatGains->zoneElectricObjects);
                 if (LoadPtr > 0) {
                     demandMgr.NumOfLoads += state.dataInternalHeatGains->zoneElectricObjects(LoadPtr).numOfSpaces;
                 } else {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->ZoneElectric);
+                    LoadPtr = Util::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->ZoneElectric);
                     if (LoadPtr > 0) {
                         ++demandMgr.NumOfLoads;
                     } else {
@@ -941,14 +937,14 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 demandMgr.Load.allocate(demandMgr.NumOfLoads);
                 int LoadNum = 0;
                 for (int Item = 1; Item <= NumAlphas - 4; ++Item) {
-                    int LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataInternalHeatGains->zoneElectricObjects);
+                    int LoadPtr = Util::FindItemInList(AlphArray(Item + 4), state.dataInternalHeatGains->zoneElectricObjects);
                     if (LoadPtr > 0) {
                         for (int Item1 = 1; Item1 <= state.dataInternalHeatGains->zoneElectricObjects(LoadPtr).numOfSpaces; ++Item1) {
                             ++LoadNum;
                             demandMgr.Load(LoadNum) = state.dataInternalHeatGains->zoneElectricObjects(LoadPtr).spaceStartPtr + Item1 - 1;
                         }
                     } else {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->ZoneElectric);
+                        LoadPtr = Util::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->ZoneElectric);
                         if (LoadPtr > 0) {
                             ++LoadNum;
                             demandMgr.Load(LoadNum) = LoadPtr;
@@ -1013,7 +1009,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             }
 
             // Validate Limiting Control
-            demandMgr.LimitControl = static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, UtilityRoutines::makeUPPER(AlphArray(3))));
+            demandMgr.LimitControl = static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, Util::makeUPPER(AlphArray(3))));
             ErrorsFound = ErrorsFound || (demandMgr.LimitControl == ManagerLimit::Invalid);
 
             if (NumArray(1) == 0.0)
@@ -1039,8 +1035,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             }
 
             // Validate Selection Control
-            demandMgr.SelectionControl =
-                static_cast<ManagerSelection>(getEnumValue(ManagerSelectionNamesUC, UtilityRoutines::makeUPPER(AlphArray(4))));
+            demandMgr.SelectionControl = static_cast<ManagerSelection>(getEnumValue(ManagerSelectionNamesUC, Util::makeUPPER(AlphArray(4))));
             ErrorsFound = ErrorsFound || (demandMgr.SelectionControl == ManagerSelection::Invalid);
 
             if (NumArray(5) == 0.0)
@@ -1051,11 +1046,11 @@ void GetDemandManagerInput(EnergyPlusData &state)
             // Count actual pointers to controlled zones
             demandMgr.NumOfLoads = 0;
             for (int LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
-                int LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataZoneCtrls->TStatObjects);
+                int LoadPtr = Util::FindItemInList(AlphArray(LoadNum + 4), state.dataZoneCtrls->TStatObjects);
                 if (LoadPtr > 0) {
                     demandMgr.NumOfLoads += state.dataZoneCtrls->TStatObjects(LoadPtr).NumOfZones;
                 } else {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataZoneCtrls->TempControlledZone);
+                    LoadPtr = Util::FindItemInList(AlphArray(LoadNum + 4), state.dataZoneCtrls->TempControlledZone);
                     if (LoadPtr > 0) {
                         ++demandMgr.NumOfLoads;
                     } else {
@@ -1074,14 +1069,14 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 demandMgr.Load.allocate(demandMgr.NumOfLoads);
                 int LoadNum = 0;
                 for (int Item = 1; Item <= NumAlphas - 4; ++Item) {
-                    int LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataZoneCtrls->TStatObjects);
+                    int LoadPtr = Util::FindItemInList(AlphArray(Item + 4), state.dataZoneCtrls->TStatObjects);
                     if (LoadPtr > 0) {
                         for (int Item1 = 1; Item1 <= state.dataZoneCtrls->TStatObjects(LoadPtr).NumOfZones; ++Item1) {
                             ++LoadNum;
                             demandMgr.Load(LoadNum) = state.dataZoneCtrls->TStatObjects(LoadPtr).TempControlledZoneStartPtr + Item1 - 1;
                         }
                     } else {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataZoneCtrls->TempControlledZone);
+                        LoadPtr = Util::FindItemInList(AlphArray(Item + 4), state.dataZoneCtrls->TempControlledZone);
                         if (LoadPtr > 0) {
                             ++LoadNum;
                             demandMgr.Load(LoadNum) = LoadPtr;
@@ -1145,7 +1140,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             }
 
             // Validate Limiting Control
-            demandMgr.LimitControl = static_cast<ManagerLimit>(getEnumValue(ManagerLimitVentNamesUC, UtilityRoutines::makeUPPER(AlphArray(3))));
+            demandMgr.LimitControl = static_cast<ManagerLimit>(getEnumValue(ManagerLimitVentNamesUC, Util::makeUPPER(AlphArray(3))));
             ErrorsFound = ErrorsFound || (demandMgr.LimitControl == ManagerLimit::Invalid);
 
             if (NumArray(1) == 0.0)
@@ -1159,8 +1154,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             demandMgr.LowerLimit = NumArray(4);
 
             // Validate Selection Control
-            demandMgr.SelectionControl =
-                static_cast<ManagerSelection>(getEnumValue(ManagerSelectionNamesUC, UtilityRoutines::makeUPPER(AlphArray(4))));
+            demandMgr.SelectionControl = static_cast<ManagerSelection>(getEnumValue(ManagerSelectionNamesUC, Util::makeUPPER(AlphArray(4))));
             ErrorsFound = ErrorsFound || (demandMgr.SelectionControl == ManagerSelection::Invalid);
 
             if (NumArray(5) == 0.0)
