@@ -291,7 +291,7 @@ namespace RoomAir {
                                             }
                                         }
                                     }
-                                } else if (UtilityRoutines::SameString(zoneEquipList.EquipName(I), afnHVAC.Name)) {
+                                } else if (Util::SameString(zoneEquipList.EquipName(I), afnHVAC.Name)) {
                                     if (afnHVAC.EquipConfigIndex == 0) {
                                         afnHVAC.EquipConfigIndex = I;
                                     }
@@ -300,9 +300,8 @@ namespace RoomAir {
                                     ReturnFrac(I) += afnHVAC.ReturnFraction;
                                 }
                             }
-
                             for (int iNode = 1; iNode <= state.dataLoopNodes->NumOfNodes; ++iNode) { // loop over all nodes to find supply node ID
-                                if (UtilityRoutines::SameString(state.dataLoopNodes->NodeID(iNode), afnHVAC.SupplyNodeName)) {
+                                if (Util::SameString(state.dataLoopNodes->NodeID(iNode), afnHVAC.SupplyNodeName)) {
                                     afnHVAC.SupNodeNum = iNode;
                                     break;
                                 }
@@ -332,7 +331,7 @@ namespace RoomAir {
 
                             if (afnHVAC.RetNodeNum == 0) {
                                 for (int iNode = 1; iNode <= state.dataLoopNodes->NumOfNodes; ++iNode) { // loop over all nodes to find return node ID
-                                    if (UtilityRoutines::SameString(state.dataLoopNodes->NodeID(iNode), afnHVAC.ReturnNodeName)) {
+                                    if (Util::SameString(state.dataLoopNodes->NodeID(iNode), afnHVAC.ReturnNodeName)) {
                                         afnHVAC.RetNodeNum = iNode;
                                         break;
                                     }

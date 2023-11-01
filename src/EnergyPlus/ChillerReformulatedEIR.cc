@@ -299,11 +299,10 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
         }
 
         // Check the type of part-load curves implemented: 1_LeavingCondenserWaterTemperature, 2_Lift
-        if (UtilityRoutines::SameString(PartLoadCurveType, "LeavingCondenserWaterTemperature") &&
+        if (Util::SameString(PartLoadCurveType, "LeavingCondenserWaterTemperature") &&
             state.dataCurveManager->PerfCurve(thisChiller.ChillerEIRFPLRIndex)->numDims == 2) {
             thisChiller.PartLoadCurveType = PLR::LeavingCondenserWaterTemperature;
-        } else if (UtilityRoutines::SameString(PartLoadCurveType, "Lift") &&
-                   state.dataCurveManager->PerfCurve(thisChiller.ChillerEIRFPLRIndex)->numDims == 3) {
+        } else if (Util::SameString(PartLoadCurveType, "Lift") && state.dataCurveManager->PerfCurve(thisChiller.ChillerEIRFPLRIndex)->numDims == 3) {
             thisChiller.PartLoadCurveType = PLR::Lift;
         } else {
             ShowSevereError(state,
@@ -1350,7 +1349,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
             this->CondVolFlowRate = tmpCondVolFlowRate;
             BaseSizer::reportSizerOutput(
                 state, "Chiller:Electric:ReformulatedEIR", this->Name, "Design Size Reference Condenser Air Flow Rate [m3/s]", this->CondVolFlowRate);
-        } else if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (tmpCondVolFlowRate > 0.0) &&
+        } else if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0) &&
                    this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             BaseSizer::reportSizerOutput(state,
                                          "Chiller:Electric:ReformulatedEIR",
@@ -1366,7 +1365,17 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
     }
 
     if (this->HeatRecActive) {
-        Real64 tmpHeatRecVolFlowRate = tmpCondVolFlowRate * this->HeatRecCapacityFraction;
+        Real64 tmpHeatRecVolFlowRate;
+        if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
+            tmpHeatRecVolFlowRate = tmpCondVolFlowRate * this->HeatRecCapacityFraction;
+        } else {
+            if (this->EvapVolFlowRateWasAutoSized) {
+                tmpHeatRecVolFlowRate = tmpEvapVolFlowRate;
+            } else {
+                tmpHeatRecVolFlowRate = this->EvapVolFlowRate;
+            }
+            tmpHeatRecVolFlowRate *= (1.0 + (1.0 / this->RefCOP)) * this->CompPowerToCondenserFrac * this->HeatRecCapacityFraction;
+        }
         if (!this->DesignHeatRecVolFlowRateWasAutoSized) tmpHeatRecVolFlowRate = this->DesignHeatRecVolFlowRate;
         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
             if (this->DesignHeatRecVolFlowRateWasAutoSized) {

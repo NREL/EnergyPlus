@@ -131,8 +131,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
                                                                       cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(
-                *state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            Util::VerifyName(*state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
                 if (IsBlank) {
                     continue;
@@ -147,12 +146,12 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
 
         EXPECT_EQ(NumOfBranches, 1);
 
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(1), "VAV Sys 1 Main Branch"));
+        EXPECT_TRUE(Util::SameString(Alphas(1), "VAV Sys 1 Main Branch"));
 
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(3), "AirLoopHVAC:OutdoorAirSystem"));
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(4), "OA Sys 1"));
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(5), "VAV Sys 1 Inlet Node"));
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(6), "Mixed Air Node 1"));
+        EXPECT_TRUE(Util::SameString(Alphas(3), "AirLoopHVAC:OutdoorAirSystem"));
+        EXPECT_TRUE(Util::SameString(Alphas(4), "OA Sys 1"));
+        EXPECT_TRUE(Util::SameString(Alphas(5), "VAV Sys 1 Inlet Node"));
+        EXPECT_TRUE(Util::SameString(Alphas(6), "Mixed Air Node 1"));
 
         NodeNums.deallocate();
         Alphas.deallocate();
@@ -297,8 +296,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
                                                                       cNumericFields);
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(
-                *state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
+            Util::VerifyName(*state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
             if (IsNotOK) {
                 if (IsBlank) {
                     continue;
@@ -313,27 +311,27 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
 
         EXPECT_EQ(NumOfBranches, 1);
 
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(1), "VAV Sys 1 Main Branch"));
+        EXPECT_TRUE(Util::SameString(Alphas(1), "VAV Sys 1 Main Branch"));
 
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(3), "AirLoopHVAC:OutdoorAirSystem"));
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(4), "OA Sys 1"));
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(5), "VAV Sys 1 Inlet Node"));
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(6), "Mixed Air Node 1"));
+        EXPECT_TRUE(Util::SameString(Alphas(3), "AirLoopHVAC:OutdoorAirSystem"));
+        EXPECT_TRUE(Util::SameString(Alphas(4), "OA Sys 1"));
+        EXPECT_TRUE(Util::SameString(Alphas(5), "VAV Sys 1 Inlet Node"));
+        EXPECT_TRUE(Util::SameString(Alphas(6), "Mixed Air Node 1"));
 
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(7), "Coil:Cooling:Water"));
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(8), "Main Cooling Coil 1"));
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(9), "Mixed Air Node 1"));
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(10), "Main Cooling Coil 1 Outlet Node"));
+        EXPECT_TRUE(Util::SameString(Alphas(7), "Coil:Cooling:Water"));
+        EXPECT_TRUE(Util::SameString(Alphas(8), "Main Cooling Coil 1"));
+        EXPECT_TRUE(Util::SameString(Alphas(9), "Mixed Air Node 1"));
+        EXPECT_TRUE(Util::SameString(Alphas(10), "Main Cooling Coil 1 Outlet Node"));
 
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(11), "Coil:Heating:Water"));
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(12), "Main Heating Coil 1"));
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(13), "Main Cooling Coil 1 Outlet Node"));
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(14), "Main Heating Coil 1 Outlet Node"));
+        EXPECT_TRUE(Util::SameString(Alphas(11), "Coil:Heating:Water"));
+        EXPECT_TRUE(Util::SameString(Alphas(12), "Main Heating Coil 1"));
+        EXPECT_TRUE(Util::SameString(Alphas(13), "Main Cooling Coil 1 Outlet Node"));
+        EXPECT_TRUE(Util::SameString(Alphas(14), "Main Heating Coil 1 Outlet Node"));
 
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(15), "Fan:VariableVolume"));
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(16), "Supply Fan 1"));
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(17), "Main Heating Coil 1 Outlet Node"));
-        EXPECT_TRUE(UtilityRoutines::SameString(Alphas(18), "VAV Sys 1 Outlet Node"));
+        EXPECT_TRUE(Util::SameString(Alphas(15), "Fan:VariableVolume"));
+        EXPECT_TRUE(Util::SameString(Alphas(16), "Supply Fan 1"));
+        EXPECT_TRUE(Util::SameString(Alphas(17), "Main Heating Coil 1 Outlet Node"));
+        EXPECT_TRUE(Util::SameString(Alphas(18), "VAV Sys 1 Outlet Node"));
 
         NodeNums.deallocate();
         Alphas.deallocate();

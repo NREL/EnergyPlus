@@ -212,7 +212,7 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                         this->autoSizedValue = this->unitarySysEqSizing(this->curSysNum).HeatingAirVolFlow;
                     } else {
                         if (this->curDuctType == DataHVACGlobals::AirDuctType::Main) {
-                            if (UtilityRoutines::SameString(this->compType, "COIL:HEATING:WATER")) {
+                            if (Util::SameString(this->compType, "COIL:HEATING:WATER")) {
                                 if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0 && !this->dataDesicRegCoil) {
                                     this->autoSizedValue =
                                         this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesMainVolFlow;
@@ -223,7 +223,7 @@ Real64 HeatingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                                 this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                             }
                         } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Cooling) {
-                            if (UtilityRoutines::SameString(this->compType, "COIL:HEATING:WATER")) {
+                            if (Util::SameString(this->compType, "COIL:HEATING:WATER")) {
                                 if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0 && !this->dataDesicRegCoil) {
                                     this->autoSizedValue =
                                         this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesCoolVolFlow;

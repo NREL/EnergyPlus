@@ -313,11 +313,11 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                            state.dataIPShortCut->cAlphaArgs(6),
                                            "Chilled Water Nodes");
 
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "WaterCooled")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "WaterCooled")) {
             thisChiller.CondenserType = DataPlant::CondenserType::WaterCooled;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "AirCooled")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "AirCooled")) {
             thisChiller.CondenserType = DataPlant::CondenserType::AirCooled;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "EvaporativelyCooled")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "EvaporativelyCooled")) {
             thisChiller.CondenserType = DataPlant::CondenserType::EvapCooled;
         } else {
             ShowSevereError(state, format("{}{}: {}", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -1585,7 +1585,17 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
 
     // now do heat recovery flow rate sizing if active
     if (this->HeatRecActive) {
-        Real64 tempHeatRecVolFlowRate = tmpCondVolFlowRate * this->HeatRecCapacityFraction;
+        Real64 tempHeatRecVolFlowRate;
+        if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
+            tempHeatRecVolFlowRate = tmpCondVolFlowRate * this->HeatRecCapacityFraction;
+        } else {
+            if (this->EvapVolFlowRateWasAutoSized) {
+                tempHeatRecVolFlowRate = tmpEvapVolFlowRate;
+            } else {
+                tempHeatRecVolFlowRate = this->EvapVolFlowRate;
+            }
+            tempHeatRecVolFlowRate *= (1.0 + (1.0 / this->RefCOP)) * this->CompPowerToCondenserFrac * this->HeatRecCapacityFraction;
+        }
         if (this->DesignHeatRecVolFlowRateWasAutoSized) {
 
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
