@@ -10229,7 +10229,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
         } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
             powerConversion = getSpecificUnitMultiplier(state, "W", "kBtuh");
             flowConversion = getSpecificUnitMultiplier(state, "m3/s", "gal/min");
-            ipElectricityConversion = powerConversion;
+            ipElectricityConversion = powerConversion * 1000.0; // W to kW adjustment
         }
 
         // collapse the gatherEndUseBEPS array to the resource groups displayed
@@ -10373,7 +10373,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
             columnHead(13) = "District Heating Steam [kBtuh]";
             columnHead(14) = "Water [gal/min]";
         } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
-            columnHead(1) = "Electricity [W]";
+            columnHead(1) = "Electricity [kW]";
             columnHead(2) = "Natural Gas [kBtuh]";
             columnHead(3) = "Gasoline [kBtuh]";
             columnHead(4) = "Diesel [kBtuh]";
@@ -10488,7 +10488,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
             columnHead(15) = "Water [gal/min]";
         } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
             columnHead(1) = "Subcategory";
-            columnHead(2) = "Electricity [W]";
+            columnHead(2) = "Electricity [kW]";
             columnHead(3) = "Natural Gas [kBtuh]";
             columnHead(4) = "Gasoline [kBtuh]";
             columnHead(5) = "Diesel [kBtuh]";
