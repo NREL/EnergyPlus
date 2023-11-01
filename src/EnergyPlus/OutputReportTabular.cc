@@ -11035,8 +11035,9 @@ void WriteVeriSumTable(EnergyPlusData &state)
             LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, state.dataOutRptTab->m3_unitName);
             state.dataOutRptTab->m3_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
             SIunit = "[W/m2]";
-            LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, state.dataOutRptTab->Wm2_unitName);
-            state.dataOutRptTab->Wm2_unitConv = ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
+            // LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWVST, state.dataOutRptTab->Wm2_unitName);
+            state.dataOutRptTab->Wm2_unitName = "[W/ft2]";
+            state.dataOutRptTab->Wm2_unitConv = 0.3048 * 0.3048; // ConvertIP(state, state.dataOutRptTab->unitConvIndexWVST, 1.0);
         } else {
             state.dataOutRptTab->m_unitName = "[m]";
             state.dataOutRptTab->m_unitConv = 1.0;
