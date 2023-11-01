@@ -6263,7 +6263,7 @@ void ReportVisualResilience(EnergyPlusData &state)
             }
         }
         state.dataHeatBalSurfMgr->reportVisualResilienceFirstTime = false;
-        if ((int)state.dataDaylightingData->daylightControl.size() == 0) {
+        if ((int)state.dataDayltg->daylightControl.size() == 0) {
             if (state.dataOutRptTab->displayVisualResilienceSummaryExplicitly) {
                 ShowWarningError(state,
                                  "Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
@@ -6284,18 +6284,18 @@ void ReportVisualResilience(EnergyPlusData &state)
         }
         // Accumulate across daylighting controls first
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            state.dataDaylightingData->ZoneDaylight(ZoneNum).zoneAvgIllumSum = 0.0;
+            state.dataDayltg->ZoneDaylight(ZoneNum).zoneAvgIllumSum = 0.0;
         }
-        for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
-            auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
+        for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDayltg->daylightControl.size(); ++daylightCtrlNum) {
+            auto &thisDaylightControl = state.dataDayltg->daylightControl(daylightCtrlNum);
             if (thisDaylightControl.PowerReductionFactor > 0) {
                 for (int refPt = 1; refPt <= thisDaylightControl.TotalDaylRefPoints; ++refPt) {
-                    state.dataDaylightingData->ZoneDaylight(thisDaylightControl.zoneIndex).zoneAvgIllumSum +=
+                    state.dataDayltg->ZoneDaylight(thisDaylightControl.zoneIndex).zoneAvgIllumSum +=
                         thisDaylightControl.IllumSetPoint(refPt);
                 }
             } else {
                 for (int refPt = 1; refPt <= thisDaylightControl.TotalDaylRefPoints; ++refPt) {
-                    state.dataDaylightingData->ZoneDaylight(thisDaylightControl.zoneIndex).zoneAvgIllumSum +=
+                    state.dataDayltg->ZoneDaylight(thisDaylightControl.zoneIndex).zoneAvgIllumSum +=
                         thisDaylightControl.DaylIllumAtRefPt(refPt);
                 }
             }
@@ -6317,10 +6317,10 @@ void ReportVisualResilience(EnergyPlusData &state)
         }
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) continue;
+            if (state.dataDayltg->ZoneDaylight(ZoneNum).totRefPts == 0) continue;
             // Now divide by total reference points to get average
             Real64 avgZoneIllum =
-                state.dataDaylightingData->ZoneDaylight(ZoneNum).zoneAvgIllumSum / state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts;
+                state.dataDayltg->ZoneDaylight(ZoneNum).zoneAvgIllumSum / state.dataDayltg->ZoneDaylight(ZoneNum).totRefPts;
 
             Real64 NumOcc = state.dataHeatBal->Resilience(ZoneNum).ZoneNumOcc;
             if (avgZoneIllum <= 100) {

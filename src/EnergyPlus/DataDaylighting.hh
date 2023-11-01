@@ -310,30 +310,6 @@ namespace Dayltg {
 
 } // namespace Dayltg
 
-struct DaylightingData : BaseGlobalStruct
-{
-    int maxRefPointsPerControl = 0;
-    bool mapResultsToReport = false; // used when only partial hour has "sun up"
-    bool mapResultsReported = false; // when no map results are ever reported this will still be false
-    char MapColSep;                  // Character for separating map columns (tab, space, comma)
-    bool DFSReportSizingDays = false;
-    bool DFSReportAllShadowCalculationDays = false;
-
-    Array1D<Dayltg::EnclDaylightCalc> enclDaylight;
-    Array1D<Dayltg::ZoneDaylightCalc> ZoneDaylight;
-    Array1D<Dayltg::DaylightingControl> daylightControl;
-    Array1D<Dayltg::IllumMapData> IllumMap;
-    Array1D<Dayltg::MapCalcData> IllumMapCalc;
-    Array1D<Dayltg::RefPointData> DaylRefPt;
-    Array1D<Dayltg::DElightComplexFeneData> DElightComplexFene;
-    Array1D<Real64> spacePowerReductionFactor; // Average electric power reduction factor for space due to daylighting
-
-    void clear_state() override
-    {
-        *this = DaylightingData();
-    }
-};
-
 } // namespace EnergyPlus
 
 #endif

@@ -53,7 +53,6 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -61,6 +60,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
@@ -2665,7 +2665,7 @@ TEST_F(EnergyPlusFixture, WindowShadingManager_Lum_Test)
     EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
     state->dataConstruction->Construct.allocate(1);
     state->dataSurface->WindowShadingControl.allocate(2);
-    state->dataDaylightingData->ZoneDaylight.allocate(1);
+    state->dataDayltg->ZoneDaylight.allocate(1);
 
     auto &surf1 = state->dataSurface->Surface(1);
     auto &surf2 = state->dataSurface->Surface(2);

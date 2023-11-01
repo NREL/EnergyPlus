@@ -8985,7 +8985,7 @@ void PerformSolarCalculations(EnergyPlusData &state)
 
     // Recalculate daylighting coefficients if storm window has been added
     // or removed from one or more windows at beginning of day
-    if (state.dataDaylightingManager->TotWindowsWithDayl > 0 && !state.dataGlobal->BeginSimFlag && !state.dataGlobal->BeginEnvrnFlag &&
+    if (state.dataDayltg->TotWindowsWithDayl > 0 && !state.dataGlobal->BeginSimFlag && !state.dataGlobal->BeginEnvrnFlag &&
         !state.dataGlobal->WarmupFlag && state.dataSurface->TotStormWin > 0 && state.dataHeatBal->StormWinChangeThisDay) {
         CalcDayltgCoefficients(state);
     }
@@ -9616,7 +9616,7 @@ void WindowShadingManager(EnergyPlusData &state)
                 }
 
                 Real64 GlareControlIsActive =
-                    (state.dataDaylightingData->ZoneDaylight(IZone).totRefPts > 0 && state.dataEnvrn->SunIsUp &&
+                    (state.dataDayltg->ZoneDaylight(IZone).totRefPts > 0 && state.dataEnvrn->SunIsUp &&
                      state.dataSurface->WindowShadingControl(IShadingCtrl).GlareControlIsActive); // True if glare control is active
 
                 Real64 SolarOnWindow = 0.0;     // Direct plus diffuse solar intensity on window (W/m2)

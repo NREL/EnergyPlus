@@ -475,8 +475,23 @@ namespace Dayltg {
 
 } // namespace Dayltg
 
-struct DaylightingManagerData : BaseGlobalStruct
+struct DaylightingData : BaseGlobalStruct
 {
+    int maxRefPointsPerControl = 0;
+    bool mapResultsToReport = false; // used when only partial hour has "sun up"
+    bool mapResultsReported = false; // when no map results are ever reported this will still be false
+    char MapColSep;                  // Character for separating map columns (tab, space, comma)
+    bool DFSReportSizingDays = false;
+    bool DFSReportAllShadowCalculationDays = false;
+
+    Array1D<Dayltg::EnclDaylightCalc> enclDaylight;
+    Array1D<Dayltg::ZoneDaylightCalc> ZoneDaylight;
+    Array1D<Dayltg::DaylightingControl> daylightControl;
+    Array1D<Dayltg::IllumMapData> IllumMap;
+    Array1D<Dayltg::MapCalcData> IllumMapCalc;
+    Array1D<Dayltg::RefPointData> DaylRefPt;
+    Array1D<Dayltg::DElightComplexFeneData> DElightComplexFene;
+    Array1D<Real64> spacePowerReductionFactor; // Average electric power reduction factor for space due to daylighting
 
     bool CalcDayltghCoefficients_firstTime = true;
     bool getDaylightingParametersInputFlag = true;
@@ -613,7 +628,7 @@ struct DaylightingManagerData : BaseGlobalStruct
     Array1D<Real64> TVIS2;  // Visible transmittance at normal incidence of fully-switched glazing
     Array1D<Real64> ASETIL; // Illuminance ratio (lux)
 
-    DaylightingManagerData()
+    DaylightingData()
     {
         this->cos_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // cos( Phi ) table
         this->sin_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // sin( Phi ) table

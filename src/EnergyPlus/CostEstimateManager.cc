@@ -59,11 +59,12 @@
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataDaylighting.hh>
+// #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/PlantChillers.hh>
@@ -453,7 +454,7 @@ namespace CostEstimateManager {
                 } else {
                     ThisZoneID = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                     if (ThisZoneID > 0) {
-                        state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDaylightingData->ZoneDaylight(ThisZoneID).totRefPts;
+                        state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDayltg->ZoneDaylight(ThisZoneID).totRefPts;
                     } else {
                         ShowSevereError(state,
                                         format("ComponentCost:LineItem: \"{}\", Daylighting:Controls, need to specify a valid zone name",
@@ -880,11 +881,11 @@ namespace CostEstimateManager {
             case ParentObject::DaylightingControls: {
                 if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
                     state.dataCostEstimateManager->CostLineItem(Item).Qty =
-                        sum(state.dataDaylightingData->ZoneDaylight, &Dayltg::ZoneDaylightCalc::totRefPts);
+                        sum(state.dataDayltg->ZoneDaylight, &Dayltg::ZoneDaylightCalc::totRefPts);
                 } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                     ThisZoneID = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                     if (ThisZoneID > 0) {
-                        state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDaylightingData->ZoneDaylight(ThisZoneID).totRefPts;
+                        state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDayltg->ZoneDaylight(ThisZoneID).totRefPts;
                     }
                 }
 

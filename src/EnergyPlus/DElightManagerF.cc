@@ -60,13 +60,14 @@
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDElight.hh>
-#include <EnergyPlus/DataDaylighting.hh>
+// #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
@@ -236,7 +237,7 @@ namespace DElightManagerF {
         SinBldgRelNorth = std::sin(-state.dataHeatBal->BuildingAzimuth * Constant::DegToRadians);
 
         // Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
-        for (auto &znDayl : state.dataDaylightingData->daylightControl) {
+        for (auto &znDayl : state.dataDayltg->daylightControl) {
             if (znDayl.DaylightMethod == Dayltg::DaylightingMethod::DElight) {
 
                 // Register Error if 0 DElight RefPts have been input for valid DElight object
@@ -272,7 +273,7 @@ namespace DElightManagerF {
 
         // Loop through the Daylighting:DElight objects searching for a match to the current Zone
 
-        for (auto &znDayl : state.dataDaylightingData->daylightControl) {
+        for (auto &znDayl : state.dataDayltg->daylightControl) {
             if (znDayl.DaylightMethod == Dayltg::DaylightingMethod::DElight) {
                 int const izone = Util::FindItemInList(znDayl.ZoneName, state.dataHeatBal->Zone);
                 if (izone != 0) {
@@ -402,7 +403,7 @@ namespace DElightManagerF {
 
                                             // Loop through all Doppelganger Surface Names to ignore these Windows
                                             lWndoIsDoppelganger = false;
-                                            for (auto const &cfs : state.dataDaylightingData->DElightComplexFene) {
+                                            for (auto const &cfs : state.dataDayltg->DElightComplexFene) {
 
                                                 // Is the current Window Surface a Doppelganger?
                                                 if (wndo.Name == cfs.wndwName) {
@@ -436,7 +437,7 @@ namespace DElightManagerF {
                                                 // Loop through all Doppelganger Surface Names to ignore these Windows
                                                 lWndoIsDoppelganger = false;
 
-                                                for (auto const &cfs : state.dataDaylightingData->DElightComplexFene) {
+                                                for (auto const &cfs : state.dataDayltg->DElightComplexFene) {
 
                                                     // Is the current Window Surface a Doppelganger?
                                                     if (wndo2.Name == cfs.wndwName) {
@@ -489,7 +490,7 @@ namespace DElightManagerF {
                                 iHostedCFS = 0;
 
                                 // Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
-                                for (auto const &cfs : state.dataDaylightingData->DElightComplexFene) {
+                                for (auto const &cfs : state.dataDayltg->DElightComplexFene) {
 
                                     // Does the current Opaque Bounding Surface host the current CFS object?
                                     if (surf.Name == cfs.surfName) {
@@ -502,7 +503,7 @@ namespace DElightManagerF {
 
                                 // Now write each of the hosted CFS data
                                 // Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
-                                for (auto const &cfs : state.dataDaylightingData->DElightComplexFene) {
+                                for (auto const &cfs : state.dataDayltg->DElightComplexFene) {
 
                                     // Does the current Opaque Bounding Surface host the current CFS object?
                                     if (surf.Name == cfs.surfName) {
@@ -559,7 +560,7 @@ namespace DElightManagerF {
                     print(delightInFile, Format_912, znDayl.TotalDaylRefPoints);
 
                     // Loop through the Daylighting:DElight:Reference Point objects checking for the current DElight Zone host
-                    for (auto &refPt : state.dataDaylightingData->DaylRefPt) {
+                    for (auto &refPt : state.dataDayltg->DaylRefPt) {
 
                         // Is this RefPt hosted by current DElight Zone?
                         if (izone == refPt.ZoneNum) {
@@ -725,8 +726,8 @@ namespace DElightManagerF {
         constexpr std::string_view cCurrentModuleObject("Daylighting:DELight:ComplexFenestration");
 
         int TotDElightCFS = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        state.dataDaylightingData->DElightComplexFene.allocate(TotDElightCFS);
-        for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
+        state.dataDayltg->DElightComplexFene.allocate(TotDElightCFS);
+        for (auto &cfs : state.dataDayltg->DElightComplexFene) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      ++CFSNum,

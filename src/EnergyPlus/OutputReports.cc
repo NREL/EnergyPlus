@@ -57,12 +57,12 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DXFEarClipping.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaceColors.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -418,9 +418,9 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
     static constexpr std::string_view Format_709("  0\nCIRCLE\n  8\n{}\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n{:15.5F}\n");
 
     // Do any daylighting reference points on layer for zone
-    if ((int)state.dataDaylightingData->DaylRefPt.size() > 0) {
-        for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
-            auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
+    if ((int)state.dataDayltg->DaylRefPt.size() > 0) {
+        for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDayltg->daylightControl.size(); ++daylightCtrlNum) {
+            auto &thisDaylightControl = state.dataDayltg->daylightControl(daylightCtrlNum);
             DataSurfaceColors::ColorNo curcolorno = DataSurfaceColors::ColorNo::DaylSensor1;
             std::string refPtType;
             if (thisDaylightControl.DaylightMethod == Dayltg::DaylightingMethod::DElight) {
@@ -434,7 +434,7 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
                                          "999\n{}:{}:{}\n",
                                          thisDaylightControl.ZoneName,
                                          refPtType,
-                                         state.dataDaylightingData->DaylRefPt(thisDaylightControl.DaylRefPtNum(refpt)).Name);
+                                         state.dataDayltg->DaylRefPt(thisDaylightControl.DaylRefPtNum(refpt)).Name);
                 print<check_syntax(Format_709)>(of,
                                                 Format_709,
                                                 normalizeName(thisDaylightControl.ZoneName),
@@ -776,17 +776,17 @@ void DXFOut(EnergyPlusData &state,
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         const DataSurfaceColors::ColorNo curcolorno = DataSurfaceColors::ColorNo::DaylSensor1;
 
-        for (int mapnum = 1; mapnum <= (int)state.dataDaylightingData->IllumMap.size(); ++mapnum) {
-            if (state.dataDaylightingData->IllumMapCalc(mapnum).zoneIndex != zones) continue;
-            for (int refpt = 1; refpt <= state.dataDaylightingData->IllumMapCalc(mapnum).TotalMapRefPoints; ++refpt) {
+        for (int mapnum = 1; mapnum <= (int)state.dataDayltg->IllumMap.size(); ++mapnum) {
+            if (state.dataDayltg->IllumMapCalc(mapnum).zoneIndex != zones) continue;
+            for (int refpt = 1; refpt <= state.dataDayltg->IllumMapCalc(mapnum).TotalMapRefPoints; ++refpt) {
                 print(dxffile, Format_710, format("{}:MapRefPt:{}", state.dataHeatBal->Zone(zones).Name, refpt));
                 print(dxffile,
                       Format_709,
                       normalizeName(state.dataHeatBal->Zone(zones).Name),
                       DXFcolorno[static_cast<int>(curcolorno)],
-                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).x,
-                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).y,
-                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).z,
+                      state.dataDayltg->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).x,
+                      state.dataDayltg->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).y,
+                      state.dataDayltg->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).z,
                       0.05);
             }
         }

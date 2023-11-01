@@ -772,14 +772,14 @@ namespace Dayltg {
             } // PipeNum
 
             if (state.dataDaylightingDevices->GetTDDInputErrorsFound) ShowFatalError(state, "Errors in DaylightingDevice:Tubular input.");
-            state.dataDaylightingManager->TDDTransVisBeam.allocate(Constant::HoursInDay, NumOfTDDPipes);
-            state.dataDaylightingManager->TDDFluxInc.allocate(Constant::HoursInDay, NumOfTDDPipes);
-            state.dataDaylightingManager->TDDFluxTrans.allocate(Constant::HoursInDay, NumOfTDDPipes);
+            state.dataDayltg->TDDTransVisBeam.allocate(Constant::HoursInDay, NumOfTDDPipes);
+            state.dataDayltg->TDDFluxInc.allocate(Constant::HoursInDay, NumOfTDDPipes);
+            state.dataDayltg->TDDFluxTrans.allocate(Constant::HoursInDay, NumOfTDDPipes);
             for (int hr = 1; hr <= Constant::HoursInDay; ++hr) {
                 for (int tddNum = 1; tddNum <= NumOfTDDPipes; ++tddNum) {
-                    state.dataDaylightingManager->TDDTransVisBeam(hr, tddNum) = 0.0;
-                    state.dataDaylightingManager->TDDFluxInc(hr, tddNum) = Illums();
-                    state.dataDaylightingManager->TDDFluxTrans(hr, tddNum) = Illums();
+                    state.dataDayltg->TDDTransVisBeam(hr, tddNum) = 0.0;
+                    state.dataDayltg->TDDFluxInc(hr, tddNum) = Illums();
+                    state.dataDayltg->TDDFluxTrans(hr, tddNum) = Illums();
                 } // for (tddNum)
             }     // for (hr)
         }
