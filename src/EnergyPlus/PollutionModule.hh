@@ -184,6 +184,19 @@ namespace Pollution {
         Constant::eFuel::OtherFuel2 // OtherFuel2
     };
 
+    constexpr std::array<std::string_view, (int)PollFuel::Num> pollFuelNamesUC = {
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::Electricity]], // Electricity
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::NaturalGas]], // NaturalGas
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::FuelOil1]], // FuelOil1
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::FuelOil2]], // FuelOil2
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::Coal]], // Coal
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::Gasoline]], // Gasoline
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::Propane]], // Propane
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::Diesel]], // Diesel
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::OtherFuel1]], // OtherFuel1
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::OtherFuel2]] // OtherFuel2
+    };
+
     enum class PollFuelComponent
     {
         Invalid = -1,
@@ -332,6 +345,8 @@ struct PollutionData : BaseGlobalStruct
 
     std::array<Real64, (int)Constant::ePollutant::Num> pollutantVals;
 
+    std::vector<Pollution::PollFuel> pollFuelFactorList;
+
     // Total Carbon Equivalent Components
     Real64 TotCarbonEquivFromN2O;
     Real64 TotCarbonEquivFromCH4;
@@ -353,6 +368,8 @@ struct PollutionData : BaseGlobalStruct
         this->GetInputFlagPollution = true;
         this->NumEnvImpactFactors = 0;
         this->NumFuelFactors = 0;
+
+        this->pollFuelFactorList.clear();
     }
 };
 

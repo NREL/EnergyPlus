@@ -277,9 +277,18 @@ void GetPollutionFactorInput(EnergyPlusData &state)
 
         ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
         
-        Constant::eFuel fuel = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(1))));
+        PollFuel pollFuel = static_cast<PollFuel>(getEnumValue(pollFuelNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(1))));
+        if (pollFuel == PollFuel::Invalid) {
+            ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
+            ErrorsFound = true;
+            continue;
+        }
 
-        auto &pollCoeff = pm->pollCoeffs[(int)fuel];
+        pm->pollFuelFactorList.push_back(pollFuel);
+        
+        auto &pollCoeff = pm->pollCoeffs[(int)pollFuel];
+        Constant::eFuel fuel = pollFuel2fuel[(int)pollFuel];
+        
         if (pollCoeff.used) {
             ShowWarningError(state, format("{}: {} already entered. Previous entry will be used.",
                                            ipsc->cCurrentModuleObject, Constant::eFuelNames[(int)fuel]));
@@ -288,7 +297,7 @@ void GetPollutionFactorInput(EnergyPlusData &state)
 
         pollCoeff.used = true;
 
-        pollCoeff.sourceSchedNum = ipsc->rNumericArgs(1);
+        pollCoeff.sourceCoeff = ipsc->rNumericArgs(1);
         if (!ipsc->lAlphaFieldBlanks(2)) {
             pollCoeff.sourceSchedNum = ScheduleManager::GetScheduleIndex(state, ipsc->cAlphaArgs(2));
             if (pollCoeff.sourceSchedNum == 0) {
@@ -426,13 +435,18 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
         pm->GetInputFlagPollution = false;
     }
 
-    for (int iFuel = 0; iFuel < (int)PollFuel::Num; ++iFuel) {
+    // We are using this list rather than the enumeration to preserve the order in which meters are created to avoid ordering diffs.
+    for (PollFuel pollFuel : pm->pollFuelFactorList) {
 
-        auto &pollComp = pm->pollComps[(int)pollFuel2pollFuelComponent[iFuel]];
+        if (!pm->pollCoeffs[(int)pollFuel].used) continue;
+            
+        auto &pollComp = pm->pollComps[(int)pollFuel2pollFuelComponent[(int)pollFuel]];
+
+        Constant::eFuel fuel = pollFuel2fuel[(int)pollFuel];
         
         // Need to check whether this fuel is used?
         SetupOutputVariable(state,
-                            format("Environmental Impact {} Source Energy", Constant::eFuelNames[(int)pollFuel2fuel[iFuel]]),
+                            format("Environmental Impact {} Source Energy", Constant::eFuelNames[(int)fuel]),
                             OutputProcessor::Unit::J,
                             pollComp.sourceVal,
                             OutputProcessor::SOVTimeStepType::System,
@@ -440,14 +454,14 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                             "Site",
                             {},
                             "Source",
-                            format("{}Emissions", Constant::eFuelNames[(int)pollFuel2fuel[iFuel]]),
+                            format("{}Emissions", Constant::eFuelNames[(int)fuel]),
                             {},
                             "");
 
         for (int iPollutant2 = 0; iPollutant2 < (int)Pollutant2::Num; ++iPollutant2) {
             SetupOutputVariable(state,
                                 format("Environmental Impact {} {}",
-                                       Constant::eFuelNames[(int)pollFuel2fuel[iFuel]], poll2outVarStrs[iPollutant2]),
+                                       Constant::eFuelNames[(int)fuel], poll2outVarStrs[iPollutant2]),
                                 poll2Units[iPollutant2],
                                 pollComp.pollutantVals[iPollutant2],
                                 OutputProcessor::SOVTimeStepType::System,
@@ -455,7 +469,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                 "Site",
                                 {},
                                 poll2Names[iPollutant2],
-                                format("{}Emissions", Constant::eFuelNames[(int)pollFuel2fuel[iFuel]]),
+                                format("{}Emissions", Constant::eFuelNames[(int)fuel]),
                                 {},
                                 "");
         }
@@ -535,7 +549,7 @@ void CheckPollutionMeterReporting(EnergyPlusData &state)
 
     // in progress (what is in progress?)
 
-    auto &pm = state.dataPollution;
+    auto const &pm = state.dataPollution;
         
     if (pm->NumFuelFactors == 0 || pm->NumEnvImpactFactors == 0) {
         if (ReportingThisVariable(state, "Environmental Impact Total N2O Emissions Carbon Equivalent Mass") ||
@@ -608,11 +622,11 @@ void CalcPollution(EnergyPlusData &state)
     }
     
     // does not include district heating or steam
-    auto const &pollCoeff = pm->pollCoeffs[(int)PollFuel::NaturalGas];
-    auto &pollComp = pm->pollComps[(int)PollFuelComponent::NaturalGas];
-    pollComp.sourceVal = pm->facilityMeterVals[(int)PollFacilityMeter::NaturalGas] * pollCoeff.sourceCoeff;
-    if (pollCoeff.sourceSchedNum != 0) {
-         pollComp.sourceVal *= ScheduleManager::GetCurrentScheduleValue(state, pollCoeff.sourceSchedNum);
+    auto const &pollCoeffGas = pm->pollCoeffs[(int)PollFuel::NaturalGas];
+    auto &pollCompGas = pm->pollComps[(int)PollFuelComponent::NaturalGas];
+    pollCompGas.sourceVal = pm->facilityMeterVals[(int)PollFacilityMeter::NaturalGas] * pollCoeffGas.sourceCoeff;
+    if (pollCoeffGas.sourceSchedNum != 0) {
+         pollCompGas.sourceVal *= ScheduleManager::GetCurrentScheduleValue(state, pollCoeffGas.sourceSchedNum);
     }
 
     for (PollFuel pollFuel : {PollFuel::FuelOil1, PollFuel::FuelOil2, PollFuel::Diesel, PollFuel::Gasoline,
@@ -755,7 +769,7 @@ void GetEnvironmentalImpactFactorInfo(EnergyPlusData &state,
     // This routine allows access to data inside this module from other modules (specifically the
     // output tabular reports.
 
-    auto &pm = state.dataPollution;
+    auto const &pm = state.dataPollution;
     if (pm->GetInputFlagPollution) {
         GetPollutionFactorInput(state);
         pm->GetInputFlagPollution = false;
