@@ -472,8 +472,9 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
     Pollution::SetupPollutionMeterReporting(*state);
 
     // Test get output variables for Total Sky Cover and Opaque Sky Cover
-    for (int i = 0; i < (int)PollFuel::Num; i++) {
-        std::string_view fuelName = Constant::eFuelNames[(int)pollFuel2fuel[i]];
+    for (int i = 0; i < (int)state->dataPollution->pollFuelFactorList.size(); ++i) {
+        PollFuel pollFuel = state->dataPollution->pollFuelFactorList[i];
+        std::string_view fuelName = Constant::eFuelNames[(int)pollFuel2fuel[(int)pollFuel]];
             
         EXPECT_EQ(format("Site:Environmental Impact {} Source Energy", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 1).VarName);
@@ -513,17 +514,17 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
 
     // Variables specific to the Electricity fuel type
     EXPECT_EQ("Site:Environmental Impact Purchased Electricity Source Energy",
-              state->dataOutputProcessor->RVariableTypes((int)PollFuel::Num * 17 + 1).VarName);
+              state->dataOutputProcessor->RVariableTypes((int)state->dataPollution->pollFuelFactorList.size() * 17 + 1).VarName);
     EXPECT_EQ("Site:Environmental Impact Surplus Sold Electricity Source",
-              state->dataOutputProcessor->RVariableTypes((int)PollFuel::Num * 17 + 2).VarName);
+              state->dataOutputProcessor->RVariableTypes((int)state->dataPollution->pollFuelFactorList.size() * 17 + 2).VarName);
 
     // Variables always setup for total carbon equivalent
     EXPECT_EQ("Site:Environmental Impact Total N2O Emissions Carbon Equivalent Mass",
-              state->dataOutputProcessor->RVariableTypes((int)PollFuel::Num * 17 + 3).VarName);
+              state->dataOutputProcessor->RVariableTypes((int)state->dataPollution->pollFuelFactorList.size() * 17 + 3).VarName);
     EXPECT_EQ("Site:Environmental Impact Total CH4 Emissions Carbon Equivalent Mass",
-              state->dataOutputProcessor->RVariableTypes((int)PollFuel::Num * 17 + 4).VarName);
+              state->dataOutputProcessor->RVariableTypes((int)state->dataPollution->pollFuelFactorList.size() * 17 + 4).VarName);
     EXPECT_EQ("Site:Environmental Impact Total CO2 Emissions Carbon Equivalent Mass",
-              state->dataOutputProcessor->RVariableTypes((int)PollFuel::Num * 17 + 5).VarName);
+              state->dataOutputProcessor->RVariableTypes((int)state->dataPollution->pollFuelFactorList.size() * 17 + 5).VarName);
 }
 
 TEST_F(EnergyPlusFixture, PollutionModule_TestEnvironmentalImpactFactors)
