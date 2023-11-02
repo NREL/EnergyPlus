@@ -8540,7 +8540,8 @@ void WriteBEPSTable(EnergyPlusData &state)
         }
 
         if (produceTabular) {
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusTotal, "Electricity", unconvert * useVal(colElectricity, 15), 2);
+            PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEusTotal, "Electricity", unconvert_ipExceptElec * useVal(colElectricity, 15), 2);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchLeedEusProc,
                              "Electricity",
