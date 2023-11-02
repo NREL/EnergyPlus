@@ -87,6 +87,13 @@ namespace Dayltg {
     constexpr int NPHMAX(10); // Number of sky/ground integration steps in altitude
     constexpr int NTHMAX(16); // Number of sky/ground integration steps in azimuth
 
+    struct SunAngles {
+        Real64 phi = 0.0;    // Solar altitude (radians)
+        Real64 sinPhi = 0.0;  
+        Real64 cosPhi = 0.0;
+        Real64 theta = 0.0; // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
+    };
+        
     void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum); // Enclosure number
 
     void CalcDayltgCoefficients(EnergyPlusData &state);
@@ -512,14 +519,9 @@ struct DaylightingData : BaseGlobalStruct
     Array1D<Real64> DaylIllum;        // Daylight illuminance at reference points (lux)
     int maxNumRefPtInAnyDaylCtrl = 0; // The most number of reference points that any single daylighting control has
     int maxNumRefPtInAnyEncl = 0;     // The most number of reference points that any single enclosure has
-    Real64 PHSUN = 0.0;               // Solar altitude (radians)
-    Real64 SPHSUN = 0.0;              // Sine of solar altitude
-    Real64 CPHSUN = 0.0;              // Cosine of solar altitude
-    Real64 THSUN = 0.0;               // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
-    Array1D<Real64> PHSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0);  // Hourly values of PHSUN
-    Array1D<Real64> SPHSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0); // Hourly values of the sine of PHSUN
-    Array1D<Real64> CPHSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0); // Hourly values of the cosine of PHSUN
-    Array1D<Real64> THSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0);  // Hourly values of THSUN
+
+    Dayltg::SunAngles sunAngles = Dayltg::SunAngles();
+    std::array<Dayltg::SunAngles, (int)Constant::HoursInDay+1> sunAnglesHr = {Dayltg::SunAngles()};
 
     // In the following I,J,K arrays:
     // I = 1 for clear sky, 2 for clear turbid, 3 for intermediate, 4 for overcast;
@@ -534,9 +536,8 @@ struct DaylightingData : BaseGlobalStruct
     Array2D<Real64> WLUMSU;         // Sun-related window luminance, excluding view of solar disk
     Array2D<Real64> WLUMSUdisk;     // Sun-related window luminance, due to view of solar disk
 
-    Array1D<Dayltg::Illums> GILSK =
-        Array1D<Dayltg::Illums>(Constant::HoursInDay, Dayltg::Illums()); // Horizontal illuminance from sky, by sky type, for each hour of the day
-    Array1D<Real64> GILSU = Array1D<Real64>(Constant::HoursInDay, 0.0);  // Horizontal illuminance from sun for each hour of the day
+   std::array<Dayltg::Illums, (int)Constant::HoursInDay+1> GILSK = {Dayltg::Illums()}; // Horizontal illuminance from sky, by sky type, for each hour of the day
+   std::array<Real64, (int)Constant::HoursInDay+1> GILSU = {0.0};  // Horizontal illuminance from sun for each hour of the day
 
     Array2D<Dayltg::Illums> EDIRSK; // Sky-related component of direct illuminance
     Array2D<Real64> EDIRSU;         // Sun-related component of direct illuminance (excluding beam solar at ref pt)
@@ -557,11 +558,11 @@ struct DaylightingData : BaseGlobalStruct
     bool MySunIsUpFlag = false;
     bool CalcDayltgCoeffsMapPointsMySunIsUpFlag = false;
     int AltSteps_last = 0;
-    Array1D<Real64> cos_Phi; // cos( Phi ) table
-    Array1D<Real64> sin_Phi; // sin( Phi ) table
+    std::array<Real64, DataSurfaces::AltAngStepsForSolReflCalc / 2 + 1> cos_Phi = {0.0}; // cos( Phi ) table
+    std::array<Real64, DataSurfaces::AltAngStepsForSolReflCalc / 2 + 1> sin_Phi = {0.0}; // sin( Phi ) table
     int AzimSteps_last = 0;
-    Array1D<Real64> cos_Theta; // cos( Theta ) table
-    Array1D<Real64> sin_Theta; // sin( Theta ) table
+    std::array<Real64, 2 * DataSurfaces::AzimAngStepsForSolReflCalc + 1> cos_Theta = {0.0}; // cos( Theta ) table
+    std::array<Real64, 2 * DataSurfaces::AzimAngStepsForSolReflCalc + 1> sin_Theta = {0.0}; // sin( Theta ) table
 
     // int IConstShaded = 0; // The shaded window construction for switchable windows
     Real64 VTDark = 0.0; // Visible transmittance (VT) of electrochromic (EC) windows in fully dark state
@@ -628,15 +629,7 @@ struct DaylightingData : BaseGlobalStruct
     Array1D<Real64> TVIS2;  // Visible transmittance at normal incidence of fully-switched glazing
     Array1D<Real64> ASETIL; // Illuminance ratio (lux)
 
-    DaylightingData()
-    {
-        this->cos_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // cos( Phi ) table
-        this->sin_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // sin( Phi ) table
-        this->cos_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // cos( Theta ) table
-        this->sin_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // sin( Theta ) table
-    }
-
-    void clear_state() override
+void clear_state() override
     {
         this->CalcDayltghCoefficients_firstTime = true;
         this->getDaylightingParametersInputFlag = true;
@@ -656,22 +649,16 @@ struct DaylightingData : BaseGlobalStruct
         this->DaylIllum.deallocate();
         this->maxNumRefPtInAnyDaylCtrl = 0;
         this->maxNumRefPtInAnyEncl = 0;
-        this->PHSUN = 0.0;
-        this->SPHSUN = 0.0;
-        this->CPHSUN = 0.0;
-        this->THSUN = 0.0;
-        this->PHSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0);
-        this->SPHSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0);
-        this->CPHSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0);
-        this->THSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0);
+        this->sunAngles = Dayltg::SunAngles();
+        this->sunAnglesHr = {Dayltg::SunAngles()};
         this->EINTSK.deallocate();
         this->EINTSU.deallocate();
         this->EINTSUdisk.deallocate();
         this->WLUMSK.deallocate();
         this->WLUMSU.deallocate();
         this->WLUMSUdisk.deallocate();
-        this->GILSK = Array1D<Dayltg::Illums>(Constant::HoursInDay, Dayltg::Illums());
-        this->GILSU = Array1D<Real64>(Constant::HoursInDay, 0.0);
+        this->GILSK = {Dayltg::Illums()};
+        this->GILSU = {0.0};
         this->EDIRSK.deallocate();
         this->EDIRSU.deallocate();
         this->EDIRSUdisk.deallocate();
@@ -687,10 +674,10 @@ struct DaylightingData : BaseGlobalStruct
         this->CalcDayltgCoeffsMapPointsMySunIsUpFlag = false;
         this->AltSteps_last = 0;
         this->AzimSteps_last = 0;
-        this->cos_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // cos( Phi ) table
-        this->sin_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // sin( Phi ) table
-        this->cos_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // cos( Theta ) table
-        this->sin_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // sin( Theta ) table
+        this->cos_Phi = {0.0}; 
+        this->sin_Phi = {0.0}; 
+        this->cos_Theta = {0.0}; 
+        this->sin_Theta = {0.0}; 
 
         // this->IConstShaded = 0;
         this->VTDark = 0.0;

@@ -1428,7 +1428,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
     // Set the following values to make thisDaylightControl.SourceLumFromWinAtRefPt much larger than
     // luminance threshold of 2000 (WindowShadingControl SetPoint2)
     for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
-        state->dataDayltg->GILSK(iHr) = {8.0, 8.0, 8.0, 8.0};
+        state->dataDayltg->GILSK[iHr] = {8.0, 8.0, 8.0, 8.0};
     }
     state->dataGlobal->WeightNow = 0.54;
     state->dataEnvrn->HISUNF = 28500.0;
@@ -1465,7 +1465,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
 
     // Set the following values to make thisDaylightControl.SourceLumFromWinAtRefPt 0
     for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
-        state->dataDayltg->GILSK(iHr) = {100.0, 100.0, 100.0, 100.0};
+        state->dataDayltg->GILSK[iHr] = {100.0, 100.0, 100.0, 100.0};
     }
     state->dataGlobal->WeightNow = 1.0;
     state->dataEnvrn->HISUNF = 100.0;
@@ -1754,7 +1754,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     Dayltg::GetDaylightingParametersInput(*state);
 
     for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
-        state->dataDayltg->GILSK(iHr) = {100.0, 100.0, 100.0, 100.0};
+        state->dataDayltg->GILSK[iHr] = {100.0, 100.0, 100.0, 100.0};
     }
 
     state->dataGlobal->WeightNow = 1.0;
