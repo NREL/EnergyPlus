@@ -286,6 +286,7 @@ namespace MixedAir {
         DataSizing::OAFlowCalcMethod ZoneOAFlowMethod = DataSizing::OAFlowCalcMethod::PerPerson; // OA flow method for each zone
         int ZoneOASchPtr = 0;              // Index to the outdoor air schedule for each zone (from DesignSpecification:OutdoorAir or default)
         Real64 OAPropCtlMinRateSchPtr = 0; // Outdoor design OA flow rate schedule from DesignSpecification:OutdoorAir
+        EPVector<int> peopleIndexes; // List of People objects in this zone (for SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlDesOcc)
     };
 
     struct VentilationMechanicalProps // Derived type for Ventilation:Mechanical data
