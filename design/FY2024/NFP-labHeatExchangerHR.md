@@ -71,12 +71,24 @@ In current EnergyPlus, a linear relationship is specified for the heat exchanger
 effectiveness at different relative airflow, using the performance at 75% and
 100% of the supply air flow rate. The linear performance curve is valid for
 relative airflow from 50% to 130%. However, some heat exchangers could have
-non-linear performance curves as shown in Figure 1.
+non-linear performance curves as shown in Figure 1 and Figure 2. In the example
+of Figure 2, the effectiveness is a function of both air flow rate and liquid
+capacity flow ratio (the minimum capacity flow rate of all streams in a heat
+exchanger divided by the maximum). If the capacity flow ratio is fixed at some
+value, say 1.0, then the distances between the curves for different air flow
+rates are not even. This indicates the non-linear relationship between the
+airflow and the effectiveness. The air-flow-and-effectiveness relationship could
+be non-monotonic as well for certain values of capacity flow ratio[2]
 
-<img src="9-Comparison-of-effect-of-airflow-rate-on-heat-exchanger-effectiveness-for-cooling-and.png" alt="alt text" width="400px">
+<img src="fig_1_9-Comparison-of-effect-of-airflow-rate-on-heat-exchanger-effectiveness-for-cooling-and.png" alt="alt text" width="400px">
 </img>
 
 Figure 1. An example of a heat exchanger with non-linear performance curves at different airflow conditions [1]
+
+<img src="fig_2_effectiveness_vs_capacity_flow_ratio.png" alt="alt text" width="400px">
+</img>
+
+Figure 2. Another example of heat exchanger effectiveness being non-linear and non-mototonic with air flow
 
 Furthermore, when the relative airflow is below 50% or above 130%, the program
 will throw a warning, "Average air volume flow rate is <50% or >130% of the
@@ -89,14 +101,13 @@ airflow conditions.
 
 This feature proposes to add 4 optional fields holding 4 performance curves at
 the end of the HeatExchanger:AirToAir:SensibleAndLatent. These fields will
-specify the sensible and latent effectiveness of heating or cooling as a
-function of relative airflow. When any of the curves is specified, the
-effectiveness will be calculated using this curve instead of the effectiveness
-specified in N2 through N9 will not be used. The warning message of "Average air
-volume flow rate is <50% or >130% of the nominal HX supply air volume flow
-rate." will also be silenced if four new curve fields all have inputs and the
-specified curves all cover the range of relative airflow below 50% and above
-130%.
+specify the heating/cooling sensible or latent effectiveness multiplier as a
+function of relative airflow. The effectiveness at a certain airflow ratio will
+be the value of the curve at that airflow ratio multiplied by the corresponding
+effectiveness value at 100% airflow at the beginning of the object. The four
+fields corresponding to effectiveness at 75% airflow conditions will be removed.
+The warning message of "Average air volume flow rate is <50% or >130% of the
+nominal HX supply air volume flow rate." will be removed too.
 
     HeatExchanger:AirToAir:SensibleAndLatent,
           \memo This object models an air-to-air heat exchanger using effectiveness relationships.
@@ -135,19 +146,7 @@ specified curves all cover the range of relative airflow below 50% and above
           \units dimensionless
           \minimum 0.0
           \maximum 1.0
-          \default 0.0
-      N4, \field Sensible Effectiveness at 75% Heating Air Flow
-          \type real
-          \units dimensionless
-          \minimum 0.0
-          \maximum 1.0
-          \default 0.0
-      N5, \field Latent Effectiveness at 75% Heating Air Flow
-          \type real
-          \units dimensionless
-          \minimum 0.0
-          \maximum 1.0
-          \default 0.0
+          \default 0.0                                             <- remove two 75% effectiveness point after here
       N6, \field Sensible Effectiveness at 100% Cooling Air Flow
           \type real
           \units dimensionless
@@ -159,19 +158,7 @@ specified curves all cover the range of relative airflow below 50% and above
           \units dimensionless
           \minimum 0.0
           \maximum 1.0
-          \default 0.0
-      N8, \field Sensible Effectiveness at 75% Cooling Air Flow
-          \type real
-          \units dimensionless
-          \minimum 0.0
-          \maximum 1.0
-          \default 0.0
-      N9, \field Latent Effectiveness at 75% Cooling Air Flow
-          \type real
-          \units dimensionless
-          \minimum 0.0
-          \maximum 1.0
-          \default 0.0
+          \default 0.0                                             <- remove two 75% effectiveness point after here
       A7, \field Supply Air Inlet Node Name
           \required-field
           \type node
@@ -251,11 +238,11 @@ specified curves all cover the range of relative airflow below 50% and above
           \note if this field has value, then field N6 and N8 will be ignored
           \type object-list
           \object-list UnivariateFunctions
-      A14; \field Latent Effectiveness of Cooling Air Flow Curve Name                  <- end of the added fields
+      A14; \field Latent Effectiveness of Cooling Air Flow Curve Name
           \note optional
           \note if this field has value, then field N7 and N9 will be ignored
           \type object-list
-          \object-list UnivariateFunctions
+          \object-list UnivariateFunctions                                              <- end of the added fields
 
 ## Testing/Validation/Data Source(s)
 
@@ -276,3 +263,4 @@ N/A
 ## References
 
 [1]	W. J. Turner, "Investigation and Development of Hybrid Ventilation Wall Convector," The University of Reading, 2009. [Online]. Available: https://www.researchgate.net/publication/263209666_Investigation_and_Development_of_Hybrid_Ventilation_Wall_Convector/figures?lo=1
+[2] Mahmoud, M., Filipsson, P., Brunninge, S., & Dalenbäck, J. O. (2022). Flow rate optimization in run-around heat recovery systems. Applied Thermal Engineering, 200, 117599.
