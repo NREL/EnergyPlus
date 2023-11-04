@@ -275,27 +275,27 @@ namespace Pollution {
         "Diesel:Facility",
         "OtherFuel1:Facility",
         "OtherFuel2:Facility",
-        "ElectricitySurplusSold:Facility"
+        "ElectricitySurplusSold:Facility",
         "ElectricityPurchased:Facility",
         "ElectricityProduced:Facility",
-        "Steam:Facility",
-        "DistrictHeating:Facility",
+        "DistrictHeatingSteam:Facility",
+        "DistrictHeatingWater:Facility",
         "DistrictCooling:Facility"
     };
 
     struct ComponentProps
     {
         Real64 sourceVal = 0.0;
-        std::array<Real64, (int)Constant::ePollutant::Num> pollutantVals = {0.0};
+        std::array<Real64, (int)Pollutant2::Num> pollutantVals = {0.0};
     };
 
     struct CoefficientProps
     {
         bool used = false;
         Real64 sourceCoeff = 0.0;
-        std::array<Real64, (int)Constant::ePollutant::Num> pollutantCoeffs = {0.0};
+        std::array<Real64, (int)Pollutant2::Num> pollutantCoeffs = {0.0};
         int sourceSchedNum = 0;
-        std::array<int, (int)Constant::ePollutant::Num> pollutantSchedNums = {0};
+        std::array<int, (int)Pollutant2::Num> pollutantSchedNums = {0};
     };
 
     void CalculatePollution(EnergyPlusData &state);
@@ -339,18 +339,18 @@ struct PollutionData : BaseGlobalStruct
     std::array<Pollution::ComponentProps, (int)Pollution::PollFuelComponent::Num> pollComps;
 
     // Meters, meter values, and grouped meter values
-    std::array<int, (int)Pollution::PollFacilityMeter::Num> facilityMeterNums;
-    std::array<Real64, (int)Pollution::PollFacilityMeter::Num> facilityMeterVals;
+    std::array<int, (int)Pollution::PollFacilityMeter::Num> facilityMeterNums = {-1};
+    std::array<Real64, (int)Pollution::PollFacilityMeter::Num> facilityMeterVals = {0.0};
     std::array<Real64, (int)Pollution::PollFuelComponent::Num> facilityMeterFuelComponentVals = {0.0};
 
-    std::array<Real64, (int)Constant::ePollutant::Num> pollutantVals;
+    std::array<Real64, (int)Pollution::Pollutant2::Num> pollutantVals = {0.0};
 
     std::vector<Pollution::PollFuel> pollFuelFactorList;
 
     // Total Carbon Equivalent Components
-    Real64 TotCarbonEquivFromN2O;
-    Real64 TotCarbonEquivFromCH4;
-    Real64 TotCarbonEquivFromCO2;
+    Real64 TotCarbonEquivFromN2O = 0.0;
+    Real64 TotCarbonEquivFromCH4 = 0.0;
+    Real64 TotCarbonEquivFromCO2 = 0.0;
     // Fuel Type Coefficients
     std::array<Pollution::CoefficientProps, (int)Pollution::PollFuel::Num> pollCoeffs;
     // Total Carbon Equivalent Coeffs

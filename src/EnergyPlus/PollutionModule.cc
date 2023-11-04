@@ -586,24 +586,35 @@ void CalcPollution(EnergyPlusData &state)
     //     For each pollution/fuel type, Schedule values are allowed.  Thus, calculations are bundled.
     auto &pm = state.dataPollution;
     
-    for (int iPoll = 0; iPoll < (int)Constant::ePollutant::Num; ++iPoll) {
+    for (int iPoll = 0; iPoll < (int)Pollutant2::Num; ++iPoll) {
+        pm->pollutantVals[iPoll] = 0.0;
+
         for (int iPollFuel = 0; iPollFuel < (int)PollFuel::Num; ++iPollFuel) {   
             auto &pollCoeff = pm->pollCoeffs[iPollFuel];
-            auto &pollComp = pm->pollComps[(int)pollFuel2pollFuelComponent[iPollFuel]];
+            PollFuelComponent pollFuelComp = pollFuel2pollFuelComponent[iPollFuel];
+            auto &pollComp = pm->pollComps[(int)pollFuelComp];
 
             if (pollCoeff.used) {
                 pollComp.pollutantVals[iPoll] = 0.0;
-                Real64 pollutantVal = pollCoeff.pollutantCoeffs[iPoll] * 0.001;
+                Real64 pollutantVal = pollCoeff.pollutantCoeffs[iPoll];
+
+                // Why are these two the exceptions?
+                if (iPoll != (int)Pollutant2::Water && iPoll != (int)Pollutant2::NuclearLow) pollutantVal *= 0.001;
+                
                 if (pollCoeff.pollutantSchedNums[iPoll] != 0) {
                     pollutantVal *= ScheduleManager::GetCurrentScheduleValue(state, pollCoeff.pollutantSchedNums[iPoll]);
                 }
                 pollComp.pollutantVals[iPoll] =
-                    pm->facilityMeterFuelComponentVals[(int)pollFuel2pollFuelComponent[iPollFuel]] * 1.0e-6 * pollutantVal;
+                    pm->facilityMeterFuelComponentVals[(int)pollFuelComp] * 1.0e-6 * pollutantVal;
             }
 
             pm->pollutantVals[iPoll] += pollComp.pollutantVals[iPoll];
         } // for (iPollFactor)
     } // for (iPoll)
+
+    pm->TotCarbonEquivFromN2O = pm->pollutantVals[(int)Pollutant2::N2O] * pm->CarbonEquivN2O;
+    pm->TotCarbonEquivFromCH4 = pm->pollutantVals[(int)Pollutant2::CH4] * pm->CarbonEquivCH4;
+    pm->TotCarbonEquivFromCO2 = pm->pollutantVals[(int)Pollutant2::CO2] * pm->CarbonEquivCO2;
 
     auto const &pollCoeffElec = pm->pollCoeffs[(int)PollFuel::Electricity];
     auto &pollCompElec = pm->pollComps[(int)PollFuelComponent::Electricity];
