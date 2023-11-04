@@ -4273,6 +4273,93 @@ namespace OutputProcessor {
 
 } // namespace OutputProcessor
 
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,              // String Name of variable (with units)
+                         OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
+                         Real64 &ActualVariable,                           // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue                 // Associated Key for this variable
+)
+{
+    SetupOutputVariable(state, VariableName, VariableUnit, ActualVariable, TimeStepTypeKey, VariableTypeKey, KeyedValue, "");
+}
+
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,              // String Name of variable (with units)
+                         OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
+                         Real64 &ActualVariable,                           // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue,                // Associated Key for this variable
+                         ReportFreqSOV ReportFreq,                         // Internal use -- causes reporting at this freqency
+                         eResourceSOV ResourceTypeKey,                     // Meter Resource Type (Electricity, Gas, etc)
+                         EndUseCatSOV EndUseKey,                           // Meter End Use Key (Lights, Heating, Cooling, etc)
+                         std::string_view const EndUseSubKey,              // Meter End Use Sub Key (General Lights, Task Lights, etc)
+                         GroupSOV GroupKey,                                // Meter Super Group Key (Building, System, Plant)
+                         std::string_view const ZoneKey,                   // Meter Zone Key (zone name)
+                         int const ZoneMult,                               // Zone Multiplier, defaults to 1
+                         int const ZoneListMult,                           // Zone List Multiplier, defaults to 1
+                         int const indexGroupKey,                          // Group identifier for SQL output
+                         std::string_view const customUnitName,            // the custom name for the units from EMS definition of units
+                         std::string_view const SpaceType                  // Space type (applicable for Building group only)
+)
+{
+    std::string locReportFreq = "";
+    std::string locResourceTypeKey = "";
+    std::string locEndUseKey = "";
+    std::string locGroupKey = "";
+
+    if (ReportFreq == ReportFreqSOV::Num) {
+        // Fatal error warning message
+        ShowFatalError(state, "Invalid Resource Type.");
+    } else if (ReportFreq == ReportFreqSOV::EachCall) // This is valid
+    {
+        locReportFreq = "DETAILED";
+    } else {
+        locReportFreq = ReporFreqSOVNames[static_cast<int>(ReportFreq)];
+    }
+
+    if (ResourceTypeKey == eResourceSOV::Invalid || ResourceTypeKey == eResourceSOV::Num) {
+        // Fatal error warning message
+        ShowFatalError(state, "Invalid Resource Type.");
+    } else {
+        locResourceTypeKey = eResourceSOVNames[static_cast<int>(ResourceTypeKey)];
+    }
+
+    if (EndUseKey == EndUseCatSOV::Invalid || EndUseKey == EndUseCatSOV::Num) {
+        // Fatal error warning message
+        ShowFatalError(state, "Invalid End Use Category.");
+    } else {
+        locEndUseKey = endUseCatSOVNames[static_cast<int>(EndUseKey)];
+    }
+
+    if (GroupKey == GroupSOV::Invalid || GroupKey == GroupSOV::Num) {
+        ShowFatalError(state, "Invalid Group Type.");
+    } else {
+        locGroupKey = GroupSOVNames[static_cast<int>(GroupKey)];
+    }
+
+    SetupOutputVariable(state,
+                        VariableName,
+                        VariableUnit,
+                        ActualVariable,
+                        TimeStepTypeKey,
+                        VariableTypeKey,
+                        KeyedValue,
+                        locReportFreq,
+                        locResourceTypeKey,
+                        locEndUseKey,
+                        EndUseSubKey,
+                        locGroupKey,
+                        ZoneKey,
+                        ZoneMult,
+                        ZoneListMult,
+                        indexGroupKey,
+                        customUnitName,
+                        SpaceType);
+}
+
 // TODO: Probably move these to a different location
 
 void SetupOutputVariable(EnergyPlusData &state,
@@ -4514,6 +4601,55 @@ void SetupOutputVariable(EnergyPlusData &state,
                                                   thisRvar.unitNameCustomEMS);
             }
         }
+    }
+}
+
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,                    // String Name of variable
+                         OutputProcessor::Unit const VariableUnit,               // Actual units corresponding to the actual variable
+                         int &ActualVariable,                                    // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue                       // Associated Key for this variable
+)
+{
+    SetupOutputVariable(state,
+                        VariableName,    // String Name of variable
+                        VariableUnit,    // Actual units corresponding to the actual variable
+                        ActualVariable,  // Actual Variable, used to set up pointer
+                        TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                        VariableTypeKey, // State, Average=1, NonState, Sum=2
+                        KeyedValue,      // Associated Key for this variable
+                        ""               // Internal use -- causes reporting at this freqency
+                                         // indexGroupKey // Group identifier for SQL output
+    );
+}
+
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,                    // String Name of variable
+                         OutputProcessor::Unit const VariableUnit,               // Actual units corresponding to the actual variable
+                         int &ActualVariable,                                    // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue,                      // Associated Key for this variable
+                         OutputProcessor::ReportingFrequency const ReportFreq,   // Internal use -- causes reporting at this freqency
+                         int const indexGroupKey                                 // Group identifier for SQL output
+)
+{
+    if (ReportFreq == OutputProcessor::ReportingFrequency::EachCall) // This is valid
+    {
+        SetupOutputVariable(
+            state, VariableName, VariableUnit, ActualVariable, TimeStepTypeKey, VariableTypeKey, KeyedValue, "DETAILED", indexGroupKey);
+    } else {
+        SetupOutputVariable(state,
+                            VariableName,
+                            VariableUnit,
+                            ActualVariable,
+                            TimeStepTypeKey,
+                            VariableTypeKey,
+                            KeyedValue,
+                            OutputProcessor::ReportingFrequencyNames[static_cast<int>(ReportFreq)],
+                            indexGroupKey);
     }
 }
 

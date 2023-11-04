@@ -136,20 +136,20 @@ namespace OutputProcessor {
 
     constexpr int N_WriteTimeStampFormatData(100);
 
-    static constexpr std::array<std::string_view, 14> endUseCategoryNames = {"HEATING",
-                                                                             "COOLING",
-                                                                             "INTERIORLIGHTS",
-                                                                             "EXTERIORLIGHTS",
-                                                                             "INTERIOREQUIPMENT",
-                                                                             "EXTERIOREQUIPMENT",
-                                                                             "FANS",
-                                                                             "PUMPS",
-                                                                             "HEATREJECTION",
-                                                                             "HUMIDIFIER",
-                                                                             "HEATRECOVERY",
-                                                                             "WATERSYSTEMS",
-                                                                             "REFRIGERATION",
-                                                                             "COGENERATION"};
+    static constexpr std::array<std::string_view, (int)Constant::EndUse::Num> endUseCategoryNames = {"HEATING",
+                                                                                                     "COOLING",
+                                                                                                     "INTERIORLIGHTS",
+                                                                                                     "EXTERIORLIGHTS",
+                                                                                                     "INTERIOREQUIPMENT",
+                                                                                                     "EXTERIOREQUIPMENT",
+                                                                                                     "FANS",
+                                                                                                     "PUMPS",
+                                                                                                     "HEATREJECTION",
+                                                                                                     "HUMIDIFIER",
+                                                                                                     "HEATRECOVERY",
+                                                                                                     "WATERSYSTEMS",
+                                                                                                     "REFRIGERATION",
+                                                                                                     "COGENERATION"};
 
     constexpr int RVarAllocInc(1000);
     constexpr int LVarAllocInc(1000);
@@ -238,6 +238,8 @@ namespace OutputProcessor {
         Yearly,        // Write out at 'EndYearFlag'
         Num
     };
+    static constexpr std::array<std::string_view, (int)ReportingFrequency::Num> ReportingFrequencyNames = {
+        "TIMESTEP", "HOURLY", "DAILY", "MONTHLY", "SIMULATION", "YEARLY"};
 
     enum class StoreType
     {
@@ -841,6 +843,275 @@ namespace OutputProcessor {
 // within the OutputProcessor.
 // *****************************************************************************
 
+enum class ReportFreqSOV
+{
+    EachCall = -1, // Write out each time UpdatedataandReport is called
+    Empty,
+    TimeStep,   // Write out at 'EndTimeStepFlag'
+    Hourly,     // Write out at 'EndHourFlag'
+    Daily,      // Write out at 'EndDayFlag'
+    Monthly,    // Write out at end of month (must be determined)
+    Simulation, // Write out once per environment 'EndEnvrnFlag'
+    Yearly,     // Write out at 'EndYearFlag'
+    Num
+};
+static constexpr std::array<std::string_view, ((int)ReportFreqSOV::Num)> ReporFreqSOVNames = {
+    "", "TIMESTEP", "HOURLY", "DAILY", "MONTHLY", "SIMULATION", "YEARLY"};
+
+enum class eResourceSOV
+{
+    Invalid = -1,
+    Empty,
+    Electricity,
+    NaturalGas,
+    Gasoline,
+    Diesel,
+    Coal,
+    Propane,
+    FuelOilNo1,
+    FuelOilNo2,
+    OtherFuel1,
+    OtherFuel2,
+    DistrictCooling,
+    DistrictHeatingWater,
+    DistrictHeatingSteam,
+    Water,
+    None, // used for OtherEquipment object
+    EnergyTransfer,
+    ElectricityProduced,
+    ElectricityPurchased,
+    ElectricitySurplusSold,
+    ElectricityNet,
+    SolarWater,
+    SolarAir,
+    CarbonEquivalent,
+    PlantLoopHeatingDemand,
+    PlantLoopCoolingDemand,
+    OnSiteWater,
+    MainsWater,
+    RainWater,
+    WellWater,
+    Condensate,
+    WaterEnvironmentalFactors,
+    Source,
+    Generic, // only used by custom meters
+    SO2,
+    NOx,
+    N2O,
+    PM,
+    PM2_5,
+    PM10,
+    CO,
+    CO2,
+    CH4,
+    NH3,
+    NMVOC,
+    Hg,
+    Pb,
+    NuclearHigh,
+    NuclearLow,
+    Num
+};
+static constexpr std::array<std::string_view, static_cast<int>(eResourceSOV::Num)> eResourceSOVNames = {"",
+                                                                                                        "Electricity",
+                                                                                                        "NaturalGas",
+                                                                                                        "Gasoline",
+                                                                                                        "Diesel",
+                                                                                                        "Coal",
+                                                                                                        "Propane",
+                                                                                                        "FuelOilNo1",
+                                                                                                        "FuelOilNo2",
+                                                                                                        "OtherFuel1",
+                                                                                                        "OtherFuel2",
+                                                                                                        "DistrictCooling",
+                                                                                                        "DistrictHeatingWater",
+                                                                                                        "DistrictHeatingSteam",
+                                                                                                        "Water",
+                                                                                                        "None",
+                                                                                                        "EnergyTransfer",
+                                                                                                        "ElectricityProduced",
+                                                                                                        "ElectricityPurchased",
+                                                                                                        "ElectricitySurplusSold",
+                                                                                                        "ElectricityNet",
+                                                                                                        "SolarWater",
+                                                                                                        "SolarAir",
+                                                                                                        "Carbon Equivalent",
+                                                                                                        "PlantLoopHeatingDemand",
+                                                                                                        "PlantLoopCoolingDemand",
+                                                                                                        "OnSiteWater",
+                                                                                                        "MainsWater",
+                                                                                                        "RainWater",
+                                                                                                        "WellWater",
+                                                                                                        "Condensate",
+                                                                                                        "WaterEnvironmentalFactors",
+                                                                                                        "Source",
+                                                                                                        "Generic",
+                                                                                                        "SO2",
+                                                                                                        "NOx",
+                                                                                                        "N2O",
+                                                                                                        "PM",
+                                                                                                        "PM2.5",
+                                                                                                        "PM10",
+                                                                                                        "CO",
+                                                                                                        "CO2",
+                                                                                                        "CH4",
+                                                                                                        "NH3",
+                                                                                                        "NMVOC",
+                                                                                                        "Hg",
+                                                                                                        "Pb",
+                                                                                                        "Nuclear High",
+                                                                                                        "Nuclear Low"};
+
+enum class EndUseCatSOV
+{
+    Invalid = -1,
+    Empty,
+    Heating,
+    Cooling,
+    InteriorLights,
+    ExteriorLights,
+    InteriorEquipment,
+    ExteriorEquipment,
+    Fans,
+    Pumps,
+    HeatRejection,
+    Humidification,
+    HeatRecovery,
+    WaterSystem,
+    Refrigeration,
+    Cogeneration,
+    Baseboard,
+    Boilers,
+    CarbonEquivalentEmissions,
+    Chillers,
+    CoalEmissions,
+    ColdStorageCharge,
+    ColdStorageDischarge,
+    Condensate,
+    CoolingCoils,
+    CoolingPanel,
+    DieselEmissions,
+    DistrictChilledWater,
+    DistrictHotWater,
+    ElectricityEmissions,
+    ElectricStorage,
+    Freecooling,
+    FuelOilNo1Emissions,
+    FuelOilNo2Emissions,
+    GasolineEmissions,
+    HeatingCoils,
+    HeatProduced,
+    HeatRecoveryForCooling,
+    HeatRecoveryForHeating,
+    LoopToLoop,
+    MainsWater,
+    NaturalGasEmissions,
+    OtherFuel1Emissions,
+    OtherFuel2Emissions,
+    Photovoltaic,
+    PowerConversion,
+    PropaneEmissions,
+    PurchasedElectricityEmissions,
+    Rainwater,
+    SoldElectricityEmissions,
+    Wellwater,
+    WindTurbine,
+    Num
+};
+static constexpr std::array<std::string_view, (int)EndUseCatSOV::Num> endUseCatSOVNames = {
+    "",
+    "HEATING",
+    "COOLING",
+    "INTERIORLIGHTS",
+    "EXTERIORLIGHTS",
+    "INTERIOREQUIPMENT",
+    "EXTERIOREQUIPMENT",
+    "FANS",
+    "PUMPS",
+    "HEATREJECTION",
+    "HUMIDIFIER",
+    "HEATRECOVERY",
+    "WATERSYSTEMS",
+    "REFRIGERATION",
+    "COGENERATION",
+    "BASEBOARD",
+    "BOILERS",
+    "CARBONEQUIVALENTEMISSIONS",
+    "CHILLERS",
+    "COALEMISSIONS",
+    "COLDSTORAGECHARGE",
+    "COLDSTORAGEDISCHARGE",
+    "CONDENSATE",
+    "COOLINGCOILS",
+    "COOLINGPANEL",
+    "DIESELEMISSIONS",
+    "DISTRICTCHILLEDWATER",
+    "DISTRICTHOTWATER",
+    "ELECTRICITYEMISSIONS",
+    "ELECTRICSTORAGE",
+    "FREECOOLING",
+    "FUELOILNO1EMISSIONS",
+    "FUELOILNO2EMISSIONS",
+    "GASOLINEEMISSIONS",
+    "HEATINGCOILS",
+    "HEATPRODUCED",
+    "HEATRECOVERYFORCOOLING",
+    "HEATRECOVERYFORHEATING",
+    "LOOPTOLOOP",
+    "MAINSWATER",
+    "NATURALGASEMISSIONS",
+    "OTHERFUEL1EMISSIONS",
+    "OTHERFUEL2EMISSIONS",
+    "PHOTOVOLTAIC",
+    "POWERCONVERSION",
+    "PROPANEEMISSIONS",
+    "PURCHASEDELECTRICITYEMISSIONS",
+    "RAINWATER",
+    "SOLDELECTRICITYEMISSIONS",
+    "WELLWATER",
+    "WINDTURBINE",
+};
+
+enum class GroupSOV
+{
+    Invalid = -1,
+    Empty,
+    Building,
+    HVAC,
+    Plant,
+    Num
+};
+static constexpr std::array<std::string_view, (int)GroupSOV::Num> GroupSOVNames = {"", "Building", "HVAC", "Plant"};
+
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,              // String Name of variable (with units)
+                         OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
+                         Real64 &ActualVariable,                           // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue                 // Associated Key for this variable
+);
+
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,                // String Name of variable (with units)
+                         OutputProcessor::Unit VariableUnit,                 // Actual units corresponding to the actual variable
+                         Real64 &ActualVariable,                             // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType TimeStepTypeKey,   // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType VariableTypeKey,      // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue,                  // Associated Key for this variable
+                         ReportFreqSOV ReportFreq,                           // Internal use -- causes reporting at this freqency
+                         eResourceSOV ResourceTypeKey = eResourceSOV::Empty, // Meter Resource Type (Electricity, Gas, etc)
+                         EndUseCatSOV EndUseKey = EndUseCatSOV::Empty,       // Meter End Use Key (Lights, Heating, Cooling, etc)
+                         std::string_view const EndUseSubKey = {},           // Meter End Use Sub Key (General Lights, Task Lights, etc)
+                         GroupSOV GroupKey = GroupSOV::Empty,                // Meter Super Group Key (Building, System, Plant)
+                         std::string_view const ZoneKey = {},                // Meter Zone Key (zone name)
+                         int const ZoneMult = 1,                             // Zone Multiplier, defaults to 1
+                         int const ZoneListMult = 1,                         // Zone List Multiplier, defaults to 1
+                         int const indexGroupKey = -999,                     // Group identifier for SQL output
+                         std::string_view const customUnitName = {},         // the custom name for the units from EMS definition of units
+                         std::string_view const SpaceType = {}               // Space type (applicable for Building group only)
+);
+
 void SetupOutputVariable(EnergyPlusData &state,
                          std::string_view const VariableName,              // String Name of variable (with units)
                          OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
@@ -848,7 +1119,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                // Associated Key for this variable
-                         std::string_view const ReportFreq = {},           // Internal use -- causes reporting at this freqency
+                         std::string_view const ReportFreq,                // Internal use -- causes reporting at this freqency
                          std::string_view const ResourceTypeKey = {},      // Meter Resource Type (Electricity, Gas, etc)
                          std::string_view const EndUseKey = {},            // Meter End Use Key (Lights, Heating, Cooling, etc)
                          std::string_view const EndUseSubKey = {},         // Meter End Use Sub Key (General Lights, Task Lights, etc)
@@ -867,8 +1138,28 @@ void SetupOutputVariable(EnergyPlusData &state,
                          int &ActualVariable,                              // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue                 // Associated Key for this variable
+);
+
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,              // String Name of variable
+                         OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
+                         int &ActualVariable,                              // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                // Associated Key for this variable
-                         std::string_view const ReportFreq = {},           // Internal use -- causes reporting at this freqency
+                         OutputProcessor::ReportingFrequency ReportFreq,   // Internal use -- causes reporting at this freqency
+                         int const indexGroupKey = -999                    // Group identifier for SQL output
+);
+
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,              // String Name of variable
+                         OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
+                         int &ActualVariable,                              // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue,                // Associated Key for this variable
+                         std::string_view const ReportFreq,                // Internal use -- causes reporting at this freqency
                          int const indexGroupKey = -999                    // Group identifier for SQL output
 );
 

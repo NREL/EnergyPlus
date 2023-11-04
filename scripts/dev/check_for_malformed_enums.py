@@ -110,6 +110,7 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
             "CsvParser.hh:Token",
             "IdfParser.hh:Token",
             "OutputProcessor.hh:ReportingFrequency",
+            "OutputProcessor.hh:ReportFreqSOV",
             "HVACInterfaceManager.cc:UpdateType",
             "DataHeatBalance.hh:PERptVars",
         ]
@@ -149,7 +150,10 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
     # check for proper casing
     if str(name[0]).islower():
         # exceptions listed by <FILE>:<ENUM NAME>
-        exceptions = ["DataGlobalConstants.hh:eResource", "DataGlobalConstants.hh:eFuel", "DataGlobalConstants.hh:ePollutant"]
+        exceptions = [
+            "DataGlobalConstants.hh:eResource", "DataGlobalConstants.hh:eFuel",
+            "DataGlobalConstants.hh:ePollutant", "OutputProcessor.hh:eResourceSOV"
+        ]
         if f"{file_name}:{name}" not in exceptions:
             error_str += "\tenum name must begin with upper case letter\n"
 
