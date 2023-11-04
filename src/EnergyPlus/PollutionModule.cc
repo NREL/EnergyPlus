@@ -473,33 +473,37 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                 {},
                                 "");
         }
-    } // End of the NumEnergyTypes Do Loop
 
-    // Setup ElectricityPurchased and ElectricitySold variables
-    SetupOutputVariable(state,
-                        "Environmental Impact Purchased Electricity Source Energy",
-                        OutputProcessor::Unit::J,
-                        pm->pollComps[(int)PollFuelComponent::ElectricityPurchased].sourceVal,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
-                        "Site",
-                        {},
-                        "Source",
-                        "PurchasedElectricityEmissions",
-                        {},
-                        "");
-    SetupOutputVariable(state,
-                        "Environmental Impact Surplus Sold Electricity Source",
-                        OutputProcessor::Unit::J,
-                        pm->pollComps[(int)PollFuelComponent::ElectricitySurplusSold].sourceVal,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
-                        "Site",
-                        {},
-                        "Source",
-                        "SoldElectricityEmissions",
-                        {},
-                        "");
+        if (fuel == Constant::eFuel::Electricity) {
+            // Setup ElectricityPurchased and ElectricitySold variables
+            // Doing this here as opposed to outside the outer loop to preserve meter order and reduce ordering diffs
+            SetupOutputVariable(state,
+                                "Environmental Impact Purchased Electricity Source Energy",
+                                OutputProcessor::Unit::J,
+                                pm->pollComps[(int)PollFuelComponent::ElectricityPurchased].sourceVal,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Source",
+                                "PurchasedElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Surplus Sold Electricity Source",
+                                OutputProcessor::Unit::J,
+                                pm->pollComps[(int)PollFuelComponent::ElectricitySurplusSold].sourceVal,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Source",
+                                "SoldElectricityEmissions",
+                                {},
+                                "");
+        }
+
+    } // End of the NumEnergyTypes Do Loop
 
     // And Total Carbon Equivalent variables
     SetupOutputVariable(state,
