@@ -61,9 +61,7 @@ namespace EnergyPlus {
 
 namespace Pollution {
 
-    // This is very similar to ePollutant in DataGlobalConstants, but
-    // also includes water. Water is a pollutant? Really?
-    enum class Pollutant2
+    enum class Pollutant
     {
         Invalid = -1,
         CO2,
@@ -85,10 +83,10 @@ namespace Pollution {
         Num
     };
 
-    constexpr std::array<std::string_view, (int)Pollutant2::Num> poll2Names = {
+    constexpr std::array<std::string_view, (int)Pollutant::Num> poll2Names = {
        "CO2", "CO", "CH4", "NOx", "N2O", "SO2", "PM", "PM10", "PM2.5", "NH3", "NMVOC", "Hg", "Pb", "WaterEnvironmentalFactors", "Nuclear High", "Nuclear Low"};
 
-    constexpr std::array<OutputProcessor::Unit, (int)Pollutant2::Num> poll2Units = {
+    constexpr std::array<OutputProcessor::Unit, (int)Pollutant::Num> poll2Units = {
         OutputProcessor::Unit::kg, // CO2
         OutputProcessor::Unit::kg, // CO
         OutputProcessor::Unit::kg, // CH4
@@ -107,7 +105,7 @@ namespace Pollution {
         OutputProcessor::Unit::m3, // NuclearLow
     };
 
-    constexpr std::array<std::string_view, (int)Pollutant2::Num> poll2outVarStrs = {
+    constexpr std::array<std::string_view, (int)Pollutant::Num> poll2outVarStrs = {
         "CO2 Emissions Mass", // CO2
         "CO Emissions Mass", // CO
         "CH4 Emissions Mass", // CH4
@@ -286,16 +284,16 @@ namespace Pollution {
     struct ComponentProps
     {
         Real64 sourceVal = 0.0;
-        std::array<Real64, (int)Pollutant2::Num> pollutantVals = {0.0};
+        std::array<Real64, (int)Pollutant::Num> pollutantVals = {0.0};
     };
 
     struct CoefficientProps
     {
         bool used = false;
         Real64 sourceCoeff = 0.0;
-        std::array<Real64, (int)Pollutant2::Num> pollutantCoeffs = {0.0};
+        std::array<Real64, (int)Pollutant::Num> pollutantCoeffs = {0.0};
         int sourceSchedNum = 0;
-        std::array<int, (int)Pollutant2::Num> pollutantSchedNums = {0};
+        std::array<int, (int)Pollutant::Num> pollutantSchedNums = {0};
     };
 
     void CalculatePollution(EnergyPlusData &state);
@@ -343,7 +341,7 @@ struct PollutionData : BaseGlobalStruct
     std::array<Real64, (int)Pollution::PollFacilityMeter::Num> facilityMeterVals = {0.0};
     std::array<Real64, (int)Pollution::PollFuelComponent::Num> facilityMeterFuelComponentVals = {0.0};
 
-    std::array<Real64, (int)Pollution::Pollutant2::Num> pollutantVals = {0.0};
+    std::array<Real64, (int)Pollution::Pollutant::Num> pollutantVals = {0.0};
 
     std::vector<Pollution::PollFuel> pollFuelFactorList;
 

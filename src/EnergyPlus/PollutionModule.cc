@@ -312,7 +312,7 @@ void GetPollutionFactorInput(EnergyPlusData &state)
             }                
         }
 
-        for (int iPollutant = 0; iPollutant < (int)Pollutant2::Num; ++iPollutant) {
+        for (int iPollutant = 0; iPollutant < (int)Pollutant::Num; ++iPollutant) {
             pollCoeff.pollutantCoeffs[iPollutant] = ipsc->rNumericArgs(iPollutant+2);
             if (!ipsc->lAlphaFieldBlanks(iPollutant+3)) {
                  
@@ -458,17 +458,17 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                             {},
                             "");
 
-        for (int iPollutant2 = 0; iPollutant2 < (int)Pollutant2::Num; ++iPollutant2) {
+        for (int iPollutant = 0; iPollutant < (int)Pollutant::Num; ++iPollutant) {
             SetupOutputVariable(state,
                                 format("Environmental Impact {} {}",
-                                       Constant::eFuelNames[(int)fuel], poll2outVarStrs[iPollutant2]),
-                                poll2Units[iPollutant2],
-                                pollComp.pollutantVals[iPollutant2],
+                                       Constant::eFuelNames[(int)fuel], poll2outVarStrs[iPollutant]),
+                                poll2Units[iPollutant],
+                                pollComp.pollutantVals[iPollutant],
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 "Site",
                                 {},
-                                poll2Names[iPollutant2],
+                                poll2Names[iPollutant],
                                 format("{}Emissions", Constant::eFuelNames[(int)fuel]),
                                 {},
                                 "");
@@ -564,7 +564,7 @@ void CheckPollutionMeterReporting(EnergyPlusData &state)
             ShowWarningError(
                 state, "GetPollutionFactorInput: Requested reporting for Carbon Equivalent Pollution, but insufficient information is entered.");
             ShowContinueError(
-                state, "(Both \"FuelFactors\" and \"EnvironmentalImpactFactors\" must be entered or the displayed carbon pollution will all be zero.)");
+                state, "Both \"FuelFactors\" and \"EnvironmentalImpactFactors\" must be entered or the displayed carbon pollution will all be zero.");
         }
     }
 }
@@ -590,7 +590,7 @@ void CalcPollution(EnergyPlusData &state)
     //     For each pollution/fuel type, Schedule values are allowed.  Thus, calculations are bundled.
     auto &pm = state.dataPollution;
     
-    for (int iPoll = 0; iPoll < (int)Pollutant2::Num; ++iPoll) {
+    for (int iPoll = 0; iPoll < (int)Pollutant::Num; ++iPoll) {
         pm->pollutantVals[iPoll] = 0.0;
 
         for (int iPollFuel = 0; iPollFuel < (int)PollFuel::Num; ++iPollFuel) {   
@@ -603,7 +603,7 @@ void CalcPollution(EnergyPlusData &state)
                 Real64 pollutantVal = pollCoeff.pollutantCoeffs[iPoll];
 
                 // Why are these two the exceptions?
-                if (iPoll != (int)Pollutant2::Water && iPoll != (int)Pollutant2::NuclearLow) pollutantVal *= 0.001;
+                if (iPoll != (int)Pollutant::Water && iPoll != (int)Pollutant::NuclearLow) pollutantVal *= 0.001;
                 
                 if (pollCoeff.pollutantSchedNums[iPoll] != 0) {
                     pollutantVal *= ScheduleManager::GetCurrentScheduleValue(state, pollCoeff.pollutantSchedNums[iPoll]);
@@ -616,9 +616,9 @@ void CalcPollution(EnergyPlusData &state)
         } // for (iPollFactor)
     } // for (iPoll)
 
-    pm->TotCarbonEquivFromN2O = pm->pollutantVals[(int)Pollutant2::N2O] * pm->CarbonEquivN2O;
-    pm->TotCarbonEquivFromCH4 = pm->pollutantVals[(int)Pollutant2::CH4] * pm->CarbonEquivCH4;
-    pm->TotCarbonEquivFromCO2 = pm->pollutantVals[(int)Pollutant2::CO2] * pm->CarbonEquivCO2;
+    pm->TotCarbonEquivFromN2O = pm->pollutantVals[(int)Pollutant::N2O] * pm->CarbonEquivN2O;
+    pm->TotCarbonEquivFromCH4 = pm->pollutantVals[(int)Pollutant::CH4] * pm->CarbonEquivCH4;
+    pm->TotCarbonEquivFromCO2 = pm->pollutantVals[(int)Pollutant::CO2] * pm->CarbonEquivCO2;
 
     auto const &pollCoeffElec = pm->pollCoeffs[(int)PollFuel::Electricity];
     auto &pollCompElec = pm->pollComps[(int)PollFuelComponent::Electricity];
