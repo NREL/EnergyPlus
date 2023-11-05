@@ -868,11 +868,7 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
             }
             if (is_AlphaBlank) AlphaBlank()(alpha_index) = true;
         } else if (field_type == "n") {
-            if (within_max_fields) {
-                findDefault(Numbers(numeric_index), schema_field_obj);
-            } else {
-                Numbers(numeric_index) = 0;
-            }
+            findDefault(Numbers(numeric_index), schema_field_obj);
             if (is_NumBlank) NumBlank()(numeric_index) = true;
         }
     }
