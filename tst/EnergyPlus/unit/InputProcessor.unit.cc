@@ -2644,7 +2644,7 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields)
 
     EXPECT_EQ(26, NumNumbers);
     EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0.4, 7, 0.0085, 11.0, 0.0085, 12.8,   16.7, 0.0085, 0.0085, 0, 0, 0, 0,
-                                                        0,      0,   0, 0,      0,    1,      -99999, 0,    0,      -99999, 0, 0, 0}),
+                                                        0,      0,   0, 0,      0,    1,      -99999, 0,    0,      -99999, 0, 0, -99999}),
                                    Numbers));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, true, true, true, true,
                                                       true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true, true, true}),
@@ -2801,7 +2801,7 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_autosize_fields)
         std::vector<std::string>({"Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power"}),
         cNumericFields));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, true, true, true}), lNumericBlanks));
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0, 0, 0, 0}), Numbers));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0, 0.8, 0, 0}), Numbers));
     EXPECT_EQ(1, IOStatus);
 }
 
@@ -2922,7 +2922,7 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
     EXPECT_TRUE(compare_containers(std::vector<bool>({true, true, false, true, true, true,  false, true, true, true, false,
                                                       true, true, true,  true, true, false, true,  true, true, true, true}),
                                    lNumericBlanks));
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 2, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 0, 0, 80, 0, 0, 0, 0, 0}), Numbers));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 2, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 0, 0, 80, 21, 0, 0, 0, 80}), Numbers));
     EXPECT_EQ(1, IOStatus);
 }
 
@@ -3038,7 +3038,7 @@ TEST_F(InputProcessorFixture, getObjectItem_test_zone_input)
 
     EXPECT_EQ(8, NumNumbers);
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, true}), lNumericBlanks));
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({0, 0, 0, 0, 1, 1, -99999, -99999, 0}), Numbers));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({0, 0, 0, 0, 1, 1, -99999, -99999, -99999}), Numbers));
     EXPECT_EQ(1, IOStatus);
 }
 
@@ -4455,8 +4455,8 @@ TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(3), 0.5, 0.0001);
     // Defaults from schema
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(2), 0.9, 0.0001);
-    // Fields beyond min-fields come back as blank or zero, even if they have a default
-    EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(4), 0.0, 0.0001);
+    // Fields beyond min-fields come back as the default value
+    EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(4), 0.7, 0.0001);
 }
 
 TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromJSON)
