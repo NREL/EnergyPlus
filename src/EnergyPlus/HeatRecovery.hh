@@ -145,14 +145,14 @@ namespace HeatRecovery {
         int PerfDataIndex = 0; // Performance data index allocating performance data number to heat exchanger
         Real64 FaceArea = 0.0; // face area of balanced desiccant heat exchangers to determine face velocity [m2]
         // generic hx performance inputs
-        Real64 HeatEffectSensible100 = 0.0; // heating sensible effectiveness at 100% rated air flow
-        Real64 HeatEffectSensible75 = 0.0;  // heating sensible effectiveness at 75% rated air flow
-        Real64 HeatEffectLatent100 = 0.0;   // heating latent effectiveness at 100% rated air flow
-        Real64 HeatEffectLatent75 = 0.0;    // heating latent effectiveness at 75% rated air flow
-        Real64 CoolEffectSensible100 = 0.0; // cooling sensible effectiveness at 100% rated air flow
-        Real64 CoolEffectSensible75 = 0.0;  // cooling sensible effectiveness at 75% rated air flow
-        Real64 CoolEffectLatent100 = 0.0;   // cooling latent effectiveness at 100% rated air flow
-        Real64 CoolEffectLatent75 = 0.0;    // cooling latent effectiveness at 75% rated air flow
+        Real64 HeatEffectSensible100 = 0.0;   // heating sensible effectiveness at 100% rated air flow
+        Real64 HeatEffectLatent100 = 0.0;     // heating latent effectiveness at 100% rated air flow
+        Real64 CoolEffectSensible100 = 0.0;   // cooling sensible effectiveness at 100% rated air flow
+        Real64 CoolEffectLatent100 = 0.0;     // cooling latent effectiveness at 100% rated air flow
+        int HeatEffectSensibleCurveIndex = 0; // heating sensible effectiveness multiplier curve to HeatEffectSensible100
+        int HeatEffectLatentCurveIndex = 0;   // heating latent effectiveness multiplier curve to HeatEffectLatent100
+        int CoolEffectSensibleCurveIndex = 0; // cooling sensible effectiveness multiplier curve to CoolEffectSensible100
+        int CoolEffectLatentCurveIndex = 0;   // cooling latent effectiveness multiplier curve to CoolEffectLatent100
         // 1 = None, 2 = Bypass, 3 = Stop Rotary HX Rotation
         HXConfigurationType ExchConfig = HXConfigurationType::Invalid; // parameter equivalent of HX configuration, plate or rotary
         // frost control parameters
