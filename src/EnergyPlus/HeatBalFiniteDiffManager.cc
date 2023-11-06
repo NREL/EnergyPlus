@@ -172,7 +172,7 @@ namespace HeatBalFiniteDiffManager {
             if (!state.dataIPShortCut->lAlphaFieldBlanks(1)) {
                 {
                     state.dataHeatBalFiniteDiffMgr->CondFDSchemeType = static_cast<CondFDScheme>(
-                        getEnumerationValue(CondFDSchemeTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
+                        getEnumValue(CondFDSchemeTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(1))));
                     if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::Invalid) {
                         ShowSevereError(state,
                                         format("{}: invalid {} entered={}, must match CrankNicholsonSecondOrder or FullyImplicitFirstOrder.",
@@ -2609,6 +2609,8 @@ namespace HeatBalFiniteDiffManager {
                 interNodeFlux - sourceFlux +
                 surfaceFD.CpDelXRhoS2(node) * (surfaceFD.TDT(node) - surfaceFD.TDpriortimestep(node)) / state.dataGlobal->TimeStepZoneSec;
         }
+        if (state.dataEnvrn->IsRain)
+            state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf) = -surfaceFD.QDreport(1); // Update the outside flux if it is raining
     }
 
     void adjustPropertiesForPhaseChange(EnergyPlusData &state,

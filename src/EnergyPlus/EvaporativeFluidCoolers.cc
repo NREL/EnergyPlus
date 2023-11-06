@@ -276,8 +276,7 @@ namespace EvaporativeFluidCoolers {
             if (state.dataIPShortCut->lAlphaFieldBlanks(6) || AlphArray(6).empty()) {
                 thisEFC.capacityControl = CapacityControl::FanCycling; // FanCycling
             } else {
-                thisEFC.capacityControl =
-                    static_cast<CapacityControl>(getEnumerationValue(controlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
+                thisEFC.capacityControl = static_cast<CapacityControl>(getEnumValue(controlNamesUC, UtilityRoutines::makeUPPER(AlphArray(6))));
                 if (thisEFC.capacityControl == CapacityControl::Invalid) {
                     thisEFC.capacityControl = CapacityControl::FanCycling;
                     ShowWarningError(state,
@@ -293,7 +292,7 @@ namespace EvaporativeFluidCoolers {
             if (AlphArray(7).empty()) {
                 thisEFC.EvapLossMode = EvapLoss::ByMoistTheory;
             } else {
-                thisEFC.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(evapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
+                thisEFC.EvapLossMode = static_cast<EvapLoss>(getEnumValue(evapLossNamesUC, UtilityRoutines::makeUPPER(AlphArray(7))));
                 if (thisEFC.EvapLossMode == EvapLoss::Invalid) {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(7), AlphArray(7)));
                     ShowContinueError(state, format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
@@ -328,7 +327,7 @@ namespace EvaporativeFluidCoolers {
                     thisEFC.ConcentrationRatio = 3.0;
                 }
             } else {
-                thisEFC.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(blowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(8))));
+                thisEFC.BlowdownMode = static_cast<Blowdown>(getEnumValue(blowDownNamesUC, UtilityRoutines::makeUPPER(AlphArray(8))));
                 if (thisEFC.BlowdownMode == Blowdown::Invalid) {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
                     ShowContinueError(state, format("Entered in {} ={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
@@ -634,7 +633,7 @@ namespace EvaporativeFluidCoolers {
             if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                 thisEFC.EvapLossMode = EvapLoss::ByMoistTheory;
             } else {
-                thisEFC.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(evapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
+                thisEFC.EvapLossMode = static_cast<EvapLoss>(getEnumValue(evapLossNamesUC, UtilityRoutines::makeUPPER(AlphArray(6))));
                 if (thisEFC.EvapLossMode == EvapLoss::Invalid) {
                     ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(6), AlphArray(6)));
                     ShowContinueError(state, format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
@@ -668,7 +667,7 @@ namespace EvaporativeFluidCoolers {
                     thisEFC.ConcentrationRatio = 3.0;
                 }
             } else {
-                thisEFC.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(blowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
+                thisEFC.BlowdownMode = static_cast<Blowdown>(getEnumValue(blowDownNamesUC, UtilityRoutines::makeUPPER(AlphArray(7))));
                 if (thisEFC.BlowdownMode == Blowdown::Invalid) {
                     ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(7), AlphArray(7)));
                     ShowContinueError(state, format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));

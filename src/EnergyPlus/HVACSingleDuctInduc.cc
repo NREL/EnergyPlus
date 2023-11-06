@@ -847,7 +847,7 @@ namespace HVACSingleDuctInduc {
                                              state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtHeatPeak);
                                 } else {
                                     DesCoilLoad = CpAir * RhoAir * DesPriVolFlow *
-                                                  (state.dataSize->ZoneSizThermSetPtLo(state.dataSize->CurZoneEqNum) -
+                                                  (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneSizThermSetPtLo -
                                                    state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU);
                                 }
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).DesHeatingLoad = DesCoilLoad;
@@ -983,7 +983,7 @@ namespace HVACSingleDuctInduc {
                                 } else {
                                     DesCoilLoad = CpAir * RhoAir * DesPriVolFlow *
                                                   (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolCoilInTempTU -
-                                                   state.dataSize->ZoneSizThermSetPtHi(state.dataSize->CurZoneEqNum));
+                                                   state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneSizThermSetPtHi);
                                 }
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).DesCoolingLoad = DesCoilLoad;
                                 Cp = FluidProperties::GetSpecificHeatGlycol(

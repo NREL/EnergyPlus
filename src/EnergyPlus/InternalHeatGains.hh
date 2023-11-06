@@ -180,13 +180,13 @@ namespace InternalHeatGains {
                                      gsl::span<const DataHeatBalance::IntGainType> GainTypeARR, // variable length 1-d array of enum valued gain types
                                      int const spaceIndex = 0);                                 // space index pointer, sum gains only for this space
 
-    Real64 SumAllInternalLatentGains(EnergyPlusData &state,
-                                     int const ZoneNum // zone index pointer for which zone to sum gains for
+    void SumAllInternalLatentGains(EnergyPlusData &state,
+                                   int const ZoneNum // zone index pointer for which zone to sum gains for
     );
 
     // Added for hybrid model -- calculate the latent gain from all sources except for people
-    Real64 SumAllInternalLatentGainsExceptPeople(EnergyPlusData &state,
-                                                 int const ZoneNum // zone index pointer for which zone to sum gains for
+    void SumAllInternalLatentGainsExceptPeople(EnergyPlusData &state,
+                                               int const ZoneNum // zone index pointer for which zone to sum gains for
     );
 
     Real64

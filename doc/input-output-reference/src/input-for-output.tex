@@ -64,7 +64,7 @@ An example input object for this report follows.
 Output:Surfaces:List, Lines;
 \end{lstlisting}
 
-The above IDF line will produce a simple file of line segments that constitute the surfaces in the IDF file. This file is the~ ``lines'' report (\textbf{eplusout.sln}) and is decribed in more detail in the Output Details and Examples document.
+The above IDF line will produce a simple file of line segments that constitute the surfaces in the IDF file. This file is the~ ``lines'' report (\textbf{eplusout.sln}) and is described in more detail in the Output Details and Examples document.
 
 \paragraph{Field: Report Specifications}\label{field-report-specifications}
 
@@ -348,7 +348,7 @@ OutputControl:ReportingTolerances,.21,.21;
 
 \subsection{Output:Variable}\label{outputvariable}
 
-This input object is used request results reporting.~ As shown above in the Variable Dictionary Report section, there are many different output variables available for reporting results from EnergyPlus.~ The Output:Variable object is primarily used for reporting time series data at various frequencys.
+This input object is used request results reporting.~ As shown above in the Variable Dictionary Report section, there are many different output variables available for reporting results from EnergyPlus.~ The Output:Variable object is primarily used for reporting time series data at various frequencies.
 
 Each Output:Variable object causes a specific number assignment for outputs. For example, you could request separate reporting for the outside temperature:
 
@@ -497,9 +497,9 @@ Propane \tabularnewline
 OtherFuel1 \tabularnewline
 OtherFuel2 \tabularnewline
 Water \tabularnewline
-Steam \tabularnewline
 DistrictCooling \tabularnewline
-DistrictHeating \tabularnewline
+DistrictHeatingWater \tabularnewline
+DistrictHeatingSteam \tabularnewline
 ElectricityPurchased \tabularnewline
 ElectricitySurplusSold \tabularnewline
 ElectricityNet \tabularnewline
@@ -537,21 +537,20 @@ Utility/Fuel End Use Types \tabularnewline
 \midrule
 \endhead
 
-InteriorLights \tabularnewline
-ExteriorLights \tabularnewline
-InteriorEquipment \tabularnewline
-ExteriorEquipment \tabularnewline
-Fans \tabularnewline
-Pumps \tabularnewline
 Heating \tabularnewline
 Cooling \tabularnewline
-HeatRejection \tabularnewline
-Humidifier \tabularnewline
-HeatRecovery \tabularnewline
-DHW \tabularnewline
-Cogeneration \tabularnewline
-Refrigeration \tabularnewline
+Interior Lights \tabularnewline
+Exterior Lights \tabularnewline
+Interior Equipment \tabularnewline
+Exterior Equipment \tabularnewline
+Fans \tabularnewline
+Pumps \tabularnewline
+Heat Rejection \tabularnewline
+Humidification \tabularnewline
+Heat Recovery \tabularnewline
 WaterSystems \tabularnewline
+Refrigeration \tabularnewline
+Generators \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -666,7 +665,7 @@ The energy is obtained internally from the following facility meters:
 %\endhead
 %
 Electricity:Facility & Diesel:Facility \tabularnewline
-DistrictCooling:Facility & DistrictHeating:Facility \tabularnewline
+DistrictCooling:Facility & DistrictHeatingWater:Facility \tabularnewline
 NaturalGas:Facility & Gasoline:Facility \tabularnewline
 Coal:Facility & FuelOilNo1:Facility \tabularnewline
 FuelOilNo2:Facility & Propane:Facility \tabularnewline
@@ -712,7 +711,7 @@ The Steam Conversion Efficiency is used to convert the Steam usage to Natural Ga
 
 \paragraph{Field: Total Carbon Equivalent Emission Factor From N2O}\label{field-total-carbon-equivalent-emission-factor-from-n2o}
 
-The Intergovernmental Panel on Climate Change has studied the effects on the relative radiative forcing effects of various greenhouse gases. This effect, called Global Warming Potential (GWP), is described in terms of the Carbon Equivalent of a particular greenhouse gase. N\(_{2}\)O (nitrous oxide) can be produced by some Fuel Types and has a default of carbon equivalent emission factor of 80.7272 kg C/kg N\(_{2}\)O.
+The Intergovernmental Panel on Climate Change has studied the effects on the relative radiative forcing effects of various greenhouse gases. This effect, called Global Warming Potential (GWP), is described in terms of the Carbon Equivalent of a particular greenhouse gas. N\(_{2}\)O (nitrous oxide) can be produced by some Fuel Types and has a default of carbon equivalent emission factor of 80.7272 kg C/kg N\(_{2}\)O.
 
 \paragraph{Field: Total Carbon Equivalent Emission Factor From CH4}\label{field-total-carbon-equivalent-emission-factor-from-ch4}
 
@@ -806,7 +805,7 @@ Similar to the source energy calculation, this field contains the name of a sche
 
 \paragraph{Field: CO Emission Factor}\label{field-co-emission-factor}
 
-The environmental impact coefficient for the Fuel for calculating the mass of carbon monoxide (CO) released into the atmosphere. The units are grams per MegaJoule. Carbon monoxide is a colorless, odorless and poisonous gas produced by incomplete fossil fuel combustion. Carbon monoxide combines with the haemoglobin of human beings, reducing its oxygen carrying capacity, with effects harmful to human beings.
+The environmental impact coefficient for the Fuel for calculating the mass of carbon monoxide (CO) released into the atmosphere. The units are grams per MegaJoule. Carbon monoxide is a colorless, odorless and poisonous gas produced by incomplete fossil fuel combustion. Carbon monoxide combines with the hemoglobin of human beings, reducing its oxygen carrying capacity, with effects harmful to human beings.
 
 \paragraph{Field: CO Emission Factor Schedule Name}\label{field-co-emission-factor-schedule-name}
 
@@ -894,7 +893,7 @@ Similar to the source energy calculation, this field contains the name of a sche
 
 \paragraph{Field: Pb Emission Factor}\label{field-pb-emission-factor}
 
-The Environmental impact coefficient for the Fuel for calculating the masss of lead (Pb) released into the atmosphere. The units are grams per MegaJoule. A heavy metal that is hazardous to health if breathed or swallowed. Its use in gasoline, paints, and plumbing compounds has been sharply restricted or eliminated by federal laws and regulations.
+The Environmental impact coefficient for the Fuel for calculating the mass of lead (Pb) released into the atmosphere. The units are grams per MegaJoule. A heavy metal that is hazardous to health if breathed or swallowed. Its use in gasoline, paints, and plumbing compounds has been sharply restricted or eliminated by federal laws and regulations.
 
 \paragraph{Field: Pb Emission Factor Schedule Name}\label{field-pb-emission-factor-schedule-name}
 
@@ -1369,7 +1368,7 @@ These outputs provide results for the source energy embodied in each type of fue
 
 \paragraph{Environmental Impact OtherFuel2 CO2 Emissions Mass {[}kg{]}}\label{environmental-impact-otherfuel2-co2-emissions-mass-kg}
 
-These outputs provide results for the carbon dioxide reelases associated with consumption of each type of fuel that might be used at the site.~ The units are kg.
+These outputs provide results for the carbon dioxide releases associated with consumption of each type of fuel that might be used at the site.~ The units are kg.
 
 \paragraph{Environmental Impact Electricity CO Emissions Mass {[}kg{]}}\label{environmental-impact-electricity-co-emissions-mass-kg}
 
@@ -1479,7 +1478,7 @@ These outputs provide results for the nitrous oxide releases associated with con
 
 \paragraph{Environmental Impact OtherFuel2 SO2 Emissions Mass {[}kg{]}}\label{environmental-impact-otherfuel2-so2-emissions-mass-kg}
 
-These outputs provide results for the sulphur dioxide releases associated with consumption of each type of fuel that might be used at the site.~ The units are kg.
+These outputs provide results for the sulfur dioxide releases associated with consumption of each type of fuel that might be used at the site.~ The units are kg.
 
 \paragraph{Environmental Impact Electricity PM Emissions Mass {[}kg{]}}\label{environmental-impact-electricity-pm-emissions-mass-kg}
 

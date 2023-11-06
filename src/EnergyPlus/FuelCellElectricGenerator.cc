@@ -127,7 +127,7 @@ namespace FuelCellElectricGenerator {
 
         // Now look for this object
         for (auto &thisFC : state.dataFuelCellElectGen->FuelCell) {
-            if (UtilityRoutines::MakeUPPERCase(thisFC.NameExhaustHX) == UtilityRoutines::MakeUPPERCase(objectName)) {
+            if (UtilityRoutines::makeUPPER(thisFC.NameExhaustHX) == UtilityRoutines::makeUPPER(objectName)) {
                 return &thisFC;
             }
         }

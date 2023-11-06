@@ -420,7 +420,7 @@ namespace OutputProcessor {
 
         ReportFreq freq = ReportFreq::Hour; // Default
         // TODO: I think it's supposed to be upper case already, but tests aren't doing that at least...
-        const std::string FreqStringUpper = UtilityRoutines::MakeUPPERCase(FreqString);
+        const std::string FreqStringUpper = UtilityRoutines::makeUPPER(FreqString);
         std::string::size_type const LenString = min(len(FreqString), static_cast<std::string::size_type>(4u));
 
         if (LenString < 4u) {
@@ -549,7 +549,7 @@ namespace OutputProcessor {
             }
             reqVar->name = cAlphaArgs(2);
 
-            reqVar->freq = determineFrequency(state, UtilityRoutines::MakeUPPERCase(cAlphaArgs(3)));
+            reqVar->freq = determineFrequency(state, UtilityRoutines::makeUPPER(cAlphaArgs(3)));
             if (reqVar->freq == ReportFreq::Invalid) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
                 ErrorsFound = true;
@@ -558,7 +558,7 @@ namespace OutputProcessor {
             // Schedule information
             if (lAlphaBlanks(4)) {
                 reqVar->SchedPtr = 0;
-            } else if ((reqVar->SchedPtr = GetScheduleIndex(state, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)))) == 0) { 
+            } else if ((reqVar->SchedPtr = GetScheduleIndex(state, UtilityRoutines::makeUPPER(cAlphaArgs(4)))) == 0) { 
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(4), cAlphaArgs(4));
                 ErrorsFound = true;
             }
@@ -717,12 +717,12 @@ namespace OutputProcessor {
         std::vector<std::string> customMeterNames;
         if (auto const found = ip->epJSON.find("Meter:Custom"); found != ip->epJSON.end()) {
             for (auto meterInstance = found.value().begin(); meterInstance != found.value().end(); ++meterInstance, ++numCustomMeters)
-                customMeterNames.push_back(UtilityRoutines::MakeUPPERCase(meterInstance.key()));
+                customMeterNames.push_back(UtilityRoutines::makeUPPER(meterInstance.key()));
         }
 
         if (auto const found = ip->epJSON.find("Meter:CustomDecrement"); found != ip->epJSON.end()) {
             for (auto meterInstance = found.value().begin(); meterInstance != found.value().end(); ++meterInstance, ++numCustomDecMeters)
-                customMeterNames.push_back(UtilityRoutines::MakeUPPERCase(meterInstance.key()));
+                customMeterNames.push_back(UtilityRoutines::makeUPPER(meterInstance.key()));
         }
 
         ipsc->cCurrentModuleObject = "Meter:Custom";
@@ -742,7 +742,7 @@ namespace OutputProcessor {
 
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
 
-            std::string meterNameUC = UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(1));
+            std::string meterNameUC = UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(1));
             std::string::size_type lbrackPos = index(meterNameUC, '[');
             if (lbrackPos != std::string::npos) meterNameUC.erase(lbrackPos);
 
@@ -756,8 +756,8 @@ namespace OutputProcessor {
             auto *meter = op->meters[meterNum];
             meter->type = MeterType::Custom;
             // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
-            meter->resource = static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC,
-                                                                                   UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(2))));
+            meter->resource = static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC,
+                                                                            UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(2))));
             if (meter->resource == Constant::eResource::Invalid) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 BigErrorsFound = true;
@@ -926,7 +926,7 @@ namespace OutputProcessor {
                               ipsc->cNumericFieldNames);
 
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
-            std::string meterNameUC = UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(1));
+            std::string meterNameUC = UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(1));
             std::string::size_type lbrackPos = index(meterNameUC, '[');
             if (lbrackPos != std::string::npos) meterNameUC.erase(lbrackPos);
 
@@ -940,14 +940,14 @@ namespace OutputProcessor {
             auto *meter = op->meters[meterNum];
             meter->type = MeterType::CustomDec;
             // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
-            meter->resource = static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC,
-                                                                                   UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(2))));
+            meter->resource = static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC,
+                                                                                   UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(2))));
             if (meter->resource == Constant::eResource::Invalid) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 BigErrorsFound = true;
             }
 
-            std::string decMeterName = UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(3));
+            std::string decMeterName = UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(3));
             lbrackPos = index(decMeterName, '[');
             if (lbrackPos != std::string::npos) decMeterName.erase(lbrackPos);
             
@@ -989,7 +989,7 @@ namespace OutputProcessor {
                     continue;
                 }
 
-                std::string meterOrVarName = UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(fldIndex + 1));
+                std::string meterOrVarName = UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(fldIndex + 1));
                 
                 lbrackPos = index(meterOrVarName, '[');
                 if (lbrackPos != std::string::npos) meterOrVarName.erase(lbrackPos);
@@ -1096,6 +1096,7 @@ namespace OutputProcessor {
         if (BigErrorsFound) ErrorsFound = true;
     }
 
+
     int AddMeter(EnergyPlusData &state,
                   std::string const &Name,              // Name for the meter
                   Constant::Units const units, // Units for the meter
@@ -1119,7 +1120,7 @@ namespace OutputProcessor {
         // Make sure this isn't already in the list of meter names
         auto &op = state.dataOutputProcessor;
 
-        std::string nameUC = UtilityRoutines::MakeUPPERCase(Name);
+        std::string nameUC = UtilityRoutines::makeUPPER(Name);
         
         if (auto found = op->meterMap.find(nameUC); found != op->meterMap.end()) {
             ShowFatalError(state, format("Requested to Add Meter which was already present={}", Name));
@@ -1178,7 +1179,7 @@ namespace OutputProcessor {
         // Make sure this isn't already in the list of meter names
         auto &op = state.dataOutputProcessor;
 
-        std::string nameUC = UtilityRoutines::MakeUPPERCase(Name);
+        std::string nameUC = UtilityRoutines::makeUPPER(Name);
         
         if (auto found = op->meterMap.find(nameUC); found != op->meterMap.end()) {
             ShowFatalError(state, format("Requested to Add Meter which was already present={}", Name));
@@ -1239,7 +1240,7 @@ namespace OutputProcessor {
             addEndUseSpaceType(state, endUse, SpaceType);
         
         std::string meterName = format("{}:Facility", resourceName);
-        if (op->meterMap.find(UtilityRoutines::MakeUPPERCase(meterName)) == op->meterMap.end()) {
+        if (op->meterMap.find(UtilityRoutines::makeUPPER(meterName)) == op->meterMap.end()) {
             AddMeter(state, meterName, units, resource, "", "", "", outVarNum);
         }
 
@@ -1277,13 +1278,13 @@ namespace OutputProcessor {
             if (group == "Building") { // Match to Zone and Space
                 if (!ZoneName.empty()) {
                     std::string enduseZoneMeterName = format("{}:{}:Zone:{}", endUse, resourceName, ZoneName);
-                    if (op->meterMap.find(UtilityRoutines::MakeUPPERCase(enduseZoneMeterName)) == op->meterMap.end()) {
+                    if (op->meterMap.find(UtilityRoutines::makeUPPER(enduseZoneMeterName)) == op->meterMap.end()) {
                         AddMeter(state, enduseZoneMeterName, units, resource, endUse, "", "Zone", outVarNum);
                     }
                 }
                 if (!SpaceType.empty()) {
                     std::string enduseSpaceMeterName = format("{}:{}:SpaceType:{}", endUse, resourceName, SpaceType);
-                    if (op->meterMap.find(UtilityRoutines::MakeUPPERCase(enduseSpaceMeterName)) == op->meterMap.end()) {
+                    if (op->meterMap.find(UtilityRoutines::makeUPPER(enduseSpaceMeterName)) == op->meterMap.end()) {
                         AddMeter(state, enduseSpaceMeterName, units, resource, endUse, "", "SpaceType", outVarNum);
                     }
                 }
@@ -1293,21 +1294,21 @@ namespace OutputProcessor {
         // End-Use Subcategories
         if (!endUseSub.empty()) {
             std::string subEnduseMeterName = format("{}:{}:{}", endUseSub, endUse, resourceName);
-            std::string subEnduseMeterNameUC = UtilityRoutines::MakeUPPERCase(subEnduseMeterName);
+            std::string subEnduseMeterNameUC = UtilityRoutines::makeUPPER(subEnduseMeterName);
             if (op->meterMap.find(subEnduseMeterNameUC) == op->meterMap.end()) {
                 AddMeter(state, subEnduseMeterName, units, resource, endUse, endUseSub, "", outVarNum);
             }
             if (group == "Building") { // Match to Zone and Space
                 if (!ZoneName.empty()) {
                     std::string subEnduseZoneMeterName = format("{}:{}:{}:Zone:{}", endUseSub, endUse, resourceName, ZoneName);
-                    std::string subEnduseZoneMeterNameUC = UtilityRoutines::MakeUPPERCase(subEnduseZoneMeterName);
+                    std::string subEnduseZoneMeterNameUC = UtilityRoutines::makeUPPER(subEnduseZoneMeterName);
                     if (op->meterMap.find(subEnduseZoneMeterNameUC) == op->meterMap.end()) {
                         AddMeter(state, subEnduseZoneMeterName, units, resource, endUse, endUseSub, "Zone", outVarNum);
                     }
                 }
                 if (!SpaceType.empty()) {
                     std::string subEnduseSpaceMeterName = format("{}:{}:{}:SpaceType:{}", endUseSub, endUse, resourceName, SpaceType);
-                    std::string subEnduseSpaceMeterNameUC = UtilityRoutines::MakeUPPERCase(subEnduseSpaceMeterName);
+                    std::string subEnduseSpaceMeterNameUC = UtilityRoutines::makeUPPER(subEnduseSpaceMeterName);
                     if (op->meterMap.find(subEnduseSpaceMeterNameUC) == op->meterMap.end()) { 
                         AddMeter(state, subEnduseSpaceMeterName, units, resource, endUse, endUseSub, "SpaceType", outVarNum);
                     }
@@ -1319,7 +1320,7 @@ namespace OutputProcessor {
     //!  Group Meters
     std::string standardizeGroup(std::string_view const groupName)
     {
-        std::string group = UtilityRoutines::MakeUPPERCase(groupName);
+        std::string group = UtilityRoutines::makeUPPER(groupName);
         if (group == "BUILDING") {
             return "Building";
         } else if (group == "HVAC" || group == "SYSTEM") {
@@ -1335,7 +1336,7 @@ namespace OutputProcessor {
     std::string standardizeEndUse(std::string_view endUseName)
     {
         assert(!endUseName.empty());
-        std::string endUse = UtilityRoutines::MakeUPPERCase(endUseName);
+        std::string endUse = UtilityRoutines::makeUPPER(endUseName);
 
         if (endUse == "INTERIOR LIGHTS" || endUse == "INTERIORLIGHTS") {
             return "InteriorLights";
@@ -1512,7 +1513,7 @@ namespace OutputProcessor {
         } else if (endUseName.empty()) {
             return "";
         } else if (Constant::EndUse endUse = static_cast<Constant::EndUse>
-                   (getEnumerationValue(Constant::endUseNamesUC, UtilityRoutines::MakeUPPERCase(endUseName))); endUse != Constant::EndUse::Invalid) {
+                   (getEnumValue(Constant::endUseNamesUC, UtilityRoutines::makeUPPER(endUseName))); endUse != Constant::EndUse::Invalid) {
             return "General";
         } else {
             return "";
@@ -2309,6 +2310,7 @@ namespace OutputProcessor {
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
                                                                                 state.dataGlobal->CalendarYear,
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear,
                                                                                 Month,
                                                                                 DayOfMonth,
                                                                                 Hour,
@@ -2337,6 +2339,7 @@ namespace OutputProcessor {
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
                                                                                 state.dataGlobal->CalendarYear,
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear,
                                                                                 Month,
                                                                                 DayOfMonth,
                                                                                 Hour,
@@ -2362,6 +2365,7 @@ namespace OutputProcessor {
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
                                                                                 state.dataGlobal->CalendarYear,
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear,
                                                                                 Month,
                                                                                 DayOfMonth,
                                                                                 _,
@@ -2380,6 +2384,7 @@ namespace OutputProcessor {
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
                                                                                 state.dataGlobal->CalendarYear,
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear,
                                                                                 Month);
             }
             break;
@@ -2390,7 +2395,8 @@ namespace OutputProcessor {
                                                                                 reportID,
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
-                                                                                state.dataGlobal->CalendarYear);
+                                                                                state.dataGlobal->CalendarYear,
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear);
             }
             break;
         default:
@@ -3107,7 +3113,6 @@ namespace OutputProcessor {
             assert(false); return "";
     }
 
-
 } // namespace OutputProcessor
 
 // TODO: Probably move these to a different location
@@ -3207,10 +3212,10 @@ void SetupOutputVariable(EnergyPlusData &state,
         var->timeStepType = timeStep;
         var->storeType = store;
         var->name = name;
-        var->nameUC = UtilityRoutines::MakeUPPERCase(var->name);
-        var->keyUC = UtilityRoutines::MakeUPPERCase(key);
+        var->nameUC = UtilityRoutines::makeUPPER(var->name);
+        var->keyUC = UtilityRoutines::makeUPPER(key);
         var->keyColonName = fmt::format("{}:{}", key, name);
-        var->keyColonNameUC = UtilityRoutines::MakeUPPERCase(var->keyColonName);
+        var->keyColonNameUC = UtilityRoutines::makeUPPER(var->keyColonName);
         var->units = units;
         if (units == Constant::Units::customEMS) var->unitNameCustomEMS = customUnitName;
         var->ReportID = ++op->CurrentReportNumber;
@@ -3315,10 +3320,10 @@ void SetupOutputVariable(EnergyPlusData &state,
         var->timeStepType = timeStepType;
         var->storeType = storeType;
         var->name = name;
-        var->nameUC = UtilityRoutines::MakeUPPERCase(var->name);
-        var->keyUC = UtilityRoutines::MakeUPPERCase(key);
+        var->nameUC = UtilityRoutines::makeUPPER(var->name);
+        var->keyUC = UtilityRoutines::makeUPPER(key);
         var->keyColonName = fmt::format("{}:{}", key, name);
-        var->keyColonNameUC = UtilityRoutines::MakeUPPERCase(var->keyColonName);
+        var->keyColonNameUC = UtilityRoutines::makeUPPER(var->keyColonName);
         var->units = units;
         var->ReportID = ++op->CurrentReportNumber;
         var->Which = &ActualVariable;
@@ -4065,7 +4070,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
 
         bool meterFileOnlyIndicator = false;
         bool cumulativeIndicator = false;
-        ReportFreq freq = determineFrequency(state, UtilityRoutines::MakeUPPERCase(Alphas(2)));
+        ReportFreq freq = determineFrequency(state, UtilityRoutines::makeUPPER(Alphas(2)));
         
         if (!setupMeterFromMeterName(Alphas(1), freq, meterFileOnlyIndicator, cumulativeIndicator)) {
             ShowWarningError(
@@ -4092,7 +4097,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
 
         bool meterFileOnlyIndicator = true;
         bool cumulativeIndicator = false;
-        ReportFreq freq = determineFrequency(state, UtilityRoutines::MakeUPPERCase(Alphas(2)));
+        ReportFreq freq = determineFrequency(state, UtilityRoutines::makeUPPER(Alphas(2)));
         if (!setupMeterFromMeterName(Alphas(1), freq, meterFileOnlyIndicator, cumulativeIndicator)) {
             ShowWarningError(
                 state, format("{}: invalid {}=\"{}\" - not found.", ipsc->cCurrentModuleObject, ipsc->cAlphaFieldNames(1), Alphas(1)));
@@ -4119,7 +4124,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
 
         bool meterFileOnlyIndicator = false;
         bool cumulativeIndicator = true;
-        ReportFreq freq = determineFrequency(state, UtilityRoutines::MakeUPPERCase(Alphas(2)));
+        ReportFreq freq = determineFrequency(state, UtilityRoutines::makeUPPER(Alphas(2)));
         if (!setupMeterFromMeterName(Alphas(1), freq, meterFileOnlyIndicator, cumulativeIndicator)) {
             ShowWarningError(
                 state, format("{}: invalid {}=\"{}\" - not found.", ipsc->cCurrentModuleObject, ipsc->cAlphaFieldNames(1), Alphas(1)));
@@ -4145,7 +4150,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
 
         bool meterFileOnlyIndicator = true;
         bool cumulativeIndicator = true;
-        ReportFreq freq = determineFrequency(state, UtilityRoutines::MakeUPPERCase(Alphas(2)));
+        ReportFreq freq = determineFrequency(state, UtilityRoutines::makeUPPER(Alphas(2)));
         if (!setupMeterFromMeterName(Alphas(1), freq, meterFileOnlyIndicator, cumulativeIndicator)) {
             ShowWarningError(
                 state, format("{}: invalid {}=\"{}\" - not found.", ipsc->cCurrentModuleObject, ipsc->cAlphaFieldNames(1), Alphas(1)));
@@ -4507,6 +4512,7 @@ int GetMeteredVariables(EnergyPlusData &state,
     for (int iVar = 0; iVar < (int)op->outVars.size(); ++iVar) {
         //    Pos=INDEX(RVariableTypes(Loop)%VarName,':')
         //    IF (ComponentName /= RVariableTypes(Loop)%VarNameUC(1:Pos-1)) CYCLE
+
         auto *var = op->outVars[iVar];
         if (var->varType != VariableType::Real) continue;
         if (ComponentName != var->keyUC) continue;
@@ -4527,12 +4533,12 @@ int GetMeteredVariables(EnergyPlusData &state,
         for (int meterNum : var->meterNums) {
             auto *meter = op->meters[meterNum];
             if (!foundEndUse && !meter->EndUse.empty()) {
-                meteredVar.endUse = UtilityRoutines::MakeUPPERCase(meter->EndUse);
+                meteredVar.endUse = UtilityRoutines::makeUPPER(meter->EndUse);
                 foundEndUse = true;
             } 
 
             if (!foundGroup && !meter->Group.empty()) {
-                meteredVar.group = UtilityRoutines::MakeUPPERCase(meter->Group);
+                meteredVar.group = UtilityRoutines::makeUPPER(meter->Group);
                 foundGroup = true;
             }
 
@@ -4591,7 +4597,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
     timeStepType = TimeStepType::Zone;
     units = Constant::Units::Invalid;
 
-    std::string nameUC = UtilityRoutines::MakeUPPERCase(name);
+    std::string nameUC = UtilityRoutines::makeUPPER(name);
 
     // Search Variable List First
     if (auto found = op->ddOutVarMap.find(nameUC); found != op->ddOutVarMap.end()) {
@@ -4621,7 +4627,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
         if (schedNum > 0) {
             numKeys = 1;
             varType = VariableType::Schedule;
-            units = static_cast<Constant::Units>(getEnumerationValue(Constant::unitNamesUC, UtilityRoutines::MakeUPPERCase(GetScheduleType(state, schedNum))));
+            units = static_cast<Constant::Units>(getEnumValue(Constant::unitNamesUC, UtilityRoutines::makeUPPER(GetScheduleType(state, schedNum))));
             storeType = StoreType::Averaged;
             timeStepType = TimeStepType::Zone;
         }
@@ -4657,7 +4663,8 @@ void GetVariableKeys(EnergyPlusData &state,
     using ScheduleManager::GetScheduleIndex;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string nameUC = UtilityRoutines::MakeUPPERCase(varName);
+
+    std::string nameUC = UtilityRoutines::makeUPPER(varName);
 
     auto &op = state.dataOutputProcessor;
 
@@ -4785,7 +4792,7 @@ void InitPollutionMeterReporting(EnergyPlusData &state, OutputProcessor::ReportF
 
     for (int iResource = 0; iResource < (int)Constant::eResource::Num; ++iResource) {
         std::string meterName = format("{}:Facility", Constant::eResourceNames[iResource]);
-        std::string meterNameUC = UtilityRoutines::MakeUPPERCase(meterName);
+        std::string meterNameUC = UtilityRoutines::makeUPPER(meterName);
 
         auto found = op->meterMap.find(meterNameUC);
         if (found == op->meterMap.end()) continue;

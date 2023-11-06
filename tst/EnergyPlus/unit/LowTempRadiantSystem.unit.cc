@@ -722,7 +722,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
         "  Branch,",
         "    Heating Purchased Hot Water Branch,  !- Name",
         "    ,                        !- Pressure Drop Curve Name",
-        "    DistrictHeating,         !- Component 1 Object Type",
+        "    DistrictHeating:Water,         !- Component 1 Object Type",
         "    Purchased Heating,       !- Component 1 Name",
         "    Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name",
         "    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name",
@@ -852,7 +852,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
 
         "  PlantEquipmentList,",
         "    heating plant,           !- Name",
-        "    DistrictHeating,         !- Equipment 1 Object Type",
+        "    DistrictHeating:Water,         !- Equipment 1 Object Type",
         "    Purchased Heating;       !- Equipment 1 Name",
 
         "  Pump:VariableSpeed,",
@@ -871,7 +871,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
         "    0,                       !- Minimum Flow Rate {m3/s}",
         "    INTERMITTENT;            !- Pump Control Type",
 
-        "  DistrictHeating,",
+        "  DistrictHeating:Water,",
         "    Purchased Heating,       !- Name",
         "    Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name",
         "    Purchased Heat Outlet Node,  !- Hot Water Outlet Node Name",
@@ -1606,7 +1606,7 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
         "  Branch,",
         "    Heating Purchased Hot Water Branch,  !- Name",
         "    ,                        !- Pressure Drop Curve Name",
-        "    DistrictHeating,         !- Component 1 Object Type",
+        "    DistrictHeating:Water,         !- Component 1 Object Type",
         "    Purchased Heating,       !- Component 1 Name",
         "    Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name",
         "    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name",
@@ -1736,7 +1736,7 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
 
         "  PlantEquipmentList,",
         "    heating plant,           !- Name",
-        "    DistrictHeating,         !- Equipment 1 Object Type",
+        "    DistrictHeating:Water,         !- Equipment 1 Object Type",
         "    Purchased Heating;       !- Equipment 1 Name",
 
         "  Pump:VariableSpeed,",
@@ -1755,7 +1755,7 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
         "    0,                       !- Minimum Flow Rate {m3/s}",
         "    INTERMITTENT;            !- Pump Control Type",
 
-        "  DistrictHeating,",
+        "  DistrictHeating:Water,",
         "    Purchased Heating,       !- Name",
         "    Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name",
         "    Purchased Heat Outlet Node,  !- Hot Water Outlet Node Name",
@@ -4240,7 +4240,7 @@ TEST_F(LowTempRadiantSystemTest, VariableFlowCoolingOnlyInputTest)
         "  Branch,",
         "    Heating Purchased Hot Water Branch,  !- Name",
         "    ,                        !- Pressure Drop Curve Name",
-        "    DistrictHeating,         !- Component 1 Object Type",
+        "    DistrictHeating:Water,         !- Component 1 Object Type",
         "    Purchased Heating,       !- Component 1 Name",
         "    Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name",
         "    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name",
@@ -4359,7 +4359,7 @@ TEST_F(LowTempRadiantSystemTest, VariableFlowCoolingOnlyInputTest)
 
         "  PlantEquipmentList,",
         "    heating plant,           !- Name",
-        "    DistrictHeating,         !- Equipment 1 Object Type",
+        "    DistrictHeating:Water,         !- Equipment 1 Object Type",
         "    Purchased Heating;       !- Equipment 1 Name",
 
         "  Pump:VariableSpeed,",
@@ -4378,7 +4378,7 @@ TEST_F(LowTempRadiantSystemTest, VariableFlowCoolingOnlyInputTest)
         "    0,                       !- Minimum Flow Rate {m3/s}",
         "    INTERMITTENT;            !- Pump Control Type",
 
-        "  DistrictHeating,",
+        "  DistrictHeating:Water,",
         "    Purchased Heating,       !- Name",
         "    Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name",
         "    Purchased Heat Outlet Node,  !- Hot Water Outlet Node Name",
@@ -4662,4 +4662,136 @@ TEST_F(LowTempRadiantSystemTest, VariableFlowCoolingOnlyInputTest)
     // Post-fix, there should be no warnings thrown.
     EXPECT_NO_THROW(GetLowTempRadiantSystem(*state));
     compare_err_stream("");
+}
+
+TEST_F(LowTempRadiantSystemTest, UpdateRadSysSourceValAvgTest)
+{
+    bool isItOn;
+    Real64 errTol = 0.0001;
+
+    auto &hRS = state->dataLowTempRadSys->HydrRadSys;
+    auto &cRS = state->dataLowTempRadSys->CFloRadSys;
+    auto &eRS = state->dataLowTempRadSys->ElecRadSys;
+    auto &surf = state->dataSurface->Surface;
+    auto &dataLTRS = state->dataLowTempRadSys;
+    auto &totSurfaces = state->dataSurface->TotSurfaces;
+    auto &qRadSysSource = state->dataHeatBalFanSys->QRadSysSource;
+
+    dataLTRS->NumOfHydrLowTempRadSys = 2;
+    dataLTRS->NumOfCFloLowTempRadSys = 1;
+    dataLTRS->NumOfElecLowTempRadSys = 1;
+    hRS.allocate(dataLTRS->NumOfHydrLowTempRadSys);
+    cRS.allocate(dataLTRS->NumOfCFloLowTempRadSys);
+    eRS.allocate(dataLTRS->NumOfElecLowTempRadSys);
+
+    hRS(1).NumOfSurfaces = 1;
+    hRS(1).SurfacePtr.allocate(hRS(1).NumOfSurfaces);
+    hRS(1).QRadSysSrcAvg.allocate(hRS(1).NumOfSurfaces);
+    hRS(2).NumOfSurfaces = 2;
+    hRS(2).SurfacePtr.allocate(hRS(2).NumOfSurfaces);
+    hRS(2).QRadSysSrcAvg.allocate(hRS(2).NumOfSurfaces);
+    cRS(1).NumOfSurfaces = 1;
+    cRS(1).SurfacePtr.allocate(cRS(1).NumOfSurfaces);
+    cRS(1).QRadSysSrcAvg.allocate(cRS(1).NumOfSurfaces);
+    eRS(1).NumOfSurfaces = 1;
+    eRS(1).SurfacePtr.allocate(eRS(1).NumOfSurfaces);
+    eRS(1).QRadSysSrcAvg.allocate(eRS(1).NumOfSurfaces);
+
+    hRS(1).SurfacePtr(1) = 1;
+    hRS(2).SurfacePtr(1) = 2;
+    hRS(2).SurfacePtr(2) = 3;
+    cRS(1).SurfacePtr(1) = 5;
+    eRS(1).SurfacePtr(1) = 6;
+    hRS(1).QRadSysSrcAvg(1) = 100.0;
+    hRS(2).QRadSysSrcAvg(1) = 200.0;
+    hRS(2).QRadSysSrcAvg(2) = 300.0;
+    cRS(1).QRadSysSrcAvg(1) = 400.0;
+    eRS(1).QRadSysSrcAvg(1) = 500.0;
+
+    totSurfaces = 6;
+    surf.allocate(totSurfaces);
+    surf(1).ExtBoundCond = 0;
+    surf(2).ExtBoundCond = 0;
+    surf(3).ExtBoundCond = 4; // interzone surface test
+    surf(4).ExtBoundCond = 3; // interzone surface test
+    surf(5).ExtBoundCond = 0;
+    surf(6).ExtBoundCond = 0;
+    qRadSysSource.allocate(totSurfaces);
+
+    // Test 1: No radiant systems--should come back with flag false and nothing set in QRadSysSource
+    isItOn = false;
+    dataLTRS->NumOfHydrLowTempRadSys = 0;
+    dataLTRS->NumOfCFloLowTempRadSys = 0;
+    dataLTRS->NumOfElecLowTempRadSys = 0;
+    dataLTRS->TotalNumOfRadSystems = dataLTRS->NumOfHydrLowTempRadSys + dataLTRS->NumOfCFloLowTempRadSys + dataLTRS->NumOfElecLowTempRadSys;
+    qRadSysSource = 0.0;
+    UpdateRadSysSourceValAvg(*state, isItOn);
+    EXPECT_FALSE(isItOn);
+    for (int surfNum = 1; surfNum <= totSurfaces; ++surfNum) {
+        EXPECT_NEAR(qRadSysSource(surfNum), 0.0, errTol);
+    }
+
+    // Test 2: Only Hydronic Radiant System--should come back with flag true and only hydronic variables set in QRadSysSource
+    isItOn = false;
+    dataLTRS->NumOfHydrLowTempRadSys = 2;
+    dataLTRS->NumOfCFloLowTempRadSys = 0;
+    dataLTRS->NumOfElecLowTempRadSys = 0;
+    dataLTRS->TotalNumOfRadSystems = dataLTRS->NumOfHydrLowTempRadSys + dataLTRS->NumOfCFloLowTempRadSys + dataLTRS->NumOfElecLowTempRadSys;
+    qRadSysSource = 0.0;
+    UpdateRadSysSourceValAvg(*state, isItOn);
+    EXPECT_TRUE(isItOn);
+    EXPECT_NEAR(qRadSysSource(1), 100.0, errTol);
+    EXPECT_NEAR(qRadSysSource(2), 200.0, errTol);
+    EXPECT_NEAR(qRadSysSource(3), 300.0, errTol);
+    EXPECT_NEAR(qRadSysSource(4), 300.0, errTol);
+    EXPECT_NEAR(qRadSysSource(5), 0.0, errTol);
+    EXPECT_NEAR(qRadSysSource(6), 0.0, errTol);
+
+    // Test 3: Only Constant Flow Radiant System--should come back with flag true and only constant flow variables set in QRadSysSource
+    isItOn = false;
+    dataLTRS->NumOfHydrLowTempRadSys = 0;
+    dataLTRS->NumOfCFloLowTempRadSys = 1;
+    dataLTRS->NumOfElecLowTempRadSys = 0;
+    dataLTRS->TotalNumOfRadSystems = dataLTRS->NumOfHydrLowTempRadSys + dataLTRS->NumOfCFloLowTempRadSys + dataLTRS->NumOfElecLowTempRadSys;
+    qRadSysSource = 0.0;
+    UpdateRadSysSourceValAvg(*state, isItOn);
+    EXPECT_TRUE(isItOn);
+    EXPECT_NEAR(qRadSysSource(1), 0.0, errTol);
+    EXPECT_NEAR(qRadSysSource(2), 0.0, errTol);
+    EXPECT_NEAR(qRadSysSource(3), 0.0, errTol);
+    EXPECT_NEAR(qRadSysSource(4), 0.0, errTol);
+    EXPECT_NEAR(qRadSysSource(5), 400.0, errTol);
+    EXPECT_NEAR(qRadSysSource(6), 0.0, errTol);
+
+    // Test 4: Only Electric Radiant System--should come back with flag true and only electric variables set in qRadSysSrc (QRadSysSource)
+    isItOn = false;
+    dataLTRS->NumOfHydrLowTempRadSys = 0;
+    dataLTRS->NumOfCFloLowTempRadSys = 0;
+    dataLTRS->NumOfElecLowTempRadSys = 1;
+    dataLTRS->TotalNumOfRadSystems = dataLTRS->NumOfHydrLowTempRadSys + dataLTRS->NumOfCFloLowTempRadSys + dataLTRS->NumOfElecLowTempRadSys;
+    qRadSysSource = 0.0;
+    UpdateRadSysSourceValAvg(*state, isItOn);
+    EXPECT_TRUE(isItOn);
+    EXPECT_NEAR(qRadSysSource(1), 0.0, errTol);
+    EXPECT_NEAR(qRadSysSource(2), 0.0, errTol);
+    EXPECT_NEAR(qRadSysSource(3), 0.0, errTol);
+    EXPECT_NEAR(qRadSysSource(4), 0.0, errTol);
+    EXPECT_NEAR(qRadSysSource(5), 0.0, errTol);
+    EXPECT_NEAR(qRadSysSource(6), 500.0, errTol);
+
+    // Test 5: All Radiant System--should come back with flag true and all variables set in qRadSysSrc (QRadSysSource)
+    isItOn = false;
+    dataLTRS->NumOfHydrLowTempRadSys = 2;
+    dataLTRS->NumOfCFloLowTempRadSys = 1;
+    dataLTRS->NumOfElecLowTempRadSys = 1;
+    dataLTRS->TotalNumOfRadSystems = dataLTRS->NumOfHydrLowTempRadSys + dataLTRS->NumOfCFloLowTempRadSys + dataLTRS->NumOfElecLowTempRadSys;
+    qRadSysSource = 0.0;
+    UpdateRadSysSourceValAvg(*state, isItOn);
+    EXPECT_TRUE(isItOn);
+    EXPECT_NEAR(qRadSysSource(1), 100.0, errTol);
+    EXPECT_NEAR(qRadSysSource(2), 200.0, errTol);
+    EXPECT_NEAR(qRadSysSource(3), 300.0, errTol);
+    EXPECT_NEAR(qRadSysSource(4), 300.0, errTol);
+    EXPECT_NEAR(qRadSysSource(5), 400.0, errTol);
+    EXPECT_NEAR(qRadSysSource(6), 500.0, errTol);
 }

@@ -48,6 +48,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
@@ -321,12 +322,12 @@ namespace ExteriorEnergyUse {
                 ShowSevereEmptyField(state, eoh, ipsc->cAlphaFieldNames(2));
                 ErrorsFound = true;
                 
-            } else if ((exteriorEquip.FuelType = static_cast<ExteriorFuelUsage>
-                        (getEnumerationValue(exteriorFuelNamesUC, UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(2))))) == ExteriorFuelUsage::Invalid) {
+            } else if ((exteriorEquip.FuelType = static_cast<Constant::eFuel>
+                        (getEnumValue(Constant::eFuelNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(2))))) == Constant::eFuel::Invalid) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 ErrorsFound = true;
 
-            } else if (exteriorEquip.FuelType != ExteriorEnergyUse::ExteriorFuelUsage::WaterUse) {
+            } else if (exteriorEquip.FuelType != Constant::eFuel::Water) {
                  SetupOutputVariable(state,
                                      "Exterior Equipment Fuel Rate",
                                      Constant::Units::W,
@@ -451,7 +452,7 @@ namespace ExteriorEnergyUse {
 
             auto &exteriorEquip = state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs);
             exteriorEquip.Name = ipsc->cAlphaArgs(1);
-            exteriorEquip.FuelType = ExteriorEnergyUse::ExteriorFuelUsage::WaterUse;
+            exteriorEquip.FuelType = Constant::eFuel::Water;
             exteriorEquip.SchedPtr = GetScheduleIndex(state, ipsc->cAlphaArgs(3));
             if (exteriorEquip.SchedPtr == 0) {
                 if (ipsc->lAlphaFieldBlanks(3)) {

@@ -220,14 +220,13 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
 
     // set the availability status based on the availability manager list name
     if (allocated(ZoneComp)) {
+        auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::HybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum);
         if (state.dataHybridUnitaryAC->MyZoneEqFlag(UnitNum)) { // initialize the name of each availability manager list and zone number
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
-                state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailManagerListName;
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
+            availMgr.AvailManagerListName = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailManagerListName;
+            availMgr.ZoneNum = ZoneNum;
             state.dataHybridUnitaryAC->MyZoneEqFlag(UnitNum) = false;
         }
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailStatus =
-            ZoneComp(DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailStatus;
+        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailStatus = availMgr.AvailStatus;
     }
 
     // need to check all zone outdoor air control units to see if they are on Zone Equipment List or issue warning
@@ -672,7 +671,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                 ShowSevereEmptyField(state, eoh, cAlphaFields(15));
                 ErrorsFound = true;
             } else if ((hybridUnitaryAC.firstFuel = static_cast<Constant::eFuel>
-                        (getEnumerationValue(Constant::eFuelNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(15))))) == Constant::eFuel::Invalid) {
+                        (getEnumValue(Constant::eFuelNamesUC, UtilityRoutines::makeUPPER(Alphas(15))))) == Constant::eFuel::Invalid) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(15), Alphas(15));
                 ErrorsFound = true;
             }
@@ -681,7 +680,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             if (!lAlphaBlanks(16) &&
                 Alphas(16) != "NONE" &&
                 (hybridUnitaryAC.secondFuel = static_cast<Constant::eFuel>
-                        (getEnumerationValue(Constant::eFuelNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(16))))) == Constant::eFuel::Invalid) {
+                        (getEnumValue(Constant::eFuelNamesUC, UtilityRoutines::makeUPPER(Alphas(16))))) == Constant::eFuel::Invalid) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(16), Alphas(16));
                 ErrorsFound = true;
             }
@@ -690,7 +689,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             if (!lAlphaBlanks(17) &&
                 Alphas(17) != "NONE" &&
                 (hybridUnitaryAC.thirdFuel = static_cast<Constant::eFuel>
-                        (getEnumerationValue(Constant::eFuelNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(17))))) == Constant::eFuel::Invalid) {
+                        (getEnumValue(Constant::eFuelNamesUC, UtilityRoutines::makeUPPER(Alphas(17))))) == Constant::eFuel::Invalid) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(17), Alphas(17));
                 ErrorsFound = true;
             }

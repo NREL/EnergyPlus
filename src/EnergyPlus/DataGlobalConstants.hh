@@ -107,9 +107,10 @@ namespace Constant {
         OtherFuel1,
         OtherFuel2,
         DistrictCooling,
-        DistrictHeating,
-        Steam,
+        DistrictHeatingWater,
+        DistrictHeatingSteam,
         Water,
+        None, // used for OtherEquipment object
         EnergyTransfer,
         ElectricityProduced,
         ElectricityPurchased,
@@ -160,8 +161,10 @@ namespace Constant {
         OtherFuel1,
         OtherFuel2,
         DistrictCooling,
-        DistrictHeating,
-        Steam,
+        DistrictHeatingWater,
+        DistrictHeatingSteam,
+        Water,
+        None, // used for OtherEquipment object
         Num
     };
 
@@ -189,7 +192,7 @@ namespace Constant {
     constexpr std::array<eFuel, (int)eResource::Num> eResource2eFuel = {
         eFuel::Electricity,     eFuel::NaturalGas,      eFuel::Gasoline,   eFuel::Diesel,     eFuel::Coal,
         eFuel::Propane,         eFuel::FuelOilNo1,      eFuel::FuelOilNo2, eFuel::OtherFuel1, eFuel::OtherFuel2,
-        eFuel::DistrictCooling, eFuel::DistrictHeating, eFuel::Steam,      eFuel::Invalid,    eFuel::Invalid,
+        eFuel::DistrictCooling, eFuel::DistrictHeatingWater, eFuel::DistrictHeatingSteam,      eFuel::Invalid,    eFuel::Invalid,
         eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
         eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
         eFuel::Invalid,         eFuel::Invalid,         eFuel::Invalid,    eFuel::Invalid,    eFuel::Invalid,
@@ -211,8 +214,8 @@ namespace Constant {
         eResource::OtherFuel1,
         eResource::OtherFuel2,
         eResource::DistrictCooling,
-        eResource::DistrictHeating,
-        eResource::Steam
+        eResource::DistrictHeatingWater,
+        eResource::DistrictHeatingSteam
     };
 
     constexpr std::array<ePollutant, (int)eResource::Num> eResource2ePollutant = {
@@ -354,8 +357,8 @@ namespace Constant {
         eResourceNamesUC[(int)eFuel2eResource[(int)eFuel::OtherFuel1]],
         eResourceNamesUC[(int)eFuel2eResource[(int)eFuel::OtherFuel2]],
         eResourceNamesUC[(int)eFuel2eResource[(int)eFuel::DistrictCooling]],
-        eResourceNamesUC[(int)eFuel2eResource[(int)eFuel::DistrictHeating]],
-        eResourceNamesUC[(int)eFuel2eResource[(int)eFuel::Steam]]
+        eResourceNamesUC[(int)eFuel2eResource[(int)eFuel::DistrictHeatingWater]],
+        eResourceNamesUC[(int)eFuel2eResource[(int)eFuel::DistrictHeatingSteam]]
     };
 
     static constexpr std::array<std::string_view, (int)eFuel::Num> eFuelNames = {
@@ -370,8 +373,8 @@ namespace Constant {
         eResourceNames[(int)eFuel2eResource[(int)eFuel::OtherFuel1]],
         eResourceNames[(int)eFuel2eResource[(int)eFuel::OtherFuel2]],
         eResourceNames[(int)eFuel2eResource[(int)eFuel::DistrictCooling]],
-        eResourceNames[(int)eFuel2eResource[(int)eFuel::DistrictHeating]],
-        eResourceNames[(int)eFuel2eResource[(int)eFuel::Steam]]
+        eResourceNames[(int)eFuel2eResource[(int)eFuel::DistrictHeatingWater]],
+        eResourceNames[(int)eFuel2eResource[(int)eFuel::DistrictHeatingSteam]]
     };
 
     static constexpr std::array<std::string_view, (int)ePollutant::Num> ePollutantNamesUC = {

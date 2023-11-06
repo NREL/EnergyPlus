@@ -605,14 +605,14 @@ namespace SystemAvailabilityManager {
                     ErrorsFound = true;
                 }
 
-                nightCycleMgr.nightCycleControlType = static_cast<NightCycleControlType>(
-                    getEnumerationValue(NightCycleControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
+                nightCycleMgr.nightCycleControlType =
+                    static_cast<NightCycleControlType>(getEnumValue(NightCycleControlTypeNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(4))));
 
                 assert(nightCycleMgr.nightCycleControlType != NightCycleControlType::Invalid);
 
                 // Cycling Run Time Control Type
-                nightCycleMgr.cyclingRunTimeControl = static_cast<CyclingRunTimeControl>(
-                    getEnumerationValue(CyclingRunTimeControlNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(5))));
+                nightCycleMgr.cyclingRunTimeControl =
+                    static_cast<CyclingRunTimeControl>(getEnumValue(CyclingRunTimeControlNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(5))));
 
                 assert(nightCycleMgr.cyclingRunTimeControl != CyclingRunTimeControl::Invalid);
 
@@ -808,8 +808,8 @@ namespace SystemAvailabilityManager {
 
                 optimumStartMgr.MaxOptStartTime = rNumericArgs(1);
 
-                optimumStartMgr.optimumStartControlType = static_cast<OptimumStartControlType>(
-                    getEnumerationValue(OptimumStartControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
+                optimumStartMgr.optimumStartControlType =
+                    static_cast<OptimumStartControlType>(getEnumValue(OptimumStartControlTypeNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(4))));
 
                 if (optimumStartMgr.optimumStartControlType == OptimumStartControlType::Invalid) {
                     optimumStartMgr.optimumStartControlType = OptimumStartControlType::ControlZone;
@@ -848,7 +848,7 @@ namespace SystemAvailabilityManager {
                 }
 
                 optimumStartMgr.controlAlgorithm =
-                    static_cast<ControlAlgorithm>(getEnumerationValue(ControlAlgorithmNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(7))));
+                    static_cast<ControlAlgorithm>(getEnumValue(ControlAlgorithmNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(7))));
 
                 assert(optimumStartMgr.controlAlgorithm != ControlAlgorithm::Invalid);
 
@@ -1319,7 +1319,7 @@ namespace SystemAvailabilityManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 ++Item;
                 auto const &objectFields = instance.value();
-                std::string const thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const thisObjectName = UtilityRoutines::makeUPPER(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
                 auto &mgrList = state.dataSystemAvailabilityManager->ListData(Item);
                 mgrList.Name = thisObjectName;
@@ -1345,7 +1345,7 @@ namespace SystemAvailabilityManager {
                         std::string availManagerObjType =
                             ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_object_type");
                         mgrList.AvailManagerType(listItem) = static_cast<DataPlant::SystemAvailabilityType>(
-                            getEnumerationValue(SystemAvailabilityTypeNamesUC, UtilityRoutines::MakeUPPERCase(availManagerObjType)));
+                            getEnumValue(SystemAvailabilityTypeNamesUC, UtilityRoutines::makeUPPER(availManagerObjType)));
                         if (mgrList.AvailManagerType(listItem) == DataPlant::SystemAvailabilityType::HybridVent)
                             mgrList.AvailManagerType(listItem) = DataPlant::SystemAvailabilityType::Invalid;
                         // these are validated individually in the GetPlant, GetSystem and GetZoneEq lists
@@ -4703,7 +4703,7 @@ namespace SystemAvailabilityManager {
                 // Enthalpy control
             } break;
             case HybridVentMode_Enth: {
-                ZoneAirEnthalpy = PsyHFnTdbW(thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat);
+                ZoneAirEnthalpy = PsyHFnTdbW(thisZoneHB.MAT, thisZoneHB.airHumRat);
                 if (state.dataEnvrn->OutEnthalpy >= hybridVentMgr.MinOutdoorEnth && state.dataEnvrn->OutEnthalpy <= hybridVentMgr.MaxOutdoorEnth) {
                     hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
                 } else {
@@ -4874,8 +4874,8 @@ namespace SystemAvailabilityManager {
 
                 // Dew point control mode
                 if (hybridVentMgr.ControlMode == HybridVentMode_DewPoint) {
-                    ZoneAirRH = PsyRhFnTdbWPb(state, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat, state.dataEnvrn->OutBaroPress) * 100.0;
-                    ZoneAirDewPoint = PsyTdpFnWPb(state, thisZoneHB.ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
+                    ZoneAirRH = PsyRhFnTdbWPb(state, thisZoneHB.MAT, thisZoneHB.airHumRat, state.dataEnvrn->OutBaroPress) * 100.0;
+                    ZoneAirDewPoint = PsyTdpFnWPb(state, thisZoneHB.airHumRat, state.dataEnvrn->OutBaroPress);
                     if (state.dataZoneCtrls->NumHumidityControlZones == 0) {
                         ++hybridVentMgr.DewPointNoRHErrCount;
                         if (hybridVentMgr.DewPointNoRHErrCount < 2) {

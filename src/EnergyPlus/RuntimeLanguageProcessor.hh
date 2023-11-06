@@ -218,6 +218,7 @@ struct RuntimeLanguageProcessorData : BaseGlobalStruct
     Array1D_int CurveIndexVariableNums;
     Array1D_int ConstructionIndexVariableNums;
     int YearVariableNum = 0;
+    int CalendarYearVariableNum = 0;
     int MonthVariableNum = 0;
     int DayOfMonthVariableNum = 0;
     int DayOfWeekVariableNum = 0;
@@ -259,6 +260,7 @@ struct RuntimeLanguageProcessorData : BaseGlobalStruct
         this->CurveIndexVariableNums.clear();
         this->ConstructionIndexVariableNums.clear();
         this->YearVariableNum = 0;
+        this->CalendarYearVariableNum = 0;
         this->MonthVariableNum = 0;
         this->DayOfMonthVariableNum = 0;
         this->DayOfWeekVariableNum = 0;

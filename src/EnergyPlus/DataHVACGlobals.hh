@@ -173,6 +173,23 @@ namespace DataHVACGlobals {
     int constexpr BypassWhenWithinEconomizerLimits(0);   // heat recovery controlled by economizer limits
     int constexpr BypassWhenOAFlowGreaterThanMinimum(1); // heat recovery ON at minimum OA in economizer mode
 
+    enum class EconomizerStagingType
+    // OA Controller Economizer Staging
+    {
+        Invalid = -1,
+        EconomizerFirst,                  // system air flow rate and economizer is ramped-up before using mechanical cooling
+        InterlockedWithMechanicalCooling, // economizer operation (flow rate) depends on the cooling speed chosen by the system
+        Num
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(DataHVACGlobals::EconomizerStagingType::Num)> EconomizerStagingTypeUC = {
+        "ECONOMIZERFIRST",
+        "INTERLOCKEDWITHMECHANICALCOOLING",
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(DataHVACGlobals::EconomizerStagingType::Num)> EconomizerStagingTypeCC = {
+        "EconomizerFirst",
+        "InterlockedWithMechanicalCooling",
+    };
+
     // parameters describing unitary systems
     int constexpr NumUnitarySystemTypes(7);
     // Furnace/Unitary System Types
@@ -373,54 +390,12 @@ namespace DataHVACGlobals {
     // Parameters for HVACSystemRootFindingAlgorithm
     int constexpr Bisection(2);
 
-    int constexpr NumZoneHVACTerminalTypes = 38;
-    int constexpr ZoneEquipTypeOf_VariableRefrigerantFlow(1);
-    int constexpr ZoneEquipTypeOf_EnergyRecoveryVentilator(2);
-    int constexpr ZoneEquipTypeOf_FourPipeFanCoil(3);
-    int constexpr ZoneEquipTypeOf_OutdoorAirUnit(4);
-    int constexpr ZoneEquipTypeOf_PackagedTerminalAirConditioner(5);
-    int constexpr ZoneEquipTypeOf_PackagedTerminalHeatPump(6);
-    int constexpr ZoneEquipTypeOf_UnitHeater(7);
-    int constexpr ZoneEquipTypeOf_UnitVentilator(8);
-    int constexpr ZoneEquipTypeOf_VentilatedSlab(9);
-    int constexpr ZoneEquipTypeOf_WaterToAirHeatPump(10);
-    int constexpr ZoneEquipTypeOf_WindowAirConditioner(11);
-    int constexpr ZoneEquipTypeOf_BaseboardRadiantConvectiveElectric(12);
-    int constexpr ZoneEquipTypeOf_BaseboardRadiantConvectiveWater(13);
-    int constexpr ZoneEquipTypeOf_BaseboardRadiantConvectiveSteam(14);
-    int constexpr ZoneEquipTypeOf_BaseboardConvectiveElectric(15);
-    int constexpr ZoneEquipTypeOf_BaseboardConvectiveWater(16);
-    int constexpr ZoneEquipTypeOf_HighTemperatureRadiant(17);
-    int constexpr ZoneEquipTypeOf_DehumidifierDX(18);
-    int constexpr ZoneEquipTypeOf_IdealLoadsAirSystem(19);
-    int constexpr ZoneEquipTypeOf_RefrigerationChillerSet(20);
-    int constexpr ZoneEquipTypeOf_HybridUnitaryAirConditioners(21);
-    int constexpr ZoneEquipTypeOf_FanZoneExhaust(22);
-    int constexpr ZoneEquipTypeOf_WaterHeaterHeatPump(23);
-    int constexpr ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume(24);
-    int constexpr ZoneEquipTypeOf_AirTerminalDualDuctVAV(25);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat(26);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeNoReheat(27);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat(28);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat(29);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat(30);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctParallelPIUReheat(31);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctCAVFourPipeInduction(32);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan(33);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolReheat(34);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolNoReheat(35);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeCooledBeam(36);
-    int constexpr ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir(37);
-    int constexpr ZoneEquipTypeOf_AirLoopHVACReturnAir(38);
-
     int constexpr MaxSpeedLevels = 10;
 
     extern Array1D_string const cFanTypes;
     extern Array1D_string const cAllCoilTypes;
     extern Array1D_string const cCoolingCoilTypes;
     extern Array1D_string const cHeatingCoilTypes;
-    extern Array1D_string const ccZoneHVACTerminalTypes;
-    extern Array1D_string const ZoneHVACTerminalTypes;
     extern Array1D_string const cATMixerTypes;
     extern Array1D_string const cVRFTUTypes;
     extern Array1D_string const cVRFHeatingPerformanceOATTypes;
@@ -502,16 +477,18 @@ struct HVACGlobalsData : BaseGlobalStruct
     Real64 MSHPWasteHeat = 0.0;             // Waste heat
     Real64 PreviousTimeStep = 0.0;          // The time step length at the previous time step
     bool ShortenTimeStepSysRoomAir = false; // Logical flag that triggers shortening of system time step
+    // For multispeed unitary systems
+    Real64 MSUSEconoSpeedNum = 0; // Economizer speed
 
     Real64 deviationFromSetPtThresholdHtg = -0.2; // heating threshold for reporting setpoint deviation
     Real64 deviationFromSetPtThresholdClg = 0.2;  // cooling threshold for reporting setpoint deviation
 
-    bool SimAirLoopsFlag;                   // True when the air loops need to be (re)simulated
-    bool SimElecCircuitsFlag;               // True when electic circuits need to be (re)simulated
-    bool SimPlantLoopsFlag;                 // True when the main plant loops need to be (re)simulated
-    bool SimZoneEquipmentFlag;              // True when zone equipment components need to be (re)simulated
-    bool SimNonZoneEquipmentFlag;           // True when non-zone equipment components need to be (re)simulated
-    bool ZoneMassBalanceHVACReSim;          // True when zone air mass flow balance and air loop needs (re)simulated
+    bool SimAirLoopsFlag = false;           // True when the air loops need to be (re)simulated
+    bool SimElecCircuitsFlag = false;       // True when electic circuits need to be (re)simulated
+    bool SimPlantLoopsFlag = false;         // True when the main plant loops need to be (re)simulated
+    bool SimZoneEquipmentFlag = false;      // True when zone equipment components need to be (re)simulated
+    bool SimNonZoneEquipmentFlag = false;   // True when non-zone equipment components need to be (re)simulated
+    bool ZoneMassBalanceHVACReSim = false;  // True when zone air mass flow balance and air loop needs (re)simulated
     int MinAirLoopIterationsAfterFirst = 1; // minimum number of HVAC iterations after FirstHVACIteration
 
     Array1D<Real64> MaxRatedVolFlowPerRatedTotCap =
@@ -575,7 +552,7 @@ struct HVACGlobalsData : BaseGlobalStruct
 
     void clear_state() override
     {
-        *this = HVACGlobalsData();
+        new (this) HVACGlobalsData();
     }
 };
 

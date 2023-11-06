@@ -232,7 +232,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             state.dataSQLiteProcedures->sqlite->addVentilationData(ventNum, state.dataHeatBal->Ventilation(ventNum));
         }
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            state.dataSQLiteProcedures->sqlite->addRoomAirModelData(zoneNum, state.dataRoomAirMod->AirModel(zoneNum));
+            state.dataSQLiteProcedures->sqlite->addRoomAirModelData(zoneNum, state.dataRoomAir->AirModel(zoneNum));
         }
 
         state.dataSQLiteProcedures->sqlite->createZoneExtendedOutput();
@@ -1602,6 +1602,7 @@ void SQLite::createSQLiteTimeIndexRecord(int const reportingInterval,
                                          int const cumlativeSimulationDays,
                                          int const curEnvirNum,
                                          int const simulationYear,
+                                         bool const curYearIsLeapYear,
                                          ObjexxFCL::Optional_int_const month,
                                          ObjexxFCL::Optional_int_const dayOfMonth,
                                          ObjexxFCL::Optional_int_const hour,
@@ -1615,7 +1616,10 @@ void SQLite::createSQLiteTimeIndexRecord(int const reportingInterval,
         int intStartMinute = 0;
         int intervalInMinutes = 60;
 
-        static const std::vector<int> lastDayOfMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        static std::vector<int> lastDayOfMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        if (curYearIsLeapYear) {
+            lastDayOfMonth[1] = 29;
+        }
 
         switch (reportingInterval) {
         case LocalReportEach:
@@ -2239,7 +2243,7 @@ void SQLite::addVentilationData(int const number, DataHeatBalance::VentilationDa
 {
     ventilations.push_back(std::make_unique<Ventilation>(m_errorStream, m_db, number, ventilationData));
 }
-void SQLite::addRoomAirModelData(int const number, DataRoomAirModel::AirModelData const &roomAirModelData)
+void SQLite::addRoomAirModelData(int const number, RoomAir::AirModelData const &roomAirModelData)
 {
     roomAirModels.push_back(std::make_unique<RoomAirModel>(m_errorStream, m_db, number, roomAirModelData));
 }
@@ -2509,7 +2513,7 @@ bool SQLite::RoomAirModel::insertIntoSQLite(sqlite3_stmt *insertStmt)
 {
     sqliteBindInteger(insertStmt, 1, number);
     sqliteBindText(insertStmt, 2, airModelName);
-    sqliteBindInteger(insertStmt, 3, static_cast<int>(airModelType));
+    sqliteBindInteger(insertStmt, 3, static_cast<int>(airModel));
     sqliteBindInteger(insertStmt, 4, static_cast<int>(tempCoupleScheme));
     sqliteBindLogical(insertStmt, 5, simAirModel);
 

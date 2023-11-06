@@ -179,7 +179,6 @@ if(OPENGL_FOUND)
       OFF
       CACHE BOOL "" FORCE)
   add_subdirectory(penumbra)
-  set_target_properties(awning PROPERTIES FOLDER ThirdParty/Penumbra)
   set_target_properties(glfw PROPERTIES FOLDER ThirdParty/Penumbra/GLFW)
   set_target_properties(glad PROPERTIES FOLDER ThirdParty/Penumbra)
   set_target_properties(penumbra PROPERTIES FOLDER ThirdParty/Penumbra)

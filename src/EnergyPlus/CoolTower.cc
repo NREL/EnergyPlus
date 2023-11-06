@@ -233,7 +233,7 @@ namespace CoolTower {
 
             {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType =
-                    static_cast<FlowCtrl>(getEnumerationValue(FlowCtrlNamesUC, state.dataIPShortCut->cAlphaArgs(5))); // Type of flow control
+                    static_cast<FlowCtrl>(getEnumValue(FlowCtrlNamesUC, state.dataIPShortCut->cAlphaArgs(5))); // Type of flow control
                 if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType == FlowCtrl::Invalid) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=\"{}\".",
@@ -718,7 +718,7 @@ namespace CoolTower {
                 thisZoneHB.CTMFL = thisZoneHB.MCPC / AirSpecHeat;
 
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SenHeatPower = thisZoneHB.MCPC * std::abs(thisZoneHB.ZT - OutletTemp);
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatPower = CVF_ZoneNum * std::abs(thisZoneHB.ZoneAirHumRat - OutletHumRat);
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatPower = CVF_ZoneNum * std::abs(thisZoneHB.airHumRat - OutletHumRat);
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletTemp = OutletTemp;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletHumRat = OutletHumRat;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRate = CVF_ZoneNum;

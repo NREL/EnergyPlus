@@ -588,10 +588,6 @@ namespace Furnaces {
                                                                 thisFurnace.CoolingCoilSensDemand,
                                                                 thisFurnace.CoolingCoilLatentDemand,
                                                                 thisFurnace.OpMode,
-                                                                thisFurnace.WSHPRuntimeFrac,
-                                                                thisFurnace.MaxONOFFCyclesperHour,
-                                                                thisFurnace.HPTimeConstant,
-                                                                thisFurnace.FanDelayTime,
                                                                 CompressorOp,
                                                                 thisFurnace.CoolPartLoadRatio,
                                                                 FirstHVACIteration);
@@ -601,10 +597,6 @@ namespace Furnaces {
                                                                 thisFurnace.HeatingCoilSensDemand,
                                                                 Dummy,
                                                                 thisFurnace.OpMode,
-                                                                thisFurnace.WSHPRuntimeFrac,
-                                                                thisFurnace.MaxONOFFCyclesperHour,
-                                                                thisFurnace.HPTimeConstant,
-                                                                thisFurnace.FanDelayTime,
                                                                 CompressorOp,
                                                                 thisFurnace.HeatPartLoadRatio,
                                                                 FirstHVACIteration);
@@ -4524,26 +4516,15 @@ namespace Furnaces {
             }
             // Set the heat pump cooling coil convergence
             thisFurnace.CoolingConvergenceTolerance = Numbers(3);
-            // Set the heatpump cycling rate
-            thisFurnace.MaxONOFFCyclesperHour = Numbers(4);
-
-            // Set the heat pump time constant
-            thisFurnace.HPTimeConstant = Numbers(5);
-
-            // Set the heat pump on-cycle power use fraction
-            thisFurnace.OnCyclePowerFraction = Numbers(6);
-
-            // Set the heat pump fan delay time
-            thisFurnace.FanDelayTime = Numbers(7);
 
             // Set the heatpump design supplemental heating capacity
             //  Get from coil module.
 
             // Set the heatpump max outlet temperature
-            thisFurnace.DesignMaxOutletTemp = Numbers(8);
+            thisFurnace.DesignMaxOutletTemp = Numbers(4);
 
             // Set maximum supply air temperature for supplemental heating coil
-            thisFurnace.MaxOATSuppHeat = Numbers(9);
+            thisFurnace.MaxOATSuppHeat = Numbers(5);
 
             // set minimum outdoor temperature for compressor operation
             SetMinOATCompressor(state, FurnaceNum, cCurrentModuleObject, ErrorsFound);
@@ -5127,7 +5108,6 @@ namespace Furnaces {
             thisFurnace.MaxCoolAirMassFlow = thisFurnace.MaxCoolAirVolFlow * state.dataEnvrn->StdRhoAir;
             thisFurnace.MaxHeatAirMassFlow = thisFurnace.MaxHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
             thisFurnace.MaxNoCoolHeatAirMassFlow = thisFurnace.MaxNoCoolHeatAirVolFlow * state.dataEnvrn->StdRhoAir;
-            thisFurnace.WSHPRuntimeFrac = 0.0;
             thisFurnace.CompPartLoadRatio = 0.0;
             thisFurnace.CoolingCoilSensDemand = 0.0;
             thisFurnace.CoolingCoilLatentDemand = 0.0;
@@ -6118,10 +6098,6 @@ namespace Furnaces {
                                                             thisFurnace.CoolingCoilSensDemand,
                                                             thisFurnace.CoolingCoilLatentDemand,
                                                             0,
-                                                            0.0,
-                                                            thisFurnace.MaxONOFFCyclesperHour,
-                                                            thisFurnace.HPTimeConstant,
-                                                            thisFurnace.FanDelayTime,
                                                             DataHVACGlobals::CompressorOperation::Off,
                                                             0.0,
                                                             FirstHVACIteration); // CoolPartLoadRatio
@@ -6132,10 +6108,6 @@ namespace Furnaces {
                                                                 thisFurnace.HeatingCoilSensDemand,
                                                                 dummy,
                                                                 0.0,
-                                                                0.0,
-                                                                thisFurnace.MaxONOFFCyclesperHour,
-                                                                thisFurnace.HPTimeConstant,
-                                                                thisFurnace.FanDelayTime,
                                                                 DataHVACGlobals::CompressorOperation::Off,
                                                                 0.0,
                                                                 FirstHVACIteration);
@@ -6155,9 +6127,6 @@ namespace Furnaces {
                                                           BlankString,
                                                           thisFurnace.CoolingCoilIndex,
                                                           0,
-                                                          thisFurnace.MaxONOFFCyclesperHour,
-                                                          thisFurnace.HPTimeConstant,
-                                                          thisFurnace.FanDelayTime,
                                                           DataHVACGlobals::CompressorOperation::Off,
                                                           0.0,
                                                           1,
@@ -6199,9 +6168,6 @@ namespace Furnaces {
                                                               BlankString,
                                                               thisFurnace.HeatingCoilIndex,
                                                               0,
-                                                              thisFurnace.MaxONOFFCyclesperHour,
-                                                              thisFurnace.HPTimeConstant,
-                                                              thisFurnace.FanDelayTime,
                                                               DataHVACGlobals::CompressorOperation::Off,
                                                               0.0,
                                                               1,
@@ -6929,7 +6895,6 @@ namespace Furnaces {
 
                     // Set the input parameters for CalcFurnaceOutput
                     thisFurnace.CompPartLoadRatio = 0.0; // compressor off
-                    thisFurnace.WSHPRuntimeFrac = 0.0;
 
                     CalcFurnaceOutput(state,
                                       FurnaceNum,
@@ -6949,7 +6914,6 @@ namespace Furnaces {
                     state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = thisFurnace.MdotFurnace;
 
                     thisFurnace.CompPartLoadRatio = 1.0; // compressor ON
-                    thisFurnace.WSHPRuntimeFrac = 1.0;
 
                     // Set fan part-load fraction equal to 1 while getting full load result
                     state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
@@ -7410,7 +7374,6 @@ namespace Furnaces {
                 PartLoadRatio = 0.0;
 
                 thisFurnace.CompPartLoadRatio = 0.0; // compressor off
-                thisFurnace.WSHPRuntimeFrac = 0.0;
 
                 //     SetAverageAirFlow calculates the operating mass flow rate based on PLR and the user specified inputs
                 //     for MaxCoolAirMassFlow and MaxNoCoolHeatAirMassFlow.
@@ -7453,7 +7416,6 @@ namespace Furnaces {
                     OnOffAirFlowRatio = 1.0;
                     PartLoadRatio = 1.0;
                     thisFurnace.CompPartLoadRatio = 1.0; // compressor ON
-                    thisFurnace.WSHPRuntimeFrac = 1.0;
 
                     // Get full load result (coils simulated full ON)
                     CalcFurnaceOutput(state,
@@ -7644,7 +7606,6 @@ namespace Furnaces {
                             state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
                             OnOffAirFlowRatio = 1.0;
                             thisFurnace.CompPartLoadRatio = 1.0; // compressor ON
-                            thisFurnace.WSHPRuntimeFrac = 1.0;
 
                             // Get full load result (coils simulated full ON)
                             CalcFurnaceOutput(state,
@@ -8190,7 +8151,6 @@ namespace Furnaces {
             thisFurnace.CoolingCoilSensDemand = 0.0;
             thisFurnace.CompPartLoadRatio = 0.0; // compressor off
             thisFurnace.InitHeatPump = true;     // initialization call to Calc Furnace
-            thisFurnace.WSHPRuntimeFrac = 0.0;
             CoolPartLoadRatio = 0.0;
 
             // Get no load result in order to calculate the effect of the fan and the mixed air equipment
@@ -8211,7 +8171,6 @@ namespace Furnaces {
             // Set the input parameters for CalcFurnaceOutput
             thisFurnace.CoolingCoilSensDemand = 1.0;
             thisFurnace.CompPartLoadRatio = 1.0; // compressor ON
-            thisFurnace.WSHPRuntimeFrac = 1.0;
             CoolPartLoadRatio = 1.0;
 
             // Get full load result in order to estimate the operating part load ratio for continuous fan operation
@@ -8258,7 +8217,6 @@ namespace Furnaces {
             } else if (ZoneSensLoadMetFanONCompOFF < TotalZoneSensLoad) {
                 CoolPartLoadRatio = 0.0;
                 thisFurnace.CompPartLoadRatio = 0.0; // compressor OFF
-                thisFurnace.WSHPRuntimeFrac = 0.0;
                 thisFurnace.CoolingCoilSensDemand = 0.0;
                 CalcFurnaceOutput(state,
                                   FurnaceNum,
@@ -8392,7 +8350,6 @@ namespace Furnaces {
             thisFurnace.CoolingCoilSensDemand = 0.0;
             thisFurnace.CompPartLoadRatio = 0.0; // compressor off
             thisFurnace.InitHeatPump = true;     // initialization call to Calc Furnace
-            thisFurnace.WSHPRuntimeFrac = 0.0;
             HeatPartLoadRatio = 0.0;
 
             // Get no load result in order to calculate the effect of the fan and the mixed air equipment
@@ -8413,7 +8370,6 @@ namespace Furnaces {
             // Set the input parameters for CalcFurnaceOutput
             thisFurnace.HeatingCoilSensDemand = 1.0;
             thisFurnace.CompPartLoadRatio = 1.0; // compressor ON
-            thisFurnace.WSHPRuntimeFrac = 1.0;
             HeatPartLoadRatio = 1.0;
 
             // Get full load result in order to estimate the operating part load ratio for continuous fan operation
@@ -8463,7 +8419,6 @@ namespace Furnaces {
                 HeatPartLoadRatio = 0.0;
                 ZoneSensLoadMet = ZoneSensLoadMetFanONCompOFF;
                 thisFurnace.CompPartLoadRatio = 0.0; // compressor ON
-                thisFurnace.WSHPRuntimeFrac = 0.0;
                 CalcFurnaceOutput(state,
                                   FurnaceNum,
                                   FirstHVACIteration,
@@ -8703,8 +8658,7 @@ namespace Furnaces {
         auto &thisFurnace = state.dataFurnaces->Furnace(FurnaceNum);
         auto &inletNode = state.dataLoopNodes->Node(thisFurnace.FurnaceInletNodeNum);
         int CoolingCoilType_Num = thisFurnace.CoolingCoilType_Num;
-        Real64 QActual = 0.0;                                 // heating coil load met or delivered
-        Real64 WSHPRuntimeFrac = thisFurnace.WSHPRuntimeFrac; // Compressor runtime fraction
+        Real64 QActual = 0.0; // heating coil load met or delivered
         state.dataFurnaces->ModifiedHeatCoilLoad = 0.0;
 
         state.dataFurnaces->CoolHeatPLRRat = CoolingHeatingPLRRatio;
@@ -8827,10 +8781,6 @@ namespace Furnaces {
                                                                 thisFurnace.CoolingCoilSensDemand,
                                                                 thisFurnace.CoolingCoilLatentDemand,
                                                                 FanOpMode,
-                                                                WSHPRuntimeFrac,
-                                                                thisFurnace.MaxONOFFCyclesperHour,
-                                                                thisFurnace.HPTimeConstant,
-                                                                thisFurnace.FanDelayTime,
                                                                 CompressorOp,
                                                                 CoolPartLoadRatio,
                                                                 FirstHVACIteration); // CoolPartLoadRatio
@@ -8842,10 +8792,6 @@ namespace Furnaces {
                                                                 thisFurnace.HeatingCoilSensDemand,
                                                                 Dummy,
                                                                 FanOpMode,
-                                                                WSHPRuntimeFrac,
-                                                                thisFurnace.MaxONOFFCyclesperHour,
-                                                                thisFurnace.HPTimeConstant,
-                                                                thisFurnace.FanDelayTime,
                                                                 CompressorOp,
                                                                 HeatPartLoadRatio,
                                                                 FirstHVACIteration); // HeatPartLoadRatio
@@ -8860,10 +8806,6 @@ namespace Furnaces {
                                                             thisFurnace.CoolingCoilSensDemand,
                                                             thisFurnace.CoolingCoilLatentDemand,
                                                             FanOpMode,
-                                                            WSHPRuntimeFrac,
-                                                            thisFurnace.MaxONOFFCyclesperHour,
-                                                            thisFurnace.HPTimeConstant,
-                                                            thisFurnace.FanDelayTime,
                                                             CompressorOp,
                                                             CoolPartLoadRatio,
                                                             FirstHVACIteration); // CoolPartLoadRatio
@@ -8875,10 +8817,6 @@ namespace Furnaces {
                                                             thisFurnace.HeatingCoilSensDemand,
                                                             Dummy,
                                                             FanOpMode,
-                                                            WSHPRuntimeFrac,
-                                                            thisFurnace.MaxONOFFCyclesperHour,
-                                                            thisFurnace.HPTimeConstant,
-                                                            thisFurnace.FanDelayTime,
                                                             CompressorOp,
                                                             HeatPartLoadRatio,
                                                             FirstHVACIteration); // HeatPartLoadRatio
@@ -8908,10 +8846,6 @@ namespace Furnaces {
                                                 thisFurnace.DesignMassFlowRate,
                                                 FanOpMode,
                                                 FirstHVACIteration,
-                                                WSHPRuntimeFrac,
-                                                thisFurnace.MaxONOFFCyclesperHour,
-                                                thisFurnace.HPTimeConstant,
-                                                thisFurnace.FanDelayTime,
                                                 thisFurnace.InitHeatPump,
                                                 thisFurnace.CoolingCoilSensDemand,
                                                 thisFurnace.CoolingCoilLatentDemand,
@@ -8924,10 +8858,6 @@ namespace Furnaces {
                                                 thisFurnace.DesignMassFlowRate,
                                                 FanOpMode,
                                                 FirstHVACIteration,
-                                                WSHPRuntimeFrac,
-                                                thisFurnace.MaxONOFFCyclesperHour,
-                                                thisFurnace.HPTimeConstant,
-                                                thisFurnace.FanDelayTime,
                                                 thisFurnace.InitHeatPump,
                                                 thisFurnace.HeatingCoilSensDemand,
                                                 Dummy,
@@ -9104,7 +9034,6 @@ namespace Furnaces {
         Real64 SensibleLoadMet;        // Sensible cooling load met (furnace outlet with respect to control zone temp)
         Real64 LatentLoadMet;          // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
         Real64 OnOffAirFlowRatio;      // Ratio of compressor ON air mass flow to AVERAGE air mass flow over time step
-        Real64 RuntimeFrac;            // heat pump runtime fraction
         Real64 CoolingHeatingPLRRatio; // ratio of cooling PLR to heating PLR, used for cycling fan RH control
         bool HXUnitOn;                 // flag to enable HX based on zone moisture load
 
@@ -9138,10 +9067,7 @@ namespace Furnaces {
 
         //  OnOffAirFlowRatio = Par(8)
         if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == DataHVACGlobals::UnitarySys_HeatPump_WaterToAir) {
-            bool errFlag = false;
-            HeatPumpRunFrac(state, FurnaceNum, PartLoadRatio, errFlag, RuntimeFrac);
             state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = PartLoadRatio;
-            state.dataFurnaces->Furnace(FurnaceNum).WSHPRuntimeFrac = RuntimeFrac;
         }
 
         if (par9_HXOnFlag == 1.0) {
@@ -9218,8 +9144,6 @@ namespace Furnaces {
         Real64 HeatCoilLoad;      // Heating coil load for gas heater
         Real64 ZoneSensLoadMet;   // Sensible cooling load met (furnace outlet with respect to control zone temp)
         Real64 ZoneLatLoadMet;    // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
-        bool errFlag;
-        Real64 RuntimeFrac;
         Real64 Dummy;
         Real64 HPCoilSensDemand;
         Real64 OnOffAirFlowRatio;
@@ -9236,39 +9160,40 @@ namespace Furnaces {
         //        Real64 ZoneSensLoadMetFanONCompOFF = Par[7];
         //        Real64 par9_HXUnitOne = Par[8];
 
+        int CoilIndex;
         if (par6_loadTypeFlag == 1.0) {
             CoolPartLoadRatio = PartLoadRatio;
             HeatPartLoadRatio = 0.0;
             HeatCoilLoad = 0.0;
+            CoilIndex = state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex;
         } else {
             CoolPartLoadRatio = 0.0;
             HeatPartLoadRatio = PartLoadRatio;
+            CoilIndex = state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex;
         }
 
-        // calculate the run time fraction
-        HeatPumpRunFrac(state, FurnaceNum, PartLoadRatio, errFlag, RuntimeFrac);
-
-        // update the fan part load factor
-        // see 'Note' under INITIAL CALCULATIONS
-        if (par6_loadTypeFlag == 1.0) {
-            if (RuntimeFrac > 0.0) {
-                state.dataHVACGlobal->OnOffFanPartLoadFraction = CoolPartLoadRatio / RuntimeFrac;
-            } else {
-                state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-            }
-        } else {
-            if (RuntimeFrac > 0.0) {
-                state.dataHVACGlobal->OnOffFanPartLoadFraction = PartLoadRatio / RuntimeFrac;
-                //   Else IF(RuntimeFrac == 0.0d0)THEN
-                //     OnOffFanPartLoadFraction = 0.0
-            } else {
-                state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-            }
+        // Get child component RuntimeFrac
+        Real64 RuntimeFrac;
+        switch (state.dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType) {
+        case DataHVACGlobals::WatertoAir_Simple: {
+            RuntimeFrac = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(CoilIndex).RunFrac;
+            break;
         }
+        case DataHVACGlobals::WatertoAir_ParEst: {
+            RuntimeFrac = state.dataWaterToAirHeatPump->WatertoAirHP(CoilIndex).RunFrac;
+            break;
+        }
+        case DataHVACGlobals::WatertoAir_VarSpeedEquationFit: {
+            RuntimeFrac = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).RunFrac;
+            break;
+        }
+        default:
+            RuntimeFrac = 1.0; // Programming error. Assert failure?
+        }
+
         state.dataFurnaces->OnOffFanPartLoadFractionSave = state.dataHVACGlobal->OnOffFanPartLoadFraction;
         // update fan and compressor run times
         state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = PartLoadRatio;
-        state.dataFurnaces->Furnace(FurnaceNum).WSHPRuntimeFrac = RuntimeFrac;
 
         // Calculate the heating coil demand as (the zone sensible load - load met by fan heat and mixed air)
         // Note; The load met by fan heat and mixed air is calculated as mdot(zoneinletenthalpy-zoneoutletenthalpy)
@@ -9371,107 +9296,6 @@ namespace Furnaces {
 
         state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace = state.dataFurnaces->CompOnMassFlow;
         state.dataFurnaces->OnOffAirFlowRatioSave = OnOffAirFlowRatio;
-    }
-
-    void HeatPumpRunFrac(EnergyPlusData &state,
-                         int const FurnaceNum, // Furnace Index Number
-                         Real64 const PLR,     // part load ratio
-                         bool &errFlag,        // part load factor out of range flag
-                         Real64 &RuntimeFrac   // the required run time fraction to meet part load
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Kenneth Tang
-        //       DATE WRITTEN   Apr 2004
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine calculates the PLF based on the PLR. Parameters required are
-        // thermostat cycling rate (Nmax), heat pump time constant (tau), and the fraction
-        // of on-cycle power use (pr)
-
-        // REFERENCES:
-        // (1) Henderson, H. I., K. Rengarajan.1996. A Model to predict the latent capacity
-        // of air conditioners and heat pumps at part-load conditions with constant fan
-        // operation. ASHRAE Transactions 102 (1): 266-274
-
-        // (2) Henderson, H.I. Jr., Y.J. Huang and Danny Parker. 1999. Residential Equipment
-        // Part Load Curves for Use in DOE-2.  Environmental Energy Technologies Division,
-        // Ernest Orlando Lawrence Berkeley National Laboratory.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 PartLoadFactor; // Part load factor
-        Real64 PLF2;           // (i+1)th term of part load factor
-        Real64 A;              // Variable for simplify equation
-
-        Real64 Nmax = state.dataFurnaces->Furnace(FurnaceNum).MaxONOFFCyclesperHour;
-        Real64 tau = state.dataFurnaces->Furnace(FurnaceNum).HPTimeConstant;
-        Real64 pr = state.dataFurnaces->Furnace(FurnaceNum).OnCyclePowerFraction;
-
-        // Initialize
-        errFlag = false;
-        Real64 error = 1.0;
-        int NumIteration = 0;
-
-        // Initial guess for part load fraction
-        Real64 PLF1 = 1.0;
-
-        // Calculate PLF using successive substitution until convergence is achieved
-        while (true) {
-            ++NumIteration;
-
-            if (PLR == 1) {
-                // Set part load fraction, PLF1=1.0 if PLR=1.0 and exit loop
-                PLF1 = 1.0;
-                goto LOOPPLF_exit;
-            }
-
-            if (NumIteration > 100) {
-                // Exit loop if interation exceed 100
-                errFlag = true;
-                PLF1 = 1.0;
-                goto LOOPPLF_exit;
-            }
-
-            if (error < 0.00001) {
-                // Exit loop if convergence is achieved
-                goto LOOPPLF_exit;
-
-            } else {
-                // Calculate PLF
-                A = 4.0 * tau * (Nmax / 3600.0) * (1 - PLR / PLF1);
-                if (A < 1.5e-3) {
-                    // A safety check to prevent PLF2 = 1 - A * (1 - Exp(-1 / A))
-                    // from "float underflow error". Occurs when PLR is very close to 1.0,
-                    // small A value, thus Exp(-1/A) = 0
-                    PLF2 = 1 - A;
-                } else {
-                    PLF2 = 1.0 - A * (1.0 - std::exp(-1.0 / A));
-                }
-                error = std::abs((PLF2 - PLF1) / PLF1);
-                PLF1 = PLF2;
-            }
-        }
-    LOOPPLF_exit:;
-
-        // Adjust PLF for the off cycle power consumption if
-        // on-cycle power use is specified by the user
-        if (pr > 0.0) {
-            PartLoadFactor = PLR / ((PLR / PLF1) + (1 - PLR / PLF1) * pr);
-        } else {
-            PartLoadFactor = PLF1;
-        }
-
-        if (PartLoadFactor <= 0.0) {
-            PartLoadFactor = 0.0;
-            RuntimeFrac = 0.0;
-            errFlag = true;
-        } else {
-            RuntimeFrac = PLR / PartLoadFactor;
-        }
-
-        if (RuntimeFrac > 1.0) {
-            RuntimeFrac = 1.0;
-        }
     }
 
     // Beginning of Reporting subroutines for the Furnace Module
@@ -10505,9 +10329,6 @@ namespace Furnaces {
                                                BlankString,
                                                thisFurnace.CoolingCoilIndex,
                                                thisFurnace.OpMode,
-                                               thisFurnace.MaxONOFFCyclesperHour,
-                                               thisFurnace.HPTimeConstant,
-                                               thisFurnace.FanDelayTime,
                                                CompressorOp,
                                                PartLoadFrac,
                                                SpeedNum,
@@ -10522,9 +10343,6 @@ namespace Furnaces {
                                                               BlankString,
                                                               thisFurnace.CoolingCoilIndex,
                                                               thisFurnace.OpMode,
-                                                              thisFurnace.MaxONOFFCyclesperHour,
-                                                              thisFurnace.HPTimeConstant,
-                                                              thisFurnace.FanDelayTime,
                                                               CompressorOp,
                                                               PartLoadFrac,
                                                               SpeedNum,
@@ -10544,9 +10362,6 @@ namespace Furnaces {
                                                BlankString,
                                                thisFurnace.CoolingCoilIndex,
                                                thisFurnace.OpMode,
-                                               thisFurnace.MaxONOFFCyclesperHour,
-                                               thisFurnace.HPTimeConstant,
-                                               thisFurnace.FanDelayTime,
                                                CompressorOp,
                                                PartLoadFrac,
                                                SpeedNum,
@@ -10557,20 +10372,8 @@ namespace Furnaces {
                                                false,
                                                OnOffAirFlowRatio);
                 } else {
-                    VariableSpeedCoils::SimVariableSpeedCoils(state,
-                                                              BlankString,
-                                                              thisFurnace.CoolingCoilIndex,
-                                                              thisFurnace.OpMode,
-                                                              thisFurnace.MaxONOFFCyclesperHour,
-                                                              thisFurnace.HPTimeConstant,
-                                                              thisFurnace.FanDelayTime,
-                                                              CompressorOp,
-                                                              0.0,
-                                                              1,
-                                                              0.0,
-                                                              0.0,
-                                                              0.0,
-                                                              OnOffAirFlowRatio);
+                    VariableSpeedCoils::SimVariableSpeedCoils(
+                        state, BlankString, thisFurnace.CoolingCoilIndex, thisFurnace.OpMode, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio);
                 }
             }
 
@@ -10581,9 +10384,6 @@ namespace Furnaces {
                                                    BlankString,
                                                    thisFurnace.HeatingCoilIndex,
                                                    thisFurnace.OpMode,
-                                                   thisFurnace.MaxONOFFCyclesperHour,
-                                                   thisFurnace.HPTimeConstant,
-                                                   thisFurnace.FanDelayTime,
                                                    CompressorOp,
                                                    PartLoadFrac,
                                                    SpeedNum,
@@ -10598,9 +10398,6 @@ namespace Furnaces {
                                                                   BlankString,
                                                                   thisFurnace.HeatingCoilIndex,
                                                                   thisFurnace.OpMode,
-                                                                  thisFurnace.MaxONOFFCyclesperHour,
-                                                                  thisFurnace.HPTimeConstant,
-                                                                  thisFurnace.FanDelayTime,
                                                                   CompressorOp,
                                                                   PartLoadFrac,
                                                                   SpeedNum,
@@ -10620,9 +10417,6 @@ namespace Furnaces {
                                                    BlankString,
                                                    thisFurnace.CoolingCoilIndex,
                                                    thisFurnace.OpMode,
-                                                   thisFurnace.MaxONOFFCyclesperHour,
-                                                   thisFurnace.HPTimeConstant,
-                                                   thisFurnace.FanDelayTime,
                                                    CompressorOp,
                                                    PartLoadFrac,
                                                    SpeedNum,
@@ -10637,9 +10431,6 @@ namespace Furnaces {
                                                                   BlankString,
                                                                   thisFurnace.HeatingCoilIndex,
                                                                   thisFurnace.OpMode,
-                                                                  thisFurnace.MaxONOFFCyclesperHour,
-                                                                  thisFurnace.HPTimeConstant,
-                                                                  thisFurnace.FanDelayTime,
                                                                   CompressorOp,
                                                                   0.0,
                                                                   1,
@@ -10672,9 +10463,6 @@ namespace Furnaces {
                                                BlankString,
                                                thisFurnace.CoolingCoilIndex,
                                                thisFurnace.OpMode,
-                                               thisFurnace.MaxONOFFCyclesperHour,
-                                               thisFurnace.HPTimeConstant,
-                                               thisFurnace.FanDelayTime,
                                                CompressorOp,
                                                PartLoadFrac,
                                                SpeedNum,
@@ -10689,9 +10477,6 @@ namespace Furnaces {
                                                               BlankString,
                                                               thisFurnace.CoolingCoilIndex,
                                                               thisFurnace.OpMode,
-                                                              thisFurnace.MaxONOFFCyclesperHour,
-                                                              thisFurnace.HPTimeConstant,
-                                                              thisFurnace.FanDelayTime,
                                                               CompressorOp,
                                                               PartLoadFrac,
                                                               SpeedNum,
@@ -10711,9 +10496,6 @@ namespace Furnaces {
                                                BlankString,
                                                thisFurnace.CoolingCoilIndex,
                                                thisFurnace.OpMode,
-                                               thisFurnace.MaxONOFFCyclesperHour,
-                                               thisFurnace.HPTimeConstant,
-                                               thisFurnace.FanDelayTime,
                                                CompressorOp,
                                                PartLoadFrac,
                                                SpeedNum,
@@ -10724,20 +10506,8 @@ namespace Furnaces {
                                                false,
                                                OnOffAirFlowRatio);
                 } else {
-                    VariableSpeedCoils::SimVariableSpeedCoils(state,
-                                                              BlankString,
-                                                              thisFurnace.CoolingCoilIndex,
-                                                              thisFurnace.OpMode,
-                                                              thisFurnace.MaxONOFFCyclesperHour,
-                                                              thisFurnace.HPTimeConstant,
-                                                              thisFurnace.FanDelayTime,
-                                                              CompressorOp,
-                                                              0.0,
-                                                              1,
-                                                              0.0,
-                                                              0.0,
-                                                              0.0,
-                                                              OnOffAirFlowRatio);
+                    VariableSpeedCoils::SimVariableSpeedCoils(
+                        state, BlankString, thisFurnace.CoolingCoilIndex, thisFurnace.OpMode, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio);
                 }
             }
 
@@ -10748,9 +10518,6 @@ namespace Furnaces {
                                                    BlankString,
                                                    thisFurnace.HeatingCoilIndex,
                                                    thisFurnace.OpMode,
-                                                   thisFurnace.MaxONOFFCyclesperHour,
-                                                   thisFurnace.HPTimeConstant,
-                                                   thisFurnace.FanDelayTime,
                                                    CompressorOp,
                                                    PartLoadFrac,
                                                    SpeedNum,
@@ -10765,9 +10532,6 @@ namespace Furnaces {
                                                                   BlankString,
                                                                   thisFurnace.HeatingCoilIndex,
                                                                   thisFurnace.OpMode,
-                                                                  thisFurnace.MaxONOFFCyclesperHour,
-                                                                  thisFurnace.HPTimeConstant,
-                                                                  thisFurnace.FanDelayTime,
                                                                   CompressorOp,
                                                                   PartLoadFrac,
                                                                   SpeedNum,
@@ -10786,9 +10550,6 @@ namespace Furnaces {
                                                    BlankString,
                                                    thisFurnace.CoolingCoilIndex,
                                                    thisFurnace.OpMode,
-                                                   thisFurnace.MaxONOFFCyclesperHour,
-                                                   thisFurnace.HPTimeConstant,
-                                                   thisFurnace.FanDelayTime,
                                                    CompressorOp,
                                                    PartLoadFrac,
                                                    SpeedNum,
@@ -10803,9 +10564,6 @@ namespace Furnaces {
                                                                   BlankString,
                                                                   thisFurnace.HeatingCoilIndex,
                                                                   thisFurnace.OpMode,
-                                                                  thisFurnace.MaxONOFFCyclesperHour,
-                                                                  thisFurnace.HPTimeConstant,
-                                                                  thisFurnace.FanDelayTime,
                                                                   CompressorOp,
                                                                   0.0,
                                                                   1,
@@ -10842,9 +10600,6 @@ namespace Furnaces {
                                                BlankString,
                                                thisFurnace.CoolingCoilIndex,
                                                thisFurnace.OpMode,
-                                               thisFurnace.MaxONOFFCyclesperHour,
-                                               thisFurnace.HPTimeConstant,
-                                               thisFurnace.FanDelayTime,
                                                CompressorOp,
                                                PartLoadFrac,
                                                SpeedNum,
@@ -10859,9 +10614,6 @@ namespace Furnaces {
                                                               BlankString,
                                                               thisFurnace.CoolingCoilIndex,
                                                               thisFurnace.OpMode,
-                                                              thisFurnace.MaxONOFFCyclesperHour,
-                                                              thisFurnace.HPTimeConstant,
-                                                              thisFurnace.FanDelayTime,
                                                               CompressorOp,
                                                               PartLoadFrac,
                                                               SpeedNum,
@@ -10881,9 +10633,6 @@ namespace Furnaces {
                                                BlankString,
                                                thisFurnace.CoolingCoilIndex,
                                                thisFurnace.OpMode,
-                                               thisFurnace.MaxONOFFCyclesperHour,
-                                               thisFurnace.HPTimeConstant,
-                                               thisFurnace.FanDelayTime,
                                                CompressorOp,
                                                PartLoadFrac,
                                                SpeedNum,
@@ -10894,20 +10643,8 @@ namespace Furnaces {
                                                false,
                                                OnOffAirFlowRatio);
                 } else {
-                    VariableSpeedCoils::SimVariableSpeedCoils(state,
-                                                              BlankString,
-                                                              thisFurnace.CoolingCoilIndex,
-                                                              thisFurnace.OpMode,
-                                                              thisFurnace.MaxONOFFCyclesperHour,
-                                                              thisFurnace.HPTimeConstant,
-                                                              thisFurnace.FanDelayTime,
-                                                              CompressorOp,
-                                                              0.0,
-                                                              1,
-                                                              0.0,
-                                                              0.0,
-                                                              0.0,
-                                                              OnOffAirFlowRatio);
+                    VariableSpeedCoils::SimVariableSpeedCoils(
+                        state, BlankString, thisFurnace.CoolingCoilIndex, thisFurnace.OpMode, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio);
                 }
             }
 
@@ -10919,9 +10656,6 @@ namespace Furnaces {
                                                    BlankString,
                                                    thisFurnace.HeatingCoilIndex,
                                                    thisFurnace.OpMode,
-                                                   thisFurnace.MaxONOFFCyclesperHour,
-                                                   thisFurnace.HPTimeConstant,
-                                                   thisFurnace.FanDelayTime,
                                                    CompressorOp,
                                                    PartLoadFrac,
                                                    SpeedNum,
@@ -10936,9 +10670,6 @@ namespace Furnaces {
                                                                   BlankString,
                                                                   thisFurnace.HeatingCoilIndex,
                                                                   thisFurnace.OpMode,
-                                                                  thisFurnace.MaxONOFFCyclesperHour,
-                                                                  thisFurnace.HPTimeConstant,
-                                                                  thisFurnace.FanDelayTime,
                                                                   CompressorOp,
                                                                   PartLoadFrac,
                                                                   SpeedNum,
@@ -10957,9 +10688,6 @@ namespace Furnaces {
                                                    BlankString,
                                                    thisFurnace.CoolingCoilIndex,
                                                    thisFurnace.OpMode,
-                                                   thisFurnace.MaxONOFFCyclesperHour,
-                                                   thisFurnace.HPTimeConstant,
-                                                   thisFurnace.FanDelayTime,
                                                    CompressorOp,
                                                    PartLoadFrac,
                                                    SpeedNum,
@@ -10974,9 +10702,6 @@ namespace Furnaces {
                                                                   BlankString,
                                                                   thisFurnace.HeatingCoilIndex,
                                                                   thisFurnace.OpMode,
-                                                                  thisFurnace.MaxONOFFCyclesperHour,
-                                                                  thisFurnace.HPTimeConstant,
-                                                                  thisFurnace.FanDelayTime,
                                                                   CompressorOp,
                                                                   0.0,
                                                                   1,

@@ -91,7 +91,6 @@ namespace EcoRoofManager {
 
     void CalcEcoRoof(EnergyPlusData &state,
                      int const SurfNum,   // Indicator of Surface Number for the current surface
-                     int const ZoneNum,   // Indicator for zone number where the current surface
                      int const ConstrNum, // Indicator for construction index for the current surface
                      Real64 &TempExt      // Exterior temperature boundary condition
     )
@@ -209,7 +208,8 @@ namespace EcoRoofManager {
                                       state.dataHeatBalSurf->SurfHConvExt(SurfNum),
                                       state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
                                       state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
-                                      state.dataHeatBalSurf->SurfHAirExt(SurfNum));
+                                      state.dataHeatBalSurf->SurfHAirExt(SurfNum),
+                                      state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum));
         }
         // Long Wave Radiation (W/m^2) - original equation shown in comment
         // Real64 Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
@@ -248,13 +248,14 @@ namespace EcoRoofManager {
 
             if (thisConstruct.CTFCross[0] > 0.01) {
                 state.dataEcoRoofMgr->QuickConductionSurf = true;
+                int spaceNum = state.dataSurface->Surface(SurfNum).spaceNum;
                 F1temp = thisConstruct.CTFCross[0] / (thisConstruct.CTFInside[0] + state.dataHeatBalSurf->SurfHConvInt(SurfNum));
                 Qsoilpart1 =
                     -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
                     F1temp * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
                               state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
                               state.dataConstruction->Construct(ConstrNum).CTFSourceIn[0] * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
-                              state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT +
+                              state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT +
                               state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum));
             } else {
                 Qsoilpart1 =

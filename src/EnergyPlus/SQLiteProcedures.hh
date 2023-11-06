@@ -132,7 +132,7 @@ public:
     void addNominalBaseboardData(int const number, DataHeatBalance::BBHeatData const &nominalBaseboardData);
     void addInfiltrationData(int const number, DataHeatBalance::InfiltrationData const &infiltrationData);
     void addVentilationData(int const number, DataHeatBalance::VentilationData const &ventilationData);
-    void addRoomAirModelData(int const number, DataRoomAirModel::AirModelData const &roomAirModelData);
+    void addRoomAirModelData(int const number, RoomAir::AirModelData const &roomAirModelData);
 
     // Open the DB and prepare for writing data
     // Create all of the tables on construction
@@ -194,6 +194,7 @@ public:
                                      int const CumlativeSimulationDays,
                                      int const curEnvirNum,
                                      int const simulationYear,
+                                     bool const curYearIsLeapYear,
                                      ObjexxFCL::Optional_int_const Month = _,
                                      ObjexxFCL::Optional_int_const DayOfMonth = _,
                                      ObjexxFCL::Optional_int_const Hour = _,
@@ -970,10 +971,9 @@ private:
         RoomAirModel(std::shared_ptr<std::ostream> const &errorStream,
                      std::shared_ptr<sqlite3> const &db,
                      int const roomAirModelNumber,
-                     DataRoomAirModel::AirModelData const &roomAirModelData)
-            : SQLiteData(errorStream, db), number(roomAirModelNumber), airModelName(roomAirModelData.AirModelName),
-              airModelType(roomAirModelData.AirModelType), tempCoupleScheme(roomAirModelData.TempCoupleScheme),
-              simAirModel(roomAirModelData.SimAirModel)
+                     RoomAir::AirModelData const &roomAirModelData)
+            : SQLiteData(errorStream, db), number(roomAirModelNumber), airModelName(roomAirModelData.Name), airModel(roomAirModelData.AirModel),
+              tempCoupleScheme(roomAirModelData.TempCoupleScheme), simAirModel(roomAirModelData.SimAirModel)
         {
         }
 
@@ -982,8 +982,8 @@ private:
     private:
         int const number;
         std::string const &airModelName;
-        DataRoomAirModel::RoomAirModel const &airModelType;
-        DataRoomAirModel::CouplingScheme const &tempCoupleScheme;
+        RoomAir::RoomAirModel const &airModel;
+        RoomAir::CouplingScheme const &tempCoupleScheme;
         bool const &simAirModel;
     };
 

@@ -1334,7 +1334,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
 
         // Inlet Air Configuration
         HPWH.InletAirConfiguration =
-            static_cast<WTTAmbientTemp>(getEnumerationValue(HPWHAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(hpwhAlpha[6 + nAlphaOffset])));
+            static_cast<WTTAmbientTemp>(getEnumValue(HPWHAmbientTempNamesUC, UtilityRoutines::makeUPPER(hpwhAlpha[6 + nAlphaOffset])));
         switch (HPWH.InletAirConfiguration) {
         case WTTAmbientTemp::Schedule: {
 
@@ -1560,7 +1560,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
 
         // Compressor Location
         HPWH.CrankcaseTempIndicator = static_cast<CrankcaseHeaterControlTemp>(
-            getEnumerationValue(CrankcaseHeaterControlTempNamesUC, UtilityRoutines::MakeUPPERCase(hpwhAlpha[20 + nAlphaOffset])));
+            getEnumValue(CrankcaseHeaterControlTempNamesUC, UtilityRoutines::makeUPPER(hpwhAlpha[20 + nAlphaOffset])));
         switch (HPWH.CrankcaseTempIndicator) {
         case CrankcaseHeaterControlTemp::Schedule: {
             if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
@@ -2403,8 +2403,8 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         }
 
         // Validate Heater Control Type
-        Tank.ControlType = static_cast<HeaterControlMode>(
-            getEnumerationValue(HeaterControlModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
+        Tank.ControlType =
+            static_cast<HeaterControlMode>(getEnumValue(HeaterControlModeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
         switch (Tank.ControlType) {
         case HeaterControlMode::Cycle: {
             Tank.MinCapacity = Tank.MaxCapacity;
@@ -2434,7 +2434,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.IgnitionDelay = state.dataIPShortCut->rNumericArgs(7); // Not yet implemented
 
         // Validate Heater Fuel Type
-        Tank.FuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
+        Tank.FuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
         switch (Tank.FuelType) {
         case Constant::eFuel::Invalid: {
             ShowSevereError(state,
@@ -2496,7 +2496,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.OffCycParaLoad = state.dataIPShortCut->rNumericArgs(9);
 
         // Validate Off-Cycle Parasitic Fuel Type
-        Tank.OffCycParaFuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
+        Tank.OffCycParaFuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
         switch (Tank.OffCycParaFuelType) {
         case Constant::eFuel::Invalid:
             if (state.dataIPShortCut->cAlphaArgs(6).empty()) { // If blank, default to Fuel Type for heater
@@ -2521,7 +2521,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.OnCycParaLoad = state.dataIPShortCut->rNumericArgs(11);
 
         // Validate On-Cycle Parasitic Fuel Type
-        Tank.OnCycParaFuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(7)));
+        Tank.OnCycParaFuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(7)));
         switch (Tank.OnCycParaFuelType) {
         case Constant::eFuel::Invalid:
             if (state.dataIPShortCut->cAlphaArgs(7).empty()) { // If blank, default to Fuel Type for heater
@@ -2543,8 +2543,8 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 
         Tank.OnCycParaFracToTank = state.dataIPShortCut->rNumericArgs(12);
 
-        Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(
-            getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8))));
+        Tank.AmbientTempIndicator =
+            static_cast<WTTAmbientTemp>(getEnumValue(TankAmbientTempNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
         switch (Tank.AmbientTempIndicator) {
         case WTTAmbientTemp::Schedule: {
             Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
@@ -2772,7 +2772,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
             Tank.SourceSideControlMode = static_cast<SourceSideControl>(
-                getEnumerationValue(SourceSideControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(18))));
+                getEnumValue(SourceSideControlNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(18))));
             if (Tank.SourceSideControlMode == SourceSideControl::Invalid) {
                 ShowSevereError(state,
                                 format("{} = {}:  Invalid Control Mode entered={}",
@@ -2862,8 +2862,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             Tank.HeightWasAutoSized = true;
         }
 
-        Tank.Shape =
-            static_cast<TankShape>(getEnumerationValue(TankShapeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
+        Tank.Shape = static_cast<TankShape>(getEnumValue(TankShapeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
         switch (Tank.Shape) {
         case TankShape::HorizCylinder:
         case TankShape::VertCylinder: {
@@ -2903,7 +2902,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         // Validate Heater Priority Control
         Tank.StratifiedControlMode = static_cast<PriorityControlMode>(
-            getEnumerationValue(PriorityControlModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
+            getEnumValue(PriorityControlModeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
         if (Tank.StratifiedControlMode == PriorityControlMode::Invalid) {
             ShowSevereError(state,
                             format("{} = {}:  Invalid Heater Priority Control entered={}",
@@ -3003,9 +3002,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         // Validate Heater Fuel Type
         Tank.FuelType = static_cast<Constant::eFuel>(
-            getEnumerationValue(Constant::eFuelNamesUC,
-                                state.dataIPShortCut->cAlphaArgs(
-                                    7))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
+            getEnumValue(Constant::eFuelNamesUC,
+                         state.dataIPShortCut->cAlphaArgs(
+                             7))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
         if (Tank.FuelType == Constant::eFuel::Invalid) {
             ShowSevereError(state,
                             format("{} = {}:  Invalid Heater Fuel Type entered={}",
@@ -3031,9 +3030,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         // Validate Off-Cycle Parasitic Fuel Type
         Tank.OffCycParaFuelType = static_cast<Constant::eFuel>(
-            getEnumerationValue(Constant::eFuelNamesUC,
-                                state.dataIPShortCut->cAlphaArgs(
-                                    8))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
+            getEnumValue(Constant::eFuelNamesUC,
+                         state.dataIPShortCut->cAlphaArgs(
+                             8))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
         if (Tank.OffCycParaFuelType == Constant::eFuel::Invalid) {
             if (state.dataIPShortCut->cAlphaArgs(8).empty()) {
                 Tank.OffCycParaFuelType = Tank.FuelType;
@@ -3055,10 +3054,10 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.OnCycParaLoad = state.dataIPShortCut->rNumericArgs(15);
 
         // Validate On-Cycle Parasitic Fuel Type
-        Tank.OnCycParaFuelType = static_cast<Constant::eFuel>(getEnumerationValue(
-            Constant::eFuelNamesUC,
-            state.dataIPShortCut->cAlphaArgs(
-                9))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported/empty
+        Tank.OnCycParaFuelType = static_cast<Constant::eFuel>(
+            getEnumValue(Constant::eFuelNamesUC,
+                         state.dataIPShortCut->cAlphaArgs(
+                             9))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported/empty
         if (Tank.OnCycParaFuelType == Constant::eFuel::Invalid) {
             if (state.dataIPShortCut->cAlphaArgs(9).empty()) {
                 Tank.OnCycParaFuelType = Tank.FuelType;
@@ -3077,8 +3076,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.OnCycParaFracToTank = state.dataIPShortCut->rNumericArgs(16);
         Tank.OnCycParaHeight = state.dataIPShortCut->rNumericArgs(17);
 
-        Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(
-            getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
+        Tank.AmbientTempIndicator =
+            static_cast<WTTAmbientTemp>(getEnumValue(TankAmbientTempNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(10))));
         switch (Tank.AmbientTempIndicator) {
 
         case WTTAmbientTemp::Schedule: {
@@ -3371,8 +3370,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
 
         // Validate inlet mode
-        Tank.InletMode = static_cast<InletPositionMode>(
-            getEnumerationValue(InletPositionModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(20))));
+        Tank.InletMode =
+            static_cast<InletPositionMode>(getEnumValue(InletPositionModeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(20))));
 
         Tank.Nodes = state.dataIPShortCut->rNumericArgs(32);
         int specifiedNodes = 0;
@@ -3407,7 +3406,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(21)) {
             Tank.SourceSideControlMode = static_cast<SourceSideControl>(
-                getEnumerationValue(SourceSideControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(21))));
+                getEnumValue(SourceSideControlNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(21))));
             if (Tank.SourceSideControlMode == SourceSideControl::Invalid) {
                 ShowSevereError(state,
                                 format("{} = {}:  Invalid Control Mode entered={}",
@@ -3530,8 +3529,8 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         Tank.OnCycParaFuelType = Constant::eFuel::Electricity;
         Tank.OnCycParaFracToTank = 0.0;
 
-        Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(
-            getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
+        Tank.AmbientTempIndicator =
+            static_cast<WTTAmbientTemp>(getEnumValue(TankAmbientTempNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
         switch (Tank.AmbientTempIndicator) {
 
         case WTTAmbientTemp::Schedule: {
@@ -3793,8 +3792,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
             Tank.HeightWasAutoSized = true;
         }
 
-        Tank.Shape =
-            static_cast<TankShape>(getEnumerationValue(TankShapeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+        Tank.Shape = static_cast<TankShape>(getEnumValue(TankShapeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
         switch (Tank.Shape) {
         case TankShape::HorizCylinder:
         case TankShape::VertCylinder: {
@@ -3867,8 +3865,8 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         Tank.OnCycParaFracToTank = 0.0;
         Tank.OnCycParaHeight = 0.0;
 
-        Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(
-            getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
+        Tank.AmbientTempIndicator =
+            static_cast<WTTAmbientTemp>(getEnumValue(TankAmbientTempNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
         switch (Tank.AmbientTempIndicator) {
 
         case WTTAmbientTemp::Schedule: {
@@ -4112,8 +4110,8 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         }
 
         // Validate inlet mode
-        Tank.InletMode = static_cast<InletPositionMode>(
-            getEnumerationValue(InletPositionModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(14))));
+        Tank.InletMode =
+            static_cast<InletPositionMode>(getEnumValue(InletPositionModeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(14))));
 
         Tank.Nodes = state.dataIPShortCut->rNumericArgs(18);
         Tank.AdditionalCond = state.dataIPShortCut->rNumericArgs(19);
@@ -4185,7 +4183,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                 "Standard Rated Energy Factor\n");
             static constexpr std::string_view Format_721(
                 "! <Heat Pump Water Heater Information>,Type,Name,Volume {{m3}},Maximum Capacity {{W}},Standard Rated Recovery "
-                "Efficiency,Standard Rated Energy Factor,\"DX Coil Total Cooling Rate {{W, HPWH Only}}\"\n");
+                "Efficiency,Standard Rated Energy Factor,DX Coil Total Cooling Rate {{W}}\n");
             static constexpr std::string_view Format_722(
                 "! <Water Heater Stratified Node Information>,Node Number,Height {{m}},Volume {{m3}},Maximum Capacity "
                 "{{W}},Off-Cycle UA {{W/K}},On-Cycle UA {{W/K}},Number Of Inlets,Number Of Outlets\n");
@@ -4405,7 +4403,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         } else {
 
                             DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
-                                getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(Tank.Type)));
+                                getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::makeUPPER(Tank.Type)));
 
                             Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                        HPWH.OutletNodeName1,
@@ -4506,12 +4504,12 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                             int ZoneEquipListNum = state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).EquipListIndex;
                             int TankCoolingPriority = 0;
                             int TankHeatingPriority = 0;
-                            for (int EquipmentTypeNum = 1; EquipmentTypeNum <= state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).NumOfEquipTypes;
-                                 ++EquipmentTypeNum) {
-                                if (state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).EquipName(EquipmentTypeNum) != HPWH.Name) continue;
+                            auto const &zoneEquipList = state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum);
+                            for (int EquipmentTypeNum = 1; EquipmentTypeNum <= zoneEquipList.NumOfEquipTypes; ++EquipmentTypeNum) {
+                                if (zoneEquipList.EquipName(EquipmentTypeNum) != HPWH.Name) continue;
                                 FoundTankInList = true;
-                                TankCoolingPriority = state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).CoolingPriority(EquipmentTypeNum);
-                                TankHeatingPriority = state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).HeatingPriority(EquipmentTypeNum);
+                                TankCoolingPriority = zoneEquipList.CoolingPriority(EquipmentTypeNum);
+                                TankHeatingPriority = zoneEquipList.HeatingPriority(EquipmentTypeNum);
                                 break;
                             } // EquipmentTypeNum
                             if (!FoundTankInList) {
@@ -4524,13 +4522,12 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                             }
                             //                     check that tank has lower priority than all other non-HPWH objects in Zone
                             //                     Equipment List
-                            for (int EquipmentTypeNum = 1; EquipmentTypeNum <= state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).NumOfEquipTypes;
-                                 ++EquipmentTypeNum) {
-                                if (UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).EquipType(EquipmentTypeNum),
+                            for (int EquipmentTypeNum = 1; EquipmentTypeNum <= zoneEquipList.NumOfEquipTypes; ++EquipmentTypeNum) {
+                                if (UtilityRoutines::SameString(zoneEquipList.EquipTypeName(EquipmentTypeNum),
                                                                 state.dataIPShortCut->cCurrentModuleObject))
                                     continue;
-                                if (TankCoolingPriority > state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).CoolingPriority(EquipmentTypeNum) ||
-                                    TankHeatingPriority > state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).HeatingPriority(EquipmentTypeNum)) {
+                                if (TankCoolingPriority > zoneEquipList.CoolingPriority(EquipmentTypeNum) ||
+                                    TankHeatingPriority > zoneEquipList.HeatingPriority(EquipmentTypeNum)) {
                                     TankNotLowestPriority = true;
                                 }
                             } // EquipmentTypeNum
@@ -5301,7 +5298,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::PlantLoopHeatingDemand,
-                        "DHW",
+                        "WaterSystems", // "DHW",
                         this->EndUseSubcategoryName,
                         "Plant");
 
@@ -5448,7 +5445,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eFuel2eResource[(int)this->FuelType],
-                        "DHW",
+                        "WaterSystems", // "DHW",
                         this->EndUseSubcategoryName,
                         "Plant");
 
@@ -5468,7 +5465,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eFuel2eResource[(int)this->OffCycParaFuelType],
-                        "DHW",
+                        "WaterSystems", // "DHW",
                         this->EndUseSubcategoryName,
                         "Plant");
 
@@ -5488,7 +5485,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eFuel2eResource[(int)this->OnCycParaFuelType],
-                        "DHW",
+                        "WaterSystems", // "DHW",
                         this->EndUseSubcategoryName,
                         "Plant");
 
@@ -5508,7 +5505,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::Water,
-                        "DHW",
+                        "WaterSystems", // "DHW",
                         this->EndUseSubcategoryName,
                         "Plant");
     SetupOutputVariable(state,
@@ -5520,7 +5517,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::MainsWater,
-                        "DHW",
+                        "WaterSystems", // "DHW",
                         this->EndUseSubcategoryName,
                         "Plant");
 
@@ -5550,7 +5547,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             HPWH.Name,
                             {},
                             Constant::eResource::Electricity,
-                            "DHW",
+                            "WaterSystems", // "DHW",
                             "Water Heater Parasitic",
                             "Plant");
         SetupOutputVariable(state,
@@ -5569,7 +5566,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             HPWH.Name,
                             {},
                             Constant::eResource::Electricity,
-                            "DHW",
+                            "WaterSystems", // "DHW",
                             "Water Heater Parasitic",
                             "Plant");
         SetupOutputVariable(state,
@@ -5613,7 +5610,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             {},
                             Constant::eResource::Electricity,
-                            "DHW",
+                            "WaterSystems", // "DHW",
                             "Water Heater Parasitic",
                             "Plant");
         SetupOutputVariable(state,
@@ -5632,7 +5629,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             {},
                             Constant::eResource::Electricity,
-                            "DHW",
+                            "WaterSystems", // "DHW",
                             "Water Heater Parasitic",
                             "Plant");
         SetupOutputVariable(state,
@@ -5658,7 +5655,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             {},
                             Constant::eResource::Electricity,
-                            "DHW",
+                            "WaterSystems", // "DHW",
                             "Desuperheater Pump",
                             "Plant");
         SetupOutputVariable(state,
@@ -5677,7 +5674,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             {},
                             Constant::eResource::EnergyTransfer,
-                            "DHW",
+                            "WaterSystems", // "DHW",
                             "Water Heater",
                             "Plant");
     }
@@ -6698,16 +6695,10 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
         } else if (UtilityRoutines::SameString(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilType,
                                                "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed") &&
                    (state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed == 0)) {
-            Real64 EMP1 = 4.0;
-            Real64 EMP2 = 0.0;
-            Real64 EMP3 = 0.0;
             VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                       std::string(),
                                                       state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
                                                       0,
-                                                      EMP1,
-                                                      EMP2,
-                                                      EMP3,
                                                       DataHVACGlobals::CompressorOperation::Off,
                                                       0.0,
                                                       1,
@@ -9030,7 +9021,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MdotWater;                                                                         // mass flow rate of condenser water, kg/s
     IntegratedHeatPump::IHPOperationMode IHPMode(IntegratedHeatPump::IHPOperationMode::Idle); // IHP working mode
-    Real64 EMP1(0.0), EMP2(0.0), EMP3(0.0);
 
     // References to objects used in this function
     HeatPumpWaterHeaterData &HeatPump = state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum);
@@ -9110,9 +9100,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                               "",
                                                               VSCoilNum,
                                                               DataHVACGlobals::CycFanCycCoil,
-                                                              EMP1,
-                                                              EMP2,
-                                                              EMP3,
                                                               DataHVACGlobals::CompressorOperation::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
@@ -9125,9 +9112,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                               HeatPump.DXCoilName,
                                                               VSCoilNum,
                                                               DataHVACGlobals::CycFanCycCoil,
-                                                              EMP1,
-                                                              EMP2,
-                                                              EMP3,
                                                               DataHVACGlobals::CompressorOperation::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
@@ -9142,9 +9126,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                               "",
                                                               VSCoilNum,
                                                               DataHVACGlobals::CycFanCycCoil,
-                                                              EMP1,
-                                                              EMP2,
-                                                              EMP3,
                                                               DataHVACGlobals::CompressorOperation::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
@@ -9157,9 +9138,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                               HeatPump.DXCoilName,
                                                               VSCoilNum,
                                                               DataHVACGlobals::CycFanCycCoil,
-                                                              EMP1,
-                                                              EMP2,
-                                                              EMP3,
                                                               DataHVACGlobals::CompressorOperation::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
@@ -9191,9 +9169,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                                   "",
                                                                   VSCoilNum,
                                                                   DataHVACGlobals::CycFanCycCoil,
-                                                                  EMP1,
-                                                                  EMP2,
-                                                                  EMP3,
                                                                   DataHVACGlobals::CompressorOperation::On,
                                                                   state.dataWaterThermalTanks->hpPartLoadRatio,
                                                                   SpeedNum,
@@ -9207,9 +9182,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                                   "",
                                                                   VSCoilNum,
                                                                   DataHVACGlobals::CycFanCycCoil,
-                                                                  EMP1,
-                                                                  EMP2,
-                                                                  EMP3,
                                                                   DataHVACGlobals::CompressorOperation::On,
                                                                   state.dataWaterThermalTanks->hpPartLoadRatio,
                                                                   SpeedNum,
@@ -9504,9 +9476,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                               "",
                                                               VSCoilNum,
                                                               DataHVACGlobals::CycFanCycCoil,
-                                                              EMP1,
-                                                              EMP2,
-                                                              EMP3,
                                                               DataHVACGlobals::CompressorOperation::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
@@ -9525,9 +9494,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                HeatPump.DXCoilName,
                                                HeatPump.DXCoilNum,
                                                DataHVACGlobals::CycFanCycCoil,
-                                               EMP1,
-                                               EMP2,
-                                               EMP3,
                                                DataHVACGlobals::CompressorOperation::On,
                                                state.dataWaterThermalTanks->hpPartLoadRatio,
                                                SpeedNum,
@@ -9557,9 +9523,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                           HeatPump.DXCoilName,
                                                           HeatPump.DXCoilNum,
                                                           DataHVACGlobals::CycFanCycCoil,
-                                                          EMP1,
-                                                          EMP2,
-                                                          EMP3,
                                                           DataHVACGlobals::CompressorOperation::On,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
@@ -9662,9 +9625,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                    HeatPump.DXCoilName,
                                                    HeatPump.DXCoilNum,
                                                    DataHVACGlobals::CycFanCycCoil,
-                                                   EMP1,
-                                                   EMP2,
-                                                   EMP3,
                                                    DataHVACGlobals::CompressorOperation::On,
                                                    state.dataWaterThermalTanks->hpPartLoadRatio,
                                                    SpeedNum,
@@ -9680,9 +9640,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                               HeatPump.DXCoilName,
                                                               HeatPump.DXCoilNum,
                                                               DataHVACGlobals::CycFanCycCoil,
-                                                              EMP1,
-                                                              EMP2,
-                                                              EMP3,
                                                               DataHVACGlobals::CompressorOperation::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
@@ -9714,9 +9671,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                    HeatPump.DXCoilName,
                                                    HeatPump.DXCoilNum,
                                                    DataHVACGlobals::CycFanCycCoil,
-                                                   EMP1,
-                                                   EMP2,
-                                                   EMP3,
                                                    DataHVACGlobals::CompressorOperation::On,
                                                    state.dataWaterThermalTanks->hpPartLoadRatio,
                                                    SpeedNum,
@@ -9731,9 +9685,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                                   HeatPump.DXCoilName,
                                                                   HeatPump.DXCoilNum,
                                                                   DataHVACGlobals::CycFanCycCoil,
-                                                                  EMP1,
-                                                                  EMP2,
-                                                                  EMP3,
                                                                   DataHVACGlobals::CompressorOperation::On,
                                                                   state.dataWaterThermalTanks->hpPartLoadRatio,
                                                                   SpeedNum,
@@ -9844,9 +9795,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                HeatPump.DXCoilName,
                                                HeatPump.DXCoilNum,
                                                DataHVACGlobals::CycFanCycCoil,
-                                               EMP1,
-                                               EMP2,
-                                               EMP3,
                                                DataHVACGlobals::CompressorOperation::On,
                                                state.dataWaterThermalTanks->hpPartLoadRatio,
                                                SpeedNum,
@@ -9861,9 +9809,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                               HeatPump.DXCoilName,
                                                               HeatPump.DXCoilNum,
                                                               DataHVACGlobals::CycFanCycCoil,
-                                                              EMP1,
-                                                              EMP2,
-                                                              EMP3,
                                                               DataHVACGlobals::CompressorOperation::On,
                                                               state.dataWaterThermalTanks->hpPartLoadRatio,
                                                               SpeedNum,
@@ -9964,9 +9909,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                            HeatPump.DXCoilName,
                                            HeatPump.DXCoilNum,
                                            DataHVACGlobals::CycFanCycCoil,
-                                           EMP1,
-                                           EMP2,
-                                           EMP3,
                                            CompressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
@@ -9985,9 +9927,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                            HeatPump.DXCoilName,
                                            HeatPump.DXCoilNum,
                                            DataHVACGlobals::CycFanCycCoil,
-                                           EMP1,
-                                           EMP2,
-                                           EMP3,
                                            CompressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
@@ -10003,9 +9942,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                            HeatPump.DXCoilName,
                                            HeatPump.DXCoilNum,
                                            DataHVACGlobals::CycFanCycCoil,
-                                           EMP1,
-                                           EMP2,
-                                           EMP3,
                                            CompressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
@@ -10024,9 +9960,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                            HeatPump.DXCoilName,
                                            HeatPump.DXCoilNum,
                                            DataHVACGlobals::CycFanCycCoil,
-                                           EMP1,
-                                           EMP2,
-                                           EMP3,
                                            CompressorOp,
                                            state.dataWaterThermalTanks->hpPartLoadRatio,
                                            SpeedNum,
@@ -10055,9 +9988,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                           HeatPump.DXCoilName,
                                                           HeatPump.DXCoilNum,
                                                           DataHVACGlobals::CycFanCycCoil,
-                                                          EMP1,
-                                                          EMP2,
-                                                          EMP3,
                                                           CompressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
@@ -10074,9 +10004,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                           HeatPump.DXCoilName,
                                                           HeatPump.DXCoilNum,
                                                           DataHVACGlobals::CycFanCycCoil,
-                                                          EMP1,
-                                                          EMP2,
-                                                          EMP3,
                                                           CompressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
@@ -10090,9 +10017,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                           HeatPump.DXCoilName,
                                                           HeatPump.DXCoilNum,
                                                           DataHVACGlobals::CycFanCycCoil,
-                                                          EMP1,
-                                                          EMP2,
-                                                          EMP3,
                                                           CompressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
@@ -10109,9 +10033,6 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                           HeatPump.DXCoilName,
                                                           HeatPump.DXCoilNum,
                                                           DataHVACGlobals::CycFanCycCoil,
-                                                          EMP1,
-                                                          EMP2,
-                                                          EMP3,
                                                           CompressorOp,
                                                           state.dataWaterThermalTanks->hpPartLoadRatio,
                                                           SpeedNum,
@@ -10411,7 +10332,6 @@ Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state,
     //  and calculates the residual as defined respectively for DataPlant::PlantEquipmentType::WtrHeaterMixed or
     //  DataPlant::PlantEquipmentType::WtrHeaterStratified
 
-    Real64 EMP1(0.0), EMP2(0.0), EMP3(0.0); // place holder to calling variable-speed coil function
     this->Mode = mode;
     state.dataWaterThermalTanks->hpPartLoadRatio = 1.0;
     Real64 MdotWater = 0.0;
@@ -10425,9 +10345,6 @@ Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state,
                                    state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
                                    state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
                                    DataHVACGlobals::CycFanCycCoil,
-                                   EMP1,
-                                   EMP2,
-                                   EMP3,
                                    DataHVACGlobals::CompressorOperation::On,
                                    state.dataWaterThermalTanks->hpPartLoadRatio,
                                    SpeedNum,
@@ -10442,9 +10359,6 @@ Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state,
                                                   state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilName,
                                                   state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum,
                                                   DataHVACGlobals::CycFanCycCoil,
-                                                  EMP1,
-                                                  EMP2,
-                                                  EMP3,
                                                   DataHVACGlobals::CompressorOperation::On,
                                                   state.dataWaterThermalTanks->hpPartLoadRatio,
                                                   SpeedNum,
@@ -11054,10 +10968,10 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
         case Constant::eFuel::FuelOilNo1:
         case Constant::eFuel::FuelOilNo2:
         case Constant::eFuel::Propane:
-        case Constant::eFuel::Steam:
         case Constant::eFuel::OtherFuel1:
         case Constant::eFuel::OtherFuel2:
-        case Constant::eFuel::DistrictHeating:
+        case Constant::eFuel::DistrictHeatingWater:
+        case Constant::eFuel::DistrictHeatingSteam:
             FuelTypeIsLikeGas = true;
             break;
         default: // FuelTypeIsLikeGas stays false
@@ -11192,7 +11106,11 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
     case SizingMode::PerPerson: {
         // how to get number of people?
 
-        Real64 SumPeopleAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::TotOccupants);
+        // MJW TODO: this won't compile now: Real64 SumPeopleAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::TotOccupants);
+        Real64 SumPeopleAllZones = 0.0;
+        for (auto &thisZone : state.dataHeatBal->Zone) {
+            SumPeopleAllZones += thisZone.TotOccupants;
+        }
         if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TankCapacityPerPerson * SumPeopleAllZones;
 
         if (this->MaxCapacityWasAutoSized) {
@@ -11240,7 +11158,11 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
     }
     case SizingMode::PerFloorArea: {
 
-        Real64 SumFloorAreaAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::FloorArea);
+        // MJW TODO: this won't compile now: Real64 SumFloorAreaAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::FloorArea);
+        Real64 SumFloorAreaAllZones = 0.0;
+        for (auto &thisZone : state.dataHeatBal->Zone) {
+            SumFloorAreaAllZones += thisZone.FloorArea;
+        }
         if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TankCapacityPerArea * SumFloorAreaAllZones;
         if (this->MaxCapacityWasAutoSized) {
             Real64 rho;
@@ -11777,10 +11699,10 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
             case Constant::eFuel::FuelOilNo1:
             case Constant::eFuel::FuelOilNo2:
             case Constant::eFuel::Propane:
-            case Constant::eFuel::Steam:
             case Constant::eFuel::OtherFuel1:
             case Constant::eFuel::OtherFuel2:
-            case Constant::eFuel::DistrictHeating:
+            case Constant::eFuel::DistrictHeatingWater:
+            case Constant::eFuel::DistrictHeatingSteam:
                 FuelTypeIsLikeGas = true;
                 break;
             default: // FuelTypeIsLikeGas stays false
@@ -11905,7 +11827,11 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
         case SizingMode::PerPerson: {
             // how to get number of people?
 
-            Real64 SumPeopleAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::TotOccupants);
+            // MJW TODO: this won't compile now: Real64 SumPeopleAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::TotOccupants);
+            Real64 SumPeopleAllZones = 0.0;
+            for (auto &thisZone : state.dataHeatBal->Zone) {
+                SumPeopleAllZones += thisZone.TotOccupants;
+            }
             if (this->VolumeWasAutoSized) {
                 tmpTankVolume = this->Sizing.TankCapacityPerPerson * SumPeopleAllZones;
             }
@@ -11929,7 +11855,11 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
         }
         case SizingMode::PerFloorArea: {
 
-            Real64 SumFloorAreaAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::FloorArea);
+            // MJW TODO: this won't compile now: Real64 SumFloorAreaAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::FloorArea);
+            Real64 SumFloorAreaAllZones = 0.0;
+            for (auto &thisZone : state.dataHeatBal->Zone) {
+                SumFloorAreaAllZones += thisZone.FloorArea;
+            }
             if (this->VolumeWasAutoSized) {
                 tmpTankVolume = this->Sizing.TankCapacityPerArea * SumFloorAreaAllZones;
             }
@@ -12207,9 +12137,6 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                         MdotWater,
                         true);
                     //       simulate the HPWH coil/fan to find heating capacity
-                    Real64 EMP1 = 0.0;
-                    Real64 EMP2 = 0.0;
-                    Real64 EMP3 = 0.0;
                     if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanPlacement == DataHVACGlobals::BlowThru) {
                         //   simulate fan and DX coil twice
                         if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
@@ -12225,9 +12152,6 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                             VSCoilName,
                             VSCoilNum,
                             DataHVACGlobals::CycFanCycCoil,
-                            EMP1,
-                            EMP2,
-                            EMP3,
                             DataHVACGlobals::CompressorOperation::On,
                             1.0,
                             state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
@@ -12248,9 +12172,6 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                             VSCoilName,
                             VSCoilNum,
                             DataHVACGlobals::CycFanCycCoil,
-                            EMP1,
-                            EMP2,
-                            EMP3,
                             DataHVACGlobals::CompressorOperation::On,
                             1.0,
                             state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
@@ -12265,9 +12186,6 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                             VSCoilName,
                             VSCoilNum,
                             DataHVACGlobals::CycFanCycCoil,
-                            EMP1,
-                            EMP2,
-                            EMP3,
                             DataHVACGlobals::CompressorOperation::On,
                             1.0,
                             state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,
@@ -12288,9 +12206,6 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                             VSCoilName,
                             VSCoilNum,
                             DataHVACGlobals::CycFanCycCoil,
-                            EMP1,
-                            EMP2,
-                            EMP3,
                             DataHVACGlobals::CompressorOperation::On,
                             1.0,
                             state.dataVariableSpeedCoils->VarSpeedCoil(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel,

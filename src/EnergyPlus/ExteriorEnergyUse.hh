@@ -55,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -129,9 +130,9 @@ namespace ExteriorEnergyUse {
         Constant::eResource::Propane,
         Constant::eResource::Gasoline,
         Constant::eResource::Diesel,
-        Constant::eResource::Steam,
+        Constant::eResource::DistrictHeatingSteam,
         Constant::eResource::DistrictCooling,
-        Constant::eResource::DistrictHeating,
+        Constant::eResource::DistrictHeatingWater,
         Constant::eResource::OtherFuel1,
         Constant::eResource::OtherFuel2
     };
@@ -172,7 +173,7 @@ namespace ExteriorEnergyUse {
     {
         // Members
         std::string Name; // Descriptive name -- will show on reporting
-        ExteriorFuelUsage FuelType;
+        Constant::eFuel FuelType;
         int SchedPtr;       // Can be scheduled
         Real64 DesignLevel; // Design Consumption (Watts, except for Water Equipment)
         Real64 Power;       // Power = DesignLevel * ScheduleValue
@@ -182,7 +183,7 @@ namespace ExteriorEnergyUse {
 
         // Default Constructor
         ExteriorEquipmentUsage()
-            : FuelType(ExteriorFuelUsage::Invalid), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
+            : FuelType(Constant::eFuel::Invalid), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
         {
         }
     };

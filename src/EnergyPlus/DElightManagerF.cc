@@ -252,8 +252,8 @@ namespace DElightManagerF {
                     ShowWarningError(state, format("Maximum of 100 Reference Points exceeded for daylighting zone using DElight ={}", znDayl.Name));
                     ShowWarningError(state, "  Only first 100 Reference Points included in DElight analysis");
                 }
-                znDayl.DaylRefPtAbsCoord.allocate(3, znDayl.TotalDaylRefPoints);
-                znDayl.DaylRefPtAbsCoord = 0.0;
+                znDayl.DaylRefPtAbsCoord.allocate(znDayl.TotalDaylRefPoints);
+                std::fill(znDayl.DaylRefPtAbsCoord.begin(), znDayl.DaylRefPtAbsCoord.end(), Vector3<Real64>(0.0));
 
                 // RJH 2008-03-07: Allocate and Init DaylIllumAtRefPt array for this DElight zone
                 znDayl.DaylIllumAtRefPt.allocate(znDayl.TotalDaylRefPoints);
@@ -595,7 +595,7 @@ namespace DElightManagerF {
                                         RefPt_WCS_Coord(2) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
                                     }
                                 }
-                                znDayl.DaylRefPtAbsCoord({1, 3}, refPt.indexToFracAndIllum) = RefPt_WCS_Coord({1, 3});
+                                znDayl.DaylRefPtAbsCoord(refPt.indexToFracAndIllum) = {RefPt_WCS_Coord(1), RefPt_WCS_Coord(2), RefPt_WCS_Coord(3)};
 
                                 // Validate that Reference Point coordinates are within the host Zone
                                 if (RefPt_WCS_Coord(1) < thisZone.MinimumX || RefPt_WCS_Coord(1) > thisZone.MaximumX) {
@@ -836,7 +836,7 @@ namespace DElightManagerF {
         // FUNCTION INFORMATION:
         //       AUTHOR         Robert J. Hitchcock
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       From UtilityRoutines::MakeUPPERCase( function by Linda K. Lawrie
+        //       MODIFIED       From UtilityRoutines::makeUPPER( function by Linda K. Lawrie
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:

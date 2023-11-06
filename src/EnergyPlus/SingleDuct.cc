@@ -5873,7 +5873,7 @@ void GetATMixers(EnergyPlusData &state)
                             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3),
                                                             state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num)) &&
                                 UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2),
-                                                            state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType(Num))) {
+                                                            state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipTypeName(Num))) {
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(ATMixerNum).ADUNum).ZoneEqNum = CtrlZone;
                                 state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = CtrlZone;
                                 // Must wait until InitATMixer to fill other zone equip config data because ultimate zone inlet node is not known yet

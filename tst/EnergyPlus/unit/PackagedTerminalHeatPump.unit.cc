@@ -155,10 +155,6 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
         "    Lobby_ZN_1_FLR_2 WSHP Heating Mode,                        !- Heating Coil Name",
         "    Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,  !- Cooling Coil Object Type",
         "    Lobby_ZN_1_FLR_2 WSHP Cooling Mode,                        !- Cooling Coil Name",
-        "    2.5,                  !- Maximum Cycling Rate {cycles/hr}",
-        "    60.0,                 !- Heat Pump Time Constant {s}",
-        "    0.01,                 !- Fraction of On-Cycle Power Use",
-        "    60,                   !- Heat Pump Fan Delay Time {s}",
         "    Coil:Heating:Electric,                    !- Supplemental Heating Coil Object Type",
         "    Lobby_ZN_1_FLR_2 WSHP Supp Heating Coil,  !- Supplemental Heating Coil Name",
         "    50.0,                 !- Maximum Supply Air Temperature from Supplemental Heater {C}",
@@ -182,6 +178,9 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
         "    Autosize,             !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0.0,                  !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0.0,                  !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    2.5,                  !- Maximum Cycling Rate {cycles/hr}",
+        "    60.0,                 !- Latent Capacity Time Constant {s}",
+        "    60,                   !- Fan Delay Time {s}",
         "    0,                    !- Flag for Using Hot Gas Reheat, 0 or 1 {dimensionless}",
         "    PLF Curve,            !- Energy Part Load Fraction Curve Name",
         "    4682.3964854,         !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}",
@@ -3867,7 +3866,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(6);
     for (auto &thisZoneHB : state->dataZoneTempPredictorCorrector->zoneHeatBalance) {
         thisZoneHB.MAT = 23.0;
-        thisZoneHB.ZoneAirHumRat = 0.001;
+        thisZoneHB.airHumRat = 0.001;
     }
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(state->dataGlobal->NumOfZones);
@@ -3886,7 +3885,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp =
             state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).MAT;
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat =
-            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).ZoneAirHumRat;
+            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).airHumRat;
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Enthalpy =
             Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp,
                                        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat);
@@ -3954,7 +3953,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp =
             state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).MAT;
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat =
-            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).ZoneAirHumRat;
+            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).airHumRat;
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Enthalpy =
             Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp,
                                        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat);
@@ -4434,6 +4433,7 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
         "  ,                                       !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "  5,                                      !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "  0,                                      !- Crankcase Heater Capacity {W}",
+        "  ,                                       !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  Resistive,                              !- Defrost Strategy",
         "  Timed,                                  !- Defrost Control",
@@ -4467,6 +4467,7 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
         "  Autosize,                               !- Evaporative Condenser Air Flow Rate {m3/s}",
         "  Autosize,                               !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "  0,                                      !- Crankcase Heater Capacity {W}",
+        "  ,                                       !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  0,                                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  ,                                       !- Supply Water Storage Tank Name",
         "  ,                                       !- Condensate Collection Water Storage Tank Name",
@@ -4756,7 +4757,7 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
             ThermostatWithMinimumRuntime, !- Cycling Run Time Control Type
             300,                     !- Cycling Run Time
             SPACE1-1;                !- Control Zone or Zone List Name
-	
+
           OutdoorAir:Mixer,
         	PTACOAMixer,             !- Name
         	PTACOAMixerOutletNode,   !- Mixed Air Node Name
@@ -4990,7 +4991,7 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     int SysAvailNum = 1;
     int PriAirSysNum = 0;
     int AvailStatus = 0;
-    int constexpr ZoneEquipType = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
+    constexpr DataZoneEquipment::ZoneEquipType zoneEquipType = DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner;
     int constexpr CompNum = 1;
     bool SimAir = false;
     // set this as zone equipment
@@ -5023,7 +5024,7 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     state->dataHeatBalFanSys->TempTstatAir(1) = 21.1;
     sysAvailMgr.AvailStatus = 0;
     // run calc system availability requirement
-    SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
+    SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, zoneEquipType, CompNum);
     // check that the fan is off
     EXPECT_EQ(DataHVACGlobals::NoAction, sysAvailMgr.AvailStatus);
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOn);
@@ -5038,20 +5039,20 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOff);
 
     // test 2: availability manager status to on
-    state->dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(1).StartTime = 0.0;
-    state->dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(1).StopTime = 4.0;
+    state->dataHVACGlobal->ZoneComp(zoneEquipType).ZoneCompAvailMgrs(1).StartTime = 0.0;
+    state->dataHVACGlobal->ZoneComp(zoneEquipType).ZoneCompAvailMgrs(1).StopTime = 4.0;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 21.10;
     state->dataHeatBalFanSys->TempTstatAir(1) = 21.5;
     sysAvailMgr.AvailStatus = 0;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 0;
     // run calc system availability requirement
-    SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
+    SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, zoneEquipType, CompNum);
     // check that the availability manager is cycling On
     EXPECT_EQ(DataHVACGlobals::CycleOn, sysAvailMgr.AvailStatus);
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOn);
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOff);
-    state->dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(1).AvailStatus = DataHVACGlobals::CycleOn;
+    state->dataHVACGlobal->ZoneComp(zoneEquipType).ZoneCompAvailMgrs(1).AvailStatus = DataHVACGlobals::CycleOn;
     // run to set zone night cycle manager
     ZoneEquipmentManager::SimZoneEquipment(*state, true, SimAir);
     // test global zone fan control variables are turned on

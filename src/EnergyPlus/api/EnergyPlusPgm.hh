@@ -52,6 +52,7 @@
 
 // C++ Headers
 #include <string>
+#include <vector>
 
 namespace EnergyPlus {
 struct EnergyPlusData;
@@ -65,11 +66,11 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &f
 
 int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state);
 
-int ENERGYPLUSLIB_API EnergyPlusPgm(int argc, const char *argv[], std::string const &filepath = std::string());
+int ENERGYPLUSLIB_API EnergyPlusPgm(const std::vector<std::string> &args, std::string const &filepath = std::string());
 
 int ENERGYPLUSLIB_API RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath = std::string());
 
-int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const char *argv[]);
+int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, const std::vector<std::string> &args);
 
 void ENERGYPLUSLIB_API StoreProgressCallback(EnergyPlus::EnergyPlusData &state, void (*f)(int const));
 

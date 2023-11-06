@@ -138,6 +138,7 @@ void InitializeRuntimeLanguage(EnergyPlusData &state)
 
         // Create dynamic built-in variables
         state.dataRuntimeLangProcessor->YearVariableNum = NewEMSVariable(state, "YEAR", 0);
+        state.dataRuntimeLangProcessor->CalendarYearVariableNum = NewEMSVariable(state, "CALENDARYEAR", 0);
         state.dataRuntimeLangProcessor->MonthVariableNum = NewEMSVariable(state, "MONTH", 0);
         state.dataRuntimeLangProcessor->DayOfMonthVariableNum = NewEMSVariable(state, "DAYOFMONTH", 0); // 'DAYOFMONTH'?
         state.dataRuntimeLangProcessor->DayOfWeekVariableNum = NewEMSVariable(state, "DAYOFWEEK", 0);
@@ -180,6 +181,8 @@ void InitializeRuntimeLanguage(EnergyPlusData &state)
 
     // Update built-in variables
     state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->YearVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Year));
+    state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->CalendarYearVariableNum).Value =
+        SetErlValueNumber(double(state.dataGlobal->CalendarYear));
     state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->MonthVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Month));
     state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->DayOfMonthVariableNum).Value =
         SetErlValueNumber(double(state.dataEnvrn->DayOfMonth));
@@ -422,7 +425,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
         } else {
             Remainder = stripped(Line.substr(Pos + 1));
         }
-        //    Keyword = UtilityRoutines::MakeUPPERCase(Line(1:Pos-1))
+        //    Keyword = UtilityRoutines::makeUPPER(Line(1:Pos-1))
         Keyword = Line.substr(0, Pos);
 
         // the functionality in each block of this parser structure is so different that a regular IF block seems reasonable
@@ -467,8 +470,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
             } else {
                 Pos = scan(Remainder, ' ');
                 if (Pos == std::string::npos) Pos = Remainder.length();
-                Variable =
-                    UtilityRoutines::MakeUPPERCase(stripped(Remainder.substr(0, Pos))); // really the subroutine, or reference to instruction set
+                Variable = UtilityRoutines::makeUPPER(stripped(Remainder.substr(0, Pos))); // really the subroutine, or reference to instruction set
                 StackNum2 = UtilityRoutines::FindItemInList(Variable, state.dataRuntimeLang->ErlStack);
                 if (StackNum2 == 0) {
                     AddError(state, StackNum, LineNum, "Program or Subroutine name [" + Variable + "] not found for the RUN instruction.");
@@ -3422,7 +3424,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                         ShowContinueError(state, format("...Units entered in {} (deprecated use)=\"{}\"", cAlphaFieldNames(1), UnitsA));
                     }
                 }
-                curUnit = static_cast<Constant::Units>(getEnumerationValue(Constant::unitNamesUC, UtilityRoutines::MakeUPPERCase(UnitsB)));
+                curUnit = static_cast<Constant::Units>(getEnumValue(Constant::unitNamesUC, UtilityRoutines::makeUPPER(UnitsB)));
 
                 state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Name = cAlphaArgs(1);
 
@@ -3603,7 +3605,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                         ShowContinueError(state, format("...Units entered in {} (deprecated use)=\"{}\"", cAlphaFieldNames(1), UnitsA));
                     }
                 }
-                curUnit = static_cast<Constant::Units>(getEnumerationValue(Constant::unitNamesUC, UtilityRoutines::MakeUPPERCase(UnitsB)));
+                curUnit = static_cast<Constant::Units>(getEnumValue(Constant::unitNamesUC, UtilityRoutines::makeUPPER(UnitsB)));
                 
                 state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Name = cAlphaArgs(1);
 
@@ -3667,7 +3669,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
                 // Resource Type
                 Constant::eResource resource = static_cast<Constant::eResource>
-                    (getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(15))));
+                    (getEnumValue(Constant::eResourceNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(15))));
 
                 if (resource == Constant::eResource::Invalid) {
                     ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -4010,7 +4012,7 @@ int FindEMSVariable(EnergyPlusData &state,
     int TrendVarNum;
 
     Found = false;
-    std::string const UppercaseName = UtilityRoutines::MakeUPPERCase(VariableName);
+    std::string const UppercaseName = UtilityRoutines::makeUPPER(VariableName);
 
     // check in ErlVariables
     for (VariableNum = 1; VariableNum <= state.dataRuntimeLang->NumErlVariables; ++VariableNum) {
@@ -4064,7 +4066,7 @@ int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int c
 
         // Add the new variable
         VariableNum = state.dataRuntimeLang->NumErlVariables;
-        state.dataRuntimeLang->ErlVariable(VariableNum).Name = UtilityRoutines::MakeUPPERCase(VariableName);
+        state.dataRuntimeLang->ErlVariable(VariableNum).Name = UtilityRoutines::makeUPPER(VariableName);
         state.dataRuntimeLang->ErlVariable(VariableNum).StackNum = StackNum;
         state.dataRuntimeLang->ErlVariable(VariableNum).Value.Type = Value::Number; // ErlVariable values are numbers
     }
