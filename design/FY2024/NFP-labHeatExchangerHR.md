@@ -147,13 +147,13 @@ nominal HX supply air volume flow rate." will be removed too.
           \minimum 0.0
           \maximum 1.0
           \default 0.0                                             <- remove two 75% effectiveness point after here
-      N6, \field Sensible Effectiveness at 100% Cooling Air Flow
+      N4, \field Sensible Effectiveness at 100% Cooling Air Flow
           \type real
           \units dimensionless
           \minimum 0.0
           \maximum 1.0
           \default 0.0
-      N7, \field Latent Effectiveness at 100% Cooling Air Flow
+      N5, \field Latent Effectiveness at 100% Cooling Air Flow
           \type real
           \units dimensionless
           \minimum 0.0
@@ -171,7 +171,7 @@ nominal HX supply air volume flow rate." will be removed too.
       A6, \field Exhaust Air Outlet Node Name
           \required-field
           \type node
-      N10,\field Nominal Electric Power
+      N6, \field Nominal Electric Power
           \type real
           \units W
           \ip-units W
@@ -194,14 +194,14 @@ nominal HX supply air volume flow rate." will be removed too.
           \key ExhaustOnly
           \key MinimumExhaustTemperature
           \default None
-      N11,\field Threshold Temperature
+      N7, \field Threshold Temperature
           \type real
           \units C
           \default 1.7
           \note Supply (outdoor) air inlet temp threshold for exhaust air recirculation and
           \note exhaust only frost control types. Exhaust air outlet threshold Temperature for
           \note minimum exhaust temperature frost control type.
-      N12,\field Initial Defrost Time Fraction
+      N8, \field Initial Defrost Time Fraction
           \type real
           \units dimensionless
           \minimum 0.0
@@ -209,7 +209,7 @@ nominal HX supply air volume flow rate." will be removed too.
           \default 0.083
           \note Fraction of the time when frost control will be invoked at the threshold temperature.
           \note This field only used for exhaust air recirc and exhaust-only frost control types.
-      N13,\field Rate of Defrost Time Fraction Increase
+      N9, \field Rate of Defrost Time Fraction Increase
           \type real
           \units 1/K
           \minimum 0.0
@@ -223,26 +223,30 @@ nominal HX supply air volume flow rate." will be removed too.
           \default Yes
           \note Yes means that the heat exchanger will be locked out (off)
           \note when the economizer is operating or high humidity control is active
-      A11, \field Sensible Effectiveness of Heating Air Flow Curve Name                 <- start of the added fields
+      A11,\field Sensible Effectiveness of Heating Air Flow Curve Name
           \note optional
-          \note if this field has value, then field N2 and N4 will be ignored
+          \note if this field has value, then the sensivle effectiveness for heating
+          \note will be the value in N2 multiplied this curve value
           \type object-list
           \object-list UnivariateFunctions
-      A12, \field Latent Effectiveness of Heating Air Flow Curve Name
+      A12,\field Latent Effectiveness of Heating Air Flow Curve Name
           \note optional
-          \note if this field has value, then field N3 and N5 will be ignored
+          \note if this field has value, then the latent effectiveness for heating
+          \note will be the value in N3 multiplied this curve value
           \type object-list
           \object-list UnivariateFunctions
-      A13, \field Sensible Effectiveness of Cooling Air Flow Curve Name
+      A13,\field Sensible Effectiveness of Cooling Air Flow Curve Name
           \note optional
-          \note if this field has value, then field N6 and N8 will be ignored
+          \note if this field has value, then the sensivle effectiveness for cooling
+          \note will be the value in N4 multiplied this curve value
           \type object-list
           \object-list UnivariateFunctions
-      A14; \field Latent Effectiveness of Cooling Air Flow Curve Name
+      A14;\field Latent Effectiveness of Cooling Air Flow Curve Name
           \note optional
-          \note if this field has value, then field N7 and N9 will be ignored
+          \note if this field has value, then the latent effectiveness for cooling
+          \note will be the value in N5 multiplied this curve value
           \type object-list
-          \object-list UnivariateFunctions                                              <- end of the added fields
+          \object-list UnivariateFunctions
 
 ## Testing/Validation/Data Source(s)
 
