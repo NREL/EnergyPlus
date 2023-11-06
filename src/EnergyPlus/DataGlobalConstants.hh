@@ -151,7 +151,6 @@ namespace Constant {
         Num
     };
 
-        
     constexpr std::array<eFuel, static_cast<int>(eResource::Num)> eResource2eFuel = {eFuel::Electricity,
                                                                                      eFuel::NaturalGas,
                                                                                      eFuel::Gasoline,

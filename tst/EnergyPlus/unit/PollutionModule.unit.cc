@@ -475,13 +475,11 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
     for (int i = 0; i < (int)state->dataPollution->pollFuelFactorList.size(); ++i) {
         PollFuel pollFuel = state->dataPollution->pollFuelFactorList[i];
         std::string_view fuelName = Constant::eFuelNames[(int)pollFuel2fuel[(int)pollFuel]];
-            
-        EXPECT_EQ(format("Site:Environmental Impact {} Source Energy", fuelName),
-                  state->dataOutputProcessor->RVariableTypes(i * 17 + 1).VarName);
+
+        EXPECT_EQ(format("Site:Environmental Impact {} Source Energy", fuelName), state->dataOutputProcessor->RVariableTypes(i * 17 + 1).VarName);
         EXPECT_EQ(format("Site:Environmental Impact {} CO2 Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 2).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} CO Emissions Mass", fuelName),
-                  state->dataOutputProcessor->RVariableTypes(i * 17 + 3).VarName);
+        EXPECT_EQ(format("Site:Environmental Impact {} CO Emissions Mass", fuelName), state->dataOutputProcessor->RVariableTypes(i * 17 + 3).VarName);
         EXPECT_EQ(format("Site:Environmental Impact {} CH4 Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 4).VarName);
         EXPECT_EQ(format("Site:Environmental Impact {} NOx Emissions Mass", fuelName),
@@ -490,8 +488,7 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 6).VarName);
         EXPECT_EQ(format("Site:Environmental Impact {} SO2 Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 7).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} PM Emissions Mass", fuelName),
-                  state->dataOutputProcessor->RVariableTypes(i * 17 + 8).VarName);
+        EXPECT_EQ(format("Site:Environmental Impact {} PM Emissions Mass", fuelName), state->dataOutputProcessor->RVariableTypes(i * 17 + 8).VarName);
         EXPECT_EQ(format("Site:Environmental Impact {} PM10 Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 9).VarName);
         EXPECT_EQ(format("Site:Environmental Impact {} PM2.5 Emissions Mass", fuelName),

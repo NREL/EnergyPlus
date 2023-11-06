@@ -83,8 +83,22 @@ namespace Pollution {
         Num
     };
 
-    constexpr std::array<std::string_view, (int)Pollutant::Num> poll2Names = {
-       "CO2", "CO", "CH4", "NOx", "N2O", "SO2", "PM", "PM10", "PM2.5", "NH3", "NMVOC", "Hg", "Pb", "WaterEnvironmentalFactors", "Nuclear High", "Nuclear Low"};
+    constexpr std::array<std::string_view, (int)Pollutant::Num> poll2Names = {"CO2",
+                                                                              "CO",
+                                                                              "CH4",
+                                                                              "NOx",
+                                                                              "N2O",
+                                                                              "SO2",
+                                                                              "PM",
+                                                                              "PM10",
+                                                                              "PM2.5",
+                                                                              "NH3",
+                                                                              "NMVOC",
+                                                                              "Hg",
+                                                                              "Pb",
+                                                                              "WaterEnvironmentalFactors",
+                                                                              "Nuclear High",
+                                                                              "Nuclear Low"};
 
     constexpr std::array<OutputProcessor::Unit, (int)Pollutant::Num> poll2Units = {
         OutputProcessor::Unit::kg, // CO2
@@ -100,30 +114,30 @@ namespace Pollution {
         OutputProcessor::Unit::kg, // NMVOC
         OutputProcessor::Unit::kg, // Hg
         OutputProcessor::Unit::kg, // Pb
-        OutputProcessor::Unit::L, // Water
+        OutputProcessor::Unit::L,  // Water
         OutputProcessor::Unit::kg, // NuclearHigh
         OutputProcessor::Unit::m3, // NuclearLow
     };
 
     constexpr std::array<std::string_view, (int)Pollutant::Num> poll2outVarStrs = {
-        "CO2 Emissions Mass", // CO2
-        "CO Emissions Mass", // CO
-        "CH4 Emissions Mass", // CH4
-        "NOx Emissions Mass", // NOx
-        "N2O Emissions Mass", // N2O
-        "SO2 Emissions Mass", // SO2
-        "PM Emissions Mass", // PM
-        "PM10 Emissions Mass", // PM10
-        "PM2.5 Emissions Mass", // PM2_5
-        "NH3 Emissions Mass", // NH3
-        "NMVOC Emissions Mass", // NMVOC
-        "Hg Emissions Mass", // Hg
-        "Pb Emissions Mass", // Pb
-        "Water Consumption Volume", // Water
-        "Nuclear High Level Waste Mass", // NuclearHigh
+        "CO2 Emissions Mass",             // CO2
+        "CO Emissions Mass",              // CO
+        "CH4 Emissions Mass",             // CH4
+        "NOx Emissions Mass",             // NOx
+        "N2O Emissions Mass",             // N2O
+        "SO2 Emissions Mass",             // SO2
+        "PM Emissions Mass",              // PM
+        "PM10 Emissions Mass",            // PM10
+        "PM2.5 Emissions Mass",           // PM2_5
+        "NH3 Emissions Mass",             // NH3
+        "NMVOC Emissions Mass",           // NMVOC
+        "Hg Emissions Mass",              // Hg
+        "Pb Emissions Mass",              // Pb
+        "Water Consumption Volume",       // Water
+        "Nuclear High Level Waste Mass",  // NuclearHigh
         "Nuclear Low Level Waste Volume", // NuclearLow
     };
-        
+
     enum class PollFuel
     {
         Invalid = -1,
@@ -143,56 +157,56 @@ namespace Pollution {
     constexpr std::array<Real64, (int)PollFuel::Num> pollFuelFactors = {
         3.167, // Electricity
         1.084, // NaturalGas
-        1.05, // FuelOil1
-        1.05, // FuelOil2
-        1.05, // Coal
-        1.05, // Gasoline
-        1.05, // Propane
-        1.05, // Diesel
-        1.0, // OtherFuel1
-        1.0 // OtherFuel2
+        1.05,  // FuelOil1
+        1.05,  // FuelOil2
+        1.05,  // Coal
+        1.05,  // Gasoline
+        1.05,  // Propane
+        1.05,  // Diesel
+        1.0,   // OtherFuel1
+        1.0    // OtherFuel2
     };
-                
+
     constexpr std::array<PollFuel, (int)Constant::eFuel::Num> fuel2pollFuel = {
         PollFuel::Electricity, // Electricity
-        PollFuel::NaturalGas, // NaturalGas
-        PollFuel::Gasoline, // Gasoline
-        PollFuel::Diesel, // Diesel
-        PollFuel::Coal, // Coal
-        PollFuel::Propane, // Propane
-        PollFuel::FuelOil1, // FuelOilNo1
-        PollFuel::FuelOil2, // FuelOilNo2
-        PollFuel::OtherFuel1, // OtherFuel1
-        PollFuel::OtherFuel2, // OtherFuel2
+        PollFuel::NaturalGas,  // NaturalGas
+        PollFuel::Gasoline,    // Gasoline
+        PollFuel::Diesel,      // Diesel
+        PollFuel::Coal,        // Coal
+        PollFuel::Propane,     // Propane
+        PollFuel::FuelOil1,    // FuelOilNo1
+        PollFuel::FuelOil2,    // FuelOilNo2
+        PollFuel::OtherFuel1,  // OtherFuel1
+        PollFuel::OtherFuel2,  // OtherFuel2
         PollFuel::Electricity, // DistrictCooling
-        PollFuel::NaturalGas, // DistrictHeating
-        PollFuel::NaturalGas, // Steam
+        PollFuel::NaturalGas,  // DistrictHeating
+        PollFuel::NaturalGas,  // Steam
     };
 
     constexpr std::array<Constant::eFuel, (int)PollFuel::Num> pollFuel2fuel = {
         Constant::eFuel::Electricity, // Electricity
-        Constant::eFuel::NaturalGas, // NaturalGas
-        Constant::eFuel::FuelOilNo1, // FuelOil1
-        Constant::eFuel::FuelOilNo2, // FuelOil2
-        Constant::eFuel::Coal, // Coal
-        Constant::eFuel::Gasoline, // Gasoline
-        Constant::eFuel::Propane, // Propane
-        Constant::eFuel::Diesel, // Diesel
-        Constant::eFuel::OtherFuel1, // OtherFuel1
-        Constant::eFuel::OtherFuel2 // OtherFuel2
+        Constant::eFuel::NaturalGas,  // NaturalGas
+        Constant::eFuel::FuelOilNo1,  // FuelOil1
+        Constant::eFuel::FuelOilNo2,  // FuelOil2
+        Constant::eFuel::Coal,        // Coal
+        Constant::eFuel::Gasoline,    // Gasoline
+        Constant::eFuel::Propane,     // Propane
+        Constant::eFuel::Diesel,      // Diesel
+        Constant::eFuel::OtherFuel1,  // OtherFuel1
+        Constant::eFuel::OtherFuel2   // OtherFuel2
     };
 
     constexpr std::array<std::string_view, (int)PollFuel::Num> pollFuelNamesUC = {
         Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::Electricity]], // Electricity
-        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::NaturalGas]], // NaturalGas
-        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::FuelOil1]], // FuelOil1
-        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::FuelOil2]], // FuelOil2
-        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::Coal]], // Coal
-        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::Gasoline]], // Gasoline
-        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::Propane]], // Propane
-        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::Diesel]], // Diesel
-        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::OtherFuel1]], // OtherFuel1
-        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::OtherFuel2]] // OtherFuel2
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::NaturalGas]],  // NaturalGas
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::FuelOil1]],    // FuelOil1
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::FuelOil2]],    // FuelOil2
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::Coal]],        // Coal
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::Gasoline]],    // Gasoline
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::Propane]],     // Propane
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::Diesel]],      // Diesel
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::OtherFuel1]],  // OtherFuel1
+        Constant::eFuelNamesUC[(int)pollFuel2fuel[(int)PollFuel::OtherFuel2]]   // OtherFuel2
     };
 
     enum class PollFuelComponent
@@ -213,20 +227,18 @@ namespace Pollution {
         Num
     };
 
-    constexpr std::array<PollFuel, (int)PollFuelComponent::Num>  pollFuelComp2pollFuel = {
-        PollFuel::Electricity,
-        PollFuel::NaturalGas,
-        PollFuel::FuelOil1,
-        PollFuel::FuelOil2,
-        PollFuel::Coal,
-        PollFuel::Gasoline,
-        PollFuel::Propane,
-        PollFuel::Diesel,
-        PollFuel::OtherFuel1,
-        PollFuel::OtherFuel2,
-        PollFuel::Electricity,
-        PollFuel::Electricity
-    };
+    constexpr std::array<PollFuel, (int)PollFuelComponent::Num> pollFuelComp2pollFuel = {PollFuel::Electricity,
+                                                                                         PollFuel::NaturalGas,
+                                                                                         PollFuel::FuelOil1,
+                                                                                         PollFuel::FuelOil2,
+                                                                                         PollFuel::Coal,
+                                                                                         PollFuel::Gasoline,
+                                                                                         PollFuel::Propane,
+                                                                                         PollFuel::Diesel,
+                                                                                         PollFuel::OtherFuel1,
+                                                                                         PollFuel::OtherFuel2,
+                                                                                         PollFuel::Electricity,
+                                                                                         PollFuel::Electricity};
 
     constexpr std::array<PollFuelComponent, (int)PollFuel::Num> pollFuel2pollFuelComponent = {
         PollFuelComponent::Electricity,
@@ -240,8 +252,9 @@ namespace Pollution {
         PollFuelComponent::OtherFuel1,
         PollFuelComponent::OtherFuel2,
     };
-                
-    enum class PollFacilityMeter {
+
+    enum class PollFacilityMeter
+    {
         Invalid = -1,
         Electricity,
         NaturalGas,
@@ -261,25 +274,23 @@ namespace Pollution {
         CoolPurchased,
         Num
     };
-   
-    constexpr std::array<std::string_view, (int)PollFacilityMeter::Num> pollFacilityMeterNames = {
-        "Electricity:Facility",
-        "NaturalGas:Facility",
-        "FuelOilNo1:Facility",
-        "FuelOilNo2:Facility",
-        "Coal:Facility",
-        "Gasoline:Facility",
-        "Propane:Facility",
-        "Diesel:Facility",
-        "OtherFuel1:Facility",
-        "OtherFuel2:Facility",
-        "ElectricitySurplusSold:Facility",
-        "ElectricityPurchased:Facility",
-        "ElectricityProduced:Facility",
-        "DistrictHeatingSteam:Facility",
-        "DistrictHeatingWater:Facility",
-        "DistrictCooling:Facility"
-    };
+
+    constexpr std::array<std::string_view, (int)PollFacilityMeter::Num> pollFacilityMeterNames = {"Electricity:Facility",
+                                                                                                  "NaturalGas:Facility",
+                                                                                                  "FuelOilNo1:Facility",
+                                                                                                  "FuelOilNo2:Facility",
+                                                                                                  "Coal:Facility",
+                                                                                                  "Gasoline:Facility",
+                                                                                                  "Propane:Facility",
+                                                                                                  "Diesel:Facility",
+                                                                                                  "OtherFuel1:Facility",
+                                                                                                  "OtherFuel2:Facility",
+                                                                                                  "ElectricitySurplusSold:Facility",
+                                                                                                  "ElectricityPurchased:Facility",
+                                                                                                  "ElectricityProduced:Facility",
+                                                                                                  "DistrictHeatingSteam:Facility",
+                                                                                                  "DistrictHeatingWater:Facility",
+                                                                                                  "DistrictCooling:Facility"};
 
     struct ComponentProps
     {
@@ -311,11 +322,11 @@ namespace Pollution {
     void ReadEnergyMeters(EnergyPlusData &state);
 
     void GetFuelFactorInfo(EnergyPlusData &state,
-                           Constant::eFuel fuel,            // input fuel name  (standard from Tabular reports)
-                           bool &fuelFactorUsed,            // return value true if user has entered this fuel
-                           Real64 &fuelSourceFactor,        // if used, the source factor
-                           bool &fuelFactorScheduleUsed,    // if true, schedules for this fuel are used
-                           int &ffScheduleIndex             // if schedules for this fuel are used, return schedule index
+                           Constant::eFuel fuel,         // input fuel name  (standard from Tabular reports)
+                           bool &fuelFactorUsed,         // return value true if user has entered this fuel
+                           Real64 &fuelSourceFactor,     // if used, the source factor
+                           bool &fuelFactorScheduleUsed, // if true, schedules for this fuel are used
+                           int &ffScheduleIndex          // if schedules for this fuel are used, return schedule index
     );
 
     void GetEnvironmentalImpactFactorInfo(EnergyPlusData &state,
@@ -358,7 +369,6 @@ struct PollutionData : BaseGlobalStruct
     Real64 PurchHeatEffic = 0.0;
     Real64 PurchCoolCOP = 0.0;
     Real64 SteamConvEffic = 0.0;
-
 
     void clear_state() override
     {

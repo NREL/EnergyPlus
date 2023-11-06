@@ -202,7 +202,7 @@ void GetPollutionFactorInput(EnergyPlusData &state)
     auto &ip = state.dataInputProcessing->inputProcessor;
     auto &ipsc = state.dataIPShortCut;
     auto &pm = state.dataPollution;
-    
+
     if (!pm->GetInputFlagPollution) return; // Input already gotten
     pm->GetInputFlagPollution = false;
 
@@ -226,7 +226,7 @@ void GetPollutionFactorInput(EnergyPlusData &state)
     } else if (pm->PollutionReportSetup) {
         ShowWarningError(state, format("{}: not entered.  Values will be defaulted.", ipsc->cCurrentModuleObject));
     }
-    
+
     pm->PurchHeatEffic = 0.3;
     pm->PurchCoolCOP = 3.0;
     pm->SteamConvEffic = 0.25;
@@ -276,7 +276,7 @@ void GetPollutionFactorInput(EnergyPlusData &state)
                           ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
-        
+
         PollFuel pollFuel = static_cast<PollFuel>(getEnumValue(pollFuelNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(1))));
         if (pollFuel == PollFuel::Invalid) {
             ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
@@ -285,13 +285,13 @@ void GetPollutionFactorInput(EnergyPlusData &state)
         }
 
         pm->pollFuelFactorList.push_back(pollFuel);
-        
+
         auto &pollCoeff = pm->pollCoeffs[(int)pollFuel];
         Constant::eFuel fuel = pollFuel2fuel[(int)pollFuel];
-        
+
         if (pollCoeff.used) {
-            ShowWarningError(state, format("{}: {} already entered. Previous entry will be used.",
-                                           ipsc->cCurrentModuleObject, Constant::eFuelNames[(int)fuel]));
+            ShowWarningError(
+                state, format("{}: {} already entered. Previous entry will be used.", ipsc->cCurrentModuleObject, Constant::eFuelNames[(int)fuel]));
             continue;
         }
 
@@ -304,29 +304,35 @@ void GetPollutionFactorInput(EnergyPlusData &state)
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 ErrorsFound = true;
             } else if (!ScheduleManager::CheckScheduleValueMinMax(state, pollCoeff.sourceSchedNum, true, 0.0)) {
-                ShowSevereError(state, format("{}: {}, invalid {}=\"{}\" invalid values.",
-                                              ipsc->cCurrentModuleObject, Constant::eFuelNames[(int)fuel],
-                                              ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2)));
+                ShowSevereError(state,
+                                format("{}: {}, invalid {}=\"{}\" invalid values.",
+                                       ipsc->cCurrentModuleObject,
+                                       Constant::eFuelNames[(int)fuel],
+                                       ipsc->cAlphaFieldNames(2),
+                                       ipsc->cAlphaArgs(2)));
                 ShowContinueError(state, "Schedule values must be (>=0.).");
                 ErrorsFound = true;
-            }                
+            }
         }
 
         for (int iPollutant = 0; iPollutant < (int)Pollutant::Num; ++iPollutant) {
-            pollCoeff.pollutantCoeffs[iPollutant] = ipsc->rNumericArgs(iPollutant+2);
-            if (!ipsc->lAlphaFieldBlanks(iPollutant+3)) {
-                 
-                pollCoeff.pollutantSchedNums[iPollutant] = ScheduleManager::GetScheduleIndex(state, ipsc->cAlphaArgs(iPollutant+3));
+            pollCoeff.pollutantCoeffs[iPollutant] = ipsc->rNumericArgs(iPollutant + 2);
+            if (!ipsc->lAlphaFieldBlanks(iPollutant + 3)) {
+
+                pollCoeff.pollutantSchedNums[iPollutant] = ScheduleManager::GetScheduleIndex(state, ipsc->cAlphaArgs(iPollutant + 3));
                 if (pollCoeff.pollutantSchedNums[iPollutant] == 0) {
-                    ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(iPollutant+3), ipsc->cAlphaArgs(iPollutant+3));
+                    ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(iPollutant + 3), ipsc->cAlphaArgs(iPollutant + 3));
                     ErrorsFound = true;
                 } else if (!ScheduleManager::CheckScheduleValueMinMax(state, pollCoeff.pollutantSchedNums[iPollutant], true, 0.0)) {
-                    ShowSevereError(state, format("{}: {}, invalid {}=\"{}\" invalid values.",
-                                                  ipsc->cCurrentModuleObject, Constant::eFuelNames[(int)fuel],
-                                                  ipsc->cAlphaFieldNames(iPollutant+3), ipsc->cAlphaArgs(iPollutant+3)));
+                    ShowSevereError(state,
+                                    format("{}: {}, invalid {}=\"{}\" invalid values.",
+                                           ipsc->cCurrentModuleObject,
+                                           Constant::eFuelNames[(int)fuel],
+                                           ipsc->cAlphaFieldNames(iPollutant + 3),
+                                           ipsc->cAlphaArgs(iPollutant + 3)));
                     ShowContinueError(state, "Schedule values must be (>=0.).");
                     ErrorsFound = true;
-                }                
+                }
             }
         } // for (iPollutant)
 
@@ -339,69 +345,61 @@ void GetPollutionFactorInput(EnergyPlusData &state)
     if (pm->PollutionReportSetup) { // only do this if reporting on the pollution
         // Need to go through all of the Fuel Types and make sure a Fuel Factor was found for each type of energy being simulated
         // Check for Electricity
-        if (!pm->pollCoeffs[(int)PollFuel::Electricity].used &&
-            ((pm->facilityMeterNums[(int)PollFacilityMeter::Electricity] > 0) ||
-             (pm->facilityMeterNums[(int)PollFacilityMeter::ElectricityProduced] > 0) ||
-             (pm->facilityMeterNums[(int)PollFacilityMeter::CoolPurchased] > 0))) {
-            ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for ELECTRICITY",
-                                          ipsc->cCurrentModuleObject));
+        if (!pm->pollCoeffs[(int)PollFuel::Electricity].used && ((pm->facilityMeterNums[(int)PollFacilityMeter::Electricity] > 0) ||
+                                                                 (pm->facilityMeterNums[(int)PollFacilityMeter::ElectricityProduced] > 0) ||
+                                                                 (pm->facilityMeterNums[(int)PollFacilityMeter::CoolPurchased] > 0))) {
+            ShowSevereError(state,
+                            format("{} Not Found or Fuel not specified For Pollution Calculation for ELECTRICITY", ipsc->cCurrentModuleObject));
             ErrorsFound = true;
         }
 
         // Check for Natural Gas
         if (!pm->pollCoeffs[(int)PollFuel::NaturalGas].used &&
-            ((pm->facilityMeterNums[(int)PollFacilityMeter::NaturalGas] > 0) ||
-             (pm->facilityMeterNums[(int)PollFacilityMeter::HeatPurchased] > 0) ||
+            ((pm->facilityMeterNums[(int)PollFacilityMeter::NaturalGas] > 0) || (pm->facilityMeterNums[(int)PollFacilityMeter::HeatPurchased] > 0) ||
              (pm->facilityMeterNums[(int)PollFacilityMeter::Steam] > 0))) {
-            ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for NATURAL GAS",
-                                          ipsc->cCurrentModuleObject));
+            ShowSevereError(state,
+                            format("{} Not Found or Fuel not specified For Pollution Calculation for NATURAL GAS", ipsc->cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for FuelOilNo2 (Residual Oil)
-        if (!pm->pollCoeffs[(int)PollFuel::FuelOil2].used &&
-            (pm->facilityMeterNums[(int)PollFacilityMeter::FuelOil2] > 0)) {
-            ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #2", ipsc->cCurrentModuleObject));
+        if (!pm->pollCoeffs[(int)PollFuel::FuelOil2].used && (pm->facilityMeterNums[(int)PollFacilityMeter::FuelOil2] > 0)) {
+            ShowSevereError(state,
+                            format("{} Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #2", ipsc->cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for FuelOilNo1 (Distillate Oil)
-        if (!pm->pollCoeffs[(int)PollFuel::FuelOil1].used &&
-            (pm->facilityMeterNums[(int)PollFacilityMeter::FuelOil1] > 0)) {
-            ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #1", ipsc->cCurrentModuleObject));
+        if (!pm->pollCoeffs[(int)PollFuel::FuelOil1].used && (pm->facilityMeterNums[(int)PollFacilityMeter::FuelOil1] > 0)) {
+            ShowSevereError(state,
+                            format("{} Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #1", ipsc->cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for Coal
-        if (!pm->pollCoeffs[(int)PollFuel::Coal].used &&
-            (pm->facilityMeterNums[(int)PollFacilityMeter::Coal] > 0)) {
+        if (!pm->pollCoeffs[(int)PollFuel::Coal].used && (pm->facilityMeterNums[(int)PollFacilityMeter::Coal] > 0)) {
             ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for COAL", ipsc->cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for Gasoline
-        if (!pm->pollCoeffs[(int)PollFuel::Gasoline].used &&
-            (pm->facilityMeterNums[(int)PollFacilityMeter::Gasoline] > 0)) {
+        if (!pm->pollCoeffs[(int)PollFuel::Gasoline].used && (pm->facilityMeterNums[(int)PollFacilityMeter::Gasoline] > 0)) {
             ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for GASOLINE", ipsc->cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for Propane
-        if (!pm->pollCoeffs[(int)PollFuel::Propane].used &&
-            (pm->facilityMeterNums[(int)PollFacilityMeter::Propane] > 0)) {
+        if (!pm->pollCoeffs[(int)PollFuel::Propane].used && (pm->facilityMeterNums[(int)PollFacilityMeter::Propane] > 0)) {
             ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for PROPANE", ipsc->cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for Diesel
-        if (!pm->pollCoeffs[(int)PollFuel::Diesel].used &&
-            (pm->facilityMeterNums[(int)PollFacilityMeter::Diesel] > 0)) {
+        if (!pm->pollCoeffs[(int)PollFuel::Diesel].used && (pm->facilityMeterNums[(int)PollFacilityMeter::Diesel] > 0)) {
             ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for DIESEL", ipsc->cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for OtherFuel1
-        if (!pm->pollCoeffs[(int)PollFuel::OtherFuel1].used &&
-            (pm->facilityMeterNums[(int)PollFacilityMeter::OtherFuel1] > 0)) {
+        if (!pm->pollCoeffs[(int)PollFuel::OtherFuel1].used && (pm->facilityMeterNums[(int)PollFacilityMeter::OtherFuel1] > 0)) {
             ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for OTHERFUEL1", ipsc->cCurrentModuleObject));
             ErrorsFound = true;
         }
         // Check for OtherFuel2
-        if (!pm->pollCoeffs[(int)PollFuel::OtherFuel2].used &&
-            (pm->facilityMeterNums[(int)PollFacilityMeter::OtherFuel2] > 0)) {
+        if (!pm->pollCoeffs[(int)PollFuel::OtherFuel2].used && (pm->facilityMeterNums[(int)PollFacilityMeter::OtherFuel2] > 0)) {
             ShowSevereError(state, format("{} Not Found or Fuel not specified For Pollution Calculation for OTHERFUEL2", ipsc->cCurrentModuleObject));
             ErrorsFound = true;
         }
@@ -429,7 +427,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &pm = state.dataPollution;
-    
+
     if (pm->GetInputFlagPollution) {
         GetPollutionFactorInput(state);
         pm->GetInputFlagPollution = false;
@@ -439,11 +437,11 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
     for (PollFuel pollFuel : pm->pollFuelFactorList) {
 
         if (!pm->pollCoeffs[(int)pollFuel].used) continue;
-            
+
         auto &pollComp = pm->pollComps[(int)pollFuel2pollFuelComponent[(int)pollFuel]];
 
         Constant::eFuel fuel = pollFuel2fuel[(int)pollFuel];
-        
+
         // Need to check whether this fuel is used?
         SetupOutputVariable(state,
                             format("Environmental Impact {} Source Energy", Constant::eFuelNames[(int)fuel]),
@@ -460,8 +458,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
 
         for (int iPollutant = 0; iPollutant < (int)Pollutant::Num; ++iPollutant) {
             SetupOutputVariable(state,
-                                format("Environmental Impact {} {}",
-                                       Constant::eFuelNames[(int)fuel], poll2outVarStrs[iPollutant]),
+                                format("Environmental Impact {} {}", Constant::eFuelNames[(int)fuel], poll2outVarStrs[iPollutant]),
                                 poll2Units[iPollutant],
                                 pollComp.pollutantVals[iPollutant],
                                 OutputProcessor::SOVTimeStepType::System,
@@ -554,7 +551,7 @@ void CheckPollutionMeterReporting(EnergyPlusData &state)
     // in progress (what is in progress?)
 
     auto const &pm = state.dataPollution;
-        
+
     if (pm->NumFuelFactors == 0 || pm->NumEnvImpactFactors == 0) {
         if (ReportingThisVariable(state, "Environmental Impact Total N2O Emissions Carbon Equivalent Mass") ||
             ReportingThisVariable(state, "Environmental Impact Total CH4 Emissions Carbon Equivalent Mass") ||
@@ -568,7 +565,6 @@ void CheckPollutionMeterReporting(EnergyPlusData &state)
         }
     }
 }
-
 
 // End of Get Input subroutines for the Pollution Module
 //******************************************************************************
@@ -589,11 +585,11 @@ void CalcPollution(EnergyPlusData &state)
 
     //     For each pollution/fuel type, Schedule values are allowed.  Thus, calculations are bundled.
     auto &pm = state.dataPollution;
-    
+
     for (int iPoll = 0; iPoll < (int)Pollutant::Num; ++iPoll) {
         pm->pollutantVals[iPoll] = 0.0;
 
-        for (int iPollFuel = 0; iPollFuel < (int)PollFuel::Num; ++iPollFuel) {   
+        for (int iPollFuel = 0; iPollFuel < (int)PollFuel::Num; ++iPollFuel) {
             auto &pollCoeff = pm->pollCoeffs[iPollFuel];
             PollFuelComponent pollFuelComp = pollFuel2pollFuelComponent[iPollFuel];
             auto &pollComp = pm->pollComps[(int)pollFuelComp];
@@ -604,17 +600,16 @@ void CalcPollution(EnergyPlusData &state)
 
                 // Why are these two the exceptions?
                 if (iPoll != (int)Pollutant::Water && iPoll != (int)Pollutant::NuclearLow) pollutantVal *= 0.001;
-                
+
                 if (pollCoeff.pollutantSchedNums[iPoll] != 0) {
                     pollutantVal *= ScheduleManager::GetCurrentScheduleValue(state, pollCoeff.pollutantSchedNums[iPoll]);
                 }
-                pollComp.pollutantVals[iPoll] =
-                    pm->facilityMeterFuelComponentVals[(int)pollFuelComp] * 1.0e-6 * pollutantVal;
+                pollComp.pollutantVals[iPoll] = pm->facilityMeterFuelComponentVals[(int)pollFuelComp] * 1.0e-6 * pollutantVal;
             }
 
             pm->pollutantVals[iPoll] += pollComp.pollutantVals[iPoll];
         } // for (iPollFactor)
-    } // for (iPoll)
+    }     // for (iPoll)
 
     pm->TotCarbonEquivFromN2O = pm->pollutantVals[(int)Pollutant::N2O] * pm->CarbonEquivN2O;
     pm->TotCarbonEquivFromCH4 = pm->pollutantVals[(int)Pollutant::CH4] * pm->CarbonEquivCH4;
@@ -624,10 +619,11 @@ void CalcPollution(EnergyPlusData &state)
     auto &pollCompElec = pm->pollComps[(int)PollFuelComponent::Electricity];
     auto &pollCompElecPurchased = pm->pollComps[(int)PollFuelComponent::ElectricityPurchased];
     auto &pollCompElecSurplusSold = pm->pollComps[(int)PollFuelComponent::ElectricitySurplusSold];
-    
+
     pollCompElec.sourceVal = pm->facilityMeterFuelComponentVals[(int)PollFuelComponent::Electricity] * pollCoeffElec.sourceCoeff;
     pollCompElecPurchased.sourceVal = pm->facilityMeterFuelComponentVals[(int)PollFuelComponent::ElectricityPurchased] * pollCoeffElec.sourceCoeff;
-    pollCompElecSurplusSold.sourceVal = pm->facilityMeterFuelComponentVals[(int)PollFuelComponent::ElectricitySurplusSold] * pollCoeffElec.sourceCoeff;
+    pollCompElecSurplusSold.sourceVal =
+        pm->facilityMeterFuelComponentVals[(int)PollFuelComponent::ElectricitySurplusSold] * pollCoeffElec.sourceCoeff;
 
     if (pollCoeffElec.sourceSchedNum != 0) {
         Real64 pollCoeffElecSchedVal = ScheduleManager::GetCurrentScheduleValue(state, pollCoeffElec.sourceSchedNum);
@@ -635,21 +631,27 @@ void CalcPollution(EnergyPlusData &state)
         pollCompElecPurchased.sourceVal *= pollCoeffElecSchedVal;
         pollCompElecSurplusSold.sourceVal *= pollCoeffElecSchedVal;
     }
-    
+
     // does not include district heating or steam
     auto const &pollCoeffGas = pm->pollCoeffs[(int)PollFuel::NaturalGas];
     auto &pollCompGas = pm->pollComps[(int)PollFuelComponent::NaturalGas];
     pollCompGas.sourceVal = pm->facilityMeterVals[(int)PollFacilityMeter::NaturalGas] * pollCoeffGas.sourceCoeff;
     if (pollCoeffGas.sourceSchedNum != 0) {
-         pollCompGas.sourceVal *= ScheduleManager::GetCurrentScheduleValue(state, pollCoeffGas.sourceSchedNum);
+        pollCompGas.sourceVal *= ScheduleManager::GetCurrentScheduleValue(state, pollCoeffGas.sourceSchedNum);
     }
 
-    for (PollFuel pollFuel : {PollFuel::FuelOil1, PollFuel::FuelOil2, PollFuel::Diesel, PollFuel::Gasoline,
-                              PollFuel::Propane, PollFuel::Coal, PollFuel::OtherFuel1, PollFuel::OtherFuel2}) {
+    for (PollFuel pollFuel : {PollFuel::FuelOil1,
+                              PollFuel::FuelOil2,
+                              PollFuel::Diesel,
+                              PollFuel::Gasoline,
+                              PollFuel::Propane,
+                              PollFuel::Coal,
+                              PollFuel::OtherFuel1,
+                              PollFuel::OtherFuel2}) {
         auto const &pollCoeff = pm->pollCoeffs[(int)pollFuel];
         PollFuelComponent pollFuelComponent = pollFuel2pollFuelComponent[(int)pollFuel];
         auto &pollComp = pm->pollComps[(int)pollFuelComponent];
-            
+
         pollComp.sourceVal = pm->facilityMeterFuelComponentVals[(int)pollFuelComponent] * pollCoeff.sourceCoeff;
         if (pollCoeff.sourceSchedNum != 0) {
             pollComp.sourceVal *= ScheduleManager::GetCurrentScheduleValue(state, pollCoeff.sourceSchedNum);
@@ -672,7 +674,7 @@ void ReadEnergyMeters(EnergyPlusData &state)
     // Using/Aliasing
     Real64 FracTimeStepZone = state.dataHVACGlobal->FracTimeStepZone;
     auto &pm = state.dataPollution;
-    
+
     for (int iMeter = 0; iMeter < (int)PollFacilityMeter::Num; ++iMeter) {
         pm->facilityMeterVals[iMeter] =
             GetInstantMeterValue(state, pm->facilityMeterNums[iMeter], OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
@@ -687,8 +689,7 @@ void ReadEnergyMeters(EnergyPlusData &state)
     // defined COP.
 
     pm->facilityMeterFuelComponentVals[(int)PollFuelComponent::Electricity] =
-        pm->facilityMeterVals[(int)PollFacilityMeter::Electricity] -
-        pm->facilityMeterVals[(int)PollFacilityMeter::ElectricityProduced] +
+        pm->facilityMeterVals[(int)PollFacilityMeter::Electricity] - pm->facilityMeterVals[(int)PollFacilityMeter::ElectricityProduced] +
         pm->facilityMeterVals[(int)PollFacilityMeter::CoolPurchased] / pm->PurchCoolCOP;
 
     if (pm->facilityMeterFuelComponentVals[(int)PollFuelComponent::Electricity] < 0.0)
@@ -708,8 +709,10 @@ void ReadEnergyMeters(EnergyPlusData &state)
     pm->facilityMeterFuelComponentVals[(int)PollFuelComponent::Diesel] = pm->facilityMeterVals[(int)PollFacilityMeter::Diesel];
     pm->facilityMeterFuelComponentVals[(int)PollFuelComponent::OtherFuel1] = pm->facilityMeterVals[(int)PollFacilityMeter::OtherFuel1];
     pm->facilityMeterFuelComponentVals[(int)PollFuelComponent::OtherFuel2] = pm->facilityMeterVals[(int)PollFacilityMeter::OtherFuel2];
-    pm->facilityMeterFuelComponentVals[(int)PollFuelComponent::ElectricityPurchased] = pm->facilityMeterVals[(int)PollFacilityMeter::ElectricityPurchased];
-    pm->facilityMeterFuelComponentVals[(int)PollFuelComponent::ElectricitySurplusSold] = pm->facilityMeterVals[(int)PollFacilityMeter::ElectricitySurplusSold];
+    pm->facilityMeterFuelComponentVals[(int)PollFuelComponent::ElectricityPurchased] =
+        pm->facilityMeterVals[(int)PollFacilityMeter::ElectricityPurchased];
+    pm->facilityMeterFuelComponentVals[(int)PollFuelComponent::ElectricitySurplusSold] =
+        pm->facilityMeterVals[(int)PollFacilityMeter::ElectricitySurplusSold];
 }
 
 // *****************************************************************************
@@ -717,11 +720,11 @@ void ReadEnergyMeters(EnergyPlusData &state)
 // *****************************************************************************
 
 void GetFuelFactorInfo(EnergyPlusData &state,
-                       Constant::eFuel fuel, // input fuel name  (standard from Tabular reports)
-                       bool &fuelFactorUsed,            // return value true if user has entered this fuel
-                       Real64 &fuelSourceFactor,        // if used, the source factor
-                       bool &fuelFactorScheduleUsed,    // if true, schedules for this fuel are used
-                       int &ffScheduleIndex             // if schedules for this fuel are used, return schedule index
+                       Constant::eFuel fuel,         // input fuel name  (standard from Tabular reports)
+                       bool &fuelFactorUsed,         // return value true if user has entered this fuel
+                       Real64 &fuelSourceFactor,     // if used, the source factor
+                       bool &fuelFactorScheduleUsed, // if true, schedules for this fuel are used
+                       int &ffScheduleIndex          // if schedules for this fuel are used, return schedule index
 )
 {
 
@@ -733,7 +736,7 @@ void GetFuelFactorInfo(EnergyPlusData &state,
     // This routine allows access to data inside this module from other modules (specifically the
     // output tabular reports.
     auto &pm = state.dataPollution;
-        
+
     if (pm->GetInputFlagPollution) {
         GetPollutionFactorInput(state);
         pm->GetInputFlagPollution = false;
@@ -746,7 +749,7 @@ void GetFuelFactorInfo(EnergyPlusData &state,
 
     PollFuel pollFuel = fuel2pollFuel[(int)fuel];
     auto const &pollCoeff = pm->pollCoeffs[(int)pollFuel];
-    
+
     if (pollCoeff.used) {
         fuelFactorUsed = true;
         fuelSourceFactor = pollCoeff.sourceCoeff;
@@ -797,4 +800,4 @@ void GetEnvironmentalImpactFactorInfo(EnergyPlusData &state,
     }
 }
 
-} // namespace EnergyPlus::PollutionModule
+} // namespace EnergyPlus::Pollution
