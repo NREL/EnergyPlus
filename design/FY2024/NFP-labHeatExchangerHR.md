@@ -226,25 +226,25 @@ nominal HX supply air volume flow rate." will be removed too.
       A11,\field Sensible Effectiveness of Heating Air Flow Curve Name
           \note optional
           \note if this field has value, then the sensivle effectiveness for heating
-          \note will be the value in N2 multiplied this curve value
+          \note will be the value in N2 multiplied by this curve value
           \type object-list
           \object-list UnivariateFunctions
       A12,\field Latent Effectiveness of Heating Air Flow Curve Name
           \note optional
           \note if this field has value, then the latent effectiveness for heating
-          \note will be the value in N3 multiplied this curve value
+          \note will be the value in N3 multiplied by this curve value
           \type object-list
           \object-list UnivariateFunctions
       A13,\field Sensible Effectiveness of Cooling Air Flow Curve Name
           \note optional
           \note if this field has value, then the sensivle effectiveness for cooling
-          \note will be the value in N4 multiplied this curve value
+          \note will be the value in N4 multiplied by this curve value
           \type object-list
           \object-list UnivariateFunctions
       A14;\field Latent Effectiveness of Cooling Air Flow Curve Name
           \note optional
           \note if this field has value, then the latent effectiveness for cooling
-          \note will be the value in N5 multiplied this curve value
+          \note will be the value in N5 multiplied by this curve value
           \type object-list
           \object-list UnivariateFunctions
 

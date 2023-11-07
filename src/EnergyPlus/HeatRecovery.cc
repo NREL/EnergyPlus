@@ -514,10 +514,14 @@ namespace HeatRecovery {
             }
 
             // yujie: read new curves here
-            thisExchanger.HeatEffectSensibleCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11)); // convert curve name to number
-            thisExchanger.HeatEffectLatentCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(12)); // convert curve name to number
-            thisExchanger.CoolEffectSensibleCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(13)); // convert curve name to number
-            thisExchanger.CoolEffectLatentCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(14)); // convert curve name to number
+            thisExchanger.HeatEffectSensibleCurveIndex =
+                Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11)); // convert curve name to number
+            thisExchanger.HeatEffectLatentCurveIndex =
+                Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(12)); // convert curve name to number
+            thisExchanger.CoolEffectSensibleCurveIndex =
+                Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(13)); // convert curve name to number
+            thisExchanger.CoolEffectLatentCurveIndex =
+                Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(14)); // convert curve name to number
 
             BranchNodeConnections::TestCompSet(state,
                                                DataHVACGlobals::cHXTypes(thisExchanger.ExchType),
