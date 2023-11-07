@@ -235,12 +235,11 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
         state.dataContaminantBalance->ZoneContamGenericConstant(Loop).Name = AlphaName(1);
 
         state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ZoneName = AlphaName(2);
-        state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ActualZoneNum =
-            UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
+        state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ActualZoneNum = Util::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
                             format("{}{}=\"{}\", invalid {} entered={}",
@@ -400,12 +399,12 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
         state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).Name = AlphaName(1);
 
         state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfName = AlphaName(2);
         state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum =
-            UtilityRoutines::FindItemInList(AlphaName(2), state.afn->MultizoneSurfaceData, &AirflowNetwork::MultizoneSurfaceProp::SurfName);
+            Util::FindItemInList(AlphaName(2), state.afn->MultizoneSurfaceData, &AirflowNetwork::MultizoneSurfaceProp::SurfName);
         if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum == 0) {
             ShowSevereError(state,
                             format("{}{}=\"{}\", invalid {} entered={}",
@@ -566,12 +565,11 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
         state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).Name = AlphaName(1);
 
         state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ZoneName = AlphaName(2);
-        state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ActualZoneNum =
-            UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
+        state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ActualZoneNum = Util::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
                             format("{}{}=\"{}\", invalid {} entered={}",
@@ -704,12 +702,11 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
         state.dataContaminantBalance->ZoneContamGenericDecay(Loop).Name = AlphaName(1);
 
         state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ZoneName = AlphaName(2);
-        state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ActualZoneNum =
-            UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
+        state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ActualZoneNum = Util::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
                             format("{}{}=\"{}\", invalid {} entered={}",
@@ -849,12 +846,11 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
         state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).Name = AlphaName(1);
 
         state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfName = AlphaName(2);
-        state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum =
-            UtilityRoutines::FindItemInList(AlphaName(2), state.dataSurface->Surface);
+        state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum = Util::FindItemInList(AlphaName(2), state.dataSurface->Surface);
         if (state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum == 0) {
             ShowSevereError(state,
                             format("{}{}=\"{}\", invalid {} entered={}",
@@ -995,11 +991,11 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
         state.dataContaminantBalance->ZoneContamGenericDVS(Loop).Name = AlphaName(1);
 
         state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfName = AlphaName(2);
-        state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataSurface->Surface);
+        state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfNum = Util::FindItemInList(AlphaName(2), state.dataSurface->Surface);
         if (state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfNum == 0) {
             ShowSevereError(state,
                             format("{}{}=\"{}\", invalid {} entered={}",
@@ -1120,12 +1116,11 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
         state.dataContaminantBalance->ZoneContamGenericDRS(Loop).Name = AlphaName(1);
 
         state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ZoneName = AlphaName(2);
-        state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ActualZoneNum =
-            UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
+        state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ActualZoneNum = Util::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
                             format("{}{}=\"{}\", invalid {} entered={}",
@@ -1310,12 +1305,12 @@ void GetZoneContaminanSetPoints(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2);
         state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum =
-            UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
+            Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).ActualZoneNum == 0) {
             ShowSevereError(state,
                             format("{}=\"{}\" invalid {}=\"{}\" not found.",

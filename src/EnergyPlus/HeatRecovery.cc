@@ -141,7 +141,7 @@ namespace HeatRecovery {
         // Find the correct unit index
         int HeatExchNum; // index of unit being simulated
         if (CompIndex == 0) {
-            HeatExchNum = UtilityRoutines::FindItemInList(CompName, state.dataHeatRecovery->ExchCond);
+            HeatExchNum = Util::FindItemInList(CompName, state.dataHeatRecovery->ExchCond);
             if (HeatExchNum == 0) {
                 ShowFatalError(state, format("SimHeatRecovery: Unit not found={}", CompName));
             }
@@ -470,19 +470,19 @@ namespace HeatRecovery {
 
             thisExchanger.NomElecPower = state.dataIPShortCut->rNumericArgs(6);
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "Yes")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "Yes")) {
                 thisExchanger.ControlToTemperatureSetPoint = true;
             } else {
-                if (!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "No")) {
+                if (!Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "No")) {
                     ShowSevereError(state, "Rotary HX Speed Modulation or Plate Bypass for Temperature Control for ");
                     ShowContinueError(state, format("{} must be set to Yes or No", thisExchanger.Name));
                     ErrorsFound = true;
                 }
             }
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "Plate")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), "Plate")) {
                 thisExchanger.ExchConfig = HXConfigurationType::Plate;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "Rotary")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), "Rotary")) {
                 thisExchanger.ExchConfig = HXConfigurationType::Rotary;
             } else {
                 ShowSevereError(state, format("{} configuration not found= {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(8)));
@@ -497,7 +497,7 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            if (!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "None")) {
+            if (!Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "None")) {
                 thisExchanger.ThresholdTemperature = state.dataIPShortCut->rNumericArgs(7);
                 thisExchanger.InitialDefrostTime = state.dataIPShortCut->rNumericArgs(8);
                 thisExchanger.RateofDefrostTimeIncrease = state.dataIPShortCut->rNumericArgs(9);
@@ -1009,7 +1009,7 @@ namespace HeatRecovery {
             int const ExchNum = ExchIndex + NumAirToAirPlateExchs + NumAirToAirGenericExchs;
             auto &thisExchanger = state.dataHeatRecovery->ExchCond(ExchNum);
             for (int PerfDataNum = 1; PerfDataNum <= NumDesBalExchsPerfDataType1; ++PerfDataNum) {
-                if (UtilityRoutines::SameString(thisExchanger.HeatExchPerfName, state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name)) {
+                if (Util::SameString(thisExchanger.HeatExchPerfName, state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name)) {
                     thisExchanger.PerfDataIndex = PerfDataNum;
                     break;
                 }
@@ -4810,7 +4810,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SupInletNode;
         } else {
@@ -4842,7 +4842,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SupOutletNode;
         } else {
@@ -4874,7 +4874,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SecInletNode;
         } else {
@@ -4906,7 +4906,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SecOutletNode;
         } else {
@@ -4938,7 +4938,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).NomSupAirVolFlow;
         } else {
@@ -4971,7 +4971,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).ExchType;
         } else {
