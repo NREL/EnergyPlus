@@ -119,14 +119,14 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     state->dataHeatRecovery->ExchCond(ExchNum).SecInletNode = 3;
     state->dataHeatRecovery->ExchCond(ExchNum).SecOutletNode = 4;
     state->dataHeatRecovery->ExchCond(ExchNum).SchedPtr = -1;
-    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible75 = 0.75;
     state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensible100 = 0.75;
-    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatent75 = 0.0;
     state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatent100 = 0.0;
-    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 = 0.75;
     state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 = 0.75;
-    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatent75 = 0.0;
     state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatent100 = 0.0;
+    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensibleCurveIndex = 1;
+    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatentCurveIndex = 1;
+    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensibleCurveIndex = 1;
+    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatentCurveIndex = 1;
 
     state->dataHeatRecovery->ExchCond(ExchNum).Name = "Test Heat Recovery 1";
     state->dataHeatRecovery->ExchCond(ExchNum).ExchType = HX_AIRTOAIR_GENERIC;
@@ -176,7 +176,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     Toutlet = (state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp +
-               (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 *
+               (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 *
                 (state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp - state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp)));
     Tnode = state->dataHeatRecovery->ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
@@ -187,7 +187,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     Toutlet = (state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp +
-               (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 *
+               (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 *
                 (state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp - state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp)));
     Tnode = state->dataHeatRecovery->ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
@@ -257,7 +257,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     EXPECT_DOUBLE_EQ((state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp +
-                      (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 *
+                      (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 *
                        (state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp - state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp))),
                      state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 
@@ -267,7 +267,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     thisHX.UpdateHeatRecovery(*state);
     EXPECT_DOUBLE_EQ((state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp +
-                      (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 *
+                      (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 *
                        (state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp - state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp))),
                      state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 
@@ -302,7 +302,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     thisHX.CalcAirToAirGenericHeatExch(*state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, PartLoadRatio);
     thisHX.UpdateHeatRecovery(*state);
     EXPECT_DOUBLE_EQ((state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp +
-                      (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible75 *
+                      (state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 *
                        (state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp - state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp))),
                      state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 }
@@ -3040,12 +3040,8 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    autosize,                !- Nominal Supply Air Flow Rate {m3/s}",
         "    0.7,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
         "    0.65,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
-        "    0.750000,                !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
-        "    0.700000,                !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
         "    0.7,                     !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
         "    0.65,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
-        "    0.750000,                !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
-        "    0.700000,                !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
         "    DOAS Mixed Air Outlet,   !- Supply Air Inlet Node Name",
         "    DOAS Heat Recovery Supply Outlet,  !- Supply Air Outlet Node Name",
         "    DOAS Relief Air Outlet,  !- Exhaust Air Inlet Node Name",
@@ -3057,7 +3053,58 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    1.7,                     !- Threshold Temperature {C}",
         "    0.083,                   !- Initial Defrost Time Fraction {dimensionless}",
         "    0.012,                   !- Rate of Defrost Time Fraction Increase {1/K}",
-        "    Yes;                     !- Economizer Lockout",
+        "    Yes,                     !- Economizer Lockout",
+        "    SenEffectivenessTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name",
+        "    LatEffectivenessTable,   !- Latent Effectiveness of Heating Air Flow Curve Name",
+        "    SenEffectivenessTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name",
+        "    LatEffectivenessTable;   !- Latent Effectiveness of Cooling Air Flow Curve Name",
+
+        "  Table:IndependentVariable,",
+        "    airFlowRatio,  !- Name",
+        "    Linear,                  !- Interpolation Method",
+        "    Linear,                  !- Extrapolation Method",
+        "    0.0,                     !- Minimum Value",
+        "    1.0,                     !- Maximum Value",
+        "    ,                        !- Normalization Reference Value",
+        "    Dimensionless,           !- Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.75,                    !- Value 1",
+        "    1.0;                     !- Value 2",
+
+        "  Table:IndependentVariableList,",
+        "    effectiveness_IndependentVariableList,  !- Name",
+        "    airFlowRatio;     !- Independent Variable 1 Name",
+
+        "  Table:Lookup,",
+        "    SenEffectivenessTable,   !- Name",
+        "    effectiveness_IndependentVariableList,  !- Independent Variable List Name",
+        "    DivisorOnly,             !- Normalization Method",
+        "    0.7,                     !- Normalization Divisor",
+        "    0.0,                     !- Minimum Output",
+        "    1.0,                     !- Maximum Output",
+        "    Dimensionless,           !- Output Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.75,                    !- Output Value 1",
+        "    0.70;                    !- Output Value 2",
+
+        "  Table:Lookup,",
+        "    LatEffectivenessTable,   !- Name",
+        "    effectiveness_IndependentVariableList,  !- Independent Variable List Name",
+        "    DivisorOnly,             !- Normalization Method",
+        "    0.65,                    !- Normalization Divisor",
+        "    0.0,                     !- Minimum Output",
+        "    1.0,                     !- Maximum Output",
+        "    Dimensionless,           !- Output Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.70,                    !- Output Value 1",
+        "    0.65;                    !- Output Value 2",
+
 
         "Controller:WaterCoil,",
         "    DOAS Cooling Coil Controller,  !- Name",
@@ -3971,12 +4018,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_AirFlowSizing)
         "    autosize,                !- Nominal Supply Air Flow Rate {m3/s}",
         "    0.76,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
         "    0.68,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
-        "    0.81,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
-        "    0.73,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
         "    0.76,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
         "    0.68,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
-        "    0.81,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
-        "    0.73,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
         "    ERV OA Inlet Node,       !- Supply Air Inlet Node Name",
         "    HR Pri Air Outlet Node,  !- Supply Air Outlet Node Name",
         "    Zone 1 Exhaust Node,     !- Exhaust Air Inlet Node Name",
@@ -4081,12 +4124,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
         "      0.5,                     !- Nominal Supply Air Flow Rate {m3/s}",
         "      0.70,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
         "      0.60,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
-        "      0.70,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
-        "      0.60,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
         "      0.75,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
         "      0.60,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
-        "      0.75,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
-        "      0.60,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
         "      VAV WITH REHEAT_OAInlet Node,  !- Supply Air Inlet Node Name",
         "      VAV WITH REHEAT Heat Recovery Outlet Node,  !- Supply Air Outlet Node Name",
         "      VAV WITH REHEAT_OARelief Node,  !- Exhaust Air Inlet Node Name",
@@ -4098,7 +4137,59 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
         "      1.7,                     !- Threshold Temperature {C}",
         "      ,                        !- Initial Defrost Time Fraction",
         "      ,                        !- Rate of Defrost Time Fraction Increase",
-        "      Yes;                     !- Economizer Lockout",
+        "      Yes,                     !- Economizer Lockout",
+        "    SenEffectivenessTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name",
+        "    LatEffectivenessTable,   !- Latent Effectiveness of Heating Air Flow Curve Name",
+        "    SenEffectivenessTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name",
+        "    LatEffectivenessTable;   !- Latent Effectiveness of Cooling Air Flow Curve Name",
+
+        "  Table:IndependentVariable,",
+        "    airFlowRatio,  !- Name",
+        "    Linear,                  !- Interpolation Method",
+        "    Linear,                  !- Extrapolation Method",
+        "    0.0,                     !- Minimum Value",
+        "    1.0,                     !- Maximum Value",
+        "    ,                        !- Normalization Reference Value",
+        "    Dimensionless,           !- Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.75,                    !- Value 1",
+        "    1.0;                     !- Value 2",
+
+        "  Table:IndependentVariableList,",
+        "    effectiveness_IndependentVariableList,  !- Name",
+        "    airFlowRatio;     !- Independent Variable 1 Name",
+
+        "  Table:Lookup,",
+        "    SenEffectivenessTable,   !- Name",
+        "    effectiveness_IndependentVariableList,  !- Independent Variable List Name",
+        "    DivisorOnly,             !- Normalization Method",
+        "    0.7,                     !- Normalization Divisor",
+        "    0.0,                     !- Minimum Output",
+        "    1.0,                     !- Maximum Output",
+        "    Dimensionless,           !- Output Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.75,                    !- Output Value 1",
+        "    0.70;                    !- Output Value 2",
+
+        "  Table:Lookup,",
+        "    LatEffectivenessTable,   !- Name",
+        "    effectiveness_IndependentVariableList,  !- Independent Variable List Name",
+        "    DivisorOnly,             !- Normalization Method",
+        "    0.65,                    !- Normalization Divisor",
+        "    0.0,                     !- Minimum Output",
+        "    1.0,                     !- Maximum Output",
+        "    Dimensionless,           !- Output Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.70,                    !- Output Value 1",
+        "    0.65;                    !- Output Value 2",
+
+
 
         "    OutdoorAir:Mixer,",
         "      VAV WITH REHEAT_OAMixing Box,  !- Name",
@@ -4209,12 +4300,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
         "    autosize,                !- Nominal Supply Air Flow Rate {m3/s}",
         "    0.76,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
         "    0.0,                     !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
-        "    0.81,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
-        "    0.0,                     !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
         "    0.76,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
         "    0.0,                     !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
-        "    0.81,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
-        "    0.0,                     !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
         "    OA Inlet Node,           !- Supply Air Inlet Node Name",
         "    HX Pri Air Outlet Node,  !- Supply Air Outlet Node Name",
         "    Return Air Node,         !- Exhaust Air Inlet Node Name",

@@ -2072,12 +2072,24 @@ namespace HeatRecovery {
 
             if (this->SupInTemp < this->SecInTemp) {
                 // Use heating effectiveness values
-                this->SensEffectiveness = Curve::CurveValue(state, this->HeatEffectSensibleCurveIndex, HXAirVolFlowRatio) * this->HeatEffectSensible100;
-                this->LatEffectiveness = Curve::CurveValue(state, this->HeatEffectLatentCurveIndex, HXAirVolFlowRatio) * this->HeatEffectLatent100 ;
+                this->SensEffectiveness = this->HeatEffectSensible100;
+                if (this->HeatEffectSensibleCurveIndex > 0) {
+                    this->SensEffectiveness *= Curve::CurveValue(state, this->HeatEffectSensibleCurveIndex, HXAirVolFlowRatio);
+                }
+                this->LatEffectiveness = this->HeatEffectLatent100;
+                if (this->HeatEffectLatentCurveIndex > 0) {
+                    this->LatEffectiveness *= Curve::CurveValue(state, this->HeatEffectLatentCurveIndex, HXAirVolFlowRatio);
+                }
             } else {
                 // Use cooling effectiveness values
-                this->SensEffectiveness = Curve::CurveValue(state, this->CoolEffectSensibleCurveIndex, HXAirVolFlowRatio) * this->CoolEffectSensible100;
-                this->LatEffectiveness = Curve::CurveValue(state, this->CoolEffectLatentCurveIndex, HXAirVolFlowRatio) * this->CoolEffectLatent100 ;
+                this->SensEffectiveness = this->CoolEffectSensible100;
+                if (this->CoolEffectSensibleCurveIndex > 0) {
+                    this->SensEffectiveness *= Curve::CurveValue(state, this->CoolEffectSensibleCurveIndex, HXAirVolFlowRatio);
+                }
+                this->LatEffectiveness = this->CoolEffectLatent100;
+                if (this->CoolEffectLatentCurveIndex > 0) {
+                    this->LatEffectiveness *= Curve::CurveValue(state, this->CoolEffectLatentCurveIndex, HXAirVolFlowRatio);
+                }
             }
 
             //     Keep effectiveness between 0 and 1.0 ??
@@ -2186,12 +2198,24 @@ namespace HeatRecovery {
                         CMin = min(CSup, CSec);
                         if (TempSupIn < TempSecIn) {
                             //          Use heating effectiveness values
-                            this->SensEffectiveness = Curve::CurveValue(state, this->HeatEffectSensibleCurveIndex, HXAirVolFlowRatio) * this->HeatEffectSensible100;
-                            this->LatEffectiveness = Curve::CurveValue(state, this->HeatEffectLatentCurveIndex, HXAirVolFlowRatio) * this->HeatEffectLatent100 ;
+                            this->SensEffectiveness = this->HeatEffectSensible100;
+                            if (this->HeatEffectSensibleCurveIndex > 0) {
+                                this->SensEffectiveness *= Curve::CurveValue(state, this->HeatEffectSensibleCurveIndex, HXAirVolFlowRatio);
+                            }
+                            this->LatEffectiveness = this->HeatEffectLatent100;
+                            if (this->HeatEffectLatentCurveIndex > 0) {
+                                this->LatEffectiveness *= Curve::CurveValue(state, this->HeatEffectLatentCurveIndex, HXAirVolFlowRatio);
+                            }
                         } else {
                             //          Use cooling effectiveness values
-                            this->SensEffectiveness = Curve::CurveValue(state, this->CoolEffectSensibleCurveIndex, HXAirVolFlowRatio) * this->CoolEffectSensible100;
-                            this->LatEffectiveness = Curve::CurveValue(state, this->CoolEffectLatentCurveIndex, HXAirVolFlowRatio) * this->CoolEffectLatent100 ;
+                            this->SensEffectiveness = this->CoolEffectSensible100;
+                            if (this->CoolEffectSensibleCurveIndex > 0) {
+                                this->SensEffectiveness *= Curve::CurveValue(state, this->CoolEffectSensibleCurveIndex, HXAirVolFlowRatio);
+                            }
+                            this->LatEffectiveness = this->CoolEffectLatent100;
+                            if (this->CoolEffectLatentCurveIndex > 0) {
+                                this->LatEffectiveness *= Curve::CurveValue(state, this->CoolEffectLatentCurveIndex, HXAirVolFlowRatio);
+                            }
                         }
 
                         if (this->SensEffectiveness < 0.0) {
@@ -2758,8 +2782,14 @@ namespace HeatRecovery {
             HXSecAirVolFlowRate = this->SecOutMassFlow / RhoSec;
             HXAvgAirVolFlowRate = (HXSecAirVolFlowRate + HXSupAirVolFlowRate) / 2.0;
             HXAirVolFlowRatio = HXAvgAirVolFlowRate / this->NomSupAirVolFlow;
-            this->SensEffectiveness = Curve::CurveValue(state, this->HeatEffectSensibleCurveIndex, HXAirVolFlowRatio) * this->HeatEffectSensible100;
-            this->LatEffectiveness = Curve::CurveValue(state, this->HeatEffectLatentCurveIndex, HXAirVolFlowRatio) * this->HeatEffectLatent100 ;
+            this->SensEffectiveness = this->HeatEffectSensible100;
+            if (this->HeatEffectSensibleCurveIndex > 0) {
+                this->SensEffectiveness *= Curve::CurveValue(state, this->HeatEffectSensibleCurveIndex, HXAirVolFlowRatio);
+            }
+            this->LatEffectiveness = this->HeatEffectLatent100;
+            if (this->HeatEffectLatentCurveIndex > 0) {
+                this->LatEffectiveness *= Curve::CurveValue(state, this->HeatEffectLatentCurveIndex, HXAirVolFlowRatio);
+            }
             this->SupOutTemp = this->SupInTemp + this->SensEffectiveness * CMin / CSup * (this->SecInTemp - this->SupInTemp);
             this->SupOutHumRat = this->SupInHumRat + this->LatEffectiveness * CMin / CSup * (this->SecInHumRat - this->SupInHumRat);
             this->SupOutEnth = Psychrometrics::PsyHFnTdbW(this->SupOutTemp, this->SupOutHumRat);
@@ -2812,12 +2842,24 @@ namespace HeatRecovery {
                     CMin = min(CSup, CSec);
                     if (TempSupIn < TempSecIn) {
                         //         Use heating effectiveness values
-                        this->SensEffectiveness = Curve::CurveValue(state, this->HeatEffectSensibleCurveIndex, HXAirVolFlowRatio) * this->HeatEffectSensible100;
-                        this->LatEffectiveness = Curve::CurveValue(state, this->HeatEffectLatentCurveIndex, HXAirVolFlowRatio) * this->HeatEffectLatent100 ;
+                        this->SensEffectiveness = this->HeatEffectSensible100;
+                        if (this->HeatEffectSensibleCurveIndex > 0) {
+                            this->SensEffectiveness *= Curve::CurveValue(state, this->HeatEffectSensibleCurveIndex, HXAirVolFlowRatio);
+                        }
+                        this->LatEffectiveness = this->HeatEffectLatent100;
+                        if (this->HeatEffectLatentCurveIndex > 0) {
+                            this->LatEffectiveness *= Curve::CurveValue(state, this->HeatEffectLatentCurveIndex, HXAirVolFlowRatio);
+                        }
                     } else {
                         //         Use cooling effectiveness values
-                        this->SensEffectiveness = Curve::CurveValue(state, this->CoolEffectSensibleCurveIndex, HXAirVolFlowRatio) * this->CoolEffectSensible100;
-                        this->LatEffectiveness = Curve::CurveValue(state, this->CoolEffectLatentCurveIndex, HXAirVolFlowRatio) * this->CoolEffectLatent100 ;
+                        this->SensEffectiveness = this->CoolEffectSensible100;
+                        if (this->CoolEffectSensibleCurveIndex > 0) {
+                            this->SensEffectiveness *= Curve::CurveValue(state, this->CoolEffectSensibleCurveIndex, HXAirVolFlowRatio);
+                        }
+                        this->LatEffectiveness = this->CoolEffectLatent100;
+                        if (this->CoolEffectLatentCurveIndex > 0) {
+                            this->LatEffectiveness *= Curve::CurveValue(state, this->CoolEffectLatentCurveIndex, HXAirVolFlowRatio);
+                        }
                     }
                     //         calculation of local variable Csup can be 0, gaurd against divide by 0.
                     TempSupOut = TempSupIn + this->SensEffectiveness * SafeDiv(CMin, CSup) * (TempSecIn - TempSupIn);
