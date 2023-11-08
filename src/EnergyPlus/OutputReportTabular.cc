@@ -2804,8 +2804,8 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
     // na
 
     // Using/Aliasing
-    using PollutionModule::GetEnvironmentalImpactFactorInfo;
-    using PollutionModule::GetFuelFactorInfo;
+    using Pollution::GetEnvironmentalImpactFactorInfo;
+    using Pollution::GetFuelFactorInfo;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
