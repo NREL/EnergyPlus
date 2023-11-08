@@ -22733,12 +22733,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.70,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0.60,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.70,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0.60,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.75,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0.60,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.75,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0.60,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     VAV_ICU_OAInlet Node,    !- Supply Air Inlet Node Name
     ICU Heat Recovery Outlet Node,  !- Supply Air Outlet Node Name
     VAV_ICU_OARelief Node,   !- Exhaust Air Inlet Node Name
@@ -22757,12 +22753,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.70,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0.60,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.70,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0.60,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.75,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0.60,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.75,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0.60,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     VAV_PATRMS_OAInlet Node, !- Supply Air Inlet Node Name
     PATRMS Heat Recovery Outlet Node,  !- Supply Air Outlet Node Name
     VAV_PATRMS_OARelief Node,!- Exhaust Air Inlet Node Name
@@ -22781,12 +22773,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.70,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0.60,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.70,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0.60,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.75,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0.60,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.75,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0.60,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     VAV_1_OAInlet Node,      !- Supply Air Inlet Node Name
     VAV_1 Heat Recovery Outlet Node,  !- Supply Air Outlet Node Name
     VAV_1_OARelief Node,     !- Exhaust Air Inlet Node Name

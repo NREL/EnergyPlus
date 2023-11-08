@@ -3884,12 +3884,8 @@
     0.0283168464628752,      !- Nominal Supply Air Flow Rate {m3/s}
     0.65,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.65,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.65,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.65,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     outdoor air node_unit1,  !- Supply Air Inlet Node Name
     OA fan inlet node_unit1, !- Supply Air Outlet Node Name
     Zone Exhaust Node_unit1, !- Exhaust Air Inlet Node Name

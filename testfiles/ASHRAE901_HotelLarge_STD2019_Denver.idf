@@ -11810,12 +11810,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.70,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0.60,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.70,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0.60,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.75,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0.60,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.75,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0.60,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     VAV WITH REHEAT_OAInlet Node,  !- Supply Air Inlet Node Name
     VAV WITH REHEAT Heat Recovery Outlet Node,  !- Supply Air Outlet Node Name
     VAV WITH REHEAT_OARelief Node,  !- Exhaust Air Inlet Node Name
@@ -11834,12 +11830,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.70,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0.60,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.70,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0.60,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.75,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0.60,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.75,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0.60,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     FLR_3_DOAS_OAInlet Node, !- Supply Air Inlet Node Name
     FLR_3_DOAS Heat Recovery Outlet Node,  !- Supply Air Outlet Node Name
     FLR_3_DOAS_OARelief Node,!- Exhaust Air Inlet Node Name
