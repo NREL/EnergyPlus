@@ -2178,6 +2178,9 @@
     Plate,                   !- Heat Exchanger Type
     MinimumExhaustTemperature,  !- Frost Control Type
     1.7,                     !- Threshold Temperature {C}
+    ,                        !- Initial Defrost Time Fraction {dimensionless}
+    ,                        !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
     SenEffectivenessTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
     LatEffectivenessTable,   !- Latent Effectiveness of Heating Air Flow Curve Name
     SenEffectivenessTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name

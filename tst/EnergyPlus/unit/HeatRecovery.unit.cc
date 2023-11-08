@@ -123,10 +123,10 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatent100 = 0.0;
     state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensible100 = 0.75;
     state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatent100 = 0.0;
-    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensibleCurveIndex = 1;
-    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatentCurveIndex = 1;
-    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensibleCurveIndex = 1;
-    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatentCurveIndex = 1;
+    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectSensibleCurveIndex = 0;
+    state->dataHeatRecovery->ExchCond(ExchNum).HeatEffectLatentCurveIndex = 0;
+    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectSensibleCurveIndex = 0;
+    state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatentCurveIndex = 0;
 
     state->dataHeatRecovery->ExchCond(ExchNum).Name = "Test Heat Recovery 1";
     state->dataHeatRecovery->ExchCond(ExchNum).ExchType = HX_AIRTOAIR_GENERIC;
@@ -387,12 +387,8 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest)
         "   4.71947443200001, !- Nominal Supply Air Flow Rate { m3 / s }",
         "   0,   !- Sensible Effectiveness at 100 % Heating Air Flow { dimensionless }",
         "   0.5, !- Latent Effectiveness at 100 % Heating Air Flow { dimensionless }",
-        "   0,   !- Sensible Effectiveness at 75 % Heating Air Flow { dimensionless }",
-        "   0.5, !- Latent Effectiveness at 75 % Heating Air Flow { dimensionless }",
         "   0,   !- Sensible Effectiveness at 100 % Cooling Air Flow { dimensionless }",
         "   0.5, !- Latent Effectiveness at 100 % Cooling Air Flow { dimensionless }",
-        "   0,   !- Sensible Effectiveness at 75 % Cooling Air Flow { dimensionless }",
-        "   0.5, !- Latent Effectiveness at 75 % Cooling Air Flow { dimensionless }",
         "   AHU Heating Coil Outlet, !- Supply Air Inlet Node Name",
         "   AHU Supply fan Inlet,    !- Supply Air Outlet Node Name",
         "   AHU relief air outlet,   !- Exhaust Air Inlet Node Name",
@@ -4136,57 +4132,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
         "      1.7,                     !- Threshold Temperature {C}",
         "      ,                        !- Initial Defrost Time Fraction",
         "      ,                        !- Rate of Defrost Time Fraction Increase",
-        "      Yes,                     !- Economizer Lockout",
-        "    SenEffectivenessTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name",
-        "    LatEffectivenessTable,   !- Latent Effectiveness of Heating Air Flow Curve Name",
-        "    SenEffectivenessTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name",
-        "    LatEffectivenessTable;   !- Latent Effectiveness of Cooling Air Flow Curve Name",
-
-        "  Table:IndependentVariable,",
-        "    airFlowRatio,  !- Name",
-        "    Linear,                  !- Interpolation Method",
-        "    Linear,                  !- Extrapolation Method",
-        "    0.0,                     !- Minimum Value",
-        "    1.0,                     !- Maximum Value",
-        "    ,                        !- Normalization Reference Value",
-        "    Dimensionless,           !- Unit Type",
-        "    ,                        !- External File Name",
-        "    ,                        !- External File Column Number",
-        "    ,                        !- External File Starting Row Number",
-        "    0.75,                    !- Value 1",
-        "    1.0;                     !- Value 2",
-
-        "  Table:IndependentVariableList,",
-        "    effectiveness_IndependentVariableList,  !- Name",
-        "    airFlowRatio;     !- Independent Variable 1 Name",
-
-        "  Table:Lookup,",
-        "    SenEffectivenessTable,   !- Name",
-        "    effectiveness_IndependentVariableList,  !- Independent Variable List Name",
-        "    DivisorOnly,             !- Normalization Method",
-        "    0.7,                     !- Normalization Divisor",
-        "    0.0,                     !- Minimum Output",
-        "    1.0,                     !- Maximum Output",
-        "    Dimensionless,           !- Output Unit Type",
-        "    ,                        !- External File Name",
-        "    ,                        !- External File Column Number",
-        "    ,                        !- External File Starting Row Number",
-        "    0.75,                    !- Output Value 1",
-        "    0.70;                    !- Output Value 2",
-
-        "  Table:Lookup,",
-        "    LatEffectivenessTable,   !- Name",
-        "    effectiveness_IndependentVariableList,  !- Independent Variable List Name",
-        "    DivisorOnly,             !- Normalization Method",
-        "    0.65,                    !- Normalization Divisor",
-        "    0.0,                     !- Minimum Output",
-        "    1.0,                     !- Maximum Output",
-        "    Dimensionless,           !- Output Unit Type",
-        "    ,                        !- External File Name",
-        "    ,                        !- External File Column Number",
-        "    ,                        !- External File Starting Row Number",
-        "    0.70,                    !- Output Value 1",
-        "    0.65;                    !- Output Value 2",
+        "      Yes;                     !- Economizer Lockout",
 
         "    OutdoorAir:Mixer,",
         "      VAV WITH REHEAT_OAMixing Box,  !- Name",

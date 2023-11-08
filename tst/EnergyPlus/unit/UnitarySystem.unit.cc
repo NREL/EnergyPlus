@@ -23203,7 +23203,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
         "    DivisorOnly,             !- Normalization Method",
         "    0.7,                     !- Normalization Divisor",
         "    0.0,                     !- Minimum Output",
-        "    1.0,                     !- Maximum Output",
+        "    10.0,                     !- Maximum Output",
         "    Dimensionless,           !- Output Unit Type",
         "    ,                        !- External File Name",
         "    ,                        !- External File Column Number",
