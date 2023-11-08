@@ -3105,7 +3105,6 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    0.70,                    !- Output Value 1",
         "    0.65;                    !- Output Value 2",
 
-
         "Controller:WaterCoil,",
         "    DOAS Cooling Coil Controller,  !- Name",
         "    Temperature,             !- Control Variable",
@@ -4188,8 +4187,6 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
         "    ,                        !- External File Starting Row Number",
         "    0.70,                    !- Output Value 1",
         "    0.65;                    !- Output Value 2",
-
-
 
         "    OutdoorAir:Mixer,",
         "      VAV WITH REHEAT_OAMixing Box,  !- Name",

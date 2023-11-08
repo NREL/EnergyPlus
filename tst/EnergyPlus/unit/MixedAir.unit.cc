@@ -4916,7 +4916,6 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
         "    0.70,                    !- Output Value 1",
         "    0.65;                    !- Output Value 2",
 
-
         "Controller:WaterCoil,",
         "    DOAS Cooling Coil Controller,  !- Name",
         "    Temperature,             !- Control Variable",
@@ -7090,7 +7089,6 @@ TEST_F(EnergyPlusFixture, OAController_FixedMinimum_MinimumLimitTypeTest)
         "    0.70,                    !- Output Value 1",
         "    0.65;                    !- Output Value 2",
 
-
         "  OutdoorAir:Mixer,",
         "    OA Mixer,                !- Name",
         "    Mixed Air Node,          !- Mixed Air Node Name",
@@ -7332,7 +7330,6 @@ TEST_F(EnergyPlusFixture, OAController_HighExhaustMassFlowTest)
         "    ,                        !- External File Starting Row Number",
         "    0.70,                    !- Output Value 1",
         "    0.65;                    !- Output Value 2",
-
 
         "  OutdoorAir:Mixer,",
         "    OA Mixer,                !- Name",
@@ -7630,7 +7627,6 @@ TEST_F(EnergyPlusFixture, OAController_LowExhaustMassFlowTest)
         "    ,                        !- External File Starting Row Number",
         "    0.70,                    !- Output Value 1",
         "    0.65;                    !- Output Value 2",
-
 
         "  OutdoorAir:Mixer,",
         "    OA Mixer,                !- Name",

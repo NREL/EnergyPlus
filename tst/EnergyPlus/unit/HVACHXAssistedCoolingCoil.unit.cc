@@ -228,7 +228,6 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
         "    0.70,                    !- Output Value 1",
         "    0.65;                    !- Output Value 2",
 
-
         "  Coil:Cooling:DX:VariableSpeed,",
         "    Main Cooling Coil 1,    !- Name",
         "    Heat Recovery Supply Outlet,  !- Indoor Air Inlet Node Name",
@@ -884,8 +883,6 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_NewDXCoil_Processing_Test)
         "    ,                        !- External File Starting Row Number",
         "    0.70,                    !- Output Value 1",
         "    0.65;                    !- Output Value 2",
-
-
 
         "  Coil:Cooling:DX,",
         "    Main Cooling Coil 1,     !- Name",
