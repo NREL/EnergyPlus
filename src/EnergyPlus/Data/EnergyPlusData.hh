@@ -228,7 +228,7 @@ struct PlantPressureSysData;
 struct PlantUtilitiesData;
 struct PlantValvesData;
 struct PluginManagerData;
-struct PollutionModuleData;
+struct PollutionData;
 struct PondGroundHeatExchangerData;
 struct PoweredInductionUnitsData;
 struct PsychrometricsData;
@@ -485,7 +485,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<PlantUtilitiesData> dataPlantUtilities;
     std::unique_ptr<PlantValvesData> dataPlantValves;
     std::unique_ptr<PluginManagerData> dataPluginManager;
-    std::unique_ptr<PollutionModuleData> dataPollutionModule;
+    std::unique_ptr<PollutionData> dataPollution;
     std::unique_ptr<PondGroundHeatExchangerData> dataPondGHE;
     std::unique_ptr<PoweredInductionUnitsData> dataPowerInductionUnits;
     std::unique_ptr<PsychrometricsData> dataPsychrometrics;
