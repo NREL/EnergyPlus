@@ -4392,9 +4392,10 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
             // That's probably not correct, but how correct is it to assume that no solar is absorbed anywhere
             // in the zone?
             if (thisSolEnclosure.solAbsFirstCalc) {
-                ShowWarningError(state,
-                                 format("ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption for all surfaces is zero in Zone: {}",
-                                        thisSolEnclosure.Name));
+                ShowWarningError(
+                    state,
+                    format("ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption for all surfaces is zero in Enclosure: {}",
+                           thisSolEnclosure.Name));
                 thisSolEnclosure.solAbsFirstCalc = false;
             }
             thisSolEnclosure.solVMULT = 0.0;
