@@ -1,5 +1,5 @@
 # Additional ASHRAE Metrics Reporting in EnergyPlus 24-1
-** Digital Alchemy **
+**NFP by Digital Alchemy**
 
 **Revisions**
 -   New Feature Proposal -- 15-November-2023
