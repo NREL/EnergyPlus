@@ -431,7 +431,7 @@ void ManageHVAC(EnergyPlusData &state)
         if (!state.dataGlobal->WarmupFlag) {
             if (state.dataGlobal->DoOutputReporting && !state.dataGlobal->ZoneSizingCalc) {
                 NodeInputManager::CalcMoreNodeInfo(state);
-                PollutionModule::CalculatePollution(state);
+                Pollution::CalculatePollution(state);
                 SystemReports::InitEnergyReports(state);
                 SystemReports::ReportSystemEnergyUse(state);
             }
