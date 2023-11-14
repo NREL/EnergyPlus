@@ -1400,22 +1400,11 @@ void GetInputTabularStyle(EnergyPlusData &state)
 
 UnitsStyle SetUnitsStyleFromString(std::string const &unitStringIn)
 {
-    UnitsStyle unitsStyleReturn;
-    if (Util::SameString(unitStringIn, "None")) {
-        unitsStyleReturn = UnitsStyle::None;
-    } else if (Util::SameString(unitStringIn, "JTOKWH")) {
-        unitsStyleReturn = UnitsStyle::JtoKWH;
-    } else if (Util::SameString(unitStringIn, "JTOMJ")) {
-        unitsStyleReturn = UnitsStyle::JtoMJ;
-    } else if (Util::SameString(unitStringIn, "JTOGJ")) {
-        unitsStyleReturn = UnitsStyle::JtoGJ;
-    } else if (Util::SameString(unitStringIn, "INCHPOUND")) {
-        unitsStyleReturn = UnitsStyle::InchPound;
-    } else if (Util::SameString(unitStringIn, "INCHPOUNDEXCEPTELECTRICITY")) {
-        unitsStyleReturn = UnitsStyle::InchPoundExceptElectricity;
-    } else {
+    UnitsStyle unitsStyleReturn = static_cast<UnitsStyle>(getEnumValue(UnitsStyleNamesUC, Util::makeUPPER(unitStringIn)));
+    if (unitsStyleReturn == UnitsStyle::Invalid) {
         unitsStyleReturn = UnitsStyle::NotFound;
     }
+
     return unitsStyleReturn;
 }
 
