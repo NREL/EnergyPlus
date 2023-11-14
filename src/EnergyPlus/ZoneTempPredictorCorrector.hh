@@ -79,7 +79,7 @@ namespace ZoneTempPredictorCorrector {
         std::string HeatTempSetptSchedName;
         int HeatTempSchedIndex = 0;
         std::string CoolTempSetptSchedName;
-        int CoolTempSchedIndex;
+        int CoolTempSchedIndex = 0;
     };
 
     struct ZoneComfortFangerControl
@@ -90,7 +90,7 @@ namespace ZoneTempPredictorCorrector {
         std::string HeatPMVSetptSchedName; // Name of PMV heating set point schedule
         int HeatPMVSchedIndex = 0;         // Index to PMV heating set point schedule
         std::string CoolPMVSetptSchedName; // Name of PMV cooling set point schedule
-        int CoolPMVSchedIndex;             // INdex to PMV cooling set point schedule
+        int CoolPMVSchedIndex = 0;         // INdex to PMV cooling set point schedule
     };
 
     struct AdaptiveComfortDailySetPointSchedule

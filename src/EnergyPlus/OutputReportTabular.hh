@@ -428,49 +428,39 @@ namespace OutputReportTabular {
     struct CompLoadTablesType
     {
         // members
-        int desDayNum;             // design day number
-        int timeStepMax;           // times step of the day that the maximum occurs
-        Array2D<Real64> cells;     // main component table results (column, row)
-        Array2D_bool cellUsed;     // flag if the cell is used for the table of results (column, row)
-        std::string peakDateHrMin; // string containing peak timestamp
-        Real64 outsideDryBulb;     // outside dry bulb temperature at peak
-        Real64 outsideWetBulb;     // outside wet bulb temperature at peak
-        Real64 outsideHumRatio;    // outside humidity ratio at peak
-        Real64 zoneDryBulb;        // zone dry bulb temperature at peak
-        Real64 zoneRelHum;         // zone relative humidity at peak
-        Real64 zoneHumRatio;       // zone humidity ratio at peak
+        int desDayNum = 0;              // design day number
+        int timeStepMax = 0;            // times step of the day that the maximum occurs
+        Array2D<Real64> cells;          // main component table results (column, row)
+        Array2D_bool cellUsed;          // flag if the cell is used for the table of results (column, row)
+        std::string peakDateHrMin = ""; // string containing peak timestamp
+        Real64 outsideDryBulb = 0.0;    // outside dry bulb temperature at peak
+        Real64 outsideWetBulb = 0.0;    // outside wet bulb temperature at peak
+        Real64 outsideHumRatio = 0.0;   // outside humidity ratio at peak
+        Real64 zoneDryBulb = 0.0;       // zone dry bulb temperature at peak
+        Real64 zoneRelHum = 0.0;        // zone relative humidity at peak
+        Real64 zoneHumRatio = 0.0;      // zone humidity ratio at peak
 
-        Real64 supAirTemp;     // supply air temperature
-        Real64 mixAirTemp;     // mixed air temperature
-        Real64 mainFanAirFlow; // main fan air flow
-        Real64 outsideAirFlow; // outside air flow
-        Real64 designPeakLoad; // design peak load
-        Real64 diffDesignPeak; // difference between Design and Peak Load
+        Real64 supAirTemp = 0.0;     // supply air temperature
+        Real64 mixAirTemp = 0.0;     // mixed air temperature
+        Real64 mainFanAirFlow = 0.0; // main fan air flow
+        Real64 outsideAirFlow = 0.0; // outside air flow
+        Real64 designPeakLoad = 0.0; // design peak load
+        Real64 diffDesignPeak = 0.0; // difference between Design and Peak Load
 
-        Real64 peakDesSensLoad;    // peak design sensible load
-        Real64 estInstDelSensLoad; // estimated instant plus delayed sensible load
-        Real64 diffPeakEst;        // difference between the peak design sensible load and the estimated instant plus delayed sensible load
-        Array1D_int zoneIndices;   // the zone numbers covered by the report
+        Real64 peakDesSensLoad = 0.0;    // peak design sensible load
+        Real64 estInstDelSensLoad = 0.0; // estimated instant plus delayed sensible load
+        Real64 diffPeakEst = 0.0;        // difference between the peak design sensible load and the estimated instant plus delayed sensible load
+        Array1D_int zoneIndices;         // the zone numbers covered by the report
 
-        Real64 outsideAirRatio;   // outside Air
-        Real64 floorArea;         // floor area
-        Real64 airflowPerFlrArea; // airflow per floor area
-        Real64 airflowPerTotCap;  // airflow per total capacity
-        Real64 areaPerTotCap;     // area per total capacity
-        Real64 totCapPerArea;     // total capacity per area
-        Real64 chlPumpPerFlow;    // chiller pump power per flow
-        Real64 cndPumpPerFlow;    // condenser pump power per flow
-        Real64 numPeople;         // number of people
-
-        // default constructor
-        CompLoadTablesType()
-            : desDayNum(0), timeStepMax(0), outsideDryBulb(0.), outsideWetBulb(0.), outsideHumRatio(0.), zoneDryBulb(0.), zoneRelHum(0.),
-              supAirTemp(0.), mixAirTemp(0.), mainFanAirFlow(0.), outsideAirFlow(0.), designPeakLoad(0.), diffDesignPeak(0.), peakDesSensLoad(0.),
-              estInstDelSensLoad(0.), diffPeakEst(0.), outsideAirRatio(0.), floorArea(0.), airflowPerFlrArea(0.), airflowPerTotCap(0.),
-              areaPerTotCap(0.), totCapPerArea(0.), chlPumpPerFlow(0.), cndPumpPerFlow(0.), numPeople(0.)
-
-        {
-        }
+        Real64 outsideAirRatio = 0.0;   // outside Air
+        Real64 floorArea = 0.0;         // floor area
+        Real64 airflowPerFlrArea = 0.0; // airflow per floor area
+        Real64 airflowPerTotCap = 0.0;  // airflow per total capacity
+        Real64 areaPerTotCap = 0.0;     // area per total capacity
+        Real64 totCapPerArea = 0.0;     // total capacity per area
+        Real64 chlPumpPerFlow = 0.0;    // chiller pump power per flow
+        Real64 cndPumpPerFlow = 0.0;    // condenser pump power per flow
+        Real64 numPeople = 0.0;         // number of people
     };
 
     struct ZompComponentAreasType
