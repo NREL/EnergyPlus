@@ -564,7 +564,7 @@ namespace OutputReportTabular {
 
     void AddTOCReportPeriod(const int nReportPeriods,
                             const std::string &kw,
-                            const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                            const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData,
                             std::ostream &tbl_stream);
 
     //======================================================================================================================
@@ -650,7 +650,7 @@ namespace OutputReportTabular {
                                        Array2D_string &tableBody,
                                        const int rowid,
                                        const int periodIdx,
-                                       const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData);
+                                       const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData);
 
     void WriteVeriSumTable(EnergyPlusData &state);
 
@@ -663,7 +663,7 @@ namespace OutputReportTabular {
     void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
                                           const std::string &reportKeyWord,
                                           const int periodIdx,
-                                          const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData);
+                                          const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData);
 
     void WriteReportPeriodTimeConsumption(EnergyPlusData &state);
 

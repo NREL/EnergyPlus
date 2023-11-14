@@ -706,7 +706,7 @@ namespace TarcogShading {
         TGapOld1 = 0.0;
         TGapOld2 = 0.0;
         tilt = Constant::Pi / 180 * (angle - 90);
-        T0 = 0.0 + Constant::KelvinConv;
+        T0 = 0.0 + Constant::Kelvin;
         A1eqin = 0.0;
         A2eqout = 0.0;
         A1eqout = 0.0;
@@ -1028,7 +1028,7 @@ namespace TarcogShading {
         bool converged;
 
         tilt = Constant::Pi / 180.0 * (angle - 90.0);
-        T0 = 0.0 + Constant::KelvinConv;
+        T0 = 0.0 + Constant::Kelvin;
 
         GASSES90(state,
                  T0,

@@ -309,11 +309,11 @@ namespace OutputProcessor {
         for (int i = 1; i <= op->NumOfReqVariables; ++i) {
             auto &reqRepVar = op->ReqRepVars(i);
 
-            if (!UtilityRoutines::SameString(reqRepVar.VarName, VarName)) {
+            if (!Util::SameString(reqRepVar.VarName, VarName)) {
                 continue;
             }
 
-            if (!reqRepVar.Key.empty() && !(reqRepVar.is_simple_string && UtilityRoutines::SameString(reqRepVar.Key, KeyedValue)) &&
+            if (!reqRepVar.Key.empty() && !(reqRepVar.is_simple_string && Util::SameString(reqRepVar.Key, KeyedValue)) &&
                 !(!reqRepVar.is_simple_string && RE2::FullMatch(std::string{KeyedValue}, *(reqRepVar.case_insensitive_pattern)))) {
                 continue;
             }
@@ -462,7 +462,7 @@ namespace OutputProcessor {
 
         ReportingFrequency ReportFreq(ReportingFrequency::Hourly); // Default
         // TODO: I think it's supposed to be upper case already, but tests aren't doing that at least...
-        const std::string FreqStringUpper = UtilityRoutines::makeUPPER(FreqString);
+        const std::string FreqStringUpper = Util::makeUPPER(FreqString);
         std::string::size_type const LenString = min(len(FreqString), static_cast<std::string::size_type>(4u));
 
         if (LenString < 4u) {
@@ -914,7 +914,7 @@ namespace OutputProcessor {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            namesOfMeterCustom.emplace(UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(1)));
+            namesOfMeterCustom.emplace(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(1)));
         }
 
         for (Loop = 1; Loop <= NumCustomMeters; ++Loop) {
@@ -949,7 +949,7 @@ namespace OutputProcessor {
             // check if any fields reference another Meter:Custom
             int found = 0;
             for (fldIndex = 4; fldIndex <= NumAlpha; fldIndex += 2) {
-                if (namesOfMeterCustom.find(UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(fldIndex))) != namesOfMeterCustom.end()) {
+                if (namesOfMeterCustom.find(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(fldIndex))) != namesOfMeterCustom.end()) {
                     found = fldIndex;
                     break;
                 }
@@ -1004,10 +1004,8 @@ namespace OutputProcessor {
                     AddMeter(state, state.dataIPShortCut->cAlphaArgs(1), UnitsVar, std::string(), std::string(), std::string(), std::string());
                     op->EnergyMeters(op->NumEnergyMeters).TypeOfMeter = MtrType::Custom;
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
-                    GetStandardMeterResourceType(state,
-                                                 op->EnergyMeters(op->NumEnergyMeters).ResourceType,
-                                                 UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2)),
-                                                 errFlag);
+                    GetStandardMeterResourceType(
+                        state, op->EnergyMeters(op->NumEnergyMeters).ResourceType, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(2)), errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("..on {}=\"{}\".", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         BigErrorsFound = true;
@@ -1179,7 +1177,7 @@ namespace OutputProcessor {
 
             lbrackPos = index(state.dataIPShortCut->cAlphaArgs(3), '[');
             if (lbrackPos != std::string::npos) state.dataIPShortCut->cAlphaArgs(1).erase(lbrackPos);
-            WhichMeter = UtilityRoutines::FindItem(state.dataIPShortCut->cAlphaArgs(3), op->EnergyMeters);
+            WhichMeter = Util::FindItem(state.dataIPShortCut->cAlphaArgs(3), op->EnergyMeters);
             if (WhichMeter == 0) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {}=\"{}\".",
@@ -1259,10 +1257,8 @@ namespace OutputProcessor {
                     op->EnergyMeters(op->NumEnergyMeters).SourceMeter = WhichMeter;
 
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
-                    GetStandardMeterResourceType(state,
-                                                 op->EnergyMeters(op->NumEnergyMeters).ResourceType,
-                                                 UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2)),
-                                                 errFlag);
+                    GetStandardMeterResourceType(
+                        state, op->EnergyMeters(op->NumEnergyMeters).ResourceType, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(2)), errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("..on {}=\"{}\".", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                         BigErrorsFound = true;
@@ -1445,7 +1441,7 @@ namespace OutputProcessor {
         // the standard resource type.
 
         ErrorsFound = false;
-        std::string const meterType = UtilityRoutines::makeUPPER(UserInputResourceType);
+        std::string const meterType = Util::makeUPPER(UserInputResourceType);
 
         int eMeterResource = getEnumValue(Constant::eResourceNamesUC, meterType);
 
@@ -1484,7 +1480,7 @@ namespace OutputProcessor {
         int Found;
 
         if (op->NumEnergyMeters > 0) {
-            Found = UtilityRoutines::FindItemInList(Name, op->EnergyMeters);
+            Found = Util::FindItemInList(Name, op->EnergyMeters);
         } else {
             Found = 0;
         }
@@ -1603,27 +1599,27 @@ namespace OutputProcessor {
         op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters = 0;
         op->VarMeterArrays(op->NumVarMeterArrays).RepVariable = RepVarNum;
         op->VarMeterArrays(op->NumVarMeterArrays).OnMeters = 0;
-        int Found = UtilityRoutines::FindItem(ResourceType + ":Facility", op->EnergyMeters);
+        int Found = Util::FindItem(ResourceType + ":Facility", op->EnergyMeters);
         if (Found != 0) {
             ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
             op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
         }
         if (!Group.empty()) {
-            Found = UtilityRoutines::FindItem(ResourceType + ':' + Group, op->EnergyMeters);
+            Found = Util::FindItem(ResourceType + ':' + Group, op->EnergyMeters);
             if (Found != 0) {
                 ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                 op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
             }
-            if (UtilityRoutines::SameString(Group, "Building")) { // Match to Zone and Space Type
+            if (Util::SameString(Group, "Building")) { // Match to Zone and Space Type
                 if (!ZoneName.empty()) {
-                    Found = UtilityRoutines::FindItem(ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
+                    Found = Util::FindItem(ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
                     if (Found != 0) {
                         ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                         op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
                     }
                 }
                 if (!SpaceType.empty()) {
-                    Found = UtilityRoutines::FindItem(ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
+                    Found = Util::FindItem(ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
                     if (Found != 0) {
                         ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                         op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
@@ -1634,21 +1630,21 @@ namespace OutputProcessor {
 
         //!! Following if EndUse is by ResourceType
         if (!EndUse.empty()) {
-            Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType, op->EnergyMeters);
+            Found = Util::FindItem(EndUse + ':' + ResourceType, op->EnergyMeters);
             if (Found != 0) {
                 ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                 op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
             }
-            if (UtilityRoutines::SameString(Group, "Building")) { // Match to Zone
+            if (Util::SameString(Group, "Building")) { // Match to Zone
                 if (!ZoneName.empty()) {
-                    Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
+                    Found = Util::FindItem(EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
                     if (Found != 0) {
                         ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                         op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
                     }
                 }
                 if (!SpaceType.empty()) {
-                    Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
+                    Found = Util::FindItem(EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
                     if (Found != 0) {
                         ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                         op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
@@ -1660,24 +1656,23 @@ namespace OutputProcessor {
 
             // End use subcategory
             if (!EndUseSub.empty()) {
-                Found = UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType, op->EnergyMeters);
+                Found = Util::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType, op->EnergyMeters);
                 if (Found != 0) {
                     ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                     op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
 
                     addEndUseSubcategory(state, EndUse, EndUseSub);
                 }
-                if (UtilityRoutines::SameString(Group, "Building")) { // Match to Zone
+                if (Util::SameString(Group, "Building")) { // Match to Zone
                     if (!ZoneName.empty()) {
-                        Found = UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
+                        Found = Util::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
                         if (Found != 0) {
                             ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                             op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
                         }
                     }
                     if (!SpaceType.empty()) {
-                        Found =
-                            UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
+                        Found = Util::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
                         if (Found != 0) {
                             ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                             op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
@@ -1753,11 +1748,11 @@ namespace OutputProcessor {
         auto &op = state.dataOutputProcessor;
 
         // Basic ResourceType Meters
-        GetStandardMeterResourceType(state, ResourceType, UtilityRoutines::makeUPPER(ResourceType), LocalErrorsFound);
+        GetStandardMeterResourceType(state, ResourceType, Util::makeUPPER(ResourceType), LocalErrorsFound);
 
         if (!LocalErrorsFound) {
             if (op->NumEnergyMeters > 0) {
-                Found = UtilityRoutines::FindItem(ResourceType + ":Facility", op->EnergyMeters);
+                Found = Util::FindItem(ResourceType + ":Facility", op->EnergyMeters);
             } else {
                 Found = 0;
             }
@@ -1786,17 +1781,17 @@ namespace OutputProcessor {
         }
 
         if (!LocalErrorsFound && !Group.empty()) {
-            Found = UtilityRoutines::FindItem(ResourceType + ':' + Group, op->EnergyMeters);
+            Found = Util::FindItem(ResourceType + ':' + Group, op->EnergyMeters);
             if (Found == 0) AddMeter(state, ResourceType + ':' + Group, MtrUnits, ResourceType, "", "", Group);
             if (Group == "Building") {
                 if (!ZoneName.empty()) {
-                    Found = UtilityRoutines::FindItem(ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
+                    Found = Util::FindItem(ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
                     if (Found == 0) {
                         AddMeter(state, ResourceType + ":Zone:" + ZoneName, MtrUnits, ResourceType, "", "", "Zone");
                     }
                 }
                 if (!SpaceType.empty()) {
-                    Found = UtilityRoutines::FindItem(ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
+                    Found = Util::FindItem(ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
                     if (Found == 0) {
                         AddMeter(state, ResourceType + ":SpaceType:" + SpaceType, MtrUnits, ResourceType, "", "", "SpaceType");
                     }
@@ -1981,18 +1976,18 @@ namespace OutputProcessor {
 
         //!! Following if we do EndUse by ResourceType
         if (!LocalErrorsFound && !EndUse.empty()) {
-            Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType, op->EnergyMeters);
+            Found = Util::FindItem(EndUse + ':' + ResourceType, op->EnergyMeters);
             if (Found == 0) AddMeter(state, EndUse + ':' + ResourceType, MtrUnits, ResourceType, EndUse, "", "");
 
             if (Group == "Building") { // Match to Zone and Space
                 if (!ZoneName.empty()) {
-                    Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
+                    Found = Util::FindItem(EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
                     if (Found == 0) {
                         AddMeter(state, EndUse + ':' + ResourceType + ":Zone:" + ZoneName, MtrUnits, ResourceType, EndUse, "", "Zone");
                     }
                 }
                 if (!SpaceType.empty()) {
-                    Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
+                    Found = Util::FindItem(EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
                     if (Found == 0) {
                         AddMeter(state, EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, MtrUnits, ResourceType, EndUse, "", "SpaceType");
                     }
@@ -2005,12 +2000,12 @@ namespace OutputProcessor {
         // End-Use Subcategories
         if (!LocalErrorsFound && !EndUseSub.empty()) {
             MeterName = EndUseSub + ':' + EndUse + ':' + ResourceType;
-            Found = UtilityRoutines::FindItem(MeterName, op->EnergyMeters);
+            Found = Util::FindItem(MeterName, op->EnergyMeters);
             if (Found == 0) AddMeter(state, MeterName, MtrUnits, ResourceType, EndUse, EndUseSub, "");
 
             if (Group == "Building") { // Match to Zone and Space
                 if (!ZoneName.empty()) {
-                    Found = UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
+                    Found = Util::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
                     if (Found == 0) {
                         AddMeter(state,
                                  EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName,
@@ -2022,7 +2017,7 @@ namespace OutputProcessor {
                     }
                 }
                 if (!SpaceType.empty()) {
-                    Found = UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
+                    Found = Util::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
                     if (Found == 0) {
                         AddMeter(state,
                                  EndUseSub + ':' + EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType,
@@ -2068,7 +2063,7 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         ErrorsFound = false;
-        std::string UC_ResourceType = UtilityRoutines::makeUPPER(ResourceType);
+        std::string UC_ResourceType = Util::makeUPPER(ResourceType);
 
         CodeForIPUnits = RT_IPUnits::OtherJ;
         if (has(UC_ResourceType, "ELEC")) {
@@ -3027,10 +3022,10 @@ namespace OutputProcessor {
 
         bool Found = false;
         for (size_t EndUseNum = 1; EndUseNum <= static_cast<size_t>(Constant::EndUse::Num); ++EndUseNum) {
-            if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).Name, EndUseName)) {
+            if (Util::SameString(op->EndUseCategory(EndUseNum).Name, EndUseName)) {
 
                 for (EndUseSubNum = 1; EndUseSubNum <= op->EndUseCategory(EndUseNum).NumSubcategories; ++EndUseSubNum) {
-                    if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).SubcategoryName(EndUseSubNum), EndUseSubName)) {
+                    if (Util::SameString(op->EndUseCategory(EndUseNum).SubcategoryName(EndUseSubNum), EndUseSubName)) {
                         // Subcategory already exists, no further action required
                         Found = true;
                         break;
@@ -3066,10 +3061,10 @@ namespace OutputProcessor {
 
         bool Found = false;
         for (size_t EndUseNum = 1; EndUseNum <= static_cast<size_t>(Constant::EndUse::Num); ++EndUseNum) {
-            if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).Name, EndUseName)) {
+            if (Util::SameString(op->EndUseCategory(EndUseNum).Name, EndUseName)) {
 
                 for (int endUseSpTypeNum = 1; endUseSpTypeNum <= op->EndUseCategory(EndUseNum).numSpaceTypes; ++endUseSpTypeNum) {
-                    if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).spaceTypeName(endUseSpTypeNum), EndUseSpaceTypeName)) {
+                    if (Util::SameString(op->EndUseCategory(EndUseNum).spaceTypeName(endUseSpTypeNum), EndUseSpaceTypeName)) {
                         // Space type already exists, no further action required
                         Found = true;
                         break;
@@ -4174,7 +4169,7 @@ namespace OutputProcessor {
     OutputProcessor::Unit unitStringToEnum(std::string const &unitIn)
     {
         // J.Glazer - August/September 2017
-        std::string unitUpper = UtilityRoutines::makeUPPER(unitIn);
+        std::string unitUpper = Util::makeUPPER(unitIn);
         if (unitUpper == "J") {
             return OutputProcessor::Unit::J;
         } else if (unitUpper == "DELTAC") {
@@ -4278,6 +4273,93 @@ namespace OutputProcessor {
 
 } // namespace OutputProcessor
 
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,              // String Name of variable (with units)
+                         OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
+                         Real64 &ActualVariable,                           // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue                 // Associated Key for this variable
+)
+{
+    SetupOutputVariable(state, VariableName, VariableUnit, ActualVariable, TimeStepTypeKey, VariableTypeKey, KeyedValue, "");
+}
+
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,              // String Name of variable (with units)
+                         OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
+                         Real64 &ActualVariable,                           // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue,                // Associated Key for this variable
+                         ReportFreqSOV ReportFreq,                         // Internal use -- causes reporting at this freqency
+                         eResourceSOV ResourceTypeKey,                     // Meter Resource Type (Electricity, Gas, etc)
+                         EndUseCatSOV EndUseKey,                           // Meter End Use Key (Lights, Heating, Cooling, etc)
+                         std::string_view const EndUseSubKey,              // Meter End Use Sub Key (General Lights, Task Lights, etc)
+                         GroupSOV GroupKey,                                // Meter Super Group Key (Building, System, Plant)
+                         std::string_view const ZoneKey,                   // Meter Zone Key (zone name)
+                         int const ZoneMult,                               // Zone Multiplier, defaults to 1
+                         int const ZoneListMult,                           // Zone List Multiplier, defaults to 1
+                         int const indexGroupKey,                          // Group identifier for SQL output
+                         std::string_view const customUnitName,            // the custom name for the units from EMS definition of units
+                         std::string_view const SpaceType                  // Space type (applicable for Building group only)
+)
+{
+    std::string locReportFreq = "";
+    std::string locResourceTypeKey = "";
+    std::string locEndUseKey = "";
+    std::string locGroupKey = "";
+
+    if (ReportFreq == ReportFreqSOV::Num) {
+        // Fatal error warning message
+        ShowFatalError(state, "Invalid Resource Type.");
+    } else if (ReportFreq == ReportFreqSOV::EachCall) // This is valid
+    {
+        locReportFreq = "DETAILED";
+    } else {
+        locReportFreq = ReporFreqSOVNames[static_cast<int>(ReportFreq)];
+    }
+
+    if (ResourceTypeKey == eResourceSOV::Invalid || ResourceTypeKey == eResourceSOV::Num) {
+        // Fatal error warning message
+        ShowFatalError(state, "Invalid Resource Type.");
+    } else {
+        locResourceTypeKey = eResourceSOVNames[static_cast<int>(ResourceTypeKey)];
+    }
+
+    if (EndUseKey == EndUseCatSOV::Invalid || EndUseKey == EndUseCatSOV::Num) {
+        // Fatal error warning message
+        ShowFatalError(state, "Invalid End Use Category.");
+    } else {
+        locEndUseKey = endUseCatSOVNames[static_cast<int>(EndUseKey)];
+    }
+
+    if (GroupKey == GroupSOV::Invalid || GroupKey == GroupSOV::Num) {
+        ShowFatalError(state, "Invalid Group Type.");
+    } else {
+        locGroupKey = GroupSOVNames[static_cast<int>(GroupKey)];
+    }
+
+    SetupOutputVariable(state,
+                        VariableName,
+                        VariableUnit,
+                        ActualVariable,
+                        TimeStepTypeKey,
+                        VariableTypeKey,
+                        KeyedValue,
+                        locReportFreq,
+                        locResourceTypeKey,
+                        locEndUseKey,
+                        EndUseSubKey,
+                        locGroupKey,
+                        ZoneKey,
+                        ZoneMult,
+                        ZoneListMult,
+                        indexGroupKey,
+                        customUnitName,
+                        SpaceType);
+}
+
 // TODO: Probably move these to a different location
 
 void SetupOutputVariable(EnergyPlusData &state,
@@ -4378,7 +4460,7 @@ void SetupOutputVariable(EnergyPlusData &state,
             } else {
                 EndUseSub = "";
                 if (!EndUseKey.empty()) {
-                    if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), UtilityRoutines::makeUPPER(std::string{EndUseKey})) !=
+                    if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), Util::makeUPPER(std::string{EndUseKey})) !=
                         endUseCategoryNames.end()) {
                         EndUseSub = "General";
                     }
@@ -4428,9 +4510,9 @@ void SetupOutputVariable(EnergyPlusData &state,
         thisRvar.storeType = VariableType;
         thisRvar.VarName = fmt::format("{}:{}", KeyedValue, VarName);
         thisRvar.VarNameOnly = VarName;
-        thisRvar.VarNameOnlyUC = UtilityRoutines::makeUPPER(VarName);
-        thisRvar.VarNameUC = UtilityRoutines::makeUPPER(thisRvar.VarName);
-        thisRvar.KeyNameOnlyUC = UtilityRoutines::makeUPPER(KeyedValue);
+        thisRvar.VarNameOnlyUC = Util::makeUPPER(VarName);
+        thisRvar.VarNameUC = Util::makeUPPER(thisRvar.VarName);
+        thisRvar.KeyNameOnlyUC = Util::makeUPPER(KeyedValue);
         thisRvar.units = VariableUnit;
         if (VariableUnit == OutputProcessor::Unit::customEMS) {
             thisRvar.unitNameCustomEMS = customUnitName;
@@ -4528,6 +4610,55 @@ void SetupOutputVariable(EnergyPlusData &state,
                          int &ActualVariable,                                    // Actual Variable, used to set up pointer
                          OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue                       // Associated Key for this variable
+)
+{
+    SetupOutputVariable(state,
+                        VariableName,    // String Name of variable
+                        VariableUnit,    // Actual units corresponding to the actual variable
+                        ActualVariable,  // Actual Variable, used to set up pointer
+                        TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                        VariableTypeKey, // State, Average=1, NonState, Sum=2
+                        KeyedValue,      // Associated Key for this variable
+                        ""               // Internal use -- causes reporting at this freqency
+                                         // indexGroupKey // Group identifier for SQL output
+    );
+}
+
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,                    // String Name of variable
+                         OutputProcessor::Unit const VariableUnit,               // Actual units corresponding to the actual variable
+                         int &ActualVariable,                                    // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue,                      // Associated Key for this variable
+                         OutputProcessor::ReportingFrequency const ReportFreq,   // Internal use -- causes reporting at this freqency
+                         int const indexGroupKey                                 // Group identifier for SQL output
+)
+{
+    if (ReportFreq == OutputProcessor::ReportingFrequency::EachCall) // This is valid
+    {
+        SetupOutputVariable(
+            state, VariableName, VariableUnit, ActualVariable, TimeStepTypeKey, VariableTypeKey, KeyedValue, "DETAILED", indexGroupKey);
+    } else {
+        SetupOutputVariable(state,
+                            VariableName,
+                            VariableUnit,
+                            ActualVariable,
+                            TimeStepTypeKey,
+                            VariableTypeKey,
+                            KeyedValue,
+                            OutputProcessor::ReportingFrequencyNames[static_cast<int>(ReportFreq)],
+                            indexGroupKey);
+    }
+}
+
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,                    // String Name of variable
+                         OutputProcessor::Unit const VariableUnit,               // Actual units corresponding to the actual variable
+                         int &ActualVariable,                                    // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                      // Associated Key for this variable
                          std::string_view const ReportFreq,                      // Internal use -- causes reporting at this freqency
                          int const indexGroupKey                                 // Group identifier for SQL output
@@ -4607,9 +4738,9 @@ void SetupOutputVariable(EnergyPlusData &state,
         thisIVar.storeType = VariableType;
         thisIVar.VarName = fmt::format("{}:{}", KeyedValue, VarName);
         thisIVar.VarNameOnly = VarName;
-        thisIVar.VarNameOnlyUC = UtilityRoutines::makeUPPER(VarName);
-        thisIVar.VarNameUC = UtilityRoutines::makeUPPER(thisIVar.VarName);
-        thisIVar.KeyNameOnlyUC = UtilityRoutines::makeUPPER(KeyedValue);
+        thisIVar.VarNameOnlyUC = Util::makeUPPER(VarName);
+        thisIVar.VarNameUC = Util::makeUPPER(thisIVar.VarName);
+        thisIVar.KeyNameOnlyUC = Util::makeUPPER(KeyedValue);
         thisIVar.units = VariableUnit;
         AssignReportNumber(state, op->CurrentReportNumber);
         std::string const IDOut = fmt::to_string(op->CurrentReportNumber);
@@ -5588,7 +5719,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
         std::string::size_type wildCardPosition = index(name, '*');
 
         if (wildCardPosition == std::string::npos) {
-            int meterIndex = UtilityRoutines::FindItem(name, op->EnergyMeters);
+            int meterIndex = Util::FindItem(name, op->EnergyMeters);
             if (meterIndex > 0) {
                 ReportingFrequency ReportFreq = determineFrequency(state, freqString);
                 SetInitialMeterReportingAndOutputNames(state, meterIndex, MeterFileOnlyIndicator, ReportFreq, CumulativeIndicator);
@@ -5597,7 +5728,7 @@ void UpdateMeterReporting(EnergyPlusData &state)
         } else { // Wildcard input
             ReportingFrequency ReportFreq = determineFrequency(state, freqString);
             for (int meterIndex = 1; meterIndex <= op->NumEnergyMeters; ++meterIndex) {
-                if (UtilityRoutines::SameString(op->EnergyMeters(meterIndex).Name.substr(0, wildCardPosition), name.substr(0, wildCardPosition))) {
+                if (Util::SameString(op->EnergyMeters(meterIndex).Name.substr(0, wildCardPosition), name.substr(0, wildCardPosition))) {
                     SetInitialMeterReportingAndOutputNames(state, meterIndex, MeterFileOnlyIndicator, ReportFreq, CumulativeIndicator);
                     result = true;
                 }
@@ -6109,7 +6240,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
     }
 }
 
-int GetMeterIndex(EnergyPlusData &state, std::string const &MeterName)
+int GetMeterIndex(EnergyPlusData &state, std::string_view const MeterName)
 {
 
     // FUNCTION INFORMATION:
@@ -6142,15 +6273,14 @@ int GetMeterIndex(EnergyPlusData &state, std::string const &MeterName)
         state.dataOutputProcessor->NumValidMeters = op->NumEnergyMeters;
         state.dataOutputProcessor->ValidMeterNames.allocate(state.dataOutputProcessor->NumValidMeters);
         for (Found = 1; Found <= state.dataOutputProcessor->NumValidMeters; ++Found) {
-            state.dataOutputProcessor->ValidMeterNames(Found) = UtilityRoutines::makeUPPER(op->EnergyMeters(Found).Name);
+            state.dataOutputProcessor->ValidMeterNames(Found) = Util::makeUPPER(op->EnergyMeters(Found).Name);
         }
         state.dataOutputProcessor->iValidMeterNames.allocate(state.dataOutputProcessor->NumValidMeters);
         SetupAndSort(state.dataOutputProcessor->ValidMeterNames, state.dataOutputProcessor->iValidMeterNames);
         op->GetMeterIndexFirstCall = false;
     }
 
-    MeterIndex =
-        UtilityRoutines::FindItemInSortedList(MeterName, state.dataOutputProcessor->ValidMeterNames, state.dataOutputProcessor->NumValidMeters);
+    MeterIndex = Util::FindItemInSortedList(MeterName, state.dataOutputProcessor->ValidMeterNames, state.dataOutputProcessor->NumValidMeters);
     if (MeterIndex != 0) MeterIndex = state.dataOutputProcessor->iValidMeterNames(MeterIndex);
 
     return MeterIndex;
@@ -6692,15 +6822,14 @@ void GetMeteredVariables(EnergyPlusData &state,
             TimeStepTypes(NumVariables) = op->RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = op->RVariableTypes(Loop).units;
 
-            ResourceTypes(NumVariables) = static_cast<Constant::eResource>(
-                getEnumValue(Constant::eResourceNamesUC, UtilityRoutines::makeUPPER(op->EnergyMeters(MeterPtr).ResourceType)));
-
+            ResourceTypes(NumVariables) =
+                static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, Util::makeUPPER(op->EnergyMeters(MeterPtr).ResourceType)));
             Names(NumVariables) = op->RVariableTypes(Loop).VarNameUC;
 
             for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
                 MeterPtr = op->VarMeterArrays(rVar.MeterArrayPtr).OnMeters(MeterNum);
                 if (!op->EnergyMeters(MeterPtr).EndUse.empty()) {
-                    EndUses(NumVariables) = UtilityRoutines::makeUPPER(op->EnergyMeters(MeterPtr).EndUse);
+                    EndUses(NumVariables) = Util::makeUPPER(op->EnergyMeters(MeterPtr).EndUse);
                     break;
                 }
             }
@@ -6708,7 +6837,7 @@ void GetMeteredVariables(EnergyPlusData &state,
             for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
                 MeterPtr = op->VarMeterArrays(rVar.MeterArrayPtr).OnMeters(MeterNum);
                 if (!op->EnergyMeters(MeterPtr).Group.empty()) {
-                    Groups(NumVariables) = UtilityRoutines::makeUPPER(op->EnergyMeters(MeterPtr).Group);
+                    Groups(NumVariables) = Util::makeUPPER(op->EnergyMeters(MeterPtr).Group);
                     break;
                 }
             }
@@ -6775,14 +6904,14 @@ void GetMeteredVariables(EnergyPlusData &state,
             TimeStepTypes(NumVariables) = op->RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = op->RVariableTypes(Loop).units;
 
-            ResourceTypes(NumVariables) = static_cast<Constant::eResource>(
-                getEnumValue(Constant::eResourceNamesUC, UtilityRoutines::makeUPPER(op->EnergyMeters(MeterPtr).ResourceType)));
+            ResourceTypes(NumVariables) =
+                static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, Util::makeUPPER(op->EnergyMeters(MeterPtr).ResourceType)));
             Names(NumVariables) = op->RVariableTypes(Loop).VarNameUC;
 
             for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
                 MeterPtr = op->VarMeterArrays(rVar.MeterArrayPtr).OnMeters(MeterNum);
                 if (!op->EnergyMeters(MeterPtr).EndUse.empty()) {
-                    EndUses(NumVariables) = UtilityRoutines::makeUPPER(op->EnergyMeters(MeterPtr).EndUse);
+                    EndUses(NumVariables) = Util::makeUPPER(op->EnergyMeters(MeterPtr).EndUse);
                     break;
                 }
             }
@@ -6790,7 +6919,7 @@ void GetMeteredVariables(EnergyPlusData &state,
             for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
                 MeterPtr = op->VarMeterArrays(rVar.MeterArrayPtr).OnMeters(MeterNum);
                 if (!op->EnergyMeters(MeterPtr).Group.empty()) {
-                    Groups(NumVariables) = UtilityRoutines::makeUPPER(op->EnergyMeters(MeterPtr).Group);
+                    Groups(NumVariables) = Util::makeUPPER(op->EnergyMeters(MeterPtr).Group);
                     break;
                 }
             }
@@ -6875,7 +7004,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
         op->numVarNames = op->NumVariablesForOutput;
         op->varNames.allocate(op->numVarNames);
         for (Loop = 1; Loop <= op->NumVariablesForOutput; ++Loop) {
-            op->varNames(Loop) = UtilityRoutines::makeUPPER(op->DDVariableTypes(Loop).VarNameOnly);
+            op->varNames(Loop) = Util::makeUPPER(op->DDVariableTypes(Loop).VarNameOnly);
         }
         op->ivarNames.allocate(op->numVarNames);
         SetupAndSort(op->varNames, op->ivarNames);
@@ -6886,7 +7015,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
         op->numVarNames = op->NumVariablesForOutput;
         op->varNames.allocate(op->numVarNames);
         for (Loop = 1; Loop <= op->NumVariablesForOutput; ++Loop) {
-            op->varNames(Loop) = UtilityRoutines::makeUPPER(op->DDVariableTypes(Loop).VarNameOnly);
+            op->varNames(Loop) = Util::makeUPPER(op->DDVariableTypes(Loop).VarNameOnly);
         }
         op->ivarNames.allocate(op->numVarNames);
         SetupAndSort(op->varNames, op->ivarNames);
@@ -6903,7 +7032,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
     varNameUpper = varName;
 
     // Search Variable List First
-    VFound = UtilityRoutines::FindItemInSortedList(varNameUpper, op->varNames, op->numVarNames);
+    VFound = Util::FindItemInSortedList(varNameUpper, op->varNames, op->numVarNames);
     if (VFound != 0) {
         varType = op->DDVariableTypes(op->ivarNames(VFound)).variableType;
     }
@@ -7045,7 +7174,7 @@ void GetVariableKeys(EnergyPlusData &state,
     Duplicate = false;
     maxKeyNames = size(keyNames);
     maxkeyVarIndexes = size(keyVarIndexes);
-    varNameUpper = UtilityRoutines::makeUPPER(varName);
+    varNameUpper = Util::makeUPPER(varName);
     auto &op = state.dataOutputProcessor;
 
     // Select based on variable type:  integer, real, or meter
@@ -7155,13 +7284,13 @@ bool ReportingThisVariable(EnergyPlusData &state, std::string const &RepVarName)
     auto &op = state.dataOutputProcessor;
 
     BeingReported = false;
-    Found = UtilityRoutines::FindItem(RepVarName, op->ReqRepVars, &ReqReportVariables::VarName);
+    Found = Util::FindItem(RepVarName, op->ReqRepVars, &ReqReportVariables::VarName);
     if (Found > 0) {
         BeingReported = true;
     }
 
     if (!BeingReported) { // check meter names too
-        Found = UtilityRoutines::FindItem(RepVarName, op->EnergyMeters);
+        Found = Util::FindItem(RepVarName, op->EnergyMeters);
         if (Found > 0) {
             if (op->EnergyMeters(Found).RptTS || op->EnergyMeters(Found).RptHR || op->EnergyMeters(Found).RptDY || op->EnergyMeters(Found).RptMN ||
                 op->EnergyMeters(Found).RptSM || op->EnergyMeters(Found).RptTSFO || op->EnergyMeters(Found).RptHRFO ||
@@ -7277,7 +7406,7 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
 
     for (Loop = 1; Loop <= NumReqMeters; ++Loop) {
 
-        Meter = UtilityRoutines::FindItem(PollutionMeters(Loop), op->EnergyMeters);
+        Meter = Util::FindItem(PollutionMeters(Loop), op->EnergyMeters);
         if (Meter > 0) { // All the active meters for this run are set, but all are still searched for.
 
             indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, op->EnergyMeters(Meter).Name);
@@ -7455,7 +7584,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
             op->ProduceReportVDD = ReportVDD::IDF;
         }
         if (!VarOption2.empty()) {
-            if (UtilityRoutines::SameString(VarOption2, "Name") || UtilityRoutines::SameString(VarOption2, "AscendingName")) {
+            if (Util::SameString(VarOption2, "Name") || Util::SameString(VarOption2, "AscendingName")) {
                 SortByName = true;
             }
         }
@@ -7654,7 +7783,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
 
     int dup = 0; // for duplicate variable name
     if (op->NumVariablesForOutput > 0) {
-        dup = UtilityRoutines::FindItemInList(VarName, op->DDVariableTypes, &VariableTypeForDDOutput::VarNameOnly, op->NumVariablesForOutput);
+        dup = Util::FindItemInList(VarName, op->DDVariableTypes, &VariableTypeForDDOutput::VarNameOnly, op->NumVariablesForOutput);
     } else {
         op->DDVariableTypes.allocate(LVarAllocInc);
         op->MaxVariablesForOutput = LVarAllocInc;

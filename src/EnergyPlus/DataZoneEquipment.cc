@@ -316,7 +316,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                  cAlphaFields,
                                                                  cNumericFields); // Get Equipment | data for one zone
 
-        int zoneOrSpaceNum = UtilityRoutines::FindItemInList(AlphArray(1), state.dataHeatBal->Zone);
+        int zoneOrSpaceNum = Util::FindItemInList(AlphArray(1), state.dataHeatBal->Zone);
         std::string_view zsString = "Zone";
 
         if (zoneOrSpaceNum == 0) {
@@ -364,7 +364,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                  cAlphaFields,
                                                                  cNumericFields); // Get Equipment | data for one zone
 
-        int zoneOrSpaceNum = UtilityRoutines::FindItemInList(AlphArray(1), state.dataHeatBal->space);
+        int zoneOrSpaceNum = Util::FindItemInList(AlphArray(1), state.dataHeatBal->space);
         std::string_view zsString = "Space";
 
         if (zoneOrSpaceNum == 0) {
@@ -473,7 +473,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     // map ZoneEquipConfig%EquipListIndex to ZoneEquipList%Name
 
     for (int ControlledZoneLoop = 1; ControlledZoneLoop <= state.dataGlobal->NumOfZones; ++ControlledZoneLoop) {
-        state.dataZoneEquip->GetZoneEquipmentDataFound = UtilityRoutines::FindItemInList(
+        state.dataZoneEquip->GetZoneEquipmentDataFound = Util::FindItemInList(
             state.dataZoneEquip->ZoneEquipList(ControlledZoneLoop).Name, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::EquipListName);
         if (state.dataZoneEquip->GetZoneEquipmentDataFound > 0)
             state.dataZoneEquip->ZoneEquipConfig(state.dataZoneEquip->GetZoneEquipmentDataFound).EquipListIndex = ControlledZoneLoop;
@@ -495,12 +495,12 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             ++zeqSplitterNum;
             auto const &objectFields = instance.value();
             auto &thisZeqSplitter = state.dataZoneEquip->zoneEquipSplitter[zeqSplitterNum];
-            thisZeqSplitter.Name = UtilityRoutines::makeUPPER(instance.key());
+            thisZeqSplitter.Name = Util::makeUPPER(instance.key());
             thisZeqSplitter.spaceEquipType = DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentSplitter;
             ip->markObjectAsUsed(CurrentModuleObject, instance.key());
 
             std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
-            int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
+            int zoneNum = Util::FindItemInList(zoneName, state.dataHeatBal->Zone);
             if (zoneNum == 0) {
                 ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisZeqSplitter.Name));
                 ShowContinueError(state, format("..Zone Name={} not found, remaining items for this object not processed.", zoneName));
@@ -532,12 +532,12 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             ++zeqMixerNum;
             auto const &objectFields = instance.value();
             auto &thisZeqMixer = state.dataZoneEquip->zoneEquipMixer[zeqMixerNum];
-            thisZeqMixer.Name = UtilityRoutines::makeUPPER(instance.key());
+            thisZeqMixer.Name = Util::makeUPPER(instance.key());
             thisZeqMixer.spaceEquipType = DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentMixer;
             ip->markObjectAsUsed(CurrentModuleObject, instance.key());
 
             std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
-            int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
+            int zoneNum = Util::FindItemInList(zoneName, state.dataHeatBal->Zone);
             if (zoneNum == 0) {
                 ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisZeqMixer.Name));
                 ShowContinueError(state, format("..Zone Name={} not found, remaining items for this object not processed.", zoneName));
@@ -803,7 +803,7 @@ void processZoneEquipmentInput(EnergyPlusData &state,
 
             std::string loadDistName = ip->getAlphaFieldValue(epListFields, objectSchemaProps, "load_distribution_scheme");
             thisZoneEquipList.LoadDistScheme =
-                static_cast<DataZoneEquipment::LoadDist>(getEnumValue(DataZoneEquipment::LoadDistNamesUC, UtilityRoutines::makeUPPER(loadDistName)));
+                static_cast<DataZoneEquipment::LoadDist>(getEnumValue(DataZoneEquipment::LoadDistNamesUC, Util::makeUPPER(loadDistName)));
             if (thisZoneEquipList.LoadDistScheme == DataZoneEquipment::LoadDist::Invalid) {
                 ShowSevereError(state, format("{}{} = \"{}, Invalid choice\".", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
                 ShowContinueError(state, format("...load_distribution_scheme=\"{}\".", loadDistName));
@@ -938,7 +938,7 @@ void processZoneEquipmentInput(EnergyPlusData &state,
                     }
 
                     thisZoneEquipList.EquipType(ZoneEquipTypeNum) = static_cast<ZoneEquipType>(
-                        getEnumValue(zoneEquipTypeNamesUC, UtilityRoutines::makeUPPER(thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum))));
+                        getEnumValue(zoneEquipTypeNamesUC, Util::makeUPPER(thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum))));
 
                     if (thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::UnitarySystem ||
                         thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::PackagedTerminalAirConditioner ||
@@ -1231,7 +1231,7 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
         getEnumValue(zoneEquipTstatControlNamesUC, ip->getAlphaFieldValue(objectFields, objectSchemaProps, "thermostat_control_method")));
     if (thisZeqSplitter.tstatControl == DataZoneEquipment::ZoneEquipTstatControl::SingleSpace) {
         std::string spaceName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "control_space_name");
-        thisZeqSplitter.controlSpaceIndex = UtilityRoutines::FindItemInList(spaceName, state.dataHeatBal->space);
+        thisZeqSplitter.controlSpaceIndex = Util::FindItemInList(spaceName, state.dataHeatBal->space);
         if (thisZeqSplitter.controlSpaceIndex == 0) {
             ShowSevereError(state, format("{}{}={}", RoutineName, zeqSplitterModuleObject, thisZeqSplitter.Name));
             ShowContinueError(state, format("Space Name={} not found.", spaceName));
@@ -1252,7 +1252,7 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
             ++spaceCount;
             auto &thisZeqSpace = thisZeqSplitter.spaces[spaceCount];
             std::string const spaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_name");
-            thisZeqSpace.spaceIndex = UtilityRoutines::FindItemInList(spaceName, state.dataHeatBal->space);
+            thisZeqSpace.spaceIndex = Util::FindItemInList(spaceName, state.dataHeatBal->space);
             if (thisZeqSpace.spaceIndex == 0) {
                 ShowSevereError(state, format("{}{}={}", RoutineName, zeqSplitterModuleObject, thisZeqSplitter.Name));
                 ShowContinueError(state, format("Space Name={} not found.", spaceName));
@@ -1329,7 +1329,7 @@ void processZoneEquipMixerInput(EnergyPlusData &state,
             ++spaceCount;
             auto &thisZeqSpace = thisZeqMixer.spaces[spaceCount];
             std::string const spaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_name");
-            thisZeqSpace.spaceIndex = UtilityRoutines::FindItemInList(spaceName, state.dataHeatBal->space);
+            thisZeqSpace.spaceIndex = Util::FindItemInList(spaceName, state.dataHeatBal->space);
             if (thisZeqSpace.spaceIndex == 0) {
                 ShowSevereError(state, format("{}{}={}", RoutineName, zeqMixerModuleObject, thisZeqMixer.Name));
                 ShowContinueError(state, format("Space Name={} not found.", spaceName));
@@ -1395,13 +1395,14 @@ bool CheckZoneEquipmentList(EnergyPlusData &state,
     for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {           // NumOfZoneEquipLists
         if (state.dataZoneEquip->ZoneEquipList(Loop).Name.empty()) continue; // dimensioned by NumOfZones.  Only valid ones have names.
         for (ListLoop = 1; ListLoop <= state.dataZoneEquip->ZoneEquipList(Loop).NumOfEquipTypes; ++ListLoop) {
-            if (!UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(Loop).EquipTypeName(ListLoop), ComponentType)) continue;
+
+            if (!Util::SameString(state.dataZoneEquip->ZoneEquipList(Loop).EquipTypeName(ListLoop), ComponentType)) continue;
             if (ComponentName == "*") {
                 IsOnList = true;
                 CtrlZoneNumLocal = Loop;
                 goto EquipList_exit;
             }
-            if (!UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(Loop).EquipName(ListLoop), ComponentName)) continue;
+            if (!Util::SameString(state.dataZoneEquip->ZoneEquipList(Loop).EquipName(ListLoop), ComponentName)) continue;
             IsOnList = true;
             CtrlZoneNumLocal = Loop;
             goto EquipList_exit;
@@ -1430,7 +1431,7 @@ int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName) /
         state.dataZoneEquip->ZoneEquipInputsFilled = true;
     }
 
-    return UtilityRoutines::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
+    return Util::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
 }
 
 int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state,
@@ -1662,7 +1663,7 @@ int GetZoneEquipControlledZoneNum(EnergyPlusData &state, DataZoneEquipment::Zone
         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
         for (int Num = 1; Num <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++Num) {
             if (zoneEquipType == state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType(Num) &&
-                UtilityRoutines::SameString(EquipmentName, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num))) {
+                Util::SameString(EquipmentName, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num))) {
                 return ControlZoneNum = CtrlZone;
             }
         }

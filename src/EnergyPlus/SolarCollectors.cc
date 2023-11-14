@@ -301,7 +301,7 @@ namespace SolarCollectors {
                     DataPlant::PlantEquipmentType::SolarCollectorFlatPlate; // parameter assigned in DataPlant
 
                 // Get parameters object
-                int ParametersNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
+                int ParametersNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
 
                 if (ParametersNum == 0) {
                     ShowSevereError(state,
@@ -316,7 +316,7 @@ namespace SolarCollectors {
                 }
 
                 // Get surface object
-                int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
+                int SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
                     ShowSevereError(state,
@@ -451,7 +451,7 @@ namespace SolarCollectors {
                 state.dataSolarCollectors->Parameters(ParametersNum).Name = state.dataIPShortCut->cAlphaArgs(1);
                 // NOTE:  currently the only available choice is RectangularTank.  In the future progressive tube type will be
                 //        added
-                //                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "RectangularTank")) {
+                //                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "RectangularTank")) {
                 //                    state.dataSolarCollectors->Parameters(ParametersNum).ICSType_Num = TankTypeEnum::ICSRectangularTank;
                 //                } else {
                 //                    ShowSevereError(state, format("{}{} not found={}{} in {}{} ={}{}", //,
@@ -557,7 +557,7 @@ namespace SolarCollectors {
                 state.dataSolarCollectors->Collector(CollectorNum).InitICS = true;
 
                 // Get parameters object
-                int ParametersNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
+                int ParametersNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
 
                 if (ParametersNum == 0) {
                     ShowSevereError(state,
@@ -588,7 +588,7 @@ namespace SolarCollectors {
                         state.dataSolarCollectors->Collector(CollectorNum).SideArea / state.dataSolarCollectors->Collector(CollectorNum).Area;
                 }
                 // Get surface object
-                int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
+                int SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
                     ShowSevereError(state,
@@ -654,12 +654,12 @@ namespace SolarCollectors {
                 }
 
                 state.dataSolarCollectors->Collector(CollectorNum).BCType = state.dataIPShortCut->cAlphaArgs(4);
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "AmbientAir")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(4), "AmbientAir")) {
                     state.dataSolarCollectors->Collector(CollectorNum).OSCMName = "";
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "OtherSideConditionsModel")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(4), "OtherSideConditionsModel")) {
                     state.dataSolarCollectors->Collector(CollectorNum).OSCMName = state.dataIPShortCut->cAlphaArgs(5);
                     state.dataSolarCollectors->Collector(CollectorNum).OSCM_ON = true;
-                    int Found = UtilityRoutines::FindItemInList(state.dataSolarCollectors->Collector(CollectorNum).OSCMName, state.dataSurface->OSCM);
+                    int Found = Util::FindItemInList(state.dataSolarCollectors->Collector(CollectorNum).OSCMName, state.dataSurface->OSCM);
                     if (Found == 0) {
                         ShowSevereError(state,
                                         format("{} not found={} in {} ={}",
@@ -1814,8 +1814,8 @@ namespace SolarCollectors {
 
         if (NumCovers == 1) {
             // calc linearized radiation coefficient
-            tempnom = Constant::StefanBoltzmann * ((TempAbsPlate + Constant::KelvinConv) + (TempOuterCover + Constant::KelvinConv)) *
-                      (pow_2(TempAbsPlate + Constant::KelvinConv) + pow_2(TempOuterCover + Constant::KelvinConv));
+            tempnom = Constant::StefanBoltzmann * ((TempAbsPlate + Constant::Kelvin) + (TempOuterCover + Constant::Kelvin)) *
+                      (pow_2(TempAbsPlate + Constant::Kelvin) + pow_2(TempOuterCover + Constant::Kelvin));
             tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfOuterCover - 1.0;
             hRadCoefA2C = tempnom / tempdenom;
             hRadCoefC2C = 0.0;
@@ -1827,8 +1827,8 @@ namespace SolarCollectors {
             for (int CoverNum = 1; CoverNum <= NumCovers; ++CoverNum) {
                 if (CoverNum == 1) {
                     // calc linearized radiation coefficient
-                    tempnom = Constant::StefanBoltzmann * ((TempAbsPlate + Constant::KelvinConv) + (TempInnerCover + Constant::KelvinConv)) *
-                              (pow_2(TempAbsPlate + Constant::KelvinConv) + pow_2(TempInnerCover + Constant::KelvinConv));
+                    tempnom = Constant::StefanBoltzmann * ((TempAbsPlate + Constant::Kelvin) + (TempInnerCover + Constant::Kelvin)) *
+                              (pow_2(TempAbsPlate + Constant::Kelvin) + pow_2(TempInnerCover + Constant::Kelvin));
                     tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfInnerCover - 1.0;
                     hRadCoefA2C = tempnom / tempdenom;
                     // Calc convection heat transfer coefficient:
@@ -1836,8 +1836,8 @@ namespace SolarCollectors {
                         TempAbsPlate, TempOuterCover, AirGapDepth, this->CosTilt, this->SinTilt);
                 } else {
                     // calculate the linearized radiation coeff.
-                    tempnom = Constant::StefanBoltzmann * ((TempInnerCover + Constant::KelvinConv) + (TempOuterCover + Constant::KelvinConv)) *
-                              (pow_2(TempInnerCover + Constant::KelvinConv) + pow_2(TempOuterCover + Constant::KelvinConv));
+                    tempnom = Constant::StefanBoltzmann * ((TempInnerCover + Constant::Kelvin) + (TempOuterCover + Constant::Kelvin)) *
+                              (pow_2(TempInnerCover + Constant::Kelvin) + pow_2(TempOuterCover + Constant::Kelvin));
                     tempdenom = 1.0 / EmissOfInnerCover + 1.0 / EmissOfOuterCover - 1.0;
                     hRadCoefC2C = tempnom / tempdenom;
                     // Calc convection heat transfer coefficient:
@@ -1852,8 +1852,8 @@ namespace SolarCollectors {
 
         // Calc linearized radiation coefficient between outer cover and the surrounding:
         tempnom = state.dataSurface->Surface(SurfNum).ViewFactorSky * EmissOfOuterCover * Constant::StefanBoltzmann *
-                  ((TempOuterCover + Constant::KelvinConv) + state.dataEnvrn->SkyTempKelvin) *
-                  (pow_2(TempOuterCover + Constant::KelvinConv) + pow_2(state.dataEnvrn->SkyTempKelvin));
+                  ((TempOuterCover + Constant::Kelvin) + state.dataEnvrn->SkyTempKelvin) *
+                  (pow_2(TempOuterCover + Constant::Kelvin) + pow_2(state.dataEnvrn->SkyTempKelvin));
         tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->SkyTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
@@ -1866,8 +1866,8 @@ namespace SolarCollectors {
         }
 
         tempnom = state.dataSurface->Surface(SurfNum).ViewFactorGround * EmissOfOuterCover * Constant::StefanBoltzmann *
-                  ((TempOuterCover + Constant::KelvinConv) + state.dataEnvrn->GroundTempKelvin) *
-                  (pow_2(TempOuterCover + Constant::KelvinConv) + pow_2(state.dataEnvrn->GroundTempKelvin));
+                  ((TempOuterCover + Constant::Kelvin) + state.dataEnvrn->GroundTempKelvin) *
+                  (pow_2(TempOuterCover + Constant::Kelvin) + pow_2(state.dataEnvrn->GroundTempKelvin));
         tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->GroundTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
@@ -2001,7 +2001,7 @@ namespace SolarCollectors {
             DensOfAir = Density[Index - 1] + InterpFrac * (Density[Index] - Density[Index - 1]);
         }
 
-        VolExpAir = 1.0 / (Tref + Constant::KelvinConv);
+        VolExpAir = 1.0 / (Tref + Constant::Kelvin);
 
         // Rayleigh number
         Real64 RaNum = gravity * pow_2(DensOfAir) * VolExpAir * PrOfAir * DeltaT * pow_3(AirGap) / pow_2(VisDOfAir);

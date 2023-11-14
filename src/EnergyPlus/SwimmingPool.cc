@@ -224,13 +224,13 @@ void GetSwimmingPool(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
-        UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
         state.dataSwimmingPools->Pool(Item).Name = Alphas(1);
 
         state.dataSwimmingPools->Pool(Item).SurfaceName = Alphas(2);
         state.dataSwimmingPools->Pool(Item).SurfacePtr = 0;
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (UtilityRoutines::SameString(state.dataSurface->Surface(SurfNum).Name, state.dataSwimmingPools->Pool(Item).SurfaceName)) {
+            if (Util::SameString(state.dataSurface->Surface(SurfNum).Name, state.dataSwimmingPools->Pool(Item).SurfaceName)) {
                 state.dataSwimmingPools->Pool(Item).SurfacePtr = SurfNum;
                 break;
             }

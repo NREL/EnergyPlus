@@ -146,7 +146,7 @@ namespace ReturnAirPathManager {
                                                                          state.dataIPShortCut->rNumericArgs,
                                                                          NumNums,
                                                                          IOStat);
-                UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataZoneEquip->ReturnAirPath(PathNum).Name = state.dataIPShortCut->cAlphaArgs(1);
                 state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents = nint((NumAlphas - 2.0) / 2.0);
@@ -174,8 +174,8 @@ namespace ReturnAirPathManager {
 
                 for (CompNum = 1; CompNum <= state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents; ++CompNum) {
 
-                    if ((UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(Counter), "AirLoopHVAC:ZoneMixer")) ||
-                        (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(Counter), "AirLoopHVAC:ReturnPlenum"))) {
+                    if ((Util::SameString(state.dataIPShortCut->cAlphaArgs(Counter), "AirLoopHVAC:ZoneMixer")) ||
+                        (Util::SameString(state.dataIPShortCut->cAlphaArgs(Counter), "AirLoopHVAC:ReturnPlenum"))) {
 
                         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType(CompNum) = state.dataIPShortCut->cAlphaArgs(Counter);
                         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName(CompNum) = state.dataIPShortCut->cAlphaArgs(Counter + 1);

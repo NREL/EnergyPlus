@@ -761,7 +761,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     }
 
     for (int ZoneSizIndex = 1; ZoneSizIndex <= state.dataSize->NumZoneSizingInput; ++ZoneSizIndex) {
-        int ZoneIndex = UtilityRoutines::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName, state.dataHeatBal->Zone);
+        int ZoneIndex = Util::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName, state.dataHeatBal->Zone);
         if (ZoneIndex == 0) {
             ShowSevereError(
                 state,
@@ -771,7 +771,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         if (std::any_of(state.dataZoneEquip->ZoneEquipConfig.begin(), state.dataZoneEquip->ZoneEquipConfig.end(), [](EquipConfiguration const &e) {
                 return e.IsControlled;
             })) {
-            ZoneIndex = UtilityRoutines::FindItemInList(
+            ZoneIndex = Util::FindItemInList(
                 state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
             if (ZoneIndex == 0) {
                 if (!state.dataGlobal->isPulseZoneSizing) {
@@ -834,7 +834,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         if (!zoneEquipConfig.IsControlled) continue;
 
         // For each Zone Sizing object, find the corresponding controlled zone
-        int ZoneSizNum = UtilityRoutines::FindItemInList(zoneEquipConfig.ZoneName, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+        int ZoneSizNum = Util::FindItemInList(zoneEquipConfig.ZoneName, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
         auto &zoneSizingInput = (ZoneSizNum > 0) ? state.dataSize->ZoneSizingInput(ZoneSizNum) : state.dataSize->ZoneSizingInput(1);
         if (ZoneSizNum == 0) { // LKL I think this is sufficient for warning -- no need for array
             if (!state.dataGlobal->isPulseZoneSizing) {
@@ -969,7 +969,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         if (thisOAReq.numDSOA > 0) {
             for (int spaceCounter = 1; spaceCounter <= thisOAReq.numDSOA; ++spaceCounter) {
                 std::string thisSpaceName = thisOAReq.dsoaSpaceNames(spaceCounter);
-                int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
+                int thisSpaceNum = Util::FindItemInList(thisSpaceName, state.dataHeatBal->space);
                 if (thisSpaceNum > 0) {
                     thisOAReq.dsoaSpaceIndexes.emplace_back(thisSpaceNum);
                 } else {
