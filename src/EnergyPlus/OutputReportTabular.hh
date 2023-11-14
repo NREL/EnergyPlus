@@ -254,27 +254,20 @@ namespace OutputReportTabular {
     struct OutputTableBinnedType
     {
         // Members
-        std::string keyValue;   // the key value (usually an asterisk to indicate all variables
-        std::string varOrMeter; // the name of the variable or meter
-        Real64 intervalStart;   // The lowest value for the intervals being binned into.
-        Real64 intervalSize;    // The size of the bins starting with Interval start.
-        int intervalCount;      // The number of bins used. The number of hours below the start of
+        std::string keyValue;       // the key value (usually an asterisk to indicate all variables
+        std::string varOrMeter;     // the name of the variable or meter
+        Real64 intervalStart = 0.0; // The lowest value for the intervals being binned into.
+        Real64 intervalSize = 0.0;  // The size of the bins starting with Interval start.
+        int intervalCount = 0;      // The number of bins used. The number of hours below the start of
         // the lowest bin and above the value of the last bin are also shown.
-        int resIndex; // result index - pointer to BinResults array
-        int numTables;
-        OutputProcessor::VariableType typeOfVar;
-        OutputProcessor::StoreType avgSum;      // Variable  is Averaged=1 or Summed=2
-        OutputProcessor::TimeStepType stepType; // Variable time step is Zone=1 or HVAC=2
-        OutputProcessor::Unit units;            // the units enumeration
-        std::string ScheduleName;               // the name of the schedule
-        int scheduleIndex;                      // index to the schedule specified - if no schedule use zero
-
-        // Default Constructor
-        OutputTableBinnedType()
-            : intervalStart(0.0), intervalSize(0.0), intervalCount(0), resIndex(0), numTables(0), typeOfVar(OutputProcessor::VariableType::NotFound),
-              avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::Zone), scheduleIndex(0)
-        {
-        }
+        int resIndex = 0; // result index - pointer to BinResults array
+        int numTables = 0;
+        OutputProcessor::VariableType typeOfVar = OutputProcessor::VariableType::NotFound;
+        OutputProcessor::StoreType avgSum = OutputProcessor::StoreType::Averaged;     // Variable  is Averaged=1 or Summed=2
+        OutputProcessor::TimeStepType stepType = OutputProcessor::TimeStepType::Zone; // Variable time step is Zone=1 or HVAC=2
+        OutputProcessor::Unit units = OutputProcessor::Unit::Invalid;                 // the units enumeration
+        std::string ScheduleName;                                                     // the name of the schedule
+        int scheduleIndex = 0;                                                        // index to the schedule specified - if no schedule use zero
     };
 
     struct BinResultsType
