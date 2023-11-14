@@ -8713,16 +8713,17 @@ void WriteBEPSTable(EnergyPlusData &state)
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchLeedEusTotal,
                              "Total",
-                             unconvert * (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeatWtr, 15) + useVal(colPurchHeatSt, 15) +
-                                          useVal(colElectricity, 15) + useVal(colGas, 15)),
+                             unconvert_ipExceptElec * useVal(colElectricity, 15) +
+                                 unconvert * (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeatWtr, 15) +
+                                              useVal(colPurchHeatSt, 15) + +useVal(colGas, 15)),
                              2);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchLeedEusProc,
                              "Total",
-                             unconvert *
-                                 (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) + useVal(colPurchCool, 13) +
-                                  useVal(colPurchHeatWtr, 5) + useVal(colPurchHeatWtr, 13) + useVal(colPurchHeatSt, 5) + useVal(colPurchHeatSt, 13) +
-                                  useVal(colElectricity, 5) + useVal(colElectricity, 13) + useVal(colGas, 5) + useVal(colGas, 13)),
+                             unconvert_ipExceptElec * (useVal(colElectricity, 5) + useVal(colElectricity, 13)) +
+                                 unconvert * (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) + useVal(colPurchCool, 13) +
+                                              useVal(colPurchHeatWtr, 5) + useVal(colPurchHeatWtr, 13) + useVal(colPurchHeatSt, 5) +
+                                              useVal(colPurchHeatSt, 13) + +useVal(colGas, 5) + useVal(colGas, 13)),
                              2);
         }
 
@@ -8828,6 +8829,7 @@ void WriteBEPSTable(EnergyPlusData &state)
 
         for (int iResource = 1; iResource <= 13; ++iResource) {
             int i = 1;
+            Real64 localUnconvert = (iResource == 1) ? unconvert_ipExceptElec : unconvert;
             for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                     for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
@@ -8836,7 +8838,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                                              resource_entry_map(iResource),
                                              state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- " +
                                                  state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
-                                             unconvert * collapsedEndUseSub(kEndUseSub, jEndUse, iResource));
+                                             localUnconvert * collapsedEndUseSub(kEndUseSub, jEndUse, iResource));
                         }
                         ++i;
                     }
@@ -8846,7 +8848,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                             PreDefTableEntry(state,
                                              resource_entry_map(iResource),
                                              state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other",
-                                             unconvert * endUseSubOther(iResource, jEndUse));
+                                             localUnconvert * endUseSubOther(iResource, jEndUse));
                         }
                         ++i;
                     }
@@ -8855,7 +8857,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                         PreDefTableEntry(state,
                                          resource_entry_map(iResource),
                                          state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
-                                         unconvert * collapsedEndUse(iResource, jEndUse));
+                                         localUnconvert * collapsedEndUse(iResource, jEndUse));
                     }
                     ++i;
                 }
@@ -10182,6 +10184,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
     // show the headers of the report
     WriteReportHeaders(state, "Demand End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
+    Real64 ipElectricityConversion = 1.0; // declare here so that last one used is correct for LEEED section
     for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
         UnitsStyle unitsStyle_cur = ort->unitsStyle;
         bool produceTabular = true;
@@ -10221,7 +10224,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
         Real64 powerConversion = 1.0;
         Real64 flowConversion = 1.0;
-        Real64 ipElectricityConversion = 1.0;
+        ipElectricityConversion = 1.0;
 
         // establish unit conversion factors
         if (unitsStyle_cur == UnitsStyle::InchPound) {
@@ -10611,6 +10614,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
     for (int iResource = 1; iResource <= 13; ++iResource) {
         int i = 1;
+        Real64 localUnconvert = (iResource == 1) ? ipElectricityConversion : 1.0;
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
             if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                 for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
@@ -10618,7 +10622,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                                      resource_entry_map(iResource),
                                      state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- " +
                                          state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
-                                     collapsedIndEndUseSub(kEndUseSub, jEndUse, iResource));
+                                     localUnconvert * collapsedIndEndUseSub(kEndUseSub, jEndUse, iResource));
                     ++i;
                 }
                 // put other
@@ -10626,14 +10630,14 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                     PreDefTableEntry(state,
                                      resource_entry_map(iResource),
                                      state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other",
-                                     endUseSubOther(iResource, jEndUse));
+                                     localUnconvert * endUseSubOther(iResource, jEndUse));
                     ++i;
                 }
             } else {
                 PreDefTableEntry(state,
                                  resource_entry_map(iResource),
                                  state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
-                                 collapsedIndEndUse(iResource, jEndUse));
+                                 localUnconvert * collapsedIndEndUse(iResource, jEndUse));
                 ++i;
             }
         }
