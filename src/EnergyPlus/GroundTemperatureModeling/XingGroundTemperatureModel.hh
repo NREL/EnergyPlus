@@ -64,14 +64,14 @@ struct EnergyPlusData;
 class XingGroundTempsModel : public BaseGroundTempsModel
 {
 public:
-    Real64 depth=0.0;
-    Real64 groundThermalDiffisivity=0.0;
-    Real64 simTimeInDays=0.0;
-    Real64 aveGroundTemp=0.0;
-    Real64 surfTempAmplitude_1=0.0;
-    Real64 phaseShift_1=0.0;
-    Real64 surfTempAmplitude_2=0.0;
-    Real64 phaseShift_2=0.0;
+    Real64 depth = 0.0;
+    Real64 groundThermalDiffisivity = 0.0;
+    Real64 simTimeInDays = 0.0;
+    Real64 aveGroundTemp = 0.0;
+    Real64 surfTempAmplitude_1 = 0.0;
+    Real64 phaseShift_1 = 0.0;
+    Real64 surfTempAmplitude_2 = 0.0;
+    Real64 phaseShift_2 = 0.0;
 
     static std::shared_ptr<XingGroundTempsModel> XingGTMFactory(EnergyPlusData &state, std::string objectName);
 
