@@ -185,7 +185,7 @@ Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Kusuda and Achenbach correlation is used
 
-    Real64 const secsInYear = Constant::SecsInDay * state.dataWeather->NumDaysInYear;
+    Real64 const secsInYear = Constant::SecsInDay * Weather::NumDaysInYear;
 
     Real64 term1 = -depth * std::sqrt(Constant::Pi / (secsInYear * groundThermalDiffisivity));
     Real64 term2 = (2 * Constant::Pi / secsInYear) *
@@ -206,7 +206,7 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &stat
     // Returns the ground temperature when input time is in seconds
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 const secondsInYear = state.dataWeather->NumDaysInYear * Constant::SecsInDay;
+    Real64 const secondsInYear = Weather::NumDaysInYear * Constant::SecsInDay;
 
     depth = _depth;
 
@@ -232,8 +232,8 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &state
     // Returns the ground temperature when input time is in months
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 const aveSecondsInMonth = (state.dataWeather->NumDaysInYear / 12) * Constant::SecsInDay;
-    Real64 const secondsPerYear = state.dataWeather->NumDaysInYear * Constant::SecsInDay;
+    Real64 const aveSecondsInMonth = (Weather::NumDaysInYear / 12) * Constant::SecsInDay;
+    Real64 const secondsPerYear = Weather::NumDaysInYear * Constant::SecsInDay;
 
     depth = _depth;
 

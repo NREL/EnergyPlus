@@ -1969,8 +1969,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                 TempControlledZone(TempControlledZoneNum).AdaptiveComfortModelTypeIndex =
                                     Util::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
                                 if (!state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.initialized) {
-                                    Array1D<Real64> runningAverageASH(state.dataWeather->NumDaysInYear, 0.0);
-                                    Array1D<Real64> runningAverageCEN(state.dataWeather->NumDaysInYear, 0.0);
+                                    Array1D<Real64> runningAverageASH(Weather::NumDaysInYear, 0.0);
+                                    Array1D<Real64> runningAverageCEN(Weather::NumDaysInYear, 0.0);
                                     CalculateMonthlyRunningAverageDryBulb(state, runningAverageASH, runningAverageCEN);
                                     CalculateAdaptiveComfortSetPointSchl(state, runningAverageASH, runningAverageCEN);
                                 }
@@ -2077,8 +2077,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                 TempControlledZone(TempControlledZoneNum).AdaptiveComfortModelTypeIndex =
                                     Util::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
                                 if (!state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.initialized) {
-                                    Array1D<Real64> runningAverageASH(state.dataWeather->NumDaysInYear, 0.0);
-                                    Array1D<Real64> runningAverageCEN(state.dataWeather->NumDaysInYear, 0.0);
+                                    Array1D<Real64> runningAverageASH(Weather::NumDaysInYear, 0.0);
+                                    Array1D<Real64> runningAverageCEN(Weather::NumDaysInYear, 0.0);
                                     CalculateMonthlyRunningAverageDryBulb(state, runningAverageASH, runningAverageCEN);
                                     CalculateAdaptiveComfortSetPointSchl(state, runningAverageASH, runningAverageCEN);
                                 }
@@ -2618,8 +2618,8 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
     std::string::size_type pos;
     int ind, i, j;
 
-    Array1D<Real64> adaptiveTemp(state.dataWeather->NumDaysInYear, 0.0);
-    Array1D<Real64> dailyDryTemp(state.dataWeather->NumDaysInYear, 0.0);
+    Array1D<Real64> adaptiveTemp(Weather::NumDaysInYear, 0.0);
+    Array1D<Real64> dailyDryTemp(Weather::NumDaysInYear, 0.0);
 
     readStat = 0;
     if (FileSystem::fileExists(state.files.inputWeatherFilePath.filePath)) {
@@ -2628,7 +2628,7 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
         for (i = 1; i <= 9; ++i) { // Headers
             epwFile.readLine();
         }
-        for (i = 1; i <= state.dataWeather->NumDaysInYear; ++i) {
+        for (i = 1; i <= Weather::NumDaysInYear; ++i) {
             avgDryBulb = 0.0;
             for (j = 1; j <= 24; ++j) {
                 epwLine = epwFile.readLine().data;
@@ -2646,7 +2646,7 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
 
         // Calculate monthly running average dry bulb temperature.
         int dayOfYear = 0;
-        while (dayOfYear < state.dataWeather->NumDaysInYear) {
+        while (dayOfYear < Weather::NumDaysInYear) {
             dayOfYear++;
             calcEndDay = dayOfYear - 1;
             calcStartDayASH = calcEndDay - 30;
@@ -2659,12 +2659,12 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
                 }
                 runningAverageASH(dayOfYear) /= 30;
             } else { // Do special things for wrapping the epw
-                calcStartDayASH += state.dataWeather->NumDaysInYear;
+                calcStartDayASH += Weather::NumDaysInYear;
                 for (i = 1; i <= calcEndDay; i++) {
                     avgDryBulb = dailyDryTemp(i);
                     runningAverageASH(dayOfYear) = runningAverageASH(dayOfYear) + avgDryBulb;
                 }
-                for (i = calcStartDayASH; i < state.dataWeather->NumDaysInYear; i++) {
+                for (i = calcStartDayASH; i < Weather::NumDaysInYear; i++) {
                     avgDryBulb = dailyDryTemp(i);
                     runningAverageASH(dayOfYear) = runningAverageASH(dayOfYear) + avgDryBulb;
                 }
@@ -2678,12 +2678,12 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
                 }
                 runningAverageCEN(dayOfYear) /= 7;
             } else { // Do special things for wrapping the epw
-                calcStartDayCEN += state.dataWeather->NumDaysInYear;
+                calcStartDayCEN += Weather::NumDaysInYear;
                 for (i = 1; i <= calcEndDay; i++) {
                     avgDryBulb = dailyDryTemp(i);
                     runningAverageCEN(dayOfYear) = runningAverageCEN(dayOfYear) + avgDryBulb;
                 }
-                for (i = calcStartDayCEN; i < state.dataWeather->NumDaysInYear; i++) {
+                for (i = calcStartDayCEN; i < Weather::NumDaysInYear; i++) {
                     avgDryBulb = dailyDryTemp(i);
                     runningAverageCEN(dayOfYear) = runningAverageCEN(dayOfYear) + avgDryBulb;
                 }
@@ -2737,16 +2737,16 @@ void CalculateAdaptiveComfortSetPointSchl(EnergyPlusData &state, Array1D<Real64>
         }
     }
 
-    AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central.allocate(state.dataWeather->NumDaysInYear);
-    AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90.allocate(state.dataWeather->NumDaysInYear);
-    AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80.allocate(state.dataWeather->NumDaysInYear);
-    AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central.allocate(state.dataWeather->NumDaysInYear);
-    AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I.allocate(state.dataWeather->NumDaysInYear);
-    AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II.allocate(state.dataWeather->NumDaysInYear);
-    AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.allocate(state.dataWeather->NumDaysInYear);
+    AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central.allocate(Weather::NumDaysInYear);
+    AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90.allocate(Weather::NumDaysInYear);
+    AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80.allocate(Weather::NumDaysInYear);
+    AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central.allocate(Weather::NumDaysInYear);
+    AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I.allocate(Weather::NumDaysInYear);
+    AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II.allocate(Weather::NumDaysInYear);
+    AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.allocate(Weather::NumDaysInYear);
 
     // Calculate the set points based on different models, set flag as -1 when running average temperature is not in the range.
-    for (int day = 1; day <= state.dataWeather->NumDaysInYear; day++) {
+    for (int day = 1; day <= Weather::NumDaysInYear; day++) {
         if (runningAverageASH(day) > 10 && runningAverageASH(day) < 33.5) {
             AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(day) = 0.31 * runningAverageASH(day) + 17.8;
             AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(day) = 0.31 * runningAverageASH(day) + 20.3;

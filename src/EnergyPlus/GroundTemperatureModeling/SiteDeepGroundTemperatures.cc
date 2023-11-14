@@ -160,7 +160,7 @@ Real64 SiteDeepGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &state, 
     // Returns the ground temperature when input time is in seconds
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secPerMonth = state.dataWeather->NumDaysInYear * Constant::SecsInDay / 12;
+    Real64 secPerMonth = Weather::NumDaysInYear * Constant::SecsInDay / 12;
 
     // Convert secs to months
     int month = ceil(_seconds / secPerMonth);
