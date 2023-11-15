@@ -30,14 +30,16 @@ In previous Task Orders, we implemented support for the following calculations a
 -   SEER2/HSPF2 -- support for these Metrics was implemented/released in EnergyPlus 22-2, based on the 2023 version of the ANSI/AHRI 210-240 standard.
     -   SEER2 - for the SingleSpeed, MultiSpeed, and CurveFit:Speed variants of DX Cooling coils.
     -   HSPF2 - for the SingleSpeed and MultiSpeed DX Heating coils. All of this was implemented based on the 2023 version of the ANSI/AHRI 210-240 standard.
--   EER/IEER2 -- support for these Metrics was implemented/released in EnergyPlus 23-1, based on the 2022 version of the AHRI Standard 340-360
+-   EER/IEER -- support for these Metrics was implemented/released in EnergyPlus 23-1, based on the 2022 version of the AHRI Standard 340-360
     -   EER - for the SingleSpeed, TwoSpeed, MultiSpeed, VariableSpeed, and CurveFit:Speed variants of DX Cooling coils.
-    -   IEER2 - for the SingleSpeed, TwoSpeed, MultiSpeed, VariableSpeed, and CurveFit:Speed variants of DX Cooling coils.
+    -   IEER - for the SingleSpeed, TwoSpeed, MultiSpeed, VariableSpeed, and CurveFit:Speed variants of DX Cooling coils.
 
 In this Task Order we propose the following scope of work:
--   Implement SEER2 -- for the TwoSpeed and VariableSpeed variants of DX Cooling Coils, based on the 2023 version of the ANSI/AHRI 210-240 standard.
--   Refactoring of standards calculation ane reporting code, which has been implemented by various team members over the past 15 years
--   Improved handling of metrics calculation/reporting, based on equipment capacities.  Some metrics vary, based on equipment capacity.
+-   Implement SEER2 -- for the following configurations and calculation variants, as defined in the 2023 version of the ANSI/AHRI Standard 210-240:
+    - Coil:Cooling:DX:TwoSpeed -- supporting 4 different calculation paths, determined by the building cooling load and the Coil's cooling capacity 
+    - Coil:Cooling:DX:VariableSpeed -- supporting 3 different calculation paths for several configurations, ranging from 1 speed to 10 speeds, and also depending on the building cooling load and the coil's cooling capacity at each speed.
+-   Refactoring of standards calculation and reporting code, which has been implemented by various team members over the past 15 years
+-   Improved handling of metrics calculation/reporting, based on Coil cooling capacity.  The standard metric calculations vary, based on Coil's cooling capacity.
 
 ## SEER2 = Seasonal Energy Efficiency Rating (2023)
 SEER2 is calculated based on ANSI/AHRI Standard 210/240-2023: applies to: Unitary Air-conditioners and Unitary Air-source Heat Pumps with
@@ -47,27 +49,39 @@ capacities less than 65,000 Btu/h.
 
 |Two Stage Systems|
 |--|
-|Graphical representation of SEER2:<br>![grafik](https://user-images.githubusercontent.com/49325382/173099074-caeb59f7-d3b8-45ab-b8a7-5367506ff7f6.png)|
+|Graphical representation of SEER2:<br><img src="https://user-images.githubusercontent.com/49325382/173099074-caeb59f7-d3b8-45ab-b8a7-5367506ff7f6.png" width=75% height=75%>|
 
-|Variable|Formulas|Code|
-|--|--|--|
-|SEER2|![grafik](https://user-images.githubusercontent.com/49325382/173098299-1b89804d-d8a3-4a75-8db3-8ad3bbdc8e36.png)|TBD|
-|q(t<sub>j</sub>) and E(t<sub>j</sub>) are calculated for the following temperature bins|![grafik](https://user-images.githubusercontent.com/49325382/173098780-28c8a2ef-b13f-46e3-956e-6540477912dc.png)|
-|BL(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173107798-68ba98a9-e5d8-4a07-9a18-da6b1145bf5b.png)||
-|q<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173108139-86c76624-cf0a-4452-a0e9-3e7379898df4.png)||
-|P<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173108210-583a6e5a-5b81-40cf-8d85-dcd31b0358a0.png)||
-|q<sub>Full</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173108349-8f3ffe8c-3960-4b1d-8d42-a649556b0e5c.png)||
-|P<sub>Full</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173108376-c5732907-dd1b-46fc-89a3-1dcaf3ca59a2.png)||
-|Case 1<br>![grafik](https://user-images.githubusercontent.com/49325382/173108719-2512fa72-daf7-4ce3-a2d3-c54a9fee1b31.png)|Building load is less than Low Stage capacity||
-||![grafik](https://user-images.githubusercontent.com/49325382/173108824-f8bee0dc-5ba6-48e0-a8f6-0e8719e28305.png)||
-|C<sub>D</sub><sup>C</sup><br>Default Cooling Degradation Coefficient|Default: 0.2<br>If Tests C and D are not performed or C<sub>D</sub><sup>C</sup> is greater than default use default value||
-|Case 2<br>![grafik](https://user-images.githubusercontent.com/49325382/173109144-f7d78157-6f28-496c-a148-e4262494bb20.png)|Building load is greater than Low Stage capacity, but less than Full Stage capacity and the unit cycles between Low Stage operation and Full Stage operation||
-||![grafik](https://user-images.githubusercontent.com/49325382/173109198-c817551d-8507-44ea-8f0f-f070b5cf695e.png)||
-|Case 3<br>![grafik](https://user-images.githubusercontent.com/49325382/173109144-f7d78157-6f28-496c-a148-e4262494bb20.png)|Building load is greater than Low Stage capacity, but less than Full Stage capacity and the unit cycles between off and Full Stage operation||
-||![grafik](https://user-images.githubusercontent.com/49325382/173109574-80e66076-9575-413b-a465-416d82ea1db3.png)||
-|C<sub>D</sub><sup>c,Full</sup><br>Default Cooling Degradation Coefficient|Default: 0.2<br>If Tests C and D are not conducted set C<sub>D</sub><sup>c,Full</sup> to the default value or use the following forumlar:<br>![grafik](https://user-images.githubusercontent.com/49325382/173117743-27b547d9-8b76-4056-9f91-7c655b387df5.png)<br>If the test is conducted use the following forumlar:<br>![grafik](https://user-images.githubusercontent.com/49325382/173117884-9f2f26f4-8ed4-496d-b6d2-4c30beca8b1d.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173117960-61d85889-c575-4b0c-b8a3-e32d591ca7d2.png)||
-|Case 4<br>![grafik](https://user-images.githubusercontent.com/49325382/173118064-7b60a4a5-97f4-4527-9e30-f9f1362c2c76.png)![grafik](https://user-images.githubusercontent.com/49325382/173118087-143d1ad3-8563-44b9-a5c0-1ebb16791c6c.png)|Building load is greater than or equal to the unit capacity||
-||![grafik](https://user-images.githubusercontent.com/49325382/173118193-28b2fc85-c7a9-437b-8998-32d7f8a10ae2.png)||
+|Variable|Formulas|
+|--|--|
+|SEER2|<img src="https://user-images.githubusercontent.com/49325382/173098299-1b89804d-d8a3-4a75-8db3-8ad3bbdc8e36.png" width=40% height=40%>|
+|q(t<sub>j</sub>) and E(t<sub>j</sub>) are calculated for the following temperature bins|<img src="https://user-images.githubusercontent.com/49325382/173098780-28c8a2ef-b13f-46e3-956e-6540477912dc.png" width=70% height=70%>|
+|BL(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173107798-68ba98a9-e5d8-4a07-9a18-da6b1145bf5b.png" width=90% height=90%>||
+|q<sub>LOW</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173108139-86c76624-cf0a-4452-a0e9-3e7379898df4.png" width=85% height=85%>||
+|P<sub>LOW</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173108210-583a6e5a-5b81-40cf-8d85-dcd31b0358a0.png" width=85% height=85%>||
+|q<sub>Full</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173108349-8f3ffe8c-3960-4b1d-8d42-a649556b0e5c.png" width=85% height=85%>||
+|P<sub>Full</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173108376-c5732907-dd1b-46fc-89a3-1dcaf3ca59a2.png" width=85% height=85%>||
+## Case 1
+|Variable|Formulas|
+|--|--|
+|<img src="https://user-images.githubusercontent.com/49325382/173108719-2512fa72-daf7-4ce3-a2d3-c54a9fee1b31.png" width=60% height=60%>|Building load is less than Low Stage capacity|
+||<img src="https://user-images.githubusercontent.com/49325382/173108824-f8bee0dc-5ba6-48e0-a8f6-0e8719e28305.png" width=70% height=70%>|
+|C<sub>D</sub><sup>C</sup><br>Default Cooling Degradation Coefficient|Default: 0.2<br>If Tests C and D are not performed or C<sub>D</sub><sup>C</sup> is greater than default use default value|
+## Case 2
+|Variable|Formulas|
+|--|--|
+|<img src="https://user-images.githubusercontent.com/49325382/173109144-f7d78157-6f28-496c-a148-e4262494bb20.png" width=120% height=120%>|Building load is greater than Low Stage capacity, but less than Full Stage capacity<br>and the unit cycles between Low Stage operation and Full Stage operation|
+||<img src="https://user-images.githubusercontent.com/49325382/173109198-c817551d-8507-44ea-8f0f-f070b5cf695e.png" width=65% height=65%>|
+## Case 3
+|Variable|Formulas|
+|--|--|
+|<img src="https://user-images.githubusercontent.com/49325382/173109144-f7d78157-6f28-496c-a148-e4262494bb20.png" width=120% height=120%>|Building load is greater than Low Stage capacity, but less than Full Stage capacity<br>and the unit cycles between off and Full Stage operation|
+||<img src="https://user-images.githubusercontent.com/49325382/173109574-80e66076-9575-413b-a465-416d82ea1db3.png" width=60% height=60%>|
+|C<sub>D</sub><sup>c,Full</sup><br>Default Cooling Degradation Coefficient|Default: 0.2<br>If Tests C and D are not conducted set C<sub>D</sub><sup>c,Full</sup> to the default value or use the following forumlar:<br><img src="https://user-images.githubusercontent.com/49325382/173117743-27b547d9-8b76-4056-9f91-7c655b387df5.png" width=40% height=40%><br>If the test is conducted use the following forumlar:<br><img src="https://user-images.githubusercontent.com/49325382/173117884-9f2f26f4-8ed4-496d-b6d2-4c30beca8b1d.png" width=40% height=40%><br><img src="https://user-images.githubusercontent.com/49325382/173117960-61d85889-c575-4b0c-b8a3-e32d591ca7d2.png" width=40% height=40%>|
+## Case 4
+|Variable|Formulas|
+|--|--|
+|<img src="https://user-images.githubusercontent.com/49325382/173118064-7b60a4a5-97f4-4527-9e30-f9f1362c2c76.png" width=50% height=50%><img src="https://user-images.githubusercontent.com/49325382/173118087-143d1ad3-8563-44b9-a5c0-1ebb16791c6c.png" width=50% height=50%>|Building load is greater than or equal to the unit capacity|
+||<img src="https://user-images.githubusercontent.com/49325382/173118193-28b2fc85-c7a9-437b-8998-32d7f8a10ae2.png" width=50% height=50%>|
  
 ### FOR VARIABLE SPEED SYSTEMS
  |Variable Speed Systems|
