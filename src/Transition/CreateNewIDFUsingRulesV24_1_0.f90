@@ -128,6 +128,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=20) :: PotentialRunPeriodName
   ! END OF TODO
 
+  ! used in transition code for HeatExchanger:AirToAir:SensibleAndLatent
+  CHARACTER(20), DIMENSION(4) :: HxEffectAt75Airflow
+  CHARACTER(20), DIMENSION(4) :: HxEffectAt100Airflow
+  CHARACTER(MaxNameLength + 2), DIMENSION(4) :: HxTableName
+  LOGICAL :: tableAdded
+  LOGICAL :: tableIndependentVarAdded
+  CHARACTER(10) :: tableID
+  REAL :: effect75
+  REAL :: effect100
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
@@ -388,6 +397,96 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with G, insert the rules here
 
               ! If your original object starts with H, insert the rules here
+
+              CASE('HeatExchanger:AirToAir:SensibleAndLatent')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+
+                ! read in 8 reference value for the effectiveness at 75% and 100%
+                HxEffectAt75Airflow(1) = TRIM(InArgs(6))    ! Sensible Effectiveness at 75% Heating Air Flow
+                HxEffectAt75Airflow(2) = TRIM(InArgs(7))    ! Latent Effectiveness at 75% Heating Air Flow
+                HxEffectAt75Airflow(3) = TRIM(InArgs(10))   ! Sensible Effectiveness at 75% Cooling Air Flow
+                HxEffectAt75Airflow(4) = TRIM(InArgs(11))   ! Latent Effectiveness at 75% Cooling Air Flow
+                HxEffectAt100Airflow(1) = TRIM(InArgs(4))   ! Sensible Effectiveness at 100% Heating Air Flow
+                HxEffectAt100Airflow(2) = TRIM(InArgs(5))   ! Latent Effectiveness at 100% Heating Air Flow
+                HxEffectAt100Airflow(3) = TRIM(InArgs(8))   ! Sensible Effectiveness at 100% Cooling Air Flow
+                HxEffectAt100Airflow(4) = TRIM(InArgs(9))   ! Latent Effectiveness at 100% Cooling Air Flow
+
+                ! Remove the 4 fields for 75% airflow and adjust the index of the fields
+                OutArgs(1:5) = InArgs(1:5)
+                OutArgs(6) = InArgs(8)
+                OutArgs(7) = InArgs(9)
+                OutArgs(8:19) = InArgs(12:23)
+
+                ! Fill in table names
+                DO i = 1, 4
+                  READ(HxEffectAt75Airflow(i), *) effect75
+                  READ(HxEffectAt100Airflow(i), *) effect100
+                  IF (effect75 /= effect100) THEN
+                    WRITE(tableID, *)
+                    HxTableName(i) = InArgs(1) // '_' // tableID
+                    OutArgs(19 + i) = HxTableName(i)      ! table name
+                  ELSE
+                    OutArgs(19 + i) = ''                  ! empty table name
+                  ENDIF
+                END DO
+                ! removed 4 fields and added 4 fields, no change to CurArgs
+
+                ! create table object
+                DO i = 1, 4
+                  READ(HxEffectAt75Airflow(i), *) effect75
+                  READ(HxEffectAt100Airflow(i), *) effect100
+                  IF (effect75 /= effect100) THEN
+                     ! create new object Table:Lookup,
+                     ObjectName='Table:Lookup'
+                     CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                     OutArgs(1) = HxTableName(i)
+                     OutArgs(2) = 'effectiveness_IndependentVariableList'
+                     OutArgs(3) = 'DivisorOnly'             !- Normalization Method
+                     OutArgs(4) = '0.0'                     !- Minimum Output
+                     OutArgs(5) = '1.0'                     !- Maximum Output
+                     OutArgs(6) = 'Dimensionless'           !- Output Unit Type
+                     OutArgs(7) = ''                        !- External File Name
+                     OutArgs(8) = ''                        !- External File Column Number
+                     OutArgs(9) = ''                        !- External File Starting Row Number
+                     OutArgs(10) = HxEffectAt75Airflow(i)   !- Output Value 1
+                     OutArgs(11) = HxEffectAt100Airflow(i)  !- Output Value 2
+                     CurArgs = 11
+                     tableAdded = .true.
+                     CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                     Written=.true.
+                  ENDIF
+                END DO
+
+              ! add independent variables used in the tables
+              IF (tableAdded .AND. .NOT. tableIndependentVarAdded) THEN
+                tableIndependentVarAdded = .false.
+                ObjectName='Table:IndependentVariableList'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = 'effectiveness_IndependentVariableList'
+                OutArgs(2) = 'HxAirFlowRatio'
+                CurArgs = 2
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                Written=.true.
+
+                ObjectName='Table:IndependentVariableList'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = 'HxAirFlowRatio'
+                OutArgs(2) = 'Linear'                  !  Interpolation Method
+                OutArgs(3) = 'Linear'                  !  Extrapolation Method
+                OutArgs(4) = '0.0'                     !  Minimum Value
+                OutArgs(5) = '1.0'                     !  Maximum Value
+                OutArgs(6) = ''                        !  Normalization Reference Value
+                OutArgs(7) = 'Dimensionless'           !  Unit Type
+                OutArgs(8) = ''                        !  External File Name
+                OutArgs(9) = ''                        !  External File Column Number
+                OutArgs(10) = ''                       !  External File Starting Row Number
+                OutArgs(11) = '0.75'                   !  Value 1
+                OutArgs(12) = '1.0'                    !  Value 2
+                CurArgs = 12
+                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                Written=.true.
+              ENDIF
 
               ! If your original object starts with I, insert the rules here
 

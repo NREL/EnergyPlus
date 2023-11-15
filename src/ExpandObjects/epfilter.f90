@@ -16704,12 +16704,8 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjStr('Nominal Supply Air Flow Rate {m3/s}','autosize')
       CALL AddToObjStr('Sensible Effectiveness at 100% Heating Air Flow {dimensionless}','0.7')
       CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow {dimensionless}','0.0')
-      CALL AddToObjStr('Sensible Effectiveness at 75% Heating Air Flow {dimensionless}','0.75')
-      CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow {dimensionless}','0.0')
       CALL AddToObjStr('Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}','0.7')
       CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow {dimensionless}','0.0')
-      CALL AddToObjStr('Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}','0.75')
-      CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow {dimensionless}','0.0')
       CALL AddToObjFld('Supply Air Inlet Node Name', base + ussAirHandlerNameOff, TRIM(coolCoilUnitInlet))
       CALL AddToObjFld('Supply Air Outlet Node Name', base + ussAirHandlerNameOff,' HX Supply Outlet Node')
       CALL AddToObjFld('Exhaust Air Inlet Node Name', base + ussAirHandlerNameOff,' Cooling Coil Outlet Node')
@@ -16723,6 +16719,10 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjStr('Rate of Defrost Time Fraction Increase {1/K}','')
       ! MJW ???? - Not sure
       CALL AddToObjStr('Economizer Lockout','No',.TRUE.)
+      CALL AddToObjStr('Sensible Effectiveness of Heating Air Flow Curve Name','')
+      CALL AddToObjStr('Latent Effectiveness of Heating Air Flow Curve Name','')
+      CALL AddToObjStr('Sensible Effectiveness of Cooling Air Flow Curve Name','')
+      CALL AddToObjStr('Latent Effectiveness of Cooling Air Flow Curve Name','')
       !***Coil:Cooling:Water
       CALL CreateNewObj('Coil:Cooling:Water')
       CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Cooling Coil')
