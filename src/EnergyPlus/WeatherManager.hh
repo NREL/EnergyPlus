@@ -782,8 +782,8 @@ struct WeatherManagerData : BaseGlobalStruct
     bool PrintEnvrnStamp = false;          // Set to true when the environment header should be printed
     bool PrintDDHeader = true;
 
-    int YearOfSim = 1; // The Present year of Simulation.
-    int const NumDaysInYear = 365;
+    int YearOfSim = 1;                     // The Present year of Simulation.
+    int NumDaysInYear = 365;               // TODO: removed const from this until leap year behavior is reviewed
     int EnvironmentReportNbr = 0;          // Report number for the environment stamp
     std::string EnvironmentReportChr = ""; // Report number for the environment stamp (character -- for printing)
     bool WeatherFileExists = false;        // Set to true if a weather file exists
