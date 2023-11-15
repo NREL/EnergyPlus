@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -459,4 +460,84 @@ TEST_F(EnergyPlusFixture, SwimmingPool_MultiplePoolUpdatePoolSourceValAvgTest)
     EXPECT_NEAR(HBFanData->QPoolSurfNumerator(2), Pool2Data.QPoolSrcAvg, closeEnough);
     EXPECT_NEAR(HBFanData->PoolHeatTransCoefs(1), Pool1Data.HeatTransCoefsAvg, closeEnough);
     EXPECT_NEAR(HBFanData->PoolHeatTransCoefs(2), Pool2Data.HeatTransCoefsAvg, closeEnough);
+}
+
+TEST_F(EnergyPlusFixture, SwimmingPool_factoryTest)
+{
+    // Test of new factory routine as part of the move to make swimming pools a plant loop object called
+    // from the plant loop and not zone equipment.
+    state->dataSwimmingPools->getSwimmingPoolInput = false;
+    state->dataSwimmingPools->NumSwimmingPools = 4;
+    state->dataSwimmingPools->Pool.allocate(state->dataSwimmingPools->NumSwimmingPools);
+
+    auto &poolData = state->dataSwimmingPools->Pool;
+    poolData(1).Name = "Schwimmbad Nummer Eins";
+    poolData(2).Name = "Schwimmbad Nummer Zwei";
+    poolData(3).Name = "Schwimmbad Nummer Drei";
+    poolData(4).Name = "Schwimmbad Nummer Vier";
+
+    // Test 1: First Pool
+    SwimmingPoolData *factoryResult = SwimmingPoolData::factory(*state, poolData(1).Name);
+    EXPECT_NE(factoryResult, nullptr);
+
+    // Test 2: First Pool
+    factoryResult = SwimmingPoolData::factory(*state, poolData(2).Name);
+    EXPECT_NE(factoryResult, nullptr);
+
+    // Test 3: First Pool
+    factoryResult = SwimmingPoolData::factory(*state, poolData(3).Name);
+    EXPECT_NE(factoryResult, nullptr);
+
+    // Test 4: First Pool
+    factoryResult = SwimmingPoolData::factory(*state, poolData(4).Name);
+    EXPECT_NE(factoryResult, nullptr);
+}
+
+TEST_F(EnergyPlusFixture, SwimmingPool_reportTest)
+{
+    // Test of modified report routine as part of the move to make swimming pools a plant loop object called
+    // from the plant loop and not zone equipment.  Report routine gets called for each pool separately rather
+    // than reporting for everything all at once.
+    Real64 const closeEnough = 0.000001;
+    SwimmingPoolData myPool;
+
+    // Test Data
+    myPool.Name = "This Pool";
+    myPool.SurfacePtr = 1;
+    state->dataHeatBalSurf->SurfInsideTempHist.allocate(1);
+    state->dataHeatBalSurf->SurfInsideTempHist(1).dimension(1, 0);
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(1) = 10.0;
+    myPool.WaterMassFlowRate = 0.001;
+    myPool.WaterInletTemp = 40.0;
+    myPool.MiscPowerFactor = 1000.0;
+    myPool.RadConvertToConvect = 0.5;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Area = 5.0;
+    state->dataHVACGlobal->TimeStepSysSec = 60.0;
+    myPool.MiscEquipPower = 0.12;
+    myPool.MakeUpWaterMassFlowRate = 0.1;
+    myPool.EvapHeatLossRate = 0.016;
+
+    // Test of .report routine
+    myPool.report(*state);
+    Real64 expectedHeatPower = 125.73;
+    Real64 expectedMiscEquipPower = 0.0010003;
+    Real64 expectedRadConvertToConvectRep = 2.5;
+    Real64 expectedMiscEquipEnergy = 0.060018;
+    Real64 expectedHeatEnergy = 7543.8;
+    Real64 expectedMakeUpWaterMass = 6.0;
+    Real64 expectedEvapEnergyLoss = 0.96;
+    Real64 expectedMakeUpWaterVolFlowRate = 0.0001003;
+    Real64 expectedMakeUpWaterVol = 0.0060018;
+
+    EXPECT_NEAR(state->dataHeatBalSurf->SurfInsideTempHist(1)(1), myPool.PoolWaterTemp, closeEnough);
+    EXPECT_NEAR(expectedHeatPower, myPool.HeatPower, closeEnough);
+    EXPECT_NEAR(expectedMiscEquipPower, myPool.MiscEquipPower, closeEnough);
+    EXPECT_NEAR(expectedRadConvertToConvectRep, myPool.RadConvertToConvectRep, closeEnough);
+    EXPECT_NEAR(expectedMiscEquipEnergy, myPool.MiscEquipEnergy, closeEnough);
+    EXPECT_NEAR(expectedHeatEnergy, myPool.HeatEnergy, closeEnough);
+    EXPECT_NEAR(expectedMakeUpWaterMass, myPool.MakeUpWaterMass, closeEnough);
+    EXPECT_NEAR(expectedEvapEnergyLoss, myPool.EvapEnergyLoss, closeEnough);
+    EXPECT_NEAR(expectedMakeUpWaterVolFlowRate, myPool.MakeUpWaterVolFlowRate, closeEnough);
+    EXPECT_NEAR(expectedMakeUpWaterVol, myPool.MakeUpWaterVol, closeEnough);
 }
