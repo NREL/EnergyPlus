@@ -39654,7 +39654,7 @@
     Linear,                  !- Interpolation Method
     Linear,                  !- Extrapolation Method
     0.0,                     !- Minimum Value
-    1.0,                     !- Maximum Value
+    10.0,                    !- Maximum Value
     ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
@@ -39673,7 +39673,7 @@
     DivisorOnly,             !- Normalization Method
     0.6,                     !- Normalization Divisor
     0.0,                     !- Minimum Output
-    1.0,                     !- Maximum Output
+    10.0,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -39687,7 +39687,7 @@
     DivisorOnly,             !- Normalization Method
     0.596,                   !- Normalization Divisor
     0.0,                     !- Minimum Output
-    1.0,                     !- Maximum Output
+    10.0,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number

@@ -2833,7 +2833,7 @@
     Linear,                  !- Interpolation Method
     Linear,                  !- Extrapolation Method
     0.0,                     !- Minimum Value
-    1.0,                     !- Maximum Value
+    10.0,                    !- Maximum Value
     ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
@@ -2852,7 +2852,7 @@
     DivisorOnly,             !- Normalization Method
     0.7,                     !- Normalization Divisor
     0.0,                     !- Minimum Output
-    1.0,                     !- Maximum Output
+    10.0,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2866,14 +2866,13 @@
     DivisorOnly,             !- Normalization Method
     0.65,                    !- Normalization Divisor
     0.0,                     !- Minimum Output
-    1.0,                     !- Maximum Output
+    10.0,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
     ,                        !- External File Starting Row Number
     0.70,                    !- Output Value 1
     0.65;                    !- Output Value 2
-
 
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:OUTDOORAIR ===========
 

@@ -337,7 +337,7 @@ Table:IndependentVariable,
   Linear,                  !- Interpolation Method
   Linear,                  !- Extrapolation Method
   0.0,                     !- Minimum Value
-  1.0,                     !- Maximum Value
+  10.0,                    !- Maximum Value
   ,                        !- Normalization Reference Value
   Dimensionless,           !- Unit Type
   ,                        !- External File Name
@@ -356,7 +356,7 @@ Table:Lookup,
   DivisorOnly,             !- Normalization Method
   0.76,                    !- Normalization Divisor
   0.0,                     !- Minimum Output
-  1.0,                     !- Maximum Output
+  10.0,                    !- Maximum Output
   Dimensionless,           !- Output Unit Type
   ,                        !- External File Name
   ,                        !- External File Column Number
@@ -370,7 +370,7 @@ Table:Lookup,
   DivisorOnly,             !- Normalization Method
   0.68,                    !- Normalization Divisor
   0.0,                     !- Minimum Output
-  1.0,                     !- Maximum Output
+  10.0,                    !- Maximum Output
   Dimensionless,           !- Output Unit Type
   ,                        !- External File Name
   ,                        !- External File Column Number
