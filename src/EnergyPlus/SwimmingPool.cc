@@ -105,24 +105,23 @@ namespace EnergyPlus::SwimmingPool {
 // 4. Smith, C., R. Jones, and G. Lof (1993). Energy Requirements and Potential Savings for Heated
 //    Indoor Swimming Pools. ASHRAE Transactions 99(2), p.864-874.
 
-PlantComponent *SwimmingPoolData::factory(EnergyPlusData &state, std::string const &objectName)
+SwimmingPoolData *SwimmingPoolData::factory(EnergyPlusData &state, std::string const &objectName)
 {
     if (state.dataSwimmingPools->getSwimmingPoolInput) {
         GetSwimmingPool(state);
         state.dataSwimmingPools->getSwimmingPoolInput = false;
-
-        // Now look for this particular swimming pool in the list
-        for (auto &pool : state.dataSwimmingPools->Pool) {
-            if (pool.Name == objectName) {
-                return &pool;
-            }
-        }
-        // If we didn't find it, fatal
-        ShowFatalError(state,
-                       format("LocalSwimmingPoolFactory: Error getting inputs or index for swimming pool named: {}", objectName)); // LCOV_EXCL_LINE
-        // Shut up the compiler
-        return nullptr; // LCOV_EXCL_LINE
     }
+    // Now look for this particular swimming pool in the list
+    for (auto &pool : state.dataSwimmingPools->Pool) {
+        if (pool.Name == objectName) {
+            return &pool;
+        }
+    }
+    // If we didn't find it, fatal
+    ShowFatalError(state,
+                   format("LocalSwimmingPoolFactory: Error getting inputs or index for swimming pool named: {}", objectName)); // LCOV_EXCL_LINE
+    // Shut up the compiler
+    return nullptr; // LCOV_EXCL_LINE
 }
 
 void SwimmingPoolData::simulate(EnergyPlusData &state,
