@@ -145,7 +145,7 @@ std::shared_ptr<SiteBuildingSurfaceGroundTemps> SiteBuildingSurfaceGroundTemps::
 
 //******************************************************************************
 
-Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp()
+Real64 SiteBuildingSurfaceGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -183,7 +183,7 @@ SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &sta
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************
@@ -205,7 +205,7 @@ Real64 SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusDat
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************

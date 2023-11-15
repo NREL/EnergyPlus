@@ -150,7 +150,7 @@ std::shared_ptr<SiteFCFactorMethodGroundTemps> SiteFCFactorMethodGroundTemps::FC
 
 //******************************************************************************
 
-Real64 SiteFCFactorMethodGroundTemps::getGroundTemp()
+Real64 SiteFCFactorMethodGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -186,7 +186,7 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusDat
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************
@@ -208,7 +208,7 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************

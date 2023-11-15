@@ -135,7 +135,7 @@ std::shared_ptr<SiteShallowGroundTemps> SiteShallowGroundTemps::ShallowGTMFactor
 
 //******************************************************************************
 
-Real64 SiteShallowGroundTemps::getGroundTemp()
+Real64 SiteShallowGroundTemps::getGroundTemp([[maybe_unused]] EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -172,7 +172,7 @@ Real64 SiteShallowGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &stat
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************
@@ -194,7 +194,7 @@ Real64 SiteShallowGroundTemps::getGroundTempAtTimeInMonths(EnergyPlusData &state
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************

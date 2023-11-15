@@ -90,7 +90,7 @@ public:
     }
 
     // Virtual method for retrieving the ground temp
-    virtual Real64 getGroundTemp() = 0;
+    virtual Real64 getGroundTemp(EnergyPlusData &state) = 0;
 
     virtual Real64 getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const, Real64 const) = 0;
 

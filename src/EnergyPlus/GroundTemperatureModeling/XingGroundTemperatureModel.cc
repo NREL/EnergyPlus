@@ -124,7 +124,7 @@ std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(Energ
 
 //******************************************************************************
 
-Real64 XingGroundTempsModel::getGroundTemp()
+Real64 XingGroundTempsModel::getGroundTemp(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -182,7 +182,7 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &state, 
     }
 
     // Get and return ground temp
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************
@@ -204,7 +204,7 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &state,
         simTimeInDays = remainder(simTimeInDays, Weather::NumDaysInYear);
     }
 
-    return getGroundTemp();
+    return getGroundTemp(state);
 }
 
 //******************************************************************************
