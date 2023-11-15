@@ -71,8 +71,6 @@ struct EnergyPlusData;
 
 namespace Weather {
 
-    int constexpr NumDaysInYear = 365;
-
     enum class EpwHeaderType
     {
         Invalid = -1,
@@ -784,7 +782,8 @@ struct WeatherManagerData : BaseGlobalStruct
     bool PrintEnvrnStamp = false;          // Set to true when the environment header should be printed
     bool PrintDDHeader = true;
 
-    int YearOfSim = 1;                     // The Present year of Simulation.
+    int YearOfSim = 1; // The Present year of Simulation.
+    int const NumDaysInYear = 365;
     int EnvironmentReportNbr = 0;          // Report number for the environment stamp
     std::string EnvironmentReportChr = ""; // Report number for the environment stamp (character -- for printing)
     bool WeatherFileExists = false;        // Set to true if a weather file exists

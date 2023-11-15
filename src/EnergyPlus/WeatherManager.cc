@@ -2558,7 +2558,7 @@ namespace Weather {
                     } else { // ReadStatus /=0
                         if (WeatherDataLine.eof &&
                             state.dataWeather->NumDataPeriods == 1) { // Standard End-of-file, rewind and position to first day...
-                            if (state.dataWeather->DataPeriods(1).NumDays >= Weather::NumDaysInYear) {
+                            if (state.dataWeather->DataPeriods(1).NumDays >= state.dataWeather->NumDaysInYear) {
                                 state.files.inputWeatherFile.rewind();
                                 SkipEPlusWFHeader(state);
                                 WeatherDataLine.update(state.files.inputWeatherFile.readLine());

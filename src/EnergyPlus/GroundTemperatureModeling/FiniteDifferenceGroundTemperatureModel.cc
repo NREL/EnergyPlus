@@ -226,7 +226,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
         ShowFatalError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data, bad KindOfSim.");
     }
 
-    weatherDataArray.dimension(Weather::NumDaysInYear);
+    weatherDataArray.dimension(state.dataWeather->NumDaysInYear);
 
     state.dataGlobal->BeginEnvrnFlag = true;
     state.dataGlobal->EndEnvrnFlag = false;
@@ -238,7 +238,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     annualAveAirTemp_num = 0.0;
 
-    while ((state.dataGlobal->DayOfSim < Weather::NumDaysInYear) || (state.dataGlobal->WarmupFlag)) { // Begin day loop ...
+    while ((state.dataGlobal->DayOfSim < state.dataWeather->NumDaysInYear) || (state.dataGlobal->WarmupFlag)) { // Begin day loop ...
 
         ++state.dataGlobal->DayOfSim;
 
@@ -322,7 +322,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     } // ... End day loop.
 
-    annualAveAirTemp = annualAveAirTemp_num / Weather::NumDaysInYear; // Used for initalizing domain
+    annualAveAirTemp = annualAveAirTemp_num / state.dataWeather->NumDaysInYear; // Used for initalizing domain
 
     // Reset Envrionment when done reading data
     --state.dataWeather->NumOfEnvrn; // May need better way of eliminating the extra envrionment that was added to read the data
@@ -450,7 +450,7 @@ void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
     do {
 
         // loop over all days
-        for (state.dataGlobal->FDsimDay = 1; state.dataGlobal->FDsimDay <= Weather::NumDaysInYear; ++state.dataGlobal->FDsimDay) {
+        for (state.dataGlobal->FDsimDay = 1; state.dataGlobal->FDsimDay <= state.dataWeather->NumDaysInYear; ++state.dataGlobal->FDsimDay) {
 
             bool iterationConverged = false;
 
@@ -823,7 +823,7 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     evaluateSoilRhoCp(_, true);
 
     // Initialize the groundTemps array
-    groundTemps.dimension({1, Weather::NumDaysInYear}, {1, totalNumCells}, 0.0);
+    groundTemps.dimension({1, state.dataWeather->NumDaysInYear}, {1, totalNumCells}, 0.0);
 
     tempModel.reset();
 }
@@ -937,10 +937,10 @@ Real64 FiniteDiffGroundTempsModel::getGroundTemp(EnergyPlusData &state)
         // All depths within domain
         j1 = j0 + 1;
 
-        if (simTimeInDays <= 1 || simTimeInDays >= Weather::NumDaysInYear) {
+        if (simTimeInDays <= 1 || simTimeInDays >= state.dataWeather->NumDaysInYear) {
             // First day of year, last day of year, and leap day
             // Interpolate between first and last day
-            i0 = Weather::NumDaysInYear;
+            i0 = state.dataWeather->NumDaysInYear;
             i1 = 1;
 
             // Lookup ground temps
@@ -980,10 +980,10 @@ Real64 FiniteDiffGroundTempsModel::getGroundTemp(EnergyPlusData &state)
         j0 = totalNumCells;
         j1 = j0;
 
-        if (simTimeInDays <= 1 || simTimeInDays >= Weather::NumDaysInYear) {
+        if (simTimeInDays <= 1 || simTimeInDays >= state.dataWeather->NumDaysInYear) {
             // First day of year, last day of year, and leap day
             // Interpolate between first and last day
-            i0 = Weather::NumDaysInYear;
+            i0 = state.dataWeather->NumDaysInYear;
             i1 = 1;
 
             // Lookup ground temps
@@ -1025,8 +1025,8 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &
 
     simTimeInDays = seconds / Constant::SecsInDay;
 
-    if (simTimeInDays > Weather::NumDaysInYear) {
-        simTimeInDays = remainder(simTimeInDays, Weather::NumDaysInYear);
+    if (simTimeInDays > state.dataWeather->NumDaysInYear) {
+        simTimeInDays = remainder(simTimeInDays, state.dataWeather->NumDaysInYear);
     }
 
     return getGroundTemp(state);
@@ -1044,15 +1044,15 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &s
     // Returns ground temperature when input time is in months
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 const aveDaysInMonth = Weather::NumDaysInYear / 12;
+    Real64 const aveDaysInMonth = state.dataWeather->NumDaysInYear / 12;
 
     depth = _depth;
 
     // Convert months to days. Puts time in middle of specified month
     simTimeInDays = aveDaysInMonth * ((month - 1) + 0.5);
 
-    if (simTimeInDays > Weather::NumDaysInYear) {
-        simTimeInDays = remainder(simTimeInDays, Weather::NumDaysInYear);
+    if (simTimeInDays > state.dataWeather->NumDaysInYear) {
+        simTimeInDays = remainder(simTimeInDays, state.dataWeather->NumDaysInYear);
     }
 
     // Get and return ground temperature

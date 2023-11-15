@@ -134,7 +134,7 @@ Real64 XingGroundTempsModel::getGroundTemp(EnergyPlusData &state)
     // Returns the ground temperature for the Site:GroundTemperature:Undisturbed:Xing
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 tp = Weather::NumDaysInYear; // Period of soil temperature cycle
+    Real64 tp = state.dataWeather->NumDaysInYear; // Period of soil temperature cycle
 
     // Inits
     Real64 Ts_1 = surfTempAmplitude_1; // Amplitude of surface temperature
@@ -169,7 +169,7 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &state, 
     // Returns ground temperature when input time is in months
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 const aveDaysInMonth = Weather::NumDaysInYear / 12;
+    Real64 const aveDaysInMonth = state.dataWeather->NumDaysInYear / 12;
 
     depth = _depth;
 
@@ -200,8 +200,8 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &state,
 
     simTimeInDays = seconds / Constant::SecsInDay;
 
-    if (simTimeInDays > Weather::NumDaysInYear) {
-        simTimeInDays = remainder(simTimeInDays, Weather::NumDaysInYear);
+    if (simTimeInDays > state.dataWeather->NumDaysInYear) {
+        simTimeInDays = remainder(simTimeInDays, state.dataWeather->NumDaysInYear);
     }
 
     return getGroundTemp(state);
