@@ -29,9 +29,14 @@ kiva/README.md
 kiva/.gitmodules
 penumbra/.gitmodules
 btwxt/.gitmodules
+btwxt/vendor/fmt
+btwxt/vendor/courierr/vendor/fmt
+btwxt/vendor/courierr/.gitmodules
 libtk205/.gitmodules
 
 # unused repo directories/files
+btwxt/docs
+btwxt/test
 btwxt/vendor/googletest
 penumbra/.github
 penumbra/examples
@@ -53,6 +58,7 @@ libtk205/.github
 libtk205/examples
 libtk205/test
 libtk205/vendor/btwxt
+libtk205/vendor/courierr
 libtk205/vendor/json
 
 FindGcov.cmake

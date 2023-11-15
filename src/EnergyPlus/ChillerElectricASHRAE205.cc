@@ -58,6 +58,7 @@
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChillerElectricASHRAE205.hh>
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -68,6 +69,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EnergyPlusLogger.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -94,26 +96,8 @@ constexpr std::array<std::string_view, static_cast<int>(AmbientTempIndicator::Nu
     "OUTDOORS",
 };
 
-std::map<std::string, Btwxt::Method> InterpMethods = // NOLINT(cert-err58-cpp)
-    {{"LINEAR", Btwxt::Method::LINEAR}, {"CUBIC", Btwxt::Method::CUBIC}};
-
-void tk205ErrCallback(tk205::MsgSeverity message_type, const std::string &message, void *context_ptr)
-{
-    std::pair<EnergyPlusData *, std::string> contextPair = *(std::pair<EnergyPlusData *, std::string> *)context_ptr;
-    std::string fullMessage = contextPair.second + ": " + message;
-    if (message_type == tk205::MsgSeverity::ERR_205) {
-        ShowSevereError(*contextPair.first, fullMessage);
-        ShowFatalError(*contextPair.first, "libtk205: Errors discovered, program terminates.");
-    } else {
-        if (message_type == tk205::MsgSeverity::WARN_205) {
-            ShowWarningError(*contextPair.first, fullMessage);
-        } else if (message_type == tk205::MsgSeverity::INFO_205) {
-            ShowMessage(*contextPair.first, fullMessage);
-        } else {
-            ShowMessage(*contextPair.first, fullMessage);
-        }
-    }
-}
+std::map<std::string, Btwxt::InterpolationMethod> InterpMethods = // NOLINT(cert-err58-cpp)
+    {{"LINEAR", Btwxt::InterpolationMethod::linear}, {"CUBIC", Btwxt::InterpolationMethod::cubic}};
 
 void getChillerASHRAE205Input(EnergyPlusData &state)
 {
@@ -159,16 +143,16 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
             // be set The CheckForActualFilePath function emits some nice information to the ERR file, so we just need a simple fatal here
             ShowFatalError(state, "Program terminates due to the missing ASHRAE 205 RS0001 representation file.");
         }
-        std::pair<EnergyPlusData *, std::string> callbackPair{&state,
-                                                              format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisObjectName)};
-        tk205::set_error_handler(tk205ErrCallback, &callbackPair);
-        Btwxt::LOG_LEVEL = static_cast<int>(Btwxt::MsgLevel::MSG_WARN);
-        thisChiller.Representation =
-            std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(RSInstanceFactory::create("RS0001", rep_file_path.string().c_str()));
+        // Since logger context must persist across all calls to libtk205/btwxt, it must be a member
+        thisChiller.LoggerContext = {&state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisObjectName)};
+        thisChiller.Representation = std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(
+            RSInstanceFactory::create("RS0001", rep_file_path.string().c_str(), std::make_shared<EnergyPlusLogger>()));
         if (nullptr == thisChiller.Representation) {
             ShowSevereError(state, format("{} is not an instance of an ASHRAE205 Chiller.", rep_file_path.string()));
             ErrorsFound = true;
         }
+        thisChiller.Representation->performance.performance_map_cooling.get_logger()->set_message_context(&thisChiller.LoggerContext);
+        thisChiller.Representation->performance.performance_map_standby.get_logger()->set_message_context(&thisChiller.LoggerContext);
         thisChiller.InterpolationType =
             InterpMethods[Util::makeUPPER(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))];
 

@@ -109,25 +109,9 @@ namespace Curve {
     // validating it, and storing it in such a manner that the curve manager
     // can provide the simulation with performance curve output.
 
-    // Functions
-    void BtwxtMessageCallback(const Btwxt::MsgLevel messageType, const std::string message, void *contextPtr)
-    {
-        std::pair<EnergyPlusData *, std::string> contextPair = *(std::pair<EnergyPlusData *, std::string> *)contextPtr;
-        std::string fullMessage = format("{}: {}", contextPair.second, message);
-        if (messageType == Btwxt::MsgLevel::MSG_ERR) {
-            ShowSevereError(*contextPair.first, fullMessage);
-            ShowFatalError(*contextPair.first, "Btwxt: Errors discovered, program terminates.");
-        } else {
-            if (static_cast<int>(messageType) >= Btwxt::LOG_LEVEL) {
-                if (messageType == Btwxt::MsgLevel::MSG_WARN) {
-                    ShowWarningError(*contextPair.first, fullMessage);
-                } else {
-                    ShowMessage(*contextPair.first, fullMessage);
-                }
-            }
-        }
-    }
+    std::shared_ptr<EnergyPlusLogger> BtwxtManager::btwxt_logger{{std::make_shared<EnergyPlusLogger>()}};
 
+    // Functions
     void commonEnvironInit(EnergyPlusData &state)
     {
         // need to be careful on where and how resetting curve outputs to some "inactive value" is done
@@ -2215,7 +2199,7 @@ namespace Curve {
 
                     std::string contextString = format("{} \"{}\"", CurrentModuleObject, Alphas(1));
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-                    Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+                    state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
 
                     thisCurve->inputLimits[0].min = 0.0;
                     thisCurve->inputLimits[0].minPresent = true;
@@ -2248,13 +2232,22 @@ namespace Curve {
                             lookupValues.push_back(Numbers(1));
                         }
 
-                        std::vector<Btwxt::GridAxis> gridAxes;
-                        gridAxes.emplace_back(axis, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
+                        try {
+                            std::vector<Btwxt::GridAxis> gridAxes;
+                            gridAxes.emplace_back(axis,
+                                                  "",
+                                                  Btwxt::InterpolationMethod::linear,
+                                                  Btwxt::ExtrapolationMethod::linear,
+                                                  std::pair<double, double>{0.0, 360.0},
+                                                  BtwxtManager::btwxt_logger);
 
-                        auto gridIndex = // (AUTO_OK_OBJ)
-                            state.dataCurveManager->btwxtManager.addGrid(Alphas(1), Btwxt::GriddedData(gridAxes));
-                        thisCurve->TableIndex = gridIndex;
-                        thisCurve->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
+                            auto gridIndex = // (AUTO_OK_OBJ)
+                                state.dataCurveManager->btwxtManager.addGrid(Alphas(1), gridAxes);
+                            thisCurve->TableIndex = gridIndex;
+                            thisCurve->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
+                        } catch (Btwxt::BtwxtException &e) {
+                            ShowFatalError(state, "Btwxt::GridAxis construction error; program terminates.");
+                        }
                     }
                 }
             }
@@ -2294,7 +2287,7 @@ namespace Curve {
                     std::string indVarName = Util::makeUPPER(indVar.at("independent_variable_name").get<std::string>());
                     std::string contextString = format("Table:IndependentVariable \"{}\"", indVarName);
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-                    Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+                    state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
 
                     // Find independent variable input data
                     if (state.dataCurveManager->btwxtManager.independentVarRefs.count(indVarName)) {
@@ -2358,21 +2351,21 @@ namespace Curve {
 
                         // This could be an enum lookup, but they are accessing enums inside Btwxt that we don't control, and it's only two options
                         // for each
-                        Btwxt::Method interpMethod = Btwxt::Method::CUBIC; // Assume cubic as the default
+                        Btwxt::InterpolationMethod interpMethod = Btwxt::InterpolationMethod::cubic; // Assume cubic as the default
                         auto interpIterator = indVarInstance.find("interpolation_method");
                         if (interpIterator != indVarInstance.end()) {
                             if (interpIterator->get<std::string>() == "Linear") {
-                                interpMethod = Btwxt::Method::LINEAR;
+                                interpMethod = Btwxt::InterpolationMethod::linear;
                             }
                         }
-                        Btwxt::Method extrapMethod = Btwxt::Method::LINEAR; // Assume linear as the default
+                        Btwxt::ExtrapolationMethod extrapMethod = Btwxt::ExtrapolationMethod::linear; // Assume linear as the default
                         auto extrapIterator = indVarInstance.find("extrapolation_method");
                         if (extrapIterator != indVarInstance.end()) {
                             if (extrapIterator->get<std::string>() == "Unavailable") {
                                 ShowSevereError(state, format("{}: Extrapolation method \"Unavailable\" is not yet available.", contextString));
                                 ErrorsFound = true;
                             } else if (extrapIterator->get<std::string>() == "Constant") {
-                                extrapMethod = Btwxt::Method::CONSTANT;
+                                extrapMethod = Btwxt::ExtrapolationMethod::constant;
                             }
                         }
 
@@ -2395,7 +2388,8 @@ namespace Curve {
                         min_val = min(min_val, min_grid_value);
                         max_val = max(max_val, max_grid_value);
 
-                        gridAxes.emplace_back(axis, extrapMethod, interpMethod, std::pair<double, double>{min_val, max_val});
+                        gridAxes.emplace_back(
+                            axis, "", interpMethod, extrapMethod, std::pair<double, double>{min_val, max_val}, BtwxtManager::btwxt_logger);
 
                     } else {
                         // Independent variable does not exist
@@ -2404,7 +2398,7 @@ namespace Curve {
                     }
                 }
                 // Add grid to btwxtManager
-                state.dataCurveManager->btwxtManager.addGrid(Util::makeUPPER(thisObjectName), Btwxt::GriddedData(gridAxes));
+                state.dataCurveManager->btwxtManager.addGrid(Util::makeUPPER(thisObjectName), gridAxes);
             }
         }
 
@@ -2426,7 +2420,7 @@ namespace Curve {
 
                 std::string contextString = format("Table:Lookup \"{}\"", thisCurve->Name);
                 std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-                Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+                state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
 
                 // TODO: Actually use this to define output variable units
                 if (fields.count("output_unit_type")) {
@@ -2604,12 +2598,12 @@ namespace Curve {
 
     int BtwxtManager::addOutputValues(int gridIndex, std::vector<double> values)
     {
-        return (int)grids[gridIndex].add_value_table(values);
+        return (int)grids[gridIndex].add_grid_point_data_set(values);
     }
 
     int BtwxtManager::getNumGridDims(int gridIndex)
     {
-        return (int)grids[gridIndex].get_ndims();
+        return (int)grids[gridIndex].get_number_of_dimensions();
     }
 
     double BtwxtManager::getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target)
@@ -2619,7 +2613,7 @@ namespace Curve {
 
     double BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> &target, const double scalar)
     {
-        return grids[gridIndex].normalize_values_at_target(outputIndex, target, scalar);
+        return grids[gridIndex].normalize_grid_point_data_set_at_target(outputIndex, target, scalar);
     }
 
     void BtwxtManager::clear()
@@ -2802,7 +2796,7 @@ namespace Curve {
 
         std::string contextString = format("Table:Lookup \"{}\"", this->Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
         Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
 
         if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
@@ -2822,7 +2816,7 @@ namespace Curve {
 
         std::string contextString = format("Table:Lookup \"{}\"", this->Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
         Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
 
         if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
@@ -2844,7 +2838,7 @@ namespace Curve {
 
         std::string contextString = format("Table:Lookup \"{}\"", this->Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
         Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
 
         if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
@@ -2868,7 +2862,7 @@ namespace Curve {
 
         std::string contextString = format("Table:Lookup \"{}\"", this->Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
         Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
 
         if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
@@ -2894,7 +2888,7 @@ namespace Curve {
 
         std::string contextString = format("Table:Lookup \"{}\"", this->Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
         Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
 
         if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
@@ -2922,7 +2916,7 @@ namespace Curve {
 
         std::string contextString = format("Table:Lookup \"{}\"", this->Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
         Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
 
         if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
