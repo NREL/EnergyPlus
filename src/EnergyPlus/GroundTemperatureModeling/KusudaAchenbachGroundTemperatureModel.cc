@@ -174,7 +174,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
 
 //******************************************************************************
 
-Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData &state)
+Real64 KusudaGroundTempsModel::getGroundTemp()
 {
     // AUTHOR         Matt Mitchell
     // DATE WRITTEN   June 2015
@@ -217,7 +217,7 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &stat
     }
 
     // Get and return ground temperature
-    return getGroundTemp(state);
+    return getGroundTemp();
 }
 
 //******************************************************************************
@@ -244,7 +244,7 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &state
     }
 
     // Get and return ground temperature
-    return getGroundTemp(state);
+    return getGroundTemp();
 }
 
 //******************************************************************************

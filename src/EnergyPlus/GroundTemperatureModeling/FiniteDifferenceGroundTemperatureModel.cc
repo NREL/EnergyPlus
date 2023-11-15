@@ -896,7 +896,7 @@ Real64 FiniteDiffGroundTempsModel::interpolate(Real64 const x, Real64 const x_hi
 
 //******************************************************************************
 
-Real64 FiniteDiffGroundTempsModel::getGroundTemp(EnergyPlusData &state)
+Real64 FiniteDiffGroundTempsModel::getGroundTemp()
 {
 
     // SUBROUTINE INFORMATION:
@@ -1029,7 +1029,7 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &
         simTimeInDays = remainder(simTimeInDays, Weather::NumDaysInYear);
     }
 
-    return getGroundTemp(state);
+    return getGroundTemp();
 }
 
 //******************************************************************************
@@ -1056,7 +1056,7 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &s
     }
 
     // Get and return ground temperature
-    return getGroundTemp(state);
+    return getGroundTemp();
 }
 
 //******************************************************************************
