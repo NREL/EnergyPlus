@@ -124,7 +124,7 @@ namespace OutputReportTabular {
         NotFound,
         Num
     };
-    constexpr std::array<std::string_view, static_cast<int>(UnitsStyle::Num)> UnitsStyleNamesUC{
+    constexpr std::array<std::string_view, static_cast<int>(UnitsStyle::Num) - 1> UnitsStyleNamesUC{
         "NONE", "JTOKWH", "JTOMJ", "JTOGJ", "INCHPOUND", "INCHPOUNDEXCEPTELECTRICITY"};
 
     enum class EndUseSubTableType
