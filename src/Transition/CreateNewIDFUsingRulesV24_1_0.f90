@@ -444,7 +444,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      OutArgs(2) = 'effectiveness_IndependentVariableList'
                      OutArgs(3) = 'DivisorOnly'             !- Normalization Method
                      OutArgs(4) = '0.0'                     !- Minimum Output
-                     OutArgs(5) = '1.0'                     !- Maximum Output
+                     OutArgs(5) = '10.0'                    !- Maximum Output
                      OutArgs(6) = 'Dimensionless'           !- Output Unit Type
                      OutArgs(7) = ''                        !- External File Name
                      OutArgs(8) = ''                        !- External File Column Number
@@ -475,7 +475,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(2) = 'Linear'                  !  Interpolation Method
                 OutArgs(3) = 'Linear'                  !  Extrapolation Method
                 OutArgs(4) = '0.0'                     !  Minimum Value
-                OutArgs(5) = '1.0'                     !  Maximum Value
+                OutArgs(5) = '10.0'                    !  Maximum Value
                 OutArgs(6) = ''                        !  Normalization Reference Value
                 OutArgs(7) = 'Dimensionless'           !  Unit Type
                 OutArgs(8) = ''                        !  External File Name
