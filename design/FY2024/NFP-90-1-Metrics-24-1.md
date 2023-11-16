@@ -86,91 +86,46 @@ capacities less than 65,000 Btu/h.
 ### FOR VARIABLE SPEED SYSTEMS
  |Variable Speed Systems|
 |--|
-|Graphical representation of SEER2:<br>![grafik](https://user-images.githubusercontent.com/49325382/173118907-586d86c5-5b44-45a2-99fd-667391a0c7ac.png)|
+|Graphical representation of SEER2:<br><img src="https://user-images.githubusercontent.com/49325382/173118907-586d86c5-5b44-45a2-99fd-667391a0c7ac.png" width=75% height=75%>|
 
-|Variable|Formulas|Code|
-|--|--|--|
-|SEER2|![grafik](https://user-images.githubusercontent.com/49325382/173120318-d5df3faf-7196-4bb8-badc-ca3e56166dce.png)|TBD|
-|q<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122263-ae5eecb5-1e19-47b0-94d1-4fa087e9a8bb.png)||
-|P<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122290-8dd0658a-acad-4137-8cfe-abfac6e49e4c.png)||
-|q<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122372-093c6157-2438-4cbc-9191-6f995fe53f0b.png)||
-|E<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122395-cfec8d6e-9db2-4b88-955c-0b3ba7d29df4.png)||
-|q<sub>Int</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122508-574ace81-85a7-4c2f-b00b-d3e1b6d812d9.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173122561-5ae042d0-28a6-4fd9-812d-f9486abe1066.png)||
-|q<sub>Int</sub>(87)|![grafik](https://user-images.githubusercontent.com/49325382/173122633-20787666-fa61-4ca2-b960-92528f8cf9bc.png)||
-|P<sub>Int</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122777-aa94c891-7248-4448-a89c-93cfcef07301.png)||
-|P<sub>LOW</sub>(87)|![grafik](https://user-images.githubusercontent.com/49325382/173122879-6a4382de-bd4b-4ed4-8f17-880d1adb0dc4.png)||
-|Case 1<br>![grafik](https://user-images.githubusercontent.com/49325382/173123094-073047bf-c555-4b7c-b826-fdd95ea3a13e.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173123126-76a4e1c1-6dce-4fcc-8f24-1405024f3392.png)|Building load is no greater than unit capacity at low speed||
-||![grafik](https://user-images.githubusercontent.com/49325382/173125098-d13579fb-6db4-4db1-bf89-54f217a378dd.png)||
-|C<sub>D</sub><sup>C,low</sup>|![grafik](https://user-images.githubusercontent.com/49325382/173123971-9e334ba4-4922-4a0a-bb93-fd85bccc4952.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173124040-b8ea5f77-d0ad-4cd8-b141-36d59162e9fc.png)<br>Substitute Test G and I for test C and D||
-|C<sub>D</sub><sup>C</sup><br>Default Cooling Degradation Coefficient|Default: 0.25<br>If Tests G and I are not performed or C<sub>D</sub><sup>C</sup> is greater than default use default value||
-|Case 2<br>![grafik](https://user-images.githubusercontent.com/49325382/173124209-db6b6044-efe8-4e7f-88f7-aae795049240.png)|Building load can be matched by modulating the compressor speed between low speed and full speed||
-|q<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122372-093c6157-2438-4cbc-9191-6f995fe53f0b.png)||
-|E<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122395-cfec8d6e-9db2-4b88-955c-0b3ba7d29df4.png)||
-||![grafik](https://user-images.githubusercontent.com/49325382/173109198-c817551d-8507-44ea-8f0f-f070b5cf695e.png)||
-|EER<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173124302-997c297d-555b-4ed2-afd5-6351d53642ba.png)||
-|Case 3<br>![grafik](https://user-images.githubusercontent.com/49325382/173124546-69a9d1f7-570a-422a-9b02-05aff8282289.png)|Building load is equal to or greater than unit capacity at full stage||
-||![grafik](https://user-images.githubusercontent.com/49325382/173118193-28b2fc85-c7a9-437b-8998-32d7f8a10ae2.png)||
-
-*For Two Stage Systems*
-
-|Two Stage Systems|
-|--|
-|Graphical representation of SEER2:<br>![grafik](https://user-images.githubusercontent.com/49325382/173099074-caeb59f7-d3b8-45ab-b8a7-5367506ff7f6.png)|
-
-|Variable|Formulas|Code|
-|--|--|--|
-|SEER2|![grafik](https://user-images.githubusercontent.com/49325382/173098299-1b89804d-d8a3-4a75-8db3-8ad3bbdc8e36.png)|TBD|
-|q(t<sub>j</sub>) and E(t<sub>j</sub>) are calculated for the following temperature bins|![grafik](https://user-images.githubusercontent.com/49325382/173098780-28c8a2ef-b13f-46e3-956e-6540477912dc.png)|
-|BL(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173107798-68ba98a9-e5d8-4a07-9a18-da6b1145bf5b.png)||
-|q<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173108139-86c76624-cf0a-4452-a0e9-3e7379898df4.png)||
-|P<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173108210-583a6e5a-5b81-40cf-8d85-dcd31b0358a0.png)||
-|q<sub>Full</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173108349-8f3ffe8c-3960-4b1d-8d42-a649556b0e5c.png)||
-|P<sub>Full</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173108376-c5732907-dd1b-46fc-89a3-1dcaf3ca59a2.png)||
-|Case 1<br>![grafik](https://user-images.githubusercontent.com/49325382/173108719-2512fa72-daf7-4ce3-a2d3-c54a9fee1b31.png)|Building load is less than Low Stage capacity||
-||![grafik](https://user-images.githubusercontent.com/49325382/173108824-f8bee0dc-5ba6-48e0-a8f6-0e8719e28305.png)||
-|C<sub>D</sub><sup>C</sup><br>Default Cooling Degradation Coefficient|Default: 0.2<br>If Tests C and D are not performed or C<sub>D</sub><sup>C</sup> is greater than default use default value||
-|Case 2<br>![grafik](https://user-images.githubusercontent.com/49325382/173109144-f7d78157-6f28-496c-a148-e4262494bb20.png)|Building load is greater than Low Stage capacity, but less than Full Stage capacity and the unit cycles between Low Stage operation and Full Stage operation||
-||![grafik](https://user-images.githubusercontent.com/49325382/173109198-c817551d-8507-44ea-8f0f-f070b5cf695e.png)||
-|Case 3<br>![grafik](https://user-images.githubusercontent.com/49325382/173109144-f7d78157-6f28-496c-a148-e4262494bb20.png)|Building load is greater than Low Stage capacity, but less than Full Stage capacity and the unit cycles between off and Full Stage operation||
-||![grafik](https://user-images.githubusercontent.com/49325382/173109574-80e66076-9575-413b-a465-416d82ea1db3.png)||
-|C<sub>D</sub><sup>c,Full</sup><br>Default Cooling Degradation Coefficient|Default: 0.2<br>If Tests C and D are not conducted set C<sub>D</sub><sup>c,Full</sup> to the default value or use the following forumlar:<br>![grafik](https://user-images.githubusercontent.com/49325382/173117743-27b547d9-8b76-4056-9f91-7c655b387df5.png)<br>If the test is conducted use the following forumlar:<br>![grafik](https://user-images.githubusercontent.com/49325382/173117884-9f2f26f4-8ed4-496d-b6d2-4c30beca8b1d.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173117960-61d85889-c575-4b0c-b8a3-e32d591ca7d2.png)||
-|Case 4<br>![grafik](https://user-images.githubusercontent.com/49325382/173118064-7b60a4a5-97f4-4527-9e30-f9f1362c2c76.png)![grafik](https://user-images.githubusercontent.com/49325382/173118087-143d1ad3-8563-44b9-a5c0-1ebb16791c6c.png)|Building load is greater than or equal to the unit capacity||
-||![grafik](https://user-images.githubusercontent.com/49325382/173118193-28b2fc85-c7a9-437b-8998-32d7f8a10ae2.png)||
- 
-*For Variable Speed System*
- |Variable Speed Systems|
-|--|
-|Graphical representation of SEER2:<br>![grafik](https://user-images.githubusercontent.com/49325382/173118907-586d86c5-5b44-45a2-99fd-667391a0c7ac.png)|
-
-|Variable|Formulas|Code|
-|--|--|--|
-|SEER2|![grafik](https://user-images.githubusercontent.com/49325382/173120318-d5df3faf-7196-4bb8-badc-ca3e56166dce.png)|TBD|
-|q<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122263-ae5eecb5-1e19-47b0-94d1-4fa087e9a8bb.png)||
-|P<sub>LOW</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122290-8dd0658a-acad-4137-8cfe-abfac6e49e4c.png)||
-|q<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122372-093c6157-2438-4cbc-9191-6f995fe53f0b.png)||
-|E<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122395-cfec8d6e-9db2-4b88-955c-0b3ba7d29df4.png)||
-|q<sub>Int</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122508-574ace81-85a7-4c2f-b00b-d3e1b6d812d9.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173122561-5ae042d0-28a6-4fd9-812d-f9486abe1066.png)||
-|q<sub>Int</sub>(87)|![grafik](https://user-images.githubusercontent.com/49325382/173122633-20787666-fa61-4ca2-b960-92528f8cf9bc.png)||
-|P<sub>Int</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122777-aa94c891-7248-4448-a89c-93cfcef07301.png)||
-|P<sub>LOW</sub>(87)|![grafik](https://user-images.githubusercontent.com/49325382/173122879-6a4382de-bd4b-4ed4-8f17-880d1adb0dc4.png)||
-|Case 1<br>![grafik](https://user-images.githubusercontent.com/49325382/173123094-073047bf-c555-4b7c-b826-fdd95ea3a13e.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173123126-76a4e1c1-6dce-4fcc-8f24-1405024f3392.png)|Building load is no greater than unit capacity at low speed||
-||![grafik](https://user-images.githubusercontent.com/49325382/173125098-d13579fb-6db4-4db1-bf89-54f217a378dd.png)||
-|C<sub>D</sub><sup>C,low</sup>|![grafik](https://user-images.githubusercontent.com/49325382/173123971-9e334ba4-4922-4a0a-bb93-fd85bccc4952.png)<br>![grafik](https://user-images.githubusercontent.com/49325382/173124040-b8ea5f77-d0ad-4cd8-b141-36d59162e9fc.png)<br>Substitute Test G and I for test C and D||
-|C<sub>D</sub><sup>C</sup><br>Default Cooling Degradation Coefficient|Default: 0.25<br>If Tests G and I are not performed or C<sub>D</sub><sup>C</sup> is greater than default use default value||
-|Case 2<br>![grafik](https://user-images.githubusercontent.com/49325382/173124209-db6b6044-efe8-4e7f-88f7-aae795049240.png)|Building load can be matched by modulating the compressor speed between low speed and full speed||
-|q<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122372-093c6157-2438-4cbc-9191-6f995fe53f0b.png)||
-|E<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173122395-cfec8d6e-9db2-4b88-955c-0b3ba7d29df4.png)||
-||![grafik](https://user-images.githubusercontent.com/49325382/173109198-c817551d-8507-44ea-8f0f-f070b5cf695e.png)||
-|EER<sub>Int-Bin</sub>(t<sub>j</sub>)|![grafik](https://user-images.githubusercontent.com/49325382/173124302-997c297d-555b-4ed2-afd5-6351d53642ba.png)||
-|Case 3<br>![grafik](https://user-images.githubusercontent.com/49325382/173124546-69a9d1f7-570a-422a-9b02-05aff8282289.png)|Building load is equal to or greater than unit capacity at full stage||
-||![grafik](https://user-images.githubusercontent.com/49325382/173118193-28b2fc85-c7a9-437b-8998-32d7f8a10ae2.png)||
+|Variable|Formulas|
+|--|--|
+|SEER2|<img src="https://user-images.githubusercontent.com/49325382/173120318-d5df3faf-7196-4bb8-badc-ca3e56166dce.png" width=40% height=40%>|
+|q<sub>LOW</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122263-ae5eecb5-1e19-47b0-94d1-4fa087e9a8bb.png" width=90% height=90%>|
+|P<sub>LOW</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122290-8dd0658a-acad-4137-8cfe-abfac6e49e4c.png" width=85% height=85%>|
+|q<sub>Int-Bin</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122372-093c6157-2438-4cbc-9191-6f995fe53f0b.png" width=70% height=70%>|
+|E<sub>Int-Bin</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122395-cfec8d6e-9db2-4b88-955c-0b3ba7d29df4.png" width=75% height=75%>|
+|q<sub>Int</sub>(t<sub>j</sub>)|<img src="(https://user-images.githubusercontent.com/49325382/173122508-574ace81-85a7-4c2f-b00b-d3e1b6d812d9.png" width=150% height=150%><br><img src="https://user-images.githubusercontent.com/49325382/173122561-5ae042d0-28a6-4fd9-812d-f9486abe1066.png" width=150% height=150%>|
+|q<sub>Int</sub>(87)|<img src="https://user-images.githubusercontent.com/49325382/173122633-20787666-fa61-4ca2-b960-92528f8cf9bc.png" width=85% height=85%>|
+|P<sub>Int</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122777-aa94c891-7248-4448-a89c-93cfcef07301.png" width=100% height=100%>|
+|P<sub>LOW</sub>(87)|<img src="https://user-images.githubusercontent.com/49325382/173122879-6a4382de-bd4b-4ed4-8f17-880d1adb0dc4.png" width=80% height=80%>|
+## Case 1
+|Variable|Formulas|
+|--|--|
+|<img src="https://user-images.githubusercontent.com/49325382/173123094-073047bf-c555-4b7c-b826-fdd95ea3a13e.png" width=28% height=28%><br><img src="https://user-images.githubusercontent.com/49325382/173123126-76a4e1c1-6dce-4fcc-8f24-1405024f3392.png" width=68% height=68%>|Building load is no greater than unit capacity at low speed|
+||<img src="https://user-images.githubusercontent.com/49325382/173125098-d13579fb-6db4-4db1-bf89-54f217a378dd.png" width=85% height=85%>|
+|C<sub>D</sub><sup>C,low</sup>|<img src="https://user-images.githubusercontent.com/49325382/173123971-9e334ba4-4922-4a0a-bb93-fd85bccc4952.png" width=50% height=50%><br><img src="https://user-images.githubusercontent.com/49325382/173124040-b8ea5f77-d0ad-4cd8-b141-36d59162e9fc.png" width=55% height=55%><br>Substitute Test G and I for test C and D
+|C<sub>D</sub><sup>C</sup><br>Default Cooling Degradation Coefficient|Default: 0.25<br>If Tests G and I are not performed or C<sub>D</sub><sup>C</sup> is greater than default use default value|
+## Case 2
+|Variable|Formulas|
+|--|--|
+|<img src="https://user-images.githubusercontent.com/49325382/173124209-db6b6044-efe8-4e7f-88f7-aae795049240.png" width=140% height=140%>|Building load can be matched by modulating the compressor<br>speed between low speed and full speed|
+|q<sub>Int-Bin</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122372-093c6157-2438-4cbc-9191-6f995fe53f0b.png" width=60% height=60%>|
+|E<sub>Int-Bin</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122395-cfec8d6e-9db2-4b88-955c-0b3ba7d29df4.png" width=68% height=68%>|
+||<img src="https://user-images.githubusercontent.com/49325382/173109198-c817551d-8507-44ea-8f0f-f070b5cf695e.png" width=90% height=90%>||
+|EER<sub>Int-Bin</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173124302-997c297d-555b-4ed2-afd5-6351d53642ba.png" width=135% height=135%>|
+## Case 3
+|Variable|Formulas|
+|--|--|
+|<img src="https://user-images.githubusercontent.com/49325382/173124546-69a9d1f7-570a-422a-9b02-05aff8282289.png" width=90% height=90%>|Building load is equal to or greater than unit capacity at full stage|
+||!<img src="https://user-images.githubusercontent.com/49325382/173118193-28b2fc85-c7a9-437b-8998-32d7f8a10ae2.png" width=50% height=50%>|
 
 ## Test Conditions: <br/>
-![image](https://user-images.githubusercontent.com/78803858/205347858-a130fb11-c23b-4a34-bdc4-2a32e7d8d263.png)<br/><br/>
-![image](https://user-images.githubusercontent.com/78803858/205354762-fdce0568-e15d-47f0-8966-cbeeb88df9c4.png)<br/>
+!<img src="https://user-images.githubusercontent.com/78803858/205347858-a130fb11-c23b-4a34-bdc4-2a32e7d8d263.png" width=75% height=75%><br/><br/>
+!<img src="https://user-images.githubusercontent.com/78803858/205354762-fdce0568-e15d-47f0-8966-cbeeb88df9c4.png" width=75% height=75%><br/>
 
 **Example Test Points Used for EER Rating Points**<br/>
-![image](https://user-images.githubusercontent.com/78803858/205357978-5b1096e7-3b38-44b4-a870-8881c911296e.png)<br/>
+!<img src="https://user-images.githubusercontent.com/78803858/205357978-5b1096e7-3b38-44b4-a870-8881c911296e.png" width=75% height=75%><br/>
 
 ## Approach
 The EnergyPlus components for this scope of work are: Coil:Cooling:DX:TwoSpeed and Coil:Cooling:DX:VariableSpeed (for which calculations must support from 1 to 10 speeds). The TwoSpeed implementation will be new, as the standard calculations are different from OneSpeed and VariableSpeed.  The VariableSpeed implementation will have some similarities to the previous implementation for MultiSpeed, but will be more involved as it must adapt to number of speeds ranging from 1 to 10.
