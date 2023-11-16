@@ -398,7 +398,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with H, insert the rules here
 
-              CASE('HeatExchanger:AirToAir:SensibleAndLatent')
+              CASE('HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.false.
 
@@ -423,14 +423,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   READ(HxEffectAt75Airflow(i), *) effect75
                   READ(HxEffectAt100Airflow(i), *) effect100
                   IF (effect75 /= effect100) THEN
-                    WRITE(tableID, *)
-                    HxTableName(i) = InArgs(1) // '_' // tableID
+                    WRITE(tableID, '(I0)') i
+                    HxTableName(i) = TRIM(InArgs(1)) // '_' // tableID
                     OutArgs(19 + i) = HxTableName(i)      ! table name
                   ELSE
                     OutArgs(19 + i) = ''                  ! empty table name
                   ENDIF
                 END DO
                 ! removed 4 fields and added 4 fields, no change to CurArgs
+                CALL WriteOutIDFLines(DifLfn,'HeatExchanger:AirToAir:SensibleAndLatent',CurArgs,OutArgs,NwFldNames,NwFldUnits)
 
                 ! create table object
                 DO i = 1, 4
@@ -443,50 +444,51 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      OutArgs(1) = HxTableName(i)
                      OutArgs(2) = 'effectiveness_IndependentVariableList'
                      OutArgs(3) = 'DivisorOnly'             !- Normalization Method
-                     OutArgs(4) = '0.0'                     !- Minimum Output
-                     OutArgs(5) = '10.0'                    !- Maximum Output
-                     OutArgs(6) = 'Dimensionless'           !- Output Unit Type
-                     OutArgs(7) = ''                        !- External File Name
-                     OutArgs(8) = ''                        !- External File Column Number
-                     OutArgs(9) = ''                        !- External File Starting Row Number
-                     OutArgs(10) = HxEffectAt75Airflow(i)   !- Output Value 1
-                     OutArgs(11) = HxEffectAt100Airflow(i)  !- Output Value 2
-                     CurArgs = 11
+                     OutArgs(4) = HxEffectAt100Airflow(i)   !- Normalization Divisor
+                     OutArgs(5) = '0.0'                     !- Minimum Output
+                     OutArgs(6) = '10.0'                    !- Maximum Output
+                     OutArgs(7) = 'Dimensionless'           !- Output Unit Type
+                     OutArgs(8) = ''                        !- External File Name
+                     OutArgs(9) = ''                        !- External File Column Number
+                     OutArgs(10) = ''                       !- External File Starting Row Number
+                     OutArgs(11) = HxEffectAt75Airflow(i)   !- Output Value 1
+                     OutArgs(12) = HxEffectAt100Airflow(i)  !- Output Value 2
+                     CurArgs = 12
                      tableAdded = .true.
                      CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
                      Written=.true.
                   ENDIF
                 END DO
 
-              ! add independent variables used in the tables
-              IF (tableAdded .AND. .NOT. tableIndependentVarAdded) THEN
-                tableIndependentVarAdded = .false.
-                ObjectName='Table:IndependentVariableList'
-                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1) = 'effectiveness_IndependentVariableList'
-                OutArgs(2) = 'HxAirFlowRatio'
-                CurArgs = 2
-                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
-                Written=.true.
+                ! add independent variables used in the tables
+                IF (tableAdded .AND. .NOT. tableIndependentVarAdded) THEN
+                  tableIndependentVarAdded = .false.
+                  ObjectName='Table:IndependentVariableList'
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  OutArgs(1) = 'effectiveness_IndependentVariableList'
+                  OutArgs(2) = 'HxAirFlowRatio'
+                  CurArgs = 2
+                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                  Written=.true.
 
-                ObjectName='Table:IndependentVariableList'
-                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1) = 'HxAirFlowRatio'
-                OutArgs(2) = 'Linear'                  !  Interpolation Method
-                OutArgs(3) = 'Linear'                  !  Extrapolation Method
-                OutArgs(4) = '0.0'                     !  Minimum Value
-                OutArgs(5) = '10.0'                    !  Maximum Value
-                OutArgs(6) = ''                        !  Normalization Reference Value
-                OutArgs(7) = 'Dimensionless'           !  Unit Type
-                OutArgs(8) = ''                        !  External File Name
-                OutArgs(9) = ''                        !  External File Column Number
-                OutArgs(10) = ''                       !  External File Starting Row Number
-                OutArgs(11) = '0.75'                   !  Value 1
-                OutArgs(12) = '1.0'                    !  Value 2
-                CurArgs = 12
-                CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
-                Written=.true.
-              ENDIF
+                  ObjectName='Table:IndependentVariableList'
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  OutArgs(1) = 'HxAirFlowRatio'
+                  OutArgs(2) = 'Linear'                  !  Interpolation Method
+                  OutArgs(3) = 'Linear'                  !  Extrapolation Method
+                  OutArgs(4) = '0.0'                     !  Minimum Value
+                  OutArgs(5) = '10.0'                    !  Maximum Value
+                  OutArgs(6) = ''                        !  Normalization Reference Value
+                  OutArgs(7) = 'Dimensionless'           !  Unit Type
+                  OutArgs(8) = ''                        !  External File Name
+                  OutArgs(9) = ''                        !  External File Column Number
+                  OutArgs(10) = ''                       !  External File Starting Row Number
+                  OutArgs(11) = '0.75'                   !  Value 1
+                  OutArgs(12) = '1.0'                    !  Value 2
+                  CurArgs = 12
+                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                  Written=.true.
+                ENDIF
 
               ! If your original object starts with I, insert the rules here
 
