@@ -498,7 +498,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_reportTest)
     // Test of modified report routine as part of the move to make swimming pools a plant loop object called
     // from the plant loop and not zone equipment.  Report routine gets called for each pool separately rather
     // than reporting for everything all at once.
-    Real64 const closeEnough = 0.000001;
+    Real64 constexpr closeEnough = 0.000001;
     SwimmingPoolData myPool;
 
     // Test Data
