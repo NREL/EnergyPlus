@@ -90,15 +90,15 @@ capacities less than 65,000 Btu/h.
 
 |Variable|Formulas|
 |--|--|
-|SEER2|<img src="https://user-images.githubusercontent.com/49325382/173120318-d5df3faf-7196-4bb8-badc-ca3e56166dce.png" width=40% height=40%>|
-|q<sub>LOW</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122263-ae5eecb5-1e19-47b0-94d1-4fa087e9a8bb.png" width=90% height=90%>|
-|P<sub>LOW</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122290-8dd0658a-acad-4137-8cfe-abfac6e49e4c.png" width=85% height=85%>|
-|q<sub>Int-Bin</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122372-093c6157-2438-4cbc-9191-6f995fe53f0b.png" width=70% height=70%>|
-|E<sub>Int-Bin</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122395-cfec8d6e-9db2-4b88-955c-0b3ba7d29df4.png" width=75% height=75%>|
-|q<sub>Int</sub>(t<sub>j</sub>)|<img src="(https://user-images.githubusercontent.com/49325382/173122508-574ace81-85a7-4c2f-b00b-d3e1b6d812d9.png" width=150% height=150%><br><img src="https://user-images.githubusercontent.com/49325382/173122561-5ae042d0-28a6-4fd9-812d-f9486abe1066.png" width=150% height=150%>|
-|q<sub>Int</sub>(87)|<img src="https://user-images.githubusercontent.com/49325382/173122633-20787666-fa61-4ca2-b960-92528f8cf9bc.png" width=85% height=85%>|
-|P<sub>Int</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122777-aa94c891-7248-4448-a89c-93cfcef07301.png" width=100% height=100%>|
-|P<sub>LOW</sub>(87)|<img src="https://user-images.githubusercontent.com/49325382/173122879-6a4382de-bd4b-4ed4-8f17-880d1adb0dc4.png" width=80% height=80%>|
+|SEER2|<img src="https://user-images.githubusercontent.com/49325382/173120318-d5df3faf-7196-4bb8-badc-ca3e56166dce.png" width=30% height=30%>|
+|q<sub>LOW</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122263-ae5eecb5-1e19-47b0-94d1-4fa087e9a8bb.png" width=80% height=80%>|
+|P<sub>LOW</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122290-8dd0658a-acad-4137-8cfe-abfac6e49e4c.png" width=75% height=75%>|
+|q<sub>Int-Bin</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122372-093c6157-2438-4cbc-9191-6f995fe53f0b.png" width=60% height=60%>|
+|E<sub>Int-Bin</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122395-cfec8d6e-9db2-4b88-955c-0b3ba7d29df4.png" width=66% height=66%>|
+|q<sub>Int</sub>(t<sub>j</sub>)|<img src="(https://user-images.githubusercontent.com/49325382/173122508-574ace81-85a7-4c2f-b00b-d3e1b6d812d9.png" width=90% height=90%><br><img src="https://user-images.githubusercontent.com/49325382/173122561-5ae042d0-28a6-4fd9-812d-f9486abe1066.png" width=90% height=90%>|
+|q<sub>Int</sub>(87)|<img src="https://user-images.githubusercontent.com/49325382/173122633-20787666-fa61-4ca2-b960-92528f8cf9bc.png" width=75% height=75%>|
+|P<sub>Int</sub>(t<sub>j</sub>)|<img src="https://user-images.githubusercontent.com/49325382/173122777-aa94c891-7248-4448-a89c-93cfcef07301.png" width=90% height=90%>|
+|P<sub>LOW</sub>(87)|<img src="https://user-images.githubusercontent.com/49325382/173122879-6a4382de-bd4b-4ed4-8f17-880d1adb0dc4.png" width=72% height=72%>|
 ## Case 1
 |Variable|Formulas|
 |--|--|
@@ -118,14 +118,14 @@ capacities less than 65,000 Btu/h.
 |Variable|Formulas|
 |--|--|
 |<img src="https://user-images.githubusercontent.com/49325382/173124546-69a9d1f7-570a-422a-9b02-05aff8282289.png" width=90% height=90%>|Building load is equal to or greater than unit capacity at full stage|
-||!<img src="https://user-images.githubusercontent.com/49325382/173118193-28b2fc85-c7a9-437b-8998-32d7f8a10ae2.png" width=50% height=50%>|
+||!<img src="https://user-images.githubusercontent.com/49325382/173118193-28b2fc85-c7a9-437b-8998-32d7f8a10ae2.png" width=45% height=45%>|
 
 ## Test Conditions: <br/>
-!<img src="https://user-images.githubusercontent.com/78803858/205347858-a130fb11-c23b-4a34-bdc4-2a32e7d8d263.png" width=75% height=75%><br/><br/>
-!<img src="https://user-images.githubusercontent.com/78803858/205354762-fdce0568-e15d-47f0-8966-cbeeb88df9c4.png" width=75% height=75%><br/>
+!<img src="https://user-images.githubusercontent.com/78803858/205347858-a130fb11-c23b-4a34-bdc4-2a32e7d8d263.png" width=85% height=85%><br/><br/>
+!<img src="https://user-images.githubusercontent.com/78803858/205354762-fdce0568-e15d-47f0-8966-cbeeb88df9c4.png" width=85% height=85%><br/>
 
 **Example Test Points Used for EER Rating Points**<br/>
-!<img src="https://user-images.githubusercontent.com/78803858/205357978-5b1096e7-3b38-44b4-a870-8881c911296e.png" width=75% height=75%><br/>
+!<img src="https://user-images.githubusercontent.com/78803858/205357978-5b1096e7-3b38-44b4-a870-8881c911296e.png" width=85% height=85%><br/>
 
 ## Approach
 The EnergyPlus components for this scope of work are: Coil:Cooling:DX:TwoSpeed and Coil:Cooling:DX:VariableSpeed (for which calculations must support from 1 to 10 speeds). The TwoSpeed implementation will be new, as the standard calculations are different from OneSpeed and VariableSpeed.  The VariableSpeed implementation will have some similarities to the previous implementation for MultiSpeed, but will be more involved as it must adapt to number of speeds ranging from 1 to 10.
