@@ -213,7 +213,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataPlantValves = std::make_unique<PlantValvesData>();
     this->dataPlnt = std::make_unique<DataPlantData>();
     this->dataPluginManager = std::make_unique<PluginManagerData>();
-    this->dataPollutionModule = std::make_unique<PollutionModuleData>();
+    this->dataPollution = std::make_unique<PollutionData>();
     this->dataPondGHE = std::make_unique<PondGroundHeatExchangerData>();
     this->dataPowerInductionUnits = std::make_unique<PoweredInductionUnitsData>();
     this->dataPsychrometrics = std::make_unique<PsychrometricsData>();
@@ -469,7 +469,7 @@ void EnergyPlusData::clear_state()
     this->dataPlantValves->clear_state();
     this->dataPlnt->clear_state();
     this->dataPluginManager->clear_state();
-    this->dataPollutionModule->clear_state();
+    this->dataPollution->clear_state();
     this->dataPondGHE->clear_state();
     this->dataPowerInductionUnits->clear_state();
     this->dataPsychrometrics->clear_state();
