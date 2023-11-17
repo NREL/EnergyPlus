@@ -220,6 +220,7 @@ set(test_src
     SizeWaterHeatingCoil.unit.cc
     SizingAnalysisObjects.unit.cc
     SizingManager.unit.cc
+    SolarCollectors.unit.cc
     SolarShading.unit.cc
     Standard621SimplifiedProcedure.unit.cc
     StandardRatings.unit.cc
