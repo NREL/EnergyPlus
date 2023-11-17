@@ -1,5 +1,5 @@
 # Additional ASHRAE Metrics Reporting in EnergyPlus 24-1
-**NFP by Digital Alchemy**
+**NFP/Design -- Digital Alchemy**
 
 **Revisions**
 -   New Feature Proposal -- 15-November-2023
@@ -157,6 +157,7 @@ We will also add a disclaimer in the sections for these Coils: \"It is not reaso
 Fields To support Calculation of SEER2 were added to these Coils in EnergyPlus 22-2, to represent the static pressure on the fans (Power per flow rate).
 - Coil:Cooling:DX:TwoSpeed -- for EER/IEER (E+ 23-1 & SEER2 (E+ 23-2)
 - Coil:Cooling:DX:VariableSpeed -- for EER/IEER (E+ 23-1) & SEER2 (E+ 23-2)
+
 Therefore, we will not need to add any new fields in this development cycle.
 
 ## Outputs Description
