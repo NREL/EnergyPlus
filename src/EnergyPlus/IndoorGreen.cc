@@ -174,14 +174,14 @@ namespace IndoorGreen {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             state.dataIndoorGreen->indoorgreens(IndoorGreenNum).IndoorGreenName = state.dataIPShortCut->cAlphaArgs(1);
             // LW to do space, space list
             state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2);
             state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZoneListPtr =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->ZoneList);
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->ZoneList);
             if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr <= 0 &&
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZoneListPtr <= 0) {
                 ShowSevereError(state,
@@ -239,11 +239,11 @@ namespace IndoorGreen {
                 }
             }
             state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETCalculationMethod = 1; // default
-            if (UtilityRoutines::SameString(UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "PENMAN-MONTEITH")) {
+            if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "PENMAN-MONTEITH")) {
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETCalculationMethod = 1; // default
-            } else if (UtilityRoutines::SameString(UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "STANGHELLINI")) {
+            } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "STANGHELLINI")) {
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETCalculationMethod = 2;
-            } else if (UtilityRoutines::SameString(UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "DATA-DRIVEN")) {
+            } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "DATA-DRIVEN")) {
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETCalculationMethod = 3;
             } else {
                 ShowSevereError(state,
@@ -256,11 +256,11 @@ namespace IndoorGreen {
             }
             // read lighting method (LED=1; Daylight=2; LED-Daylight=3)
             state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightingMethod = 1; // default
-            if (UtilityRoutines::SameString(UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "LED")) {
+            if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "LED")) {
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightingMethod = 1; // default
-            } else if (UtilityRoutines::SameString(UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "DAYLIGHT")) {
+            } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "DAYLIGHT")) {
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightingMethod = 2;
-            } else if (UtilityRoutines::SameString(UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "LED-DAYLIGHT")) {
+            } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "LED-DAYLIGHT")) {
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightingMethod = 3;
             } else {
                 ShowSevereError(state,
@@ -326,7 +326,7 @@ namespace IndoorGreen {
             if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightingMethod == 2 ||
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightingMethod == 3) {
                     state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightRefPtr =
-                        UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
+                        Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
                                                         state.dataDaylightingData->DaylRefPt,
                                                         &EnergyPlus::Dayltg::RefPointData::Name); // Field: Daylighting Reference Point Name
                     if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightRefPtr == 0) {
@@ -490,8 +490,10 @@ namespace IndoorGreen {
                    }
                 //ETRate=ETDatadriven(state);
                    else {
-                    ShowSevereError(state,
-                                       format("Require EMS/Python Plugin for ET Data Driven Model"));
+                   ShowSevereError(state,
+                                   format("EMS/Python Plugin for ET Data Driven Model not find in {}={}",
+                                          state.dataIPShortCut->cCurrentModuleObject,
+                                          state.dataIndoorGreen->indoorgreens(IndoorGreenNum).IndoorGreenName));
                    }
                 } 
 
