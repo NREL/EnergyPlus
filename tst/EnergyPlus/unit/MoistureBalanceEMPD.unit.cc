@@ -121,7 +121,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     state->dataConstruction->Construct.allocate(1);
     Construction::ConstructionProps &construction = state->dataConstruction->Construct(1);
     construction.TotLayers = 1;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
+    construction.LayerPoint(construction.TotLayers) = Util::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
@@ -241,7 +241,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     state->dataConstruction->Construct.allocate(1);
     Construction::ConstructionProps &construction = state->dataConstruction->Construct(1);
     construction.TotLayers = 1;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
+    construction.LayerPoint(construction.TotLayers) = Util::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
@@ -327,7 +327,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     state->dataConstruction->Construct.allocate(constNum);
     Construction::ConstructionProps &construction = state->dataConstruction->Construct(constNum);
     construction.TotLayers = constNum;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInPtrList("WOOD", state->dataMaterial->Material);
+    construction.LayerPoint(construction.TotLayers) = Util::FindItemInPtrList("WOOD", state->dataMaterial->Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
@@ -357,7 +357,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     // Calculate RH for use in material property calculations.
     Real64 RV_Deep_Old = state->dataMstBalEMPD->RVdeepOld(surfNum);
     Real64 RVaver = state->dataMstBalEMPD->RVSurfLayerOld(surfNum);
-    Real64 RHaver = RVaver * 461.52 * (Taver + Constant::KelvinConv) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
+    Real64 RHaver = RVaver * 461.52 * (Taver + Constant::Kelvin) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
     Real64 dU_dRH = material->MoistACoeff * material->MoistBCoeff * pow(RHaver, material->MoistBCoeff - 1) +
                     material->MoistCCoeff * material->MoistDCoeff * pow(RHaver, material->MoistDCoeff - 1);
 

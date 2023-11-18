@@ -272,8 +272,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
-        state.dataPipeHT->PipeHT(Item).ConstructionNum =
-            UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
+        state.dataPipeHT->PipeHT(Item).ConstructionNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
 
         if (state.dataPipeHT->PipeHT(Item).ConstructionNum == 0) {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -331,8 +330,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         switch (indoorType) {
         case PipeIndoorBoundaryType::Zone:
             state.dataPipeHT->PipeHT(Item).EnvironmentPtr = EnvrnPtr::ZoneEnv;
-            state.dataPipeHT->PipeHT(Item).EnvrZonePtr =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataHeatBal->Zone);
+            state.dataPipeHT->PipeHT(Item).EnvrZonePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataHeatBal->Zone);
             if (state.dataPipeHT->PipeHT(Item).EnvrZonePtr == 0) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
                 ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -428,8 +426,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
-        state.dataPipeHT->PipeHT(Item).ConstructionNum =
-            UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
+        state.dataPipeHT->PipeHT(Item).ConstructionNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
 
         if (state.dataPipeHT->PipeHT(Item).ConstructionNum == 0) {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -565,8 +562,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
-        state.dataPipeHT->PipeHT(Item).ConstructionNum =
-            UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
+        state.dataPipeHT->PipeHT(Item).ConstructionNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
 
         if (state.dataPipeHT->PipeHT(Item).ConstructionNum == 0) {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -619,9 +615,9 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         // Solar inclusion flag
         // A6,  \field Sun Exposure
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "SUNEXPOSED")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "SUNEXPOSED")) {
             state.dataPipeHT->PipeHT(Item).SolarExposed = true;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "NOSUN")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "NOSUN")) {
             state.dataPipeHT->PipeHT(Item).SolarExposed = false;
         } else {
             ShowSevereError(state, format("GetPipesHeatTransfer: invalid key for sun exposure flag for {}", state.dataIPShortCut->cAlphaArgs(1)));
@@ -651,8 +647,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         // Also get the soil material name
         // A7,  \field Soil Material
         state.dataPipeHT->PipeHT(Item).SoilMaterial = state.dataIPShortCut->cAlphaArgs(6);
-        state.dataPipeHT->PipeHT(Item).SoilMaterialNum =
-            UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material);
+        state.dataPipeHT->PipeHT(Item).SoilMaterialNum = Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material);
         if (state.dataPipeHT->PipeHT(Item).SoilMaterialNum == 0) {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataPipeHT->PipeHT(Item).SoilMaterial));
             ShowContinueError(state, format("Found in {}={}", cCurrentModuleObject, state.dataPipeHT->PipeHT(Item).Name));
@@ -1416,8 +1411,8 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
 
                         // If on soil boundary, load up local variables and perform calculations
                         NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Previous);
-                        PastNodeTempAbs = NodePast + Constant::KelvinConv;
-                        SkyTempAbs = state.dataEnvrn->SkyTemp + Constant::KelvinConv;
+                        PastNodeTempAbs = NodePast + Constant::Kelvin;
+                        SkyTempAbs = state.dataEnvrn->SkyTemp + Constant::Kelvin;
                         TopRoughness = this->SoilRoughness;
                         TopThermAbs = this->SoilThermAbs;
                         TopSolarAbs = this->SoilSolarAbs;

@@ -87,27 +87,27 @@ protected:
         state->dataGlobal->TimeStepZone = 0.25;
 
         // setup weather manager state needed
-        state->dataWeatherManager->NumOfEnvrn = 2;
-        state->dataWeatherManager->Environment.allocate(state->dataWeatherManager->NumOfEnvrn);
-        state->dataWeatherManager->Environment(1).KindOfEnvrn = Constant::KindOfSim::DesignDay;
-        state->dataWeatherManager->Environment(1).DesignDayNum = 1;
+        state->dataWeather->NumOfEnvrn = 2;
+        state->dataWeather->Environment.allocate(state->dataWeather->NumOfEnvrn);
+        state->dataWeather->Environment(1).KindOfEnvrn = Constant::KindOfSim::DesignDay;
+        state->dataWeather->Environment(1).DesignDayNum = 1;
 
-        state->dataWeatherManager->Environment(2).KindOfEnvrn = Constant::KindOfSim::DesignDay;
-        state->dataWeatherManager->Environment(2).DesignDayNum = 2;
+        state->dataWeather->Environment(2).KindOfEnvrn = Constant::KindOfSim::DesignDay;
+        state->dataWeather->Environment(2).DesignDayNum = 2;
 
         averagingWindow = 1;
         logIndex = sizingLoggerFrameObj.SetupVariableSizingLog(*state, LogVal, averagingWindow);
 
-        state->dataWeatherManager->NumOfEnvrn = 4;
-        state->dataWeatherManager->Environment.redimension(state->dataWeatherManager->NumOfEnvrn);
+        state->dataWeather->NumOfEnvrn = 4;
+        state->dataWeather->Environment.redimension(state->dataWeather->NumOfEnvrn);
 
-        state->dataWeatherManager->Environment(3).KindOfEnvrn = Constant::KindOfSim::HVACSizeDesignDay;
-        state->dataWeatherManager->Environment(3).DesignDayNum = 1;
-        state->dataWeatherManager->Environment(3).SeedEnvrnNum = 1;
+        state->dataWeather->Environment(3).KindOfEnvrn = Constant::KindOfSim::HVACSizeDesignDay;
+        state->dataWeather->Environment(3).DesignDayNum = 1;
+        state->dataWeather->Environment(3).SeedEnvrnNum = 1;
 
-        state->dataWeatherManager->Environment(4).KindOfEnvrn = Constant::KindOfSim::HVACSizeDesignDay;
-        state->dataWeatherManager->Environment(4).DesignDayNum = 2;
-        state->dataWeatherManager->Environment(4).SeedEnvrnNum = 2;
+        state->dataWeather->Environment(4).KindOfEnvrn = Constant::KindOfSim::HVACSizeDesignDay;
+        state->dataWeather->Environment(4).DesignDayNum = 2;
+        state->dataWeather->Environment(4).SeedEnvrnNum = 2;
 
         OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone);
         OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
@@ -152,8 +152,8 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
     state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeDesignDay;
     state->dataGlobal->DayOfSim = 1;
     state->dataGlobal->HourOfDay = 1;
-    state->dataWeatherManager->Envrn = 3;
-    state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 1;
+    state->dataWeather->Envrn = 3;
+    state->dataWeather->Environment(state->dataWeather->Envrn).DesignDayNum = 1;
     sizingLoggerFrameObj.SetupSizingLogsNewEnvironment(*state);
     state->dataGlobal->TimeStep = 1;
 
@@ -173,8 +173,8 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
     // first step of second design day
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
-    state->dataWeatherManager->Envrn = 4;
-    state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 2;
+    state->dataWeather->Envrn = 4;
+    state->dataWeather->Environment(state->dataWeather->Envrn).DesignDayNum = 2;
     sizingLoggerFrameObj.SetupSizingLogsNewEnvironment(*state);
     LogVal = midLogVal;
     sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep(*state);

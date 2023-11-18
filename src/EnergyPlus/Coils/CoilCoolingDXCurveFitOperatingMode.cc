@@ -77,7 +77,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
     this->evapRateRatio = input_data.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
     this->maxCyclingRate = input_data.maximum_cycling_rate;
     this->latentTimeConst = input_data.latent_capacity_time_constant;
-    if (UtilityRoutines::SameString(input_data.apply_latent_degradation_to_speeds_greater_than_1, "Yes")) {
+    if (Util::SameString(input_data.apply_latent_degradation_to_speeds_greater_than_1, "Yes")) {
         this->applyLatentDegradationAllSpeeds = true;
     } else {
         this->applyLatentDegradationAllSpeeds = false;
@@ -96,9 +96,9 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
         this->latentDegradationActive = true;
     }
 
-    if (UtilityRoutines::SameString(input_data.condenser_type, "AirCooled")) {
+    if (Util::SameString(input_data.condenser_type, "AirCooled")) {
         this->condenserType = CondenserType::AIRCOOLED;
-    } else if (UtilityRoutines::SameString(input_data.condenser_type, "EvaporativelyCooled")) {
+    } else if (Util::SameString(input_data.condenser_type, "EvaporativelyCooled")) {
         this->condenserType = CondenserType::EVAPCOOLED;
     } else {
         ShowSevereError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
@@ -138,7 +138,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlu
                                                                  state.dataIPShortCut->rNumericArgs,
                                                                  NumNumbers,
                                                                  IOStatus);
-        if (!UtilityRoutines::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
+        if (!Util::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
             continue;
         }
         found_it = true;

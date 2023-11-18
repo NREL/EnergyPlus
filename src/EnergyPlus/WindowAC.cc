@@ -155,7 +155,7 @@ namespace WindowAC {
 
         // Find the correct Window AC Equipment
         if (CompIndex == 0) {
-            WindACNum = UtilityRoutines::FindItemInList(CompName, state.dataWindowAC->WindAC);
+            WindACNum = Util::FindItemInList(CompName, state.dataWindowAC->WindAC);
             if (WindACNum == 0) {
                 ShowFatalError(state, format("SimWindowAC: Unit not found={}", CompName));
             }
@@ -307,7 +307,7 @@ namespace WindowAC {
             state.dataWindowAC->WindACNumericFields(WindACNum).FieldNames.allocate(NumNumbers);
             state.dataWindowAC->WindACNumericFields(WindACNum).FieldNames = "";
             state.dataWindowAC->WindACNumericFields(WindACNum).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             state.dataWindowAC->WindAC(WindACNum).Name = Alphas(1);
             state.dataWindowAC->WindAC(WindACNum).UnitType = state.dataWindowAC->WindowAC_UnitType; // 'ZoneHVAC:WindowAirConditioner'
@@ -382,7 +382,7 @@ namespace WindowAC {
                 ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
                 ErrorsFound = true;
             } else {
-                if (UtilityRoutines::SameString(state.dataWindowAC->WindAC(WindACNum).FanType, "Fan:SystemModel")) {
+                if (Util::SameString(state.dataWindowAC->WindAC(WindACNum).FanType, "Fan:SystemModel")) {
                     state.dataWindowAC->WindAC(WindACNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     state.dataHVACFan->fanObjs.emplace_back(
                         new HVACFan::FanSystem(state, state.dataWindowAC->WindAC(WindACNum).FanName)); // call constructor
@@ -464,20 +464,20 @@ namespace WindowAC {
 
             state.dataWindowAC->WindAC(WindACNum).DXCoilName = Alphas(10);
 
-            if (UtilityRoutines::SameString(Alphas(9), "Coil:Cooling:DX:SingleSpeed") ||
-                UtilityRoutines::SameString(Alphas(9), "CoilSystem:Cooling:DX:HeatExchangerAssisted") ||
-                UtilityRoutines::SameString(Alphas(9), "Coil:Cooling:DX:VariableSpeed")) {
+            if (Util::SameString(Alphas(9), "Coil:Cooling:DX:SingleSpeed") ||
+                Util::SameString(Alphas(9), "CoilSystem:Cooling:DX:HeatExchangerAssisted") ||
+                Util::SameString(Alphas(9), "Coil:Cooling:DX:VariableSpeed")) {
                 state.dataWindowAC->WindAC(WindACNum).DXCoilType = Alphas(9);
                 CoilNodeErrFlag = false;
-                if (UtilityRoutines::SameString(Alphas(9), "Coil:Cooling:DX:SingleSpeed")) {
+                if (Util::SameString(Alphas(9), "Coil:Cooling:DX:SingleSpeed")) {
                     state.dataWindowAC->WindAC(WindACNum).DXCoilType_Num = CoilDX_CoolingSingleSpeed;
                     state.dataWindowAC->WindAC(WindACNum).CoilOutletNodeNum = GetDXCoilOutletNode(
                         state, state.dataWindowAC->WindAC(WindACNum).DXCoilType, state.dataWindowAC->WindAC(WindACNum).DXCoilName, CoilNodeErrFlag);
-                } else if (UtilityRoutines::SameString(Alphas(9), "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
+                } else if (Util::SameString(Alphas(9), "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
                     state.dataWindowAC->WindAC(WindACNum).DXCoilType_Num = CoilDX_CoolingHXAssisted;
                     state.dataWindowAC->WindAC(WindACNum).CoilOutletNodeNum = GetDXHXAsstdCoilOutletNode(
                         state, state.dataWindowAC->WindAC(WindACNum).DXCoilType, state.dataWindowAC->WindAC(WindACNum).DXCoilName, CoilNodeErrFlag);
-                } else if (UtilityRoutines::SameString(Alphas(9), "Coil:Cooling:DX:VariableSpeed")) {
+                } else if (Util::SameString(Alphas(9), "Coil:Cooling:DX:VariableSpeed")) {
                     state.dataWindowAC->WindAC(WindACNum).DXCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
                     state.dataWindowAC->WindAC(WindACNum).CoilOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(
                         state, state.dataWindowAC->WindAC(WindACNum).DXCoilType, state.dataWindowAC->WindAC(WindACNum).DXCoilName, CoilNodeErrFlag);
@@ -508,8 +508,8 @@ namespace WindowAC {
                 state.dataWindowAC->WindAC(WindACNum).OpMode = CycFanCycCoil;
             }
 
-            if (UtilityRoutines::SameString(Alphas(12), "BlowThrough")) state.dataWindowAC->WindAC(WindACNum).FanPlace = BlowThru;
-            if (UtilityRoutines::SameString(Alphas(12), "DrawThrough")) state.dataWindowAC->WindAC(WindACNum).FanPlace = DrawThru;
+            if (Util::SameString(Alphas(12), "BlowThrough")) state.dataWindowAC->WindAC(WindACNum).FanPlace = BlowThru;
+            if (Util::SameString(Alphas(12), "DrawThrough")) state.dataWindowAC->WindAC(WindACNum).FanPlace = DrawThru;
             if (state.dataWindowAC->WindAC(WindACNum).FanPlace == 0) {
                 ShowSevereError(state, format("Invalid {} = {}", cAlphaFields(12), Alphas(12)));
                 ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
@@ -524,7 +524,7 @@ namespace WindowAC {
 
             state.dataWindowAC->WindAC(WindACNum).HVACSizingIndex = 0;
             if (!lAlphaBlanks(14)) {
-                state.dataWindowAC->WindAC(WindACNum).HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(14), state.dataSize->ZoneHVACSizing);
+                state.dataWindowAC->WindAC(WindACNum).HVACSizingIndex = Util::FindItemInList(Alphas(14), state.dataSize->ZoneHVACSizing);
                 if (state.dataWindowAC->WindAC(WindACNum).HVACSizingIndex == 0) {
                     ShowSevereError(state, format("{} = {} not found.", cAlphaFields(14), Alphas(14)));
                     ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
