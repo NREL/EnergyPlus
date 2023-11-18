@@ -70,17 +70,22 @@ namespace IndoorGreen {
         std::string ZoneName;
         std::string Schedule;
         int SchedPtr = 0;
+        int SchedLEDPtr = 0;
+        int LightRefPtr = 0; //daylight reference point number;
         Real64 LeafArea = 0.0;
         Real64 ZPreTemp = 0.0;
         Real64 ZPreHum = 0.0;
         Real64 ZCO2 = 400;
-        Real64 ZPPFD = 0;
+        Real64 ZPPFD = 0;          //PPFD
         Real64 SensibleRate = 0.0; //w
         Real64 LatentRate = 0.0;   //w
         int ZoneListPtr = 0;
         int ZonePtr = 0;                    // point to the zone where the indoor greenery system is located
-        int ETCalculationMethod = 0;        // - Method for ET calculation- (Penman-Monteith=1, Stanghellini=2, Data-driven=3)
+        int ETCalculationMethod = 0;        // - Method for ET calculation-(Penman-Monteith=1, Stanghellini=2, Data-driven=3)
+        int LightingMethod = 0;             // - Method for light calculation-(LED=1, Daylighting=2, LED-Daylighting=3)
         bool CheckIndoorGreenName = true;
+        Real64 EMSET = 0.0;
+        bool EMSETCalOverrideOn = false;
         Array1D_string FieldNames;
      };
 
