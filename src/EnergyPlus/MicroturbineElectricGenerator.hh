@@ -165,7 +165,7 @@ namespace MicroturbineElectricGenerator {
         Real64 ThermalEfficiencyLHV;  // Reporting: Thermal (heat recovery to water) efficiency LHV (-)
         Real64 AncillaryEnergy;       // Reporting: Ancillary energy use (J)
         Real64 StandbyEnergy;         // Reporting: Standby energy use (J)
-        Constant::eFuel FuelType;
+        Constant::eFuel FuelType = Constant::eFuel::None;
         bool myFlag;
 
         // Default Constructor
