@@ -133,7 +133,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(20), DIMENSION(4) :: HxEffectAt100Airflow
   CHARACTER(MaxNameLength + 2), DIMENSION(4) :: HxTableName
   LOGICAL :: tableAdded
-  LOGICAL :: tableIndependentVarAdded
+  LOGICAL :: tableIndependentVarAdded = .false.
   CHARACTER(10) :: tableID
   REAL :: effect75
   REAL :: effect100
@@ -456,24 +456,22 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      CurArgs = 12
                      tableAdded = .true.
                      CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
-                     Written=.true.
                   ENDIF
                 END DO
 
                 ! add independent variables used in the tables
                 IF (tableAdded .AND. .NOT. tableIndependentVarAdded) THEN
-                  tableIndependentVarAdded = .false.
+                  tableIndependentVarAdded = .true.
                   ObjectName='Table:IndependentVariableList'
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                   OutArgs(1) = 'effectiveness_IndependentVariableList'
                   OutArgs(2) = 'HxAirFlowRatio'
                   CurArgs = 2
                   CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
-                  Written=.true.
 
-                  ObjectName='Table:IndependentVariableList'
+                  ObjectName='Table:IndependentVariable'
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                  OutArgs(1) = 'HxAirFlowRatio'
+                  OutArgs(1) = 'HxAirFlowRatio'          !  Name
                   OutArgs(2) = 'Linear'                  !  Interpolation Method
                   OutArgs(3) = 'Linear'                  !  Extrapolation Method
                   OutArgs(4) = '0.0'                     !  Minimum Value
@@ -487,8 +485,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   OutArgs(12) = '1.0'                    !  Value 2
                   CurArgs = 12
                   CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
-                  Written=.true.
                 ENDIF
+                Written=.true.
 
               ! If your original object starts with I, insert the rules here
 
