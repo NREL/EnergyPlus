@@ -6159,6 +6159,7 @@ namespace OutputProcessor {
              {"126", "0", "Sum", "System", "HVAC System", "Site", "Environmental Impact Fuel Oil No 2 CO2 Emissions Mass", "Run Period", "", "kg"}});
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
     }
+
     TEST_F(EnergyPlusFixture, OutputProcessor_setupOutputVariable_endUseAlias)
     {
         // Test PR 10228 that fixes Issue 10224 about refactoring
@@ -6252,7 +6253,7 @@ namespace OutputProcessor {
         int found;
 
         // fuel oil CO2 emissions
-        found = UtilityRoutines::FindItem("FuelOilNo2Emissions:CO2", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("FuelOilNo2Emissions:CO2", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("CO2", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("FuelOilNo2Emissions", state->dataOutputProcessor->EnergyMeters(found).EndUse);
@@ -6267,13 +6268,13 @@ namespace OutputProcessor {
         EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(2).NumSubcategories);
         EXPECT_EQ("General", state->dataOutputProcessor->EndUseCategory(2).SubcategoryName(1));
 
-        found = UtilityRoutines::FindItem("Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("Cooling", state->dataOutputProcessor->EnergyMeters(found).EndUse);
         EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
 
-        found = UtilityRoutines::FindItem("General:Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("General:Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("Cooling", state->dataOutputProcessor->EnergyMeters(found).EndUse);
@@ -6283,32 +6284,31 @@ namespace OutputProcessor {
         EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(12).NumSubcategories);
         EXPECT_EQ("General", state->dataOutputProcessor->EndUseCategory(12).SubcategoryName(1));
 
-        found = UtilityRoutines::FindItem("WaterSystems:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("WaterSystems:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("WaterSystems", state->dataOutputProcessor->EnergyMeters(found).EndUse);
         EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
 
-        found = UtilityRoutines::FindItem("General:WaterSystems:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("General:WaterSystems:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("WaterSystems", state->dataOutputProcessor->EnergyMeters(found).EndUse);
         EXPECT_EQ("General", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
 
         // WaterSystems MainsWater
-        found = UtilityRoutines::FindItem("WaterSystems:MainsWater", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("WaterSystems:MainsWater", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("MainsWater", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("WaterSystems", state->dataOutputProcessor->EnergyMeters(found).EndUse);
         EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
 
-        found = UtilityRoutines::FindItem("General:WaterSystems:MainsWater", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("General:WaterSystems:MainsWater", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("MainsWater", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("WaterSystems", state->dataOutputProcessor->EnergyMeters(found).EndUse);
         EXPECT_EQ("General", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
     }
-
 } // namespace OutputProcessor
 
 } // namespace EnergyPlus
