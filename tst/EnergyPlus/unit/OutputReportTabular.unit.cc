@@ -13066,3 +13066,48 @@ TEST_F(SQLiteFixture, OutputReportTabular_DistrictHeating)
         EXPECT_NEAR(DistrictHeatingSteam * 2 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
     }
 }
+
+TEST_F(EnergyPlusFixture, OutputReportTabular_Test_SetupUnitConversion_Fix)
+{
+    // Unit test for PR 10261 that fixes Issue 10260
+    std::string unitString;
+    std::string curUnits;
+
+    SetupUnitConversions(*state);
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPound;
+
+    // Mimic the unit conversion for LEED Table EAp2-17b
+    // Energy Use Intensity - Natural Gas
+    unitString = "Natural Gas [MJ/m2]";
+    int unitConvNum = unitsFromHeading(*state, unitString);
+    EXPECT_EQ("Natural Gas [kBtu/ft2]", unitString);
+    EXPECT_EQ(93, unitConvNum);
+    Real64 unitConvFactor = state->dataOutRptTab->UnitConv(unitConvNum).mult;
+    EXPECT_NEAR(unitConvFactor, 0.94708628903179 / 10.764961, 1e-5);
+
+    // Mimic the unit conversion for LEED Table EAp2-17b
+    // Energy Use Intensity - Natural Gas
+    // Another form
+    unitString = "Natural Gas {MJ/m2}";
+    unitConvNum = unitsFromHeading(*state, unitString);
+    EXPECT_EQ(93, unitConvNum);
+    EXPECT_EQ("Natural Gas {kBtu/ft2}", unitString);
+    unitConvFactor = state->dataOutRptTab->UnitConv(unitConvNum).mult;
+    EXPECT_NEAR(unitConvFactor, 0.94708628903179 / 10.764961, 1e-5);
+
+    // Test affected Unit Conversion Entry #94 as well
+    unitString = "Additional [MJ/m2]";
+    unitConvNum = unitsFromHeading(*state, unitString);
+    EXPECT_EQ(94, unitConvNum);
+    EXPECT_EQ("Additional [kBtu/ft2]", unitString);
+    unitConvFactor = state->dataOutRptTab->UnitConv(unitConvNum).mult;
+    EXPECT_NEAR(unitConvFactor, 0.94708628903179 / 10.764961, 1e-5);
+
+    // Should not affect entries after #93-94
+    unitString = "";
+    unitConvNum = unitsFromHeading(*state, unitString);
+    EXPECT_EQ(97, unitConvNum);
+    EXPECT_EQ("", unitString);
+    unitConvFactor = state->dataOutRptTab->UnitConv(unitConvNum).mult;
+    EXPECT_NEAR(unitConvFactor, 1.0, 1e-5);
+}

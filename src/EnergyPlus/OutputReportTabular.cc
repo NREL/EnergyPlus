@@ -18442,7 +18442,7 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(91).hint = "COOL";
     ort->UnitConv(92).hint = "ELEC";
     ort->UnitConv(93).hint = "GAS";
-    ort->UnitConv(93).hint = "ADDITIONAL";
+    ort->UnitConv(94).hint = "ADDITIONAL";
 
     ort->UnitConv(19).several = true;
     ort->UnitConv(20).several = true;
