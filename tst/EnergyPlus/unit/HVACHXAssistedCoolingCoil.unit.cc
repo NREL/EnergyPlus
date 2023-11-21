@@ -531,8 +531,8 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     // coil system delta T > 0, coil system inlet node = 8, outlet node = 4
     int coilSystemInletNode = thisSys->CoolCoilInletNodeNum;
     int coilSystemOutletNode = thisSys->CoolCoilOutletNodeNum;
-    int coolCoilInletHXSupplyOutlet = UtilityRoutines::FindItemInList("HEAT RECOVERY SUPPLY OUTLET", state->dataLoopNodes->NodeID);
-    int coolCoilOutletHXExhaustInlet = UtilityRoutines::FindItemInList("HEAT RECOVERY EXHUAST INLET NODE", state->dataLoopNodes->NodeID);
+    int coolCoilInletHXSupplyOutlet = Util::FindItemInList("HEAT RECOVERY SUPPLY OUTLET", state->dataLoopNodes->NodeID);
+    int coolCoilOutletHXExhaustInlet = Util::FindItemInList("HEAT RECOVERY EXHUAST INLET NODE", state->dataLoopNodes->NodeID);
     EXPECT_LT(state->dataLoopNodes->Node(coilSystemOutletNode).Temp, state->dataLoopNodes->Node(coilSystemInletNode).Temp);
     // coil delta T > 0, cooling coil inlet node = 6, cooling coil outlet node = 7
     EXPECT_LT(state->dataLoopNodes->Node(coolCoilOutletHXExhaustInlet).Temp, state->dataLoopNodes->Node(coolCoilInletHXSupplyOutlet).Temp);

@@ -702,7 +702,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
             // now search equipment
             auto const &zoneEquipList = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum);
             if (zoneEquipList.NumOfEquipTypes == 1) { // this must be it, fill strings for type and name
-                c->typeHVACname = zoneEquipList.EquipType(1);
+                c->typeHVACname = zoneEquipList.EquipTypeName(1);
                 c->userNameforHVACsystem = zoneEquipList.EquipName(1);
                 c->coilLocation = "Zone Equipment";
             } else if (zoneEquipList.NumOfEquipTypes > 1) {
@@ -971,8 +971,8 @@ int ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName(EnergyPlusData &
     int index(-1);
     for (int i = 0; i < numCoilsReported_; i++) {
         if (coilSelectionDataObjs[i] != nullptr) {
-            if (UtilityRoutines::SameString(coilSelectionDataObjs[i]->coilName_, coilName)) {
-                if (UtilityRoutines::SameString(coilSelectionDataObjs[i]->coilObjName, coilType)) {
+            if (Util::SameString(coilSelectionDataObjs[i]->coilName_, coilName)) {
+                if (Util::SameString(coilSelectionDataObjs[i]->coilObjName, coilType)) {
                     return index = i;
                 } else {
                     // throw error  coil type does not match coil name, check for unique names across coil types
@@ -992,10 +992,10 @@ int ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName(EnergyPlusData &
         bool locIsCooling(false);
         bool locIsHeating(false);
         for (int loop = 1; loop <= DataHVACGlobals::NumAllCoilTypes; ++loop) {
-            if (UtilityRoutines::SameString(coilType, DataHVACGlobals::cAllCoilTypes(loop))) {
+            if (Util::SameString(coilType, DataHVACGlobals::cAllCoilTypes(loop))) {
                 found = true;
-                locIsCooling = UtilityRoutines::SameString(coilType, DataHVACGlobals::cCoolingCoilTypes(loop));
-                locIsHeating = UtilityRoutines::SameString(coilType, DataHVACGlobals::cHeatingCoilTypes(loop));
+                locIsCooling = Util::SameString(coilType, DataHVACGlobals::cCoolingCoilTypes(loop));
+                locIsHeating = Util::SameString(coilType, DataHVACGlobals::cHeatingCoilTypes(loop));
                 break;
             }
         }
@@ -1237,8 +1237,8 @@ void ReportCoilSelection::setCoilLvgAirHumRat(EnergyPlusData &state,
 std::string PeakHrMinString(EnergyPlusData &state, const int designDay, const int timeStepAtPeak)
 {
     return fmt::format("{}/{} {}",
-                       state.dataWeatherManager->DesDayInput(designDay).Month,
-                       state.dataWeatherManager->DesDayInput(designDay).DayOfMonth,
+                       state.dataWeather->DesDayInput(designDay).Month,
+                       state.dataWeather->DesDayInput(designDay).DayOfMonth,
                        ReportCoilSelection::getTimeText(state, timeStepAtPeak));
 }
 
@@ -1281,20 +1281,20 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         // These next blocks does not always work with SizingPeriod:WeatherFileDays or SizingPeriod:WeatherFileConditionType, protect against hard
         // crash
         if (SysSizPeakDDNum(curSysNum).SensCoolPeakDD > 0 && SysSizPeakDDNum(curSysNum).SensCoolPeakDD <= state.dataEnvrn->TotDesDays) {
-            c->desDayNameAtSensPeak = state.dataWeatherManager->DesDayInput(SysSizPeakDDNum(curSysNum).SensCoolPeakDD).Title;
+            c->desDayNameAtSensPeak = state.dataWeather->DesDayInput(SysSizPeakDDNum(curSysNum).SensCoolPeakDD).Title;
             c->coilSensePeakHrMin = PeakHrMinString(state,
                                                     SysSizPeakDDNum(curSysNum).SensCoolPeakDD,
                                                     SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(SysSizPeakDDNum(curSysNum).SensCoolPeakDD));
         }
         if (SysSizPeakDDNum(curSysNum).TotCoolPeakDD > 0 && SysSizPeakDDNum(curSysNum).TotCoolPeakDD <= state.dataEnvrn->TotDesDays) {
-            c->desDayNameAtTotalPeak = state.dataWeatherManager->DesDayInput(SysSizPeakDDNum(curSysNum).TotCoolPeakDD).Title;
+            c->desDayNameAtTotalPeak = state.dataWeather->DesDayInput(SysSizPeakDDNum(curSysNum).TotCoolPeakDD).Title;
             c->coilTotalPeakHrMin = PeakHrMinString(state,
                                                     SysSizPeakDDNum(curSysNum).TotCoolPeakDD,
                                                     SysSizPeakDDNum(curSysNum).TimeStepAtTotCoolPk(SysSizPeakDDNum(curSysNum).TotCoolPeakDD));
         }
 
         if (SysSizPeakDDNum(curSysNum).CoolFlowPeakDD > 0 && SysSizPeakDDNum(curSysNum).CoolFlowPeakDD <= state.dataEnvrn->TotDesDays) {
-            c->desDayNameAtAirFlowPeak = state.dataWeatherManager->DesDayInput(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).Title;
+            c->desDayNameAtAirFlowPeak = state.dataWeather->DesDayInput(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).Title;
             c->airPeakHrMin = PeakHrMinString(state,
                                               SysSizPeakDDNum(curSysNum).CoolFlowPeakDD,
                                               SysSizPeakDDNum(curSysNum).TimeStepAtCoolFlowPk(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD));
@@ -1605,7 +1605,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
 
             c->airPeakHrMin = PeakHrMinString(state, finalSysSizing.HeatDDNum, finalSysSizing.SysHeatAirTimeStepPk);
 
-            c->desDayNameAtAirFlowPeak = state.dataWeatherManager->DesDayInput(finalSysSizing.HeatDDNum).Title;
+            c->desDayNameAtAirFlowPeak = state.dataWeather->DesDayInput(finalSysSizing.HeatDDNum).Title;
         }
 
         // now set Coil Ent And Lvg Conditions
@@ -1987,15 +1987,15 @@ bool ReportCoilSelection::isCompTypeFan(std::string const &compType // string co
 )
 {
     // if compType name is one of the fan objects, then return true
-    if (UtilityRoutines::SameString(compType, "Fan:SystemModel")) {
+    if (Util::SameString(compType, "Fan:SystemModel")) {
         return true;
-    } else if (UtilityRoutines::SameString(compType, "Fan:ComponentModel")) {
+    } else if (Util::SameString(compType, "Fan:ComponentModel")) {
         return true;
-    } else if (UtilityRoutines::SameString(compType, "Fan:OnOff")) {
+    } else if (Util::SameString(compType, "Fan:OnOff")) {
         return true;
-    } else if (UtilityRoutines::SameString(compType, "Fan:ConstantVolume")) {
+    } else if (Util::SameString(compType, "Fan:ConstantVolume")) {
         return true;
-    } else if (UtilityRoutines::SameString(compType, "Fan:VariableVolume")) {
+    } else if (Util::SameString(compType, "Fan:VariableVolume")) {
         return true;
     } else {
         return false;
@@ -2008,7 +2008,7 @@ bool ReportCoilSelection::isCompTypeCoil(std::string const &compType // string c
     // if compType name is one of the coil objects, then return true
     bool found(false);
     for (int loop = 1; loop <= DataHVACGlobals::NumAllCoilTypes; ++loop) {
-        if (UtilityRoutines::SameString(compType, DataHVACGlobals::cAllCoilTypes(loop))) {
+        if (Util::SameString(compType, DataHVACGlobals::cAllCoilTypes(loop))) {
             found = true;
             break;
         }

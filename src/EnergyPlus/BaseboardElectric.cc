@@ -107,7 +107,7 @@ namespace BaseboardElectric {
 
         // Find the correct Baseboard Equipment
         if (CompIndex == 0) {
-            BaseboardNum = UtilityRoutines::FindItemInList(EquipName, baseboard->baseboards, &BaseboardParams::EquipName);
+            BaseboardNum = Util::FindItemInList(EquipName, baseboard->baseboards, &BaseboardParams::EquipName);
             if (BaseboardNum == 0) {
                 ShowFatalError(state, format("SimElectricBaseboard: Unit not found={}", EquipName));
             }
@@ -215,8 +215,8 @@ namespace BaseboardElectric {
 
                 ++BaseboardNum;
                 auto &thisBaseboard = baseboard->baseboards(BaseboardNum);
-                thisBaseboard.EquipName = state.dataIPShortCut->cAlphaArgs(1);              // name of this baseboard
-                thisBaseboard.EquipType = UtilityRoutines::makeUPPER(cCurrentModuleObject); // the type of baseboard-rename change
+                thisBaseboard.EquipName = state.dataIPShortCut->cAlphaArgs(1);   // name of this baseboard
+                thisBaseboard.EquipType = Util::makeUPPER(cCurrentModuleObject); // the type of baseboard-rename change
                 thisBaseboard.Schedule = state.dataIPShortCut->cAlphaArgs(2);
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                     thisBaseboard.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
@@ -238,7 +238,7 @@ namespace BaseboardElectric {
                 thisBaseboard.BaseboardEfficiency = state.dataIPShortCut->rNumericArgs(4);
 
                 // Determine baseboard electric heating design capacity sizing method
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
                     thisBaseboard.HeatingCapMethod = HeatingDesignCapacity;
                     if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
                         thisBaseboard.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
@@ -260,7 +260,7 @@ namespace BaseboardElectric {
                             state, format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum)));
                         ErrorsFound = true;
                     }
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
                     thisBaseboard.HeatingCapMethod = CapacityPerFloorArea;
                     if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                         thisBaseboard.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
@@ -297,7 +297,7 @@ namespace BaseboardElectric {
                             format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum)));
                         ErrorsFound = true;
                     }
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
                     thisBaseboard.HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
                     if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                         thisBaseboard.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
@@ -352,10 +352,10 @@ namespace BaseboardElectric {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipName,
                                 {},
-                                "ENERGYTRANSFER",
-                                "BASEBOARD",
+                                eResourceSOV::EnergyTransfer,
+                                EndUseCatSOV::Baseboard,
                                 {},
-                                "System");
+                                GroupSOV::HVAC); // "System");
 
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Rate",
@@ -373,10 +373,10 @@ namespace BaseboardElectric {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipName,
                                 {},
-                                "Electricity",
-                                "HEATING",
+                                eResourceSOV::Electricity,
+                                EndUseCatSOV::Heating,
                                 {},
-                                "System");
+                                GroupSOV::HVAC); // "System");
 
             SetupOutputVariable(state,
                                 "Baseboard Electricity Rate",

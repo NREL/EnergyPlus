@@ -298,7 +298,7 @@ namespace RoomAir {
 
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
             // first get zone ID
-            int ZoneNum = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(2), state.dataHeatBal->Zone);
+            int ZoneNum = Util::FindItemInList(ipsc->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (ZoneNum == 0) { // throw error
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 ErrorsFound = true;
@@ -429,7 +429,7 @@ namespace RoomAir {
             roomAirPattern.TwoGradPatrn.HiGradient = ipsc->rNumericArgs(6);
 
             roomAirPattern.TwoGradPatrn.InterpolationMode =
-                static_cast<UserDefinedPatternMode>(getEnumValue(userDefinedPatternModeNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(2))));
+                static_cast<UserDefinedPatternMode>(getEnumValue(userDefinedPatternModeNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(2))));
             if (roomAirPattern.TwoGradPatrn.InterpolationMode == UserDefinedPatternMode::Invalid) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 ErrorsFound = true;
@@ -559,7 +559,7 @@ namespace RoomAir {
             for (int i = 1; i <= NumPairs; ++i) {
                 roomAirPattern.MapPatrn.SurfName(i) = ipsc->cAlphaArgs(i + 1);
                 roomAirPattern.MapPatrn.DeltaTai(i) = ipsc->rNumericArgs(i + 4);
-                roomAirPattern.MapPatrn.SurfID(i) = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(i + 1), state.dataSurface->Surface);
+                roomAirPattern.MapPatrn.SurfID(i) = Util::FindItemInList(ipsc->cAlphaArgs(i + 1), state.dataSurface->Surface);
                 if (roomAirPattern.MapPatrn.SurfID(i) == 0) {
                     ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(i + 1), ipsc->cAlphaArgs(i + 1));
                     ErrorsFound = true;
@@ -592,8 +592,9 @@ namespace RoomAir {
         for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
             if (state.dataRoomAir->AirPatternZoneInfo(i).IsUsed) {
                 // first get return and exhaust air node index
-                int found = UtilityRoutines::FindItemInList(
+                int found = Util::FindItemInList(
                     state.dataRoomAir->AirPatternZoneInfo(i).ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
+
                 if (found != 0) {
 
                     state.dataRoomAir->AirPatternZoneInfo(i).ZoneNodeID = state.dataZoneEquip->ZoneEquipConfig(found).ZoneNode;
@@ -675,7 +676,7 @@ namespace RoomAir {
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, airNode.Name};
 
             airNode.ZoneName = ipsc->cAlphaArgs(3); // Zone name
-            airNode.ZonePtr = UtilityRoutines::FindItemInList(airNode.ZoneName, state.dataHeatBal->Zone);
+            airNode.ZonePtr = Util::FindItemInList(airNode.ZoneName, state.dataHeatBal->Zone);
             if (airNode.ZonePtr == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
                 ErrorsFound = true;
@@ -688,7 +689,7 @@ namespace RoomAir {
                 airNode.SurfMask.allocate(NumOfSurfs);
             }
 
-            airNode.ClassType = static_cast<AirNodeType>(getEnumValue(airNodeTypeNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(2))));
+            airNode.ClassType = static_cast<AirNodeType>(getEnumValue(airNodeTypeNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(2))));
             if (airNode.ClassType == AirNodeType::Invalid) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 ErrorsFound = true;
@@ -846,7 +847,7 @@ namespace RoomAir {
                                                                      ipsc->cNumericFieldNames);
 
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ""};
-            int ZoneNum = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(1), state.dataHeatBal->Zone);
+            int ZoneNum = Util::FindItemInList(ipsc->cAlphaArgs(1), state.dataHeatBal->Zone);
             if (ZoneNum == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
                 ErrorsFound = true;
@@ -915,7 +916,7 @@ namespace RoomAir {
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
             // First is Zone Name
             // zoneUCSDDV.ZoneName = ipsc->cAlphaArgs(1);
-            zoneDV3N.ZonePtr = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(1), state.dataHeatBal->Zone);
+            zoneDV3N.ZonePtr = Util::FindItemInList(ipsc->cAlphaArgs(1), state.dataHeatBal->Zone);
             if (zoneDV3N.ZonePtr == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
                 ErrorsFound = true;
@@ -990,7 +991,7 @@ namespace RoomAir {
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
             // First is Zone Name
             // state.dataRoomAir->ZoneUCSDCV(Loop).ZoneName = ipsc->cAlphaArgs(1);
-            if ((zoneCV.ZonePtr = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(1), state.dataHeatBal->Zone)) == 0) {
+            if ((zoneCV.ZonePtr = Util::FindItemInList(ipsc->cAlphaArgs(1), state.dataHeatBal->Zone)) == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
                 ErrorsFound = true;
             } else {
@@ -1014,7 +1015,7 @@ namespace RoomAir {
                     ShowSevereEmptyField(state, eoh, ipsc->cAlphaFieldNames(3));
                     ErrorsFound = true;
                 }
-            } else if ((zoneCV.VforComfort = static_cast<Comfort>(getEnumValue(comfortNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(3))))) ==
+            } else if ((zoneCV.VforComfort = static_cast<Comfort>(getEnumValue(comfortNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(3))))) ==
                        Comfort::Invalid) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
                 ErrorsFound = true;
@@ -1024,7 +1025,7 @@ namespace RoomAir {
 
             // Following depend on valid zone
 
-            if (UtilityRoutines::FindItemInList(
+            if (Util::FindItemInList(
                     state.dataHeatBal->Zone(zoneCV.ZonePtr).Name, state.afn->MultizoneZoneData, &AirflowNetwork::MultizoneZoneProp::ZoneName) == 0) {
                 ShowSevereError(state, format("Problem with {} = {}", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                 ShowContinueError(state, "AirflowNetwork airflow model must be active in this zone");
@@ -1119,7 +1120,7 @@ namespace RoomAir {
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
 
             zoneUI.ZoneName = ipsc->cAlphaArgs(1);
-            zoneUI.ZonePtr = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(1), state.dataHeatBal->Zone);
+            zoneUI.ZonePtr = Util::FindItemInList(ipsc->cAlphaArgs(1), state.dataHeatBal->Zone);
             state.dataRoomAir->ZoneUFADPtr(zoneUI.ZonePtr) = Loop;
             if (zoneUI.ZonePtr == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
@@ -1130,7 +1131,7 @@ namespace RoomAir {
             }
 
             // 2nd alpha is diffuser type
-            zoneUI.DiffuserType = static_cast<Diffuser>(getEnumValue(diffuserNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(2))));
+            zoneUI.DiffuserType = static_cast<Diffuser>(getEnumValue(diffuserNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(2))));
             if (zoneUI.DiffuserType == Diffuser::Invalid) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 ErrorsFound = true;
@@ -1181,7 +1182,7 @@ namespace RoomAir {
             auto &zoneUE = state.dataRoomAir->ZoneUFAD(Loop + state.dataRoomAir->TotUFADInt);
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
             zoneUE.ZoneName = ipsc->cAlphaArgs(1);
-            zoneUE.ZonePtr = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(1), state.dataHeatBal->Zone);
+            zoneUE.ZonePtr = Util::FindItemInList(ipsc->cAlphaArgs(1), state.dataHeatBal->Zone);
             if (zoneUE.ZonePtr == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
                 ErrorsFound = true;
@@ -1189,8 +1190,7 @@ namespace RoomAir {
                 state.dataRoomAir->IsZoneUFAD(zoneUE.ZonePtr) = true;
                 state.dataRoomAir->ZoneUFADPtr(zoneUE.ZonePtr) = Loop + state.dataRoomAir->TotUFADInt;
             }
-
-            zoneUE.DiffuserType = static_cast<Diffuser>(getEnumValue(diffuserNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(2))));
+            zoneUE.DiffuserType = static_cast<Diffuser>(getEnumValue(diffuserNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(2))));
             if (zoneUE.DiffuserType == Diffuser::Invalid) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 ErrorsFound = true;
@@ -1280,7 +1280,8 @@ namespace RoomAir {
                                                                      ipsc->cNumericFieldNames);
 
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
-            int ZoneNum = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(2), state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
+            int ZoneNum = Util::FindItemInList(ipsc->cAlphaArgs(2), state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
+
             if (ZoneNum == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 ErrorsFound = true;
@@ -1316,8 +1317,7 @@ namespace RoomAir {
             }
             // control point node
 
-            roomAFNZoneInfo.ControlAirNodeID =
-                UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(3), roomAFNZoneInfo.Node, roomAFNZoneInfo.NumOfAirNodes);
+            roomAFNZoneInfo.ControlAirNodeID = Util::FindItemInList(ipsc->cAlphaArgs(3), roomAFNZoneInfo.Node, roomAFNZoneInfo.NumOfAirNodes);
             if (roomAFNZoneInfo.ControlAirNodeID == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
                 ErrorsFound = true;
@@ -1348,7 +1348,7 @@ namespace RoomAir {
                                                                      ipsc->cNumericFieldNames);
 
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
-            int ZoneNum = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(2), state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
+            int ZoneNum = Util::FindItemInList(ipsc->cAlphaArgs(2), state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             if (ZoneNum == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 ErrorsFound = true;
@@ -1356,7 +1356,7 @@ namespace RoomAir {
             }
 
             auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(ZoneNum);
-            int RAFNNodeNum = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(1), roomAFNZoneInfo.Node, roomAFNZoneInfo.NumOfAirNodes);
+            int RAFNNodeNum = Util::FindItemInList(ipsc->cAlphaArgs(1), roomAFNZoneInfo.Node, roomAFNZoneInfo.NumOfAirNodes);
             if (RAFNNodeNum == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
                 ErrorsFound = true;
@@ -1405,7 +1405,7 @@ namespace RoomAir {
                 int RAFNNodeNum = 0;
                 auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(iZone);
                 if (roomAFNZoneInfo.NumOfAirNodes > 0) {
-                    RAFNNodeNum = UtilityRoutines::FindItemInList(
+                    RAFNNodeNum = Util::FindItemInList(
                         ipsc->cAlphaArgs(1), roomAFNZoneInfo.Node, &AFNAirNodeNested::NodeSurfListName, roomAFNZoneInfo.NumOfAirNodes);
                 }
 
@@ -1498,7 +1498,7 @@ namespace RoomAir {
                 // find surface list
                 int RAFNNodeNum = 0;
                 if (roomAFNZoneInfo.NumOfAirNodes > 0) {
-                    RAFNNodeNum = UtilityRoutines::FindItemInList(
+                    RAFNNodeNum = Util::FindItemInList(
                         ipsc->cAlphaArgs(1), roomAFNZoneInfo.Node, &AFNAirNodeNested::NodeIntGainsListName, roomAFNZoneInfo.NumOfAirNodes);
                 }
                 if (RAFNNodeNum == 0) continue;
@@ -1526,7 +1526,7 @@ namespace RoomAir {
                 for (int gainsLoop = 1; gainsLoop <= numInputGains; ++gainsLoop) {
                     auto &intGain = roomAFNZoneNode.IntGain(gainsLoop);
                     intGain.type = static_cast<DataHeatBalance::IntGainType>(
-                        getEnumValue(DataHeatBalance::IntGainTypeNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(gainsLoop * 2))));
+                        getEnumValue(DataHeatBalance::IntGainTypeNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(gainsLoop * 2))));
 
                     if (intGain.type == DataHeatBalance::IntGainType::Invalid) {
                         ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(gainsLoop * 2), ipsc->cAlphaArgs(gainsLoop * 2));
@@ -1596,7 +1596,7 @@ namespace RoomAir {
                 // find surface list
                 int RAFNNodeNum = 0;
                 if (roomAFNZoneInfo.NumOfAirNodes > 0) {
-                    RAFNNodeNum = UtilityRoutines::FindItemInList(
+                    RAFNNodeNum = Util::FindItemInList(
                         ipsc->cAlphaArgs(1), roomAFNZoneInfo.Node, &AFNAirNodeNested::NodeHVACListName, roomAFNZoneInfo.NumOfAirNodes);
                 }
 
@@ -1690,7 +1690,7 @@ namespace RoomAir {
                         for (int iGain2 = 1; iGain2 <= roomAFNNode2.NumIntGains; ++iGain2) {
                             auto &intGain2 = roomAFNNode2.IntGain(iGain2);
                             if (intGain2.FractionCheck) continue;
-                            if (intGain.type == intGain2.type && UtilityRoutines::SameString(intGain.Name, intGain2.Name)) {
+                            if (intGain.type == intGain2.type && Util::SameString(intGain.Name, intGain2.Name)) {
                                 SumFraction += roomAFNNode2.IntGainsFractions(iGain2);
                                 intGain2.FractionCheck = true;
                             }
@@ -2657,7 +2657,7 @@ namespace RoomAir {
         for (int I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
             auto const &afnZoneInfo = state.dataRoomAir->AFNZoneInfo(I);
             if (afnZoneInfo.NumOfAirNodes > 0) {
-                RAFNNodeNum = UtilityRoutines::FindItemInList(RAFNNodeName, afnZoneInfo.Node, afnZoneInfo.NumOfAirNodes);
+                RAFNNodeNum = Util::FindItemInList(RAFNNodeName, afnZoneInfo.Node, afnZoneInfo.NumOfAirNodes);
                 if (RAFNNodeNum > 0) {
                     ZoneNum = I;
                     break;
@@ -2736,7 +2736,7 @@ namespace RoomAir {
 
         for (int I = 1; I <= TotNumEquip; ++I) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state, equipTypeName, I, Alphas, NumAlphas, Numbers, NumNumbers, Status);
-            if (UtilityRoutines::SameString(Alphas(1), EquipName)) {
+            if (Util::SameString(Alphas(1), EquipName)) {
                 EquipFind = true;
                 break;
             }

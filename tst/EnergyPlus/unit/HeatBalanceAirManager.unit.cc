@@ -373,7 +373,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltrationAndVentilation)
     std::string const error_string = delimited_string(
         {"   ** Warning ** GetSurfaceData: Entered Space Floor Area(s) differ more than 5% from calculated Space Floor Area(s).",
          "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual Spaces.",
-         "   ** Warning ** CalculateZoneVolume: 1 zone is not fully enclosed. For more details use:  Output:Diagnostics,DisplayExtrawarnings; "});
+         "   ** Warning ** CalculateZoneVolume: 1 zone is not fully enclosed. For more details use:  Output:Diagnostics,DisplayExtrawarnings; ",
+         "   ** Warning ** CalcApproximateViewFactors: Zero area for all other zone surfaces.",
+         "   **   ~~~   ** Happens for Surface=\"DUMMY SPACE 1A FLOOR\" in Zone=ZONE 1",
+         "   ** Warning ** CalcApproximateViewFactors: Zero area for all other zone surfaces.",
+         "   **   ~~~   ** Happens for Surface=\"DUMMY SPACE 1B FLOOR\" in Zone=ZONE 1",
+         "   ** Warning ** Surfaces in Zone/Enclosure=\"ZONE 1\" do not define an enclosure.",
+         "   **   ~~~   ** Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.",
+         "   **   ~~~   ** Reciprocity means that radiant exchange between two surfaces will match and not lead to an energy loss.",
+         "   **   ~~~   ** Completeness means that all of the view factors between a surface and the other surfaces in a zone add up to unity.",
+         "   **   ~~~   ** So, when there are three or less surfaces in a zone, EnergyPlus will make sure there are no losses of energy but",
+         "   **   ~~~   ** it will not exchange the full amount of radiation with the rest of the zone as it would if there was a completed "
+         "enclosure."});
 
     compare_err_stream(error_string, true);
     EXPECT_FALSE(ErrorsFound);
@@ -390,11 +401,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltrationAndVentilation)
     Real64 constexpr Zone2FloorArea = 1000.0;
 
     // Zone and space nums
-    int const zone1 = UtilityRoutines::FindItemInList("ZONE 1", state->dataHeatBal->Zone);
-    int const zone2 = UtilityRoutines::FindItemInList("ZONE 2", state->dataHeatBal->Zone);
-    int const space1a = UtilityRoutines::FindItemInList("SPACE 1A", state->dataHeatBal->space);
-    int const space1b = UtilityRoutines::FindItemInList("SPACE 1B", state->dataHeatBal->space);
-    int const spaceZone2 = UtilityRoutines::FindItemInList("ZONE 2", state->dataHeatBal->space);
+    int const zone1 = Util::FindItemInList("ZONE 1", state->dataHeatBal->Zone);
+    int const zone2 = Util::FindItemInList("ZONE 2", state->dataHeatBal->Zone);
+    int const space1a = Util::FindItemInList("SPACE 1A", state->dataHeatBal->space);
+    int const space1b = Util::FindItemInList("SPACE 1B", state->dataHeatBal->space);
+    int const spaceZone2 = Util::FindItemInList("ZONE 2", state->dataHeatBal->space);
 
     int zoneNum = zone1;
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(zoneNum).Name);
@@ -490,9 +501,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltrationAndVentilation)
     for (int itemNum = 0; itemNum <= numInstances - 1; ++itemNum) {
         auto &thisInfiltration = state->dataHeatBal->Infiltration[itemNum];
         auto &thisVentilation = state->dataHeatBal->Ventilation[itemNum];
-        EXPECT_TRUE(UtilityRoutines::SameString(infilNames[itemNum], thisInfiltration.Name));
+        EXPECT_TRUE(Util::SameString(infilNames[itemNum], thisInfiltration.Name));
         EXPECT_EQ(thisInfiltration.DesignLevel, flows[itemNum]);
-        EXPECT_TRUE(UtilityRoutines::SameString(ventNames[itemNum], thisVentilation.Name));
+        EXPECT_TRUE(Util::SameString(ventNames[itemNum], thisVentilation.Name));
         EXPECT_EQ(thisVentilation.DesignLevel, flows[itemNum]);
         EXPECT_EQ(thisInfiltration.ZonePtr, zoneNums[itemNum]);
         EXPECT_EQ(thisVentilation.ZonePtr, zoneNums[itemNum]);
@@ -749,7 +760,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
     std::string const error_string = delimited_string(
         {"   ** Warning ** GetSurfaceData: Entered Space Floor Area(s) differ more than 5% from calculated Space Floor Area(s).",
          "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual Spaces.",
-         "   ** Warning ** CalculateZoneVolume: 1 zone is not fully enclosed. For more details use:  Output:Diagnostics,DisplayExtrawarnings; "});
+         "   ** Warning ** CalculateZoneVolume: 1 zone is not fully enclosed. For more details use:  Output:Diagnostics,DisplayExtrawarnings; ",
+         "   ** Warning ** CalcApproximateViewFactors: Zero area for all other zone surfaces.",
+         "   **   ~~~   ** Happens for Surface=\"DUMMY SPACE 1A FLOOR\" in Zone=ZONE 1",
+         "   ** Warning ** CalcApproximateViewFactors: Zero area for all other zone surfaces.",
+         "   **   ~~~   ** Happens for Surface=\"DUMMY SPACE 1B FLOOR\" in Zone=ZONE 1",
+         "   ** Warning ** Surfaces in Zone/Enclosure=\"ZONE 1\" do not define an enclosure.",
+         "   **   ~~~   ** Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.",
+         "   **   ~~~   ** Reciprocity means that radiant exchange between two surfaces will match and not lead to an energy loss.",
+         "   **   ~~~   ** Completeness means that all of the view factors between a surface and the other surfaces in a zone add up to unity.",
+         "   **   ~~~   ** So, when there are three or less surfaces in a zone, EnergyPlus will make sure there are no losses of energy but",
+         "   **   ~~~   ** it will not exchange the full amount of radiation with the rest of the zone as it would if there was a completed "
+         "enclosure."});
 
     compare_err_stream(error_string, true);
     EXPECT_FALSE(ErrorsFound);
@@ -766,11 +788,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
     Real64 constexpr Zone2FloorArea = 1000.0;
 
     // Zone  and space nums
-    int const zone1 = UtilityRoutines::FindItemInList("ZONE 1", state->dataHeatBal->Zone);
-    int const zone2 = UtilityRoutines::FindItemInList("ZONE 2", state->dataHeatBal->Zone);
-    int const space1a = UtilityRoutines::FindItemInList("SPACE 1A", state->dataHeatBal->space);
-    int const space1b = UtilityRoutines::FindItemInList("SPACE 1B", state->dataHeatBal->space);
-    int const spaceZone2 = UtilityRoutines::FindItemInList("ZONE 2", state->dataHeatBal->space);
+    int const zone1 = Util::FindItemInList("ZONE 1", state->dataHeatBal->Zone);
+    int const zone2 = Util::FindItemInList("ZONE 2", state->dataHeatBal->Zone);
+    int const space1a = Util::FindItemInList("SPACE 1A", state->dataHeatBal->space);
+    int const space1b = Util::FindItemInList("SPACE 1B", state->dataHeatBal->space);
+    int const spaceZone2 = Util::FindItemInList("ZONE 2", state->dataHeatBal->space);
 
     int zoneNum = zone1;
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(zoneNum).Name);
@@ -845,9 +867,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
     for (int itemNum = 0; itemNum <= numInstances - 1; ++itemNum) {
         auto &thisMixing = state->dataHeatBal->Mixing[itemNum];
         auto &thisCrossMixing = state->dataHeatBal->CrossMixing[itemNum];
-        EXPECT_TRUE(UtilityRoutines::SameString(mixNames[itemNum], thisMixing.Name));
+        EXPECT_TRUE(Util::SameString(mixNames[itemNum], thisMixing.Name));
         EXPECT_EQ(thisMixing.DesignLevel, flows[itemNum]);
-        EXPECT_TRUE(UtilityRoutines::SameString(crossMixNames[itemNum], thisCrossMixing.Name));
+        EXPECT_TRUE(Util::SameString(crossMixNames[itemNum], thisCrossMixing.Name));
         EXPECT_EQ(thisCrossMixing.DesignLevel, flows[itemNum]);
         EXPECT_EQ(thisMixing.ZonePtr, zoneNums[itemNum]);
         EXPECT_EQ(thisCrossMixing.ZonePtr, zoneNums[itemNum]);

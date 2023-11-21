@@ -462,7 +462,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
         "    Activity Sch,            !- Activity Level Schedule Name",
         "    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}",
         "    ,                        !- Enable ASHRAE 55 Comfort Warnings",
-        "    zoneaveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "    ,                        !- Surface Name/Angle Factor List Name",
         "    Work Eff Sch,            !- Work Efficiency Schedule Name",
         "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -852,7 +852,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_EQ(state->dataConstruction->Construct(4).LayerPoint(2), 5); // air gap
     EXPECT_EQ(state->dataConstruction->Construct(4).LayerPoint(3), 4); // glass, inner layer
 
-    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", state->dataSurface->Surface);
+    int windowSurfNum = Util::FindItemInList("ZN001:WALL001:WIN001", state->dataSurface->Surface);
 
     EXPECT_FALSE(state->dataSurface->SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
     // check if the construction has a blind material layer

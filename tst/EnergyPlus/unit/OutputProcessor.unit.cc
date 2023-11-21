@@ -70,7 +70,6 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus::PurchasedAirManager;
-using namespace EnergyPlus::WeatherManager;
 using namespace EnergyPlus::OutputProcessor;
 
 namespace EnergyPlus {
@@ -3719,13 +3718,13 @@ namespace OutputProcessor {
         EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(2).NumSubcategories);
         EXPECT_EQ("General", state->dataOutputProcessor->EndUseCategory(2).SubcategoryName(1));
 
-        found = UtilityRoutines::FindItem("Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("Cooling", state->dataOutputProcessor->EnergyMeters(found).EndUse);
         EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
 
-        found = UtilityRoutines::FindItem("General:Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("General:Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("Cooling", state->dataOutputProcessor->EnergyMeters(found).EndUse);
@@ -3736,16 +3735,16 @@ namespace OutputProcessor {
         EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(3).NumSubcategories); // lighting end use
         EXPECT_EQ("RailroadCrossing", state->dataOutputProcessor->EndUseCategory(3).SubcategoryName(1));
 
-        found = UtilityRoutines::FindItem("InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("InteriorLights", state->dataOutputProcessor->EnergyMeters(found).EndUse);
         EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
 
-        found = UtilityRoutines::FindItem("General:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("General:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_EQ(0, found); // should not find this
 
-        found = UtilityRoutines::FindItem("RailroadCrossing:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("RailroadCrossing:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("InteriorLights", state->dataOutputProcessor->EnergyMeters(found).EndUse);
@@ -3753,7 +3752,7 @@ namespace OutputProcessor {
 
         // fuel oil CO2 emissions
         // testing a non-ABUPS end use with no sub end use specified
-        found = UtilityRoutines::FindItem("FuelOilNo2Emissions:CO2", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("FuelOilNo2Emissions:CO2", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("CO2", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("FuelOilNo2Emissions", state->dataOutputProcessor->EnergyMeters(found).EndUse);
@@ -4449,7 +4448,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -4737,7 +4736,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -5050,7 +5049,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -5307,7 +5306,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -5394,7 +5393,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -5478,7 +5477,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -6012,6 +6011,154 @@ namespace OutputProcessor {
         }
     }
 
+    TEST_F(SQLiteFixture, OutputProcessor_SetupOutputVariable_enum)
+    {
+        // Test SOV calls for PR 10231 for extended tests on Calling SOV using new enum parameter drivers, upon different varieties such as:
+        // 1). SOV calls for average, summed variables (regular and meters etc.)
+        // 2). SOV handling on Output:variable processed results
+        // 3). Wild cards
+        // 4). Report frequencies;
+        // 5). Emissions categories;
+        std::string const idf_objects = delimited_string({
+            "Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
+            "Output:Variable,*,Chiller Electricity Energy,runperiod;",
+            "Output:Variable,*,Lights Electricity Energy,runperiod;",
+            "Output:Variable,*,Environmental Impact Fuel Oil No 2 CO2 Emissions Mass,runperiod;",
+            "Output:Variable,*,Chiller Electricity Energy,hourly;",
+            "Output:Variable,*,Lights Electricity Energy,timestep;",
+        });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+
+        GetReportVariableInput(*state);
+
+        SetupOutputVariable(*state,
+                            "Site Outdoor Air Drybulb Temperature",
+                            OutputProcessor::Unit::C,
+                            state->dataEnvrn->OutDryBulbTemp,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
+                            "Environment");
+
+        Real64 cooling_consumption = 0.;
+        SetupOutputVariable(*state,
+                            "Chiller Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            cooling_consumption,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "Cool-1",
+                            {},
+                            eResourceSOV::Electricity,
+                            EndUseCatSOV::Cooling,
+                            {}, // EndUseSubKey
+                            GroupSOV::Plant);
+
+        Real64 light_consumption = 0.;
+        SetupOutputVariable(*state,
+                            "Lights Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            light_consumption,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "LIGHTS 1",
+                            {},
+                            eResourceSOV::Electricity,
+                            EndUseCatSOV::InteriorLights,
+                            "RailroadCrossing", // EndUseSubKey
+                            GroupSOV::Building,
+                            "SPACE1-1",
+                            1,
+                            1);
+
+        Real64 fuel_oil_co2 = 0.;
+        SetupOutputVariable(*state,
+                            "Environmental Impact Fuel Oil No 2 CO2 Emissions Mass",
+                            OutputProcessor::Unit::kg,
+                            fuel_oil_co2,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "Site",
+                            {},
+                            eResourceSOV::CO2,
+                            EndUseCatSOV::FuelOilNo2Emissions,
+                            {}, // EndUseSubKey
+                            GroupSOV::Empty);
+
+        auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
+
+        EXPECT_EQ(1, state->dataOutputProcessor->NumExtraVars);
+
+        EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).Key);
+        EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(1).VarName);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Simulation, state->dataOutputProcessor->ReqRepVars(1).frequency));
+        EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(1).SchedPtr);
+        EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).SchedName);
+        EXPECT_EQ(true, state->dataOutputProcessor->ReqRepVars(1).Used);
+
+        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::Zone, state->dataOutputProcessor->DDVariableTypes(1).timeStepType));
+        EXPECT_TRUE(compare_enums(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(1).storeType));
+        EXPECT_TRUE(compare_enums(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(1).variableType));
+        EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(1).Next);
+        EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(1).ReportedOnDDFile);
+        EXPECT_EQ("Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->DDVariableTypes(1).VarNameOnly);
+
+        int found;
+
+        // Cooling
+        // testing an ABUPS end use with no sub end use specified
+        EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(2).NumSubcategories);
+        EXPECT_EQ("General", state->dataOutputProcessor->EndUseCategory(2).SubcategoryName(1));
+
+        found = Util::FindItem("Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("Cooling", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        found = Util::FindItem("General:Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("Cooling", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("General", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        // lighting
+        // testing an ABUPS end use with a sub end use specified
+        EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(3).NumSubcategories); // lighting end use
+        EXPECT_EQ("RailroadCrossing", state->dataOutputProcessor->EndUseCategory(3).SubcategoryName(1));
+
+        found = Util::FindItem("InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("InteriorLights", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        found = Util::FindItem("General:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_EQ(0, found); // should not find this
+
+        found = Util::FindItem("RailroadCrossing:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("InteriorLights", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("RailroadCrossing", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        // fuel oil CO2 emissions
+        // testing a non-ABUPS end use with no sub end use specified
+        found = Util::FindItem("FuelOilNo2Emissions:CO2", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("CO2", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("FuelOilNo2Emissions", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        std::vector<std::vector<std::string>> reportDataDictionary(
+            {{"1", "0", "Avg", "Zone", "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", "Run Period", "", "C"},
+             {"2", "0", "Sum", "System", "HVAC System", "Cool-1", "Chiller Electricity Energy", "Run Period", "", "J"},
+             {"51", "0", "Sum", "System", "HVAC System", "Cool-1", "Chiller Electricity Energy", "Hourly", "", "J"},
+             {"52", "0", "Sum", "Zone", "Zone", "LIGHTS 1", "Lights Electricity Energy", "Run Period", "", "J"},
+             {"125", "0", "Sum", "Zone", "Zone", "LIGHTS 1", "Lights Electricity Energy", "Zone Timestep", "", "J"},
+             {"126", "0", "Sum", "System", "HVAC System", "Site", "Environmental Impact Fuel Oil No 2 CO2 Emissions Mass", "Run Period", "", "kg"}});
+        EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
+    }
     TEST_F(EnergyPlusFixture, OutputProcessor_setupOutputVariable_endUseAlias)
     {
         // Test PR 10228 that fixes Issue 10224 about refactoring

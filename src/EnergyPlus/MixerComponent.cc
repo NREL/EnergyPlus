@@ -104,7 +104,7 @@ void SimAirMixer(EnergyPlusData &state, std::string_view CompName, int &CompInde
 
     // Find the correct MixerNumber
     if (CompIndex == 0) {
-        MixerNum = UtilityRoutines::FindItemInList(CompName, state.dataMixerComponent->MixerCond, &MixerConditions::MixerName);
+        MixerNum = Util::FindItemInList(CompName, state.dataMixerComponent->MixerCond, &MixerConditions::MixerName);
         if (MixerNum == 0) {
             ShowFatalError(state, format("SimAirLoopMixer: Mixer not found={}", CompName));
         }
@@ -211,7 +211,7 @@ void GetMixerInput(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
         state.dataMixerComponent->MixerCond(MixerNum).MixerName = AlphArray(1);
 
@@ -618,7 +618,7 @@ void GetZoneMixerIndex(EnergyPlusData &state, std::string const &MixerName, int 
         state.dataMixerComponent->GetZoneMixerIndexInputFlag = false;
     }
 
-    MixerIndex = UtilityRoutines::FindItemInList(MixerName, state.dataMixerComponent->MixerCond, &MixerConditions::MixerName);
+    MixerIndex = Util::FindItemInList(MixerName, state.dataMixerComponent->MixerCond, &MixerConditions::MixerName);
     if (MixerIndex == 0) {
         if (!ThisObjectType.empty()) {
             ShowSevereError(state, format("{}, GetZoneMixerIndex: Zone Mixer not found={}", ThisObjectType, MixerName));

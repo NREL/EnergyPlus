@@ -143,7 +143,7 @@ namespace HighTempRadiantSystem {
 
         // Find the correct ZoneHVAC:HighTemperatureRadiant
         if (CompIndex == 0) {
-            RadSysNum = UtilityRoutines::FindItemInList(CompName, state.dataHighTempRadSys->HighTempRadSys);
+            RadSysNum = Util::FindItemInList(CompName, state.dataHighTempRadSys->HighTempRadSys);
             if (RadSysNum == 0) {
                 ShowFatalError(state, format("SimHighTempRadiantSystem: Unit not found={}", CompName));
             }
@@ -276,7 +276,7 @@ namespace HighTempRadiantSystem {
                 }
             }
 
-            highTempRadSys.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
+            highTempRadSys.ZonePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
             if (highTempRadSys.ZonePtr == 0) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -816,19 +816,19 @@ namespace HighTempRadiantSystem {
             // Determine the current setpoint temperature and the temperature at which the unit should be completely off
             Real64 SetPtTemp = ScheduleManager::GetCurrentScheduleValue(state, thisHTR.SetptSchedPtr);
             Real64 OffTemp = SetPtTemp + 0.5 * thisHTR.ThrottlRange;
-            Real64 OpTemp = (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + state.dataHeatBal->ZoneMRT(ZoneNum)) /
-                            2.0; // Approximate the "operative" temperature
+            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+            Real64 OpTemp = (thisZoneHB.MAT + thisZoneHB.MRT) / 2.0; // Approximate the "operative" temperature
 
             // Determine the fraction of maximum power to the unit (limiting the fraction range from zero to unity)
             switch (thisHTR.ControlType) {
             case RadControlType::MATControl: {
-                HeatFrac = (OffTemp - state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT) / thisHTR.ThrottlRange;
+                HeatFrac = (OffTemp - thisZoneHB.MAT) / thisHTR.ThrottlRange;
             } break;
             case RadControlType::MRTControl: {
-                HeatFrac = (OffTemp - state.dataHeatBal->ZoneMRT(ZoneNum)) / thisHTR.ThrottlRange;
+                HeatFrac = (OffTemp - thisZoneHB.MRT) / thisHTR.ThrottlRange;
             } break;
             case RadControlType::OperativeControl: {
-                OpTemp = 0.5 * (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
+                OpTemp = 0.5 * (thisZoneHB.MAT + thisZoneHB.MRT);
                 HeatFrac = (OffTemp - OpTemp) / thisHTR.ThrottlRange;
             } break;
             default:
@@ -909,15 +909,16 @@ namespace HighTempRadiantSystem {
 
             // First determine whether or not the unit should be on
             // Determine the proper temperature on which to control
+            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
             switch (thisHTR.ControlType) {
             case RadControlType::MATSPControl: {
-                ZoneTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+                ZoneTemp = thisZoneHB.MAT;
             } break;
             case RadControlType::MRTSPControl: {
-                ZoneTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
+                ZoneTemp = thisZoneHB.MRT;
             } break;
             case RadControlType::OperativeSPControl: {
-                ZoneTemp = 0.5 * (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
+                ZoneTemp = 0.5 * (thisZoneHB.MAT + thisZoneHB.MRT);
             } break;
             default: {
                 assert(false);
@@ -954,15 +955,16 @@ namespace HighTempRadiantSystem {
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                     // Redetermine the current value of the controlling temperature
+                    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
                     switch (thisHTR.ControlType) {
                     case RadControlType::MATControl: {
-                        ZoneTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+                        ZoneTemp = thisZoneHB.MAT;
                     } break;
                     case RadControlType::MRTControl: {
-                        ZoneTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
+                        ZoneTemp = thisZoneHB.MRT;
                     } break;
                     case RadControlType::OperativeControl: {
-                        ZoneTemp = 0.5 * (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
+                        ZoneTemp = 0.5 * (thisZoneHB.MAT + thisZoneHB.MRT);
                     } break;
                     default:
                         break;

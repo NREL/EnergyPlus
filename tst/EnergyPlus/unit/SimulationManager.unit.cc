@@ -135,13 +135,13 @@ TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
     fs::remove(state->dataStrGlobals->outputPerfLogFilePath);
 
     // make sure the static variables are cleared
-    UtilityRoutines::appendPerfLog(*state, "RESET", "RESET");
+    Util::appendPerfLog(*state, "RESET", "RESET");
 
     // call the function to test
     SimulationManager::writeIntialPerfLogValues(*state, "MODE193");
 
     // force the file to be written
-    UtilityRoutines::appendPerfLog(*state, "lastHeader", "lastValue", true);
+    Util::appendPerfLog(*state, "lastHeader", "lastValue", true);
 
     std::ifstream perfLogFile;
     std::stringstream perfLogStrSteam;
