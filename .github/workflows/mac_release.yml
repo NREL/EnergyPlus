@@ -8,7 +8,7 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   BUILD_TYPE: Release
-  FC: gfortran-12
+  FC: gfortran-13
   SDKROOT: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
   Python_REQUIRED_VERSION: 3.8
 
@@ -65,6 +65,9 @@ jobs:
         # The MACOSX_DEPLOYMENT_TARGET environment variable sets the default value for the CMAKE_OSX_DEPLOYMENT_TARGET variable.
         # We use cmake commands to build some subprojects, so setting it globally
         echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_dev_target }} >> $GITHUB_ENV
+        echo "Installing gcc@13 for gfortran support of -static-libquadmath"
+        brew list gcc@13 || brew install gcc@13
+        which gfortran-13 || echo "FC=$(brew --prefix gcc@13)/bin/gfortran-13" >> $GITHUB_ENV
 
     - name: Create Build Directory
       run: cmake -E make_directory ./build/
