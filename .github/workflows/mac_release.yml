@@ -79,6 +79,7 @@ jobs:
               -DPython_ROOT_DIR:PATH=$RUNNER_TOOL_CACHE/Python/${{ steps.setup-python.outputs.python-version }}/x64/ \
               -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD:STRING="BuildWithAll" -DTEX_INTERACTION:STRING="batchmode" \
+              -DENABLE_OPENMP:BOOL=OFF -DUSE_OpenMP:BOOL=OFF \
               ../
 
     - name: Build Package
