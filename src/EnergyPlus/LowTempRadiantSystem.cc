@@ -5577,9 +5577,9 @@ namespace LowTempRadiantSystem {
         case LowTempRadiantControlTypes::MATControl:
             return thisZoneHB.MAT;
         case LowTempRadiantControlTypes::MRTControl:
-            return state.dataHeatBal->ZoneMRT(this->ZonePtr);
+            return thisZoneHB.MRT;
         case LowTempRadiantControlTypes::OperativeControl:
-            return 0.5 * (thisZoneHB.MAT + state.dataHeatBal->ZoneMRT(this->ZonePtr));
+            return 0.5 * (thisZoneHB.MAT + thisZoneHB.MRT);
         case LowTempRadiantControlTypes::ODBControl:
             return state.dataHeatBal->Zone(this->ZonePtr).OutDryBulbTemp;
         case LowTempRadiantControlTypes::OWBControl:
