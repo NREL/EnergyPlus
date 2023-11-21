@@ -155,6 +155,8 @@ namespace SwimmingPool {
         {
         }
 
+        static SwimmingPoolData *factory(EnergyPlusData &state, std::string const &objectName);
+
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,
                       bool FirstHVACIteration,
@@ -187,15 +189,13 @@ namespace SwimmingPool {
         void oneTimeInit(EnergyPlusData &state) override;
 
         void oneTimeInit_new(EnergyPlusData &state) override;
+
+        void report(EnergyPlusData &state);
     };
 
     void GetSwimmingPool(EnergyPlusData &state);
 
-    void SimSwimmingPool(EnergyPlusData &state, bool FirstHVACIteration);
-
     void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
-
-    void ReportSwimmingPool(EnergyPlusData &state);
 
     Real64 MakeUpWaterVolFlowFunct(Real64 MakeUpWaterMassFlowRate, Real64 Density);
 
