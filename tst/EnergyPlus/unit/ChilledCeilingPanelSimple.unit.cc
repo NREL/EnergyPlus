@@ -78,8 +78,7 @@ TEST_F(EnergyPlusFixture, SetCoolingPanelControlTemp)
     state->dataChilledCeilingPanelSimple->CoolingPanel.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 22.0;
-    state->dataHeatBal->ZoneMRT.allocate(1);
-    state->dataHeatBal->ZoneMRT(1) = 20.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MRT = 20.0;
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 10.0;
     state->dataHeatBal->Zone(1).OutWetBulbTemp = 5.0;

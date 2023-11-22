@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataShadowingCombinations.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/Material.hh>
@@ -2653,7 +2654,6 @@ namespace WindowComplexManager {
         int TotGlassLay;          // Total number of glass layers in a construction
         int k;                    // Layer counter
         int SurfNumAdj;           // An interzone surface's number in the adjacent zone
-        int ZoneNumAdj;           // An interzone surface's adjacent zone number
         WinShadingType ShadeFlag; // Flag indicating whether shade or blind is on, and shade/blind position
         int IMix;
 
@@ -2759,11 +2759,11 @@ namespace WindowComplexManager {
             // now get "outside" air temperature
             if (SurfNumAdj > 0) { // Interzone window
 
-                ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
+                int enclNumAdj = state.dataSurface->Surface(SurfNumAdj).RadEnclIndex;
                 RefAirTemp = state.dataSurface->Surface(SurfNumAdj).getInsideAirTemperature(state, SurfNumAdj);
                 tout = RefAirTemp + Constant::Kelvin; // outside air temperature
 
-                tsky = state.dataHeatBal->ZoneMRT(ZoneNumAdj) +
+                tsky = state.dataViewFactor->EnclRadInfo(enclNumAdj).MRT +
                        Constant::Kelvin; // TODO this misses IR from sources such as high temp radiant and baseboards
 
                 //  ! Add long-wave radiation from adjacent zone absorbed by glass layer closest to the adjacent zone.

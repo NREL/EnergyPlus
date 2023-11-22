@@ -532,48 +532,48 @@ namespace DataSurfaces {
     {
         // Values that must be the same in order for surfaces to use a representative calculation
 
-        int Construction;          // Pointer to the construction in the Construct derived type
-        Real64 Azimuth;            // Direction the surface outward normal faces (degrees) or FACING
-        Real64 Tilt;               // Angle (deg) between the ground outward normal and the surface outward normal
-        Real64 Height;             // Height of the surface (m)
-        int Zone;                  // Interior environment or zone the surface is a part of
-        int EnclIndex;             // Pointer to enclosure this surface belongs to
-        int TAirRef;               // Flag for reference air temperature
-        int ExtZone;               // For an "interzone" surface, this is the adjacent ZONE number (not adjacent SURFACE number).
-        int ExtCond;               // Exterior condition type. Same as ExtBoundCond for non-interzone surfaces. Value = 1 for interzone surfaces.
-        int ExtEnclIndex;          // For an "interzone" surface, this is the adjacent ENCLOSURE number
-        bool ExtSolar;             // True if the "outside" of the surface is exposed to solar
-        bool ExtWind;              // True if the "outside" of the surface is exposed to wind
-        Real64 ViewFactorGround;   // View factor to the ground from the exterior of the surface for diffuse solar radiation
-        Real64 ViewFactorSky;      // View factor to the sky from the exterior of the surface for diffuse solar radiation
-        Real64 ViewFactorSrdSurfs; // View factor to the surrounding surfaces seen from the exterior of the surface
+        int Construction = 0;          // Pointer to the construction in the Construct derived type
+        Real64 Azimuth = 0.0;          // Direction the surface outward normal faces (degrees) or FACING
+        Real64 Tilt = 0.0;             // Angle (deg) between the ground outward normal and the surface outward normal
+        Real64 Height = 0.0;           // Height of the surface (m)
+        int Zone = 0;                  // Interior environment or zone the surface is a part of
+        int EnclIndex = 0;             // Pointer to enclosure this surface belongs to
+        int TAirRef = 0;               // Flag for reference air temperature
+        int ExtZone = 0;               // For an "interzone" surface, this is the adjacent ZONE number (not adjacent SURFACE number).
+        int ExtCond = 0;               // Exterior condition type. Same as ExtBoundCond for non-interzone surfaces. Value = 1 for interzone surfaces.
+        int ExtEnclIndex = 0;          // For an "interzone" surface, this is the adjacent ENCLOSURE number
+        bool ExtSolar = false;         // True if the "outside" of the surface is exposed to solar
+        bool ExtWind = false;          // True if the "outside" of the surface is exposed to wind
+        Real64 ViewFactorGround = 0.0; // View factor to the ground from the exterior of the surface for diffuse solar radiation
+        Real64 ViewFactorSky = 0.0;    // View factor to the sky from the exterior of the surface for diffuse solar radiation
+        Real64 ViewFactorSrdSurfs = 0.0; // View factor to the surrounding surfaces seen from the exterior of the surface
 
         // Special Properties
-        HeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
-        Convect::HcInt intConvModel;             // Interior convection algorithm
-        int intConvUserModelNum;                 // Interior convection user coefficient index
-        Convect::HcExt extConvModel;             // Exterior convection algorithm
-        int extConvUserModelNum;                 // Exterior convection user coefficient index
-        int OSCPtr;                              // Pointer to OSC data structure
-        int OSCMPtr;                             // "Pointer" to OSCM data structure (other side conditions from a model)
+        HeatTransferModel HeatTransferAlgorithm = HeatTransferModel::CTF; // used for surface-specific heat transfer algorithm.
+        Convect::HcInt intConvModel = Convect::HcInt::Invalid;            // Interior convection algorithm
+        int intConvUserModelNum = 0;                                      // Interior convection user coefficient index
+        Convect::HcExt extConvModel = Convect::HcExt::Invalid;            // Exterior convection algorithm
+        int extConvUserModelNum = 0;                                      // Exterior convection user coefficient index
+        int OSCPtr = 0;                                                   // Pointer to OSC data structure
+        int OSCMPtr = 0;                                                  // "Pointer" to OSCM data structure (other side conditions from a model)
 
         // Windows
-        int FrameDivider;          // Pointer to frame and divider information (windows only)
-        int SurfWinStormWinConstr; // Construction with storm window (windows only)
+        int FrameDivider = 0;          // Pointer to frame and divider information (windows only)
+        int SurfWinStormWinConstr = 0; // Construction with storm window (windows only)
         //   Airflow control                      // Not supported
         //   Shading Control                      // Not supported
 
         // Other special boundary conditions
         //   SolarIncidentInside                  // Not supported
-        int MaterialMovInsulExt;           // Pointer to the material used for exterior movable insulation
-        int MaterialMovInsulInt;           // Pointer to the material used for interior movable insulation
-        int SchedMovInsulExt;              // Schedule for exterior movable insulation
-        int SchedMovInsulInt;              // Schedule for interior movable insulation
-        int ExternalShadingSchInd;         // Schedule for a the external shading
-        int SurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
-        int LinkedOutAirNode;              // Index of the an OutdoorAir:Node
-        int OutsideHeatSourceTermSchedule; // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
-        int InsideHeatSourceTermSchedule;  // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
+        int MaterialMovInsulExt = 0;           // Pointer to the material used for exterior movable insulation
+        int MaterialMovInsulInt = 0;           // Pointer to the material used for interior movable insulation
+        int SchedMovInsulExt = 0;              // Schedule for exterior movable insulation
+        int SchedMovInsulInt = 0;              // Schedule for interior movable insulation
+        int ExternalShadingSchInd = 0;         // Schedule for a the external shading
+        int SurroundingSurfacesNum = 0;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
+        int LinkedOutAirNode = 0;              // Index of the an OutdoorAir:Node
+        int OutsideHeatSourceTermSchedule = 0; // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
+        int InsideHeatSourceTermSchedule = 0;  // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
 
         // based on boost::hash_combine
         std::size_t hash_combine(std::size_t current_hash, std::size_t new_hash) const

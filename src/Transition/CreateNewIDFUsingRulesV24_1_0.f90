@@ -11,7 +11,13 @@ SUBROUTINE SetThisVersionVariables()
       ! TODO: Update this section as appropriate
       VerString='Conversion 23.2 => 24.1'
       VersionNum=24.1
-      sVersionNum='24.1'
+      ! Starting with version 22.1, the version string requires 4 characters
+      ! The original sVersionNum variable is a 3 character length string
+      ! If we just change that variable to be 4 characters, it could break everything before 22.1
+      ! So instead, let's just move forward with a new 4 character string and use that in this file and the future
+      ! If we get to version 100.1 and we are still using this Fortran transition then well....we can deal with it then
+      sVersionNum = '***'
+      sVersionNumFourChars='24.1'
       IDDFileNameWithPath=TRIM(ProgramPath)//'V23-2-0-Energy+.idd'
       NewIDDFileNameWithPath=TRIM(ProgramPath)//'V24-1-0-Energy+.idd'
       RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 23-2-0 to 24-1-0.csv'
@@ -290,9 +296,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             ENDDO
             IF (NoVersion .and. Num == 1) THEN
               CALL GetNewObjectDefInIDD('VERSION',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-              OutArgs(1) = sVersionNum
+              OutArgs(1) = sVersionNumFourChars
               CurArgs=1
-              CALL ShowWarningError('No version found in file, defaulting to '//sVersionNum,Auditf)
+              CALL ShowWarningError('No version found in file, defaulting to '//sVersionNumFourChars,Auditf)
               CALL WriteOutIDFLinesAsComments(DifLfn,'Version',CurArgs,OutArgs,NwFldNames,NwFldUnits)
             ENDIF
 
@@ -364,14 +370,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               SELECT CASE (MakeUPPERCase(TRIM(IDFRecords(Num)%Name)))
 
               CASE ('VERSION')
-                IF ((InArgs(1)(1:3)) == sVersionNum .and. ArgFile) THEN
+                IF ((InArgs(1)(1:4)) == sVersionNumFourChars .and. ArgFile) THEN
                   CALL ShowWarningError('File is already at latest version.  No new diff file made.',Auditf)
                   CLOSE(diflfn,STATUS='DELETE')
                   LatestVersion=.true.
                   EXIT
                 ENDIF
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1) = sVersionNum
+                OutArgs(1) = sVersionNumFourChars
                 NoDiff=.false.
 
     ! changes for this version, pick one of the spots to add rules, this will reduce the possibility of merge conflicts
@@ -387,6 +393,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with A, insert the rules here
 
               ! If your original object starts with C, insert the rules here
+              CASE('COMFORTVIEWFACTORANGLES')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1)=InArgs(1)
+                  ! InArgs(2) is deleted
+                  OutArgs(2:CurArgs-1)=InArgs(3:CurArgs)
+                  CurArgs = CurArgs -1
 
               ! If your original object starts with D, insert the rules here
 
@@ -499,6 +512,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with O, insert the rules here
 
               ! If your original object starts with P, insert the rules here
+              CASE('PEOPLE')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                  IF (SameString(OutArgs(13),'ZoneAveraged') ) THEN
+                    OutArgs(13)='EnclosureAveraged'
+                  ENDIF
 
               ! If your original object starts with R, insert the rules here
 

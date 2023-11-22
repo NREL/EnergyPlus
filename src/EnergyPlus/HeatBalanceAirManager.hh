@@ -84,7 +84,12 @@ namespace HeatBalanceAirManager {
 
     void ReportZoneMeanAirTemp(EnergyPlusData &state);
 
-    void calcMeanAirTemps(EnergyPlusData &state, Real64 ZTAV, Real64 airHumRatAvg, DataHeatBalance::AirReportVars &thisAirRpt, int zoneNum);
+    void calcMeanAirTemps(EnergyPlusData &state,
+                          Real64 const ZTAV,
+                          Real64 const airHumRatAvg,
+                          Real64 const MRT,
+                          DataHeatBalance::AirReportVars &thisAirRpt,
+                          int const zoneNum);
 
 } // namespace HeatBalanceAirManager
 
