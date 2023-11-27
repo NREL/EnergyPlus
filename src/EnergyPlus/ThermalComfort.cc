@@ -170,6 +170,7 @@ namespace ThermalComfort {
             CurrentGroupName = state.dataHeatBal->People(Loop).Name;
 
             // CurrentModuleObject='People'
+            // MJW MRT ToDo: Rename most Zone Therml Comfort output varibles to People Thermal Comfort ('cause they're keyed by People name)
             if (state.dataHeatBal->People(Loop).Fanger) {
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Fanger Model PMV",
@@ -1944,7 +1945,6 @@ namespace ThermalComfort {
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
             thisAngFacList.Name = state.dataIPShortCut->cAlphaArgs(1); // no need for verification/uniqueness.
-            // Ignore ZoneName cAlphaArgs(2)
 
             thisAngFacList.TotAngleFacSurfaces = NumNumbers;
             thisAngFacList.SurfaceName.allocate(thisAngFacList.TotAngleFacSurfaces);
@@ -1952,16 +1952,16 @@ namespace ThermalComfort {
             thisAngFacList.AngleFactor.allocate(thisAngFacList.TotAngleFacSurfaces);
 
             for (int SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
-                thisAngFacList.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 2);
-                thisAngFacList.SurfacePtr(SurfNum) = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(SurfNum + 2), state.dataSurface->Surface);
+                thisAngFacList.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 1);
+                thisAngFacList.SurfacePtr(SurfNum) = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(SurfNum + 1), state.dataSurface->Surface);
                 thisAngFacList.AngleFactor(SurfNum) = state.dataIPShortCut->rNumericArgs(SurfNum);
                 // Error trap for surfaces that do not exist or surfaces not in the zone
                 if (thisAngFacList.SurfacePtr(SurfNum) == 0) {
                     ShowSevereError(state,
                                     format("{}: invalid {}, entered value={}",
                                            cCurrentModuleObject,
-                                           state.dataIPShortCut->cAlphaFieldNames(SurfNum + 2),
-                                           state.dataIPShortCut->cAlphaArgs(SurfNum + 2)));
+                                           state.dataIPShortCut->cAlphaFieldNames(SurfNum + 1),
+                                           state.dataIPShortCut->cAlphaArgs(SurfNum + 1)));
                     ShowContinueError(state,
                                       format("ref {}={} not found in {}={}",
                                              state.dataIPShortCut->cAlphaFieldNames(1),
@@ -1979,11 +1979,10 @@ namespace ThermalComfort {
                                                 routineName,
                                                 cCurrentModuleObject,
                                                 thisAngFacList.Name));
-                        ShowContinueError(
-                            state,
-                            format("... Surface=\"{}\" is in enclosure=\"{}\"",
-                                   state.dataSurface->Surface(thisAngFacList.SurfacePtr(1)).Name,
-                                   state.dataViewFactor->EnclRadInfo(state.dataSurface->Surface(thisAngFacList.SurfacePtr(1)).RadEnclIndex).Name));
+                        ShowContinueError(state,
+                                          format("... Surface=\"{}\" is in enclosure=\"{}\"",
+                                                 state.dataSurface->Surface(thisAngFacList.SurfacePtr(1)).Name,
+                                                 state.dataViewFactor->EnclRadInfo(thisAngFacList.EnclosurePtr).Name));
                         ShowContinueError(state,
                                           format("... Surface=\"{}\" is in enclosure=\"{}\"",
                                                  thisSurf.Name,
@@ -2127,24 +2126,28 @@ namespace ThermalComfort {
         }
 
         // Now weight the MRT
+        auto &thisSurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
         if (thisSurface.enclAESum > 0.01) {
             CalcSurfaceWeightedMRT = sumAET / thisSurface.enclAESum;
             // if averaged with surface--half comes from the surface used for weighting (SurfNum) and the rest from the calculated MRT that excludes
             // this surface
             if (AverageWithSurface) {
-                CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) + CalcSurfaceWeightedMRT);
+                CalcSurfaceWeightedMRT = 0.5 * (thisSurfaceTemp + CalcSurfaceWeightedMRT);
             }
         } else {
             if (state.dataThermalComforts->FirstTimeError) {
-                int ZoneNum = thisSurface.Zone;
-                ShowWarningError(
-                    state,
-                    format("Zone areas*inside surface emissivities are summing to zero, for Zone=\"{}\"", state.dataHeatBal->Zone(ZoneNum).Name));
-                ShowContinueError(state, "As a result, MAT will be used for MRT when calculating a surface weighted MRT for this zone.");
+                int spaceNum = thisSurface.spaceNum;
+                ShowWarningError(state,
+                                 format("CalcSurfaceWeightedMRT: Areas*Inside surface emissivities are summing to zero for Enclosure=\"{}\"",
+                                        thisRadEnclosure.Name));
+                ShowContinueError(state,
+                                  format("As a result, the MAT for Space={} will be used for MRT when calculating the surface weighted MRT.",
+                                         state.dataHeatBal->space(spaceNum).Name));
+                ShowContinueError(state, format("for Surface={}", thisSurface.Name));
                 state.dataThermalComforts->FirstTimeError = false;
-                CalcSurfaceWeightedMRT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+                CalcSurfaceWeightedMRT = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
                 if (AverageWithSurface) {
-                    CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) + CalcSurfaceWeightedMRT);
+                    CalcSurfaceWeightedMRT = 0.5 * (thisSurfaceTemp + CalcSurfaceWeightedMRT);
                 }
             }
         }
@@ -2183,7 +2186,7 @@ namespace ThermalComfort {
         return std::exp(18.6686 - 4030.183 / (Temp + 235.0));
     }
 
-    Real64 CalcRadTemp(EnergyPlusData &state, int const PeopleListNum) // Type of MRT calculation (zone averaged or surface weighted)
+    Real64 CalcRadTemp(EnergyPlusData &state, int const PeopleListNum)
     {
 
         // FUNCTION INFORMATION:
@@ -2217,36 +2220,28 @@ namespace ThermalComfort {
         // within a space.  Future additions might include the effect of direct
         // solar energy on occupants.
 
-        // Return value
-        Real64 CalcRadTemp;
+        Real64 CalcRadTemp = 0.0;
+        Real64 constexpr AreaEff = 1.8;                    // Effective area of a "standard" person in meters squared
+        Real64 constexpr StefanBoltzmannConst = 5.6697e-8; // Stefan-Boltzmann constant in W/(m2*K4)
 
-        // Locals
-        Real64 SurfaceTemp;
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        Real64 constexpr AreaEff(1.8);                    // Effective area of a "standard" person in meters squared
-        Real64 constexpr StefanBoltzmannConst(5.6697e-8); // Stefan-Boltzmann constant in W/(m2*K4)
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 ZoneRadTemp;
-
-        switch (state.dataHeatBal->People(PeopleListNum).MRTCalcType) {
-        case DataHeatBalance::CalcMRT::ZoneAveraged: {
-            state.dataThermalComforts->RadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
+        auto &thisPeople = state.dataHeatBal->People(PeopleListNum);
+        switch (thisPeople.MRTCalcType) {
+        case DataHeatBalance::CalcMRT::EnclosureAveraged: {
+            int enclNum = state.dataHeatBal->space(thisPeople.spaceIndex).radiantEnclosureNum;
+            state.dataThermalComforts->RadTemp = state.dataViewFactor->EnclRadInfo(enclNum).MRT;
         } break;
         case DataHeatBalance::CalcMRT::SurfaceWeighted: {
-            ZoneRadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
-            SurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataHeatBal->People(PeopleListNum).SurfacePtr);
-            state.dataThermalComforts->RadTemp = CalcSurfaceWeightedMRT(state, state.dataHeatBal->People(PeopleListNum).SurfacePtr);
+            state.dataThermalComforts->RadTemp = CalcSurfaceWeightedMRT(state, thisPeople.SurfacePtr);
         } break;
         case DataHeatBalance::CalcMRT::AngleFactor: {
-            state.dataThermalComforts->RadTemp = CalcAngleFactorMRT(state, state.dataHeatBal->People(PeopleListNum).AngleFactorListPtr);
+            state.dataThermalComforts->RadTemp = CalcAngleFactorMRT(state, thisPeople.AngleFactorListPtr);
         } break;
         default:
             break;
         }
 
         // If high temperature radiant heater present and on, then must account for this in MRT calculation
+        // MJW MRT ToDo: Think about what happens here - at a minimum, set a flag to skip this if there isn't any radiant HVAC
         state.dataHeatBalFanSys->ZoneQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) =
             state.dataHeatBalFanSys->ZoneQHTRadSysToPerson(state.dataThermalComforts->ZoneNum) +
             state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson(state.dataThermalComforts->ZoneNum) +
@@ -2282,8 +2277,6 @@ namespace ThermalComfort {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 OperTemp;
-        Real64 CurAirTemp;
-        Real64 CurMeanRadiantTemp;
         Real64 NumberOccupants;
         bool isComfortableWithSummerClothes;
         bool isComfortableWithWinterClothes;
@@ -2309,18 +2302,19 @@ namespace ThermalComfort {
             }
         }
         // loop through the zones and determine if in simple ashrae 55 comfort regions
+        // MJW MRT ToDo: Extend ASHRAE 55 to spaces?
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             if (state.dataThermalComforts->ThermalComfortInASH55(iZone).ZoneIsOccupied) {
                 auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(iZone);
                 // keep track of occupied hours
                 state.dataThermalComforts->ZoneOccHrs(iZone) += state.dataGlobal->TimeStepZone;
-                CurAirTemp = thisZoneHB.ZTAVComf;
+                Real64 CurAirTemp = thisZoneHB.ZTAVComf;
                 if (state.dataRoomAir->anyNonMixingRoomAirModel) {
                     if (state.dataRoomAir->IsZoneDispVent3Node(iZone) || state.dataRoomAir->IsZoneUFAD(iZone)) {
                         CurAirTemp = state.dataRoomAir->TCMF(iZone);
                     }
                 }
-                CurMeanRadiantTemp = state.dataHeatBal->ZoneMRT(iZone);
+                Real64 CurMeanRadiantTemp = thisZoneHB.MRT;
                 OperTemp = CurAirTemp * 0.5 + CurMeanRadiantTemp * 0.5;
                 // for debugging
                 // ThermalComfortInASH55(iZone)%dCurAirTemp = CurAirTemp
