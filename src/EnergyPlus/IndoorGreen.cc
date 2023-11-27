@@ -177,13 +177,18 @@ namespace IndoorGreen {
             Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             state.dataIndoorGreen->indoorgreens(IndoorGreenNum).IndoorGreenName = state.dataIPShortCut->cAlphaArgs(1);
             // LW to do space, space list
-            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2);
-            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr =
-                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
-            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZoneListPtr =
-                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->ZoneList);
+            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SurfName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SurfPtr =
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr= 
+                Util::FindItem(
+                state.dataSurface->Surface(state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SurfPtr).ZoneName, state.dataHeatBal->Zone);
+            //state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr =
+            //    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
+            //state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZoneListPtr =
+             //   Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->ZoneList);
             if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr <= 0 &&
-                state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZoneListPtr <= 0) {
+                state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SurfPtr <= 0) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {} entered={}",
                                        RoutineName,

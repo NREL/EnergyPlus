@@ -68,6 +68,7 @@ namespace IndoorGreen {
     {
         std::string IndoorGreenName;
         std::string ZoneName;
+        std::string SurfName;
         std::string Schedule;
         int SchedPtr = 0;
         int SchedLEDPtr = 0;
@@ -79,6 +80,7 @@ namespace IndoorGreen {
         Real64 ZPPFD = 0;          //PPFD
         Real64 SensibleRate = 0.0; //w
         Real64 LatentRate = 0.0;   //w
+        int SurfPtr = 0;
         int ZoneListPtr = 0;
         int ZonePtr = 0;                    // point to the zone where the indoor greenery system is located
         int ETCalculationMethod = 0;        // - Method for ET calculation-(Penman-Monteith=1, Stanghellini=2, Data-driven=3)
