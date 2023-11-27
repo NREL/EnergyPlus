@@ -179,6 +179,9 @@
 // C++ Headers
 #include <exception>
 #include <iostream>
+#include <string>
+#include <vector>
+
 #ifndef NDEBUG
 #ifdef __unix__
 #include <cfenv>
@@ -219,7 +222,7 @@
 #include <unistd.h>
 #endif
 
-int EnergyPlusPgm(int argc, const char *argv[], std::string const &filepath)
+int EnergyPlusPgm(const std::vector<std::string> &args, std::string const &filepath)
 {
     EnergyPlus::EnergyPlusData state;
     //// these need to be set early to be used in help and version output messaging
@@ -233,7 +236,7 @@ int EnergyPlusPgm(int argc, const char *argv[], std::string const &filepath)
     }
     state.dataStrGlobals->VerStringVar = EnergyPlus::DataStringGlobals::VerString + "," + state.dataStrGlobals->CurrentDateTime;
 
-    EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv);
+    EnergyPlus::CommandLineInterface::ProcessArgs(state, args);
     return RunEnergyPlus(state, filepath);
 }
 
@@ -267,7 +270,7 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state)
 #endif
 #endif
 
-    state.dataSysVars->Time_Start = UtilityRoutines::epElapsedTime();
+    state.dataSysVars->Time_Start = Util::epElapsedTime();
 
     state.dataStrGlobals->CurrentDateTime = CreateCurrentDateTimeString();
 
@@ -333,9 +336,7 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &f
             return EXIT_FAILURE;
         }
         state.dataStrGlobals->ProgramPath = filepath + DataStringGlobals::pathChar;
-        int dummy_argc = 1;
-        const char *dummy_argv[1] = {"energyplus"};
-        CommandLineInterface::ProcessArgs(state, dummy_argc, dummy_argv);
+        CommandLineInterface::ProcessArgs(state, {"energyplus"});
     }
 
     return commonRun(state);
@@ -418,7 +419,7 @@ int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath
     return wrapUpEnergyPlus(state);
 }
 
-int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const char *argv[])
+int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, const std::vector<std::string> &args)
 {
     // PROGRAM INFORMATION:
     //       AUTHOR         Linda K. Lawrie, et al
@@ -441,7 +442,7 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const ch
     if (!std::cerr.good()) std::cerr.clear();
     if (!std::cout.good()) std::cout.clear();
 
-    int return_code = EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv);
+    int return_code = EnergyPlus::CommandLineInterface::ProcessArgs(state, args);
     if (return_code == static_cast<int>(EnergyPlus::CommandLineInterface::ReturnCodes::Failure)) {
         return return_code;
     } else if (return_code == static_cast<int>(EnergyPlus::CommandLineInterface::ReturnCodes::SuccessButHelper)) {
@@ -450,7 +451,9 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const ch
     }
 
     int status = initializeAsLibrary(state);
-    if (status || state.dataGlobal->outputEpJSONConversionOnly) return status;
+    if (status || state.dataGlobal->outputEpJSONConversionOnly) {
+        return status;
+    }
     try {
         EnergyPlus::SimulationManager::ManageSimulation(state);
     } catch (const EnergyPlus::FatalError &e) {

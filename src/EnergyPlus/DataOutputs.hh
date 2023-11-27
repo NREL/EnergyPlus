@@ -96,20 +96,20 @@ struct OutputsData : BaseGlobalStruct
 
     int MaxConsideredOutputVariables = 0; // Max Array size for OutputVariable pre-scanned
     int NumConsideredOutputVariables = 0; // Number of variables - pre-scanned, allowed for output
-    int iNumberOfRecords;                 // Number of records in input
-    int iNumberOfDefaultedFields;         // number of defaulted fields
-    int iTotalFieldsWithDefaults;         // number of fields that can be defaulted
-    int iNumberOfAutoSizedFields;         // number of autosized fields
-    int iTotalAutoSizableFields;          // number of fields that can be autosized
-    int iNumberOfAutoCalcedFields;        // number of autocalculated fields
-    int iTotalAutoCalculatableFields;     // number of fields that can be autocalculated
+    int iNumberOfRecords = 0;             // Number of records in input
+    int iNumberOfDefaultedFields = 0;     // number of defaulted fields
+    int iTotalFieldsWithDefaults = 0;     // number of fields that can be defaulted
+    int iNumberOfAutoSizedFields = 0;     // number of autosized fields
+    int iTotalAutoSizableFields = 0;      // number of fields that can be autosized
+    int iNumberOfAutoCalcedFields = 0;    // number of autocalculated fields
+    int iTotalAutoCalculatableFields = 0; // number of fields that can be autocalculated
     std::map<std::string,
              std::map<std::string,
                       DataOutputs::OutputReportingVariables,
-                      // UtilityRoutines::case_insensitive_hasher,
-                      UtilityRoutines::case_insensitive_comparator>,
-             // UtilityRoutines::case_insensitive_hasher,
-             UtilityRoutines::case_insensitive_comparator>
+                      // Util::case_insensitive_hasher,
+                      Util::case_insensitive_comparator>,
+             // Util::case_insensitive_hasher,
+             Util::case_insensitive_comparator>
         OutputVariablesForSimulation;
 
     void clear_state() override

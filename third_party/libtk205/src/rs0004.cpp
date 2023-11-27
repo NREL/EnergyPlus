@@ -169,7 +169,7 @@ namespace tk205  {
 
 		const std::string_view PerformanceMapCooling::lookup_variables_name = "lookup_variables";
 
-		LookupVariablesCoolingStruct PerformanceMapCooling::calculate_performance(double outdoor_coil_entering_dry_bulb_temperature, double indoor_coil_entering_relative_humidity, double indoor_coil_entering_dry_bulb_temperature, double indoor_coil_air_mass_flow_rate, double compressor_sequence_number, double ambient_absolute_air_pressure, Btwxt::Method performance_interpolation_method ) {
+		LookupVariablesCoolingStruct PerformanceMapCooling::calculate_performance(double outdoor_coil_entering_dry_bulb_temperature, double indoor_coil_entering_relative_humidity, double indoor_coil_entering_dry_bulb_temperature, double indoor_coil_air_mass_flow_rate, double compressor_sequence_number, double ambient_absolute_air_pressure, Btwxt::InterpolationMethod performance_interpolation_method ) {
 			std::vector<double> target {outdoor_coil_entering_dry_bulb_temperature, indoor_coil_entering_relative_humidity, indoor_coil_entering_dry_bulb_temperature, indoor_coil_air_mass_flow_rate, compressor_sequence_number, ambient_absolute_air_pressure};
 			auto v = PerformanceMapBase::calculate_performance(target, performance_interpolation_method);
 			LookupVariablesCoolingStruct s {v[0], v[1], v[2], };
@@ -224,7 +224,7 @@ namespace tk205  {
 
 		const std::string_view PerformanceMapStandby::lookup_variables_name = "lookup_variables";
 
-		LookupVariablesStandbyStruct PerformanceMapStandby::calculate_performance(double outdoor_coil_environment_dry_bulb_temperature, Btwxt::Method performance_interpolation_method ) {
+		LookupVariablesStandbyStruct PerformanceMapStandby::calculate_performance(double outdoor_coil_environment_dry_bulb_temperature, Btwxt::InterpolationMethod performance_interpolation_method ) {
 			std::vector<double> target {outdoor_coil_environment_dry_bulb_temperature};
 			auto v = PerformanceMapBase::calculate_performance(target, performance_interpolation_method);
 			LookupVariablesStandbyStruct s {v[0], };

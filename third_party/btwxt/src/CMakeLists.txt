@@ -2,6 +2,7 @@
 
 set(library_sources
         regular-grid-interpolator-implementation.h
+        regular-grid-interpolator-implementation.cpp
         regular-grid-interpolator.cpp
         grid-axis.cpp
         )

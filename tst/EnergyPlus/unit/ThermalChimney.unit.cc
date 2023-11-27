@@ -1144,18 +1144,18 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     state->dataHeatBalSurf->SurfHConvInt.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBalSurf->SurfHConvInt = 0.1;
     state->dataHeatBalSurf->SurfTempIn = 25.00;
-    int surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001", state->dataSurface->Surface);
+    int surfNum = Util::FindItemInList("ZN002:WALL001", state->dataSurface->Surface);
     state->dataHeatBalSurf->SurfTempIn(surfNum) = 25.92;
-    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001:WIN001", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("ZN002:WALL001:WIN001", state->dataSurface->Surface);
     state->dataHeatBalSurf->SurfTempIn(surfNum) = 25.92;
-    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL004", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("ZN002:WALL004", state->dataSurface->Surface);
     state->dataHeatBalSurf->SurfTempIn(surfNum) = 26.99;
-    surfNum = UtilityRoutines::FindItemInList("ZN004:WALL001:WIN001", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("ZN004:WALL001:WIN001", state->dataSurface->Surface);
     state->dataHeatBalSurf->SurfTempIn(surfNum) = 22.99;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     for (auto &thisZoneHB : state->dataZoneTempPredictorCorrector->zoneHeatBalance) {
         thisZoneHB.MAT = 23.0;
-        thisZoneHB.ZoneAirHumRat = 0.01;
+        thisZoneHB.airHumRat = 0.01;
     }
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);

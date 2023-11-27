@@ -687,7 +687,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     state->dataBSDFWindow->SUNCOSTS(4, 9)(3) = 0.1;
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
 
-    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int windowSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     EXPECT_NEAR(0.6504, state->dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(4, 9, windowSurfNum), 0.0001);
     EXPECT_NEAR(0.9152, state->dataSolarShading->SurfDifShdgRatioHorizHRTS(4, 9, windowSurfNum), 0.0001);
 }
@@ -1098,11 +1098,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     EXPECT_FALSE(state->dataSolarShading->SUNCOS(3) < DataEnvironment::SunIsUpValue);
 
-    int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
+    int surfNum = Util::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
     EXPECT_DOUBLE_EQ(1, state->dataHeatBal->SurfSunlitFrac(9, 4, surfNum));
-    surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     EXPECT_DOUBLE_EQ(1, state->dataHeatBal->SurfSunlitFrac(9, 4, surfNum));
-    surfNum = UtilityRoutines::FindItemInList("ZN001:ROOF", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("ZN001:ROOF", state->dataSurface->Surface);
     EXPECT_DOUBLE_EQ(0.5432, state->dataHeatBal->SurfSunlitFrac(9, 4, surfNum));
 }
 
@@ -1877,7 +1877,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     state->dataSolarShading->CalcSkyDifShading = false;
 
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
-    int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int surfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     EXPECT_NEAR(0.6504, state->dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(4, 9, surfNum), 0.0001);
     EXPECT_NEAR(0.9152, state->dataSolarShading->SurfDifShdgRatioHorizHRTS(4, 9, surfNum), 0.0001);
 
@@ -3156,7 +3156,7 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     SolarShading::InitSolarCalculations(*state);
     SolarShading::SkyDifSolarShading(*state);
 
-    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int windowSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     auto &win_Surface = state->dataSurface->Surface(windowSurfNum);
     // check exterior default surfaces sky and ground view factors
     EXPECT_DOUBLE_EQ(0.5, win_Surface.ViewFactorSkyIR);
@@ -3169,6 +3169,7 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     SrdSurfsProperty.TotSurroundingSurface = 1;
     SrdSurfsProperty.SurroundingSurfs.allocate(1);
     SrdSurfsProperty.SurroundingSurfs(1).ViewFactor = 0.2;
+    SrdSurfsProperty.SurfsViewFactorSum = SrdSurfsProperty.SurroundingSurfs(1).ViewFactor;
     SrdSurfsProperty.SkyViewFactor = 0.0;
     SrdSurfsProperty.IsSkyViewFactorSet = false;
     SrdSurfsProperty.GroundViewFactor = 0.0;
@@ -3180,6 +3181,7 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     win_Surface.UseSurfPropertyGndSurfRefl = true;
     win_Surface.SurfHasSurroundingSurfProperty = true;
     win_Surface.SurfSurroundingSurfacesNum = 1;
+    win_Surface.ViewFactorSrdSurfs = SrdSurfsProperty.SurfsViewFactorSum;
 
     state->dataSurface->GroundSurfsProperty.allocate(1);
     auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(1);
@@ -3887,7 +3889,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_Warn_Pixel_Count_and_TM_Schedule)
     EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
     EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
 #else
-    if (!Pumbra::Penumbra::isValidContext()) {
+    if (!Penumbra::Penumbra::is_valid_context()) {
         EXPECT_EQ(state->dataErrTracking->TotalWarningErrors, 1);
         EXPECT_EQ(state->dataErrTracking->TotalSevereErrors, 0);
         EXPECT_EQ(state->dataErrTracking->LastSevereError, "");
@@ -4171,10 +4173,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap)
     SurfaceGeometry::GetGeometryParameters(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::GetLocationInfo(*state, FoundError);
+    Weather::GetLocationInfo(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::CheckLocationValidity(*state);
+    Weather::CheckLocationValidity(*state);
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
@@ -4218,10 +4220,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap)
     SolarShading::PerformSolarCalculations(*state);
 
     // Get surface nums
-    int winSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
-    int wallSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
-    int overhangSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:SHADE001", state->dataSurface->Surface);
-    int treeSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:TREE", state->dataSurface->Surface);
+    int winSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int wallSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
+    int overhangSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:SHADE001", state->dataSurface->Surface);
+    int treeSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:TREE", state->dataSurface->Surface);
 
     // Get shading surface schedule indexes
     int overhangSchedNum = state->dataSurface->Surface(overhangSurfNum).SchedShadowSurfIndex;
@@ -4600,10 +4602,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap2)
     SurfaceGeometry::GetGeometryParameters(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::GetLocationInfo(*state, FoundError);
+    Weather::GetLocationInfo(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::CheckLocationValidity(*state);
+    Weather::CheckLocationValidity(*state);
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
@@ -4647,10 +4649,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap2)
     SolarShading::PerformSolarCalculations(*state);
 
     // Get surface nums
-    int winSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
-    int wallSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
-    int shade1SurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:SHADE1", state->dataSurface->Surface);
-    int shade2SurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:SHADE2", state->dataSurface->Surface);
+    int winSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int wallSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
+    int shade1SurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:SHADE1", state->dataSurface->Surface);
+    int shade2SurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:SHADE2", state->dataSurface->Surface);
 
     // Get shading surface schedule indexes
     int shade1SchedNum = state->dataSurface->Surface(shade1SurfNum).SchedShadowSurfIndex;
@@ -4961,10 +4963,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap3)
     SurfaceGeometry::GetGeometryParameters(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::GetLocationInfo(*state, FoundError);
+    Weather::GetLocationInfo(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::CheckLocationValidity(*state);
+    Weather::CheckLocationValidity(*state);
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
@@ -5008,8 +5010,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap3)
     SolarShading::PerformSolarCalculations(*state);
 
     // Get surface nums
-    int winSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
-    int wallSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
+    int winSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int wallSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
 
     // Use the base transmittance schedules (no EMS override)
     // shade1 transmittance = 0.5, shade2 transmittance = 0.8
@@ -5025,4 +5027,41 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap3)
     // Expected results - window
     Real64 expWinSunlitFrac = 0.5 * 0.8 * 0.2; // again, in simple terms
     EXPECT_NEAR(expWinSunlitFrac, winSunLitFracShade1Shade2Partial, 0.0001);
+}
+
+TEST_F(EnergyPlusFixture, SolarShadingTest_checkScheduledSurfacePresent)
+// Test of check to see if all surfaces have a sunlit schedule when shadow calculations are set to "Scheduled"
+{
+    auto &surfData = state->dataSurface;
+    surfData->TotSurfaces = 5;
+    surfData->Surface.allocate(surfData->TotSurfaces);
+
+    // Set up data for test: three of five surfaces are non-shading and two are shading.  Shading surfaces
+    // are skipped so they should not report any errors.  Two of the surfaces will be correctly defined while
+    // one surface will not be correctly defined and will generate an error.
+    surfData->Surface(1).Class = SurfaceClass::Wall;
+    surfData->Surface(1).SurfSchedExternalShadingFrac = true;
+    surfData->Surface(1).Name = "WALL1OK";
+    surfData->Surface(2).Class = SurfaceClass::Roof;
+    surfData->Surface(2).SurfSchedExternalShadingFrac = true;
+    surfData->Surface(2).Name = "ROOF1OK";
+    surfData->Surface(3).Class = SurfaceClass::Window;
+    surfData->Surface(3).SurfSchedExternalShadingFrac = false;
+    surfData->Surface(3).Name = "WINDOW1NOTOK";
+    surfData->Surface(4).Class = SurfaceClass::Shading;
+    surfData->Surface(4).SurfSchedExternalShadingFrac = true;
+    surfData->Surface(4).Name = "SHADING1OK";
+    surfData->Surface(5).Class = SurfaceClass::Overhang;
+    surfData->Surface(5).SurfSchedExternalShadingFrac = false;
+    surfData->Surface(5).Name = "SHADING2NOTOK";
+
+    checkScheduledSurfacePresent(*state);
+
+    std::string const error_string = delimited_string({
+        "   ** Warning ** ShadowCalculation specified Schedule for the Shading Calculation Method but no schedule provided for WINDOW1NOTOK",
+        "   **   ~~~   ** When Schedule is selected for the Shading Calculation Method and no schedule is provided for a particular surface,",
+        "   **   ~~~   ** EnergyPlus will assume that the surface is not shaded.  Use SurfaceProperty:LocalEnvironment to specify a schedule",
+        "   **   ~~~   ** for sunlit fraction if this was not desired.  Otherwise, this surface will not be shaded at all.",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }

@@ -158,7 +158,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name = AlphArray(1);
 
         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefElecPowerOutput = NumArray(1);
@@ -521,12 +521,12 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefInletWaterTemp = NumArray(13);
 
-            if (UtilityRoutines::SameString(AlphArray(9), "InternalControl")) {
+            if (Util::SameString(AlphArray(9), "InternalControl")) {
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).InternalFlowControl =
                     true; //  A9, \field Heat Recovery Water Flow Operating Mode
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).PlantFlowControl = false;
             }
-            if ((!(UtilityRoutines::SameString(AlphArray(9), "InternalControl"))) && (!(UtilityRoutines::SameString(AlphArray(9), "PlantControl")))) {
+            if ((!(Util::SameString(AlphArray(9), "InternalControl"))) && (!(Util::SameString(AlphArray(9), "PlantControl")))) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(9), AlphArray(9)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ShowContinueError(state, "Operating Mode must be INTERNAL CONTROL or PLANT CONTROL.");

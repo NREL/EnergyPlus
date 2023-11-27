@@ -114,14 +114,14 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     state->dataMstBal->HMassConvInFD.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 20.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.0061285406810457849;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.0061285406810457849;
 
     // Construction
     surface.Construction = 1;
     state->dataConstruction->Construct.allocate(1);
     Construction::ConstructionProps &construction = state->dataConstruction->Construct(1);
     construction.TotLayers = 1;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
+    construction.LayerPoint(construction.TotLayers) = Util::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
@@ -234,14 +234,14 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     state->dataMstBal->HMassConvInFD.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 20.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.0061285406810457849;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.0061285406810457849;
 
     // Construction
     surface.Construction = 1;
     state->dataConstruction->Construct.allocate(1);
     Construction::ConstructionProps &construction = state->dataConstruction->Construct(1);
     construction.TotLayers = 1;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
+    construction.LayerPoint(construction.TotLayers) = Util::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
@@ -319,7 +319,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     state->dataMstBal->HMassConvInFD.allocate(surfNum);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(zoneNum);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).MAT = 20.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).ZoneAirHumRat = 0.0061285406810457849;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).airHumRat = 0.0061285406810457849;
 
     // Construction
     int constNum = 1;
@@ -327,7 +327,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     state->dataConstruction->Construct.allocate(constNum);
     Construction::ConstructionProps &construction = state->dataConstruction->Construct(constNum);
     construction.TotLayers = constNum;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInPtrList("WOOD", state->dataMaterial->Material);
+    construction.LayerPoint(construction.TotLayers) = Util::FindItemInPtrList("WOOD", state->dataMaterial->Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
@@ -357,7 +357,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     // Calculate RH for use in material property calculations.
     Real64 RV_Deep_Old = state->dataMstBalEMPD->RVdeepOld(surfNum);
     Real64 RVaver = state->dataMstBalEMPD->RVSurfLayerOld(surfNum);
-    Real64 RHaver = RVaver * 461.52 * (Taver + Constant::KelvinConv) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
+    Real64 RHaver = RVaver * 461.52 * (Taver + Constant::Kelvin) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
     Real64 dU_dRH = material->MoistACoeff * material->MoistBCoeff * pow(RHaver, material->MoistBCoeff - 1) +
                     material->MoistCCoeff * material->MoistDCoeff * pow(RHaver, material->MoistDCoeff - 1);
 

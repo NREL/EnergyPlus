@@ -76,9 +76,9 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
     this->crankcaseHeaterCap = input_data.crankcase_heater_capacity;
     this->normalMode = CoilCoolingDXCurveFitOperatingMode(state, input_data.base_operating_mode_name);
     this->normalMode.oneTimeInit(state); // oneTimeInit does not need to be delayed in this use case
-    if (UtilityRoutines::SameString(input_data.capacity_control, "CONTINUOUS")) {
+    if (Util::SameString(input_data.capacity_control, "CONTINUOUS")) {
         this->capControlMethod = CapControlMethod::CONTINUOUS;
-    } else if (UtilityRoutines::SameString(input_data.capacity_control, "DISCRETE")) {
+    } else if (Util::SameString(input_data.capacity_control, "DISCRETE")) {
         this->capControlMethod = CapControlMethod::DISCRETE;
     } else {
         ShowSevereError(state, format("{}{}=\"{}\", invalid", routineName, this->object_name, this->name));
@@ -106,8 +106,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
         this->alternateMode.oneTimeInit(state); // oneTimeInit does not need to be delayed in this use case
     }
     // Validate fuel type input
-    this->compressorFuelType =
-        static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, UtilityRoutines::makeUPPER(input_data.compressor_fuel_type)));
+    this->compressorFuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(input_data.compressor_fuel_type)));
     if (this->compressorFuelType == Constant::eFuel::Invalid) {
         ShowSevereError(state, format("{} {} =\"{}\" invalid", std::string{routineName}, this->object_name, this->name));
         ShowContinueError(state, format("...Compressor Fuel Type=\"{}\".", input_data.compressor_fuel_type));
@@ -150,7 +149,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
                                                                  IOStatus,
                                                                  _,
                                                                  state.dataIPShortCut->lAlphaFieldBlanks);
-        if (!UtilityRoutines::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
+        if (!Util::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
             continue;
         }
         found_it = true;
@@ -166,17 +165,20 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
         } else {
             input_specs.unit_internal_static_air_pressure = state.dataIPShortCut->rNumericArgs(4);
         }
-        input_specs.capacity_control = state.dataIPShortCut->cAlphaArgs(2);
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+            input_specs.outdoor_temperature_dependent_crankcase_heater_capacity_curve_name = state.dataIPShortCut->cAlphaArgs(2);
+        }
+        input_specs.capacity_control = state.dataIPShortCut->cAlphaArgs(3);
         input_specs.basin_heater_capacity = state.dataIPShortCut->rNumericArgs(5);
         input_specs.basin_heater_setpoint_temperature = state.dataIPShortCut->rNumericArgs(6);
-        input_specs.basin_heater_operating_schedule_name = state.dataIPShortCut->cAlphaArgs(3);
-        input_specs.compressor_fuel_type = state.dataIPShortCut->cAlphaArgs(4);
-        input_specs.base_operating_mode_name = state.dataIPShortCut->cAlphaArgs(5);
+        input_specs.basin_heater_operating_schedule_name = state.dataIPShortCut->cAlphaArgs(4);
+        input_specs.compressor_fuel_type = state.dataIPShortCut->cAlphaArgs(5);
+        input_specs.base_operating_mode_name = state.dataIPShortCut->cAlphaArgs(6);
         if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-            input_specs.alternate_operating_mode_name = state.dataIPShortCut->cAlphaArgs(6);
+            input_specs.alternate_operating_mode_name = state.dataIPShortCut->cAlphaArgs(7);
         }
-        if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-            input_specs.alternate_operating_mode2_name = state.dataIPShortCut->cAlphaArgs(7);
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+            input_specs.alternate_operating_mode2_name = state.dataIPShortCut->cAlphaArgs(8);
         }
 
         this->instantiateFromInputSpec(state, input_specs);

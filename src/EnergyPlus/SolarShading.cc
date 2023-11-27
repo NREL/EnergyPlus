@@ -78,6 +78,7 @@
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EnergyPlusLogger.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -461,10 +462,11 @@ void GetShadowingInput(EnergyPlusData &state)
     int aNum = 1;
     unsigned pixelRes = 512u;
     if (NumAlphas >= aNum) {
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Scheduled")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Scheduled")) {
             state.dataSysVars->shadingMethod = ShadingMethod::Scheduled;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Scheduled";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Imported")) {
+            checkScheduledSurfacePresent(state);
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Imported")) {
             if (state.dataScheduleMgr->ScheduleFileShadingProcessed) {
                 state.dataSysVars->shadingMethod = ShadingMethod::Imported;
                 state.dataIPShortCut->cAlphaArgs(aNum) = "Imported";
@@ -474,10 +476,10 @@ void GetShadowingInput(EnergyPlusData &state)
                                   format("Value entered=\"{}\" while no Schedule:File:Shading object is defined, InternalCalculation will be used.",
                                          state.dataIPShortCut->cAlphaArgs(aNum)));
             }
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "PolygonClipping")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "PolygonClipping")) {
             state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
             state.dataIPShortCut->cAlphaArgs(aNum) = "PolygonClipping";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "PixelCounting")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "PixelCounting")) {
             state.dataSysVars->shadingMethod = ShadingMethod::PixelCounting;
             state.dataIPShortCut->cAlphaArgs(aNum) = "PixelCounting";
             if (NumNumbers >= 3) {
@@ -491,18 +493,11 @@ void GetShadowingInput(EnergyPlusData &state)
             state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
             state.dataIPShortCut->cAlphaArgs(aNum) = "PolygonClipping";
 #else
-            auto error_callback = [](const int messageType, const std::string &message, void *contextPtr) {
-                auto *state = reinterpret_cast<EnergyPlusData *>(contextPtr);
-                if (messageType == Pumbra::MSG_ERR) {
-                    ShowSevereError(*state, message);
-                } else if (messageType == Pumbra::MSG_WARN) {
-                    ShowWarningError(*state, message);
-                } else { // if (messageType == MSG_INFO)
-                    ShowMessage(*state, message);
-                }
-            };
-            if (Pumbra::Penumbra::isValidContext()) {
-                state.dataSolarShading->penumbra = std::make_unique<Pumbra::Penumbra>(error_callback, &state, pixelRes);
+            if (Penumbra::Penumbra::is_valid_context()) {
+                std::shared_ptr<EnergyPlusLogger> penumbra_logger = std::make_shared<EnergyPlusLogger>(EnergyPlusLogger::Log_level::Info);
+                state.dataSolarShading->LoggerContext = std::make_pair<EnergyPlusData *, std::string>(&state, "");
+                penumbra_logger->set_message_context(&state.dataSolarShading->LoggerContext);
+                state.dataSolarShading->penumbra = std::make_unique<Penumbra::Penumbra>(pixelRes, penumbra_logger);
             } else {
                 ShowWarningError(state, "No GPU found (required for PixelCounting)");
                 ShowContinueError(state, "PolygonClipping will be used instead");
@@ -533,10 +528,10 @@ void GetShadowingInput(EnergyPlusData &state)
 
     aNum++;
     if (NumAlphas >= aNum) {
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Periodic")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Periodic")) {
             state.dataSysVars->DetailedSolarTimestepIntegration = false;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Periodic";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Timestep")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Timestep")) {
             state.dataSysVars->DetailedSolarTimestepIntegration = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Timestep";
         } else {
@@ -552,13 +547,13 @@ void GetShadowingInput(EnergyPlusData &state)
 
     aNum++;
     if (NumAlphas >= aNum) {
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "SutherlandHodgman")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "SutherlandHodgman")) {
             state.dataSysVars->SutherlandHodgman = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "SutherlandHodgman";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "ConvexWeilerAtherton")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "ConvexWeilerAtherton")) {
             state.dataSysVars->SutherlandHodgman = false;
             state.dataIPShortCut->cAlphaArgs(aNum) = "ConvexWeilerAtherton";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "SlaterBarskyandSutherlandHodgman")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "SlaterBarskyandSutherlandHodgman")) {
             state.dataSysVars->SutherlandHodgman = true;
             state.dataSysVars->SlaterBarsky = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "SlaterBarskyandSutherlandHodgman";
@@ -600,10 +595,10 @@ void GetShadowingInput(EnergyPlusData &state)
 
     aNum++;
     if (NumAlphas >= aNum) {
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "SimpleSkyDiffuseModeling")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "SimpleSkyDiffuseModeling")) {
             state.dataSysVars->DetailedSkyDiffuseAlgorithm = false;
             state.dataIPShortCut->cAlphaArgs(aNum) = "SimpleSkyDiffuseModeling";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "DetailedSkyDiffuseModeling")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "DetailedSkyDiffuseModeling")) {
             state.dataSysVars->DetailedSkyDiffuseAlgorithm = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "DetailedSkyDiffuseModeling";
         } else if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
@@ -620,10 +615,10 @@ void GetShadowingInput(EnergyPlusData &state)
 
     aNum++;
     if (NumAlphas >= aNum) {
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
             state.dataSysVars->ReportExtShadingSunlitFrac = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Yes";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
             state.dataSysVars->ReportExtShadingSunlitFrac = false;
             state.dataIPShortCut->cAlphaArgs(aNum) = "No";
         } else {
@@ -656,10 +651,10 @@ void GetShadowingInput(EnergyPlusData &state)
 
     aNum++;
     if (NumAlphas >= aNum) {
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
             DisableSelfShadingWithinGroup = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Yes";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
             state.dataIPShortCut->cAlphaArgs(aNum) = "No";
         } else {
             ShowWarningError(state, format("{}: invalid {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(aNum)));
@@ -672,10 +667,10 @@ void GetShadowingInput(EnergyPlusData &state)
 
     aNum++;
     if (NumAlphas >= aNum) {
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Yes")) {
             DisableSelfShadingBetweenGroup = true;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Yes";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "No")) {
             state.dataIPShortCut->cAlphaArgs(aNum) = "No";
         } else {
             ShowWarningError(state, format("{}: invalid {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(aNum)));
@@ -702,7 +697,7 @@ void GetShadowingInput(EnergyPlusData &state)
             NumOfShadingGroups = NumAlphas - (aNum - 1);
             DisableSelfShadingGroups.allocate(NumOfShadingGroups);
             for (int i = 1; i <= NumOfShadingGroups; i++) {
-                Found = UtilityRoutines::FindItemInList(
+                Found = Util::FindItemInList(
                     state.dataIPShortCut->cAlphaArgs(i + (aNum - 1)), state.dataHeatBal->ZoneList, state.dataHeatBal->NumOfZoneLists);
                 if (Found != 0) DisableSelfShadingGroups(i) = Found;
             }
@@ -800,6 +795,37 @@ void GetShadowingInput(EnergyPlusData &state)
           state.dataIPShortCut->cAlphaArgs(5),
           state.dataIPShortCut->cAlphaArgs(6),
           state.dataIPShortCut->cAlphaArgs(7));
+}
+
+void checkScheduledSurfacePresent(EnergyPlusData &state)
+{
+    // User has chosen "Scheduled" for sunlit fraction so check to see which surfaces don't have a schedule
+    int numNotDef = 0;
+    int constexpr maxErrMessages = 50;
+    auto &surfData = state.dataSurface;
+    for (int surfNum = 1; surfNum <= surfData->TotSurfaces; ++surfNum) {
+        auto &thisSurf = surfData->Surface(surfNum);
+        if ((thisSurf.Class == SurfaceClass::Shading || thisSurf.Class == SurfaceClass::Detached_F || thisSurf.Class == SurfaceClass::Detached_B ||
+             thisSurf.Class == SurfaceClass::Overhang || thisSurf.Class == SurfaceClass::Fin))
+            continue; // skip shading surfaces
+        if (!thisSurf.SurfSchedExternalShadingFrac) {
+            numNotDef += 1;
+            if (numNotDef == 1) {
+                ShowWarningError(
+                    state,
+                    format("ShadowCalculation specified Schedule for the Shading Calculation Method but no schedule provided for {}", thisSurf.Name));
+                ShowContinueError(
+                    state, "When Schedule is selected for the Shading Calculation Method and no schedule is provided for a particular surface,");
+                ShowContinueError(
+                    state, "EnergyPlus will assume that the surface is not shaded.  Use SurfaceProperty:LocalEnvironment to specify a schedule");
+                ShowContinueError(state, "for sunlit fraction if this was not desired.  Otherwise, this surface will not be shaded at all.");
+            } else if (numNotDef <= maxErrMessages) {
+                ShowWarningError(state, format("No schedule was provided for {} either.  See above error message for more details", thisSurf.Name));
+            }
+        }
+    }
+    if (numNotDef > maxErrMessages)
+        ShowContinueError(state, format("This message is only shown for the first {} occurrences of this issue.", maxErrMessages));
 }
 
 void AllocateModuleArrays(EnergyPlusData &state)
@@ -5239,7 +5265,7 @@ void DetermineShadowingCombinations(EnergyPlusData &state)
 
             if (!skipSurface) {
                 // Add surfaces to penumbra...
-                Pumbra::Polygon poly;
+                Penumbra::Polygon poly;
 
                 if (state.dataSurface->Surface(GRSNR).Reveal > 0.0) {
                     Real64 R = state.dataSurface->Surface(GRSNR).Reveal;
@@ -5257,7 +5283,7 @@ void DetermineShadowingCombinations(EnergyPlusData &state)
                             vPrev = v[i - 1];
                         }
 
-                        Pumbra::Polygon rPoly; // Reveal surface
+                        Penumbra::Polygon rPoly; // Reveal surface
                         rPoly.push_back(v[i].x);
                         rPoly.push_back(v[i].y);
                         rPoly.push_back(v[i].z);
@@ -5274,8 +5300,8 @@ void DetermineShadowingCombinations(EnergyPlusData &state)
                         rPoly.push_back(vPrev.y);
                         rPoly.push_back(vPrev.z);
 
-                        Pumbra::Surface rSurf(rPoly);
-                        state.dataSolarShading->penumbra->addSurface(rSurf);
+                        Penumbra::Surface rSurf(rPoly, fmt::format("{} reveal {}", state.dataSurface->Surface(GRSNR).Name, i));
+                        state.dataSolarShading->penumbra->add_surface(rSurf);
                     }
                 } else {
                     for (auto const &v : state.dataSurface->Surface(GRSNR).Vertex) {
@@ -5284,7 +5310,7 @@ void DetermineShadowingCombinations(EnergyPlusData &state)
                         poly.push_back(v.z);
                     }
                 }
-                Pumbra::Surface pSurf(poly);
+                Penumbra::Surface pSurf(poly, state.dataSurface->Surface(GRSNR).Name);
 
                 // Punch holes for subsurfaces
                 if (state.dataSurface->Surface(GRSNR).BaseSurf == GRSNR) { // Only look for subsurfaces on base surfaces
@@ -5293,7 +5319,7 @@ void DetermineShadowingCombinations(EnergyPlusData &state)
                         if (!state.dataSurface->Surface(subSurface).HeatTransSurf) continue;    // Skip non heat transfer subsurfaces
                         if (subSurface == GRSNR) continue;                                      // Surface itself cannot be its own subsurface
 
-                        Pumbra::Polygon subPoly;
+                        Penumbra::Polygon subPoly;
                         if (state.dataSurface->Surface(subSurface).Reveal > 0.0) {
                             Real64 R = state.dataSurface->Surface(subSurface).Reveal;
                             auto &norm = state.dataSurface->Surface(subSurface).NewellSurfaceNormalVector;
@@ -5310,10 +5336,10 @@ void DetermineShadowingCombinations(EnergyPlusData &state)
                             }
                         }
 
-                        pSurf.addHole(subPoly);
+                        pSurf.add_hole(subPoly);
                     }
                 }
-                state.dataSurface->SurfPenumbraID(GRSNR) = state.dataSolarShading->penumbra->addSurface(pSurf);
+                state.dataSurface->SurfPenumbraID(GRSNR) = state.dataSolarShading->penumbra->add_surface(pSurf);
                 state.dataSolarShading->penumbraIDs.push_back(state.dataSurface->SurfPenumbraID(GRSNR));
             }
         }
@@ -5586,8 +5612,8 @@ void DetermineShadowingCombinations(EnergyPlusData &state)
     CastingSurface.deallocate();
 
 #ifndef EP_NO_OPENGL
-    if (state.dataSolarShading->penumbra && state.dataSolarShading->penumbra->getNumSurfaces() > 0) {
-        state.dataSolarShading->penumbra->setModel();
+    if (state.dataSolarShading->penumbra && state.dataSolarShading->penumbra->get_number_of_surfaces() > 0) {
+        state.dataSolarShading->penumbra->set_model();
     }
 #endif
 }
@@ -5649,8 +5675,8 @@ void SHADOW(EnergyPlusData &state,
     if (state.dataSolarShading->penumbra) {
         Real64 ElevSun = Constant::PiOvr2 - std::acos(state.dataSolarShading->SUNCOS(3));
         Real64 AzimSun = std::atan2(state.dataSolarShading->SUNCOS(1), state.dataSolarShading->SUNCOS(2));
-        state.dataSolarShading->penumbra->setSunPosition(AzimSun, ElevSun);
-        state.dataSolarShading->penumbra->submitPSSA();
+        state.dataSolarShading->penumbra->set_sun_position(AzimSun, ElevSun);
+        state.dataSolarShading->penumbra->submit_pssa();
     }
 #endif
 
@@ -5686,7 +5712,7 @@ void SHADOW(EnergyPlusData &state,
             if (state.dataSolarShading->penumbra && id >= 0) {
                 // SurfSunlitArea(HTS) = buildingPSSF.at(id) / SurfSunCosTheta(HTS);
                 state.dataSolarShading->SurfSunlitArea(HTS) =
-                    state.dataSolarShading->penumbra->fetchPSSA(id) / state.dataSolarShading->SurfSunCosTheta(HTS);
+                    state.dataSolarShading->penumbra->retrieve_pssa(id) / state.dataSolarShading->SurfSunCosTheta(HTS);
                 // SurfSunlitArea(HTS) = penumbra->fetchPSSA(Surface(HTS).PenumbraID)/SurfSunCosTheta(HTS);
                 for (int SS = 1; SS <= NSBS; ++SS) {
                     int HTSS = state.dataShadowComb->ShadowComb(HTS).SubSurf(SS);
@@ -5694,7 +5720,7 @@ void SHADOW(EnergyPlusData &state,
                     if (id >= 0) {
                         // SurfSunlitArea(HTSS) = buildingPSSF.at(id) / SurfSunCosTheta(HTSS);
                         state.dataSolarShading->SurfSunlitArea(HTSS) =
-                            state.dataSolarShading->penumbra->fetchPSSA(id) / state.dataSolarShading->SurfSunCosTheta(HTSS);
+                            state.dataSolarShading->penumbra->retrieve_pssa(id) / state.dataSolarShading->SurfSunCosTheta(HTSS);
                         // SurfSunlitArea(HTSS) = penumbra->fetchPSSA(Surface(HTSS).PenumbraID)/SurfSunCosTheta(HTSS);
                         if (state.dataSolarShading->SurfSunlitArea(HTSS) > 0.0) {
                             if (iHour > 0 && TS > 0)
@@ -6237,7 +6263,7 @@ void CalcInteriorSolarOverlaps(EnergyPlusData &state,
 
         if (!UseSimpleDistribution) { // Compute overlaps
 
-            std::map<unsigned, float> pssas;
+            std::unordered_map<unsigned, float> pssas;
 
 #ifndef EP_NO_OPENGL
             if (state.dataSolarShading->penumbra) {
@@ -6249,8 +6275,9 @@ void CalcInteriorSolarOverlaps(EnergyPlusData &state,
                         pbBackSurfaces.push_back(state.dataSurface->SurfPenumbraID(bkSurfNum));
                     }
                 }
-                pssas = state.dataSolarShading->penumbra->calculateInteriorPSSAs({(unsigned)state.dataSurface->SurfPenumbraID(HTSS)}, pbBackSurfaces);
-                // penumbra->renderInteriorScene({(unsigned)Surface(HTSS).PenumbraID}, pbBackSurfaces);
+                pssas =
+                    state.dataSolarShading->penumbra->calculate_interior_pssas({(unsigned)state.dataSurface->SurfPenumbraID(HTSS)}, pbBackSurfaces);
+                // penumbra->render_interior_scene({(unsigned)Surface(HTSS).PenumbraID}, pbBackSurfaces);
 
                 JBKS = 0;
                 for (int bkSurfNum : state.dataShadowComb->ShadowComb(GRSNR).BackSurf) {
@@ -7313,7 +7340,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                     } else {
                         TBmAll = TBmBm + TBmDif;
                     }
-                    BTOTZone += TBmAll * SunLitFract * CosInc * state.dataSurface->Surface(SurfNum).Area * InOutProjSLFracMult; // [m2]
+                    BTOTZone += state.dataSurface->Surface(SurfNum).IncSolMultiplier * TBmAll * SunLitFract * CosInc *
+                                state.dataSurface->Surface(SurfNum).Area * InOutProjSLFracMult; // [m2]
                 }
             }
 
@@ -7391,6 +7419,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         TBm -= state.dataSurface->SurfWinBmSolAbsdInsReveal(SurfNum) / TBmDenom;
                     }
                     TBm = max(0.0, TBm);
+                    // this multiplier doesn't work with other shading, so no need to apply in other branches
+                    TBm *= state.dataSurface->Surface(SurfNum).IncSolMultiplier;
                 }
 
                 if (TBm == 0.0) continue;
@@ -8719,6 +8749,7 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
             }
 
             TBm = max(0.0, TBm);
+            TBm *= state.dataSurface->Surface(SurfNum).IncSolMultiplier;
 
             int NumOfBackSurf = state.dataShadowComb->ShadowComb(BaseSurfNum).NumBackSurf;
 
@@ -9704,7 +9735,7 @@ void WindowShadingManager(EnergyPlusData &state)
                     // In the following, the check on BeginSimFlag is needed since SNLoadCoolRate (and SNLoadHeatRate,
                     // used in other CASEs) are not allocated at this point for the first time step of the simulation.
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).ZoneSNLoadCoolRate > SetPoint && SchedAllowsControl) {
+                        if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).airSysCoolRate > SetPoint && SchedAllowsControl) {
                             shadingOn = true;
                         } else if (GlareControlIsActive) {
                             shadingOffButGlareControlOn = true;
@@ -9810,7 +9841,7 @@ void WindowShadingManager(EnergyPlusData &state)
 
                 case WindowShadingControlType::OnNightIfHeating_OffDay: // 'OnNightIfHeatingAndOffDay'
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (!state.dataEnvrn->SunIsUp && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).ZoneSNLoadHeatRate > SetPoint &&
+                        if (!state.dataEnvrn->SunIsUp && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).airSysHeatRate > SetPoint &&
                             SchedAllowsControl) {
                             shadingOn = true;
                         } else if (GlareControlIsActive) {
@@ -9824,7 +9855,7 @@ void WindowShadingManager(EnergyPlusData &state)
                         if (!state.dataEnvrn->SunIsUp) { // Night
                             if (state.dataSurface->SurfOutDryBulbTemp(ISurf) < SetPoint && SchedAllowsControl) shadingOn = true;
                         } else { // Day
-                            if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).ZoneSNLoadCoolRate > 0.0 && SchedAllowsControl) {
+                            if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).airSysCoolRate > 0.0 && SchedAllowsControl) {
                                 shadingOn = true;
                             } else if (GlareControlIsActive) {
                                 shadingOffButGlareControlOn = true;
@@ -9836,10 +9867,10 @@ void WindowShadingManager(EnergyPlusData &state)
                 case WindowShadingControlType::OnNightIfHeating_OnDayCooling: // 'OnNightIfHeatingAndOnDayIfCooling'
                     if (!state.dataGlobal->BeginSimFlag) {
                         if (!state.dataEnvrn->SunIsUp) { // Night
-                            if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).ZoneSNLoadHeatRate > SetPoint && SchedAllowsControl)
+                            if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).airSysHeatRate > SetPoint && SchedAllowsControl)
                                 shadingOn = true;
                         } else { // Day
-                            if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).ZoneSNLoadCoolRate > 0.0 && SchedAllowsControl) {
+                            if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).airSysCoolRate > 0.0 && SchedAllowsControl) {
                                 shadingOn = true;
                             } else if (GlareControlIsActive) {
                                 shadingOffButGlareControlOn = true;
@@ -9850,7 +9881,7 @@ void WindowShadingManager(EnergyPlusData &state)
 
                 case WindowShadingControlType::OffNight_OnDay_HiSolarWindow: // 'OffNightAndOnDayIfCoolingAndHighSolarOnWindow'
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (state.dataEnvrn->SunIsUp && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).ZoneSNLoadCoolRate > 0.0 &&
+                        if (state.dataEnvrn->SunIsUp && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).airSysCoolRate > 0.0 &&
                             SchedAllowsControl) {
                             if (SolarOnWindow > SetPoint) shadingOn = true;
                         } else if (GlareControlIsActive) {
@@ -9861,7 +9892,7 @@ void WindowShadingManager(EnergyPlusData &state)
 
                 case WindowShadingControlType::OnNight_OnDay_HiSolarWindow: // 'OnNightAndOnDayIfCoolingAndHighSolarOnWindow'
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (state.dataEnvrn->SunIsUp && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).ZoneSNLoadCoolRate > 0.0 &&
+                        if (state.dataEnvrn->SunIsUp && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(IZone).airSysCoolRate > 0.0 &&
                             SchedAllowsControl) {
                             if (SolarOnWindow > SetPoint) shadingOn = true;
                         } else if (!state.dataEnvrn->SunIsUp && SchedAllowsControl) {
@@ -10495,22 +10526,17 @@ void SkyDifSolarShading(EnergyPlusData &state)
     // sky or ground.
 
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        auto &surface = state.dataSurface->Surface(SurfNum);
         if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
             state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
-            state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *= state.dataSolarShading->SurfDifShdgRatioIsoSky(SurfNum);
+            surface.ViewFactorSkyIR *= state.dataSolarShading->SurfDifShdgRatioIsoSky(SurfNum);
         } else {
-            state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *= state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, 1, SurfNum);
+            surface.ViewFactorSkyIR *= state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, 1, SurfNum);
         }
-        state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = 1.0 - state.dataSurface->Surface(SurfNum).ViewFactorSkyIR;
+        surface.ViewFactorGroundIR = 1.0 - surface.ViewFactorSkyIR;
 
-        if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-            Real64 SrdSurfsViewFactor = 0.0;
-            int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-            auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
-            for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
-                SrdSurfsViewFactor += SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
-            }
-            state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = 1.0 - state.dataSurface->Surface(SurfNum).ViewFactorSkyIR - SrdSurfsViewFactor;
+        if (surface.SurfHasSurroundingSurfProperty) {
+            surface.ViewFactorGroundIR = 1.0 - surface.ViewFactorSkyIR - surface.ViewFactorSrdSurfs;
         }
     }
 

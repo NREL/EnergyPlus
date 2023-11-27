@@ -226,8 +226,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         // Determine whether this meter is related to electricity, or water, or gas
         if (tariff(iInObj).reportMeterIndx != 0) {
 
-            std::string const &SELECT_CASE_var(
-                UtilityRoutines::makeUPPER(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType));
+            std::string const &SELECT_CASE_var(Util::makeUPPER(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType));
 
             // Various types of electricity meters
             if (SELECT_CASE_var == "ELECTRICITY") {
@@ -259,23 +258,23 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         // We set demandConv to something analogous to m3/h
         if (tariff(iInObj).kindWaterMtr == kindMeterWater) {
             // conversion factor
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "USERDEFINED")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "USERDEFINED")) {
                 tariff(iInObj).convChoice = EconConv::USERDEF;
                 tariff(iInObj).energyConv = state.dataIPShortCut->rNumericArgs(1); // energy conversion factor
                 tariff(iInObj).demandConv = state.dataIPShortCut->rNumericArgs(2); // demand conversion factor
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "M3")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "M3")) {
                 tariff(iInObj).convChoice = EconConv::M3;
                 tariff(iInObj).energyConv = 1.0;
                 tariff(iInObj).demandConv = 3600.0;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "CCF")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "CCF")) {
                 tariff(iInObj).convChoice = EconConv::CCF;
                 tariff(iInObj).energyConv = 0.35314666721488586;
                 tariff(iInObj).demandConv = 0.35314666721488586 * 3600;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "GAL")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "GAL")) {
                 tariff(iInObj).convChoice = EconConv::GAL;
                 tariff(iInObj).energyConv = 264.1720523602524;
                 tariff(iInObj).demandConv = 264.1720523602524 * 3600;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "KGAL")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "KGAL")) {
                 tariff(iInObj).convChoice = EconConv::KGAL;
                 tariff(iInObj).energyConv = 0.2641720523602524;
                 tariff(iInObj).demandConv = 0.2641720523602524 * 3600;
@@ -295,29 +294,29 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             // Volumetric units such as MCF or CCF doesn't make sense IMHO (JM)
             // THERM is strange for an electric meter but currently I accept but issue a warning
         } else if (tariff(iInObj).kindElectricMtr != kindMeterNotElectric) {
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "USERDEFINED")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "USERDEFINED")) {
                 tariff(iInObj).convChoice = EconConv::USERDEF;
                 tariff(iInObj).energyConv = state.dataIPShortCut->rNumericArgs(1); // energy conversion factor
                 tariff(iInObj).demandConv = state.dataIPShortCut->rNumericArgs(2); // demand conversion factor
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "KWH")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "KWH")) {
                 tariff(iInObj).convChoice = EconConv::KWH;
                 tariff(iInObj).energyConv = 0.0000002778;
                 tariff(iInObj).demandConv = 0.001;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "MJ")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "MJ")) {
                 tariff(iInObj).convChoice = EconConv::MJ;
                 tariff(iInObj).energyConv = 0.000001;
                 tariff(iInObj).demandConv = 0.0036;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "MMBTU")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "MMBTU")) {
                 tariff(iInObj).convChoice = EconConv::MMBTU;
                 tariff(iInObj).energyConv = 9.4781712e-10;
                 tariff(iInObj).demandConv = 0.000003412;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "KBTU")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "KBTU")) {
                 tariff(iInObj).convChoice = EconConv::KBTU;
                 tariff(iInObj).energyConv = 9.4781712e-7;
                 tariff(iInObj).demandConv = 0.003412;
 
                 // We accept the following choices, but issue a warning
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "THERM")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "THERM")) {
                 tariff(iInObj).convChoice = EconConv::THERM;
                 tariff(iInObj).energyConv = 9.4781712e-9;
                 tariff(iInObj).demandConv = 0.00003412;
@@ -342,42 +341,42 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
 
             // If it's a gas meter
         } else if (tariff(iInObj).kindGasMtr == kindMeterGas) {
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "USERDEFINED")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "USERDEFINED")) {
                 tariff(iInObj).convChoice = EconConv::USERDEF;
                 tariff(iInObj).energyConv = state.dataIPShortCut->rNumericArgs(1); // energy conversion factor
                 tariff(iInObj).demandConv = state.dataIPShortCut->rNumericArgs(2); // demand conversion factor
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "KWH")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "KWH")) {
                 tariff(iInObj).convChoice = EconConv::KWH;
                 tariff(iInObj).energyConv = 0.0000002778;
                 tariff(iInObj).demandConv = 0.001;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "THERM")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "THERM")) {
                 tariff(iInObj).convChoice = EconConv::THERM;
                 tariff(iInObj).energyConv = 9.4781712e-9;
                 tariff(iInObj).demandConv = 0.00003412;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "MMBTU")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "MMBTU")) {
                 tariff(iInObj).convChoice = EconConv::MMBTU;
                 tariff(iInObj).energyConv = 9.4781712e-10;
                 tariff(iInObj).demandConv = 0.000003412;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "MJ")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "MJ")) {
                 tariff(iInObj).convChoice = EconConv::MJ;
                 tariff(iInObj).energyConv = 0.000001;
                 tariff(iInObj).demandConv = 0.0036;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "KBTU")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "KBTU")) {
                 tariff(iInObj).convChoice = EconConv::KBTU;
                 tariff(iInObj).energyConv = 9.4781712e-7;
                 tariff(iInObj).demandConv = 0.003412;
 
                 // Volumetric units for natural gas
                 // Actually assuming 1 therm = 1 CCF (= 100 ft^3)
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "MCF")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "MCF")) {
                 tariff(iInObj).convChoice = EconConv::MCF;
                 tariff(iInObj).energyConv = 9.4781712e-10;
                 tariff(iInObj).demandConv = 0.000003412;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "CCF")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "CCF")) {
                 tariff(iInObj).convChoice = EconConv::CCF;
                 tariff(iInObj).energyConv = 9.4781712e-9;
                 tariff(iInObj).demandConv = 0.00003412;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "M3")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "M3")) {
                 // Obtained from converting CCF above to m^3 so the same heat content of natural gas is used (1 therm = 1 CCF)
                 tariff(iInObj).convChoice = EconConv::M3;
                 tariff(iInObj).energyConv = 2.6839192e-10;
@@ -396,27 +395,27 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             // It it's neither an electric, water or gas meter, we cannot accept volumetric units
             // because we cannot infer the heat content
         } else {
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "USERDEFINED")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "USERDEFINED")) {
                 tariff(iInObj).convChoice = EconConv::USERDEF;
                 tariff(iInObj).energyConv = state.dataIPShortCut->rNumericArgs(1); // energy conversion factor
                 tariff(iInObj).demandConv = state.dataIPShortCut->rNumericArgs(2); // demand conversion factor
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "KWH")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "KWH")) {
                 tariff(iInObj).convChoice = EconConv::KWH;
                 tariff(iInObj).energyConv = 0.0000002778;
                 tariff(iInObj).demandConv = 0.001;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "THERM")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "THERM")) {
                 tariff(iInObj).convChoice = EconConv::THERM;
                 tariff(iInObj).energyConv = 9.4781712e-9;
                 tariff(iInObj).demandConv = 0.00003412;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "MMBTU")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "MMBTU")) {
                 tariff(iInObj).convChoice = EconConv::MMBTU;
                 tariff(iInObj).energyConv = 9.4781712e-10;
                 tariff(iInObj).demandConv = 0.000003412;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "MJ")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "MJ")) {
                 tariff(iInObj).convChoice = EconConv::MJ;
                 tariff(iInObj).energyConv = 0.000001;
                 tariff(iInObj).demandConv = 0.0036;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "KBTU")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "KBTU")) {
                 tariff(iInObj).convChoice = EconConv::KBTU;
                 tariff(iInObj).energyConv = 9.4781712e-7;
                 tariff(iInObj).demandConv = 0.003412;
@@ -476,7 +475,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             tariff(iInObj).monthSchIndex = 0; // flag value for no schedule used
         }
         // type of demand window
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "QuarterHour")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "QuarterHour")) {
             // check to make sure that the demand window and the TIMESTEP IN HOUR are consistant.
             {
                 switch (state.dataGlobal->NumOfTimeStepInHour) {
@@ -518,7 +517,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                 } break;
                 }
             }
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "HalfHour")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "HalfHour")) {
             {
                 switch (state.dataGlobal->NumOfTimeStepInHour) {
                 case 1:
@@ -550,13 +549,13 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                 } break;
                 }
             }
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "FullHour")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "FullHour")) {
             tariff(iInObj).demandWindow = DemandWindow::Hour;
             tariff(iInObj).demWinTime = 1.00;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "Day")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "Day")) {
             tariff(iInObj).demandWindow = DemandWindow::Day;
             tariff(iInObj).demWinTime = 24.00;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "Week")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "Week")) {
             tariff(iInObj).demandWindow = DemandWindow::Week;
             tariff(iInObj).demWinTime = 24.0 * 7.0;
         } else {
@@ -591,12 +590,12 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             }
         }
         // monthly charge
-        tariff(iInObj).monthChgVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(8), isNotNumeric);
+        tariff(iInObj).monthChgVal = Util::ProcessNumber(state.dataIPShortCut->cAlphaArgs(8), isNotNumeric);
         tariff(iInObj).monthChgPt =
             AssignVariablePt(state, state.dataIPShortCut->cAlphaArgs(8), isNotNumeric, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, iInObj);
         // minimum monthly charge
         if (len(state.dataIPShortCut->cAlphaArgs(9)) > 0) {
-            tariff(iInObj).minMonthChgVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(9), isNotNumeric);
+            tariff(iInObj).minMonthChgVal = Util::ProcessNumber(state.dataIPShortCut->cAlphaArgs(9), isNotNumeric);
         } else {
             tariff(iInObj).minMonthChgVal = -HUGE_(-1.0); // set to a very negative value
         }
@@ -610,24 +609,23 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         // group name for separate distribution and transmission rates
         tariff(iInObj).groupName = state.dataIPShortCut->cAlphaArgs(12);
         // buy or sell option
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(13), "BuyFromUtility")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(13), "BuyFromUtility")) {
             tariff(iInObj).buyOrSell = buyFromUtility;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(13), "SellToUtility")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(13), "SellToUtility")) {
             tariff(iInObj).buyOrSell = sellToUtility;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(13), "NetMetering")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(13), "NetMetering")) {
             tariff(iInObj).buyOrSell = netMetering;
         } else {
             tariff(iInObj).buyOrSell = buyFromUtility;
         }
         // check if meter is consistent with buy or sell option
-        if ((tariff(iInObj).buyOrSell == sellToUtility) &&
-            (!UtilityRoutines::SameString(tariff(iInObj).reportMeter, "ELECTRICITYSURPLUSSOLD:FACILITY"))) {
+        if ((tariff(iInObj).buyOrSell == sellToUtility) && (!Util::SameString(tariff(iInObj).reportMeter, "ELECTRICITYSURPLUSSOLD:FACILITY"))) {
             ShowWarningError(state, format("{}{}=\"{}\" atypical meter", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state,
                               format("The meter chosen \"{}\" is not typically used with the sellToUtility option.", tariff(iInObj).reportMeter));
             ShowContinueError(state, "Usually the ElectricitySurplusSold:Facility meter is selected when the sellToUtility option is used.");
         }
-        if ((tariff(iInObj).buyOrSell == netMetering) && (!UtilityRoutines::SameString(tariff(iInObj).reportMeter, "ELECTRICITYNET:FACILITY"))) {
+        if ((tariff(iInObj).buyOrSell == netMetering) && (!Util::SameString(tariff(iInObj).reportMeter, "ELECTRICITYNET:FACILITY"))) {
             ShowWarningError(state, format("{}{}=\"{}\" atypical meter", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state,
                               format("The meter chosen \"{}\" is not typically used with the netMetering option.", tariff(iInObj).reportMeter));
@@ -636,8 +634,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         // also test the buy option for electricity
         if (tariff(iInObj).buyOrSell == buyFromUtility) {
             if (hasi(tariff(iInObj).reportMeter, "Elec")) { // test if electric meter
-                if (!(UtilityRoutines::SameString(tariff(iInObj).reportMeter, "Electricity:Facility") ||
-                      UtilityRoutines::SameString(tariff(iInObj).reportMeter, "ElectricityPurchased:Facility"))) {
+                if (!(Util::SameString(tariff(iInObj).reportMeter, "Electricity:Facility") ||
+                      Util::SameString(tariff(iInObj).reportMeter, "ElectricityPurchased:Facility"))) {
                     ShowWarningError(state,
                                      format("{}{}=\"{}\" atypical meter", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(
@@ -664,9 +662,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         }
         // associate the resource number with each tariff
         if (tariff(iInObj).reportMeterIndx >= 1) {
-            tariff(iInObj).resource = static_cast<Constant::eResource>(
-                getEnumValue(Constant::eResourceNamesUC,
-                             UtilityRoutines::makeUPPER(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType)));
+            tariff(iInObj).resource = static_cast<Constant::eResource>(getEnumValue(
+                Constant::eResourceNamesUC, Util::makeUPPER(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType)));
         }
     }
 }
@@ -722,9 +719,9 @@ void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound) // true 
         qualify(iInObj).sourcePt = AssignVariablePt(
             state, state.dataIPShortCut->cAlphaArgs(3), true, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, qualify(iInObj).tariffIndx);
         // indicator if maximum test otherwise minimum
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "Minimum")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(4), "Minimum")) {
             qualify(iInObj).isMaximum = false;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "Maximum")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(4), "Maximum")) {
             qualify(iInObj).isMaximum = true;
         } else {
             ShowSevereError(state, format("{}{}=\"{}\" invalid data", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -733,7 +730,7 @@ void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound) // true 
             qualify(iInObj).isMaximum = true;
         }
         // value of the threshold
-        qualify(iInObj).thresholdVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(5), isNotNumeric);
+        qualify(iInObj).thresholdVal = Util::ProcessNumber(state.dataIPShortCut->cAlphaArgs(5), isNotNumeric);
         qualify(iInObj).thresholdPt = AssignVariablePt(state,
                                                        state.dataIPShortCut->cAlphaArgs(5),
                                                        isNotNumeric,
@@ -745,9 +742,9 @@ void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound) // true 
         // enumerated list of the kind of season
         qualify(iInObj).season = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(6), state.dataIPShortCut->cAlphaArgs(1));
         // indicator if consecutive months otherwise count
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "Count")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "Count")) {
             qualify(iInObj).isConsecutive = false;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "Consecutive")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "Consecutive")) {
             qualify(iInObj).isConsecutive = true;
         } else {
             ShowWarningError(state, format("{}{}=\"{}\" invalid data", RoutineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -830,7 +827,7 @@ void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound) // 
         chargeSimple.categoryPt = AssignVariablePt(
             state, state.dataIPShortCut->cAlphaArgs(5), true, varIsAssigned, varNotYetDefined, ObjType::Category, iInObj, chargeSimple.tariffIndx);
         // cost per unit value or variable
-        chargeSimple.costPerVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(6), isNotNumeric);
+        chargeSimple.costPerVal = Util::ProcessNumber(state.dataIPShortCut->cAlphaArgs(6), isNotNumeric);
         chargeSimple.costPerPt = AssignVariablePt(
             state, state.dataIPShortCut->cAlphaArgs(6), isNotNumeric, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, chargeSimple.tariffIndx);
     }
@@ -911,7 +908,7 @@ void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // t
             chargeBlock.blkSzMultVal = 1.0;                  // default is 1 if left blank
             chargeBlock.blkSzMultPt = 0;
         } else {
-            chargeBlock.blkSzMultVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(7), isNotNumeric);
+            chargeBlock.blkSzMultVal = Util::ProcessNumber(state.dataIPShortCut->cAlphaArgs(7), isNotNumeric);
             chargeBlock.blkSzMultPt = AssignVariablePt(state,
                                                        state.dataIPShortCut->cAlphaArgs(7),
                                                        isNotNumeric,
@@ -926,12 +923,12 @@ void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // t
         for (int jBlk = 1; jBlk <= chargeBlock.numBlk; ++jBlk) {
             alphaOffset = 7 + (jBlk - 1) * 2;
             // catch the "remaining" code word for the block size
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(alphaOffset + 1), "REMAINING")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(alphaOffset + 1), "REMAINING")) {
                 chargeBlock.blkSzVal(jBlk) = hugeNumber / 1000000; // using small portion of largest possible value to prevent overflow
                 chargeBlock.blkSzPt(jBlk) = 0;
             } else {
                 // array of block size
-                chargeBlock.blkSzVal(jBlk) = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(alphaOffset + 1), isNotNumeric);
+                chargeBlock.blkSzVal(jBlk) = Util::ProcessNumber(state.dataIPShortCut->cAlphaArgs(alphaOffset + 1), isNotNumeric);
 
                 chargeBlock.blkSzPt(jBlk) = AssignVariablePt(state,
                                                              state.dataIPShortCut->cAlphaArgs(alphaOffset + 1),
@@ -943,7 +940,7 @@ void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // t
                                                              chargeBlock.tariffIndx);
             }
             // array of block cost
-            chargeBlock.blkCostVal(jBlk) = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(alphaOffset + 2), isNotNumeric);
+            chargeBlock.blkCostVal(jBlk) = Util::ProcessNumber(state.dataIPShortCut->cAlphaArgs(alphaOffset + 2), isNotNumeric);
             chargeBlock.blkCostPt(jBlk) = AssignVariablePt(state,
                                                            state.dataIPShortCut->cAlphaArgs(alphaOffset + 2),
                                                            isNotNumeric,
@@ -1010,11 +1007,11 @@ void GetInputEconomicsRatchet(EnergyPlusData &state, bool &ErrorsFound) // true 
         ratchet.seasonFrom = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(5), state.dataIPShortCut->cAlphaArgs(1));
         ratchet.seasonTo = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(6), state.dataIPShortCut->cAlphaArgs(1));
         // ratchet multiplier
-        ratchet.multiplierVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(7), isNotNumeric);
+        ratchet.multiplierVal = Util::ProcessNumber(state.dataIPShortCut->cAlphaArgs(7), isNotNumeric);
         ratchet.multiplierPt = AssignVariablePt(
             state, state.dataIPShortCut->cAlphaArgs(7), isNotNumeric, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, ratchet.tariffIndx);
         // ratchet offset
-        ratchet.offsetVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(8), isNotNumeric);
+        ratchet.offsetVal = Util::ProcessNumber(state.dataIPShortCut->cAlphaArgs(8), isNotNumeric);
         ratchet.offsetPt = AssignVariablePt(
             state, state.dataIPShortCut->cAlphaArgs(8), isNotNumeric, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, ratchet.tariffIndx);
     }
@@ -1063,13 +1060,13 @@ void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound) // true
         auto &econVar = state.dataEconTariff->econVar(variablePt);
 
         // validate the kind of variable - not used internally except for validation
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "ENERGY")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "ENERGY")) {
             econVar.varUnitType = varUnitTypeEnergy;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "DEMAND")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "DEMAND")) {
             econVar.varUnitType = varUnitTypeDemand;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "DIMENSIONLESS")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "DIMENSIONLESS")) {
             econVar.varUnitType = varUnitTypeDimensionless;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "CURRENCY")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "CURRENCY")) {
             econVar.varUnitType = varUnitTypeCurrency;
         } else {
             econVar.varUnitType = varUnitTypeDimensionless;
@@ -1205,7 +1202,7 @@ void GetInputEconomicsCurrencyType(EnergyPlusData &state, bool &ErrorsFound) // 
                                                                  state.dataIPShortCut->cNumericFieldNames);
         // Monetary Unit
         for (i = 1; i <= (int)state.dataCostEstimateManager->monetaryUnit.size(); ++i) {
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), state.dataCostEstimateManager->monetaryUnit(i).code)) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(1), state.dataCostEstimateManager->monetaryUnit(i).code)) {
                 state.dataCostEstimateManager->selectedMonetaryUnit = i;
                 break;
             }
@@ -1691,15 +1688,15 @@ int LookUpSeason(EnergyPlusData &state, std::string const &nameOfSeason, std::st
 
     int LookUpSeason;
 
-    if (UtilityRoutines::SameString(nameOfSeason, "Summer")) {
+    if (Util::SameString(nameOfSeason, "Summer")) {
         LookUpSeason = seasonSummer;
-    } else if (UtilityRoutines::SameString(nameOfSeason, "Winter")) {
+    } else if (Util::SameString(nameOfSeason, "Winter")) {
         LookUpSeason = seasonWinter;
-    } else if (UtilityRoutines::SameString(nameOfSeason, "Spring")) {
+    } else if (Util::SameString(nameOfSeason, "Spring")) {
         LookUpSeason = seasonSpring;
-    } else if (UtilityRoutines::SameString(nameOfSeason, "Fall")) {
+    } else if (Util::SameString(nameOfSeason, "Fall")) {
         LookUpSeason = seasonFall;
-    } else if (UtilityRoutines::SameString(nameOfSeason, "Annual")) {
+    } else if (Util::SameString(nameOfSeason, "Annual")) {
         LookUpSeason = seasonAnnual;
     } else {
         ShowWarningError(state, format("UtilityCost: Invalid season name {} in: {}", nameOfSeason, nameOfReferingObj));
@@ -1722,7 +1719,7 @@ int FindTariffIndex(
     int found = 0;
 
     for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-        if (UtilityRoutines::SameString(nameOfTariff, state.dataEconTariff->tariff(iTariff).tariffName)) {
+        if (Util::SameString(nameOfTariff, state.dataEconTariff->tariff(iTariff).tariffName)) {
             found = iTariff;
             break;
         }
@@ -1748,52 +1745,52 @@ void warnIfNativeVarname(
     //   one of the names of native variables
 
     bool throwError = false;
-    if (UtilityRoutines::SameString(objName, "TotalEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "TotalDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "ShoulderEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "ShoulderDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "OffPeakEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "OffPeakDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "MidPeakEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "MidPeakDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakExceedsOffPeak")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "OffPeakExceedsPeak")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakExceedsMidPeak")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "MidPeakExceedsPeak")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakExceedsShoulder")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "ShoulderExceedsPeak")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsWinter")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsNotWinter")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsSpring")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsNotSpring")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsSummer")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsNotSummer")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsAutumn")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "IsNotAutumn")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakAndShoulderEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakAndShoulderDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakAndMidPeakEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakAndMidPeakDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "ShoulderAndOffPeakEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "ShoulderAndOffPeakDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakAndOffPeakEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "PeakAndOffPeakDemand")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "RealTimePriceCosts")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "AboveCustomerBaseCosts")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "BelowCustomerBaseCosts")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "AboveCustomerBaseEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "BelowCustomerBaseEnergy")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "EnergyCharges")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "DemandCharges")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "ServiceCharges")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "Basis")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "Surcharges")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "Adjustments")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "Subtotal")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "Taxes")) throwError = true;
-    if (UtilityRoutines::SameString(objName, "Total")) throwError = true;
+    if (Util::SameString(objName, "TotalEnergy")) throwError = true;
+    if (Util::SameString(objName, "TotalDemand")) throwError = true;
+    if (Util::SameString(objName, "PeakEnergy")) throwError = true;
+    if (Util::SameString(objName, "PeakDemand")) throwError = true;
+    if (Util::SameString(objName, "ShoulderEnergy")) throwError = true;
+    if (Util::SameString(objName, "ShoulderDemand")) throwError = true;
+    if (Util::SameString(objName, "OffPeakEnergy")) throwError = true;
+    if (Util::SameString(objName, "OffPeakDemand")) throwError = true;
+    if (Util::SameString(objName, "MidPeakEnergy")) throwError = true;
+    if (Util::SameString(objName, "MidPeakDemand")) throwError = true;
+    if (Util::SameString(objName, "PeakExceedsOffPeak")) throwError = true;
+    if (Util::SameString(objName, "OffPeakExceedsPeak")) throwError = true;
+    if (Util::SameString(objName, "PeakExceedsMidPeak")) throwError = true;
+    if (Util::SameString(objName, "MidPeakExceedsPeak")) throwError = true;
+    if (Util::SameString(objName, "PeakExceedsShoulder")) throwError = true;
+    if (Util::SameString(objName, "ShoulderExceedsPeak")) throwError = true;
+    if (Util::SameString(objName, "IsWinter")) throwError = true;
+    if (Util::SameString(objName, "IsNotWinter")) throwError = true;
+    if (Util::SameString(objName, "IsSpring")) throwError = true;
+    if (Util::SameString(objName, "IsNotSpring")) throwError = true;
+    if (Util::SameString(objName, "IsSummer")) throwError = true;
+    if (Util::SameString(objName, "IsNotSummer")) throwError = true;
+    if (Util::SameString(objName, "IsAutumn")) throwError = true;
+    if (Util::SameString(objName, "IsNotAutumn")) throwError = true;
+    if (Util::SameString(objName, "PeakAndShoulderEnergy")) throwError = true;
+    if (Util::SameString(objName, "PeakAndShoulderDemand")) throwError = true;
+    if (Util::SameString(objName, "PeakAndMidPeakEnergy")) throwError = true;
+    if (Util::SameString(objName, "PeakAndMidPeakDemand")) throwError = true;
+    if (Util::SameString(objName, "ShoulderAndOffPeakEnergy")) throwError = true;
+    if (Util::SameString(objName, "ShoulderAndOffPeakDemand")) throwError = true;
+    if (Util::SameString(objName, "PeakAndOffPeakEnergy")) throwError = true;
+    if (Util::SameString(objName, "PeakAndOffPeakDemand")) throwError = true;
+    if (Util::SameString(objName, "RealTimePriceCosts")) throwError = true;
+    if (Util::SameString(objName, "AboveCustomerBaseCosts")) throwError = true;
+    if (Util::SameString(objName, "BelowCustomerBaseCosts")) throwError = true;
+    if (Util::SameString(objName, "AboveCustomerBaseEnergy")) throwError = true;
+    if (Util::SameString(objName, "BelowCustomerBaseEnergy")) throwError = true;
+    if (Util::SameString(objName, "EnergyCharges")) throwError = true;
+    if (Util::SameString(objName, "DemandCharges")) throwError = true;
+    if (Util::SameString(objName, "ServiceCharges")) throwError = true;
+    if (Util::SameString(objName, "Basis")) throwError = true;
+    if (Util::SameString(objName, "Surcharges")) throwError = true;
+    if (Util::SameString(objName, "Adjustments")) throwError = true;
+    if (Util::SameString(objName, "Subtotal")) throwError = true;
+    if (Util::SameString(objName, "Taxes")) throwError = true;
+    if (Util::SameString(objName, "Total")) throwError = true;
     if (throwError) {
         ErrorsFound = true;
         if (curTariffIndex >= 1 && curTariffIndex <= state.dataEconTariff->numTariff) {
@@ -1832,7 +1829,7 @@ int AssignVariablePt(EnergyPlusData &state,
         if (allocated(econVar)) {
             for (int iVar = 1; iVar <= state.dataEconTariff->numEconVar; ++iVar) {
                 if (econVar(iVar).tariffIndx == tariffPt) {
-                    if (UtilityRoutines::SameString(econVar(iVar).name, inNoSpaces)) {
+                    if (Util::SameString(econVar(iVar).name, inNoSpaces)) {
                         found = iVar;
                         break;
                     }
@@ -2057,109 +2054,109 @@ int lookupOperator(std::string const &opString)
 
     int lookupOperator;
 
-    if (UtilityRoutines::SameString(opString, "Sum")) {
+    if (Util::SameString(opString, "Sum")) {
         lookupOperator = opSUM;
-    } else if (UtilityRoutines::SameString(opString, "MULTIPLY")) {
+    } else if (Util::SameString(opString, "MULTIPLY")) {
         lookupOperator = opMULTIPLY;
-    } else if (UtilityRoutines::SameString(opString, "MULT")) {
+    } else if (Util::SameString(opString, "MULT")) {
         lookupOperator = opMULTIPLY;
-    } else if (UtilityRoutines::SameString(opString, "SUBTRACT")) {
+    } else if (Util::SameString(opString, "SUBTRACT")) {
         lookupOperator = opSUBTRACT;
-    } else if (UtilityRoutines::SameString(opString, "SUBT")) {
+    } else if (Util::SameString(opString, "SUBT")) {
         lookupOperator = opSUBTRACT;
-    } else if (UtilityRoutines::SameString(opString, "DIVIDE")) {
+    } else if (Util::SameString(opString, "DIVIDE")) {
         lookupOperator = opDIVIDE;
-    } else if (UtilityRoutines::SameString(opString, "DIV")) {
+    } else if (Util::SameString(opString, "DIV")) {
         lookupOperator = opDIVIDE;
-    } else if (UtilityRoutines::SameString(opString, "ABSOLUTE")) {
+    } else if (Util::SameString(opString, "ABSOLUTE")) {
         lookupOperator = opABSOLUTE;
-    } else if (UtilityRoutines::SameString(opString, "ABS")) {
+    } else if (Util::SameString(opString, "ABS")) {
         lookupOperator = opABSOLUTE;
-    } else if (UtilityRoutines::SameString(opString, "INTEGER")) {
+    } else if (Util::SameString(opString, "INTEGER")) {
         lookupOperator = opINTEGER;
-    } else if (UtilityRoutines::SameString(opString, "INT")) {
+    } else if (Util::SameString(opString, "INT")) {
         lookupOperator = opINTEGER;
-    } else if (UtilityRoutines::SameString(opString, "SIGN")) {
+    } else if (Util::SameString(opString, "SIGN")) {
         lookupOperator = opSIGN;
-    } else if (UtilityRoutines::SameString(opString, "ROUND")) {
+    } else if (Util::SameString(opString, "ROUND")) {
         lookupOperator = opROUND;
-    } else if (UtilityRoutines::SameString(opString, "Maximum")) {
+    } else if (Util::SameString(opString, "Maximum")) {
         lookupOperator = opMAXIMUM;
-    } else if (UtilityRoutines::SameString(opString, "MAX")) {
+    } else if (Util::SameString(opString, "MAX")) {
         lookupOperator = opMAXIMUM;
-    } else if (UtilityRoutines::SameString(opString, "MINIMUM")) {
+    } else if (Util::SameString(opString, "MINIMUM")) {
         lookupOperator = opMINIMUM;
-    } else if (UtilityRoutines::SameString(opString, "MIN")) {
+    } else if (Util::SameString(opString, "MIN")) {
         lookupOperator = opMINIMUM;
-    } else if (UtilityRoutines::SameString(opString, "EXCEEDS")) {
+    } else if (Util::SameString(opString, "EXCEEDS")) {
         lookupOperator = opEXCEEDS;
-    } else if (UtilityRoutines::SameString(opString, "ANNUALMINIMUM")) {
+    } else if (Util::SameString(opString, "ANNUALMINIMUM")) {
         lookupOperator = opANNUALMINIMUM;
-    } else if (UtilityRoutines::SameString(opString, "ANMIN")) {
+    } else if (Util::SameString(opString, "ANMIN")) {
         lookupOperator = opANNUALMINIMUM;
-    } else if (UtilityRoutines::SameString(opString, "ANNUALMAXIMUM")) {
+    } else if (Util::SameString(opString, "ANNUALMAXIMUM")) {
         lookupOperator = opANNUALMAXIMUM;
-    } else if (UtilityRoutines::SameString(opString, "ANMAX")) {
+    } else if (Util::SameString(opString, "ANMAX")) {
         lookupOperator = opANNUALMAXIMUM;
-    } else if (UtilityRoutines::SameString(opString, "ANNUALSUM")) {
+    } else if (Util::SameString(opString, "ANNUALSUM")) {
         lookupOperator = opANNUALSUM;
-    } else if (UtilityRoutines::SameString(opString, "ANSUM")) {
+    } else if (Util::SameString(opString, "ANSUM")) {
         lookupOperator = opANNUALSUM;
-    } else if (UtilityRoutines::SameString(opString, "ANNUALAVERAGE")) {
+    } else if (Util::SameString(opString, "ANNUALAVERAGE")) {
         lookupOperator = opANNUALAVERAGE;
-    } else if (UtilityRoutines::SameString(opString, "ANAVG")) {
+    } else if (Util::SameString(opString, "ANAVG")) {
         lookupOperator = opANNUALAVERAGE;
-    } else if (UtilityRoutines::SameString(opString, "ANNUALOR")) {
+    } else if (Util::SameString(opString, "ANNUALOR")) {
         lookupOperator = opANNUALOR;
-    } else if (UtilityRoutines::SameString(opString, "ANOR")) {
+    } else if (Util::SameString(opString, "ANOR")) {
         lookupOperator = opANNUALOR;
-    } else if (UtilityRoutines::SameString(opString, "ANNUALAND")) {
+    } else if (Util::SameString(opString, "ANNUALAND")) {
         lookupOperator = opANNUALAND;
-    } else if (UtilityRoutines::SameString(opString, "ANAND")) {
+    } else if (Util::SameString(opString, "ANAND")) {
         lookupOperator = opANNUALAND;
-    } else if (UtilityRoutines::SameString(opString, "ANNUALMAXIMUMZERO")) {
+    } else if (Util::SameString(opString, "ANNUALMAXIMUMZERO")) {
         lookupOperator = opANNUALMAXIMUMZERO;
-    } else if (UtilityRoutines::SameString(opString, "ANMAXZ")) {
+    } else if (Util::SameString(opString, "ANMAXZ")) {
         lookupOperator = opANNUALMAXIMUMZERO;
-    } else if (UtilityRoutines::SameString(opString, "ANNUALMINIMUMZERO")) {
+    } else if (Util::SameString(opString, "ANNUALMINIMUMZERO")) {
         lookupOperator = opANNUALMINIMUMZERO;
-    } else if (UtilityRoutines::SameString(opString, "ANMINZ")) {
+    } else if (Util::SameString(opString, "ANMINZ")) {
         lookupOperator = opANNUALMINIMUMZERO;
-    } else if (UtilityRoutines::SameString(opString, "IF")) {
+    } else if (Util::SameString(opString, "IF")) {
         lookupOperator = opIF;
-    } else if (UtilityRoutines::SameString(opString, "GREATERTHAN")) {
+    } else if (Util::SameString(opString, "GREATERTHAN")) {
         lookupOperator = opGREATERTHAN;
-    } else if (UtilityRoutines::SameString(opString, "GT")) {
+    } else if (Util::SameString(opString, "GT")) {
         lookupOperator = opGREATERTHAN;
-    } else if (UtilityRoutines::SameString(opString, "GREATEREQUAL")) {
+    } else if (Util::SameString(opString, "GREATEREQUAL")) {
         lookupOperator = opGREATEREQUAL;
-    } else if (UtilityRoutines::SameString(opString, "GE")) {
+    } else if (Util::SameString(opString, "GE")) {
         lookupOperator = opGREATEREQUAL;
-    } else if (UtilityRoutines::SameString(opString, "LESSTHAN")) {
+    } else if (Util::SameString(opString, "LESSTHAN")) {
         lookupOperator = opLESSTHAN;
-    } else if (UtilityRoutines::SameString(opString, "LT")) {
+    } else if (Util::SameString(opString, "LT")) {
         lookupOperator = opLESSTHAN;
-    } else if (UtilityRoutines::SameString(opString, "LESSEQUAL")) {
+    } else if (Util::SameString(opString, "LESSEQUAL")) {
         lookupOperator = opLESSEQUAL;
-    } else if (UtilityRoutines::SameString(opString, "LE")) {
+    } else if (Util::SameString(opString, "LE")) {
         lookupOperator = opLESSEQUAL;
-    } else if (UtilityRoutines::SameString(opString, "EQUAL")) {
+    } else if (Util::SameString(opString, "EQUAL")) {
         lookupOperator = opEQUAL;
-    } else if (UtilityRoutines::SameString(opString, "EQ")) {
+    } else if (Util::SameString(opString, "EQ")) {
         lookupOperator = opEQUAL;
-    } else if (UtilityRoutines::SameString(opString, "NOTEQUAL")) {
+    } else if (Util::SameString(opString, "NOTEQUAL")) {
         lookupOperator = opNOTEQUAL;
-    } else if (UtilityRoutines::SameString(opString, "NE")) {
+    } else if (Util::SameString(opString, "NE")) {
         lookupOperator = opNOTEQUAL;
-    } else if (UtilityRoutines::SameString(opString, "AND")) {
+    } else if (Util::SameString(opString, "AND")) {
         lookupOperator = opAND;
-    } else if (UtilityRoutines::SameString(opString, "OR")) {
+    } else if (Util::SameString(opString, "OR")) {
         lookupOperator = opOR;
-    } else if (UtilityRoutines::SameString(opString, "NOT")) {
+    } else if (Util::SameString(opString, "NOT")) {
         lookupOperator = opNOT;
-    } else if (UtilityRoutines::SameString(opString, "FROM")) {
+    } else if (Util::SameString(opString, "FROM")) {
         lookupOperator = opNOOP;
-    } else if (UtilityRoutines::SameString(opString, "ADD")) {
+    } else if (Util::SameString(opString, "ADD")) {
         lookupOperator = opADD;
     } else {
         lookupOperator = 0;
@@ -3864,51 +3861,63 @@ void LEEDtariffReporting(EnergyPlusData &state)
     Real64 elecTotalEne;
     Real64 gasTotalEne;
     Real64 distCoolTotalEne;
-    Real64 distHeatTotalEne;
+    Real64 distHeatWaterTotalEne;
+    Real64 distHeatSteamTotalEne;
     Real64 otherTotalEne;
     Real64 elecTotalCost;
     Real64 gasTotalCost;
     Real64 otherTotalCost;
     Real64 distCoolTotalCost;
-    Real64 distHeatTotalCost;
+    Real64 distHeatWaterTotalCost;
+    Real64 distHeatSteamTotalCost;
     Real64 allTotalCost;
+    std::string distCoolTariffNames;
+    std::string distHeatWaterTariffNames;
+    std::string distHeatSteamTariffNames;
     EconConv elecUnits;
     EconConv gasUnits;
     EconConv distCoolUnits;
-    EconConv distHeatUnits;
+    EconConv distHeatWaterUnits;
+    EconConv distHeatSteamUnits;
     EconConv othrUnits;
     DemandWindow gasDemWindowUnits;
     DemandWindow distCoolDemWindowUnits;
-    DemandWindow distHeatDemWindowUnits;
+    DemandWindow distHeatWaterDemWindowUnits;
+    DemandWindow distHeatSteamDemWindowUnits;
     DemandWindow othrDemWindowUnits;
 
     auto const &tariff = state.dataEconTariff->tariff;
 
     if (state.dataEconTariff->numTariff > 0) {
         int distCoolFacilMeter = GetMeterIndex(state, "DISTRICTCOOLING:FACILITY");
-        int distHeatFacilMeter = GetMeterIndex(state, "DISTRICTHEATING:FACILITY");
+        int distHeatWaterFacilMeter = GetMeterIndex(state, "DISTRICTHEATINGWATER:FACILITY");
+        int distHeatSteamFacilMeter = GetMeterIndex(state, "DISTRICTHEATINGSTEAM:FACILITY");
         elecTotalEne = 0.0;
         gasTotalEne = 0.0;
         distCoolTotalEne = 0.0;
-        distHeatTotalEne = 0.0;
+        distHeatWaterTotalEne = 0.0;
+        distHeatSteamTotalEne = 0.0;
         otherTotalEne = 0.0;
         elecTotalCost = 0.0;
         gasTotalCost = 0.0;
         distCoolTotalCost = 0.0;
-        distHeatTotalCost = 0.0;
+        distHeatWaterTotalCost = 0.0;
+        distHeatSteamTotalCost = 0.0;
         otherTotalCost = 0.0;
         allTotalCost = 0.0;
         elecUnits = EconConv::USERDEF;
         gasUnits = EconConv::USERDEF;
         distCoolUnits = EconConv::USERDEF;
-        distHeatUnits = EconConv::USERDEF;
+        distHeatWaterUnits = EconConv::USERDEF;
+        distHeatSteamUnits = EconConv::USERDEF;
         othrUnits = EconConv::USERDEF;
         gasDemWindowUnits = DemandWindow::Invalid;
         othrDemWindowUnits = DemandWindow::Invalid;
         std::string elecTariffNames = "";
         std::string gasTariffNames = "";
         std::string distCoolTariffNames = "";
-        std::string distHeatTariffNames = "";
+        std::string distHeatWaterTariffNames = "";
+        std::string distHeatSteamTariffNames = "";
         std::string othrTariffNames = "";
         for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
             if (tariff(iTariff).isSelected) {
@@ -3930,12 +3939,18 @@ void LEEDtariffReporting(EnergyPlusData &state)
                     distCoolTariffNames += ' ' + tariff(iTariff).tariffName;
                     distCoolUnits = tariff(iTariff).convChoice;
                     distCoolDemWindowUnits = tariff(iTariff).demandWindow;
-                } else if (tariff(iTariff).reportMeterIndx == distHeatFacilMeter) {
-                    if (tariff(iTariff).totalAnnualEnergy > distHeatTotalEne) distHeatTotalEne = tariff(iTariff).totalAnnualEnergy;
-                    distHeatTotalCost += tariff(iTariff).totalAnnualCost;
-                    distHeatTariffNames += ' ' + tariff(iTariff).tariffName;
-                    distHeatUnits = tariff(iTariff).convChoice;
-                    distHeatDemWindowUnits = tariff(iTariff).demandWindow;
+                } else if (tariff(iTariff).reportMeterIndx == distHeatWaterFacilMeter) {
+                    if (tariff(iTariff).totalAnnualEnergy > distHeatWaterTotalEne) distHeatWaterTotalEne = tariff(iTariff).totalAnnualEnergy;
+                    distHeatWaterTotalCost += tariff(iTariff).totalAnnualCost;
+                    distHeatWaterTariffNames += ' ' + tariff(iTariff).tariffName;
+                    distHeatWaterUnits = tariff(iTariff).convChoice;
+                    distHeatWaterDemWindowUnits = tariff(iTariff).demandWindow;
+                } else if (tariff(iTariff).reportMeterIndx == distHeatSteamFacilMeter) {
+                    if (tariff(iTariff).totalAnnualEnergy > distHeatSteamTotalEne) distHeatSteamTotalEne = tariff(iTariff).totalAnnualEnergy;
+                    distHeatSteamTotalCost += tariff(iTariff).totalAnnualCost;
+                    distHeatSteamTariffNames += ' ' + tariff(iTariff).tariffName;
+                    distHeatSteamUnits = tariff(iTariff).convChoice;
+                    distHeatSteamDemWindowUnits = tariff(iTariff).demandWindow;
                 } else if (tariff(iTariff).kindWaterMtr == kindMeterNotWater) {
                     if (tariff(iTariff).totalAnnualEnergy > otherTotalEne) otherTotalEne = tariff(iTariff).totalAnnualEnergy;
                     otherTotalCost += tariff(iTariff).totalAnnualCost;
@@ -3951,8 +3966,12 @@ void LEEDtariffReporting(EnergyPlusData &state)
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Natural Gas", gasTariffNames);
         if (distCoolTotalEne != 0)
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Cooling", distCoolTariffNames);
-        if (distHeatTotalEne != 0)
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating", distHeatTariffNames);
+        if (distHeatWaterTotalEne != 0)
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating Water", distHeatWaterTariffNames);
+        if (distHeatSteamTotalEne != 0)
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating Steam", distHeatSteamTariffNames);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Other", othrTariffNames);
         // virtual rate
         if (elecTotalEne != 0)
@@ -3996,25 +4015,41 @@ void LEEDtariffReporting(EnergyPlusData &state)
                                                      format("{}{}", convDemStrings(distCoolUnits), demWindowStrings(distCoolDemWindowUnits)));
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Cooling", distCoolTotalCost, 2);
         }
-        if (distHeatTotalEne != 0) {
+        if (distHeatWaterTotalEne != 0) {
             OutputReportPredefined::PreDefTableEntry(
-                state, state.dataOutRptPredefined->pdchLeedEtsVirt, "District Heating", distHeatTotalCost / distHeatTotalEne, 3);
+                state, state.dataOutRptPredefined->pdchLeedEtsVirt, "District Heating Water", distHeatWaterTotalCost / distHeatWaterTotalEne, 3);
             OutputReportPredefined::PreDefTableEntry(
-                state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Heating", format("{}", convEneStrings(distHeatUnits)));
-            OutputReportPredefined::PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchLeedEtsDemUnt,
-                                                     "District Heating",
-                                                     format("{}{}", convDemStrings(distHeatUnits), demWindowStrings(distHeatDemWindowUnits)));
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating", distHeatTotalCost, 2);
+                state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Heating Water", format("{}", convEneStrings(distHeatWaterUnits)));
+            OutputReportPredefined::PreDefTableEntry(
+                state,
+                state.dataOutRptPredefined->pdchLeedEtsDemUnt,
+                "District Heating Water",
+                format("{}{}", convDemStrings(distHeatWaterUnits), demWindowStrings(distHeatWaterDemWindowUnits)));
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating Water", distHeatWaterTotalCost, 2);
+        }
+        if (distHeatSteamTotalEne != 0) {
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEtsVirt, "District Heating Steam", distHeatSteamTotalCost / distHeatSteamTotalEne, 3);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Heating Steam", format("{}", convEneStrings(distHeatSteamUnits)));
+            OutputReportPredefined::PreDefTableEntry(
+                state,
+                state.dataOutRptPredefined->pdchLeedEtsDemUnt,
+                "District Heating Steam",
+                format("{}{}", convDemStrings(distHeatSteamUnits), demWindowStrings(distHeatSteamDemWindowUnits)));
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating Steam", distHeatSteamTotalCost, 2);
         }
         // save the total costs for later to compute process fraction
         state.dataOutRptPredefined->LEEDelecCostTotal = elecTotalCost;
         state.dataOutRptPredefined->LEEDgasCostTotal = gasTotalCost;
-        state.dataOutRptPredefined->LEEDothrCostTotal = distCoolTotalCost + distHeatTotalCost + otherTotalCost;
+        state.dataOutRptPredefined->LEEDothrCostTotal = distCoolTotalCost + distHeatWaterTotalCost + distHeatSteamTotalCost + otherTotalCost;
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchLeedEcsTotal,
                                                  "Total",
-                                                 elecTotalCost + gasTotalCost + distCoolTotalCost + distHeatTotalCost + otherTotalCost,
+                                                 elecTotalCost + gasTotalCost + distCoolTotalCost + distHeatWaterTotalCost + distHeatSteamTotalCost +
+                                                     otherTotalCost,
                                                  2);
     }
 }
@@ -4739,7 +4774,7 @@ void selectTariff(EnergyPlusData &state)
             groupIndex(iTariff) = groupCount;
             // set all remaining matching items to the same index
             for (int kTariff = iTariff + 1; kTariff <= state.dataEconTariff->numTariff; ++kTariff) {
-                if (UtilityRoutines::SameString(state.dataEconTariff->tariff(kTariff).groupName, tariff.groupName)) {
+                if (Util::SameString(state.dataEconTariff->tariff(kTariff).groupName, tariff.groupName)) {
                     groupIndex(kTariff) = groupCount;
                 }
             }

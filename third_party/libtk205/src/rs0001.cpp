@@ -707,7 +707,7 @@ namespace tk205  {
 
 		const std::string_view PerformanceMapCooling::lookup_variables_name = "lookup_variables";
 
-		LookupVariablesCoolingStruct PerformanceMapCooling::calculate_performance(double evaporator_liquid_volumetric_flow_rate, double evaporator_liquid_leaving_temperature, double condenser_liquid_volumetric_flow_rate, double condenser_liquid_entering_temperature, double compressor_sequence_number, Btwxt::Method performance_interpolation_method ) {
+		LookupVariablesCoolingStruct PerformanceMapCooling::calculate_performance(double evaporator_liquid_volumetric_flow_rate, double evaporator_liquid_leaving_temperature, double condenser_liquid_volumetric_flow_rate, double condenser_liquid_entering_temperature, double compressor_sequence_number, Btwxt::InterpolationMethod performance_interpolation_method ) {
 			std::vector<double> target {evaporator_liquid_volumetric_flow_rate, evaporator_liquid_leaving_temperature, condenser_liquid_volumetric_flow_rate, condenser_liquid_entering_temperature, compressor_sequence_number};
 			auto v = PerformanceMapBase::calculate_performance(target, performance_interpolation_method);
 			LookupVariablesCoolingStruct s {v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], };
@@ -762,7 +762,7 @@ namespace tk205  {
 
 		const std::string_view PerformanceMapStandby::lookup_variables_name = "lookup_variables";
 
-		LookupVariablesStandbyStruct PerformanceMapStandby::calculate_performance(double environment_dry_bulb_temperature, Btwxt::Method performance_interpolation_method ) {
+		LookupVariablesStandbyStruct PerformanceMapStandby::calculate_performance(double environment_dry_bulb_temperature, Btwxt::InterpolationMethod performance_interpolation_method ) {
 			std::vector<double> target {environment_dry_bulb_temperature};
 			auto v = PerformanceMapBase::calculate_performance(target, performance_interpolation_method);
 			LookupVariablesStandbyStruct s {v[0], };

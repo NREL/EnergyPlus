@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -69,7 +70,6 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus::PurchasedAirManager;
-using namespace EnergyPlus::WeatherManager;
 using namespace EnergyPlus::OutputProcessor;
 
 namespace EnergyPlus {
@@ -775,7 +775,7 @@ namespace OutputProcessor {
     {
         state->dataGlobal->MinutesPerTimeStep = 10;
 
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
         state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
 
@@ -868,7 +868,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_writeReportRealData)
     {
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
         state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
 
@@ -1032,7 +1032,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_writeReportIntegerData)
     {
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
         state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
 
@@ -1117,7 +1117,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_writeNumericData_1)
     {
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
         state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
 
@@ -1178,9 +1178,9 @@ namespace OutputProcessor {
                                                                  {"WELLWATER", "WellWater"},
                                                                  {"CONDENSATE", "Condensate"},
                                                                  {"ENERGYTRANSFER", "EnergyTransfer"},
-                                                                 {"STEAM", "Steam"},
+                                                                 {"DISTRICTHEATINGSTEAM", "DistrictHeatingSteam"},
                                                                  {"DISTRICTCOOLING", "DistrictCooling"},
-                                                                 {"DISTRICTHEATING", "DistrictHeating"},
+                                                                 {"DISTRICTHEATINGWATER", "DistrictHeatingWater"},
                                                                  {"ELECTRICITYPRODUCED", "ElectricityProduced"},
                                                                  {"ELECTRICITYPURCHASED", "ElectricityPurchased"},
                                                                  {"ELECTRICITYSURPLUSSOLD", "ElectricitySurplusSold"},
@@ -1242,7 +1242,7 @@ namespace OutputProcessor {
     {
         std::map<std::string, int> const resource_map = {{"Electricity:Facility", 100},
                                                          {"NaturalGas:Facility", 101},
-                                                         {"DistricHeating:Facility", 102},
+                                                         {"DistricHeatingWater:Facility", 102},
                                                          {"DistricCooling:Facility", 103},
                                                          {"ElectricityNet:Facility", 104},
                                                          {"Electricity:Building", 201},
@@ -1392,7 +1392,7 @@ namespace OutputProcessor {
     {
         InitializeOutput(*state);
 
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
 
         WriteMeterDictionaryItem(*state,
                                  ReportingFrequency::TimeStep,
@@ -1826,7 +1826,7 @@ namespace OutputProcessor {
     {
         InitializeOutput(*state);
 
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
 
         // Store expected results
         std::vector<std::vector<std::string>> expectedReportDataDictionary;
@@ -2383,7 +2383,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_writeCumulativeReportMeterData)
     {
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
         state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
 
@@ -2419,7 +2419,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_writeNumericData_2)
     {
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
         state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
 
@@ -3718,13 +3718,13 @@ namespace OutputProcessor {
         EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(2).NumSubcategories);
         EXPECT_EQ("General", state->dataOutputProcessor->EndUseCategory(2).SubcategoryName(1));
 
-        found = UtilityRoutines::FindItem("Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("Cooling", state->dataOutputProcessor->EnergyMeters(found).EndUse);
         EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
 
-        found = UtilityRoutines::FindItem("General:Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("General:Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("Cooling", state->dataOutputProcessor->EnergyMeters(found).EndUse);
@@ -3735,16 +3735,16 @@ namespace OutputProcessor {
         EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(3).NumSubcategories); // lighting end use
         EXPECT_EQ("RailroadCrossing", state->dataOutputProcessor->EndUseCategory(3).SubcategoryName(1));
 
-        found = UtilityRoutines::FindItem("InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("InteriorLights", state->dataOutputProcessor->EnergyMeters(found).EndUse);
         EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
 
-        found = UtilityRoutines::FindItem("General:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("General:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_EQ(0, found); // should not find this
 
-        found = UtilityRoutines::FindItem("RailroadCrossing:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("RailroadCrossing:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("InteriorLights", state->dataOutputProcessor->EnergyMeters(found).EndUse);
@@ -3752,7 +3752,7 @@ namespace OutputProcessor {
 
         // fuel oil CO2 emissions
         // testing a non-ABUPS end use with no sub end use specified
-        found = UtilityRoutines::FindItem("FuelOilNo2Emissions:CO2", state->dataOutputProcessor->EnergyMeters);
+        found = Util::FindItem("FuelOilNo2Emissions:CO2", state->dataOutputProcessor->EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("CO2", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("FuelOilNo2Emissions", state->dataOutputProcessor->EnergyMeters(found).EndUse);
@@ -4448,7 +4448,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -4736,7 +4736,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -5049,7 +5049,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -5277,18 +5277,14 @@ namespace OutputProcessor {
             "\n"));
     }
 
-    TEST_F(EnergyPlusFixture, OutputProcessor_ResetAccumulationWhenWarmupComplete)
+    TEST_F(EnergyPlusFixture, OutputProcessor_UpdateMeters)
     {
         std::string const idf_objects = delimited_string({
-            "Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,detailed;",
-            "Output:Meter:MeterFileOnly,DistrictHeating:HVAC,detailed;",
-            "Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,runperiod;",
-            "Output:Meter:MeterFileOnly,DistrictHeating:HVAC,hourly;",
+            "Output:Meter,Electricity:Facility,timestep;",
         });
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        // Setup so that UpdateDataandReport can be called.
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
         state->dataEnvrn->Month = 12;
@@ -5310,120 +5306,61 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
+
         // OutputProcessor::TimeValue.allocate(2);
+
         auto timeStep = 1.0 / 6;
+
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 10;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 10;
-
-        state->dataGlobal->WarmupFlag = true;
-
-        ReportOutputFileHeaders(*state);
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 50;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 50;
 
         GetReportVariableInput(*state);
-        Array1D<ZonePurchasedAir> PurchAir; // Used to specify purchased air parameters
-        PurchAir.allocate(1);
+        Real64 light_consumption = 999;
         SetupOutputVariable(*state,
-                            "Zone Ideal Loads Supply Air Total Heating Energy",
+                            "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
-                            PurchAir(1).TotHeatEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
+                            light_consumption,
+                            OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
-                            PurchAir(1).Name,
+                            "SPACE1-1 LIGHTS 1",
                             {},
-                            "DISTRICTHEATING",
-                            "Heating",
-                            {},
-                            "System");
-
-        PurchAir(1).TotHeatEnergy = 1.1;
+                            "Electricity",
+                            "InteriorLights",
+                            "GeneralLights",
+                            "Building",
+                            "SPACE1-1",
+                            1,
+                            1);
+        state->dataGlobal->WarmupFlag = true;
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        PurchAir(1).TotHeatEnergy = 1.3;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        PurchAir(1).TotHeatEnergy = 1.5;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        PurchAir(1).TotHeatEnergy = 1.7;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        PurchAir(1).TotHeatEnergy = 1.9;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        PurchAir(1).TotHeatEnergy = 2.2;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        state->dataGlobal->WarmupFlag = false;
-
-        PurchAir(1).TotHeatEnergy = 2.4;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone); // zone timestep
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
 
         compare_eso_stream(delimited_string(
             {
-                "1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]",
-                "2,8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType",
-                "3,5,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Report Variables "
-                "Requested",
-                "4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Report Variables Requested",
-                "5,1,Cumulative Days of Simulation[] ! When Run Period Report Variables Requested",
-                "6,1,Calendar Year of Simulation[] ! When Annual Report Variables Requested",
-                "7,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
-                "56,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-                "2,365,12,31, 0,24,10.00,20.00,Tuesday",
-                "7,1.1",
-                "2,365,12,31, 0,24,20.00,30.00,Tuesday",
-                "7,1.3",
-                "2,365,12,31, 0,24,30.00,40.00,Tuesday",
-                "7,1.5",
-                "2,365,12,31, 0,24,40.00,50.00,Tuesday",
-                "7,1.7",
-                "2,365,12,31, 0,24,50.00,60.00,Tuesday",
-                "7,1.9",
-                "2,365,12,31, 0,24,60.00,70.00,Tuesday",
-                "7,2.2",
-                "5,365",
-                "56,9.7,1.1,12,31,24,20,2.2,12,31,24,70",
+                "2,1,Electricity:Facility [J] !TimeStep",
+                ",365,12,31, 0,24,50.00,60.00,Tuesday",
+                "2,0.0",
             },
             "\n"));
 
-        ResetAccumulationWhenWarmupComplete(*state);
-
-        PurchAir(1).TotHeatEnergy = 100.0;
+        state->dataGlobal->WarmupFlag = false;
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        PurchAir(1).TotHeatEnergy = 200.0;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        PurchAir(1).TotHeatEnergy = 300.0;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone); // zone timestep
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
 
         compare_eso_stream(delimited_string(
             {
-                "2,365,12,31, 0,24, 0.00,10.00,Tuesday",
-                "7,100.0",
-                "2,365,12,31, 0,24,10.00,20.00,Tuesday",
-                "7,200.0",
-                "5,365",
-                "56,300.0,100.0,12,31,24,10,200.0,12,31,24,20",
+                ",365,12,31, 0,24, 0.00,10.00,Tuesday",
+                "2,999.0",
             },
             "\n"));
     }
+
     TEST_F(EnergyPlusFixture, OutputProcessor_GenOutputVariablesAuditReport)
     {
         std::string const idf_objects = delimited_string({
@@ -5456,7 +5393,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -5540,7 +5477,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -5864,7 +5801,7 @@ namespace OutputProcessor {
                                                           "CustomMeter1,               !- Name",
                                                           "Generic,                    !- Fuel Type",
                                                           ",                           !- Key Name 1",
-                                                          "DistrictHeating:Facility;   !- Variable or Meter 1 Name",
+                                                          "DistrictHeatingWater:Facility;   !- Variable or Meter 1 Name",
                                                           "Meter:Custom,",
                                                           "CustomMeter2,               !- Name",
                                                           "Generic,                    !- Fuel Type",
@@ -5882,7 +5819,7 @@ namespace OutputProcessor {
         EXPECT_FALSE(errors_found);
 
         std::string errMsg = delimited_string(
-            {"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid Output Variable or Meter Name=\"DISTRICTHEATING:FACILITY\".",
+            {"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid Output Variable or Meter Name=\"DISTRICTHEATINGWATER:FACILITY\".",
              "   **   ~~~   ** ...will not be shown with the Meter results.",
              "   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", no items assigned ",
              "   **   ~~~   ** ...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another "
@@ -6074,6 +6011,154 @@ namespace OutputProcessor {
         }
     }
 
+    TEST_F(SQLiteFixture, OutputProcessor_SetupOutputVariable_enum)
+    {
+        // Test SOV calls for PR 10231 for extended tests on Calling SOV using new enum parameter drivers, upon different varieties such as:
+        // 1). SOV calls for average, summed variables (regular and meters etc.)
+        // 2). SOV handling on Output:variable processed results
+        // 3). Wild cards
+        // 4). Report frequencies;
+        // 5). Emissions categories;
+        std::string const idf_objects = delimited_string({
+            "Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
+            "Output:Variable,*,Chiller Electricity Energy,runperiod;",
+            "Output:Variable,*,Lights Electricity Energy,runperiod;",
+            "Output:Variable,*,Environmental Impact Fuel Oil No 2 CO2 Emissions Mass,runperiod;",
+            "Output:Variable,*,Chiller Electricity Energy,hourly;",
+            "Output:Variable,*,Lights Electricity Energy,timestep;",
+        });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+
+        GetReportVariableInput(*state);
+
+        SetupOutputVariable(*state,
+                            "Site Outdoor Air Drybulb Temperature",
+                            OutputProcessor::Unit::C,
+                            state->dataEnvrn->OutDryBulbTemp,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Average,
+                            "Environment");
+
+        Real64 cooling_consumption = 0.;
+        SetupOutputVariable(*state,
+                            "Chiller Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            cooling_consumption,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "Cool-1",
+                            {},
+                            eResourceSOV::Electricity,
+                            EndUseCatSOV::Cooling,
+                            {}, // EndUseSubKey
+                            GroupSOV::Plant);
+
+        Real64 light_consumption = 0.;
+        SetupOutputVariable(*state,
+                            "Lights Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            light_consumption,
+                            OutputProcessor::SOVTimeStepType::Zone,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "LIGHTS 1",
+                            {},
+                            eResourceSOV::Electricity,
+                            EndUseCatSOV::InteriorLights,
+                            "RailroadCrossing", // EndUseSubKey
+                            GroupSOV::Building,
+                            "SPACE1-1",
+                            1,
+                            1);
+
+        Real64 fuel_oil_co2 = 0.;
+        SetupOutputVariable(*state,
+                            "Environmental Impact Fuel Oil No 2 CO2 Emissions Mass",
+                            OutputProcessor::Unit::kg,
+                            fuel_oil_co2,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "Site",
+                            {},
+                            eResourceSOV::CO2,
+                            EndUseCatSOV::FuelOilNo2Emissions,
+                            {}, // EndUseSubKey
+                            GroupSOV::Empty);
+
+        auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
+
+        EXPECT_EQ(1, state->dataOutputProcessor->NumExtraVars);
+
+        EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).Key);
+        EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(1).VarName);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Simulation, state->dataOutputProcessor->ReqRepVars(1).frequency));
+        EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(1).SchedPtr);
+        EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).SchedName);
+        EXPECT_EQ(true, state->dataOutputProcessor->ReqRepVars(1).Used);
+
+        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::Zone, state->dataOutputProcessor->DDVariableTypes(1).timeStepType));
+        EXPECT_TRUE(compare_enums(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(1).storeType));
+        EXPECT_TRUE(compare_enums(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(1).variableType));
+        EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(1).Next);
+        EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(1).ReportedOnDDFile);
+        EXPECT_EQ("Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->DDVariableTypes(1).VarNameOnly);
+
+        int found;
+
+        // Cooling
+        // testing an ABUPS end use with no sub end use specified
+        EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(2).NumSubcategories);
+        EXPECT_EQ("General", state->dataOutputProcessor->EndUseCategory(2).SubcategoryName(1));
+
+        found = Util::FindItem("Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("Cooling", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        found = Util::FindItem("General:Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("Cooling", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("General", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        // lighting
+        // testing an ABUPS end use with a sub end use specified
+        EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(3).NumSubcategories); // lighting end use
+        EXPECT_EQ("RailroadCrossing", state->dataOutputProcessor->EndUseCategory(3).SubcategoryName(1));
+
+        found = Util::FindItem("InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("InteriorLights", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        found = Util::FindItem("General:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_EQ(0, found); // should not find this
+
+        found = Util::FindItem("RailroadCrossing:InteriorLights:Electricity", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("InteriorLights", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("RailroadCrossing", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        // fuel oil CO2 emissions
+        // testing a non-ABUPS end use with no sub end use specified
+        found = Util::FindItem("FuelOilNo2Emissions:CO2", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("CO2", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("FuelOilNo2Emissions", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        std::vector<std::vector<std::string>> reportDataDictionary(
+            {{"1", "0", "Avg", "Zone", "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", "Run Period", "", "C"},
+             {"2", "0", "Sum", "System", "HVAC System", "Cool-1", "Chiller Electricity Energy", "Run Period", "", "J"},
+             {"51", "0", "Sum", "System", "HVAC System", "Cool-1", "Chiller Electricity Energy", "Hourly", "", "J"},
+             {"52", "0", "Sum", "Zone", "Zone", "LIGHTS 1", "Lights Electricity Energy", "Run Period", "", "J"},
+             {"125", "0", "Sum", "Zone", "Zone", "LIGHTS 1", "Lights Electricity Energy", "Zone Timestep", "", "J"},
+             {"126", "0", "Sum", "System", "HVAC System", "Site", "Environmental Impact Fuel Oil No 2 CO2 Emissions Mass", "Run Period", "", "kg"}});
+        EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
+    }
 } // namespace OutputProcessor
 
 } // namespace EnergyPlus

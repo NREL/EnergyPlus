@@ -252,8 +252,8 @@ namespace DElightManagerF {
                     ShowWarningError(state, format("Maximum of 100 Reference Points exceeded for daylighting zone using DElight ={}", znDayl.Name));
                     ShowWarningError(state, "  Only first 100 Reference Points included in DElight analysis");
                 }
-                znDayl.DaylRefPtAbsCoord.allocate(3, znDayl.TotalDaylRefPoints);
-                znDayl.DaylRefPtAbsCoord = 0.0;
+                znDayl.DaylRefPtAbsCoord.allocate(znDayl.TotalDaylRefPoints);
+                std::fill(znDayl.DaylRefPtAbsCoord.begin(), znDayl.DaylRefPtAbsCoord.end(), Vector3<Real64>(0.0));
 
                 // RJH 2008-03-07: Allocate and Init DaylIllumAtRefPt array for this DElight zone
                 znDayl.DaylIllumAtRefPt.allocate(znDayl.TotalDaylRefPoints);
@@ -274,7 +274,7 @@ namespace DElightManagerF {
 
         for (auto &znDayl : state.dataDaylightingData->daylightControl) {
             if (znDayl.DaylightMethod == Dayltg::DaylightingMethod::DElight) {
-                int const izone = UtilityRoutines::FindItemInList(znDayl.ZoneName, state.dataHeatBal->Zone);
+                int const izone = Util::FindItemInList(znDayl.ZoneName, state.dataHeatBal->Zone);
                 if (izone != 0) {
 
                     rLightLevel = GetDesignLightingLevelForZone(state, izone);
@@ -595,7 +595,7 @@ namespace DElightManagerF {
                                         RefPt_WCS_Coord(2) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
                                     }
                                 }
-                                znDayl.DaylRefPtAbsCoord({1, 3}, refPt.indexToFracAndIllum) = RefPt_WCS_Coord({1, 3});
+                                znDayl.DaylRefPtAbsCoord(refPt.indexToFracAndIllum) = {RefPt_WCS_Coord(1), RefPt_WCS_Coord(2), RefPt_WCS_Coord(3)};
 
                                 // Validate that Reference Point coordinates are within the host Zone
                                 if (RefPt_WCS_Coord(1) < thisZone.MinimumX || RefPt_WCS_Coord(1) > thisZone.MaximumX) {
@@ -742,7 +742,7 @@ namespace DElightManagerF {
             cfs.Name = state.dataIPShortCut->cAlphaArgs(1);
             cfs.ComplexFeneType = state.dataIPShortCut->cAlphaArgs(2);
             cfs.surfName = state.dataIPShortCut->cAlphaArgs(3);
-            if (UtilityRoutines::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
+            if (Util::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
                 ShowSevereError(state,
                                 format("{}{}",
                                        cCurrentModuleObject,
@@ -750,7 +750,7 @@ namespace DElightManagerF {
                 ErrorsFound = true;
             }
             cfs.wndwName = state.dataIPShortCut->cAlphaArgs(4);
-            if (UtilityRoutines::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
+            if (Util::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
                 ShowSevereError(state,
                                 format("{}{}",
                                        cCurrentModuleObject,
@@ -836,8 +836,6 @@ namespace DElightManagerF {
         // FUNCTION INFORMATION:
         //       AUTHOR         Robert J. Hitchcock
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       From UtilityRoutines::makeUPPER( function by Linda K. Lawrie
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This function returns a representation of the InputString with blanks replaced with underscores.

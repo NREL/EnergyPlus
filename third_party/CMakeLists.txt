@@ -2,14 +2,14 @@
 # add_library( ModernJSON INTERFACE )
 # target_include_directories( ModernJSON INTERFACE "${PROJECT_SOURCE_DIR}/nlohmann" "${PROJECT_SOURCE_DIR}/doj" )
 
-add_library( ModernJSON INTERFACE )
+add_library( nlohmann_json INTERFACE )
 target_compile_definitions(
-        ModernJSON
+        nlohmann_json
         INTERFACE
-        JSON_USE_IMPLICIT_CONVERSIONS=OFF
+        JSON_USE_IMPLICIT_CONVERSIONS=1
 )
 target_include_directories(
-        ModernJSON
+        nlohmann_json
         INTERFACE
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/nlohmann>
 )
@@ -179,7 +179,6 @@ if(OPENGL_FOUND)
       OFF
       CACHE BOOL "" FORCE)
   add_subdirectory(penumbra)
-  set_target_properties(awning PROPERTIES FOLDER ThirdParty/Penumbra)
   set_target_properties(glfw PROPERTIES FOLDER ThirdParty/Penumbra/GLFW)
   set_target_properties(glad PROPERTIES FOLDER ThirdParty/Penumbra)
   set_target_properties(penumbra PROPERTIES FOLDER ThirdParty/Penumbra)

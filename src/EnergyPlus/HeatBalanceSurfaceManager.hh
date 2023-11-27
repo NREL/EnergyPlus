@@ -194,7 +194,7 @@ namespace HeatBalanceSurfaceManager {
 
     void CalcOutsideSurfTemp(EnergyPlusData &state,
                              int SurfNum,      // Surface number DO loop counter
-                             int ZoneNum,      // Zone number the current surface is attached to
+                             int spaceNum,     // Space number the current surface is attached to
                              int ConstrNum,    // Construction index for the current surface
                              Real64 HMovInsul, // "Convection" coefficient of movable insulation
                              Real64 TempExt,   // Exterior temperature boundary condition
@@ -214,6 +214,8 @@ namespace HeatBalanceSurfaceManager {
     void GetGroundSurfacesReflectanceAverage(EnergyPlusData &state);
 
     void ReSetGroundSurfacesViewFactor(EnergyPlusData &state, int const SurfNum);
+
+    void GetSurroundingSurfacesTemperatureAverage(EnergyPlusData &state);
 
 } // namespace HeatBalanceSurfaceManager
 

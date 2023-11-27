@@ -99,6 +99,8 @@ namespace SolarShading {
 
     void GetShadowingInput(EnergyPlusData &state);
 
+    void checkScheduledSurfacePresent(EnergyPlusData &state);
+
     void AllocateModuleArrays(EnergyPlusData &state);
 
     void AnisoSkyViewFactors(EnergyPlusData &state);
@@ -428,7 +430,8 @@ struct SolarShadingData : BaseGlobalStruct
 #ifdef EP_NO_OPENGL
     bool penumbra = false;
 #else
-    std::unique_ptr<Pumbra::Penumbra> penumbra = nullptr;
+    std::unique_ptr<Penumbra::Penumbra> penumbra = nullptr;
+    std::pair<EnergyPlusData *, std::string> LoggerContext;
 #endif
 
     bool GetInputFlag = true;
@@ -640,6 +643,6 @@ struct SolarShadingData : BaseGlobalStruct
     {
     }
 };
-} // namespace EnergyPlus
 
+} // namespace EnergyPlus
 #endif

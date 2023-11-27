@@ -209,7 +209,7 @@ namespace PhotovoltaicThermalCollectors {
             auto &thisTmpSimplePVTperf = tmpSimplePVTperf(Item);
             thisTmpSimplePVTperf.Name = state.dataIPShortCut->cAlphaArgs(1);
             thisTmpSimplePVTperf.ThermEfficMode =
-                static_cast<ThermEfficEnum>(getEnumValue(ThermEfficTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
+                static_cast<ThermEfficEnum>(getEnumValue(ThermEfficTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
             thisTmpSimplePVTperf.ThermalActiveFract = state.dataIPShortCut->rNumericArgs(1);
             thisTmpSimplePVTperf.ThermEffic = state.dataIPShortCut->rNumericArgs(2);
             thisTmpSimplePVTperf.ThermEffSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
@@ -257,7 +257,7 @@ namespace PhotovoltaicThermalCollectors {
             auto &thisTmpBIPVTperf = tmpBIPVTperf(Item);
             thisTmpBIPVTperf.Name = state.dataIPShortCut->cAlphaArgs(1);
             thisTmpBIPVTperf.OSCMName = state.dataIPShortCut->cAlphaArgs(2);
-            Found = UtilityRoutines::FindItemInList(thisTmpBIPVTperf.OSCMName, state.dataSurface->OSCM);
+            Found = Util::FindItemInList(thisTmpBIPVTperf.OSCMName, state.dataSurface->OSCM);
             if (Found == 0) {
                 ShowSevereError(state,
                                 format("GetBIPVTCollectorsInput: Invalid outside model name={}, object type={}, object name={}",
@@ -335,7 +335,7 @@ namespace PhotovoltaicThermalCollectors {
             thisPVT.Name = state.dataIPShortCut->cAlphaArgs(1);
             thisPVT.Type = DataPlant::PlantEquipmentType::PVTSolarCollectorFlatPlate;
 
-            thisPVT.SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+            thisPVT.SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
             // check surface
             if (thisPVT.SurfNum == 0) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
@@ -383,14 +383,14 @@ namespace PhotovoltaicThermalCollectors {
                 ErrorsFound = true;
             } else {
                 thisPVT.PVTModelName = state.dataIPShortCut->cAlphaArgs(3);
-                int ThisParamObj = UtilityRoutines::FindItemInList(thisPVT.PVTModelName, tmpSimplePVTperf);
+                int ThisParamObj = Util::FindItemInList(thisPVT.PVTModelName, tmpSimplePVTperf);
                 if (ThisParamObj > 0) {
                     thisPVT.Simple = tmpSimplePVTperf(ThisParamObj); // entire structure assigned
                     // do one-time setups on input data
                     thisPVT.AreaCol = state.dataSurface->Surface(thisPVT.SurfNum).Area * thisPVT.Simple.ThermalActiveFract;
                     thisPVT.ModelType = PVTModelType::Simple;
                 } else {
-                    ThisParamObj = UtilityRoutines::FindItemInList(PVT(Item).PVTModelName, tmpBIPVTperf);
+                    ThisParamObj = Util::FindItemInList(PVT(Item).PVTModelName, tmpBIPVTperf);
                     if (ThisParamObj > 0) {
                         thisPVT.BIPVT = tmpBIPVTperf(ThisParamObj); // entire structure assigned
                         // do one-time setups on input data
@@ -407,7 +407,7 @@ namespace PhotovoltaicThermalCollectors {
                 }
 
                 if (allocated(state.dataPhotovoltaic->PVarray)) { // then PV input gotten... but don't expect this to be true.
-                    thisPVT.PVnum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataPhotovoltaic->PVarray);
+                    thisPVT.PVnum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataPhotovoltaic->PVarray);
                     // check PV
                     if (thisPVT.PVnum == 0) {
                         ShowSevereError(state,
@@ -424,9 +424,9 @@ namespace PhotovoltaicThermalCollectors {
                     thisPVT.PVfound = false;
                 }
 
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "Water")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "Water")) {
                     thisPVT.WorkingFluidType = WorkingFluidEnum::LIQUID;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "Air")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "Air")) {
                     thisPVT.WorkingFluidType = WorkingFluidEnum::AIR;
                 } else {
                     if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
@@ -618,7 +618,7 @@ namespace PhotovoltaicThermalCollectors {
         // finish set up of PV, because PV get-input follows PVT's get input.
         if (!this->PVfound) {
             if (allocated(state.dataPhotovoltaic->PVarray)) {
-                this->PVnum = UtilityRoutines::FindItemInList(this->PVname, state.dataPhotovoltaic->PVarray);
+                this->PVnum = Util::FindItemInList(this->PVname, state.dataPhotovoltaic->PVarray);
                 if (this->PVnum == 0) {
                     ShowSevereError(state, format("Invalid name for photovoltaic generator = {}", this->PVname));
                     ShowContinueError(state, format("Entered in flat plate photovoltaic-thermal collector = {}", this->Name));
@@ -1114,6 +1114,7 @@ namespace PhotovoltaicThermalCollectors {
             Real64 HrAir(0.0);
             Real64 HcExt(0.0);
             Real64 HrSky(0.0);
+            Real64 HrSrdSurf(0.0);
 
             Convect::InitExtConvCoeff(state,
                                       this->SurfNum,
@@ -1124,7 +1125,8 @@ namespace PhotovoltaicThermalCollectors {
                                       HcExt,
                                       HrSky,
                                       HrGround,
-                                      HrAir);
+                                      HrAir,
+                                      HrSrdSurf);
 
             Real64 WetBulbInlet(0.0);
             Real64 DewPointInlet(0.0);
@@ -1858,7 +1860,7 @@ namespace PhotovoltaicThermalCollectors {
             state.dataPhotovoltaicThermalCollector->GetInputFlag = false;
         }
 
-        WhichPVT = UtilityRoutines::FindItemInList(PVTName, state.dataPhotovoltaicThermalCollector->PVT);
+        WhichPVT = Util::FindItemInList(PVTName, state.dataPhotovoltaicThermalCollector->PVT);
         if (WhichPVT != 0) {
             NodeNum = state.dataPhotovoltaicThermalCollector->PVT(WhichPVT).HVACInletNodeNum;
         } else {
@@ -1889,7 +1891,7 @@ namespace PhotovoltaicThermalCollectors {
             state.dataPhotovoltaicThermalCollector->GetInputFlag = false;
         }
 
-        WhichPVT = UtilityRoutines::FindItemInList(PVTName, state.dataPhotovoltaicThermalCollector->PVT);
+        WhichPVT = Util::FindItemInList(PVTName, state.dataPhotovoltaicThermalCollector->PVT);
         if (WhichPVT != 0) {
             NodeNum = state.dataPhotovoltaicThermalCollector->PVT(WhichPVT).HVACOutletNodeNum;
         } else {

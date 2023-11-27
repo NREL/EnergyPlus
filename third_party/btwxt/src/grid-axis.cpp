@@ -8,14 +8,14 @@ namespace Btwxt {
 
 GridAxis::GridAxis(std::vector<double> values_in,
                    const std::string& name,
-                   Method interpolation_method,
-                   Method extrapolation_method,
+                   InterpolationMethod interpolation_method,
+                   ExtrapolationMethod extrapolation_method,
                    std::pair<double, double> extrapolation_limits,
                    const std::shared_ptr<Courierr::Courierr>& logger_in)
     : name(name)
     , values(std::move(values_in))
-    , extrapolation_method(extrapolation_method)
     , interpolation_method(interpolation_method)
+    , extrapolation_method(extrapolation_method)
     , extrapolation_limits(std::move(extrapolation_limits))
     , cubic_spacing_ratios(
           2, std::vector<double>(std::max(static_cast<int>(values.size()) - 1, 0), 1.0))
@@ -28,44 +28,32 @@ GridAxis::GridAxis(std::vector<double> values_in,
     }
     check_grid_sorted();
     check_extrapolation_limits();
-    if (interpolation_method == Method::cubic) {
+    if (interpolation_method == InterpolationMethod::cubic) {
         calculate_cubic_spacing_ratios();
     }
 }
 
-void GridAxis::set_interpolation_method(Method interpolation_method_in)
+void GridAxis::set_interpolation_method(InterpolationMethod interpolation_method_in)
 {
     interpolation_method = interpolation_method_in;
-    if (interpolation_method_in == Method::cubic) {
+    if (interpolation_method_in == InterpolationMethod::cubic) {
         calculate_cubic_spacing_ratios();
     }
 }
 
-void GridAxis::set_extrapolation_method(Method extrapolation_method_in)
+void GridAxis::set_extrapolation_method(ExtrapolationMethod extrapolation_method_in)
 {
     constexpr std::string_view info_format =
         "A {} extrapolation method is not valid for grid axis (name=\"{}\") with only {} value. "
         "Extrapolation method reset to {}.";
     switch (extrapolation_method_in) {
-    case Method::linear: {
+    case ExtrapolationMethod::linear: {
         if (get_length() == 1) {
-            extrapolation_method = Method::constant;
+            extrapolation_method = ExtrapolationMethod::constant;
             logger->info(fmt::format(info_format, "linear", name, "one", "constant"));
             return;
         }
         break;
-    }
-    case Method::cubic: {
-        if (get_length() <= 1) {
-            extrapolation_method = Method::constant;
-            logger->info(fmt::format(info_format, "cubic", name, "one", "constant"));
-            return;
-        }
-        else if (get_length() == 2) {
-            extrapolation_method = Method::linear;
-            logger->info(fmt::format(info_format, "cubic", name, "two", "linear"));
-            return;
-        }
     }
     default: {
         break;
@@ -77,13 +65,13 @@ void GridAxis::set_extrapolation_method(Method extrapolation_method_in)
 void GridAxis::calculate_cubic_spacing_ratios()
 {
     if (get_length() == 1) {
-        interpolation_method = Method::linear;
+        interpolation_method = InterpolationMethod::linear;
         logger->info(fmt::format(
             "A cubic interpolation method is not valid for grid axis (name=\"{}\") with "
             "only one value. Interpolation method reset to linear.",
             name));
     }
-    if (interpolation_method == Method::linear) {
+    if (interpolation_method == InterpolationMethod::linear) {
         return;
     }
     static constexpr std::size_t floor = 0;
@@ -107,9 +95,9 @@ GridAxis::get_cubic_spacing_ratios(const std::size_t floor_or_ceiling) const
 
 void GridAxis::check_grid_sorted()
 {
-    bool grid_is_sorted = vector_is_sorted(values);
+    bool grid_is_sorted = vector_is_valid(values);
     if (!grid_is_sorted) {
-        throw BtwxtException(fmt::format("Grid axis (name=\"{}\") values are not sorted.", name),
+        throw BtwxtException(fmt::format("Grid axis (name=\"{}\") values are not sorted, or have duplicates.", name),
                              *logger);
     }
 }

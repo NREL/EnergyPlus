@@ -69,7 +69,7 @@ struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
     static constexpr std::string_view object_name = "Coil:DX:ASHRAE205:Performance";
 
     std::shared_ptr<tk205::rs0004_ns::RS0004> representation; // ASHRAE205 representation instance
-    Btwxt::Method interpolation_type{Btwxt::Method::linear};
+    Btwxt::InterpolationMethod interpolation_type{Btwxt::InterpolationMethod::linear};
     Real64 rated_total_cooling_capacity;
     Real64 rated_steady_state_heating_capacity;
 

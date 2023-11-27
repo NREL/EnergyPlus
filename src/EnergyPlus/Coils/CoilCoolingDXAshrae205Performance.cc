@@ -54,6 +54,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/EnergyPlusLogger.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
@@ -66,8 +67,8 @@
 
 using namespace EnergyPlus;
 
-static std::map<std::string, Btwxt::Method> InterpMethods = // NOLINT(cert-err58-cpp)
-    {{"LINEAR", Btwxt::Method::linear}, {"CUBIC", Btwxt::Method::cubic}};
+static std::map<std::string, Btwxt::InterpolationMethod> InterpMethods = // NOLINT(cert-err58-cpp)
+    {{"LINEAR", Btwxt::InterpolationMethod::linear}, {"CUBIC", Btwxt::InterpolationMethod::cubic}};
 
 CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusData &state, const std::string &name_to_find)
 {
@@ -90,12 +91,11 @@ CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusD
         auto const &fields = instance.value();
         std::string const &thisObjectName = instance.key();
 
-        if (!UtilityRoutines::SameString(name_to_find, thisObjectName)) {
+        if (!Util::SameString(name_to_find, thisObjectName)) {
             continue;
         } else {
             ShowFatalError(state, format("Could not find Coil:Cooling:DX:Performance object with name: {}", name_to_find));
         }
-
 
         this->name = ip->getAlphaFieldValue(fields, objectSchemaProps, "name");
         std::string const rep_file_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "representation_file_name");
@@ -107,47 +107,48 @@ CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusD
             // be set The CheckForActualFilePath function emits some nice information to the ERR file, so we just need a simple fatal here
             ShowFatalError(state, "Program terminates due to the missing ASHRAE 205 RS0004 representation file.");
         }
-        this->representation =
-            std::dynamic_pointer_cast<rs0004_ns::RS0004>(RSInstanceFactory::create("RS0004", rep_file_path.string().c_str(), std::make_shared<EnergyPlus::Curve::EPlusLogging>()));
+        this->representation = std::dynamic_pointer_cast<rs0004_ns::RS0004>(
+            RSInstanceFactory::create("RS0004", rep_file_path.string().c_str(), std::make_shared<EnergyPlusLogger>()));
         if (nullptr == this->representation) {
             ShowSevereError(state, format("{} is not an instance of an ASHRAE205 Chiller.", rep_file_path.string()));
             errorsFound = true;
         }
         this->interpolation_type =
-            InterpMethods[UtilityRoutines::makeUPPER(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))];
+            InterpMethods[Util::makeUPPER(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))];
         this->rated_total_cooling_capacity = fields.at("rated_total_cooling_capacity").get<Real64>();
         this->rated_steady_state_heating_capacity = fields.at("rated_steady_state_heating_capacity").get<Real64>();
 
         if (errorsFound) {
             ShowFatalError(state,
-                           format("{} Errors found in getting {} input. Preceding condition(s) causes termination.", std::string{routineName}, this->object_name));
+                           format("{} Errors found in getting {} input. Preceding condition(s) causes termination.",
+                                  std::string{routineName},
+                                  this->object_name));
         }
     }
 }
 
 void CoilCoolingDX205Performance::simulate(EnergyPlus::EnergyPlusData &state,
-                                                const DataLoopNode::NodeData &inletNode,
-                                                DataLoopNode::NodeData &outletNode,
-                                                int useAlternateMode,
-                                                Real64 &PLR,
-                                                int &speedNum,
-                                                Real64 &speedRatio,
-                                                int const fanOpMode,
-                                                DataLoopNode::NodeData &condInletNode,
-                                                DataLoopNode::NodeData &condOutletNode,
-                                                bool const singleMode,
-                                                Real64 LoadSHR)
+                                           const DataLoopNode::NodeData &inletNode,
+                                           DataLoopNode::NodeData &outletNode,
+                                           int useAlternateMode,
+                                           Real64 &PLR,
+                                           int &speedNum,
+                                           Real64 &speedRatio,
+                                           int const fanOpMode,
+                                           DataLoopNode::NodeData &condInletNode,
+                                           DataLoopNode::NodeData &condOutletNode,
+                                           bool const singleMode,
+                                           Real64 LoadSHR)
 {
     static constexpr std::string_view RoutineName = "CoilCoolingDX205Performance::simulate";
     Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
     this->recoveredEnergyRate = 0.0;
     this->NormalSHR = 0.0;
 
-    this->calculate(
-        state, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+    this->calculate(state, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
     this->OperatingMode = 1;
 
-    #if 0
+#if 0
     // calculate crankcase heater operation
     if (state.dataEnvrn->OutDryBulbTemp < this->maxOutdoorDrybulbForBasin) {
         this->crankcaseHeaterPower = this->crankcaseHeaterCap;
@@ -169,7 +170,7 @@ void CoilCoolingDX205Performance::simulate(EnergyPlus::EnergyPlusData &state,
             this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - state.dataEnvrn->OutDryBulbTemp));
         }
     }
-    #endif //if 0
+#endif // if 0
 
     this->basinHeaterPower *= (1.0 - this->RTF);
     this->electricityConsumption = this->powerUse * reportingConstant;
@@ -185,14 +186,14 @@ void CoilCoolingDX205Performance::simulate(EnergyPlus::EnergyPlusData &state,
 }
 
 void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
-                                                 const DataLoopNode::NodeData &inletNode,
-                                                 DataLoopNode::NodeData &outletNode,
-                                                 Real64 &PLR,
-                                                 int &speedNum,
-                                                 Real64 &speedRatio,
-                                                 int const fanOpMode,
-                                                 DataLoopNode::NodeData &condInletNode,
-                                                 DataLoopNode::NodeData &condOutletNode)
+                                            const DataLoopNode::NodeData &inletNode,
+                                            DataLoopNode::NodeData &outletNode,
+                                            Real64 &PLR,
+                                            int &speedNum,
+                                            Real64 &speedRatio,
+                                            int const fanOpMode,
+                                            DataLoopNode::NodeData &condInletNode,
+                                            DataLoopNode::NodeData &condOutletNode)
 {
     static constexpr std::string_view RoutineName = "CoilCoolingDX205Performance::calculate";
 
@@ -204,7 +205,7 @@ void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
     if (fanOpMode == DataHVACGlobals::CycFanCycCoil && this_speed == 1) {
         // Entire system, fan and coil, are on or off for portions of a timestep
         if (PLR > 0.0) {
-            // Inlet node mass flow rate is the time-averaged mass flow rate during cycling, 
+            // Inlet node mass flow rate is the time-averaged mass flow rate during cycling,
             // so we divide by PLR to calculate the instantaneous (on-cycle) flow rate.
             // Performance calculation depends on the on-cycle rate.
             air_mass_flow_rate = air_mass_flow_rate / PLR;
@@ -222,13 +223,13 @@ void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
     auto outdoor_coil_dry_bulb_temperature = condInletNode.Temp;
 
     if (((this_speed == 1) && (PLR == 0.0)) || (inletNode.MassFlowRate == 0.0)) {
-        // Standby performance 
-        powerUse =
-            representation->performance.performance_map_standby.calculate_performance(outdoor_coil_dry_bulb_temperature).gross_power;  // TODO convert to Kelvin
+        // Standby performance
+        powerUse = representation->performance.performance_map_standby.calculate_performance(outdoor_coil_dry_bulb_temperature)
+                       .gross_power; // TODO convert to Kelvin
         calculate_output_nodes(state, inletNode, outletNode, 0.0, 0.0, air_mass_flow_rate);
         RTF = 0;
         return;
-    } 
+    }
 
     // Normal performance
     const auto &[gross_total_capacity, gross_sensible_capacity, gross_power] =
@@ -242,8 +243,7 @@ void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
             this->interpolation_type);
 
     // Sets outletNode Enthalpy, Temp, HumRat, Press:
-    calculate_output_nodes(
-        state, inletNode, outletNode, gross_total_capacity, gross_sensible_capacity, air_mass_flow_rate);
+    calculate_output_nodes(state, inletNode, outletNode, gross_total_capacity, gross_sensible_capacity, air_mass_flow_rate);
 
     const auto min_speed = representation->performance.performance_map_cooling.grid_variables.compressor_sequence_number.front();
     const auto max_speed = representation->performance.performance_map_cooling.grid_variables.compressor_sequence_number.back();
@@ -274,7 +274,7 @@ void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
     auto part_load_factor = (1.0 - cd) + (cd * cycling_ratio);
     RTF = cycling_ratio / part_load_factor;
 
-    if (fanOpMode == DataHVACGlobals::ContFanCycCoil) { 
+    if (fanOpMode == DataHVACGlobals::ContFanCycCoil) {
         // Fan on, compressor cycling
         outletNode.HumRat = outletNode.HumRat * cycling_ratio + (1.0 - cycling_ratio) * inletNode.HumRat;
         outletNode.Enthalpy = outletNode.Enthalpy * cycling_ratio + (1.0 - cycling_ratio) * inletNode.Enthalpy;
@@ -292,21 +292,22 @@ void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
         // If multispeed, evaluate next lower speed using PLR, then combine with high speed for final outlet conditions
         auto lowerspeed = max(speedNum - 1, 1);
 
-        const auto &[gross_capacity_lower_speed, gross_sensible_capacity_lower_speed, power_lower_speed] = representation->performance.performance_map_cooling
-                                                    .calculate_performance(outdoor_coil_entering_dry_bulb_temperature, // TODO convert to Kelvin
-                                                                           indoor_coil_entering_relative_humidity,
-                                                                           indoor_coil_entering_dry_bulb_temperature, // TODO convert to Kelvin
-                                                                           air_mass_flow_rate, // use prior mfr, because we need resulting capacity to calculate the current one!
-                                                                           lowerspeed,
-                                                                           ambient_pressure,
-                                                                           this->interpolation_type);
+        const auto &[gross_capacity_lower_speed, gross_sensible_capacity_lower_speed, power_lower_speed] =
+            representation->performance.performance_map_cooling.calculate_performance(
+                outdoor_coil_entering_dry_bulb_temperature, // TODO convert to Kelvin
+                indoor_coil_entering_relative_humidity,
+                indoor_coil_entering_dry_bulb_temperature, // TODO convert to Kelvin
+                air_mass_flow_rate,                        // use prior mfr, because we need resulting capacity to calculate the current one!
+                lowerspeed,
+                ambient_pressure,
+                this->interpolation_type);
 
         auto mass_flow_rate_lowerspeed = state.dataHVACGlobal->MSHPMassFlowRateLow * gross_capacity_lower_speed / gross_total_capacity;
 
         // Sets outletNode Enthalpy, Temp, HumRat, Press:
         calculate_output_nodes(
             state, inletNode, outletNode, gross_capacity_lower_speed, gross_sensible_capacity_lower_speed, mass_flow_rate_lowerspeed);
-        //lowerspeed.CalcSpeedOutput(state, inletNode, outletNode, PLR, fanOpMode, condInletTemp); // out
+        // lowerspeed.CalcSpeedOutput(state, inletNode, outletNode, PLR, fanOpMode, condInletTemp); // out
 
         Real64 outSpeed1HumRat = outletNode.HumRat;
         Real64 outSpeed1Enthalpy = outletNode.Enthalpy;

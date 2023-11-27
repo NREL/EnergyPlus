@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -85,6 +86,7 @@ namespace OutsideEnergySources {
         Real64 MassFlowRate = 0.0;
         Real64 InletTemp = 0.0;
         Real64 OutletTemp = 0.0;
+        Real64 OutletSteamQuality = 0.0;
 
         OutsideEnergySourceSpecs() = default;
 

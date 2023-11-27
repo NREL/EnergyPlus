@@ -73,6 +73,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Plant/EquipAndOperations.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PluginManager.hh>
@@ -374,7 +375,7 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
     for (OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(
             state, CurrentModuleObject, OpNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
-        if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
+        if (Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
     }
 
     CurrentModuleObject = "CondenserEquipmentOperationSchemes";
@@ -382,7 +383,7 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
     for (OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(
             state, CurrentModuleObject, OpNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
-        if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
+        if (Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
     }
 
     // Load the Plant data structure
@@ -423,6 +424,8 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
                             state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type = OpScheme::HeatingRB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT") { //* Temp Based Control
                             state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type = OpScheme::CompSetPtBased;
+                        } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:CHILLERHEATERCHANGEOVER") {
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type = OpScheme::ChillerHeaterSupervisory;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE") { //* Simple TES Control
                             state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type =
                                 OpScheme::CompSetPtBased; // set this to component based as it will be converted to this
@@ -539,6 +542,7 @@ void GetOperationSchemeInput(EnergyPlusData &state)
     int WBTDBO;                 // Number ofWet Bulb Temperature Range Based Operation Inputs
     int DPTDBO;                 // Number ofDewPoint Temperature Range Based Operation Inputs
     int TESSPBO;                // Number of Thermal Energy Storage Setpoint Based Operation Inputs
+    int ACXSPBO;                // Number of Chiller Heater setpoint based operation inputs
     int NumSchemes;             // Number of Condenser equipment lists
     int NumUncontrolledSchemes; // Number of Condenser equipment lists
     int NumUserDefOpSchemes;    // number of user defined EMS op schemes
@@ -565,7 +569,8 @@ void GetOperationSchemeInput(EnergyPlusData &state)
     WBTDBO = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorWetBulbDifference");
     DPTDBO = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:OutdoorDewpointDifference");
     TESSPBO = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:ThermalEnergyStorage");
-    NumSchemes = CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUserDefOpSchemes + TESSPBO;
+    ACXSPBO = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:ChillerHeaterChangeover");
+    NumSchemes = CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUserDefOpSchemes + TESSPBO + ACXSPBO;
     NumUncontrolledSchemes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:Uncontrolled");
     if ((NumSchemes + NumUncontrolledSchemes) <= 0) {
         ShowFatalError(state, "No PlantEquipmentOperation:* objects specified. Stop simulation.");
@@ -620,6 +625,11 @@ void GetOperationSchemeInput(EnergyPlusData &state)
             CurrentModuleObject = "PlantEquipmentOperation:ThermalEnergyStorage";
             Count =
                 Num - CLRBO - HLRBO - DBRBO - WBRBO - DPRBO - RHRBO - CSPBO - DBTDBO - WBTDBO - DPTDBO - NumUncontrolledSchemes - NumUserDefOpSchemes;
+        } else if (ACXSPBO > 0 && Num <= (CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUncontrolledSchemes +
+                                          NumUserDefOpSchemes + TESSPBO + ACXSPBO)) {
+            CurrentModuleObject = "PlantEquipmentOperation:ChillerHeaterChangeover";
+            Count = Num - CLRBO - HLRBO - DBRBO - WBRBO - DPRBO - RHRBO - CSPBO - DBTDBO - WBTDBO - DPTDBO - NumUncontrolledSchemes -
+                    NumUserDefOpSchemes - TESSPBO;
         } else {
             ShowFatalError(state, "Error in control scheme identification");
         }
@@ -730,6 +740,10 @@ void GetOperationSchemeInput(EnergyPlusData &state)
                     CurrentModuleObject = "PlantEquipmentOperation:ThermalEnergyStorage";
                     FindCompSPInput(state, CurrentModuleObject, TESSPBO, LoopNum, SchemeNum, ErrorsFound);
 
+                } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:CHILLERHEATERCHANGEOVER") {
+                    CurrentModuleObject = "PlantEquipmentOperation:ChillerHeaterChangeover";
+                    GetChillerHeaterChangeoverOpSchemeInput(state, CurrentModuleObject, ACXSPBO, ErrorsFound);
+
                 } else { // invalid op scheme type for plant loop
                     // Seems like the alpha args below is incorrect....
                     ShowSevereError(state,
@@ -830,7 +844,7 @@ void FindRangeBasedOrUncontrolledInput(EnergyPlusData &state,
         for (Num = 1; Num <= NumSchemes; ++Num) {
             state.dataInputProcessing->inputProcessor->getObjectItem(
                 state, CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
-            if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, AlphArray(1))) break;
+            if (Util::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, AlphArray(1))) break;
             if (Num == NumSchemes) {
                 ShowSevereError(state,
                                 format("{} = \"{}\", could not find {} = \"{}\".",
@@ -1054,7 +1068,7 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
     if (NumSchemes > 0) {
         for (Num = 1; Num <= NumSchemes; ++Num) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state, cmoStr, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
-            if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, AlphArray(1))) break;
+            if (Util::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, AlphArray(1))) break;
             if (Num == NumSchemes) {
                 ShowSevereError(state,
                                 format("{} = \"{}\", could not find {} = \"{}\".",
@@ -1294,8 +1308,8 @@ void LoadEquipList(EnergyPlusData &state,
     FoundIntendedList = false;
     // find name in set of possible list
     for (Num = 1; Num <= state.dataPlantCondLoopOp->TotNumLists; ++Num) {
-        if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Name,
-                                        state.dataPlantCondLoopOp->EquipListsNameList(Num))) {
+        if (Util::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Name,
+                             state.dataPlantCondLoopOp->EquipListsNameList(Num))) {
             FoundIntendedList = true;
             // get object item for real this time
             {
@@ -1395,7 +1409,7 @@ void FindCompSPInput(EnergyPlusData &state,
     SchemeNameFound = true;
 
     DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
-        getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::makeUPPER(CurrentModuleObject)));
+        getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, Util::makeUPPER(CurrentModuleObject)));
 
     if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
         LoopOpSchemeObj = "PlantEquipmentOperationSchemes";
@@ -1407,7 +1421,7 @@ void FindCompSPInput(EnergyPlusData &state,
         for (int Num = 1; Num <= NumSchemes; ++Num) {
             state.dataInputProcessing->inputProcessor->getObjectItem(
                 state, CurrentModuleObject, Num, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
-            if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, state.dataIPShortCut->cAlphaArgs(1))) break;
+            if (Util::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, state.dataIPShortCut->cAlphaArgs(1))) break;
             if (Num == NumSchemes) {
                 ShowSevereError(state,
                                 format("{} = \"{}\", could not find {} = \"{}\".",
@@ -1833,6 +1847,541 @@ void FindCompSPInput(EnergyPlusData &state,
     }
 }
 
+void GetChillerHeaterChangeoverOpSchemeInput(EnergyPlusData &state,
+                                             [[maybe_unused]] std::string &CurrentModuleObject,
+                                             int const NumSchemes,
+                                             bool &ErrorsFound)
+{
+    // process input objects for advanced operation scheme, use json type input patterns
+
+    if (NumSchemes > 0 && state.dataPlantCondLoopOp->LoadSupervisoryChillerHeaterOpScheme) {
+
+        state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes.allocate(NumSchemes);
+        std::string heatingOnlyLoadOpName;
+        std::string coolingOnlyLoadOpName;
+        std::string simultHeatCoolHeatingOpName;
+        std::string simulHeatCoolCoolingOpName;
+        for (int Num = 1; Num <= NumSchemes; ++Num) {
+            auto &scheme = state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes(Num);
+            std::string cCurrentModuleObject("PlantEquipmentOperation:ChillerHeaterChangeover");
+            static const std::string routineName("GetChillerHeaterChangeoverOpSchemeInput: ");
+            auto const schemeInstances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+            auto &ip = state.dataInputProcessing->inputProcessor;
+            if (schemeInstances != ip->epJSON.end()) {
+                auto &instancesValue = schemeInstances.value();
+                for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                    auto const &fields = instance.value();
+                    auto const &thisObjectName = Util::makeUPPER(instance.key());
+                    state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+                    scheme.Name = thisObjectName;
+                    scheme.TypeOf = "PlantEquipmentOperation:ChillerHeaterChangeover";
+                    scheme.Type = OpScheme::ChillerHeaterSupervisory;
+                    scheme.Setpoint.PrimCW = fields.at("primary_cooling_plant_setpoint_temperature").get<Real64>();
+                    auto const secCWSP = fields.find("secondary_distribution_cooling_plant_setpoint_temperature");
+                    if (secCWSP != fields.end()) { // not required field
+                        scheme.Setpoint.SecCW = secCWSP.value().get<Real64>();
+                    }
+                    scheme.Setpoint.PrimHW_High = fields.at("primary_heating_plant_setpoint_at_outdoor_high_temperature").get<Real64>();
+                    scheme.TempReset.HighOutdoorTemp = fields.at("outdoor_high_temperature").get<Real64>();
+                    scheme.Setpoint.PrimHW_Low = fields.at("primary_heating_plant_setpoint_at_outdoor_low_temperature").get<Real64>();
+                    scheme.TempReset.LowOutdoorTemp = fields.at("outdoor_low_temperature").get<Real64>();
+                    auto const secHWSP = fields.find("secondary_distribution_heating_plant_setpoint_temperature");
+                    if (secHWSP != fields.end()) { // not required field
+                        scheme.Setpoint.SecHW = secHWSP.value().get<Real64>();
+                    }
+                    auto const boilerOffset = fields.find("boiler_setpoint_temperature_offset");
+                    (boilerOffset != fields.end()) ? (scheme.TempReset.BoilerTemperatureOffset = boilerOffset.value().get<Real64>())
+                                                   : (scheme.TempReset.BoilerTemperatureOffset = 0.5);
+                    auto const backUpLow_HWset = fields.find("primary_heating_plant_setpoint_at_backup_outdoor_low_temperature");
+                    (backUpLow_HWset != fields.end()) ? (scheme.Setpoint.PrimHW_BackupLow = backUpLow_HWset.value().get<Real64>())
+                                                      : (scheme.Setpoint.PrimHW_BackupLow = scheme.Setpoint.PrimHW_Low);
+                    auto const backUpLowTemp = fields.find("backup_outdoor_low_temperature");
+                    (backUpLowTemp != fields.end()) ? (scheme.TempReset.BackupLowOutdoorTemp = backUpLowTemp.value().get<Real64>())
+                                                    : (scheme.TempReset.BackupLowOutdoorTemp = scheme.TempReset.LowOutdoorTemp);
+                    auto const zoneNameList = fields.find("zone_load_polling_zonelist_name");
+                    if (zoneNameList != fields.end()) {
+                        scheme.ZoneListName = Util::makeUPPER(zoneNameList.value().get<std::string>());
+                    }
+                    auto const coolPlantEqOpCoolingLoad = fields.find("cooling_only_load_plant_equipment_operation_cooling_load_name");
+                    if (coolPlantEqOpCoolingLoad != fields.end()) {
+                        coolingOnlyLoadOpName = Util::makeUPPER(coolPlantEqOpCoolingLoad.value().get<std::string>());
+                    }
+                    auto const heatPlantEqOpHeatingLoad = fields.find("heating_only_load_plant_equipment_operation_heating_load_name");
+                    if (heatPlantEqOpHeatingLoad != fields.end()) {
+                        heatingOnlyLoadOpName = Util::makeUPPER(heatPlantEqOpHeatingLoad.value().get<std::string>());
+                    }
+                    auto const simulEqOpCoolingLoad = fields.find("simultaneous_cooling_and_heating_plant_equipment_operation_cooling_load_name");
+                    if (simulEqOpCoolingLoad != fields.end()) {
+                        simulHeatCoolCoolingOpName = Util::makeUPPER(simulEqOpCoolingLoad.value().get<std::string>());
+                        scheme.PlantOps.SimulHeatCoolCoolingOpInput = true;
+                    }
+                    auto const simulEqOpHeatingLoad = fields.find("simultaneous_cooling_and_heating_plant_equipment_operation_heating_load_name");
+                    if (simulEqOpHeatingLoad != fields.end()) {
+                        simultHeatCoolHeatingOpName = Util::makeUPPER(simulEqOpHeatingLoad.value().get<std::string>());
+                        scheme.PlantOps.SimultHeatCoolHeatingOpInput = true;
+                    }
+                    auto const dedicatedCWHPName = fields.find("dedicated_chilled_water_return_recovery_heat_pump_name");
+                    if (dedicatedCWHPName != fields.end()) {
+                        scheme.DedicatedHR_ChWRetControl_Name = Util::makeUPPER(dedicatedCWHPName.value().get<std::string>());
+                        scheme.PlantOps.DedicatedHR_ChWRetControl_Input = true;
+                    }
+                    auto const dedicatedHWHPName = fields.find("dedicated_hot_water_return_recovery_heat_pump_name");
+                    if (dedicatedHWHPName != fields.end()) {
+                        scheme.DedicatedHR_HWRetControl_Name = Util::makeUPPER(dedicatedHWHPName.value().get<std::string>());
+                        scheme.PlantOps.DedicatedHR_HWRetControl_Input = true;
+                    }
+                }
+            }
+
+            //  Load input instances from input processor
+            cCurrentModuleObject = "PlantEquipmentOperation:CoolingLoad";
+            auto const coolLoadInstances = ip->epJSON.find(cCurrentModuleObject);
+            auto &coolLoadInstancesValue = coolLoadInstances.value();
+
+            cCurrentModuleObject = "PlantEquipmentOperation:HeatingLoad";
+            auto const heatLoadInstances = ip->epJSON.find(cCurrentModuleObject);
+            auto &heatLoadInstancesValue = heatLoadInstances.value();
+
+            cCurrentModuleObject = "PlantEquipmentList";
+            auto const equipListInstances = ip->epJSON.find(cCurrentModuleObject);
+            auto const &equipListObjectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject);
+            auto &equipListInstancesValue = equipListInstances.value();
+
+            // process cooling only mode equipment lists and ranges
+            for (auto instance = coolLoadInstancesValue.begin(); instance != coolLoadInstancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = Util::makeUPPER(instance.key());
+                if (!Util::SameString(coolingOnlyLoadOpName, thisObjectName)) continue;
+
+                int numfields = fields.size();
+                scheme.PlantOps.NumCoolingOnlyEquipLists = (numfields - 1) / 3; //  assume correctly formed field sets?
+                scheme.CoolingOnlyEquipList.allocate(scheme.PlantOps.NumCoolingOnlyEquipLists);
+                for (int listNum = 1; listNum <= scheme.PlantOps.NumCoolingOnlyEquipLists; ++listNum) {
+                    switch (listNum) {
+                    case 1: {
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_1_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_1_lower_limit").get<Real64>();
+                        scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_1_upper_limit").get<Real64>();
+                    } break;
+
+                    case 2: {
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_2_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_2_lower_limit").get<Real64>();
+                        scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_2_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 3: {
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_3_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_3_lower_limit").get<Real64>();
+                        scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_3_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 4: {
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_4_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_4_lower_limit").get<Real64>();
+                        scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_4_upper_limit").get<Real64>();
+
+                    } break;
+                    case 5: {
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_5_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_5_lower_limit").get<Real64>();
+                        scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_5_upper_limit").get<Real64>();
+
+                    } break;
+                    case 6: {
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_6_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_6_lower_limit").get<Real64>();
+                        scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_6_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 7: {
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_7_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_7_lower_limit").get<Real64>();
+                        scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_7_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 8: {
+                        scheme.CoolingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_8_equipment_list_name").get<std::string>());
+                        scheme.CoolingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_8_lower_limit").get<Real64>();
+                        scheme.CoolingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_8_upper_limit").get<Real64>();
+
+                    } break;
+                    }
+                }
+            }
+
+            if (!allocated(scheme.CoolingOnlyEquipList)) { // never found a match
+                ShowSevereError(state,
+                                format("GetChillerHeaterChangeoverOpSchemeInput problem with PlantEquipmentOperation:ChillerHeaterChangeover name "
+                                       "=\"{}\", PlantEquipmentOperation:CoolingLoad name = \"{}\" was not found.",
+                                       scheme.Name,
+                                       coolingOnlyLoadOpName));
+                ErrorsFound = true;
+            }
+
+            for (int listNum = 1; listNum <= scheme.PlantOps.NumCoolingOnlyEquipLists; ++listNum) {
+
+                for (auto instance = equipListInstancesValue.begin(); instance != equipListInstancesValue.end(); ++instance) {
+                    auto const &objectFields = instance.value();
+                    auto const &thisObjectName = Util::makeUPPER(instance.key());
+                    if (!Util::SameString(scheme.CoolingOnlyEquipList(listNum).Name, thisObjectName)) continue;
+
+                    auto extensibles = objectFields.find("equipment");
+                    auto const &extensionSchemaProps = equipListObjectSchemaProps["equipment"]["items"]["properties"];
+                    if (extensibles != objectFields.end()) {
+                        auto extensiblesArray = extensibles.value();
+                        int numExtensibles = extensiblesArray.size();
+                        scheme.CoolingOnlyEquipList(listNum).NumComps = numExtensibles;
+                        scheme.CoolingOnlyEquipList(listNum).Comp.allocate(numExtensibles);
+                        int listItem = 0;
+                        for (nlohmann::json const &extensibleInstance : extensiblesArray) {
+                            ++listItem;
+                            scheme.CoolingOnlyEquipList(listNum).Comp(listItem).TypeOf =
+                                ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "equipment_object_type");
+                            scheme.CoolingOnlyEquipList(listNum).Comp(listItem).Name =
+                                ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "equipment_name");
+                        }
+                    }
+                }
+            }
+
+            // process heating only mode equipment lists and ranges
+            for (auto instance = heatLoadInstancesValue.begin(); instance != heatLoadInstancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = Util::makeUPPER(instance.key());
+                if (!Util::SameString(heatingOnlyLoadOpName, thisObjectName)) continue;
+
+                int numfields = fields.size();
+                scheme.PlantOps.NumHeatingOnlyEquipLists = (numfields - 1) / 3; //  assume correctly formed field sets?
+                scheme.HeatingOnlyEquipList.allocate(scheme.PlantOps.NumHeatingOnlyEquipLists);
+                for (int listNum = 1; listNum <= scheme.PlantOps.NumHeatingOnlyEquipLists; ++listNum) {
+                    switch (listNum) {
+                    case 1: {
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_1_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_1_lower_limit").get<Real64>();
+                        scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_1_upper_limit").get<Real64>();
+                    } break;
+
+                    case 2: {
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_2_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_2_lower_limit").get<Real64>();
+                        scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_2_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 3: {
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_3_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_3_lower_limit").get<Real64>();
+                        scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_3_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 4: {
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_4_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_4_lower_limit").get<Real64>();
+                        scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_4_upper_limit").get<Real64>();
+
+                    } break;
+                    case 5: {
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_5_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_5_lower_limit").get<Real64>();
+                        scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_5_upper_limit").get<Real64>();
+
+                    } break;
+                    case 6: {
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_6_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_6_lower_limit").get<Real64>();
+                        scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_6_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 7: {
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_7_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_7_lower_limit").get<Real64>();
+                        scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_7_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 8: {
+                        scheme.HeatingOnlyEquipList(listNum).Name = Util::makeUPPER(fields.at("range_8_equipment_list_name").get<std::string>());
+                        scheme.HeatingOnlyEquipList(listNum).RangeLowerLimit = fields.at("load_range_8_lower_limit").get<Real64>();
+                        scheme.HeatingOnlyEquipList(listNum).RangeUpperLimit = fields.at("load_range_8_upper_limit").get<Real64>();
+
+                    } break;
+                    }
+                }
+            }
+
+            if (!allocated(scheme.HeatingOnlyEquipList)) { // never found a match
+                ShowSevereError(state,
+                                format("GetChillerHeaterChangeoverOpSchemeInput problem with PlantEquipmentOperation:ChillerHeaterChangeover name "
+                                       "=\"{}\", PlantEquipmentOperation:HeatingLoad name = \"{}\" was not found.",
+                                       scheme.Name,
+                                       heatingOnlyLoadOpName));
+                ErrorsFound = true;
+            }
+
+            for (int listNum = 1; listNum <= scheme.PlantOps.NumHeatingOnlyEquipLists; ++listNum) {
+
+                for (auto instance = equipListInstancesValue.begin(); instance != equipListInstancesValue.end(); ++instance) {
+                    auto const &objectFields = instance.value();
+                    auto const &thisObjectName = Util::makeUPPER(instance.key());
+                    if (!Util::SameString(scheme.HeatingOnlyEquipList(listNum).Name, thisObjectName)) continue;
+
+                    auto extensibles = objectFields.find("equipment");
+                    auto const &extensionSchemaProps = equipListObjectSchemaProps["equipment"]["items"]["properties"];
+                    if (extensibles != objectFields.end()) {
+                        auto extensiblesArray = extensibles.value();
+                        int numExtensibles = extensiblesArray.size();
+                        scheme.HeatingOnlyEquipList(listNum).NumComps = numExtensibles;
+                        scheme.HeatingOnlyEquipList(listNum).Comp.allocate(numExtensibles);
+                        int listItem = 0;
+                        for (nlohmann::json const &extensibleInstance : extensiblesArray) {
+                            ++listItem;
+                            scheme.HeatingOnlyEquipList(listNum).Comp(listItem).TypeOf =
+                                ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "equipment_object_type");
+                            scheme.HeatingOnlyEquipList(listNum).Comp(listItem).Name =
+                                ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "equipment_name");
+                        }
+                    }
+                }
+            }
+
+            // process simulataneous heating and cooling mode cooling equipment lists and ranges
+
+            for (auto instance = coolLoadInstancesValue.begin(); instance != coolLoadInstancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = Util::makeUPPER(instance.key());
+                if (!Util::SameString(simulHeatCoolCoolingOpName, thisObjectName)) continue;
+
+                int numfields = fields.size();
+                scheme.PlantOps.NumSimultHeatCoolCoolingEquipLists = (numfields - 1) / 3; //  assume correctly formed field sets?
+                scheme.SimultHeatCoolCoolingEquipList.allocate(scheme.PlantOps.NumSimultHeatCoolCoolingEquipLists);
+                for (int listNum = 1; listNum <= scheme.PlantOps.NumSimultHeatCoolCoolingEquipLists; ++listNum) {
+                    switch (listNum) {
+                    case 1: {
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_1_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeLowerLimit = fields.at("load_range_1_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeUpperLimit = fields.at("load_range_1_upper_limit").get<Real64>();
+                    } break;
+
+                    case 2: {
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_2_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeLowerLimit = fields.at("load_range_2_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeUpperLimit = fields.at("load_range_2_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 3: {
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_3_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeLowerLimit = fields.at("load_range_3_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeUpperLimit = fields.at("load_range_3_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 4: {
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_4_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeLowerLimit = fields.at("load_range_4_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeUpperLimit = fields.at("load_range_4_upper_limit").get<Real64>();
+
+                    } break;
+                    case 5: {
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_5_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeLowerLimit = fields.at("load_range_5_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeUpperLimit = fields.at("load_range_5_upper_limit").get<Real64>();
+
+                    } break;
+                    case 6: {
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_6_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeLowerLimit = fields.at("load_range_6_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeUpperLimit = fields.at("load_range_6_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 7: {
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_7_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeLowerLimit = fields.at("load_range_7_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeUpperLimit = fields.at("load_range_7_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 8: {
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_8_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeLowerLimit = fields.at("load_range_8_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).RangeUpperLimit = fields.at("load_range_8_upper_limit").get<Real64>();
+
+                    } break;
+                    }
+                }
+            }
+
+            if (scheme.PlantOps.SimulHeatCoolCoolingOpInput && !allocated(scheme.SimultHeatCoolCoolingEquipList)) {
+                ShowSevereError(state,
+                                format("GetChillerHeaterChangeoverOpSchemeInput problem with PlantEquipmentOperation:ChillerHeaterChangeover name "
+                                       "=\"{}\", PlantEquipmentOperation:CoolingLoad name = \"{}\" was not found.",
+                                       scheme.Name,
+                                       simulHeatCoolCoolingOpName));
+                ErrorsFound = true;
+            }
+
+            for (int listNum = 1; listNum <= scheme.PlantOps.NumSimultHeatCoolCoolingEquipLists; ++listNum) {
+
+                for (auto instance = equipListInstancesValue.begin(); instance != equipListInstancesValue.end(); ++instance) {
+                    auto const &objectFields = instance.value();
+                    auto const &thisObjectName = Util::makeUPPER(instance.key());
+                    if (!Util::SameString(scheme.SimultHeatCoolCoolingEquipList(listNum).Name, thisObjectName)) continue;
+
+                    auto extensibles = objectFields.find("equipment");
+                    auto const &extensionSchemaProps = equipListObjectSchemaProps["equipment"]["items"]["properties"];
+                    if (extensibles != objectFields.end()) {
+                        auto extensiblesArray = extensibles.value();
+                        int numExtensibles = extensiblesArray.size();
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).NumComps = numExtensibles;
+                        scheme.SimultHeatCoolCoolingEquipList(listNum).Comp.allocate(numExtensibles);
+                        int listItem = 0;
+                        for (nlohmann::json const &extensibleInstance : extensiblesArray) {
+                            ++listItem;
+                            scheme.SimultHeatCoolCoolingEquipList(listNum).Comp(listItem).TypeOf =
+                                ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "equipment_object_type");
+                            scheme.SimultHeatCoolCoolingEquipList(listNum).Comp(listItem).Name =
+                                ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "equipment_name");
+                        }
+                    }
+                }
+            }
+
+            // process simultaneous heating and cooling mode heating equipment lists and ranges
+
+            for (auto instance = heatLoadInstancesValue.begin(); instance != heatLoadInstancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = Util::makeUPPER(instance.key());
+                if (!Util::SameString(simultHeatCoolHeatingOpName, thisObjectName)) continue;
+
+                int numfields = fields.size();
+                scheme.PlantOps.NumSimultHeatCoolHeatingEquipLists = (numfields - 1) / 3; //  assume correctly formed field sets?
+                scheme.SimultHeatCoolHeatingEquipList.allocate(scheme.PlantOps.NumSimultHeatCoolHeatingEquipLists);
+                for (int listNum = 1; listNum <= scheme.PlantOps.NumSimultHeatCoolHeatingEquipLists; ++listNum) {
+                    switch (listNum) {
+                    case 1: {
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_1_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeLowerLimit = fields.at("load_range_1_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeUpperLimit = fields.at("load_range_1_upper_limit").get<Real64>();
+                    } break;
+
+                    case 2: {
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_2_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeLowerLimit = fields.at("load_range_2_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeUpperLimit = fields.at("load_range_2_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 3: {
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_3_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeLowerLimit = fields.at("load_range_3_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeUpperLimit = fields.at("load_range_3_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 4: {
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_4_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeLowerLimit = fields.at("load_range_4_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeUpperLimit = fields.at("load_range_4_upper_limit").get<Real64>();
+
+                    } break;
+                    case 5: {
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_5_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeLowerLimit = fields.at("load_range_5_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeUpperLimit = fields.at("load_range_5_upper_limit").get<Real64>();
+
+                    } break;
+                    case 6: {
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_6_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeLowerLimit = fields.at("load_range_6_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeUpperLimit = fields.at("load_range_6_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 7: {
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_7_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeLowerLimit = fields.at("load_range_7_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeUpperLimit = fields.at("load_range_7_upper_limit").get<Real64>();
+
+                    } break;
+
+                    case 8: {
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).Name =
+                            Util::makeUPPER(fields.at("range_8_equipment_list_name").get<std::string>());
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeLowerLimit = fields.at("load_range_8_lower_limit").get<Real64>();
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).RangeUpperLimit = fields.at("load_range_8_upper_limit").get<Real64>();
+
+                    } break;
+                    }
+                }
+            }
+            if (scheme.PlantOps.SimultHeatCoolHeatingOpInput && !allocated(scheme.SimultHeatCoolHeatingEquipList)) {
+                ShowSevereError(state,
+                                format("GetChillerHeaterChangeoverOpSchemeInput problem with PlantEquipmentOperation:ChillerHeaterChangeover name "
+                                       "=\"{}\", PlantEquipmentOperation:HeatingLoad name = \"{}\" was not found.",
+                                       scheme.Name,
+                                       simultHeatCoolHeatingOpName));
+                ErrorsFound = true;
+            }
+
+            for (int listNum = 1; listNum <= scheme.PlantOps.NumSimultHeatCoolHeatingEquipLists; ++listNum) {
+
+                std::string cCurrentModuleObject("PlantEquipmentList");
+
+                auto const instances = ip->epJSON.find(cCurrentModuleObject);
+                auto const &objectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject);
+
+                auto &instancesValue = instances.value();
+                for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                    auto const &objectFields = instance.value();
+                    auto const &thisObjectName = Util::makeUPPER(instance.key());
+                    if (!Util::SameString(scheme.SimultHeatCoolHeatingEquipList(listNum).Name, thisObjectName)) continue;
+
+                    auto extensibles = objectFields.find("equipment");
+                    auto const &extensionSchemaProps = objectSchemaProps["equipment"]["items"]["properties"];
+                    if (extensibles != objectFields.end()) {
+                        auto extensiblesArray = extensibles.value();
+                        int numExtensibles = extensiblesArray.size();
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).NumComps = numExtensibles;
+                        scheme.SimultHeatCoolHeatingEquipList(listNum).Comp.allocate(numExtensibles);
+                        int listItem = 0;
+                        for (nlohmann::json const &extensibleInstance : extensiblesArray) {
+                            ++listItem;
+                            scheme.SimultHeatCoolHeatingEquipList(listNum).Comp(listItem).TypeOf =
+                                ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "equipment_object_type");
+                            scheme.SimultHeatCoolHeatingEquipList(listNum).Comp(listItem).Name =
+                                ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "equipment_name");
+                        }
+                    }
+                }
+            }
+        }
+    }
+    state.dataPlantCondLoopOp->LoadSupervisoryChillerHeaterOpScheme = false;
+}
+
 void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
                                  std::string &CurrentModuleObject, // for ease in renaming
                                  int const NumSchemes,             // May be set here and passed on
@@ -1887,7 +2436,7 @@ void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, state.dataIPShortCut->cAlphaArgs(1)))
+            if (Util::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, state.dataIPShortCut->cAlphaArgs(1)))
                 break;               // found the correct one
             if (Num == NumSchemes) { // did not find it
                 ShowSevereError(state,
@@ -1934,7 +2483,7 @@ void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).EMSIntVarRemainingLoadValue);
                 }
             }
-            StackMngrNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
+            StackMngrNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
             if (StackMngrNum > 0) { // found it
                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).ErlSimProgramMngr = StackMngrNum;
             } else {
@@ -1948,7 +2497,7 @@ void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
                 }
             }
             if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                StackMngrNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
+                StackMngrNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
                 if (StackMngrNum > 0) { // found it
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).ErlInitProgramMngr = StackMngrNum;
                 } else {
@@ -2063,8 +2612,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                     auto &this_equip_list = this_op_scheme.EquipList(ListNum);
                     for (int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum) {
                         auto &this_equip = this_equip_list.Comp(EquipNum);
-                        Type = static_cast<DataPlant::PlantEquipmentType>(
-                            getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_equip.TypeOf)));
+                        Type = static_cast<DataPlant::PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
                         errFlag1 = false;
                         PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, plantLoc, errFlag1, _, _, NumSearchResults, _, LoopNum);
 
@@ -2114,8 +2662,28 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
 
                     } // Equipment on List
                 }     // List
-            }         // operation scheme
-        }             // loop
+                if (this_op_scheme.Type == OpScheme::ChillerHeaterSupervisory) {
+                    // do one time set up for custom chillerheater controls
+                    bool found = false;
+                    for (auto &s : state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes) {
+                        if (s.Name == this_op_scheme.Name) {
+                            this_op_scheme.ChillerHeaterSupervisoryOperation = &s; // assign as pointer
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        this_op_scheme.ChillerHeaterSupervisoryOperation->OneTimeInitChillerHeaterChangeoverOpScheme(state);
+                    } else {
+                        ShowSevereError(state,
+                                        format("InitLoadDistribution: PlantLoop=\"{}\", Operation Scheme=\"{}\", was not found, check input",
+                                               this_plant_loop.Name,
+                                               this_op_scheme.Name));
+                        ShowFatalError(state, "Program halted because ChillerHeaterSupervisory operation scheme not found.");
+                    }
+                }
+            } // operation scheme
+        }     // loop
 
         // second loop, fill op schemes info at each component.
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
@@ -2144,7 +2712,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                             dummy_op_scheme_1.OpSchemePtr = OpNum;
                             dummy_op_scheme_1.EquipList(1).ListPtr = ListNum;
                             dummy_op_scheme_1.EquipList(1).CompPtr = EquipNum;
-                        } else if (dummy_loop_equip.NumOpSchemes > 0) { // already an op scheme
+                        } else { // already an op scheme
                             OldNumOpSchemes = dummy_loop_equip.NumOpSchemes;
 
                             // could be new list on existing scheme or new scheme with new list.  Check and see
@@ -2285,12 +2853,26 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                 }
             }
         }
+        // set sim flag so each supervisor is only simulated once in the plant loop below
+        for (DataPlant::ChillerHeaterSupervisoryOperationData &supervisor : state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes) {
+            supervisor.needsSimulation = true;
+        }
         // Update the OpScheme schedules
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             FoundScheme = false;
             auto &this_loop = state.dataPlnt->PlantLoop(LoopNum);
             for (int OpNum = 1; OpNum <= this_loop.NumOpSchemes; ++OpNum) {
                 auto &this_op_scheme = this_loop.OpScheme(OpNum);
+
+                if (this_op_scheme.Type == OpScheme::ChillerHeaterSupervisory) {
+                    if (this_op_scheme.ChillerHeaterSupervisoryOperation != nullptr &&
+                        this_op_scheme.ChillerHeaterSupervisoryOperation->needsSimulation) {
+                        this_op_scheme.ChillerHeaterSupervisoryOperation->EvaluateChillerHeaterChangeoverOpScheme(state);
+                        this_op_scheme.ChillerHeaterSupervisoryOperation->needsSimulation = false;
+                    }
+                    continue;
+                }
+
                 if (GetCurrentScheduleValue(state, this_op_scheme.SchedPtr) > 0.0) {
                     this_op_scheme.Available = true;
                     FoundScheme = true;
@@ -2337,6 +2919,27 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
             //    IF(.NOT. foundscheme)THEN
             //      !'call warning 'no current control scheme specified.  Loop Equipment will be shut down'
             //    ENDIF
+        }
+    } else { // call supervisory scheme every iteration
+        if (!state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes.empty()) {
+            // set sim flag so each supervisor is only simulated once in the plant loop below
+            for (DataPlant::ChillerHeaterSupervisoryOperationData &supervisor : state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes) {
+                supervisor.needsSimulation = true;
+            }
+            for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+                auto &this_loop = state.dataPlnt->PlantLoop(LoopNum);
+                for (int OpNum = 1; OpNum <= this_loop.NumOpSchemes; ++OpNum) {
+                    auto &this_op_scheme = this_loop.OpScheme(OpNum);
+                    if (this_op_scheme.Type == OpScheme::ChillerHeaterSupervisory) {
+                        if (this_op_scheme.ChillerHeaterSupervisoryOperation != nullptr &&
+                            this_op_scheme.ChillerHeaterSupervisoryOperation->needsSimulation) {
+                            this_op_scheme.ChillerHeaterSupervisoryOperation->EvaluateChillerHeaterChangeoverOpScheme(state);
+                            this_op_scheme.ChillerHeaterSupervisoryOperation->needsSimulation = false;
+                        }
+                        continue;
+                    }
+                }
+            }
         }
     }
 

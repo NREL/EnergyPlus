@@ -49,7 +49,7 @@
 #include <thread>
 
 // CLI Headers
-#include <ezOptionParser.hpp>
+#include <CLI/CLI11.hpp>
 
 // Project headers
 #include <EnergyPlus/CommandLineInterface.hh>
@@ -65,27 +65,26 @@ namespace EnergyPlus {
 
 namespace CommandLineInterface {
 
-    using namespace ez;
-
-    int ProcessArgs(EnergyPlusData &state, int argc, const char *argv[])
+    int ProcessArgs(EnergyPlusData &state, const std::vector<std::string> &args)
     {
-        typedef std::string::size_type size_type;
+        using size_type = std::string::size_type;
 
         // Expand long-name options using "=" sign in to two arguments
         // and expand multiple short options into separate arguments
         std::vector<std::string> arguments;
 
-        for (int i = 0; i < argc; ++i) {
+        std::string const dash("-");
 
-            std::string inputArg(argv[i]);
+        for (const auto &inputArg : args) {
 
-            std::string const dash("-");
             size_type const doubleDashPosition = inputArg.find("--");
             size_type const equalsPosition = inputArg.find("=");
 
             if (doubleDashPosition == 0 && equalsPosition != std::string::npos) { // --option=value
                 arguments.push_back(inputArg.substr(0, equalsPosition));
                 arguments.push_back(inputArg.substr(equalsPosition + 1, inputArg.size() - 1));
+            } else if (doubleDashPosition == 0 && inputArg.size() == 2) {
+                // Filter it out, it's a bash-like separator (end of the command options, before positionals arguments are accepted)
             } else if ((inputArg.size() > 2) && (inputArg[0] == '-') && (inputArg[1] != '-')) { // -abc style
                 for (size_type c = 1; c < inputArg.size(); ++c) {
                     arguments.push_back(dash + inputArg[c]);
@@ -95,163 +94,185 @@ namespace CommandLineInterface {
             }
         }
 
-        // Fix This is problematic for a few reasons:
-        //  Using ezOptionParser with a raw C-string interface is asking for trouble: Find something taking std::string if possible
-        //  Passing out pointers returned by c_str() is bad form:
-        //   They are pointers to internally-managed memory in std::string
-        //   They are invalid as soon as the string goes out of scope or is modified
-        //   In this case the strings may be in scope and unmodified until parse is done but this is red flag usage
-        // convert to vector of C strings for option parser
-        std::vector<const char *> cStrArgs;
-        cStrArgs.reserve(arguments.size());
-        for (size_type i = 0; i < arguments.size(); ++i) {
-            cStrArgs.push_back(arguments[i].c_str());
-        }
+        // erase the first element, which is the name of the program
+        const std::string programName = std::move(arguments.front());
+        arguments.erase(arguments.begin());
 
-        size_type const argCount = cStrArgs.size();
-
-        bool const legacyMode = (argCount == 1);
-
-        // Define options
-        ezOptionParser opt;
-
-        opt.overview = state.dataStrGlobals->VerStringVar;
-        opt.overview.append("\nPythonLinkage: " + PluginManagement::pythonStringForUsage(state));
-        opt.overview.append("\nBuilt on Platform: " + DataStringGlobals::BuildPlatformString);
-
-        opt.syntax = "energyplus [options] [input-file]";
-
-        opt.add("", 0, 0, 0, "Force annual simulation", "-a", "--annual");
-
-        opt.add("", 0, 1, 0, "Output directory path (default: current directory)", "-d", "--output-directory");
-
-        opt.add("", 0, 0, 0, "Force design-day-only simulation", "-D", "--design-day");
-
-        opt.add("", 0, 0, 0, "Display help information", "-h", "--help");
-
-        opt.add("Energy+.idd", 0, 1, 0, "Input data dictionary path (default: Energy+.idd in executable directory)", "-i", "--idd");
-
-        opt.add("", 0, 0, 0, "Run EPMacro prior to simulation", "-m", "--epmacro");
-
-        opt.add("", 0, 1, 0, "Prefix for output file names (default: eplus)", "-p", "--output-prefix");
-
-        opt.add("", 0, 0, 0, "Run ReadVarsESO after simulation", "-r", "--readvars");
-
-        opt.add("", 0, 0, 0, "Output IDF->epJSON or epJSON->IDF, dependent on input file type", "-c", "--convert");
-
-        opt.add("", 0, 0, 0, "Only convert IDF->epJSON or epJSON->IDF, dependent on input file type. No simulation", "--convert-only");
-
-        opt.add("L",
-                0,
-                1,
-                0,
-                "Suffix style for output file names (default: L)\n   L: Legacy (e.g., eplustbl.csv)\n   C: Capital (e.g., eplusTable.csv)\n   D: "
-                "Dash (e.g., eplus-table.csv)",
-                "-s",
-                "--output-suffix");
-
-        opt.add("", false, 0, 0, "Display version information", "-v", "--version");
-
-        opt.add("1", false, 1, 0, "Multi-thread with N threads; 1 thread with no arg. (Currently only for G-Function generation)", "-j", "--jobs");
-
-        opt.add("in.epw", false, 1, 0, "Weather file path (default: in.epw in current directory)", "-w", "--weather");
-
-        opt.add("", false, 0, 0, "Run ExpandObjects prior to simulation", "-x", "--expandobjects");
-
-        opt.example = "energyplus -w weather.epw -r input.idf";
-
-        std::string errorFollowUp = "Type 'energyplus --help' for usage.";
-
-        // Parse arguments
-        opt.parse(argCount, &cStrArgs[0]);
-
-        // print arguments parsed (useful for debugging)
-        //        std::string pretty;
-        //        opt.prettyPrint(pretty);
-        //        std::cout << pretty << std::endl;
-
-        std::string usage;
-        opt.getUsage(usage);
+        size_type const argCount = arguments.size();
+        bool const legacyMode = (argCount == 0);
 
         // Set path of EnergyPlus program path (if we aren't overriding it)
         if (!state.dataGlobal->installRootOverride) {
             state.dataStrGlobals->exeDirectoryPath = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
         }
 
-        // ezOptionParser doesn't have a getPath, so we get a string, then convert it to path
-        // I'm limiting the scope of the std::string temporaries I used to avoid mistakes
-        {
-            std::string inputWeatherFileName;
-            opt.get("-w")->getString(inputWeatherFileName);
-            state.files.inputWeatherFilePath.filePath = fs::path{inputWeatherFileName};
+        CLI::App app{"energyplus", programName};
+        // opt.add("", false, 0, 0, "Display version information", "-v", "--version");
+        app.set_version_flag("-v,--version", EnergyPlus::DataStringGlobals::VerString);
+
+        std::string const description = fmt::format(R"({}
+PythonLinkage: {}
+Built on Platform: {}
+)",
+                                                    state.dataStrGlobals->VerStringVar,
+                                                    PluginManagement::pythonStringForUsage(state),
+                                                    DataStringGlobals::BuildPlatformString);
+        app.description(description);
+
+        auto *annualOpt = app.add_flag("-a,--annual", state.dataGlobal->AnnualSimulation, "Force annual simulation");
+
+        app.add_flag("-D,--design-day", state.dataGlobal->DDOnlySimulation, "Force design-day-only simulation")->excludes(annualOpt);
+
+        app.add_option("-d,--output-directory", state.dataStrGlobals->outDirPath, "Output directory path (default: current directory)")
+            ->option_text("DIR")
+            ->required(false);
+        // ->check(CLI::ExistingDirectory) // We don't require it to exist, we make it if needed
+
+        if (legacyMode) {
+            state.dataStrGlobals->inputIddFilePath = "Energy+.idd";
+        } else {
+            state.dataStrGlobals->inputIddFilePath = state.dataStrGlobals->exeDirectoryPath / "Energy+.idd";
         }
+        app.add_option(
+               "-i,--idd", state.dataStrGlobals->inputIddFilePath, "Input data dictionary path (default: Energy+.idd in executable directory)")
+            ->required(false)
+            ->option_text("IDD")
+            ->check(CLI::ExistingFile);
 
-        {
-            // TODO: should this be in IOFiles as an InputFile?
-            std::string inputIddFileName;
-            opt.get("-i")->getString(inputIddFileName);
-            state.dataStrGlobals->inputIddFilePath = fs::path{inputIddFileName};
-        }
+        bool runEPMacro = false;
+        app.add_flag("-m,--epmacro", runEPMacro, "Run EPMacro prior to simulation");
 
-        if (!opt.isSet("-i") && !legacyMode) {
-            state.dataStrGlobals->inputIddFilePath = state.dataStrGlobals->exeDirectoryPath / state.dataStrGlobals->inputIddFilePath;
-        }
+        std::string prefixOutName = "eplus";
+        app.add_option("-p,--output-prefix", prefixOutName, "Prefix for output file names (default: eplus)")->required(false)->option_text("PRE");
 
-        {
-            std::string outDirPathName;
-            opt.get("-d")->getString(outDirPathName);
-            state.dataStrGlobals->outDirPath = fs::path{outDirPathName};
-        }
+        app.add_flag("-r,--readvars", state.dataGlobal->runReadVars, "Run ReadVarsESO after simulation");
 
-        state.dataGlobal->runReadVars = opt.isSet("-r");
+        app.add_flag("-c,--convert", state.dataGlobal->outputEpJSONConversion, "Output IDF->epJSON or epJSON->IDF, dependent on input file type");
 
-        state.dataGlobal->DDOnlySimulation = opt.isSet("-D");
+        app.add_flag("--convert-only",
+                     state.dataGlobal->outputEpJSONConversionOnly,
+                     "Only convert IDF->epJSON or epJSON->IDF, dependent on input file type. No simulation");
 
-        state.dataGlobal->AnnualSimulation = opt.isSet("-a");
+        std::string suffixType = "L";
+        std::string const suffixHelp = R"help(Suffix style for output file names (default: L)
+   L: Legacy (e.g., eplustbl.csv)
+   C: Capital (e.g., eplusTable.csv)
+   D: Dash (e.g., eplus-table.csv))help";
+        app.add_option("-s,--output-suffix", suffixType, suffixHelp)
+            ->option_text("SUFFIX")
+            ->required(false)
+            ->check(CLI::IsMember({"L", "C", "D"}, CLI::ignore_case));
 
-        state.dataGlobal->outputEpJSONConversion = opt.isSet("-c");
+        // TODO: maybe delay validation to output a better error message?
+        const int MAX_N = static_cast<int>(std::thread::hardware_concurrency());
+        app.add_option("-j,--jobs",
+                       state.dataGlobal->numThread,
+                       "Multi-thread with N threads; 1 thread with no arg. (Currently only for G-Function generation)")
+            ->option_text("N")
+            // ->check(CLI::Range(1, MAX_N)  // Tempted to just do that... much simpler
+            // ->check(CLI::Number)
+            ->transform([MAX_N, &state](std::string input) -> std::string {
+                int number_of_threads = -1;
+                bool const converted = CLI::detail::lexical_cast(input, number_of_threads);
+                if (!converted) {
+                    // CLI::ValidationError
+                    return fmt::format("Argument should be an integer, not '{}'", input);
+                }
+                if (number_of_threads <= 0) {
+                    DisplayString(state, "Invalid value for -j arg. Defaulting to 1.");
+                    return "1";
+                }
+                if (number_of_threads > MAX_N) {
+                    DisplayString(state,
+                                  fmt::format("Invalid value for -j arg. Value exceeds num available. Defaulting to num available. -j {}", MAX_N));
+                    return std::to_string(MAX_N);
+                }
+                return input;
+            });
 
-        state.dataGlobal->outputEpJSONConversionOnly = opt.isSet("--convert-only");
+        state.files.inputWeatherFilePath.filePath = "in.epw";
+        // Note: we can't do check(CLI::ExistingFile) here since passing a non-existing /path/to/myfile.epw file
+        // when there exists a /path/to/myfile.stat would mean the Weather File Statistics are still parsed and reported to the tabular output
+        // We still report a message + fail later if DDOnlySimulation is false
+        auto *weatherPathOpt =
+            app.add_option("-w,--weather", state.files.inputWeatherFilePath.filePath, "Weather file path (default: in.epw in current directory)")
+                ->required(false)
+                ->option_text("EPW");
 
-        bool eplusRunningViaAPI = state.dataGlobal->eplusRunningViaAPI;
+        bool runExpandObjects = false;
+        app.add_flag("-x,--expandobjects", runExpandObjects, "Run ExpandObjects prior to simulation");
 
-        opt.get("-j")->getInt(state.dataGlobal->numThread);
+        // Positional
+        state.dataStrGlobals->inputFilePath = "in.idf";
+        app.add_option("input_file", state.dataStrGlobals->inputFilePath, "Input file (default: in.idf in current directory)")
+            ->required(false)
+            ->check(CLI::ExistingFile);
 
-        if (state.dataGlobal->numThread == 0) {
-            DisplayString(state, "Invalid value for -j arg. Defaulting to 1.");
-            state.dataGlobal->numThread = 1;
-        } else if (state.dataGlobal->numThread > (int)std::thread::hardware_concurrency()) {
-            DisplayString(state,
-                          fmt::format("Invalid value for -j arg. Value exceeds num available. Defaulting to num available. -j {}",
-                                      (int)std::thread::hardware_concurrency()));
-            state.dataGlobal->numThread = (int)std::thread::hardware_concurrency();
-        }
+        bool debugCLI = false;
+        app.add_flag("--debug-cli", debugCLI, "Print the result of the CLI assignments to the console and exit")->group(""); // Empty group to hide it
 
-        // Process standard arguments
-        if (opt.isSet("-h")) {
-            DisplayString(state, usage);
+        app.footer("Example: energyplus -w weather.epw -r input.idf");
+
+        const bool eplusRunningViaAPI = state.dataGlobal->eplusRunningViaAPI;
+
+        try {
+            // app.parse(argc, argv);
+            // CLI11 when passing argc, argv creates a vector<string> but **in reverse** order:
+            // https://github.com/CLIUtils/CLI11/blob/291c58789c031208f08f4f261a858b5b7083e8e2/include/CLI/impl/App_inl.hpp#L476-L488
+            std::reverse(arguments.begin(), arguments.end());
+            app.parse(arguments);
+        } catch (const CLI::Success &e) {
+            int const return_code = app.exit(e);
             if (eplusRunningViaAPI) {
-                // we need another return code to let runEnergyPlusAsLibrary know it should not try to run anything
                 return static_cast<int>(ReturnCodes::SuccessButHelper);
             } else {
-                exit(EXIT_SUCCESS);
+                exit(return_code);
+            }
+        } catch (const CLI::ParseError &e) {
+            int const return_code = app.exit(e);
+            if (eplusRunningViaAPI) {
+                return static_cast<int>(ReturnCodes::Failure);
+            } else {
+                exit(return_code);
             }
         }
 
-        if (opt.isSet("-v")) {
-            DisplayString(state, state.dataStrGlobals->VerStringVar);
-            if (eplusRunningViaAPI) {
-                // we need another return code to let runEnergyPlusAsLibrary know it should not try to run anything
-                return static_cast<int>(ReturnCodes::SuccessButHelper);
-            } else {
-                exit(EXIT_SUCCESS);
-            }
-        }
+        if (debugCLI) {
+            fmt::print(stderr,
+                       R"debug(
+state.dataGlobal->AnnualSimulation = {},
+state.dataGlobal->DDOnlySimulation = {},
+state.dataStrGlobals->outDirPath = '{}',
+state.dataStrGlobals->inputIddFilePath= '{}',
 
-        if (opt.lastArgs.size() == 1) {
-            state.dataStrGlobals->inputFilePath = fs::path{*opt.lastArgs[0]};
-        } else if (opt.lastArgs.empty()) {
-            state.dataStrGlobals->inputFilePath = "in.idf";
+runEPMacro = {},
+prefixOutName = {},
+
+state.dataGlobal->runReadVars={},
+state.dataGlobal->outputEpJSONConversion={},
+state.dataGlobal->outputEpJSONConversionOnly={},
+
+suffixType={},
+
+state.dataGlobal->numThread={},
+state.files.inputWeatherFilePath.filePath='{}',
+state.dataStrGlobals->inputFilePath='{}',
+)debug",
+                       state.dataGlobal->AnnualSimulation,
+                       state.dataGlobal->DDOnlySimulation,
+                       state.dataStrGlobals->outDirPath.generic_string(),
+                       state.dataStrGlobals->inputIddFilePath.generic_string(),
+
+                       runEPMacro,
+                       prefixOutName,
+                       state.dataGlobal->runReadVars,
+                       state.dataGlobal->outputEpJSONConversion,
+                       state.dataGlobal->outputEpJSONConversionOnly,
+                       suffixType,
+                       state.dataGlobal->numThread,
+                       state.files.inputWeatherFilePath.filePath.generic_string(),
+                       state.dataStrGlobals->inputFilePath.generic_string());
+            exit(0);
         }
 
         // Convert all paths to native paths
@@ -259,38 +280,6 @@ namespace CommandLineInterface {
         state.files.inputWeatherFilePath.filePath = FileSystem::makeNativePath(state.files.inputWeatherFilePath.filePath);
         state.dataStrGlobals->inputIddFilePath = FileSystem::makeNativePath(state.dataStrGlobals->inputIddFilePath);
         state.dataStrGlobals->outDirPath = FileSystem::makeNativePath(state.dataStrGlobals->outDirPath);
-
-        std::vector<std::string> badOptions;
-        if (opt.lastArgs.size() > 1u) {
-            bool invalidOptionFound = false;
-            for (size_type i = 0; i < opt.lastArgs.size(); ++i) {
-                std::string const &arg(*opt.lastArgs[i]);
-                if (arg.substr(0, 1) == "-") {
-                    invalidOptionFound = true;
-                    DisplayString(state, "ERROR: Invalid option: " + arg);
-                }
-            }
-            if (invalidOptionFound) {
-                DisplayString(state, errorFollowUp);
-                if (eplusRunningViaAPI) {
-                    return static_cast<int>(ReturnCodes::Failure);
-                } else {
-                    exit(EXIT_FAILURE);
-                }
-            } else {
-                DisplayString(state, "ERROR: Multiple input files specified:");
-                for (size_type i = 0; i < opt.lastArgs.size(); ++i) {
-                    std::string const &arg(*opt.lastArgs[i]);
-                    DisplayString(state, format("  Input file #{}: {}", i + 1, arg));
-                }
-                DisplayString(state, errorFollowUp);
-                if (eplusRunningViaAPI) {
-                    return static_cast<int>(ReturnCodes::Failure);
-                } else {
-                    exit(EXIT_FAILURE);
-                }
-            }
-        }
 
         state.dataStrGlobals->inputFilePathNameOnly = FileSystem::getFileName(state.dataStrGlobals->inputFilePath);
         state.dataStrGlobals->inputDirPath = FileSystem::getParentDirectoryPath(state.dataStrGlobals->inputFilePath);
@@ -317,7 +306,9 @@ namespace CommandLineInterface {
                 DisplayString(state, "BSON input format is experimental and unsupported.");
                 break;
             default:
-                DisplayString(state, "ERROR: Input file must have IDF, IMF, or epJSON extension.");
+                DisplayString(state,
+                              fmt::format("ERROR: Input file must have IDF, IMF, or epJSON extension: {}",
+                                          state.dataStrGlobals->inputFilePath.generic_string()));
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
                 } else {
@@ -326,24 +317,13 @@ namespace CommandLineInterface {
             }
         }
 
-        bool runExpandObjects = opt.isSet("-x");
-        bool runEPMacro = opt.isSet("-m");
-
-        if (opt.isSet("-d")) {
+        if (!state.dataStrGlobals->outDirPath.empty()) {
             // Create directory if it doesn't already exist
             FileSystem::makeDirectory(state.dataStrGlobals->outDirPath);
         }
 
         // File naming scheme
-        fs::path outputFilePrefixFullPath;
-        if (opt.isSet("-p")) {
-            std::string prefixOutName;
-            opt.get("-p")->getString(prefixOutName);
-            fs::path prefix = FileSystem::makeNativePath(fs::path(prefixOutName)); // Why is this needed?
-            outputFilePrefixFullPath = state.dataStrGlobals->outDirPath / prefixOutName;
-        } else {
-            outputFilePrefixFullPath = state.dataStrGlobals->outDirPath / "eplus";
-        }
+        fs::path outputFilePrefixFullPath = state.dataStrGlobals->outDirPath / prefixOutName;
 
         fs::path outputEpmdetFilePath;
         fs::path outputEpmidfFilePath;
@@ -362,10 +342,9 @@ namespace CommandLineInterface {
         std::string screenSuffix;
         std::string shdSuffix;
 
-        std::string suffixType;
+        std::string const errorFollowUp = "Type 'energyplus --help' for usage.";
         {
-            opt.get("-s")->getString(suffixType);
-            std::transform((suffixType).begin(), (suffixType).end(), (suffixType).begin(), ::toupper);
+            std::transform(suffixType.begin(), suffixType.end(), suffixType.begin(), ::toupper);
 
             if (suffixType == "L") {
 
@@ -405,16 +384,8 @@ namespace CommandLineInterface {
                 adsSuffix = "Ads";
                 screenSuffix = "Screen";
                 shdSuffix = "Shading";
-
-            } else {
-                DisplayString(state, "ERROR: Unrecognized argument for output suffix style: " + suffixType);
-                DisplayString(state, errorFollowUp);
-                if (eplusRunningViaAPI) {
-                    return static_cast<int>(ReturnCodes::Failure);
-                } else {
-                    exit(EXIT_FAILURE);
-                }
             }
+            // No else needed, this is validated at CLI level above
         }
 
         // Helper to construct output file path
@@ -528,60 +499,6 @@ namespace CommandLineInterface {
         outputExpidfFilePath = composePath(normalSuffix + ".expidf");
         outputExperrFilePath = composePath(normalSuffix + ".experr");
 
-        // Handle bad options
-        if (!opt.gotExpected(badOptions)) {
-            for (size_type i = 0; i < badOptions.size(); ++i) {
-                DisplayString(state, "ERROR: Unexpected number of arguments for option " + badOptions[i]);
-            }
-            DisplayString(state, errorFollowUp);
-            if (eplusRunningViaAPI) {
-                return static_cast<int>(ReturnCodes::Failure);
-            } else {
-                exit(EXIT_FAILURE);
-            }
-        }
-
-        // This is a placeholder in case there are required options in the future
-        if (!opt.gotRequired(badOptions)) {
-            for (size_type i = 0; i < badOptions.size(); ++i) {
-                DisplayString(state, "ERROR: Missing required option " + badOptions[i]);
-            }
-            DisplayString(state, errorFollowUp);
-            if (eplusRunningViaAPI) {
-                return static_cast<int>(ReturnCodes::Failure);
-            } else {
-                exit(EXIT_FAILURE);
-            }
-        }
-
-        if (opt.firstArgs.size() > 1 || opt.unknownArgs.size() > 0) {
-            for (size_type i = 1; i < opt.firstArgs.size(); ++i) {
-                std::string const &arg(*opt.firstArgs[i]);
-                DisplayString(state, "ERROR: Invalid option: " + arg);
-            }
-            for (size_type i = 0; i < opt.unknownArgs.size(); ++i) {
-                std::string const &arg(*opt.unknownArgs[i]);
-                DisplayString(state, "ERROR: Invalid option: " + arg);
-            }
-            DisplayString(state, errorFollowUp);
-            if (eplusRunningViaAPI) {
-                return static_cast<int>(ReturnCodes::Failure);
-            } else {
-                exit(EXIT_FAILURE);
-            }
-        }
-
-        // Error for cases where both design-day and annual simulation switches are set
-        if (state.dataGlobal->DDOnlySimulation && state.dataGlobal->AnnualSimulation) {
-            DisplayString(state, "ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.");
-            DisplayString(state, errorFollowUp);
-            if (eplusRunningViaAPI) {
-                return static_cast<int>(ReturnCodes::Failure);
-            } else {
-                exit(EXIT_FAILURE);
-            }
-        }
-
         // Read path from INI file if it exists
 
         // Check for IDD and IDF files
@@ -624,7 +541,7 @@ namespace CommandLineInterface {
             }
         }
 
-        if (opt.isSet("-w") && !state.dataGlobal->DDOnlySimulation) {
+        if ((weatherPathOpt->count() > 0) && !state.dataGlobal->DDOnlySimulation) {
             if (!FileSystem::fileExists(state.files.inputWeatherFilePath.filePath)) {
                 DisplayString(
                     state,

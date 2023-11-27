@@ -131,7 +131,7 @@ void SimTESCoil(EnergyPlusData &state,
 
     int TESCoilNum = 0;
     if (CompIndex == 0) {
-        TESCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataPackagedThermalStorageCoil->TESCoil);
+        TESCoilNum = Util::FindItemInList(CompName, state.dataPackagedThermalStorageCoil->TESCoil);
         if (TESCoilNum == 0) {
             ShowFatalError(state, format("Thermal Energy Storage Cooling Coil not found={}", CompName));
         }
@@ -240,7 +240,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         // ErrorsFound will be set to True if problem was found, left untouched otherwise
         VerifyUniqueCoilName(state, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
@@ -295,7 +295,7 @@ void GetTESCoilInput(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "USERDEFINEDFLUIDTYPE")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "USERDEFINEDFLUIDTYPE")) {
             if (!(state.dataIPShortCut->lAlphaFieldBlanks(6))) {
                 thisTESCoil.StorageFluidName = state.dataIPShortCut->cAlphaArgs(6);
                 if (CheckFluidPropertyName(state, state.dataIPShortCut->cAlphaArgs(6)) == 0) {
@@ -4301,7 +4301,7 @@ void GetTESCoilIndex(
     }
 
     if (state.dataPackagedThermalStorageCoil->NumTESCoils > 0) {
-        CoilIndex = UtilityRoutines::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil);
+        CoilIndex = Util::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil);
     } else {
         CoilIndex = 0;
     }
@@ -4341,8 +4341,7 @@ void GetTESCoilAirInletNode(
     }
 
     if (state.dataPackagedThermalStorageCoil->NumTESCoils > 0) {
-        CoilIndex =
-            UtilityRoutines::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
+        CoilIndex = Util::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
     } else {
         CoilIndex = 0;
     }
@@ -4381,8 +4380,7 @@ void GetTESCoilAirOutletNode(
     }
 
     if (state.dataPackagedThermalStorageCoil->NumTESCoils > 0) {
-        CoilIndex =
-            UtilityRoutines::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
+        CoilIndex = Util::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
     } else {
         CoilIndex = 0;
     }
@@ -4421,8 +4419,7 @@ void GetTESCoilCoolingCapacity(
     }
 
     if (state.dataPackagedThermalStorageCoil->NumTESCoils > 0) {
-        CoilIndex =
-            UtilityRoutines::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
+        CoilIndex = Util::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
     } else {
         CoilIndex = 0;
     }
@@ -4469,8 +4466,7 @@ void GetTESCoilCoolingAirFlowRate(
     }
 
     if (state.dataPackagedThermalStorageCoil->NumTESCoils > 0) {
-        CoilIndex =
-            UtilityRoutines::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
+        CoilIndex = Util::FindItem(CoilName, state.dataPackagedThermalStorageCoil->TESCoil, state.dataPackagedThermalStorageCoil->NumTESCoils);
     } else {
         CoilIndex = 0;
     }

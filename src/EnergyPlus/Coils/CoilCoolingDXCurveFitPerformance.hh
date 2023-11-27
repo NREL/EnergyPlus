@@ -62,21 +62,23 @@ namespace EnergyPlus {
 // Forward declarations
     struct EnergyPlusData;
 
-    struct CoilCoolingDXCurveFitPerformanceInputSpecification {
-        std::string name;
-        Real64 crankcase_heater_capacity;
-        Real64 minimum_outdoor_dry_bulb_temperature_for_compressor_operation;
-        Real64 maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation;
-        Real64 unit_internal_static_air_pressure;
-        Real64 basin_heater_capacity;
-        Real64 basin_heater_setpoint_temperature;
-        std::string basin_heater_operating_schedule_name;
-        std::string compressor_fuel_type;
-        std::string base_operating_mode_name;
-        std::string alternate_operating_mode_name;
-        std::string alternate_operating_mode2_name;
-        std::string capacity_control;
-    };
+struct CoilCoolingDXCurveFitPerformanceInputSpecification
+{
+    std::string name;
+    Real64 crankcase_heater_capacity;
+    Real64 minimum_outdoor_dry_bulb_temperature_for_compressor_operation;
+    Real64 maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation;
+    Real64 unit_internal_static_air_pressure;
+    Real64 basin_heater_capacity;
+    Real64 basin_heater_setpoint_temperature;
+    std::string basin_heater_operating_schedule_name;
+    std::string compressor_fuel_type;
+    std::string base_operating_mode_name;
+    std::string alternate_operating_mode_name;
+    std::string alternate_operating_mode2_name;
+    std::string outdoor_temperature_dependent_crankcase_heater_capacity_curve_name;
+    std::string capacity_control;
+};
 
     struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase {
         static constexpr std::string_view object_name = "Coil:Cooling:DX:CurveFit:Performance";

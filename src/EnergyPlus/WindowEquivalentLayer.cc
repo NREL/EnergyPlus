@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DaylightingManager.hh>
@@ -426,13 +427,13 @@ void CalcEQLWindowUvalue(EnergyPlusData &state,
     for (I = 1; I <= 10; ++I) {
         TGO = TOUT + U * DT / HXO; // update glazing surface temps
         TGI = TIN - U * DT / HXI;
-        HRO = Constant::StefanBoltzmann * EO * (pow_2(TGO + Constant::KelvinConv) + pow_2(TOUT + Constant::KelvinConv)) *
-              ((TGO + Constant::KelvinConv) + (TOUT + Constant::KelvinConv));
-        HRI = Constant::StefanBoltzmann * EI * (pow_2(TGI + Constant::KelvinConv) + pow_2(TIN + Constant::KelvinConv)) *
-              ((TGI + Constant::KelvinConv) + (TIN + Constant::KelvinConv));
+        HRO = Constant::StefanBoltzmann * EO * (pow_2(TGO + Constant::Kelvin) + pow_2(TOUT + Constant::Kelvin)) *
+              ((TGO + Constant::Kelvin) + (TOUT + Constant::Kelvin));
+        HRI = Constant::StefanBoltzmann * EI * (pow_2(TGI + Constant::Kelvin) + pow_2(TIN + Constant::Kelvin)) *
+              ((TGI + Constant::Kelvin) + (TIN + Constant::Kelvin));
         // HCI = HIC_ASHRAE( Height, TGI, TI)  ! BAN June 2103 Raplaced with ISO Std 15099
-        TGIK = TGI + Constant::KelvinConv;
-        TIK = TIN + Constant::KelvinConv;
+        TGIK = TGI + Constant::Kelvin;
+        TIK = TIN + Constant::Kelvin;
         HCI = HCInWindowStandardRatings(state, Height, TGIK, TIK);
         if (HCI < 0.001) break;
         HXI = HCI + HRI;
@@ -687,7 +688,6 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     int ConstrNum; // Construction number
 
     int SurfNumAdj;  // An interzone surface's number in the adjacent zone
-    int ZoneNumAdj;  // An interzone surface's adjacent zone number
     Real64 LWAbsIn;  // effective long wave absorptance/emissivity back side
     Real64 LWAbsOut; // effective long wave absorptance/emissivity front side
     Real64 outir(0);
@@ -703,7 +703,6 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     LayerType InSideLayerType;  // interior shade type
 
     Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
-    Real64 SrdSurfViewFac; // View factor of a surrounding surface
     Real64 OutSrdIR;
 
     if (CalcCondition != DataBSDFWindow::Condition::Invalid) return;
@@ -720,17 +719,17 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
         SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
         Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
         TaIn = RefAirTemp;
-        TIN = TaIn + Constant::KelvinConv; // Inside air temperature, K
+        TIN = TaIn + Constant::Kelvin; // Inside air temperature, K
 
         // now get "outside" air temperature
         if (SurfNumAdj > 0) {
             // this is interzone window. the outside condition is determined from the adjacent zone
             // condition
-            ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
+            int enclNumAdj = state.dataSurface->Surface(SurfNumAdj).RadEnclIndex;
             RefAirTemp = state.dataSurface->Surface(SurfNumAdj).getInsideAirTemperature(state, SurfNumAdj);
-            Tout = RefAirTemp + Constant::KelvinConv; // outside air temperature
-            tsky = state.dataHeatBal->ZoneMRT(ZoneNumAdj) +
-                   Constant::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
+            Tout = RefAirTemp + Constant::Kelvin; // outside air temperature
+            tsky = state.dataViewFactor->EnclRadInfo(enclNumAdj).MRT +
+                   Constant::Kelvin; // TODO this misses IR from sources such as high temp radiant and baseboards
 
             // The IR radiance of this window's "exterior" surround is the IR radiance
             // from surfaces and high-temp radiant sources in the adjacent zone
@@ -742,24 +741,18 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
             OutSrdIR = 0;
             if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                 if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-                    int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-                    auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
-                    for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
-                        SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
-                        SrdSurfTempAbs =
-                            GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::KelvinConv;
-                        OutSrdIR += Constant::StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
-                    }
+                    SrdSurfTempAbs = state.dataSurface->Surface(SurfNum).SrdSurfTemp + Constant::Kelvin;
+                    OutSrdIR = Constant::StefanBoltzmann * state.dataSurface->Surface(SurfNum).ViewFactorSrdSurfs * pow_4(SrdSurfTempAbs);
                 }
             }
             if (state.dataSurface->Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
                 if (state.dataEnvrn->IsRain) {                 // Raining: since wind exposed, outside window surface gets wet
-                    Tout = state.dataSurface->SurfOutWetBulbTemp(SurfNum) + Constant::KelvinConv;
+                    Tout = state.dataSurface->SurfOutWetBulbTemp(SurfNum) + Constant::Kelvin;
                 } else { // Dry
-                    Tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + Constant::KelvinConv;
+                    Tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + Constant::Kelvin;
                 }
             } else { // Window not exposed to wind
-                Tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + Constant::KelvinConv;
+                Tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + Constant::Kelvin;
             }
             tsky = state.dataEnvrn->SkyTempKelvin;
             Ebout = Constant::StefanBoltzmann * pow_4(Tout);
@@ -806,7 +799,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
 
     // effective surface temperature is set to surface temperature calculated
     // by the fenestration layers temperature solver
-    SurfInsideTemp = T(NL) - Constant::KelvinConv;
+    SurfInsideTemp = T(NL) - Constant::Kelvin;
     // Convective to room
     QCONV = H(NL) * (T(NL) - TIN);
     // Other convective = total conv - standard model prediction
@@ -814,7 +807,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     // Save the extra convection term. This term is added to the zone air heat
     // balance equation
     state.dataSurface->SurfWinOtherConvHeatGain(SurfNum) = state.dataSurface->Surface(SurfNum).Area * QXConv;
-    SurfOutsideTemp = T(1) - Constant::KelvinConv;
+    SurfOutsideTemp = T(1) - Constant::Kelvin;
     // Various reporting calculations
     InSideLayerType = state.dataWindowEquivLayer->CFS(EQLNum).L(NL).LTYPE;
     if (InSideLayerType == LayerType::GLAZE) {
@@ -824,7 +817,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     }
     state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) = SurfInsideTemp;
     NetIRHeatGainWindow =
-        state.dataSurface->Surface(SurfNum).Area * LWAbsIn * (Constant::StefanBoltzmann * pow_4(SurfInsideTemp + Constant::KelvinConv) - rmir);
+        state.dataSurface->Surface(SurfNum).Area * LWAbsIn * (Constant::StefanBoltzmann * pow_4(SurfInsideTemp + Constant::Kelvin) - rmir);
     ConvHeatGainWindow = state.dataSurface->Surface(SurfNum).Area * HcIn * (SurfInsideTemp - TaIn);
     // Window heat gain (or loss) is calculated here
     state.dataSurface->SurfWinHeatGain(SurfNum) =
@@ -6369,9 +6362,9 @@ bool CFSUFactor(EnergyPlusData &state,
         return CFSUFactor;
     }
 
-    TOABS = TOUT + Constant::KelvinConv;
+    TOABS = TOUT + Constant::Kelvin;
     TRMOUT = TOABS;
-    TIABS = TIN + Constant::KelvinConv;
+    TIABS = TIN + Constant::Kelvin;
     TRMIN = TIABS;
 
     NL = FS.NL;
@@ -8092,7 +8085,7 @@ Real64 TRadC(Real64 const J,    // radiosity, W/m2
     // PURPOSE OF THIS FUNCTION:
     // Returns equivalent celsius scale temperature from radiosity
 
-    return root_4(J / (Constant::StefanBoltzmann * max(Emiss, 0.001))) - Constant::KelvinConv;
+    return root_4(J / (Constant::StefanBoltzmann * max(Emiss, 0.001))) - Constant::Kelvin;
 }
 
 void CalcEQLOpticalProperty(EnergyPlusData &state,

@@ -152,24 +152,6 @@ namespace RuntimeLanguageProcessor {
 
     ErlValueType EvaluateExpression(EnergyPlusData &state, int ExpressionNum, bool &seriousErrorFound);
 
-    void TodayTomorrowWeather(EnergyPlusData &state,
-                              ErlFunc FunctionCode,
-                              Real64 Operand1,
-                              Real64 Operand2,
-                              Array2D<Real64> &TodayTomorrowWeatherSource,
-                              ErlValueType &ReturnVal);
-
-    void TodayTomorrowWeather(EnergyPlusData &state,
-                              ErlFunc FunctionCode,
-                              Real64 Operand1,
-                              Real64 Operand2,
-                              Array2D_bool &TodayTomorrowWeatherSource,
-                              ErlValueType &ReturnVal);
-
-    int TodayTomorrowWeather(EnergyPlusData &state, int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value);
-
-    int TodayTomorrowWeather(EnergyPlusData &state, int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value);
-
     void GetRuntimeLanguageUserInput(EnergyPlusData &state);
 
     void ReportRuntimeLanguage(EnergyPlusData &state);
@@ -185,8 +167,6 @@ namespace RuntimeLanguageProcessor {
                         int StackNum);
 
     int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int StackNum, ObjexxFCL::Optional<ErlValueType const> Value = _);
-
-    void SetupPossibleOperators(EnergyPlusData &state);
 
     void ExternalInterfaceSetErlVariable(EnergyPlusData &state,
                                          int varNum,  // The variable index to be written during run time
@@ -218,6 +198,7 @@ struct RuntimeLanguageProcessorData : BaseGlobalStruct
     Array1D_int CurveIndexVariableNums;
     Array1D_int ConstructionIndexVariableNums;
     int YearVariableNum = 0;
+    int CalendarYearVariableNum = 0;
     int MonthVariableNum = 0;
     int DayOfMonthVariableNum = 0;
     int DayOfWeekVariableNum = 0;
@@ -259,6 +240,7 @@ struct RuntimeLanguageProcessorData : BaseGlobalStruct
         this->CurveIndexVariableNums.clear();
         this->ConstructionIndexVariableNums.clear();
         this->YearVariableNum = 0;
+        this->CalendarYearVariableNum = 0;
         this->MonthVariableNum = 0;
         this->DayOfMonthVariableNum = 0;
         this->DayOfWeekVariableNum = 0;

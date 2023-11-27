@@ -238,6 +238,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
         "    No,                      !- Apply Part Load Fraction to Speeds Greater than 1",
         "    No,                      !- Apply Latent Degradation to Speeds Greater than 1",
         "    0,                       !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Basin Heater Capacity {W/K}",
         "    ,                        !- Basin Heater Setpoint Temperature {C}",
@@ -335,6 +336,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
         "    No,                      !- Apply Part Load Fraction to Speeds Greater than 1",
         "    No,                      !- Apply Latent Degradation to Speeds Greater than 1",
         "    0,                       !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Basin Heater Capacity {W/K}",
         "    ,                        !- Basin Heater Setpoint Temperature {C}",
@@ -444,6 +446,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
         "    -8,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "    0,                       !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    DefrostTempCurve,        !- Defrost Energy Input Ratio Function of Temperature Curve Name",
         "    4.4,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
@@ -488,6 +491,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
         "    -8,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "    0,                       !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    DefrostTempCurve,        !- Defrost Energy Input Ratio Function of Temperature Curve Name",
         "    4.4,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
@@ -1598,6 +1602,7 @@ TEST_F(EnergyPlusFixture, HVACMSHP_UnitarySystemElectricityRateTest)
         "    No,                      !- Apply Part Load Fraction to Speeds Greater than 1",
         "    No,                      !- Apply Latent Degradation to Speeds Greater than 1",
         "    0,                       !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Basin Heater Capacity {W/K}",
         "    ,                        !- Basin Heater Setpoint Temperature {C}",
@@ -1663,6 +1668,7 @@ TEST_F(EnergyPlusFixture, HVACMSHP_UnitarySystemElectricityRateTest)
         "    -8,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "    0,                       !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    DefrostTempCurve,        !- Defrost Energy Input Ratio Function of Temperature Curve Name",
         "    4.4,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
@@ -2201,13 +2207,13 @@ TEST_F(EnergyPlusFixture, HVACMSHP_UnitarySystemElectricityRateTest)
     state->dataEnvrn->OutBaroPress = 101325.0;
     // set zone air conditions
     auto &zoneAirNode =
-        state->dataLoopNodes->Node(UtilityRoutines::FindItemInList("Z401 AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+        state->dataLoopNodes->Node(Util::FindItemInList("Z401 AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     zoneAirNode.Temp = 21.1;
     zoneAirNode.HumRat = 0.0035;
     zoneAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneAirNode.Temp, zoneAirNode.HumRat);
     // set maixed air node conditions
-    auto &mixedAirNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("AC-24 SF INLET AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    auto &mixedAirNode =
+        state->dataLoopNodes->Node(Util::FindItemInList("AC-24 SF INLET AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     mixedAirNode.Temp = 10.0;
     mixedAirNode.HumRat = 0.005;
     mixedAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(mixedAirNode.Temp, mixedAirNode.HumRat);

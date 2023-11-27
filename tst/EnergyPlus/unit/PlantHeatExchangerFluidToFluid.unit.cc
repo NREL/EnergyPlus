@@ -809,7 +809,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
         "    SOURCE Supply Cooling Outlet Node,  !- Setpoint 1 Node Name",
         "    0.003,                   !- Component 1 Flow Rate {m3/s}",
         "    Cooling,                 !- Operation 1 Type",
-        "    DistrictHeating,         !- Equipment 2 Object Type",
+        "    DistrictHeating:Water,         !- Equipment 2 Object Type",
         "    SOURCE Purchased Heating,!- Equipment 2 Name",
         "    SOURCE Supply Heating Inlet Node,  !- Demand Calculation 2 Node Name",
         "    SOURCE Supply Heating Outlet Node,  !- Setpoint 2 Node Name",
@@ -888,12 +888,12 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
         "  Branch,",
         "    SOURCE Heating Branch,   !- Name",
         "    ,                        !- Pressure Drop Curve Name",
-        "    DistrictHeating,         !- Component 1 Object Type",
+        "    DistrictHeating:Water,         !- Component 1 Object Type",
         "    SOURCE Purchased Heating,!- Component 1 Name",
         "    SOURCE Supply Heating Inlet Node,  !- Component 1 Inlet Node Name",
         "    SOURCE Supply Heating Outlet Node;  !- Component 1 Outlet Node Name",
 
-        "  DistrictHeating,",
+        "  DistrictHeating:Water,",
         "    SOURCE Purchased Heating,!- Name",
         "    SOURCE Supply Heating Inlet Node,  !- Hot Water Inlet Node Name",
         "    SOURCE Supply Heating Outlet Node,  !- Hot Water Outlet Node Name",
@@ -1077,7 +1077,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     state->dataGlobal->KickOffSimulation = false;
 
@@ -1087,7 +1087,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
+        Weather::GetNextEnvironment(*state, Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -1138,7 +1138,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                         }
                     }
 
-                    WeatherManager::ManageWeather(*state);
+                    Weather::ManageWeather(*state);
 
                     HeatBalanceManager::ManageHeatBalance(*state);
 
@@ -1901,7 +1901,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
         "    SOURCE Supply Cooling Outlet Node,  !- Setpoint 1 Node Name",
         "    0.003,                   !- Component 1 Flow Rate {m3/s}",
         "    Cooling,                 !- Operation 1 Type",
-        "    DistrictHeating,         !- Equipment 2 Object Type",
+        "    DistrictHeating:Water,         !- Equipment 2 Object Type",
         "    SOURCE Purchased Heating,!- Equipment 2 Name",
         "    SOURCE Supply Heating Inlet Node,  !- Demand Calculation 2 Node Name",
         "    SOURCE Supply Heating Outlet Node,  !- Setpoint 2 Node Name",
@@ -1980,12 +1980,12 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
         "  Branch,",
         "    SOURCE Heating Branch,   !- Name",
         "    ,                        !- Pressure Drop Curve Name",
-        "    DistrictHeating,         !- Component 1 Object Type",
+        "    DistrictHeating:Water,         !- Component 1 Object Type",
         "    SOURCE Purchased Heating,!- Component 1 Name",
         "    SOURCE Supply Heating Inlet Node,  !- Component 1 Inlet Node Name",
         "    SOURCE Supply Heating Outlet Node;  !- Component 1 Outlet Node Name",
 
-        "  DistrictHeating,",
+        "  DistrictHeating:Water,",
         "    SOURCE Purchased Heating,!- Name",
         "    SOURCE Supply Heating Inlet Node,  !- Hot Water Inlet Node Name",
         "    SOURCE Supply Heating Outlet Node,  !- Hot Water Outlet Node Name",
@@ -2169,7 +2169,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     state->dataGlobal->KickOffSimulation = false;
 
@@ -2179,7 +2179,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
+        Weather::GetNextEnvironment(*state, Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -2230,7 +2230,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                         }
                     }
 
-                    WeatherManager::ManageWeather(*state);
+                    Weather::ManageWeather(*state);
 
                     HeatBalanceManager::ManageHeatBalance(*state);
 

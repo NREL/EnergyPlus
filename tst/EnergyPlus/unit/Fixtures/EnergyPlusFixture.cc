@@ -64,6 +64,7 @@
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
+
 #include <algorithm>
 #include <fstream>
 #include <nlohmann/json.hpp>
