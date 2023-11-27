@@ -77,6 +77,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -734,73 +735,70 @@ namespace InternalHeatGains {
 
                         if (state.dataInternalHeatGains->UsingThermalComfort) {
 
-                            // Set the default value of MRTCalcType as 'ZoneAveraged'
-                            thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
+                            // Set the default value of MRTCalcType as 'EnclosureAveraged'
+                            thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::EnclosureAveraged;
 
                             bool ModelWithAdditionalInputs = thisPeople.Fanger || thisPeople.Pierce || thisPeople.KSU ||
                                                              thisPeople.CoolingEffectASH55 || thisPeople.AnkleDraftASH55;
 
                             // MRT Calculation Type and Surface Name
-                            {
-                                std::string const &mrtType = IHGAlphas(7);
+                            thisPeople.MRTCalcType = static_cast<CalcMRT>(getEnumValue(CalcMRTTypeNamesUC, IHGAlphas(7)));
 
-                                if (mrtType == "ZONEAVERAGED") {
-                                    thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
-
-                                } else if (mrtType == "SURFACEWEIGHTED") {
-                                    thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::SurfaceWeighted;
-                                    thisPeople.SurfacePtr = Util::FindItemInList(IHGAlphas(8), state.dataSurface->Surface);
-                                    if (thisPeople.SurfacePtr == 0 && ModelWithAdditionalInputs) {
-                                        if (Item1 == 1) {
-                                            ShowSevereError(state,
-                                                            format("{}{}=\"{}\", {}={} invalid Surface Name={}",
-                                                                   RoutineName,
-                                                                   peopleModuleObject,
-                                                                   IHGAlphas(1),
-                                                                   IHGAlphaFieldNames(7),
-                                                                   IHGAlphas(7),
-                                                                   IHGAlphas(8)));
-                                            ErrorsFound = true;
-                                        }
-                                    } else if (state.dataSurface->Surface(thisPeople.SurfacePtr).Zone != thisPeople.ZonePtr &&
-                                               ModelWithAdditionalInputs) {
+                            switch (thisPeople.MRTCalcType) {
+                            case DataHeatBalance::CalcMRT::EnclosureAveraged: {
+                                // nothing to do here
+                            } break;
+                            case DataHeatBalance::CalcMRT::SurfaceWeighted: {
+                                thisPeople.SurfacePtr = Util::FindItemInList(IHGAlphas(8), state.dataSurface->Surface);
+                                if (thisPeople.SurfacePtr == 0 && ModelWithAdditionalInputs) {
+                                    if (Item1 == 1) {
                                         ShowSevereError(state,
-                                                        format("{}{}=\"{}\", Surface referenced in {}={} in different zone.",
+                                                        format("{}{}=\"{}\", {}={} invalid Surface Name={}",
+                                                               RoutineName,
+                                                               peopleModuleObject,
+                                                               IHGAlphas(1),
+                                                               IHGAlphaFieldNames(7),
+                                                               IHGAlphas(7),
+                                                               IHGAlphas(8)));
+                                        ErrorsFound = true;
+                                    }
+                                } else {
+                                    int const surfRadEnclNum = state.dataSurface->Surface(thisPeople.SurfacePtr).RadEnclIndex;
+                                    int const thisPeopleRadEnclNum = state.dataHeatBal->space(thisPeople.spaceIndex).radiantEnclosureNum;
+                                    if (surfRadEnclNum != thisPeopleRadEnclNum && ModelWithAdditionalInputs) {
+                                        ShowSevereError(state,
+                                                        format("{}{}=\"{}\", Surface referenced in {}={} in different enclosure.",
                                                                RoutineName,
                                                                peopleModuleObject,
                                                                IHGAlphas(1),
                                                                IHGAlphaFieldNames(7),
                                                                IHGAlphas(7)));
                                         ShowContinueError(state,
-                                                          format("Surface is in Zone={} and {} is in Zone={}",
-                                                                 state.dataHeatBal->Zone(state.dataSurface->Surface(thisPeople.SurfacePtr).Zone).Name,
+                                                          format("Surface is in Enclosure={} and {} is in Enclosure={}",
+                                                                 state.dataViewFactor->EnclRadInfo(surfRadEnclNum).Name,
                                                                  peopleModuleObject,
-                                                                 IHGAlphas(2)));
+                                                                 state.dataViewFactor->EnclRadInfo(thisPeopleRadEnclNum).Name));
                                         ErrorsFound = true;
                                     }
-
-                                } else if (mrtType == "ANGLEFACTOR") {
-                                    thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::AngleFactor;
-                                    thisPeople.AngleFactorListName = IHGAlphas(8);
-
-                                } else if (mrtType == "") { // Blank input field--just ignore this
-                                    if (Item1 == 1 && ModelWithAdditionalInputs)
-                                        ShowWarningError(
-                                            state,
-                                            format("{}{}=\"{}\", blank {}", RoutineName, peopleModuleObject, IHGAlphas(1), IHGAlphaFieldNames(7)));
-
-                                } else { // An invalid keyword was entered--warn but ignore
-                                    if (Item1 == 1 && ModelWithAdditionalInputs) {
-                                        ShowWarningError(state,
-                                                         format("{}{}=\"{}\", invalid {}={}",
-                                                                RoutineName,
-                                                                peopleModuleObject,
-                                                                IHGAlphas(1),
-                                                                IHGAlphaFieldNames(7),
-                                                                IHGAlphas(7)));
-                                        ShowContinueError(state, "...Valid values are \"ZoneAveraged\", \"SurfaceWeighted\", \"AngleFactor\".");
-                                    }
                                 }
+
+                            } break;
+                            case DataHeatBalance::CalcMRT::AngleFactor: {
+                                thisPeople.AngleFactorListName = IHGAlphas(8);
+
+                            } break;
+                            default: { // An invalid keyword was entered--warn but ignore
+                                if (Item1 == 1 && ModelWithAdditionalInputs) {
+                                    ShowWarningError(state,
+                                                     format("{}{}=\"{}\", invalid {}={}",
+                                                            RoutineName,
+                                                            peopleModuleObject,
+                                                            IHGAlphas(1),
+                                                            IHGAlphaFieldNames(7),
+                                                            IHGAlphas(7)));
+                                    ShowContinueError(state, "...Valid values are \"EnclosureAveraged\", \"SurfaceWeighted\", \"AngleFactor\".");
+                                }
+                            } break;
                             }
 
                             if (!IHGAlphaFieldBlanks(9)) {
@@ -3788,7 +3786,7 @@ namespace InternalHeatGains {
                 state.dataHeatBal->People(Loop).CoolingEffectASH55 || state.dataHeatBal->People(Loop).AnkleDraftASH55) {
                 print(state.files.eio, "{:.0R},", state.dataHeatBal->People(Loop).NomMaxNumberPeople);
 
-                if (state.dataHeatBal->People(Loop).MRTCalcType == DataHeatBalance::CalcMRT::ZoneAveraged) {
+                if (state.dataHeatBal->People(Loop).MRTCalcType == DataHeatBalance::CalcMRT::EnclosureAveraged) {
                     print(state.files.eio, "Zone Averaged,");
                 } else if (state.dataHeatBal->People(Loop).MRTCalcType == DataHeatBalance::CalcMRT::SurfaceWeighted) {
                     print(state.files.eio, "Surface Weighted,");

@@ -115,7 +115,7 @@ namespace DataHeatBalance {
     enum class CalcMRT
     {
         Invalid = -1,
-        ZoneAveraged,
+        EnclosureAveraged,
         SurfaceWeighted,
         AngleFactor,
         Num
@@ -281,6 +281,9 @@ namespace DataHeatBalance {
         IndoorGreen,
         Num
     };
+
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::CalcMRT::Num)> CalcMRTTypeNamesUC = {
+        "ENCLOSUREAVERAGED", "SURFACEWEIGHTED", "ANGLEFACTOR"};
 
     static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AirBalance::Num)> AirBalanceTypeNamesUC = {"NONE", "QUADRATURE"};
 
@@ -1398,7 +1401,7 @@ namespace DataHeatBalance {
         Real64 OperativeTemp = 0.0;          // Average of Mean Air Temperature {C} and Mean Radiant Temperature {C}
         Real64 MeanAirHumRat = 0.0;          // Mean Air Humidity Ratio {kg/kg} (averaged over zone time step)
         Real64 MeanAirDewPointTemp = 0.0;    // Mean Air Dewpoint Temperature {C}
-        Real64 ThermOperativeTemp = 0.0;     // Mix or MRT and MAT for Zone Control:Thermostatic:Operative Temperature {C}
+        Real64 ThermOperativeTemp = 0.0;     // Mix of MRT and MAT for Zone Control:Thermostatic:Operative Temperature {C}
         Real64 InfilHeatGain = 0.0;          // Heat Gain {J} due to infiltration
         Real64 InfilHeatLoss = 0.0;          // Heat Loss {J} due to infiltration
         Real64 InfilLatentGain = 0.0;        // Latent Gain {J} due to infiltration
@@ -1916,7 +1919,6 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> ZoneGroupSNLoadHeatRate;
     Array1D<Real64> ZoneGroupSNLoadCoolRate;
 
-    Array1D<Real64> ZoneMRT;        // MEAN RADIANT TEMPERATURE (C)
     Array1D<Real64> ZoneTransSolar; // Exterior beam plus diffuse solar entering zone sum of WinTransSolar for exterior windows in zone (W)
     Array1D<Real64>
         ZoneWinHeatGain; // Heat gain to zone from all exterior windows (includes oneTransSolar); sum of WinHeatGain for exterior windows in zone (W)
