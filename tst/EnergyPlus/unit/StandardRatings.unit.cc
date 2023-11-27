@@ -6691,8 +6691,7 @@ TEST_F(EnergyPlusFixture, CurveFit_alternateMode_IEER2022ValueTest)
     Real64 NetCoolingCapRated2022(0.0);
 
     // TODO: we can always decide and give precedence to Alternate Mode 1 or Alternate Mode 2 if present | Needs Discussion about the applicability.
-    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
-        IEERCalulcationCurveFit(*state, "Coil:Cooling:DX:CurveFit", performance->normalMode);
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalulcationCurveFit(*state, "Coil:Cooling:DX:CurveFit", performance->normalMode);
 
     NetCoolingCapRated(nsp) = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
@@ -7000,8 +6999,7 @@ TEST_F(EnergyPlusFixture, CurveFit_3Speed_IEER2022ValueTest)
     Real64 NetCoolingCapRated2022(0.0);
 
     // TODO: we can always decide and give precedence to Alternate Mode 1 or Alternate Mode 2 if present | Needs Discussion about the applicability.
-    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
-        IEERCalulcationCurveFit(*state, "Coil:Cooling:DX:CurveFit", performance->normalMode);
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalulcationCurveFit(*state, "Coil:Cooling:DX:CurveFit", performance->normalMode);
 
     NetCoolingCapRated(nsp) = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);

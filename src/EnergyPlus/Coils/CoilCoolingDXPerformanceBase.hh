@@ -49,156 +49,175 @@
 #define ENERGYPLUS_COILS_COIL_COOLING_DX_PERFORMANCE_BASE
 
 #include <EnergyPlus/DataLoopNode.hh>
+#include <optional>
 #include <string>
 #include <vector>
-#include <optional>
 
 namespace EnergyPlus {
 
 // Forward declarations
-    struct EnergyPlusData;
+struct EnergyPlusData;
 
-    struct CoilCoolingDXPerformanceBase {
-        CoilCoolingDXPerformanceBase() = default;
+struct CoilCoolingDXPerformanceBase
+{
+    CoilCoolingDXPerformanceBase() = default;
 
-        std::string name;
-        std::string parentName;
+    std::string name;
+    std::string parentName;
 
-        // standard rating stuff -- for now just 210/240
-        Real64 standardRatingCoolingCapacity = 0.0; // net cooling capacity of single speed DX cooling coil
-        Real64 standardRatingSEER = 0.0;            // seasonal energy efficiency ratio of single speed DX cooling coil
-        Real64 standardRatingEER = 0.0;             // energy efficiency ratio of single speed DX cooling coil
-        Real64 standardRatingIEER = 0.0;            // Integrated energy efficiency ratio of single speed DX cooling coil
+    // standard rating stuff -- for now just 210/240
+    Real64 standardRatingCoolingCapacity = 0.0; // net cooling capacity of single speed DX cooling coil
+    Real64 standardRatingSEER = 0.0;            // seasonal energy efficiency ratio of single speed DX cooling coil
+    Real64 standardRatingEER = 0.0;             // energy efficiency ratio of single speed DX cooling coil
+    Real64 standardRatingIEER = 0.0;            // Integrated energy efficiency ratio of single speed DX cooling coil
 
-        // standard rating stuff -- for now just 210/240 2023
-        Real64 standardRatingCoolingCapacity2023 = 0.0; // net cooling capacity of single speed DX cooling coil
-        Real64 standardRatingSEER2_User = 0.0;          // seasonal energy efficiency ratio of single speed DX cooling coil
-        Real64 standardRatingSEER2_Standard = 0.0;
-        Real64 standardRatingEER2 = 0.0;  // energy efficiency ratio of single speed DX cooling coil
-        Real64 standardRatingIEER2 = 0.0; // Integrated energy efficiency ratio of singgle speed DX cooling coil | AHRI Std.340/360-2022(IP)
+    // standard rating stuff -- for now just 210/240 2023
+    Real64 standardRatingCoolingCapacity2023 = 0.0; // net cooling capacity of single speed DX cooling coil
+    Real64 standardRatingSEER2_User = 0.0;          // seasonal energy efficiency ratio of single speed DX cooling coil
+    Real64 standardRatingSEER2_Standard = 0.0;
+    Real64 standardRatingEER2 = 0.0;  // energy efficiency ratio of single speed DX cooling coil
+    Real64 standardRatingIEER2 = 0.0; // Integrated energy efficiency ratio of singgle speed DX cooling coil | AHRI Std.340/360-2022(IP)
 
-        Real64 powerUse = 0.0;
-        Real64 RTF = 0.0;
-        Real64 wasteHeatRate = 0.0;
-        Real64 recoveredEnergyRate = 0.0;
+    Real64 powerUse = 0.0;
+    Real64 RTF = 0.0;
+    Real64 wasteHeatRate = 0.0;
+    Real64 recoveredEnergyRate = 0.0;
 
-        Real64 crankcaseHeaterPower = 0.0;
-        Real64 crankcaseHeaterElectricityConsumption = 0.0;
-        Constant::eFuel compressorFuelType = Constant::eFuel::Invalid;
-        std::string compressorFuelTypeForOutput;
-        Real64 compressorFuelRate = 0.0;
-        Real64 compressorFuelConsumption = 0.0;
-        Real64 electricityConsumption = 0.0;
-        Real64 evapCondBasinHeatCap = 0.0;
-        Real64 basinHeaterPower = 0.0;
-        Real64 basinHeaterElectricityConsumption = 0.0;
-        Real64 minOutdoorDrybulb = 0.0;
-        int hasAlternateMode = 0; // 0 Normal, 1 Enhanced, 2 SubcoolReheat
-        int OperatingMode = 0;
-        Real64 ModeRatio = 0.0;
-        Real64 NormalSHR = 0.0;
+    Real64 crankcaseHeaterPower = 0.0;
+    Real64 crankcaseHeaterElectricityConsumption = 0.0;
+    Constant::eFuel compressorFuelType = Constant::eFuel::Invalid;
+    std::string compressorFuelTypeForOutput;
+    Real64 compressorFuelRate = 0.0;
+    Real64 compressorFuelConsumption = 0.0;
+    Real64 electricityConsumption = 0.0;
+    Real64 evapCondBasinHeatCap = 0.0;
+    Real64 basinHeaterPower = 0.0;
+    Real64 basinHeaterElectricityConsumption = 0.0;
+    Real64 minOutdoorDrybulb = 0.0;
+    int hasAlternateMode = 0; // 0 Normal, 1 Enhanced, 2 SubcoolReheat
+    int OperatingMode = 0;
+    Real64 ModeRatio = 0.0;
+    Real64 NormalSHR = 0.0;
 
-        enum CapControlMethod {
-            CONTINUOUS,
-            DISCRETE
-        };
-        CapControlMethod capControlMethod = CapControlMethod::DISCRETE;
-
-        virtual void size(EnergyPlusData &) {
-        }
-
-        virtual void simulate(EnergyPlusData &,
-                              const DataLoopNode::NodeData &,
-                              DataLoopNode::NodeData &,
-                              int,
-                              Real64 &,
-                              int &,
-                              Real64 &,
-                              int const,
-                              DataLoopNode::NodeData &,
-                              DataLoopNode::NodeData &,
-                              bool const,
-                              Real64 = 0.0) {
-        }
-
-        virtual Real64 RatedCBF() // rated coil bypass factor at speed
-        {
-            return 0.0;
-        }
-
-        virtual Real64 grossRatedSHR() // rated sensible heat ratio at speed
-        {
-            return 0.0;
-        }
-
-        virtual Real64 GrossRatedCoolingCOPAtMaxSpeed() {
-            return 0.0;
-        }
-
-        virtual const std::string_view NameAtSpeed(int) {
-            return "";
-        }
-
-        virtual Real64
-        RatedAirMassFlowRateMaxSpeed(bool = false) {
-            return 0.0;
-        }
-
-        virtual Real64 RatedAirMassFlowRateMinSpeed(bool = false) {
-            return 0.0;
-        }
-
-        virtual Real64
-        RatedCondAirMassFlowRateNomSpeed(bool) // rated condenser air mass flow rate at speed {kg/s}
-        {
-            return 0.0;
-        }
-
-        virtual Real64 RatedEvapAirMassFlowRate() {
-            return 0.0;
-        }
-
-        virtual Real64 RatedEvapAirFlowRate() {
-            return 0.0;
-        }
-
-        virtual Real64 RatedGrossTotalCap() {
-            return 0.0;
-        }
-
-        virtual int IndexCapFT(bool) {
-            return 0;
-        }
-
-        virtual bool SubcoolReheatFlag() {
-            return false;
-        }
-
-        virtual int NumSpeeds() {
-            return 0;
-        }
-
-        virtual void calcStandardRatings210240(EnergyPlusData &) {}
-
-        virtual void setToHundredPercentDOAS() {
-        }
-
-        virtual Real64 EvapAirFlowRateAtSpeed(int) {
-            return 0.0;
-        }
-
-        virtual Real64 RatedTotalCapacityAtSpeed(int) {
-            return 0.0;
-        }
-
-        virtual Real64 CurrentEvapCondPumpPowerAtSpeed(int) {
-            return 0.0;
-        }
-
-        virtual Real64 EvapCondenserEffectivenessAtSpeed(int) {
-            return 0.0;
-        }
+    enum CapControlMethod
+    {
+        CONTINUOUS,
+        DISCRETE
     };
+    CapControlMethod capControlMethod = CapControlMethod::DISCRETE;
+
+    virtual void size(EnergyPlusData &)
+    {
+    }
+
+    virtual void simulate(EnergyPlusData &,
+                          const DataLoopNode::NodeData &,
+                          DataLoopNode::NodeData &,
+                          int,
+                          Real64 &,
+                          int &,
+                          Real64 &,
+                          int const,
+                          DataLoopNode::NodeData &,
+                          DataLoopNode::NodeData &,
+                          bool const,
+                          Real64 = 0.0)
+    {
+    }
+
+    virtual Real64 RatedCBF() // rated coil bypass factor at speed
+    {
+        return 0.0;
+    }
+
+    virtual Real64 grossRatedSHR() // rated sensible heat ratio at speed
+    {
+        return 0.0;
+    }
+
+    virtual Real64 GrossRatedCoolingCOPAtMaxSpeed()
+    {
+        return 0.0;
+    }
+
+    virtual const std::string_view NameAtSpeed(int)
+    {
+        return "";
+    }
+
+    virtual Real64 RatedAirMassFlowRateMaxSpeed(bool = false)
+    {
+        return 0.0;
+    }
+
+    virtual Real64 RatedAirMassFlowRateMinSpeed(bool = false)
+    {
+        return 0.0;
+    }
+
+    virtual Real64 RatedCondAirMassFlowRateNomSpeed(bool) // rated condenser air mass flow rate at speed {kg/s}
+    {
+        return 0.0;
+    }
+
+    virtual Real64 RatedEvapAirMassFlowRate()
+    {
+        return 0.0;
+    }
+
+    virtual Real64 RatedEvapAirFlowRate()
+    {
+        return 0.0;
+    }
+
+    virtual Real64 RatedGrossTotalCap()
+    {
+        return 0.0;
+    }
+
+    virtual int IndexCapFT(bool)
+    {
+        return 0;
+    }
+
+    virtual bool SubcoolReheatFlag()
+    {
+        return false;
+    }
+
+    virtual int NumSpeeds()
+    {
+        return 0;
+    }
+
+    virtual void calcStandardRatings210240(EnergyPlusData &)
+    {
+    }
+
+    virtual void setToHundredPercentDOAS()
+    {
+    }
+
+    virtual Real64 EvapAirFlowRateAtSpeed(int)
+    {
+        return 0.0;
+    }
+
+    virtual Real64 RatedTotalCapacityAtSpeed(int)
+    {
+        return 0.0;
+    }
+
+    virtual Real64 CurrentEvapCondPumpPowerAtSpeed(int)
+    {
+        return 0.0;
+    }
+
+    virtual Real64 EvapCondenserEffectivenessAtSpeed(int)
+    {
+        return 0.0;
+    }
+};
 
 } // namespace EnergyPlus
 #endif // ENERGYPLUS_COILS_COIL_COOLING_DX_PERFORMANCE_BASE
