@@ -13,7 +13,7 @@ Certain building energy codes require fan powered VAV boxes to use variable spee
 
     All fan powered VAV terminal units (series or parallel) shall be provided with electronically commutated motors. The DDC system shall be configured to vary the speed of the motor as a function of the heating and cooling load in the space. Minimum speed shall not be greater than 66 percent of design airflow required for the greater of heating or cooling operation. Minimum speed shall be used during periods of low heating and cooling operation and ventilation-only operation.
 
-There is also a user request for it: https://github.com/NREL/EnergyPlus/issues/7311
+There is also a user request for it, see [here](https://github.com/NREL/EnergyPlus/issues/7311).
 
 ## E-mail and  Conference Call Conclusions ##
 
@@ -28,6 +28,7 @@ This new feature will enable users to simulate fan powered boxes with variable s
 The ASHRAE Guideline 36 provides sequence of operation during heating, cooling and deadband (ventilation) operation for both series and parallel fan powered boxes, see Figure 1 and Figure 2 below.
 
 ![Sequence of Operation of a VAV parallel FPB](vav_parallel_fpb.png)
+
 _Figure 1 - Sequence of Operation of a VAV parallel FPB According to ASHRAE Guideline 36_
 
 In summary, Figure 1 shows that VAV parallel FPB should operate as follows:
@@ -36,11 +37,12 @@ In summary, Figure 1 shows that VAV parallel FPB should operate as follows:
 - **Cooling**: the fan is off unless the primary airflow rate falls under the minimum outdoor airflow rate (same case as in deadband).
 
 ![Sequence of Operation of a VAV series FPB](vav_series_fpb.png)
+
 _Figure 2 - Sequence of Operation of a VAV series FPB According to ASHRAE Guideline 36_
 
 In summary, Figure 2 shows that VAV series FPB should operate as follows:
 - **Heating**: the fan should operate at the minimum airflow rate (fan minimum airflow rate or outdoor air minimum flow rate) until the maximum reheat discharge air temperature is reached, and then the airflow should be raised to meet the load.
-- **Deadband**: the fan shall operate at the minimum airflow rate (fan minimum airflow rate or outdoor air minimum flow rate)
+- **Deadband**: the fan shall operate at the minimum airflow rate (fan minimum airflow rate or outdoor air minimum flow rate).
 - **Cooling**: the fan air flow rate will be adjusted based on the primary airflow rate ratio (ratio of actual primary airflow rate to maximum airflow rate).
 
 PIU terminal currently don't have a maximum reheat air temperature input but is necessary to implement the Guideline 36 implementation.
@@ -61,7 +63,7 @@ A new `Maximum Reheat Air Temperature` input will be added. The input will be ad
 
 ```
 Maximum Reheat Air Temperature
-This field specifies a maximum suppply air temperature (deg. C) leaving the reheat coil in a PIU terminal unit during heating operation. If leaving blank, the temperature of the supply air to the space in heating operation may get unrealistic.
+This field specifies a maximum supply air temperature (deg. C) leaving the reheat coil in a PIU terminal unit during heating operation. If leaving blank, the temperature of the supply air to the space in heating operation may get unrealistic.
 ```
 
 ## Outputs Description ##
