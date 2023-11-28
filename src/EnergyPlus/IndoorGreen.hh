@@ -80,6 +80,7 @@ namespace IndoorGreen {
         Real64 ZPPFD = 0;          //PPFD
         Real64 SensibleRate = 0.0; //w
         Real64 LatentRate = 0.0;   //w
+        Real64 LambdaET = 0.0;     //w
         int SurfPtr = 0;
         int ZoneListPtr = 0;
         int ZonePtr = 0;                    // point to the zone where the indoor greenery system is located
