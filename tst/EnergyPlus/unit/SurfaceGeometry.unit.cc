@@ -11267,7 +11267,8 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder4)
     SetupZoneGeometry(*state, ErrorsFound);
     EXPECT_TRUE(ErrorsFound); // expect errors
     std::string const error_string = delimited_string(
-        {"   ** Warning ** No floor exists in Zone=\"ATTIC ZONE\", zone floor area is zero. All values for this zone that are entered per floor "
+        {"   ** Warning ** createSpaceSurfaceLists: Space = ATTIC ZONE has no surfaces.",
+         "   ** Warning ** No floor exists in Zone=\"ATTIC ZONE\", zone floor area is zero. All values for this zone that are entered per floor "
          "area will be zero.",
          "   ** Warning ** Indicated Zone Volume <= 0.0 for Zone=ATTIC ZONE",
          "   **   ~~~   ** The calculated Zone Volume was=0.00",
