@@ -10560,7 +10560,6 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder3)
     int wallLivingEast = Util::FindItemInList(Util::makeUPPER("Living:East"), state->dataSurface->Surface);
     int wallLivingSouth = Util::FindItemInList(Util::makeUPPER("Living:South"), state->dataSurface->Surface);
     int wallLivingWest = Util::FindItemInList(Util::makeUPPER("Living:West"), state->dataSurface->Surface);
-    int wallLivingInterior = Util::FindItemInList(Util::makeUPPER("Living:Interior"), state->dataSurface->Surface);
     int floorLivingFloor = Util::FindItemInList(Util::makeUPPER("Living:Floor"), state->dataSurface->Surface);
     int ceilingLivingCeiling = Util::FindItemInList(Util::makeUPPER("Living:Ceiling"), state->dataSurface->Surface);
     int doorWestDoor = Util::FindItemInList(Util::makeUPPER("WestDoor"), state->dataSurface->Surface);
@@ -10596,7 +10595,6 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder3)
     int wallWestGable = Util::FindItemInList(Util::makeUPPER("WestGable"), state->dataSurface->Surface);
     int wallNorthGable = Util::FindItemInList(Util::makeUPPER("NorthGable"), state->dataSurface->Surface);
     int floorAtticLivingFloor = Util::FindItemInList(Util::makeUPPER("Attic:LivingFloor"), state->dataSurface->Surface);
-    int floorAtticGarageFloor = Util::FindItemInList(Util::makeUPPER("Attic:GarageFloor"), state->dataSurface->Surface);
     int roofNorthRoof1 = Util::FindItemInList(Util::makeUPPER("NorthRoof1"), state->dataSurface->Surface);
     int roofSouthRoof = Util::FindItemInList(Util::makeUPPER("SouthRoof"), state->dataSurface->Surface);
     int roofNorthRoof2 = Util::FindItemInList(Util::makeUPPER("NorthRoof2"), state->dataSurface->Surface);
