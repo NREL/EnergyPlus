@@ -168,7 +168,7 @@ namespace HeatBalanceSurfaceManager {
     CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                                ObjexxFCL::Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
-    Real64 GetSurfQdotRadHVACInPerArea(EnergyPlusData &state, int SurfNum);
+    void sumSurfQdotRadHVAC(EnergyPlusData &state);
 
     Real64 GetQdotConvOutPerArea(EnergyPlusData &state, const int SurfNum);
 

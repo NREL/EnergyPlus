@@ -1155,7 +1155,7 @@ namespace HighTempRadiantSystem {
                     ThisSurfIntensity = (thisHTR.QHTRRadSource * thisHTR.FracRadiant * thisHTR.FracDistribToSurf(RadSurfNum) /
                                          state.dataSurface->Surface(SurfNum).Area);
                     dataHBFS->SurfQHTRadSys(SurfNum) += ThisSurfIntensity;
-                    state.dataHeatBalSurf->AnyRadiantSystems = true;
+                    state.dataHeatBalSurf->AnyRadiantSystems(SurfNum) = true;
 
                     if (ThisSurfIntensity > DataHeatBalFanSys::MaxRadHeatFlux) { // CR 8074, trap excessive intensity (throws off surface balance )
                         ShowSevereError(state, "DistributeHTRadGains:  excessive thermal radiation heat flux intensity detected");
