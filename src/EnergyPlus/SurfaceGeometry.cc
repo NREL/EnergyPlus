@@ -558,6 +558,7 @@ namespace SurfaceGeometry {
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
             bool nonInternalMassSurfacesPresent = false;
+            bool internalMassSurfacesPresent = false;
             Real64 TotSurfArea = 0.0;
             thisZone.Centroid = Vector(0.0, 0.0, 0.0);
             if ((thisZone.AllSurfaceFirst > 0) && (state.dataSurface->Surface(thisZone.AllSurfaceFirst).Sides > 0)) {
@@ -573,8 +574,11 @@ namespace SurfaceGeometry {
 
                 for (int SurfNum = thisSpace.AllSurfaceFirst; SurfNum <= thisSpace.AllSurfaceLast; ++SurfNum) {
                     auto &thisSurface = state.dataSurface->Surface(SurfNum);
-                    if (thisSurface.Class == SurfaceClass::IntMass) continue;
-                    nonInternalMassSurfacesPresent = true;
+                    if (thisSurface.Class == SurfaceClass::IntMass) {
+                        internalMassSurfacesPresent = true;
+                        continue;
+                    }
+                    if (!thisSurface.IsAirBoundarySurf) nonInternalMassSurfacesPresent = true;
                     if (thisSurface.Class == SurfaceClass::Wall || (thisSurface.Class == SurfaceClass::Roof) ||
                         (thisSurface.Class == SurfaceClass::Floor)) {
 
@@ -596,7 +600,7 @@ namespace SurfaceGeometry {
                 thisZone.Centroid.y /= TotSurfArea;
                 thisZone.Centroid.z /= TotSurfArea;
             }
-            if (!nonInternalMassSurfacesPresent) {
+            if (internalMassSurfacesPresent && !nonInternalMassSurfacesPresent) {
                 ShowSevereError(
                     state, format("{}Zone=\"{}\" has only internal mass surfaces.  Need at least one other surface.", RoutineName, thisZone.Name));
                 ErrorsFound = true;
@@ -2910,7 +2914,7 @@ namespace SurfaceGeometry {
         }
         for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             if (int(state.dataHeatBal->space(spaceNum).surfaces.size()) == 0) {
-                ShowWarningError(state, format("{}Space = {} has no surfaces.", RoutineName, state.dataHeatBal->space(spaceNum).Name));
+                ShowWarningError(state, format("{}Space={} has no surfaces.", RoutineName, state.dataHeatBal->space(spaceNum).Name));
             }
         }
     }

@@ -778,6 +778,7 @@ namespace HeatBalanceIntRadExchange {
 
         Array2D<Real64> SaveApproximateViewFactors; // Save for View Factor reporting
         std::string Option1;                        // view factor report option
+        static constexpr std::string_view RoutineName("InitSolarViewFactors: ");
 
         bool ErrorsFound = false;
         bool ViewFactorReport = false;
@@ -817,7 +818,7 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
             thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
-            if (numEnclosureSurfaces < 1) ShowFatalError(state, "No surfaces in an enclosure in InitSolarViewFactors");
+            if (numEnclosureSurfaces < 1) ShowFatalError(state, format("{}No surfaces in enclosure={}.", RoutineName, thisEnclosure.Name));
 
             // Allocate the parts of the derived type
             thisEnclosure.F.dimension(numEnclosureSurfaces, numEnclosureSurfaces, 0.0);
