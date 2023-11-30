@@ -9645,7 +9645,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder2)
     EXPECT_FALSE(ErrorsFound);        // expect no errors
 
     SetupZoneGeometry(*state, ErrorsFound);
-    EXPECT_TRUE(ErrorsFound); // expect errors due to zone with no surfaces
+    EXPECT_FALSE(ErrorsFound); // expect no errors
     // compare_err_stream( "" ); // just for debugging
 
     // This tests the space surface first/last values after surfaces are sorted:
@@ -10498,7 +10498,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder3)
     EXPECT_FALSE(ErrorsFound);        // expect no errors
 
     SetupZoneGeometry(*state, ErrorsFound);
-    EXPECT_TRUE(ErrorsFound); // expect errors due to zone with no surfaces
+    EXPECT_FALSE(ErrorsFound); // expect no errors
     // compare_err_stream( "" ); // just for debugging
 
     // This tests the space surface first/last values after surfaces are sorted:
@@ -11265,7 +11265,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder4)
     EXPECT_FALSE(ErrorsFound);        // expect no errors
 
     SetupZoneGeometry(*state, ErrorsFound);
-    EXPECT_TRUE(ErrorsFound); // expect errors
+    EXPECT_FALSE(ErrorsFound); // expect no errors, just warnings
     std::string const error_string = delimited_string(
         {"   ** Warning ** createSpaceSurfaceLists: Space=ATTIC ZONE has no surfaces.",
          "   ** Warning ** No floor exists in Zone=\"ATTIC ZONE\", zone floor area is zero. All values for this zone that are entered per floor "
@@ -11274,8 +11274,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder4)
          "   **   ~~~   ** The calculated Zone Volume was=0.00",
          "   **   ~~~   ** The simulation will continue with the Zone Volume set to 10.0 m3. ",
          "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.",
-         "   ** Warning ** CalculateZoneVolume: 1 zone is not fully enclosed. For more details use:  Output:Diagnostics,DisplayExtrawarnings; ",
-         "   ** Severe  ** SetUpZoneGeometry: Zone=\"ATTIC ZONE\" has only internal mass surfaces.  Need at least one other surface."});
+         "   ** Warning ** CalculateZoneVolume: 1 zone is not fully enclosed. For more details use:  Output:Diagnostics,DisplayExtrawarnings; "});
 
     compare_err_stream(error_string);
 
