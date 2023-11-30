@@ -7571,11 +7571,12 @@ void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
         state.dataHeatBalSurfMgr->calcHeatBalInsideSurEnvrnFlag = true;
     }
 
+    sumSurfQdotRadHVAC(state);
+
     // Pass correct list of surfaces to CalcHeatBalanceInsideSurf2
     bool const PartialResimulate(present(ZoneToResimulate));
 
     if (!PartialResimulate) {
-
         if (state.dataHeatBal->AllCTF) {
             CalcHeatBalanceInsideSurf2CTFOnly(state, 1, state.dataGlobal->NumOfZones, state.dataSurface->AllIZSurfaceList);
         } else {
@@ -7797,8 +7798,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                             state, SurfNum, state.dataHeatBalSurf->SurfTempInTmp(SurfNum), MAT_zone, SurfTempInSat);
                     }
                     // Pre-calculate a few terms
-                    if (state.dataHeatBalSurf->AnyRadiantSystems(SurfNum))
-                        state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum) = GetSurfQdotRadHVACInPerArea(state, SurfNum);
                     Real64 const TempTerm(
                         state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
                         state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) + state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(SurfNum) +
@@ -7907,8 +7906,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                 state, SurfNum, state.dataHeatBalSurf->SurfTempInTmp(SurfNum), MAT_zone, SurfTempInSat);
                         }
                         // Pre-calculate a few terms
-                        if (state.dataHeatBalSurf->AnyRadiantSystems(SurfNum))
-                            state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum) = GetSurfQdotRadHVACInPerArea(state, SurfNum);
                         Real64 const TempTerm(
                             state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
                             state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) + state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(SurfNum) +
@@ -8063,8 +8060,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
                     Real64 F1 = HMovInsul / (HMovInsul + HConvIn_surf + DataHeatBalSurface::IterDampConst);
 
-                    if (state.dataHeatBalSurf->AnyRadiantSystems(SurfNum))
-                        state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum) = GetSurfQdotRadHVACInPerArea(state, SurfNum);
                     state.dataHeatBalSurf->SurfTempIn(SurfNum) =
                         (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
                          construct.CTFCross[0] * TH11 +
@@ -8126,8 +8121,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                 Real64 const Sigma_Temp_4(Constant::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(SurfNum) + Constant::Kelvin));
 
                 // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
-                if (state.dataHeatBalSurf->AnyRadiantSystems(SurfNum))
-                    state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum) = GetSurfQdotRadHVACInPerArea(state, SurfNum);
                 state.dataSurface->SurfWinHeatGain(SurfNum) =
                     state.dataSurface->SurfWinTransSolar(SurfNum) +
                     HConvIn_surf * surface.Area * (state.dataHeatBalSurf->SurfTempIn(SurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(SurfNum)) +
@@ -8497,8 +8490,6 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                     state.dataHeatBalSurf->SurfQSourceSinkHist(surfNum) = state.dataHeatBalSurf->SurfQsrcHist(surfNum, 1);
                 }
 
-                if (state.dataHeatBalSurf->AnyRadiantSystems(surfNum))
-                    state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) = GetSurfQdotRadHVACInPerArea(state, surfNum);
                 // The special heat balance terms for pools are used only when the pool is operating, so IsPool can change
                 if (state.dataSurface->SurfIsPool(surfNum)) {
                     if ((std::abs(state.dataHeatBalFanSys->QPoolSurfNumerator(surfNum)) >= DataHeatBalSurface::PoolIsOperatingLimit) ||
@@ -8821,8 +8812,6 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                         Real64 const Sigma_Temp_4(Constant::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(surfNum) + Constant::Kelvin));
 
                         // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
-                        if (state.dataHeatBalSurf->AnyRadiantSystems(surfNum))
-                            state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) = GetSurfQdotRadHVACInPerArea(state, surfNum);
                         state.dataSurface->SurfWinHeatGain(surfNum) =
                             state.dataSurface->SurfWinTransSolar(surfNum) +
                             HConvIn_surf * surface.Area *
@@ -9042,11 +9031,18 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
     } // ...end of main inside heat balance iteration loop (ends when Converged)
 }
 
-Real64 GetSurfQdotRadHVACInPerArea(EnergyPlusData &state, int const SurfNum)
+void sumSurfQdotRadHVAC(EnergyPlusData &state)
 {
-    return state.dataHeatBalFanSys->SurfQHTRadSys(SurfNum) + state.dataHeatBalFanSys->SurfQHWBaseboard(SurfNum) +
-           state.dataHeatBalFanSys->SurfQSteamBaseboard(SurfNum) + state.dataHeatBalFanSys->SurfQElecBaseboard(SurfNum) +
-           state.dataHeatBalFanSys->SurfQCoolingPanel(SurfNum);
+    for (auto thisSpace : state.dataHeatBal->space) {
+        for (int surfNum = thisSpace.HTSurfaceFirst; surfNum <= thisSpace.HTSurfaceLast; ++surfNum) {
+            if (state.dataHeatBalSurf->AnyRadiantSystems(surfNum)) {
+                state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) =
+                    state.dataHeatBalFanSys->SurfQHTRadSys(surfNum) + state.dataHeatBalFanSys->SurfQHWBaseboard(surfNum) +
+                    state.dataHeatBalFanSys->SurfQSteamBaseboard(surfNum) + state.dataHeatBalFanSys->SurfQElecBaseboard(surfNum) +
+                    state.dataHeatBalFanSys->SurfQCoolingPanel(surfNum);
+            }
+        }
+    }
 }
 
 void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, int const SurfNum, DataHeatBalance::ZoneData &zone, int WarmupSurfTemp)
