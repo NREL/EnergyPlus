@@ -611,6 +611,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
             continue;
         }
 
+        state.dataHeatBal->anyRadiantSystems = true;
         Real64 AllFracsSummed = thisCP.FracDistribPerson;
         for (SurfNum = 1; SurfNum <= thisCP.TotSurfToDistrib; ++SurfNum) {
             thisCP.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 8);
@@ -1605,7 +1606,6 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
             if (ThisSurf.Area > SmallestArea) {
                 Real64 ThisSurfIntensity = (thisCP.CoolingPanelSource * thisCP.FracDistribToSurf(RadSurfNum) / ThisSurf.Area);
                 state.dataHeatBalFanSys->SurfQCoolingPanel(SurfNum) += ThisSurfIntensity;
-                state.dataHeatBalSurf->AnyRadiantSystems(SurfNum) = true;
                 // CR 8074, trap for excessive intensity (throws off surface balance )
                 if (ThisSurfIntensity > DataHeatBalFanSys::MaxRadHeatFlux) {
                     ShowSevereError(state, "DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected");

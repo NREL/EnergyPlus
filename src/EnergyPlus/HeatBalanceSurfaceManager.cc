@@ -1375,7 +1375,6 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     state.dataHeatBalSurf->SurfQRadIntGainsInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfQdotRadIntGainsInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-    state.dataHeatBalSurf->AnyRadiantSystems.dimension(state.dataSurface->TotSurfaces, false);
     state.dataHeatBalSurf->SurfQRadHVACInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfQdotRadHVACInRep.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfQdotRadHVACInPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -2162,7 +2161,6 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
                 state.dataHeatBalSurf->SurfQdotRadLightsInRep(SurfNum) = 0.0;
                 state.dataHeatBalSurf->SurfQRadIntGainsInRep(SurfNum) = 0.0;
                 state.dataHeatBalSurf->SurfQdotRadIntGainsInRep(SurfNum) = 0.0;
-                state.dataHeatBalSurf->AnyRadiantSystems(SurfNum) = false;
                 state.dataHeatBalSurf->SurfQRadHVACInRep(SurfNum) = 0.0;
                 state.dataHeatBalSurf->SurfQdotRadHVACInRep(SurfNum) = 0.0;
                 state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum) = 0.0;
@@ -9033,9 +9031,10 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
 void sumSurfQdotRadHVAC(EnergyPlusData &state)
 {
+    if (!state.dataHeatBal->anyRadiantSystems) return;
     for (auto thisSpace : state.dataHeatBal->space) {
         for (int surfNum = thisSpace.HTSurfaceFirst; surfNum <= thisSpace.HTSurfaceLast; ++surfNum) {
-            if (state.dataHeatBalSurf->AnyRadiantSystems(surfNum)) {
+            if (state.dataSurface->surfIntConv(surfNum).getsRadiantHeat) {
                 state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) =
                     state.dataHeatBalFanSys->SurfQHTRadSys(surfNum) + state.dataHeatBalFanSys->SurfQHWBaseboard(surfNum) +
                     state.dataHeatBalFanSys->SurfQSteamBaseboard(surfNum) + state.dataHeatBalFanSys->SurfQElecBaseboard(surfNum) +

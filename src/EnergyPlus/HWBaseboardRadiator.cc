@@ -630,6 +630,7 @@ namespace HWBaseboardRadiator {
             thisHWBaseboard.ZonePtr =
                 DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::BaseboardWater, thisHWBaseboard.Name);
 
+            state.dataHeatBal->anyRadiantSystems = true;
             Real64 AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= thisHWBaseboard.TotSurfToDistrib; ++SurfNum) {
                 thisHWBaseboard.SurfacePtr(SurfNum) =
@@ -1510,7 +1511,6 @@ namespace HWBaseboardRadiator {
                 if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
                     ThisSurfIntensity = (thisHWBB.QBBRadSource * thisHWBB.FracDistribToSurf(RadSurfNum) / state.dataSurface->Surface(SurfNum).Area);
                     state.dataHeatBalFanSys->SurfQHWBaseboard(SurfNum) += ThisSurfIntensity;
-                    state.dataHeatBalSurf->AnyRadiantSystems(SurfNum) = true;
                     // CR 8074, trap for excessive intensity (throws off surface balance )
                     if (ThisSurfIntensity > DataHeatBalFanSys::MaxRadHeatFlux) {
                         ShowSevereError(state, "DistributeBBRadGains:  excessive thermal radiation heat flux intensity detected");

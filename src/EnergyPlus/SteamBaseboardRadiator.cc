@@ -718,6 +718,7 @@ namespace SteamBaseboardRadiator {
                 continue;
             }
 
+            state.dataHeatBal->anyRadiantSystems = true;
             Real64 AllFracsSummed = SteamBaseboardDesignDataObject.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib; ++SurfNum) {
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 5);
@@ -1539,7 +1540,6 @@ namespace SteamBaseboardRadiator {
                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracDistribToSurf(RadSurfNum) /
                                          state.dataSurface->Surface(SurfNum).Area);
                     state.dataHeatBalFanSys->SurfQSteamBaseboard(SurfNum) += ThisSurfIntensity;
-                    state.dataHeatBalSurf->AnyRadiantSystems(SurfNum) = true;
 
                     if (ThisSurfIntensity > MaxRadHeatFlux) { // CR 8074, trap for excessive intensity (throws off surface balance )
                         ShowSevereError(state, "DistributeBBSteamRadGains:  excessive thermal radiation heat flux intensity detected");
