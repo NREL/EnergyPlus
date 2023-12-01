@@ -698,8 +698,6 @@ namespace DataHeatBalance {
         int zoneOABalanceIndex = 0;       // Index to ZoneAirBalance for this zone, if any
 
         // Spaces
-        bool anySurfacesWithoutSpace = false; // True if any surfaces in a zone do not have a space assigned in input
-        bool anySurfacesWithSpace = false;    // True if any surfaces in a zone have a space assigned in input
         EPVector<int> spaceIndexes;           // Indexes to spaces in this zone
         int numSpaces = 0;                    // Number of spaces in this zone
 
