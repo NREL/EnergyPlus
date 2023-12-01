@@ -448,6 +448,7 @@ namespace HeatBalanceIntRadExchange {
         // the grey interchange between surfaces in an enclosure.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        static constexpr std::string_view RoutineName("InitInteriorRadExchange: ");
         bool NoUserInputF; // Logical flag signifying no input F's for zone
         bool ErrorsFound(false);
         Real64 CheckValue1;
@@ -499,7 +500,10 @@ namespace HeatBalanceIntRadExchange {
             thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
             state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs =
                 max(state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs, numEnclosureSurfaces);
-            if (numEnclosureSurfaces < 1) ShowFatalError(state, "No surfaces in an enclosure in InitInteriorRadExchange");
+            if (numEnclosureSurfaces < 1) {
+                ShowSevereError(state, format("{}No surfaces in enclosure={}.", RoutineName, thisEnclosure.Name));
+                ErrorsFound = true;
+            }
 
             // Allocate the parts of the derived type
             thisEnclosure.F.dimension(numEnclosureSurfaces, numEnclosureSurfaces, 0.0);
@@ -767,7 +771,7 @@ namespace HeatBalanceIntRadExchange {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "InitInteriorRadExchange: Errors found during initialization of radiant exchange.  Program terminated.");
+            ShowFatalError(state, format("{}Errors found during initialization of radiant exchange.  Program terminated.", RoutineName));
         }
     }
 
@@ -778,6 +782,7 @@ namespace HeatBalanceIntRadExchange {
 
         Array2D<Real64> SaveApproximateViewFactors; // Save for View Factor reporting
         std::string Option1;                        // view factor report option
+        static constexpr std::string_view RoutineName("InitSolarViewFactors: ");
 
         bool ErrorsFound = false;
         bool ViewFactorReport = false;
@@ -817,7 +822,10 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
             thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
-            if (numEnclosureSurfaces < 1) ShowFatalError(state, "No surfaces in an enclosure in InitSolarViewFactors");
+            if (numEnclosureSurfaces < 1) {
+                ShowSevereError(state, format("{}No surfaces in enclosure={}.", RoutineName, thisEnclosure.Name));
+                ErrorsFound = true;
+            }
 
             // Allocate the parts of the derived type
             thisEnclosure.F.dimension(numEnclosureSurfaces, numEnclosureSurfaces, 0.0);
@@ -1048,7 +1056,7 @@ namespace HeatBalanceIntRadExchange {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, "InitSolarViewFactors: Errors found during initialization of diffuse solar distribution.  Program terminated.");
+            ShowFatalError(state, format("{}Errors found during initialization of diffuse solar distribution.  Program terminated.", RoutineName));
         }
     }
 
