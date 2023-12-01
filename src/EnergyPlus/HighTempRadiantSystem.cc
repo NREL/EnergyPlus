@@ -489,7 +489,6 @@ namespace HighTempRadiantSystem {
             highTempRadSys.SurfacePtr.allocate(highTempRadSys.TotSurfToDistrib);
             highTempRadSys.FracDistribToSurf.allocate(highTempRadSys.TotSurfToDistrib);
 
-            state.dataHeatBal->anyRadiantSystems = true;
             AllFracsSummed = highTempRadSys.FracDistribPerson;
             for (int SurfNum = 1; SurfNum <= highTempRadSys.TotSurfToDistrib; ++SurfNum) {
                 highTempRadSys.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 7);
@@ -514,6 +513,7 @@ namespace HighTempRadiantSystem {
 
                 if (highTempRadSys.SurfacePtr(SurfNum) != 0) {
                     state.dataSurface->surfIntConv(highTempRadSys.SurfacePtr(SurfNum)).getsRadiantHeat = true;
+                    state.dataSurface->allGetsRadiantHeatSurfaceList.emplace_back(highTempRadSys.SurfacePtr(SurfNum));
                 }
 
                 AllFracsSummed += highTempRadSys.FracDistribToSurf(SurfNum);

@@ -9021,16 +9021,11 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
 void sumSurfQdotRadHVAC(EnergyPlusData &state)
 {
-    if (!state.dataHeatBal->anyRadiantSystems) return;
-    for (auto thisSpace : state.dataHeatBal->space) {
-        for (int surfNum = thisSpace.HTSurfaceFirst; surfNum <= thisSpace.HTSurfaceLast; ++surfNum) {
-            if (state.dataSurface->surfIntConv(surfNum).getsRadiantHeat) {
-                state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) =
-                    state.dataHeatBalFanSys->SurfQHTRadSys(surfNum) + state.dataHeatBalFanSys->SurfQHWBaseboard(surfNum) +
-                    state.dataHeatBalFanSys->SurfQSteamBaseboard(surfNum) + state.dataHeatBalFanSys->SurfQElecBaseboard(surfNum) +
-                    state.dataHeatBalFanSys->SurfQCoolingPanel(surfNum);
-            }
-        }
+    for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
+        state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) =
+            state.dataHeatBalFanSys->SurfQHTRadSys(surfNum) + state.dataHeatBalFanSys->SurfQHWBaseboard(surfNum) +
+            state.dataHeatBalFanSys->SurfQSteamBaseboard(surfNum) + state.dataHeatBalFanSys->SurfQElecBaseboard(surfNum) +
+            state.dataHeatBalFanSys->SurfQCoolingPanel(surfNum);
     }
 }
 

@@ -1451,6 +1451,7 @@ struct SurfacesData : BaseGlobalStruct
     std::vector<int> AllVaryAbsOpaqSurfaceList;        // List of all opaque exterior surfaces with dynamic coating
     std::vector<int> allInsideSourceSurfaceList;       // List of all surfaces with SurfaceProperty:HeatBalanceSourceTerm for inside face
     std::vector<int> allOutsideSourceSurfaceList;      // List of all surfaces with SurfaceProperty:HeatBalanceSourceTerm for outside face
+    std::vector<int> allGetsRadiantHeatSurfaceList;    // List of all surfaces that receive radiant HVAC output
 
     std::array<std::vector<int>, static_cast<int>(DataSurfaces::SurfaceFilter::Num)> SurfaceFilterLists;
 

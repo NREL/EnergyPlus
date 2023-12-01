@@ -387,7 +387,6 @@ namespace ElectricBaseboardRadiator {
             elecBaseboard.ZonePtr =
                 DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::BaseboardElectric, elecBaseboard.EquipName);
 
-            state.dataHeatBal->anyRadiantSystems = true;
             Real64 AllFracsSummed = elecBaseboard.FracDistribPerson;
             for (int SurfNum = 1; SurfNum <= elecBaseboard.TotSurfToDistrib; ++SurfNum) {
                 elecBaseboard.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 3);
@@ -410,6 +409,7 @@ namespace ElectricBaseboardRadiator {
                 }
                 if (elecBaseboard.SurfacePtr(SurfNum) != 0) {
                     state.dataSurface->surfIntConv(elecBaseboard.SurfacePtr(SurfNum)).getsRadiantHeat = true;
+                    state.dataSurface->allGetsRadiantHeatSurfaceList.emplace_back(elecBaseboard.SurfacePtr(SurfNum));
                 }
 
                 AllFracsSummed += elecBaseboard.FracDistribToSurf(SurfNum);

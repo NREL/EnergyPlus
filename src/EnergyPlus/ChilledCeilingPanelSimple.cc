@@ -611,7 +611,6 @@ void GetCoolingPanelInput(EnergyPlusData &state)
             continue;
         }
 
-        state.dataHeatBal->anyRadiantSystems = true;
         Real64 AllFracsSummed = thisCP.FracDistribPerson;
         for (SurfNum = 1; SurfNum <= thisCP.TotSurfToDistrib; ++SurfNum) {
             thisCP.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 8);
@@ -640,6 +639,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
             }
             if (thisCP.SurfacePtr(SurfNum) != 0) {
                 state.dataSurface->surfIntConv(thisCP.SurfacePtr(SurfNum)).getsRadiantHeat = true;
+                state.dataSurface->allGetsRadiantHeatSurfaceList.emplace_back(thisCP.SurfacePtr(SurfNum));
             }
 
             AllFracsSummed += thisCP.FracDistribToSurf(SurfNum);

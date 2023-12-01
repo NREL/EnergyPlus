@@ -630,7 +630,6 @@ namespace HWBaseboardRadiator {
             thisHWBaseboard.ZonePtr =
                 DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::BaseboardWater, thisHWBaseboard.Name);
 
-            state.dataHeatBal->anyRadiantSystems = true;
             Real64 AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= thisHWBaseboard.TotSurfToDistrib; ++SurfNum) {
                 thisHWBaseboard.SurfacePtr(SurfNum) =
@@ -663,6 +662,7 @@ namespace HWBaseboardRadiator {
                 }
                 if (thisHWBaseboard.SurfacePtr(SurfNum) != 0) {
                     state.dataSurface->surfIntConv(thisHWBaseboard.SurfacePtr(SurfNum)).getsRadiantHeat = true;
+                    state.dataSurface->allGetsRadiantHeatSurfaceList.emplace_back(thisHWBaseboard.SurfacePtr(SurfNum));
                 }
 
                 AllFracsSummed += thisHWBaseboard.FracDistribToSurf(SurfNum);
