@@ -8632,7 +8632,6 @@ namespace SurfaceGeometry {
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 state.dataSurface->Surface(Found).InsideHeatSourceTermSchedule =
                     ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
-                state.dataSurface->AnyHeatBalanceInsideSourceTerm = true;
                 if (state.dataSurface->Surface(Found).InsideHeatSourceTermSchedule == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", cannot find the matching Schedule: {}=\"{}",
@@ -8641,13 +8640,14 @@ namespace SurfaceGeometry {
                                            state.dataIPShortCut->cAlphaFieldNames(2),
                                            state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
+                } else {
+                    state.dataSurface->allInsideSourceSurfaceList.emplace_back(Found);
                 }
             }
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 state.dataSurface->Surface(Found).OutsideHeatSourceTermSchedule =
                     ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
-                state.dataSurface->AnyHeatBalanceOutsideSourceTerm = true;
                 if (state.dataSurface->Surface(Found).OutsideHeatSourceTermSchedule == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", cannot find the matching Schedule: {}=\"{}",
@@ -8662,6 +8662,8 @@ namespace SurfaceGeometry {
                                            cCurrentModuleObject,
                                            state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
+                } else {
+                    state.dataSurface->allOutsideSourceSurfaceList.emplace_back(Found);
                 }
             }
 

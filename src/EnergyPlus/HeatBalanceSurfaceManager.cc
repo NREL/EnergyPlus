@@ -6874,6 +6874,11 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
             state, state.dataHeatBalSurf->SurfInsideTempHist(1), 0, state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea, _, Outside);
     }
 
+    // Calculate heat extract due to additional heat flux source term as the surface boundary condition
+    for (int surfNum : state.dataSurface->allOutsideSourceSurfaceList) {
+        state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(surfNum) =
+            EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, Surface(surfNum).OutsideHeatSourceTermSchedule);
+    }
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) { // Loop through all surfaces...
         for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
             auto &thisSpace = state.dataHeatBal->space(spaceNum);
@@ -6900,13 +6905,6 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                 state.dataHeatBalSurf->SurfHSkyExt(SurfNum) = 0.0;
                 state.dataHeatBalSurf->SurfHGrdExt(SurfNum) = 0.0;
                 state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) = 0.0;
-
-                // Calculate heat extract due to additional heat flux source term as the surface boundary condition
-
-                if (Surface(SurfNum).OutsideHeatSourceTermSchedule) {
-                    state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) =
-                        EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, Surface(SurfNum).OutsideHeatSourceTermSchedule);
-                }
 
                 // Calculate the current outside surface temperature TH(SurfNum,1,1) for the
                 // various different boundary conditions
@@ -7678,13 +7676,9 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
     state.dataHeatBal->InsideSurfIterations = 0;
 
     // Calculate heat extract due to additional heat flux source term as the surface boundary condition
-    if (state.dataSurface->AnyHeatBalanceInsideSourceTerm) {
-        for (int SurfNum : HTSurfs) {
-            if (state.dataSurface->Surface(SurfNum).InsideHeatSourceTermSchedule) {
-                state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(SurfNum) =
-                    EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->Surface(SurfNum).InsideHeatSourceTermSchedule);
-            }
-        }
+    for (int surfNum : state.dataSurface->allInsideSourceSurfaceList) {
+        state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(surfNum) =
+            EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->Surface(surfNum).InsideHeatSourceTermSchedule);
     }
 
     // Calculate Kiva instances
@@ -8524,14 +8518,10 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                 state.dataSurface->SurfWinDividerQRadInAbs(surfNum) = 0.0;
             }
 
-            // Calculate heat extract due to additional heat flux source term as the surface boundary condition - all HT surfaces
-            if (state.dataSurface->AnyHeatBalanceInsideSourceTerm) {
-                for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
-                    if (Surface(surfNum).InsideHeatSourceTermSchedule) {
-                        state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(surfNum) =
-                            EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, Surface(surfNum).InsideHeatSourceTermSchedule);
-                    }
-                }
+            // Calculate heat extract due to additional heat flux source term as the surface boundary condition
+            for (int surfNum : state.dataSurface->allInsideSourceSurfaceList) {
+                state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(surfNum) =
+                    EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->Surface(surfNum).InsideHeatSourceTermSchedule);
             }
 
             // Set up coefficient arrays prior to calculations and precalc terms that do no change during iteration - non-window surfaces

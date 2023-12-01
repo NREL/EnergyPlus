@@ -1425,8 +1425,6 @@ struct SurfacesData : BaseGlobalStruct
     bool AirflowWindows = false;          // TRUE if one or more airflow windows
     bool ShadingTransmittanceVaries = false;           // overall, shading transmittance varies for the building
     bool UseRepresentativeSurfaceCalculations = false; // Use Representative Surfaces for Calculations
-    bool AnyHeatBalanceInsideSourceTerm = false;       // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
-    bool AnyHeatBalanceOutsideSourceTerm = false;      // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
     bool AnyMovableInsulation = false;                 // True if any movable insulation presents
     bool AnyMovableSlat = false;                       // True if there are any movable slats for window blinds presented
 
@@ -1451,6 +1449,8 @@ struct SurfacesData : BaseGlobalStruct
     std::vector<int> AllHTKivaSurfaceList;             // List of all Kiva foundation surfaces
     std::vector<int> AllSurfaceListReportOrder;        // List of all surfaces - output reporting order
     std::vector<int> AllVaryAbsOpaqSurfaceList;        // List of all opaque exterior surfaces with dynamic coating
+    std::vector<int> allInsideSourceSurfaceList;       // List of all surfaces with SurfaceProperty:HeatBalanceSourceTerm for inside face
+    std::vector<int> allOutsideSourceSurfaceList;      // List of all surfaces with SurfaceProperty:HeatBalanceSourceTerm for outside face
 
     std::array<std::vector<int>, static_cast<int>(DataSurfaces::SurfaceFilter::Num)> SurfaceFilterLists;
 
