@@ -265,17 +265,17 @@ namespace OutputProcessor {
 
     struct RealVariables
     {
-        Real64 *Which;       // The POINTER to the actual variable holding the value
-        Real64 Value;        // Current Value of the variable (to resolution of Zone Time Step)
-        Real64 TSValue;      // Value of this variable at the Zone Time Step
-        Real64 EITSValue;    // Value of this variable at the Zone Time Step for external interface
-        Real64 StoreValue;   // At end of Zone Time Step, value is placed here for later reporting
-        Real64 NumStored;    // Number of hours stored
-        StoreType storeType; // Variable Type (Summed/Non-Static or Average/Static)
-        bool Stored;         // True when value is stored
-        bool Report;         // User has requested reporting of this variable in the IDF
-        bool tsStored;       // if stored for this zone timestep
-        bool thisTSStored;   // if stored for this zone timestep
+        Real64 *Which = nullptr; // The POINTER to the actual variable holding the value
+        Real64 Value;            // Current Value of the variable (to resolution of Zone Time Step)
+        Real64 TSValue;          // Value of this variable at the Zone Time Step
+        Real64 EITSValue;        // Value of this variable at the Zone Time Step for external interface
+        Real64 StoreValue;       // At end of Zone Time Step, value is placed here for later reporting
+        Real64 NumStored;        // Number of hours stored
+        StoreType storeType;     // Variable Type (Summed/Non-Static or Average/Static)
+        bool Stored;             // True when value is stored
+        bool Report;             // User has requested reporting of this variable in the IDF
+        bool tsStored;           // if stored for this zone timestep
+        bool thisTSStored;       // if stored for this zone timestep
         int thisTSCount;
         ReportingFrequency frequency; // How often to report this variable
         Real64 MaxValue;              // Maximum reporting (only for Averaged variables, and those greater than Time Step)
@@ -301,17 +301,17 @@ namespace OutputProcessor {
     struct IntegerVariables
     {
         // Members
-        int *Which;          // The POINTER to the actual variable holding the value
-        Real64 Value;        // Current Value of the variable (to resolution of Zone Time Step)
-        Real64 TSValue;      // Value of this variable at the Zone Time Step
-        Real64 EITSValue;    // Value of this variable at the Zone Time Step for external interface
-        Real64 StoreValue;   // At end of Zone Time Step, value is placed here for later reporting
-        Real64 NumStored;    // Number of hours stored
-        StoreType storeType; // Variable Type (Summed/Non-Static or Average/Static)
-        bool Stored;         // True when value is stored
-        bool Report;         // User has requested reporting of this variable in the IDF
-        bool tsStored;       // if stored for this zone timestep
-        bool thisTSStored;   // if stored for this zone timestep
+        int *Which = nullptr; // The POINTER to the actual variable holding the value
+        Real64 Value;         // Current Value of the variable (to resolution of Zone Time Step)
+        Real64 TSValue;       // Value of this variable at the Zone Time Step
+        Real64 EITSValue;     // Value of this variable at the Zone Time Step for external interface
+        Real64 StoreValue;    // At end of Zone Time Step, value is placed here for later reporting
+        Real64 NumStored;     // Number of hours stored
+        StoreType storeType;  // Variable Type (Summed/Non-Static or Average/Static)
+        bool Stored;          // True when value is stored
+        bool Report;          // User has requested reporting of this variable in the IDF
+        bool tsStored;        // if stored for this zone timestep
+        bool thisTSStored;    // if stored for this zone timestep
         int thisTSCount;
         ReportingFrequency frequency; // How often to report this variable
         int MaxValue;                 // Maximum reporting (only for Averaged variables, and those greater than Time Step)

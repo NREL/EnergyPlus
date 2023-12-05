@@ -90,6 +90,10 @@ namespace DataViewFactorInformation {
         bool solAbsFirstCalc = true;         // for error message
         bool radReCalc = false; // Enclosure solar or thermal radiation properties need recalc due to window/shading status change or envelope EMS
                                 // actuators present
+        Real64 sumAE = 0.0;     // Sum of surface area * emissivity for all surfaces in the enclosure
+        Real64 sumAET = 0.0;    // Sum of surface area * emissivity * temperature for all surfaces in the enclosure
+        Real64 MRT = 0.0;       // Mean radiant temperature of the enclosure
+        bool reCalcMRT = false; // True when MRT needs to be recalculated
     };
 
 } // namespace DataViewFactorInformation
