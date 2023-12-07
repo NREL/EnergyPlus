@@ -124,6 +124,8 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem)
 
     EXPECT_TRUE(compare_err_stream(error_string01, true));
     EXPECT_TRUE(ErrorsFound);
+    EXPECT_EQ(state->dataSurface->allGetsRadiantHeatSurfaceList[0], 1);
+    EXPECT_TRUE(state->dataSurface->surfIntConv(1).getsRadiantHeat);
 }
 
 TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_SizeHighTempRadiantSystemScalableFlagSetTest)

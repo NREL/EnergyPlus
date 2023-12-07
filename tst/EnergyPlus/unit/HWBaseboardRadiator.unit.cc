@@ -320,6 +320,11 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterInputTest)
 
     GetHWBaseboardInput(*state);
 
+    int surfNumTheFloor = Util::FindItemInList("THEFLOOR", state->dataSurface->Surface);
+
+    EXPECT_EQ(state->dataSurface->allGetsRadiantHeatSurfaceList[0], surfNumTheFloor);
+    EXPECT_TRUE(state->dataSurface->surfIntConv(surfNumTheFloor).getsRadiantHeat);
+
     ASSERT_NEAR(state->dataHWBaseboardRad->HWBaseboard(1).FracDistribToSurf(1), 0.8, absTol);
     ASSERT_NEAR(state->dataHWBaseboardRad->HWBaseboardDesignObject(1).FracRadiant, 0.4, absTol);
     ASSERT_NEAR(state->dataHWBaseboardRad->HWBaseboardDesignObject(1).FracDistribPerson, 0.2, absTol);
