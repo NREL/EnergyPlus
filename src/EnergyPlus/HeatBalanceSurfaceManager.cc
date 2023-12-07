@@ -547,13 +547,17 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
                 state.dataHeatBalFanSys->QRadSysSource(SurfNum) = 0.0;
                 state.dataHeatBalFanSys->QPVSysSource(SurfNum) = 0.0;
-                state.dataHeatBalFanSys->SurfQHTRadSys(SurfNum) = 0.0;
-                state.dataHeatBalFanSys->SurfQHWBaseboard(SurfNum) = 0.0;
-                state.dataHeatBalFanSys->SurfQSteamBaseboard(SurfNum) = 0.0;
-                state.dataHeatBalFanSys->SurfQElecBaseboard(SurfNum) = 0.0;
-                state.dataHeatBalFanSys->SurfQCoolingPanel(SurfNum) = 0.0;
                 state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) = 0.0;
                 state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) = 0.0;
+                for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
+                    auto &thisSurfQRadFromHVAC = state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum);
+                    thisSurfQRadFromHVAC.HTRadSys = 0.0;
+                    thisSurfQRadFromHVAC.HWBaseboard = 0.0;
+                    thisSurfQRadFromHVAC.SteamBaseboard = 0.0;
+                    thisSurfQRadFromHVAC.ElecBaseboard = 0.0;
+                    thisSurfQRadFromHVAC.CoolingPanel = 0.0;
+                }
+
             } // ...end of Zone Surf loop
         }
     } // ...end of Zone loop
@@ -1447,11 +1451,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     state.dataHeatBalFanSys->RadSysToHBQsrcCoef.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalFanSys->QRadSysSource.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalFanSys->TCondFDSourceNode.dimension(state.dataSurface->TotSurfaces, 15.0);
-    state.dataHeatBalFanSys->SurfQHTRadSys.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalFanSys->SurfQHWBaseboard.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalFanSys->SurfQSteamBaseboard.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalFanSys->SurfQElecBaseboard.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalFanSys->SurfQCoolingPanel.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalFanSys->surfQRadFromHVAC.allocate(state.dataSurface->TotSurfaces);
     state.dataHeatBalFanSys->QRadSurfAFNDuct.dimension(state.dataSurface->TotSurfaces, 0.0);
 
     // allocate terms used for pool surface heat balance
@@ -9022,10 +9022,10 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 void sumSurfQdotRadHVAC(EnergyPlusData &state)
 {
     for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
-        state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) =
-            state.dataHeatBalFanSys->SurfQHTRadSys(surfNum) + state.dataHeatBalFanSys->SurfQHWBaseboard(surfNum) +
-            state.dataHeatBalFanSys->SurfQSteamBaseboard(surfNum) + state.dataHeatBalFanSys->SurfQElecBaseboard(surfNum) +
-            state.dataHeatBalFanSys->SurfQCoolingPanel(surfNum);
+        auto &thisSurfQRadFromHVAC = state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum);
+        state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum) = thisSurfQRadFromHVAC.HTRadSys + thisSurfQRadFromHVAC.HWBaseboard +
+                                                                   thisSurfQRadFromHVAC.SteamBaseboard + thisSurfQRadFromHVAC.ElecBaseboard +
+                                                                   thisSurfQRadFromHVAC.CoolingPanel;
     }
 }
 

@@ -1496,7 +1496,10 @@ namespace HWBaseboardRadiator {
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
         // Initialize arrays
-        state.dataHeatBalFanSys->SurfQHWBaseboard = 0.0;
+        for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
+            auto &thisSurfQRadFromHVAC = state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum);
+            thisSurfQRadFromHVAC.HWBaseboard = 0.0;
+        }
         state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson = 0.0;
 
         for (auto &thisHWBB : state.dataHWBaseboardRad->HWBaseboard) {
@@ -1510,7 +1513,7 @@ namespace HWBaseboardRadiator {
                 SurfNum = thisHWBB.SurfacePtr(RadSurfNum);
                 if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
                     ThisSurfIntensity = (thisHWBB.QBBRadSource * thisHWBB.FracDistribToSurf(RadSurfNum) / state.dataSurface->Surface(SurfNum).Area);
-                    state.dataHeatBalFanSys->SurfQHWBaseboard(SurfNum) += ThisSurfIntensity;
+                    state.dataHeatBalFanSys->surfQRadFromHVAC(SurfNum).HWBaseboard += ThisSurfIntensity;
                     // CR 8074, trap for excessive intensity (throws off surface balance )
                     if (ThisSurfIntensity > DataHeatBalFanSys::MaxRadHeatFlux) {
                         ShowSevereError(state, "DistributeBBRadGains:  excessive thermal radiation heat flux intensity detected");

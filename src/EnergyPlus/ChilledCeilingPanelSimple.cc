@@ -1589,7 +1589,10 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
     Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
     // Initialize arrays
-    state.dataHeatBalFanSys->SurfQCoolingPanel = 0.0;
+    for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
+        auto &thisSurfQRadFromHVAC = state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum);
+        thisSurfQRadFromHVAC.CoolingPanel = 0.0;
+    }
     state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson = 0.0;
 
     for (int CoolingPanelNum = 1; CoolingPanelNum <= (int)state.dataChilledCeilingPanelSimple->CoolingPanel.size(); ++CoolingPanelNum) {
@@ -1605,7 +1608,7 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
             auto &ThisSurf(state.dataSurface->Surface(SurfNum));
             if (ThisSurf.Area > SmallestArea) {
                 Real64 ThisSurfIntensity = (thisCP.CoolingPanelSource * thisCP.FracDistribToSurf(RadSurfNum) / ThisSurf.Area);
-                state.dataHeatBalFanSys->SurfQCoolingPanel(SurfNum) += ThisSurfIntensity;
+                state.dataHeatBalFanSys->surfQRadFromHVAC(SurfNum).CoolingPanel += ThisSurfIntensity;
                 // CR 8074, trap for excessive intensity (throws off surface balance )
                 if (ThisSurfIntensity > DataHeatBalFanSys::MaxRadHeatFlux) {
                     ShowSevereError(state, "DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected");

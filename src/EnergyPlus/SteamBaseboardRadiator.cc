@@ -1522,7 +1522,10 @@ namespace SteamBaseboardRadiator {
         int ZoneNum;              // Pointer to the Zone derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
-        state.dataHeatBalFanSys->SurfQSteamBaseboard = 0.0;
+        for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
+            auto &thisSurfQRadFromHVAC = state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum);
+            thisSurfQRadFromHVAC.SteamBaseboard = 0.0;
+        }
         state.dataHeatBalFanSys->ZoneQSteamBaseboardToPerson = 0.0;
 
         for (BaseboardNum = 1; BaseboardNum <= state.dataSteamBaseboardRadiator->NumSteamBaseboards; ++BaseboardNum) {
@@ -1540,7 +1543,7 @@ namespace SteamBaseboardRadiator {
                     ThisSurfIntensity = (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).QBBSteamRadSource *
                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracDistribToSurf(RadSurfNum) /
                                          state.dataSurface->Surface(SurfNum).Area);
-                    state.dataHeatBalFanSys->SurfQSteamBaseboard(SurfNum) += ThisSurfIntensity;
+                    state.dataHeatBalFanSys->surfQRadFromHVAC(SurfNum).SteamBaseboard += ThisSurfIntensity;
 
                     if (ThisSurfIntensity > MaxRadHeatFlux) { // CR 8074, trap for excessive intensity (throws off surface balance )
                         ShowSevereError(state, "DistributeBBSteamRadGains:  excessive thermal radiation heat flux intensity detected");

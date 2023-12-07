@@ -906,7 +906,10 @@ namespace ElectricBaseboardRadiator {
         Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
         // Initialize arrays
-        state.dataHeatBalFanSys->SurfQElecBaseboard = 0.0;
+        for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
+            auto &thisSurfQRadFromHVAC = state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum);
+            thisSurfQRadFromHVAC.ElecBaseboard = 0.0;
+        }
         state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson = 0.0;
 
         for (auto &elecBaseboard : state.dataElectBaseboardRad->ElecBaseboard) {
@@ -919,7 +922,7 @@ namespace ElectricBaseboardRadiator {
                     if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
                         Real64 ThisSurfIntensity =
                             (elecBaseboard.QBBElecRadSource * elecBaseboard.FracDistribToSurf(RadSurfNum) / state.dataSurface->Surface(SurfNum).Area);
-                        state.dataHeatBalFanSys->SurfQElecBaseboard(SurfNum) += ThisSurfIntensity;
+                        state.dataHeatBalFanSys->surfQRadFromHVAC(SurfNum).ElecBaseboard += ThisSurfIntensity;
                         if (ThisSurfIntensity > DataHeatBalFanSys::MaxRadHeatFlux) {
                             ShowSevereError(state, "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected");
                             ShowContinueError(state, "Surface = " + state.dataSurface->Surface(SurfNum).Name);
