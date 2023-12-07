@@ -53,6 +53,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -188,6 +189,14 @@ namespace IndoorGreen {
                                        state.dataIPShortCut->cAlphaArgs(2)));
                 ErrorsFound = true;
             } else {
+                 //check for SurfaceProperty:HeatBalanceSourceTerm
+                if (state.dataSurface->Surface(state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SurfPtr).InsideHeatSourceTermSchedule > 0) {
+                    ShowSevereError(state,
+                                    format("The indoor green surface {} has an Inside Face Heat Source Term Schedule defined. This surface cannot also be used for indoor green.",
+                                           state.dataIPShortCut->cAlphaArgs(2)));
+                    ErrorsFound = true;
+                }
+                 //get zone pointer
                  state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr =
                  state.dataSurface->Surface(state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SurfPtr).Zone;
                 if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr <= 0) {
@@ -526,7 +535,9 @@ namespace IndoorGreen {
                state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LambdaET =
                     ETTotal * hfg * std::pow(10, 6) /
                     state.dataSurface->Surface(state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SurfPtr).Area; // (J/(kg m2))
-                rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZonePreTemp, ZonePreHum);
+               state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(
+                   state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SurfPtr) = -1.0 *state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LambdaET;// negative sign indicates heat loss from inside surface
+               rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZonePreTemp, ZonePreHum);
                 ZoneAirVol = state.dataHeatBal->Zone(state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr).Volume;
                 ZoneNewHum =
                 ZonePreHum + ETTotal / (rhoair * ZoneAirVol);
