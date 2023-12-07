@@ -1141,8 +1141,7 @@ namespace HighTempRadiantSystem {
         dataHBFS->SumConvHTRadSys = 0.0;
         dataHBFS->SumLatentHTRadSys = 0.0;
         for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
-            auto &thisSurfQRadFromHVAC = state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum);
-            thisSurfQRadFromHVAC.HTRadSys = 0.0;
+            state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).HTRadSys = 0.0;
         }
         dataHBFS->ZoneQHTRadSysToPerson = 0.0;
 

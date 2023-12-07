@@ -1497,8 +1497,7 @@ namespace HWBaseboardRadiator {
 
         // Initialize arrays
         for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
-            auto &thisSurfQRadFromHVAC = state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum);
-            thisSurfQRadFromHVAC.HWBaseboard = 0.0;
+            state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).HWBaseboard = 0.0;
         }
         state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson = 0.0;
 

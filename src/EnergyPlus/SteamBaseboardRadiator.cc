@@ -1523,8 +1523,7 @@ namespace SteamBaseboardRadiator {
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
         for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
-            auto &thisSurfQRadFromHVAC = state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum);
-            thisSurfQRadFromHVAC.SteamBaseboard = 0.0;
+            state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).SteamBaseboard = 0.0;
         }
         state.dataHeatBalFanSys->ZoneQSteamBaseboardToPerson = 0.0;
 

@@ -549,18 +549,19 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                 state.dataHeatBalFanSys->QPVSysSource(SurfNum) = 0.0;
                 state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) = 0.0;
                 state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) = 0.0;
-                for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
-                    auto &thisSurfQRadFromHVAC = state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum);
-                    thisSurfQRadFromHVAC.HTRadSys = 0.0;
-                    thisSurfQRadFromHVAC.HWBaseboard = 0.0;
-                    thisSurfQRadFromHVAC.SteamBaseboard = 0.0;
-                    thisSurfQRadFromHVAC.ElecBaseboard = 0.0;
-                    thisSurfQRadFromHVAC.CoolingPanel = 0.0;
-                }
 
             } // ...end of Zone Surf loop
         }
     } // ...end of Zone loop
+
+    for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
+        auto &thisSurfQRadFromHVAC = state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum);
+        thisSurfQRadFromHVAC.HTRadSys = 0.0;
+        thisSurfQRadFromHVAC.HWBaseboard = 0.0;
+        thisSurfQRadFromHVAC.SteamBaseboard = 0.0;
+        thisSurfQRadFromHVAC.ElecBaseboard = 0.0;
+        thisSurfQRadFromHVAC.CoolingPanel = 0.0;
+    }
 
     if (state.dataGlobal->ZoneSizingCalc) GatherComponentLoadsSurfAbsFact(state);
 

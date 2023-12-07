@@ -907,8 +907,7 @@ namespace ElectricBaseboardRadiator {
 
         // Initialize arrays
         for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
-            auto &thisSurfQRadFromHVAC = state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum);
-            thisSurfQRadFromHVAC.ElecBaseboard = 0.0;
+            state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).ElecBaseboard = 0.0;
         }
         state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson = 0.0;
 

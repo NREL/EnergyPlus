@@ -1590,8 +1590,7 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
 
     // Initialize arrays
     for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
-        auto &thisSurfQRadFromHVAC = state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum);
-        thisSurfQRadFromHVAC.CoolingPanel = 0.0;
+        state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).CoolingPanel = 0.0;
     }
     state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson = 0.0;
 
