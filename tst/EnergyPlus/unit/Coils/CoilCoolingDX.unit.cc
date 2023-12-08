@@ -169,7 +169,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance)
     auto &evapOutletNode = state->dataLoopNodes->Node(thisCoil.evapOutletNodeIndex);
 
     // set some values to run at rated conditions and call to run normal mode speed 1
-    evapInletNode.MassFlowRate = thisCoil.performance->RatedAirMassFlowRateMaxSpeed();
+    evapInletNode.MassFlowRate = thisCoil.performance->RatedAirMassFlowRateMinSpeed();
     int useAlternateMode = DataHVACGlobals::coilNormalMode;
     Real64 PLR = 1.0;
     int speedNum = 1;
