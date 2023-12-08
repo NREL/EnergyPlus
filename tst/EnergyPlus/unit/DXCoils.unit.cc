@@ -6854,12 +6854,12 @@ TEST_F(EnergyPlusFixture, Test_DHW_End_Use_Cat_Removal)
 
     EXPECT_EQ(24, state->dataOutputProcessor->meters.size());
     EXPECT_EQ(state->dataOutputProcessor->meters[19]->Name, "WaterSystems:Electricity");
-    EXPECT_EQ(state->dataOutputProcessor->meters[19]->resource, Constant::eResource::Electricity);
-    EXPECT_EQ(state->dataOutputProcessor->meters[19]->sovEndUseCat, OutputProcessor::SOVEndUseCat::WaterSystem);
+    EXPECT_EQ((int)state->dataOutputProcessor->meters[19]->resource, (int)Constant::eResource::Electricity);
+    EXPECT_EQ((int)state->dataOutputProcessor->meters[19]->sovEndUseCat, (int)OutputProcessor::SOVEndUseCat::WaterSystem);
 
     EXPECT_EQ(state->dataOutputProcessor->meters[20]->Name, "General:WaterSystems:Electricity");
-    EXPECT_EQ(state->dataOutputProcessor->meters[20]->resource, Constant::eResource::Electricity);
-    EXPECT_EQ(state->dataOutputProcessor->meters[20]->sovEndUseCat, OutputProcessor::SOVEndUseCat::WaterSystem);
+    EXPECT_EQ((int)state->dataOutputProcessor->meters[20]->resource, (int)Constant::eResource::Electricity);
+    EXPECT_EQ((int)state->dataOutputProcessor->meters[20]->sovEndUseCat, (int)OutputProcessor::SOVEndUseCat::WaterSystem);
 }
 
 } // namespace EnergyPlus
