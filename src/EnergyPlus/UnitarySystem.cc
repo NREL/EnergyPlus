@@ -2115,26 +2115,73 @@ namespace UnitarySystems {
                 }
             } else {
                 if (this->m_CoolCoilExists || this->m_HeatCoilExists) {
-                    if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                    if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
+                        this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
                         Real64 MaxSpeedFlowRate =
                             state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex)
                                 .MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds);
                         if (MaxSpeedFlowRate > 0.0) {
                             NoLoadCoolingAirFlowRateRatio =
                                 state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(1) / MaxSpeedFlowRate;
+                        } else {
+                            // I think all these little IFs need an else in case these inputs are autosized proportional to number of speeds/stages
+                            NoLoadCoolingAirFlowRateRatio = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds;
+                        }
+                    } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
+                        // for (DehumidModeNum = 0; DehumidModeNum <= thisDXCoil.NumDehumidModes; ++DehumidModeNum)
+                        // for (CapacityStageNum = 1; CapacityStageNum <= thisDXCoil.NumCapacityStages; ++CapacityStageNum)
+                        // PerfModeNum = DehumidModeNum * 2 + CapacityStageNum
+                        // RatedAirVolFlowRate(PerfModeNum) so PerfModeNum = 1 to NumCapacityStages to find air flow ratio
+                        Real64 MaxSpeedFlowRate = state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex)
+                                                      .RatedAirVolFlowRate(state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).NumCapacityStages);
+                        if (MaxSpeedFlowRate > 0.0) {
+                            NoLoadCoolingAirFlowRateRatio =
+                                state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).RatedAirVolFlowRate(1) / MaxSpeedFlowRate;
+                        } else {
+                            NoLoadCoolingAirFlowRateRatio = 1.0 / state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).NumCapacityStages;
+                        }
+                    } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
+                        // RatedAirVolFlowRate(1) = high speed, RatedAirVolFlowRate2= low speed
+                        Real64 MaxSpeedFlowRate = state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).RatedAirVolFlowRate(1);
+                        if (MaxSpeedFlowRate > 0.0) {
+                            NoLoadCoolingAirFlowRateRatio =
+                                state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).RatedAirVolFlowRate2 / MaxSpeedFlowRate;
+                        } else {
+                            NoLoadCoolingAirFlowRateRatio = 0.5;
+                        }
+                    } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+                        // MSRatedAirVolFlowRate
+                        Real64 MaxSpeedFlowRate = state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex)
+                                                      .MSRatedAirVolFlowRate(state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).NumOfSpeeds);
+                        if (MaxSpeedFlowRate > 0.0) {
+                            NoLoadCoolingAirFlowRateRatio =
+                                state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(1) / MaxSpeedFlowRate;
+                        } else {
+                            NoLoadCoolingAirFlowRateRatio = 1.0 / state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).NumOfSpeeds;
                         }
                     } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                         NoLoadCoolingAirFlowRateRatio = state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex]
                                                             .performance.normalMode.speeds[0]
                                                             .original_input_specs.evaporator_air_flow_fraction;
                     }
-                    if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+                    if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed ||
+                        this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) {
                         Real64 MaxSpeedFlowRate =
                             state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex)
                                 .MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds);
                         if (MaxSpeedFlowRate > 0.0) {
                             NoLoadHeatingAirFlowRateRatio =
                                 state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowRate(1) / MaxSpeedFlowRate;
+                        }
+                    } else if (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
+                        // MSRatedAirVolFlowRate
+                        Real64 MaxSpeedFlowRate = state.dataDXCoils->DXCoil(this->m_HeatingCoilIndex)
+                                                      .MSRatedAirVolFlowRate(state.dataDXCoils->DXCoil(this->m_HeatingCoilIndex).NumOfSpeeds);
+                        if (MaxSpeedFlowRate > 0.0) {
+                            NoLoadHeatingAirFlowRateRatio =
+                                state.dataDXCoils->DXCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowRate(1) / MaxSpeedFlowRate;
+                        } else {
+                            NoLoadHeatingAirFlowRateRatio = 1.0 / state.dataDXCoils->DXCoil(this->m_HeatingCoilIndex).NumOfSpeeds;
                         }
                     }
                     this->m_NoLoadAirFlowRateRatio = min(NoLoadCoolingAirFlowRateRatio, NoLoadHeatingAirFlowRateRatio);
