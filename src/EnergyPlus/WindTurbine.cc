@@ -136,7 +136,7 @@ namespace WindTurbine {
         }
 
         if (GeneratorIndex == 0) {
-            WindTurbineNum = UtilityRoutines::FindItemInList(GeneratorName, state.dataWindTurbine->WindTurbineSys);
+            WindTurbineNum = Util::FindItemInList(GeneratorName, state.dataWindTurbine->WindTurbineSys);
             if (WindTurbineNum == 0) {
                 ShowFatalError(state, format("SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators {}", GeneratorName));
             }
@@ -259,7 +259,7 @@ namespace WindTurbine {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
 
             auto &windTurbine = state.dataWindTurbine->WindTurbineSys(WindTurbineNum);
 
@@ -282,7 +282,7 @@ namespace WindTurbine {
             }
             // Select rotor type
             windTurbine.rotorType =
-                static_cast<RotorType>(getEnumValue(WindTurbine::RotorNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
+                static_cast<RotorType>(getEnumValue(WindTurbine::RotorNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
             if (windTurbine.rotorType == RotorType::Invalid) {
                 if (state.dataIPShortCut->cAlphaArgs(3).empty()) {
                     windTurbine.rotorType = RotorType::HorizontalAxis;
@@ -299,7 +299,7 @@ namespace WindTurbine {
 
             // Select control type
             windTurbine.controlType =
-                static_cast<ControlType>(getEnumValue(WindTurbine::ControlNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
+                static_cast<ControlType>(getEnumValue(WindTurbine::ControlNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
             if (windTurbine.controlType == ControlType::Invalid) {
                 if (state.dataIPShortCut->cAlphaArgs(4).empty()) {
                     windTurbine.controlType = ControlType::VariableSpeedVariablePitch;
@@ -691,9 +691,9 @@ namespace WindTurbine {
                                 windTurbine.Name,
                                 {},
                                 Constant::eResource::ElectricityProduced,
-                                "WINDTURBINE",
+                                OutputProcessor::SOVEndUseCat::WindTurbine,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
             SetupOutputVariable(state,
                                 "Generator Turbine Local Wind Speed",
                                 Constant::Units::m_s,
@@ -814,7 +814,7 @@ namespace WindTurbine {
                                 if ((lnPtr == std::string::npos) || (!stripped(lineIn.data.substr(0, lnPtr)).empty())) {
                                     if (lnPtr != std::string::npos) {
                                         bool error = false;
-                                        MonthWS(mon) = UtilityRoutines::ProcessNumber(lineIn.data.substr(0, lnPtr), error);
+                                        MonthWS(mon) = Util::ProcessNumber(lineIn.data.substr(0, lnPtr), error);
 
                                         if (error) {
                                             // probably should throw some error here

@@ -142,7 +142,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electric Energy",
@@ -153,7 +153,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Lite2",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electric Energy",
@@ -164,7 +164,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Lite3",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electric Power",
@@ -234,7 +234,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electric Energy",
@@ -245,7 +245,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Lite2",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electric Energy",
@@ -256,7 +256,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Lite3",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electric Power",
@@ -306,9 +306,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
     state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
     Meter *meter1 = new Meter("HEATING:MYTH:VARIABLE");
-    Meter *meter2 = new Meter("ELECTRICITY:MYTH");
+    meter1->units = Constant::Units::None;
     state->dataOutputProcessor->meters.push_back(meter1);
+    state->dataOutputProcessor->meterMap.insert_or_assign("HEATING:MYTH:VARIABLE", state->dataOutputProcessor->meters.size() - 1);
+    Meter *meter2 = new Meter("ELECTRICITY:MYTH");
+    meter2->units = Constant::Units::None;
     state->dataOutputProcessor->meters.push_back(meter2);
+    state->dataOutputProcessor->meterMap.insert_or_assign("ELECTRICITY:MYTH", state->dataOutputProcessor->meters.size() - 1);
 
     std::vector<AnnualTable> annualTables;
     annualTables.push_back(AnnualTable(*state, "PEAK ELECTRICTY ANNUAL MYTH REPORT", "", ""));
@@ -384,14 +388,17 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Facility",
+                        OutputProcessor::SOVEndUseCat::InteriorLights, // Was "Facility"
                         "General"); // create an electric meter
 
     Meter *meter1 = new Meter("Electricity:Facility");
-    Meter *meter2 = new Meter("ELECTRICITY:LIGHTING");
-    
+    meter1->units = Constant::Units::None;
     state->dataOutputProcessor->meters.push_back(meter1);
+    state->dataOutputProcessor->meterMap.insert_or_assign("ELECTRICITY:FACILITY", state->dataOutputProcessor->meters.size() - 1);
+    Meter *meter2 = new Meter("ELECTRICITY:LIGHTING");
+    meter2->units = Constant::Units::None;
     state->dataOutputProcessor->meters.push_back(meter2);
+    state->dataOutputProcessor->meterMap.insert_or_assign("ELECTRICITY:LIGHTING", state->dataOutputProcessor->meters.size() - 1);
 
     state->dataGlobal->DoWeathSim = true;
 
@@ -445,13 +452,17 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Facility",
+                        OutputProcessor::SOVEndUseCat::InteriorLights, // Was "Facility"
                         "General"); // create an electric meter
 
-    Meter *meter1 = new Meter("Electricity:Facility");
-    Meter *meter2 = new Meter("ELECTRICITY:LIGHTING");
+    Meter *meter1 = new Meter("ELECTRICITY:FACILITY");
+    meter1->units = Constant::Units::None;
     state->dataOutputProcessor->meters.push_back(meter1);
+    state->dataOutputProcessor->meterMap.insert_or_assign("ELECTRICITY:FACILITY", state->dataOutputProcessor->meters.size() - 1);
+    Meter *meter2 = new Meter("ELECTRICITY:LIGHTING");
+    meter2->units = Constant::Units::None;
     state->dataOutputProcessor->meters.push_back(meter2); 
+    state->dataOutputProcessor->meterMap.insert_or_assign("ELECTRICITY:LIGHTING", state->dataOutputProcessor->meters.size() - 1);
 
     state->dataGlobal->DoWeathSim = true;
 
@@ -528,8 +539,10 @@ TEST_F(SQLiteFixture, OutputReportTabularAnnual_CurlyBraces)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    Meter *meter1 = new Meter("Electricity:Facility");
+    Meter *meter1 = new Meter("ELECTRICITY:FACILITY");
+    meter1->units = Constant::Units::None;
     state->dataOutputProcessor->meters.push_back(meter1);
+    state->dataOutputProcessor->meterMap.insert_or_assign("ELECTRICITY:FACILITY", state->dataOutputProcessor->meters.size() - 1);
 
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 0.25;

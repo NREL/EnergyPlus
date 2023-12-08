@@ -4448,7 +4448,7 @@ TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
 
     // User inputs from above
     // Note even though choice keys are case-sensitive during epJSON processing, getObjectItem pushes Alphas to UPPERcase
-    EXPECT_EQ(state->dataIPShortCut->cAlphaArgs(1), UtilityRoutines::makeUPPER(name2)); // Material Name field is NOT tagged with /retaincase
+    EXPECT_EQ(state->dataIPShortCut->cAlphaArgs(1), Util::makeUPPER(name2)); // Material Name field is NOT tagged with /retaincase
     EXPECT_EQ(state->dataIPShortCut->cAlphaArgs(2), "MEDIUMROUGH");
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(1), 2.0, 0.0001);
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(3), 0.5, 0.0001);
@@ -4631,10 +4631,10 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromIDF)
             EXPECT_EQ(numericFieldValue, -99999);
             // Check an alpha field
             alphaFieldValue = ip->getAlphaFieldValue(fields, objectSchemaProps, "on_cycle_parasitic_fuel_type");
-            EXPECT_TRUE(UtilityRoutines::SameString(alphaFieldValue, "Electricity"));
+            EXPECT_TRUE(Util::SameString(alphaFieldValue, "Electricity"));
             // Check a defaulted alpha field
             alphaFieldValue = ip->getAlphaFieldValue(fields, objectSchemaProps, "heater_control_type");
-            EXPECT_TRUE(UtilityRoutines::SameString(alphaFieldValue, "Cycle"));
+            EXPECT_TRUE(Util::SameString(alphaFieldValue, "Cycle"));
         }
     }
 }
@@ -4682,11 +4682,11 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &objectFields = instance.value();
-            std::string const &thisObjectName = UtilityRoutines::makeUPPER(instance.key());
+            std::string const &thisObjectName = Util::makeUPPER(instance.key());
             EXPECT_EQ(thisObjectName, "SPACE EQUIPMENT");
             // Fields before extensibles
             alphaFieldValue = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "load_distribution_scheme");
-            EXPECT_TRUE(UtilityRoutines::SameString(alphaFieldValue, "UniformPLR"));
+            EXPECT_TRUE(Util::SameString(alphaFieldValue, "UniformPLR"));
 
             // Extensibles
 
@@ -4725,25 +4725,25 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
                 }
                 EXPECT_EQ(counter, 3);
             }
-            EXPECT_TRUE(UtilityRoutines::SameString(equipmentNames[0], "Baseboard Heat"));
-            EXPECT_TRUE(UtilityRoutines::SameString(equipmentTypes[0], "ZoneHVAC:Baseboard:RadiantConvective:Electric"));
-            EXPECT_TRUE(UtilityRoutines::SameString(coolFracSchedNames[0], ""));
-            EXPECT_TRUE(UtilityRoutines::SameString(heatFracSchedNames[0], ""));
+            EXPECT_TRUE(Util::SameString(equipmentNames[0], "Baseboard Heat"));
+            EXPECT_TRUE(Util::SameString(equipmentTypes[0], "ZoneHVAC:Baseboard:RadiantConvective:Electric"));
+            EXPECT_TRUE(Util::SameString(coolFracSchedNames[0], ""));
+            EXPECT_TRUE(Util::SameString(heatFracSchedNames[0], ""));
             EXPECT_EQ(coolSeqNums[0], 0);
             EXPECT_EQ(heatSeqNums[0], 3);
 
-            EXPECT_TRUE(UtilityRoutines::SameString(equipmentNames[1], "Air Terminal ADU"));
-            EXPECT_TRUE(UtilityRoutines::SameString(equipmentTypes[1], "ZoneHVAC:AirDistributionUnit"));
-            EXPECT_TRUE(UtilityRoutines::SameString(coolFracSchedNames[1], "ADU Cooling Fraction Schedule"));
-            EXPECT_TRUE(UtilityRoutines::SameString(heatFracSchedNames[1], "ADU Heating Fraction Schedule"));
+            EXPECT_TRUE(Util::SameString(equipmentNames[1], "Air Terminal ADU"));
+            EXPECT_TRUE(Util::SameString(equipmentTypes[1], "ZoneHVAC:AirDistributionUnit"));
+            EXPECT_TRUE(Util::SameString(coolFracSchedNames[1], "ADU Cooling Fraction Schedule"));
+            EXPECT_TRUE(Util::SameString(heatFracSchedNames[1], "ADU Heating Fraction Schedule"));
             // Note the input values above are 1.9 and 2.1, the should round to the nearest integer
             EXPECT_EQ(coolSeqNums[1], 2);
             EXPECT_EQ(heatSeqNums[1], 2);
 
-            EXPECT_TRUE(UtilityRoutines::SameString(equipmentNames[2], "Exhaust Fan"));
-            EXPECT_TRUE(UtilityRoutines::SameString(equipmentTypes[2], "Fan:ZoneExhaust"));
-            EXPECT_TRUE(UtilityRoutines::SameString(coolFracSchedNames[2], ""));
-            EXPECT_TRUE(UtilityRoutines::SameString(heatFracSchedNames[2], ""));
+            EXPECT_TRUE(Util::SameString(equipmentNames[2], "Exhaust Fan"));
+            EXPECT_TRUE(Util::SameString(equipmentTypes[2], "Fan:ZoneExhaust"));
+            EXPECT_TRUE(Util::SameString(coolFracSchedNames[2], ""));
+            EXPECT_TRUE(Util::SameString(heatFracSchedNames[2], ""));
             EXPECT_EQ(coolSeqNums[2], 1);
             EXPECT_EQ(heatSeqNums[2], 1);
         }

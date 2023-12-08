@@ -146,16 +146,14 @@ namespace HybridModel {
                                                                          cNumericFieldNames);
 
                 ZoneListPtr = 0;
-                ZonePtr =
-                    UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone); // "Zone" is a 1D array, cAlphaArgs(2) is the zone name
+                ZonePtr = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone); // "Zone" is a 1D array, cAlphaArgs(2) is the zone name
                 if (ZonePtr == 0 && state.dataHeatBal->NumOfZoneLists > 0)
-                    ZoneListPtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
+                    ZoneListPtr = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
                 if (ZonePtr > 0) {
-                    state.dataHybridModel->HybridModelZone(ZonePtr).Name = cAlphaArgs(1);                          // Zone HybridModel name
-                    state.dataHybridModel->FlagHybridModel_TM = UtilityRoutines::SameString(cAlphaArgs(3), "Yes"); // Calculate thermal mass option
-                    state.dataHybridModel->FlagHybridModel_AI =
-                        UtilityRoutines::SameString(cAlphaArgs(4), "Yes"); // Calculate infiltration rate option
-                    state.dataHybridModel->FlagHybridModel_PC = UtilityRoutines::SameString(cAlphaArgs(5), "Yes"); // Calculate people count option
+                    state.dataHybridModel->HybridModelZone(ZonePtr).Name = cAlphaArgs(1);               // Zone HybridModel name
+                    state.dataHybridModel->FlagHybridModel_TM = Util::SameString(cAlphaArgs(3), "Yes"); // Calculate thermal mass option
+                    state.dataHybridModel->FlagHybridModel_AI = Util::SameString(cAlphaArgs(4), "Yes"); // Calculate infiltration rate option
+                    state.dataHybridModel->FlagHybridModel_PC = Util::SameString(cAlphaArgs(5), "Yes"); // Calculate people count option
 
                     // Pointers used to help decide which unknown parameter to solve
                     // Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously

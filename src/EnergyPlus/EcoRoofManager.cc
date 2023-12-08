@@ -266,8 +266,8 @@ namespace EcoRoofManager {
             Qsoilpart2 = thisConstruct.CTFOutside[0] - F1temp * thisConstruct.CTFCross[0];
 
             state.dataEcoRoofMgr->Pa = state.dataEnvrn->StdBaroPress; // standard atmospheric pressure (apparently in Pascals)
-            Tgk = state.dataEcoRoofMgr->Tg + Constant::KelvinConv;
-            Tak = Ta + Constant::KelvinConv;
+            Tgk = state.dataEcoRoofMgr->Tg + Constant::Kelvin;
+            Tak = Ta + Constant::Kelvin;
 
             sigmaf = 0.9 - 0.7 * std::exp(-0.75 * state.dataEcoRoofMgr->LAI); // Fractional veg cover based on (2) from FASST TR-04-25
             // Formula for grasses modified to incorporate limits from
@@ -283,9 +283,9 @@ namespace EcoRoofManager {
 
             // Air Temperature within the canopy is given as
             // (Deardorff (1987)). Kelvin. based of the previous temperatures
-            Tafk = (1.0 - sigmaf) * Tak + sigmaf * (0.3 * Tak + 0.6 * (Tif + Constant::KelvinConv) + 0.1 * Tgk);
+            Tafk = (1.0 - sigmaf) * Tak + sigmaf * (0.3 * Tak + 0.6 * (Tif + Constant::Kelvin) + 0.1 * Tgk);
 
-            Taf = Tafk - Constant::KelvinConv;                      // Air Temperature within canopy in Celcius (C).
+            Taf = Tafk - Constant::Kelvin;                          // Air Temperature within canopy in Celcius (C).
             Rhof = state.dataEcoRoofMgr->Pa / (Rair * Tafk);        // Density of air at the leaf temperature
             Rhoaf = (Rhoa + Rhof) / 2.0;                            // Average of air density
             Zd = 0.701 * std::pow(state.dataEcoRoofMgr->Zf, 0.979); // Zero displacement height
@@ -307,9 +307,9 @@ namespace EcoRoofManager {
             // These parameters were taken from "The Atm Boundary Layer", By J.R. Garratt
             // NOTE the Garratt eqn. (A21) gives esf in units of hPA so we have multiplied
             // the constant 6.112 by a factor of 100.
-            esf = 611.2 * std::exp(17.67 * Tif / (Tif + Constant::KelvinConv - 29.65));
+            esf = 611.2 * std::exp(17.67 * Tif / (Tif + Constant::Kelvin - 29.65));
 
-            // From Garratt - eqn. A21, p284. Note that Tif and Tif+Constant::KelvinConv() usage is correct.
+            // From Garratt - eqn. A21, p284. Note that Tif and Tif+Constant::Kelvin() usage is correct.
             // Saturation specific humidity at leaf temperature again based on previous temperatures
 
             qsf = 0.622 * esf / (state.dataEcoRoofMgr->Pa - 1.000 * esf); // "The Atm Boundary Layer", J.R Garrat for Saturation mixing ratio
@@ -344,21 +344,21 @@ namespace EcoRoofManager {
 
             // Latent heat of vaporation at leaf surface temperature. The source of this
             // equation is Henderson-Sellers (1984)
-            Lef = 1.91846e6 * pow_2((Tif + Constant::KelvinConv) / (Tif + Constant::KelvinConv - 33.91));
+            Lef = 1.91846e6 * pow_2((Tif + Constant::Kelvin) / (Tif + Constant::Kelvin - 33.91));
             // Check to see if ice is sublimating or frost is forming.
             if (state.dataEcoRoofMgr->Tfold < 0.0) Lef = 2.838e6; // per FASST documentation p.15 after eqn. 37.
 
             // Derivative of Saturation vapor pressure, which is used in the calculation of
             // derivative of saturation specific humidity.
 
-            Desf = 611.2 * std::exp(17.67 * (state.dataEcoRoofMgr->Tf / (state.dataEcoRoofMgr->Tf + Constant::KelvinConv - 29.65))) *
-                   (17.67 * state.dataEcoRoofMgr->Tf * (-1.0) * std::pow(state.dataEcoRoofMgr->Tf + Constant::KelvinConv - 29.65, -2) +
-                    17.67 / (Constant::KelvinConv - 29.65 + state.dataEcoRoofMgr->Tf));
+            Desf = 611.2 * std::exp(17.67 * (state.dataEcoRoofMgr->Tf / (state.dataEcoRoofMgr->Tf + Constant::Kelvin - 29.65))) *
+                   (17.67 * state.dataEcoRoofMgr->Tf * (-1.0) * std::pow(state.dataEcoRoofMgr->Tf + Constant::Kelvin - 29.65, -2) +
+                    17.67 / (Constant::Kelvin - 29.65 + state.dataEcoRoofMgr->Tf));
             dqf = ((0.622 * state.dataEcoRoofMgr->Pa) / pow_2(state.dataEcoRoofMgr->Pa - esf)) * Desf; // Derivative of saturation specific humidity
             esg = 611.2 * std::exp(17.67 * (state.dataEcoRoofMgr->Tg /
-                                            ((state.dataEcoRoofMgr->Tg + Constant::KelvinConv) - 29.65))); // Pa saturation vapor pressure
+                                            ((state.dataEcoRoofMgr->Tg + Constant::Kelvin) - 29.65))); // Pa saturation vapor pressure
             // From Garratt - eqn. A21, p284.
-            // Note that Tg and Tg+Constant::KelvinConv() usage is correct.
+            // Note that Tg and Tg+Constant::Kelvin() usage is correct.
             qsg = 0.622 * esg / (state.dataEcoRoofMgr->Pa - esg); // Saturation mixing ratio at ground surface temperature.
 
             // Latent heat vaporization  at the ground temperature
@@ -366,9 +366,9 @@ namespace EcoRoofManager {
             // Check to see if ice is sublimating or frost is forming.
             if (state.dataEcoRoofMgr->Tgold < 0.0) Leg = 2.838e6; // per FASST documentation p.15 after eqn. 37.
 
-            Desg = 611.2 * std::exp(17.67 * (state.dataEcoRoofMgr->Tg / (state.dataEcoRoofMgr->Tg + Constant::KelvinConv - 29.65))) *
-                   (17.67 * state.dataEcoRoofMgr->Tg * (-1.0) * std::pow(state.dataEcoRoofMgr->Tg + Constant::KelvinConv - 29.65, -2) +
-                    17.67 / (Constant::KelvinConv - 29.65 + state.dataEcoRoofMgr->Tg));
+            Desg = 611.2 * std::exp(17.67 * (state.dataEcoRoofMgr->Tg / (state.dataEcoRoofMgr->Tg + Constant::Kelvin - 29.65))) *
+                   (17.67 * state.dataEcoRoofMgr->Tg * (-1.0) * std::pow(state.dataEcoRoofMgr->Tg + Constant::Kelvin - 29.65, -2) +
+                    17.67 / (Constant::Kelvin - 29.65 + state.dataEcoRoofMgr->Tg));
             dqg = (0.622 * state.dataEcoRoofMgr->Pa / pow_2(state.dataEcoRoofMgr->Pa - esg)) * Desg;
 
             // Final Ground Atmosphere Energy Balance
@@ -433,8 +433,8 @@ namespace EcoRoofManager {
             //   revisit this issue later.
             //   Implement an iterative solution scheme to solve the simultaneous equations for Leaf and Soil temperature.
             //   Prior experience suggests that no more than 3 iterations are likely needed
-            LeafTK = state.dataEcoRoofMgr->Tf + Constant::KelvinConv;
-            SoilTK = state.dataEcoRoofMgr->Tg + Constant::KelvinConv;
+            LeafTK = state.dataEcoRoofMgr->Tf + Constant::Kelvin;
+            SoilTK = state.dataEcoRoofMgr->Tg + Constant::Kelvin;
 
             for (int EcoLoop = 1; EcoLoop <= 3; ++EcoLoop) {
                 P1 = sigmaf * (RS * (1.0 - state.dataEcoRoofMgr->Alphaf) + state.dataEcoRoofMgr->epsilonf * Latm) -
@@ -443,7 +443,7 @@ namespace EcoRoofManager {
                          (-sigmaf * state.dataEcoRoofMgr->epsilonf * Sigma -
                           sigmaf * state.dataEcoRoofMgr->epsilonf * state.dataEcoRoofMgr->epsilong * Sigma / EpsilonOne) *
                          pow_4(LeafTK) +
-                     state.dataEcoRoofMgr->sheatf * (1.0 - 0.7 * sigmaf) * (Ta + Constant::KelvinConv) +
+                     state.dataEcoRoofMgr->sheatf * (1.0 - 0.7 * sigmaf) * (Ta + Constant::Kelvin) +
                      state.dataEcoRoofMgr->LAI * Rhoaf * Cf * Lef * Waf * rn * ((1.0 - 0.7 * sigmaf) / dOne) * qa +
                      state.dataEcoRoofMgr->LAI * Rhoaf * Cf * Lef * Waf * rn * (((0.6 * sigmaf * rn) / dOne) - 1.0) * (qsf - LeafTK * dqf) +
                      state.dataEcoRoofMgr->LAI * Rhoaf * Cf * Lef * Waf * rn * ((0.1 * sigmaf * Mg) / dOne) * (qsg - SoilTK * dqg);
@@ -468,11 +468,11 @@ namespace EcoRoofManager {
                           (-(1.0 - sigmaf) * state.dataEcoRoofMgr->epsilong * Sigma -
                            sigmaf * state.dataEcoRoofMgr->epsilonf * state.dataEcoRoofMgr->epsilong * Sigma / EpsilonOne) *
                           pow_4(SoilTK) +
-                      state.dataEcoRoofMgr->sheatg * (1.0 - 0.7 * sigmaf) * (Ta + Constant::KelvinConv) +
+                      state.dataEcoRoofMgr->sheatg * (1.0 - 0.7 * sigmaf) * (Ta + Constant::Kelvin) +
                       Rhoag * Ce * Leg * Waf * Mg * ((1.0 - 0.7 * sigmaf) / dOne) * qa +
                       Rhoag * Ce * Leg * Waf * Mg * (0.1 * sigmaf * Mg / dOne - Mg) * (qsg - SoilTK * dqg) +
                       Rhoag * Ce * Leg * Waf * Mg * (0.6 * sigmaf * rn / dOne) * (qsf - LeafTK * dqf) + Qsoilpart1 +
-                      Qsoilpart2 * (Constant::KelvinConv); // finished by T1G
+                      Qsoilpart2 * (Constant::Kelvin); // finished by T1G
 
                 T2G = 4.0 *
                           (-(1.0 - sigmaf) * state.dataEcoRoofMgr->epsilong * Sigma -
@@ -494,10 +494,9 @@ namespace EcoRoofManager {
                 // difference scheme this loop structure should be removed.
 
             } // This loop does an iterative solution of the simultaneous equations
-            state.dataEcoRoofMgr->Qsoil =
-                -1.0 * (Qsoilpart1 - Qsoilpart2 * (SoilTK - Constant::KelvinConv)); // This is heat flux INTO top of the soil
-            state.dataEcoRoofMgr->Tfold = LeafTK - Constant::KelvinConv;
-            state.dataEcoRoofMgr->Tgold = SoilTK - Constant::KelvinConv;
+            state.dataEcoRoofMgr->Qsoil = -1.0 * (Qsoilpart1 - Qsoilpart2 * (SoilTK - Constant::Kelvin)); // This is heat flux INTO top of the soil
+            state.dataEcoRoofMgr->Tfold = LeafTK - Constant::Kelvin;
+            state.dataEcoRoofMgr->Tgold = SoilTK - Constant::Kelvin;
 
         } // if firstecosurface (if not we do NOT need to recalculate ecoroof energybalance as all ecoroof surfaces MUST be the same
         // this endif was moved here from the if statement regarding whether we are looking at the first ecoroof surface or not.

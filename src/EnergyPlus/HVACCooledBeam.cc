@@ -141,7 +141,7 @@ namespace HVACCooledBeam {
 
         // Get the  unit index
         if (CompIndex == 0) {
-            CBNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACCooledBeam->CoolBeam);
+            CBNum = Util::FindItemInList(CompName, state.dataHVACCooledBeam->CoolBeam);
             if (CBNum == 0) {
                 ShowFatalError(state, format("SimCoolBeam: Cool Beam Unit not found={}", CompName));
             }
@@ -272,9 +272,9 @@ namespace HVACCooledBeam {
             CoolBeam(CBNum).UnitType = CurrentModuleObject;
             CoolBeam(CBNum).UnitType_Num = 1;
             CoolBeam(CBNum).CBTypeString = Alphas(3);
-            if (UtilityRoutines::SameString(CoolBeam(CBNum).CBTypeString, "Passive")) {
+            if (Util::SameString(CoolBeam(CBNum).CBTypeString, "Passive")) {
                 CoolBeam(CBNum).CBType = CooledBeamType::Passive;
-            } else if (UtilityRoutines::SameString(CoolBeam(CBNum).CBTypeString, "Active")) {
+            } else if (Util::SameString(CoolBeam(CBNum).CBTypeString, "Active")) {
                 CoolBeam(CBNum).CBType = CooledBeamType::Active;
             } else {
                 ShowSevereError(state, format("Illegal {} = {}.", cAlphaFields(3), CoolBeam(CBNum).CBTypeString));
@@ -380,9 +380,9 @@ namespace HVACCooledBeam {
                                 CoolBeam(CBNum).Name,
                                 {},
                                 Constant::eResource::EnergyTransfer,
-                                "COOLINGCOILS",
+                                OutputProcessor::SOVEndUseCat::CoolingCoils,
                                 {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Beam Chilled Water Energy",
                                 Constant::Units::J,
@@ -392,9 +392,9 @@ namespace HVACCooledBeam {
                                 CoolBeam(CBNum).Name,
                                 {},
                                 Constant::eResource::PlantLoopCoolingDemand,
-                                "COOLINGCOILS",
+                                OutputProcessor::SOVEndUseCat::CoolingCoils,
                                 {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Beam Sensible Cooling Rate",
                                 Constant::Units::W,

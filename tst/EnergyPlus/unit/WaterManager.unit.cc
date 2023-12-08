@@ -54,6 +54,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WaterManager.hh>
@@ -310,4 +311,68 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
     EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
 
     WaterManager::UpdateWaterManager(*state);
+}
+
+TEST_F(EnergyPlusFixture, WaterManager_MainsWater_Meter_Test)
+{
+    // Test for #10235: A mainswater meter with a blank Water Quality Subcategory
+    // should add a "General" mainswater meter
+    std::string const idf_objects = delimited_string({
+
+        "WaterUse:Storage,",
+        "  Cooling Tower Water Storage Tank,  !- Name",
+        "  ,                        !- Water Quality Subcategory",
+        "  3,                       !- Maximum Capacity {m3}",
+        "  0.25,                    !- Initial Volume {m3}",
+        "  0.003,                   !- Design In Flow Rate {m3/s}",
+        "  ,                        !- Design Out Flow Rate {m3/s}",
+        "  ,                        !- Overflow Destination",
+        "  GroundwaterWell,         !- Type of Supply Controlled by Float Valve",
+        "  0.20,                    !- Float Valve On Capacity {m3}",
+        "  3,                       !- Float Valve Off Capacity {m3}",
+        "  0.10,                    !- Backup Mains Capacity {m3}",
+        "  ,                        !- Other Tank Name",
+        "  ScheduledTemperature,    !- Water Thermal Mode",
+        "  Always 18,               !- Water Temperature Schedule Name",
+        "  ,                        !- Ambient Temperature Indicator",
+        "  ,                        !- Ambient Temperature Schedule Name",
+        "  ,                        !- Zone Name",
+        "  ,                        !- Tank Surface Area {m2}",
+        "  ,                        !- Tank U Value {W/m2-K}",
+        "  ;                        !- Tank Outside Surface Material Name",
+
+        "WaterUse:Well,",
+        "  Cooling Tower Transfer Pumps,  !- Name",
+        "  Cooling Tower Water Storage Tank,  !- Storage Tank Name",
+        "  ,                        !- Pump Depth {m}",
+        "  0.003,                   !- Pump Rated Flow Rate {m3/s}",
+        "  ,                        !- Pump Rated Head {Pa}",
+        "  1500,                    !- Pump Rated Power Consumption {W}",
+        "  ,                        !- Pump Efficiency",
+        "  ,                        !- Well Recovery Rate {m3/s}",
+        "  ,                        !- Nominal Well Storage Volume {m3}",
+        "  ,                        !- Water Table Depth Mode",
+        "  ,                        !- Water Table Depth {m}",
+        "  ;                        !- Water Table Depth Schedule Name",
+
+        "Schedule:Constant,",
+        "    Always 18,               !- Name",
+        "    ,                        !- Schedule Type Limits Name",
+        "    18.0;                    !- Hourly Value",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    WaterManager::GetWaterManagerInput(*state);
+    state->dataWaterManager->GetInputFlag = false;
+
+    EXPECT_EQ(state->dataWaterData->WaterStorage.size(), 1u);
+
+    EXPECT_EQ(state->dataOutputProcessor->meters.size(), 11u);
+
+    EXPECT_EQ(state->dataOutputProcessor->meters[3]->Name, "General:WaterSystems:MainsWater");
+    EXPECT_TRUE(compare_enums(state->dataOutputProcessor->meters[3]->resource, Constant::eResource::MainsWater));
+    EXPECT_TRUE(compare_enums(state->dataOutputProcessor->meters[3]->sovEndUseCat, OutputProcessor::SOVEndUseCat::WaterSystem));
+    EXPECT_EQ(state->dataOutputProcessor->meters[3]->EndUseSub, "General");
+    EXPECT_TRUE(compare_enums(state->dataOutputProcessor->meters[3]->sovGroup, OutputProcessor::SOVGroup::Invalid));
 }

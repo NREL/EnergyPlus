@@ -3524,7 +3524,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
@@ -3535,7 +3535,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Lite2",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
@@ -3546,7 +3546,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Lite3",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -3592,7 +3592,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
@@ -3603,7 +3603,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Lite2",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
@@ -3614,7 +3614,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Lite3",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -3679,11 +3679,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     Meter *meterSubEndUse = new Meter("SubEndUse");
 
     op->meters.push_back(meterTotal);
-    int totalMeterNum = (int)op->meters.size();
+    int totalMeterNum = (int)op->meters.size()-1;
     state->dataOutputProcessor->meters.push_back(meterEndUse);
-    int endUseMeterNum = (int)op->meters.size();
+    int endUseMeterNum = (int)op->meters.size()-1;
     state->dataOutputProcessor->meters.push_back(meterSubEndUse);
-    int subEndUseMeterNum = (int)op->meters.size();
+    int subEndUseMeterNum = (int)op->meters.size()-1;
     
     int endUseNum = 1;
     int subEndUseNum = 1;
@@ -6550,7 +6550,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
@@ -6561,7 +6561,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Lite2",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
@@ -6572,7 +6572,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Lite3",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -6601,9 +6601,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     state->dataHeatBal->Zone(1).ListMultiplier = 1;
     state->dataHeatBal->Zone(1).FloorArea = 12.;
 
-    state->dataWeatherManager->DesDayInput.allocate(1);
-    state->dataWeatherManager->DesDayInput(1).Month = 5;
-    state->dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
+    state->dataWeather->DesDayInput.allocate(1);
+    state->dataWeather->DesDayInput(1).Month = 5;
+    state->dataWeather->DesDayInput(1).DayOfMonth = 21;
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
@@ -7090,11 +7090,11 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     int numDesDays = 2;
     state->dataEnvrn->TotDesDays = numDesDays;
     state->dataEnvrn->TotRunDesPersDays = 0;
-    state->dataWeatherManager->DesDayInput.allocate(2);
-    state->dataWeatherManager->DesDayInput(1).Month = 7;
-    state->dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
-    state->dataWeatherManager->DesDayInput(2).Month = 1;
-    state->dataWeatherManager->DesDayInput(2).DayOfMonth = 21;
+    state->dataWeather->DesDayInput.allocate(2);
+    state->dataWeather->DesDayInput(1).Month = 7;
+    state->dataWeather->DesDayInput(1).DayOfMonth = 21;
+    state->dataWeather->DesDayInput(2).Month = 1;
+    state->dataWeather->DesDayInput(2).DayOfMonth = 21;
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
@@ -8036,7 +8036,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
@@ -8047,7 +8047,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Lite2",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "AnotherEndUseSubCat");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
@@ -8058,7 +8058,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Lite3",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Coal Energy",
@@ -8069,7 +8069,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Lite4",
                         {},
                         Constant::eResource::Coal,
-                        "Heating",
+                        OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Gasoline Energy",
@@ -8080,7 +8080,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Lite5",
                         {},
                         Constant::eResource::Gasoline,
-                        "Heating",
+                        OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Propane Energy",
@@ -8091,7 +8091,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Lite6",
                         {},
                         Constant::eResource::Propane,
-                        "Heating",
+                        OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
@@ -8500,9 +8500,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
     bool fFScheduleUsed;
     int ffScheduleIndex;
 
-    PollutionModule::GetFuelFactorInfo(
-        *state, Constant::eFuel::DistrictHeatingSteam, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
-
+    Pollution::GetFuelFactorInfo(*state, Constant::eFuel::DistrictHeatingSteam, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     EXPECT_EQ(curSourceFactor, 1.2);
 }
 
@@ -8596,7 +8594,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Rate",
@@ -8607,7 +8605,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
                         "Lite2",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -8618,13 +8616,24 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
     InitializeOutput(*state);
 
     Constant::eResource resource = Constant::eResource::NaturalGas;
-    std::string endUse("Heating");
+    OutputProcessor::SOVEndUseCat sovEndUseCat = OutputProcessor::SOVEndUseCat::Heating;
     std::string endUseSub("");
-    std::string group("");
+    OutputProcessor::SOVGroup sovGroup = OutputProcessor::SOVGroup::Invalid;
     std::string const zoneName("");
     std::string const spaceType("");
 
-    AttachMeters(*state, Constant::Units::J, resource, endUse, endUseSub, group, zoneName, spaceType, -1);
+    // AttachMeters(*state, Constant::Units::J, resource, sovEndUseCat, endUseSub, sovGroup, zoneName, spaceType, -1);
+    Meter *meter1 = new Meter("NATURALGAS:FACILITY");
+    meter1->resource = Constant::eResource::NaturalGas;
+    meter1->sovEndUseCat = OutputProcessor::SOVEndUseCat::Invalid;
+    state->dataOutputProcessor->meters.push_back(meter1);
+    state->dataOutputProcessor->meterMap.insert_or_assign("NATURALGAS:FACILITY", state->dataOutputProcessor->meters.size() - 1);
+
+    Meter *meter2 = new Meter("HEATING:NATURALGAS");
+    meter2->resource = Constant::eResource::NaturalGas;
+    meter2->sovEndUseCat = OutputProcessor::SOVEndUseCat::Heating;
+    state->dataOutputProcessor->meters.push_back(meter2);
+    state->dataOutputProcessor->meterMap.insert_or_assign("HEATING:NATURALGAS", state->dataOutputProcessor->meters.size() - 1);
 
     OutputReportTabular::GetInputTabularMonthly(*state);
     OutputReportTabular::InitializeTabularMonthly(*state);
@@ -9563,7 +9572,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
@@ -9574,7 +9583,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Lite2",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "AnotherEndUseSubCat");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
@@ -9585,7 +9594,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Lite3",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Coal Energy",
@@ -9596,7 +9605,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Lite4",
                         {},
                         Constant::eResource::Coal,
-                        "Heating",
+                        OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Gasoline Energy",
@@ -9607,7 +9616,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Lite5",
                         {},
                         Constant::eResource::Gasoline,
-                        "Heating",
+                        OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Propane Energy",
@@ -9618,7 +9627,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Lite6",
                         {},
                         Constant::eResource::Propane,
-                        "Heating",
+                        OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
@@ -9969,8 +9978,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_Standard62_1_N
     SetPredefinedTables(*state);
     EXPECT_GT(state->dataOutRptPredefined->numReportName, 0);
     auto &reportNameArray = state->dataOutRptPredefined->reportName;
-    auto it = std::find_if(
-        reportNameArray.begin(), reportNameArray.end(), [](const auto &rN) { return UtilityRoutines::SameString("Standard62.1Summary", rN.name); });
+    auto it =
+        std::find_if(reportNameArray.begin(), reportNameArray.end(), [](const auto &rN) { return Util::SameString("Standard62.1Summary", rN.name); });
     EXPECT_FALSE(it != reportNameArray.end()); // Not found
 
     GetInputOutputTableSummaryReports(*state);
@@ -10003,10 +10012,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_Standard62_1_W
     SetPredefinedTables(*state);
     EXPECT_GT(state->dataOutRptPredefined->numReportName, 0);
     auto &reportNameArray = state->dataOutRptPredefined->reportName;
-    auto it = std::find_if(
-        reportNameArray.begin(), reportNameArray.end(), [](const auto &rN) { return UtilityRoutines::SameString("Standard62.1Summary", rN.name); });
+    auto it =
+        std::find_if(reportNameArray.begin(), reportNameArray.end(), [](const auto &rN) { return Util::SameString("Standard62.1Summary", rN.name); });
     EXPECT_TRUE(it != reportNameArray.end());
-    // EXPECT_TRUE(UtilityRoutines::FindItem("Standard62.1Summary", state->dataOutRptPredefined->reportName));
+    // EXPECT_TRUE(Util::FindItem("Standard62.1Summary", state->dataOutRptPredefined->reportName));
 
     GetInputOutputTableSummaryReports(*state);
 
@@ -10057,7 +10066,7 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
 
     Meter *meter = new Meter("Electricity:Facility");
     state->dataOutputProcessor->meters.push_back(meter);
-
+    state->dataOutputProcessor->meterMap.insert_or_assign("ELECTRICITY:FACILITY", (int)state->dataOutputProcessor->meters.size()-1);
     // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
     state->dataGlobal->DoWeathSim = true; // flag to trick tabular reports to scan meters
     state->dataGlobal->TimeStepZone = 0.25;
@@ -10251,15 +10260,15 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableReportingPer
     columnHead(5) = "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period ";
 
     Real64 degreeHourConversion = 1.8;
-    state->dataWeatherManager->TotReportPers = 2;
+    state->dataWeather->TotReportPers = 2;
 
-    state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    for (int i = 1; i <= state->dataWeatherManager->TotReportPers; i++) {
+    state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotReportPers);
+    for (int i = 1; i <= state->dataWeather->TotReportPers; i++) {
         state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, i).assign(5, 0.0);
     }
 
     int encodedMonDayHrMin;
-    for (int k = 1; k <= state->dataWeatherManager->TotReportPers; k++) {
+    for (int k = 1; k <= state->dataWeather->TotReportPers; k++) {
         for (int i = 0; i < 4; i++) {
             state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, k)[i] = float(k) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
         }
@@ -10335,14 +10344,14 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourRepPeriodUnitCo
     std::string tableName = "Unmet Degree-Hours";
 
     Real64 degreeHourConversion = 1.8;
-    state->dataWeatherManager->TotReportPers = 2;
+    state->dataWeather->TotReportPers = 2;
 
-    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    for (int i = 1; i <= state->dataWeatherManager->TotReportPers; i++) {
+    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotReportPers);
+    for (int i = 1; i <= state->dataWeather->TotReportPers; i++) {
         state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, i).assign(columnNumUnmetDegHr, 0.0);
     }
     // state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins: [0, -1, 4, -9, 16, -25]
-    for (int k = 1; k <= state->dataWeatherManager->TotReportPers; k++) {
+    for (int k = 1; k <= state->dataWeather->TotReportPers; k++) {
         for (int i = 0; i < 6; i++) {
             state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, k)[i] = float(k) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
         }
@@ -12596,7 +12605,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthly)
         "  2, !-  Digits After Decimal",
         "  Exterior Lights Electricity Energy, !- Variable or Meter 1 Name",
         "  SumOrAverage, !- Aggregation Type for Variable or Meter 1",
-        "  NON EXISTANT VARIABLE, !- Variable or Meter 2 Name",
+        "  NON EXISTANT VARIABLE, !- Variable or Meter 2 Name", // That's not how you spell EXISTENT
         "  Maximum; !- Aggregation Type for Variable or Meter 2",
 
         "Output:Table:SummaryReports,",
@@ -12616,7 +12625,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthly)
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -12681,7 +12690,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthly_AlwaysIfWeather
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
     // In a regular simulation with the above SimulationControl, when InitializeTabularMonthly is called it's DesignDay
@@ -12733,7 +12742,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthlyDisplayExtraWarn
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
     SetupOutputVariable(*state,
@@ -12745,7 +12754,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthlyDisplayExtraWarn
                         "Lite2",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -12799,7 +12808,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_NoWarnMonthlIfNoWeatherFile
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
     SetupOutputVariable(*state,
@@ -12811,7 +12820,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_NoWarnMonthlIfNoWeatherFile
                         "Lite2",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = false; // <- here
@@ -12855,7 +12864,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_DontWarnMonthlyIfOnlyNamedR
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -12904,7 +12913,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_DistrictHeating)
                         "DHWaterExtEq",
                         {},
                         Constant::eResource::DistrictHeatingWater,
-                        "ExteriorEquipment",
+                        OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                         "General");
 
     Real64 DistrictHeatingSteam = 5e8;
@@ -12917,7 +12926,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_DistrictHeating)
                         "DHSteamExtEq",
                         {},
                         Constant::eResource::DistrictHeatingSteam,
-                        "ExteriorEquipment",
+                        OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;

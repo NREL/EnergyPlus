@@ -407,7 +407,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
         if (thisChiller.EvapVolFlowRate == DataSizing::AutoSize) {
             thisChiller.EvapVolFlowRateWasAutoSized = true;
         }
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "AirCooled")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "AirCooled")) {
             thisChiller.CondVolFlowRate = 0.0011; // Condenser flow rate not used for this cond type
         } else {
             thisChiller.CondVolFlowRate = state.dataIPShortCut->rNumericArgs(13);
@@ -432,9 +432,9 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
                            format("Errors found in processing curve input for {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             Get_ErrorsFound = false;
         }
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(15), "LeavingCondenser")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(15), "LeavingCondenser")) {
             thisChiller.isEnterCondensTemp = false;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(15), "EnteringCondenser")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(15), "EnteringCondenser")) {
             thisChiller.isEnterCondensTemp = true;
         } else {
             thisChiller.isEnterCondensTemp = true;
@@ -443,9 +443,9 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
             ShowContinueError(state, "resetting to ENTERING-CONDENSER, simulation continues");
         }
         // Assign Other Paramters
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "AirCooled")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "AirCooled")) {
             thisChiller.isWaterCooled = false;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "WaterCooled")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "WaterCooled")) {
             thisChiller.isWaterCooled = true;
         } else {
             thisChiller.isWaterCooled = true;
@@ -514,7 +514,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
         thisChiller.SizFac = state.dataIPShortCut->rNumericArgs(16);
         thisChiller.TypeOf = state.dataIPShortCut->cAlphaArgs(17);
 
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(17), "Generator:MicroTurbine")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(17), "Generator:MicroTurbine")) {
             thisChiller.CompType_Num = GeneratorType::Microturbine;
             thisChiller.ExhaustSourceName = state.dataIPShortCut->cAlphaArgs(18);
 
@@ -548,9 +548,9 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         ChillerName,
                         {},
                         Constant::eResource::EnergyTransfer, 
-                        "CHILLERS",
+                        OutputProcessor::SOVEndUseCat::Chillers,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Heater Heating Rate",
@@ -568,9 +568,9 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         ChillerName,
                         {},
                         Constant::eResource::EnergyTransfer, 
-                        "BOILERS",
+                        OutputProcessor::SOVEndUseCat::Boilers,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Heater Condenser Heat Transfer Rate",
@@ -588,9 +588,9 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         ChillerName,
                         {},
                         Constant::eResource::EnergyTransfer,
-                        "HEATREJECTION",
+                        OutputProcessor::SOVEndUseCat::HeatRejection,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Heater Cooling Source Heat COP",
@@ -632,9 +632,9 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         ChillerName,
                         {},
                         Constant::eResource::Electricity, 
-                        "Cooling",
+                        OutputProcessor::SOVEndUseCat::Cooling,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Heater Heating Electricity Rate",
@@ -652,9 +652,9 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         ChillerName,
                         {},
                         Constant::eResource::Electricity,
-                        "Heating",
+                        OutputProcessor::SOVEndUseCat::Heating,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Heater Evaporator Inlet Temperature",

@@ -384,9 +384,9 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::EnergyTransfer,
-                        "BOILERS",
+                        OutputProcessor::SOVEndUseCat::Boilers,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
     SetupOutputVariable(state,
                         format("Boiler {} Rate", sFuelType),
                         Constant::Units::W,
@@ -403,9 +403,9 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eFuel2eResource[(int)this->FuelType],
-                        "Heating",
+                        OutputProcessor::SOVEndUseCat::Heating,
                         this->EndUseSubcategory,
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
     SetupOutputVariable(state,
                         "Boiler Inlet Temperature",
                         Constant::Units::C,
@@ -443,9 +443,9 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::Electricity,
-                        "Heating",
+                        OutputProcessor::SOVEndUseCat::Heating,
                         "Boiler Parasitic",
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
     if (this->FuelType != Constant::eFuel::Electricity) {
         SetupOutputVariable(state,
                             format("Boiler Ancillary {} Rate", sFuelType),
@@ -463,9 +463,9 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                             this->Name,
                             {},
                             Constant::eFuel2eResource[(int)this->FuelType], 
-                            "Heating",
+                            OutputProcessor::SOVEndUseCat::Heating,
                             "Boiler Parasitic",
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
     }
     SetupOutputVariable(state,
                         "Boiler Part Load Ratio",

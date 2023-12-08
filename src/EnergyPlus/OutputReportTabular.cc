@@ -357,7 +357,7 @@ void GetInputTabularMonthly(EnergyPlusData &state)
         state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, TabNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
 
         if (TabNum - 1 > 0) {
-            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
         }
         if (NumAlphas < 2) {
             ShowSevereError(state, format("{}: No fields specified.", CurrentModuleObject));
@@ -371,31 +371,31 @@ void GetInputTabularMonthly(EnergyPlusData &state)
             std::string const curAggString = AlphArray(jField + 1);
             AggType curAggType; // kind of aggregation identified (see AggType parameters)
             // set accumulator values to default as appropriate for aggregation type
-            if (UtilityRoutines::SameString(curAggString, "SumOrAverage")) {
+            if (Util::SameString(curAggString, "SumOrAverage")) {
                 curAggType = AggType::SumOrAvg;
-            } else if (UtilityRoutines::SameString(curAggString, "Maximum")) {
+            } else if (Util::SameString(curAggString, "Maximum")) {
                 curAggType = AggType::Maximum;
-            } else if (UtilityRoutines::SameString(curAggString, "Minimum")) {
+            } else if (Util::SameString(curAggString, "Minimum")) {
                 curAggType = AggType::Minimum;
-            } else if (UtilityRoutines::SameString(curAggString, "ValueWhenMaximumOrMinimum")) {
+            } else if (Util::SameString(curAggString, "ValueWhenMaximumOrMinimum")) {
                 curAggType = AggType::ValueWhenMaxMin;
-            } else if (UtilityRoutines::SameString(curAggString, "HoursZero")) {
+            } else if (Util::SameString(curAggString, "HoursZero")) {
                 curAggType = AggType::HoursZero;
-            } else if (UtilityRoutines::SameString(curAggString, "HoursNonzero")) {
+            } else if (Util::SameString(curAggString, "HoursNonzero")) {
                 curAggType = AggType::HoursNonZero;
-            } else if (UtilityRoutines::SameString(curAggString, "HoursPositive")) {
+            } else if (Util::SameString(curAggString, "HoursPositive")) {
                 curAggType = AggType::HoursPositive;
-            } else if (UtilityRoutines::SameString(curAggString, "HoursNonpositive")) {
+            } else if (Util::SameString(curAggString, "HoursNonpositive")) {
                 curAggType = AggType::HoursNonPositive;
-            } else if (UtilityRoutines::SameString(curAggString, "HoursNegative")) {
+            } else if (Util::SameString(curAggString, "HoursNegative")) {
                 curAggType = AggType::HoursNegative;
-            } else if (UtilityRoutines::SameString(curAggString, "HoursNonnegative")) {
+            } else if (Util::SameString(curAggString, "HoursNonnegative")) {
                 curAggType = AggType::HoursNonNegative;
-            } else if (UtilityRoutines::SameString(curAggString, "SumOrAverageDuringHoursShown")) {
+            } else if (Util::SameString(curAggString, "SumOrAverageDuringHoursShown")) {
                 curAggType = AggType::SumOrAverageHoursShown;
-            } else if (UtilityRoutines::SameString(curAggString, "MaximumDuringHoursShown")) {
+            } else if (Util::SameString(curAggString, "MaximumDuringHoursShown")) {
                 curAggType = AggType::MaximumDuringHoursShown;
-            } else if (UtilityRoutines::SameString(curAggString, "MinimumDuringHoursShown")) {
+            } else if (Util::SameString(curAggString, "MinimumDuringHoursShown")) {
                 curAggType = AggType::MinimumDuringHoursShown;
             } else {
                 curAggType = AggType::SumOrAvg;
@@ -614,13 +614,14 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             // #ifdef ITM_KEYCACHE
             //  Noel comment:  First time in this TabNum/ColNum loop, let's save the results
             //   of GetVariableKeyCountandType & GetVariableKeys.
-            std::string const curVariMeter = UtilityRoutines::makeUPPER(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
+            std::string const curVariMeter = Util::makeUPPER(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
             // call the key count function but only need count during this pass
             int KeyCount = 0;
             GetVariableKeyCountandType(state, curVariMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
-            if (TypeVar == OutputProcessor::VariableType::Invalid) {
-                ShowWarningError(
-                    state, format("In Output:Table:Monthly '{}' invalid Variable or Meter Name '{}'", ort->MonthlyInput(TabNum).name, curVariMeter));
+            if (TypeVar == OutputProcessor::VariableType::NotFound) { // TODO: This NotFound thing has to go
+                if (!ort->MonthlyInput(TabNum).isNamedMonthly) {
+                    ++state.dataOutRptTab->ErrCount1;
+                }
             }
             //    IF (KeyCount > maxKeyCount) THEN
             //      DEALLOCATE(NamesOfKeys)
@@ -629,20 +630,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             //      ALLOCATE(NamesOfKeys(maxKeyCount))
             //      ALLOCATE(IndexesForKeyVar(maxKeyCount))
             //    ENDIF
-            ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys.allocate(KeyCount);
-            ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar.allocate(KeyCount);
 
-            // fill keys?
-            GetVariableKeys(state,
-                            curVariMeter,
-                            TypeVar,
-                            ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar);
-
-            for (int i = 1; i <= KeyCount; ++i) { 
-                ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(i) =
-                        state.dataOutputProcessor->outVars[ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar(i)]->keyUC;
-            }
-            
             // save these values to use later -- noel
             ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeterUpper = curVariMeter;
             ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).typeOfVar = TypeVar;
@@ -650,12 +638,27 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).varAvgSum = AvgSumVar;
             ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).varStepType = StepTypeVar;
             ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).varUnits = UnitsVar;
+
+            if (TypeVar == OutputProcessor::VariableType::Invalid) {
+                continue;
+            }
+            
+            ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys.allocate(KeyCount);
+            ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar.allocate(KeyCount);
+
+            // fill keys?
+            GetVariableKeys(state,
+                            curVariMeter,
+                            TypeVar,
+                            ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys,
+                            ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar);
+
             //    DO iKey = 1, KeyCount
             //      MonthlyFieldSetInput(FirstColumn + ColNum - 1)%NamesOfKeys(iKey) = NamesOfKeys(iKey)  !noel
             //      MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) = IndexesForKeyVar(iKey)  !noel
             //    ENDDO
             // #else
-            //    curVariMeter = UtilityRoutines::makeUPPER(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
+            //    curVariMeter = Util::makeUPPER(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
             //    ! call the key count function but only need count during this pass
             //    CALL GetVariableKeyCountandType(state, curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
             //    ALLOCATE(NamesOfKeys(KeyCount))
@@ -666,12 +669,12 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             for (int iKey = 1; iKey <= KeyCount; ++iKey) {
                 found = 0;
                 // set a flag if environment variables are found
-                if (UtilityRoutines::SameString(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey), "ENVIRONMENT")) {
+                if (Util::SameString(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey), "ENVIRONMENT")) {
                     environmentKeyFound = true;
                     found = -1; // so not counted in list of unique keys
                 }
                 for (int jUnique = 1; jUnique <= UniqueKeyCount; ++jUnique) {
-                    if (UtilityRoutines::SameString(UniqueKeyNames(jUnique), ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey))) {
+                    if (Util::SameString(UniqueKeyNames(jUnique), ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey))) {
                         found = jUnique;
                         break;
                     }
@@ -764,12 +767,12 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             for (int iKey = 1; iKey <= KeyCount; ++iKey) {
                 found = 0;
                 // set a flag if environment variables are found
-                if (UtilityRoutines::SameString(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey), "ENVIRONMENT")) {
+                if (Util::SameString(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey), "ENVIRONMENT")) {
                     environmentKeyFound = true;
                     found = -1; // so not counted in list of unique keys
                 }
                 for (int jUnique = 1; jUnique <= UniqueKeyCount; ++jUnique) {
-                    if (UtilityRoutines::SameString(UniqueKeyNames(jUnique), ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey))) {
+                    if (Util::SameString(UniqueKeyNames(jUnique), ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey))) {
                         found = jUnique;
                         break;
                     }
@@ -830,7 +833,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                 //       IndexesForKeyVar(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) !noel
                 //    ENDDO
                 // #else
-                //    curVariMeter = UtilityRoutines::makeUPPER(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
+                //    curVariMeter = Util::makeUPPER(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
                 //    ! call the key count function but only need count during this pass
                 //    CALL GetVariableKeyCountandType(state, curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
                 //    ALLOCATE(NamesOfKeys(KeyCount))
@@ -839,7 +842,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                 // #endif
 
                 if (KeyCount == 1) { // first test if KeyCount is one to avoid referencing a zero element array
-                    if (UtilityRoutines::SameString(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(1), "ENVIRONMENT")) {
+                    if (Util::SameString(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(1), "ENVIRONMENT")) {
                         environmentKeyFound = true;
                     }
                 }
@@ -850,8 +853,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                     // search through the keys for the currently active key "UniqueKeyNames(kUniqueKey)"
                     found = 0;
                     for (int iKey = 1; iKey <= KeyCount; ++iKey) {
-                        if (UtilityRoutines::SameString(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey),
-                                                        UniqueKeyNames(kUniqueKey))) {
+                        if (Util::SameString(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys(iKey), UniqueKeyNames(kUniqueKey))) {
                             found = iKey;
                             break;
                         }
@@ -1108,8 +1110,8 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
         }
         // validate the kind of variable - not used internally except for validation
         if (len(AlphArray(4)) > 0) {
-            if (!(UtilityRoutines::SameString(AlphArray(4), "ENERGY") || UtilityRoutines::SameString(AlphArray(4), "DEMAND") ||
-                  UtilityRoutines::SameString(AlphArray(4), "TEMPERATURE") || UtilityRoutines::SameString(AlphArray(4), "FLOWRATE"))) {
+            if (!(Util::SameString(AlphArray(4), "ENERGY") || Util::SameString(AlphArray(4), "DEMAND") ||
+                  Util::SameString(AlphArray(4), "TEMPERATURE") || Util::SameString(AlphArray(4), "FLOWRATE"))) {
                 ShowWarningError(
                     state,
                     format("In {} named {} the Variable Type was not energy, demand, temperature, or flowrate.", CurrentModuleObject, AlphArray(1)));
@@ -1166,10 +1168,8 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
         // allocate the arrays to the number of objects
         objVarIDs.allocate(ort->OutputTableBinned(iInObj).numTables);
         objNames.allocate(ort->OutputTableBinned(iInObj).numTables);
-        GetVariableKeys(state, ort->OutputTableBinned(iInObj).varOrMeter, ort->OutputTableBinned(iInObj).typeOfVar, objVarIDs);
-        for (int iTable = 1; iTable <= ort->OutputTableBinned(iInObj).numTables; ++iTable) {
-            objNames(iTable) = state.dataOutputProcessor->outVars[objVarIDs(iTable)]->keyUC;
-        }
+        GetVariableKeys(state, ort->OutputTableBinned(iInObj).varOrMeter, ort->OutputTableBinned(iInObj).typeOfVar, objNames, objVarIDs);
+
         if (ort->OutputTableBinned(iInObj).keyValue == "*") {
             for (int iTable = 1; iTable <= ort->OutputTableBinned(iInObj).numTables; ++iTable) {
                 int repIndex = firstReport + (iTable - 1);
@@ -1185,7 +1185,7 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
             // scan through the keys and look for the user specified key
             int found = 0;
             for (int iTable = 1; iTable <= ort->OutputTableBinned(iInObj).numTables; ++iTable) {
-                if (UtilityRoutines::SameString(objNames(iTable), ort->OutputTableBinned(iInObj).keyValue)) {
+                if (Util::SameString(objNames(iTable), ort->OutputTableBinned(iInObj).keyValue)) {
                     found = iTable;
                     break;
                 }
@@ -1308,51 +1308,51 @@ void GetInputTabularStyle(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
         // ColumnSeparator
-        if (UtilityRoutines::SameString(AlphArray(1), "Comma")) {
+        if (Util::SameString(AlphArray(1), "Comma")) {
             ort->numStyles = 1;
             ort->TableStyle(1) = TableStyle::Comma;
             ort->del(1) = CharComma; // comma
-        } else if (UtilityRoutines::SameString(AlphArray(1), "Tab")) {
+        } else if (Util::SameString(AlphArray(1), "Tab")) {
             ort->numStyles = 1;
             ort->TableStyle(1) = TableStyle::Tab;
             ort->del(1) = CharTab; // tab
-        } else if (UtilityRoutines::SameString(AlphArray(1), "Fixed")) {
+        } else if (Util::SameString(AlphArray(1), "Fixed")) {
             ort->numStyles = 1;
             ort->TableStyle(1) = TableStyle::Fixed;
             ort->del(1) = CharSpace; // space
-        } else if (UtilityRoutines::SameString(AlphArray(1), "HTML")) {
+        } else if (Util::SameString(AlphArray(1), "HTML")) {
             ort->numStyles = 1;
             ort->TableStyle(1) = TableStyle::HTML;
             ort->del(1) = CharSpace; // space - this is not used much for HTML output
-        } else if (UtilityRoutines::SameString(AlphArray(1), "XML")) {
+        } else if (Util::SameString(AlphArray(1), "XML")) {
             ort->numStyles = 1;
             ort->TableStyle(1) = TableStyle::XML;
             ort->del(1) = CharSpace; // space - this is not used much for XML output
-        } else if (UtilityRoutines::SameString(AlphArray(1), "CommaAndHTML")) {
+        } else if (Util::SameString(AlphArray(1), "CommaAndHTML")) {
             ort->numStyles = 2;
             ort->TableStyle(1) = TableStyle::Comma;
             ort->del(1) = CharComma; // comma
             ort->TableStyle(2) = TableStyle::HTML;
             ort->del(2) = CharSpace; // space - this is not used much for HTML output
-        } else if (UtilityRoutines::SameString(AlphArray(1), "CommaAndXML")) {
+        } else if (Util::SameString(AlphArray(1), "CommaAndXML")) {
             ort->numStyles = 2;
             ort->TableStyle(1) = TableStyle::Comma;
             ort->del(1) = CharComma; // comma
             ort->TableStyle(2) = TableStyle::XML;
             ort->del(2) = CharSpace; // space - this is not used much for XML output
-        } else if (UtilityRoutines::SameString(AlphArray(1), "TabAndHTML")) {
+        } else if (Util::SameString(AlphArray(1), "TabAndHTML")) {
             ort->numStyles = 2;
             ort->TableStyle(1) = TableStyle::Tab;
             ort->del(1) = CharTab; // tab
             ort->TableStyle(2) = TableStyle::HTML;
             ort->del(2) = CharSpace; // space - this is not used much for HTML output
-        } else if (UtilityRoutines::SameString(AlphArray(1), "XMLandHTML")) {
+        } else if (Util::SameString(AlphArray(1), "XMLandHTML")) {
             ort->numStyles = 2;
             ort->TableStyle(1) = TableStyle::XML;
             ort->del(1) = CharSpace; // space - this is not used much for XML output
             ort->TableStyle(2) = TableStyle::HTML;
             ort->del(2) = CharSpace; // space - this is not used much for HTML output
-        } else if (UtilityRoutines::SameString(AlphArray(1), "All")) {
+        } else if (Util::SameString(AlphArray(1), "All")) {
             ort->numStyles = 5;
             ort->TableStyle(1) = TableStyle::Comma;
             ort->del(1) = CharComma; // comma
@@ -1410,15 +1410,15 @@ void GetInputTabularStyle(EnergyPlusData &state)
 UnitsStyle SetUnitsStyleFromString(std::string const &unitStringIn)
 {
     UnitsStyle unitsStyleReturn;
-    if (UtilityRoutines::SameString(unitStringIn, "None")) {
+    if (Util::SameString(unitStringIn, "None")) {
         unitsStyleReturn = UnitsStyle::None;
-    } else if (UtilityRoutines::SameString(unitStringIn, "JTOKWH")) {
+    } else if (Util::SameString(unitStringIn, "JTOKWH")) {
         unitsStyleReturn = UnitsStyle::JtoKWH;
-    } else if (UtilityRoutines::SameString(unitStringIn, "JTOMJ")) {
+    } else if (Util::SameString(unitStringIn, "JTOMJ")) {
         unitsStyleReturn = UnitsStyle::JtoMJ;
-    } else if (UtilityRoutines::SameString(unitStringIn, "JTOGJ")) {
+    } else if (Util::SameString(unitStringIn, "JTOGJ")) {
         unitsStyleReturn = UnitsStyle::JtoGJ;
-    } else if (UtilityRoutines::SameString(unitStringIn, "INCHPOUND")) {
+    } else if (Util::SameString(unitStringIn, "INCHPOUND")) {
         unitsStyleReturn = UnitsStyle::InchPound;
     } else {
         unitsStyleReturn = UnitsStyle::NotFound;
@@ -1493,93 +1493,93 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
             bool nameFound = false;
             if (AlphArray(iReport).empty()) {
                 ShowFatalError(state, "Blank report name in Output:Table:SummaryReports");
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "AnnualBuildingUtilityPerformanceSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "AnnualBuildingUtilityPerformanceSummary")) {
                 ort->displayTabularBEPS = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "ComponentCostEconomicsSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "ComponentCostEconomicsSummary")) {
                 ort->displayTabularCompCosts = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "InputVerificationandResultsSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "InputVerificationandResultsSummary")) {
                 ort->displayTabularVeriSum = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "ComponentSizingSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "ComponentSizingSummary")) {
                 ort->displayComponentSizing = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "SurfaceShadowingSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "SurfaceShadowingSummary")) {
                 ort->displaySurfaceShadowing = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "DemandEndUseComponentsSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "DemandEndUseComponentsSummary")) {
                 ort->displayDemandEndUse = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "AdaptiveComfortSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "AdaptiveComfortSummary")) {
                 ort->displayAdaptiveComfort = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "SourceEnergyEndUseComponentsSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "SourceEnergyEndUseComponentsSummary")) {
                 ort->displaySourceEnergyEndUseSummary = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "ZoneComponentLoadSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "ZoneComponentLoadSummary")) {
                 ort->displayZoneComponentLoadSummary = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "AirLoopComponentLoadSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "AirLoopComponentLoadSummary")) {
                 ort->displayAirLoopComponentLoadSummary = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "FacilityComponentLoadSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "FacilityComponentLoadSummary")) {
                 ort->displayFacilityComponentLoadSummary = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "LEEDSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "LEEDSummary")) {
                 ort->displayLEEDSummary = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "LifeCycleCostReport")) {
+            } else if (Util::SameString(AlphArray(iReport), "LifeCycleCostReport")) {
                 ort->displayLifeCycleCostReport = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "TariffReport")) {
+            } else if (Util::SameString(AlphArray(iReport), "TariffReport")) {
                 ort->displayTariffReport = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "EconomicResultSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "EconomicResultSummary")) {
                 ort->displayEconomicResultSummary = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "HeatEmissionsSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "HeatEmissionsSummary")) {
                 ort->displayHeatEmissionsSummary = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "ThermalResilienceSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "ThermalResilienceSummary")) {
                 ort->displayThermalResilienceSummary = true;
                 ort->displayThermalResilienceSummaryExplicitly = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "CO2ResilienceSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "CO2ResilienceSummary")) {
                 ort->displayCO2ResilienceSummary = true;
                 ort->displayCO2ResilienceSummaryExplicitly = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "VisualResilienceSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "VisualResilienceSummary")) {
                 ort->displayVisualResilienceSummary = true;
                 ort->displayVisualResilienceSummaryExplicitly = true;
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "EnergyMeters")) {
+            } else if (Util::SameString(AlphArray(iReport), "EnergyMeters")) {
                 ort->WriteTabularFiles = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "InitializationSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "InitializationSummary")) {
                 ort->WriteTabularFiles = true;
                 ort->displayEioSummary = true;
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "AllSummary")) {
+            } else if (Util::SameString(AlphArray(iReport), "AllSummary")) {
                 ort->WriteTabularFiles = true;
                 ort->displayTabularBEPS = true;
                 ort->displayTabularVeriSum = true;
@@ -1602,7 +1602,7 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
                 for (int jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
                     state.dataOutRptPredefined->reportName(jReport).show = true;
                 }
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "AllSummaryAndSizingPeriod")) {
+            } else if (Util::SameString(AlphArray(iReport), "AllSummaryAndSizingPeriod")) {
                 ort->WriteTabularFiles = true;
                 ort->displayTabularBEPS = true;
                 ort->displayTabularVeriSum = true;
@@ -1629,13 +1629,13 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
                 ort->displayZoneComponentLoadSummary = true;
                 ort->displayAirLoopComponentLoadSummary = true;
                 ort->displayFacilityComponentLoadSummary = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "AllMonthly")) {
+            } else if (Util::SameString(AlphArray(iReport), "AllMonthly")) {
                 ort->WriteTabularFiles = true;
                 for (int jReport = 1; jReport <= numNamedMonthly; ++jReport) {
                     ort->namedMonthly(jReport).show = true;
                 }
                 nameFound = true;
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "AllSummaryAndMonthly")) {
+            } else if (Util::SameString(AlphArray(iReport), "AllSummaryAndMonthly")) {
                 ort->WriteTabularFiles = true;
                 ort->displayTabularBEPS = true;
                 ort->displayTabularVeriSum = true;
@@ -1661,7 +1661,7 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
                 for (int jReport = 1; jReport <= numNamedMonthly; ++jReport) {
                     ort->namedMonthly(jReport).show = true;
                 }
-            } else if (UtilityRoutines::SameString(AlphArray(iReport), "AllSummaryMonthlyAndSizingPeriod")) {
+            } else if (Util::SameString(AlphArray(iReport), "AllSummaryMonthlyAndSizingPeriod")) {
                 ort->WriteTabularFiles = true;
                 ort->displayTabularBEPS = true;
                 ort->displayTabularVeriSum = true;
@@ -1694,12 +1694,12 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
             }
             // check the reports that are predefined and are created by OutputReportPredefined
             for (int jReport = 1; jReport <= state.dataOutRptPredefined->numReportName; ++jReport) {
-                if (UtilityRoutines::SameString(AlphArray(iReport), state.dataOutRptPredefined->reportName(jReport).name)) {
+                if (Util::SameString(AlphArray(iReport), state.dataOutRptPredefined->reportName(jReport).name)) {
                     ort->WriteTabularFiles = true;
                     state.dataOutRptPredefined->reportName(jReport).show = true;
                     nameFound = true;
                 }
-                if (UtilityRoutines::SameString(AlphArray(iReport), state.dataOutRptPredefined->reportName(jReport).abrev)) {
+                if (Util::SameString(AlphArray(iReport), state.dataOutRptPredefined->reportName(jReport).abrev)) {
                     ort->WriteTabularFiles = true;
                     state.dataOutRptPredefined->reportName(jReport).show = true;
                     nameFound = true;
@@ -1707,14 +1707,14 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
             }
             // check if the predefined monthly reports are used
             for (int jReport = 1; jReport <= numNamedMonthly; ++jReport) {
-                if (UtilityRoutines::SameString(AlphArray(iReport), ort->namedMonthly(jReport).title)) {
+                if (Util::SameString(AlphArray(iReport), ort->namedMonthly(jReport).title)) {
                     ort->namedMonthly(jReport).show = true;
                     ort->WriteTabularFiles = true;
                     nameFound = true;
                 }
             }
             if (!nameFound) {
-                if (UtilityRoutines::SameString(AlphArray(iReport), "Standard62.1Summary")) {
+                if (Util::SameString(AlphArray(iReport), "Standard62.1Summary")) {
                     ShowWarningError(state, format("{} Field[{}]=\"Standard62.1Summary\", Report is not enabled.", CurrentModuleObject, iReport));
                     ShowContinueError(state, "Do Zone Sizing or Do System Sizing must be enabled in SimulationControl.");
 
@@ -1789,42 +1789,42 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         for (int endUse = 1; endUse <= static_cast<int>(Constant::EndUse::Num); ++endUse) {
             for (int resType = 1; resType <= numResourceTypes; ++resType) {
                 for (int subCat = 1; subCat <= op->MaxNumSubcategories; ++subCat) {
-                    ort->meterNumEndUseSubBEPS(subCat, endUse, resType) = 0;
+                    ort->meterNumEndUseSubBEPS(subCat, endUse, resType) = -1;
                 }
                 for (int spType = 1; spType <= op->maxNumEndUseSpaceTypes; ++spType) {
-                    ort->meterNumEndUseSpTypeBEPS(spType, endUse, resType) = 0;
+                    ort->meterNumEndUseSpTypeBEPS(spType, endUse, resType) = -1;
                 }
             }
         }
 
         // loop through all of the resources and end uses and sub end uses for the entire facility
         for (int iResource = 1; iResource <= numResourceTypes; ++iResource) {
-            std::string meterName = ort->resourceTypeNames(iResource) + ":FACILITY";
-            int meterNumber = GetMeterIndex(state, meterName);
+            std::string meterName = format("{}:FACILITY", ort->resourceTypeNames(iResource));
+            int meterNumber = GetMeterIndex(state, Util::makeUPPER(meterName));
             ort->meterNumTotalsBEPS(iResource) = meterNumber;
 
             for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-                meterName = ort->endUseNames(jEndUse) + ':' + ort->resourceTypeNames(iResource); //// ':FACILITY'
-                meterNumber = GetMeterIndex(state, meterName);
+                meterName = format("{}:{}", ort->endUseNames(jEndUse), ort->resourceTypeNames(iResource)); //// ':FACILITY'
+                meterNumber = GetMeterIndex(state, Util::makeUPPER(meterName));
                 ort->meterNumEndUseBEPS(iResource, jEndUse) = meterNumber;
 
                 for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                    meterName = op->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub) + ':' + ort->endUseNames(jEndUse) +
-                                ':' + ort->resourceTypeNames(iResource);
-                    meterNumber = GetMeterIndex(state, meterName);
+                    meterName = format("{}:{}:{}", op->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub), ort->endUseNames(jEndUse),
+                                       ort->resourceTypeNames(iResource));
+                    meterNumber = GetMeterIndex(state, Util::makeUPPER(meterName));
                     ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource) = meterNumber;
                 }
                 for (int kEndUseSpType = 1; kEndUseSpType <= op->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
-                    meterName = ort->endUseNames(jEndUse) + ':' + ort->resourceTypeNames(iResource) +
-                                ":SpaceType:" + op->EndUseCategory(jEndUse).spaceTypeName(kEndUseSpType);
-                    meterNumber = GetMeterIndex(state, meterName);
+                    meterName = format("{}:{}:SpaceType:{}", ort->endUseNames(jEndUse), ort->resourceTypeNames(iResource),
+                                       op->EndUseCategory(jEndUse).spaceTypeName(kEndUseSpType));
+                    meterNumber = GetMeterIndex(state, Util::makeUPPER(meterName));
                     ort->meterNumEndUseSpTypeBEPS(kEndUseSpType, jEndUse, iResource) = meterNumber;
                 }
             }
         }
 
         for (int iResource = 1; iResource <= numSourceTypes; ++iResource) {
-            int const meterNumber = GetMeterIndex(state, ort->sourceTypeNames(iResource) + "Emissions:Source");
+            int const meterNumber = GetMeterIndex(state, Util::makeUPPER(format("{}Emissions:Source", ort->sourceTypeNames(iResource))));
             ort->meterNumTotalsSource(iResource) = meterNumber;
         }
 
@@ -1846,20 +1846,20 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->gatherDemandIndEndUseSub = 0.0;
 
         // get meter numbers for other meters relating to electric load components
-        ort->meterNumPowerFuelFireGen = GetMeterIndex(state, "Cogeneration:ElectricityProduced");
-        ort->meterNumPowerPV = GetMeterIndex(state, "Photovoltaic:ElectricityProduced");
-        ort->meterNumPowerWind = GetMeterIndex(state, "WindTurbine:ElectricityProduced");
-        ort->meterNumPowerHTGeothermal = GetMeterIndex(state, "HTGeothermal:ElectricityProduced");
-        ort->meterNumElecStorage = GetMeterIndex(state, "ElectricStorage:ElectricityProduced");
-        ort->meterNumPowerConversion = GetMeterIndex(state, "PowerConversion:ElectricityProduced");
-        ort->meterNumElecProduced = GetMeterIndex(state, "ElectricityProduced:Facility");
-        ort->meterNumElecPurchased = GetMeterIndex(state, "ElectricityPurchased:Facility");
-        ort->meterNumElecSurplusSold = GetMeterIndex(state, "ElectricitySurplusSold:Facility");
+        ort->meterNumPowerFuelFireGen = GetMeterIndex(state, "COGENERATION:ELECTRICITYPRODUCED");
+        ort->meterNumPowerPV = GetMeterIndex(state, "PHOTOVOLTAIC:ELECTRICITYPRODUCED");
+        ort->meterNumPowerWind = GetMeterIndex(state, "WINDTURBINE:ELECTRICITYPRODUCED");
+        ort->meterNumPowerHTGeothermal = GetMeterIndex(state, "HTGEOTHERMAL:ELECTRICITYPRODUCED");
+        ort->meterNumElecStorage = GetMeterIndex(state, "ELECTRICSTORAGE:ELECTRICITYPRODUCED");
+        ort->meterNumPowerConversion = GetMeterIndex(state, "POWERCONVERSION:ELECTRICITYPRODUCED");
+        ort->meterNumElecProduced = GetMeterIndex(state, "ELECTRICITYPRODUCED:FACILITY");
+        ort->meterNumElecPurchased = GetMeterIndex(state, "ELECTRICITYPURCHASED:FACILITY");
+        ort->meterNumElecSurplusSold = GetMeterIndex(state, "ELECTRICITYSURPLUSSOLD:FACILITY");
         // if no ElectricityPurchased:Facility meter is defined then no electric load center
         // was created by the user and no power generation will occur in the plant. The amount
         // purchased would be the total end use.
         if (ort->meterNumElecPurchased == 0) {
-            ort->meterNumElecPurchased = GetMeterIndex(state, "Electricity:Facility");
+            ort->meterNumElecPurchased = GetMeterIndex(state, "ELECTRICITY:FACILITY");
         }
 
         // initialize the gathering variables for the electric load components
@@ -1874,12 +1874,12 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->gatherPowerConversion = 0.0;
 
         // get meter numbers for onsite thermal components on BEPS report
-        ort->meterNumWaterHeatRecovery = GetMeterIndex(state, "HeatRecovery:EnergyTransfer");
-        ort->meterNumAirHeatRecoveryCool = GetMeterIndex(state, "HeatRecoveryForCooling:EnergyTransfer");
-        ort->meterNumAirHeatRecoveryHeat = GetMeterIndex(state, "HeatRecoveryForHeating:EnergyTransfer");
-        ort->meterNumHeatHTGeothermal = GetMeterIndex(state, "HTGeothermal:HeatProduced");
-        ort->meterNumHeatSolarWater = GetMeterIndex(state, "SolarWater:Facility");
-        ort->meterNumHeatSolarAir = GetMeterIndex(state, "HeatProduced:SolarAir");
+        ort->meterNumWaterHeatRecovery = GetMeterIndex(state, "HEATRECOVERY:ENERGYTRANSFER");
+        ort->meterNumAirHeatRecoveryCool = GetMeterIndex(state, "HEATRECOVERYFORCOOLING:ENERGYTRANSFER");
+        ort->meterNumAirHeatRecoveryHeat = GetMeterIndex(state, "HEATRECOVERYFORHEATING:ENERGYTRANSFER");
+        ort->meterNumHeatHTGeothermal = GetMeterIndex(state, "HTGEOTHERMAL:HEATPRODUCED");
+        ort->meterNumHeatSolarWater = GetMeterIndex(state, "SOLARWATER:FACILITY");
+        ort->meterNumHeatSolarAir = GetMeterIndex(state, "HEATPRODUCED:SOLARAIR");
         // initialize the gathering variables for onsite thermal components on BEPS report
         ort->gatherWaterHeatRecovery = 0.0;
         ort->gatherAirHeatRecoveryCool = 0.0;
@@ -1889,11 +1889,11 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->gatherHeatSolarAir = 0.0;
 
         // get meter numbers for water components on BEPS report
-        ort->meterNumRainWater = GetMeterIndex(state, "Rainwater:OnSiteWater");
-        ort->meterNumCondensate = GetMeterIndex(state, "Condensate:OnSiteWater");
-        ort->meterNumGroundwater = GetMeterIndex(state, "Wellwater:OnSiteWater");
-        ort->meterNumMains = GetMeterIndex(state, "MainsWater:Facility");
-        ort->meterNumWaterEndUseTotal = GetMeterIndex(state, "Water:Facility");
+        ort->meterNumRainWater = GetMeterIndex(state, "RAINWATER:ONSITEWATER");
+        ort->meterNumCondensate = GetMeterIndex(state, "CONDENSATE:ONSITEWATER");
+        ort->meterNumGroundwater = GetMeterIndex(state, "WELLWATER:ONSITEWATER");
+        ort->meterNumMains = GetMeterIndex(state, "MAINSWATER:FACILITY");
+        ort->meterNumWaterEndUseTotal = GetMeterIndex(state, "WATER:FACILITY");
 
         // initialize the gathering variables for water components on BEPS report
         ort->gatherRainWater = 0.0;
@@ -1964,19 +1964,19 @@ bool isCompLoadRepReq(EnergyPlusData &state)
         state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
         // loop through the fields looking for matching report titles
         for (int iReport = 1; iReport <= NumAlphas; ++iReport) {
-            if (UtilityRoutines::SameString(AlphArray(iReport), "ZoneComponentLoadSummary")) {
+            if (Util::SameString(AlphArray(iReport), "ZoneComponentLoadSummary")) {
                 isFound = true;
             }
-            if (UtilityRoutines::SameString(AlphArray(iReport), "AirLoopComponentLoadSummary")) {
+            if (Util::SameString(AlphArray(iReport), "AirLoopComponentLoadSummary")) {
                 isFound = true;
             }
-            if (UtilityRoutines::SameString(AlphArray(iReport), "FacilityComponentLoadSummary")) {
+            if (Util::SameString(AlphArray(iReport), "FacilityComponentLoadSummary")) {
                 isFound = true;
             }
-            if (UtilityRoutines::SameString(AlphArray(iReport), "AllSummaryAndSizingPeriod")) {
+            if (Util::SameString(AlphArray(iReport), "AllSummaryAndSizingPeriod")) {
                 isFound = true;
             }
-            if (UtilityRoutines::SameString(AlphArray(iReport), "AllSummaryMonthlyAndSizingPeriod")) {
+            if (Util::SameString(AlphArray(iReport), "AllSummaryMonthlyAndSizingPeriod")) {
                 isFound = true;
             }
         }
@@ -2100,7 +2100,7 @@ void InitializePredefinedMonthlyTitles(EnergyPlusData &state)
                               NumMonthlyReports));
     } else {
         for (int xcount = 1; xcount <= numNamedMonthly; ++xcount) {
-            if (!UtilityRoutines::SameString(MonthlyNamedReports(xcount), ort->namedMonthly(xcount).title)) {
+            if (!Util::SameString(MonthlyNamedReports(xcount), ort->namedMonthly(xcount).title)) {
                 ShowSevereError(state,
                                 "InitializePredefinedMonthlyTitles: Monthly Report Titles in OutputReportTabular do not match titles in DataOutput.");
                 ShowContinueError(state, format("first mismatch at ORT [{}] =\"{}\".", numNamedMonthly, ort->namedMonthly(xcount).title));
@@ -2809,8 +2809,8 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
     // na
 
     // Using/Aliasing
-    using PollutionModule::GetEnvironmentalImpactFactorInfo;
-    using PollutionModule::GetFuelFactorInfo;
+    using Pollution::GetEnvironmentalImpactFactorInfo;
+    using Pollution::GetFuelFactorInfo;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3384,16 +3384,14 @@ void WriteTableOfContents(EnergyPlusData &state)
                 }
             }
 
-            if (state.dataWeatherManager->TotReportPers > 0) {
+            if (state.dataWeather->TotReportPers > 0) {
                 std::string ReportPeriodSummary = "Reporting Period Summary";
                 tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriodSummary, Entire_Facility) << "\">"
                            << "Reporting Period Summary"
                            << "</a>\n";
-                AddTOCReportPeriod(
-                    state.dataWeatherManager->TotThermalReportPers, "Thermal", state.dataWeatherManager->ThermalReportPeriodInput, tbl_stream);
-                AddTOCReportPeriod(state.dataWeatherManager->TotCO2ReportPers, "CO2", state.dataWeatherManager->CO2ReportPeriodInput, tbl_stream);
-                AddTOCReportPeriod(
-                    state.dataWeatherManager->TotVisualReportPers, "Visual", state.dataWeatherManager->VisualReportPeriodInput, tbl_stream);
+                AddTOCReportPeriod(state.dataWeather->TotThermalReportPers, "Thermal", state.dataWeather->ThermalReportPeriodInput, tbl_stream);
+                AddTOCReportPeriod(state.dataWeather->TotCO2ReportPers, "CO2", state.dataWeather->CO2ReportPeriodInput, tbl_stream);
+                AddTOCReportPeriod(state.dataWeather->TotVisualReportPers, "Visual", state.dataWeather->VisualReportPeriodInput, tbl_stream);
             }
         }
     }
@@ -3401,7 +3399,7 @@ void WriteTableOfContents(EnergyPlusData &state)
 
 void AddTOCReportPeriod(const int nReportPeriods,
                         const std::string &kw,
-                        const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                        const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData,
                         std::ostream &tbl_stream)
 {
     static std::string const Entire_Facility("Entire Facility");
@@ -3908,27 +3906,27 @@ void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSt
         // loop through all of the resources and end uses for the entire facility
         for (int iResource = 1; iResource <= numResourceTypes; ++iResource) {
             int curResMeterNumber = ort->meterNumTotalsBEPS(iResource);
-            if (curResMeterNumber > 0) {
+            if (curResMeterNumber > -1) {
                 Real64 curResMeterValue = GetCurrentMeterValue(state, curResMeterNumber);
                 ort->gatherTotalsBEPS(iResource) += curResMeterValue;
             }
 
             for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 int curEndUseMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
-                if (curEndUseMeterNumber > 0) {
+                if (curEndUseMeterNumber > -1) {
                     Real64 curEndUseMeterValue = GetCurrentMeterValue(state, curEndUseMeterNumber);
                     ort->gatherEndUseBEPS(iResource, jEndUse) += curEndUseMeterValue;
 
                     for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         int curSubMeterNumber = ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
-                        if (curSubMeterNumber > 0) {
+                        if (curSubMeterNumber > -1) {
                             Real64 curSubMeterValue = GetCurrentMeterValue(state, curSubMeterNumber);
                             ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, iResource) += curSubMeterValue;
                         }
                     }
                     for (int kEndUseSpType = 1; kEndUseSpType <= op->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
                         int curSpTypeMeterNumber = ort->meterNumEndUseSpTypeBEPS(kEndUseSpType, jEndUse, iResource);
-                        if (curSpTypeMeterNumber > 0) {
+                        if (curSpTypeMeterNumber > -1) {
                             Real64 curSpTypeMeterValue = GetCurrentMeterValue(state, curSpTypeMeterNumber);
                             ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, iResource) += curSpTypeMeterValue;
                         }
@@ -3939,7 +3937,7 @@ void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSt
 
         for (int iResource = 1; iResource <= numSourceTypes; ++iResource) {
             int curResMeterNumber = ort->meterNumTotalsSource(iResource);
-            if (curResMeterNumber > 0) {
+            if (curResMeterNumber > -1) {
                 Real64 curResMeterValue = GetCurrentMeterValue(state, curResMeterNumber);
                 ort->gatherTotalsSource(iResource) += curResMeterValue;
             }
@@ -4063,14 +4061,14 @@ void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state,
 
             if (ort->ffSchedUsed(iResource)) {
                 int const curMeterNumber = ort->meterNumTotalsBEPS(iResource);
-                if (curMeterNumber > 0) {
+                if (curMeterNumber > -1) {
                     Real64 const curMeterValue = GetCurrentMeterValue(state, curMeterNumber) *
                                                  GetCurrentScheduleValue(state, ort->ffSchedIndex(iResource)) * ort->SourceFactors(iResource);
                     ort->gatherTotalsBySourceBEPS(iResource) += curMeterValue;
                 }
             } else {
                 int const curMeterNumber = ort->meterNumTotalsBEPS(iResource);
-                if (curMeterNumber > 0) {
+                if (curMeterNumber > -1) {
                     Real64 const curMeterValue = GetCurrentMeterValue(state, curMeterNumber) * ort->SourceFactors(iResource);
                     ort->gatherTotalsBySourceBEPS(iResource) += curMeterValue;
                 }
@@ -4079,14 +4077,14 @@ void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state,
             for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 if (ort->ffSchedUsed(iResource)) {
                     int const curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
-                    if (curMeterNumber > 0) {
+                    if (curMeterNumber > -1) {
                         Real64 const curMeterValue = GetCurrentMeterValue(state, curMeterNumber) *
                                                      GetCurrentScheduleValue(state, ort->ffSchedIndex(iResource)) * ort->SourceFactors(iResource);
                         ort->gatherEndUseBySourceBEPS(iResource, jEndUse) += curMeterValue;
                     }
                 } else {
                     int const curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
-                    if (curMeterNumber > 0) {
+                    if (curMeterNumber > -1) {
                         Real64 const curMeterValue = GetCurrentMeterValue(state, curMeterNumber) * ort->SourceFactors(iResource);
                         ort->gatherEndUseBySourceBEPS(iResource, jEndUse) += curMeterValue;
                     }
@@ -4177,7 +4175,7 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
         // loop through all of the resources and end uses for the entire facility
         for (int iResource = 1; iResource <= numResourceTypes; ++iResource) {
             int curMeterNumber = ort->meterNumTotalsBEPS(iResource);
-            if (curMeterNumber > 0) {
+            if (curMeterNumber > -1) {
                 Real64 curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                 // check if current value is greater than existing peak demand value
                 if (curDemandValue > ort->gatherDemandTotal(iResource)) {
@@ -4193,13 +4191,13 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
                     // time to find the components of the peak demand
                     for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                         curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
-                        if (curMeterNumber > 0) {
+                        if (curMeterNumber > -1) {
                             curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                             ort->gatherDemandEndUse(iResource, jEndUse) = curDemandValue;
                             for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories;
                                  ++kEndUseSub) {
                                 curMeterNumber = ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
-                                if (curMeterNumber > 0) {
+                                if (curMeterNumber > -1) {
                                     curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                                     ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, iResource) = curDemandValue;
                                 }
@@ -4217,14 +4215,14 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
         for (int iResource = 1; iResource <= numResourceTypes; ++iResource) {
             for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 int curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
-                if (curMeterNumber > 0) {
+                if (curMeterNumber > -1) {
                     Real64 curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                     if (curDemandValue > ort->gatherDemandIndEndUse(iResource, jEndUse)) {
                         ort->gatherDemandIndEndUse(iResource, jEndUse) = curDemandValue;
                     }
                     for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         curMeterNumber = ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
-                        if (curMeterNumber > 0) {
+                        if (curMeterNumber > -1) {
                             curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                             // check if current value is greater than existing peak demand value
                             if (curDemandValue > ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, iResource)) {
@@ -5260,14 +5258,14 @@ void WriteTabularReports(EnergyPlusData &state)
             WriteCO2ResilienceTables(state);                                           // code will crash if pure load calc
         if (ort->displayVisualResilienceSummary && !state.dataGlobal->DoPureLoadCalc)  // code will crash if pure load calc
             WriteVisualResilienceTables(state);                                        // code will crash if pure load calc
-        if (state.dataWeatherManager->TotReportPers > 0) WriteReportPeriodTimeConsumption(state);
-        for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+        if (state.dataWeather->TotReportPers > 0) WriteReportPeriodTimeConsumption(state);
+        for (int i = 1; i <= state.dataWeather->TotThermalReportPers; i++) {
             WriteThermalResilienceTablesRepPeriod(state, i);
         }
-        for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
+        for (int i = 1; i <= state.dataWeather->TotCO2ReportPers; i++) {
             WriteCO2ResilienceTablesRepPeriod(state, i);
         }
-        for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
+        for (int i = 1; i <= state.dataWeather->TotVisualReportPers; i++) {
             WriteVisualResilienceTablesRepPeriod(state, i);
         }
 
@@ -6884,7 +6882,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
     for (long iSch = 1; iSch <= state.dataScheduleMgr->NumSchedules; ++iSch) {
         std::string curSchName = state.dataScheduleMgr->Schedule(iSch).Name;
         std::string curSchType = ScheduleManager::GetScheduleType(state, iSch);
-        if (UtilityRoutines::SameString(curSchType, "FRACTION")) {
+        if (Util::SameString(curSchType, "FRACTION")) {
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchLeedEflhEflh,
                              curSchName,
@@ -7064,7 +7062,7 @@ void WriteMonthlyTables(EnergyPlusData &state)
                         varNameWithUnits = format("{} [{}]", ort->MonthlyColumns(curCol).varName, Constant::unitNames[(int)ort->MonthlyColumns(curCol).units]);
                         LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
                         GetUnitConversion(state, indexUnitConv, curConversionFactor, state.dataOutRptTab->curConversionOffset, curUnits);
-                    } else if (UtilityRoutines::SameString(Constant::unitNames[(int)ort->MonthlyColumns(curCol).units], "J")) {
+                    } else if (Util::SameString(Constant::unitNames[(int)ort->MonthlyColumns(curCol).units], "J")) {
                         curUnits = energyUnitsString;
                         curConversionFactor = energyUnitsConversionFactor;
                         state.dataOutRptTab->curConversionOffset = 0.0;
@@ -7163,31 +7161,31 @@ void WriteMonthlyTables(EnergyPlusData &state)
                         if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) {
                             curUnits += "/s";
                         }
-                        if (UtilityRoutines::SameString(curUnits, "J/s")) {
+                        if (Util::SameString(curUnits, "J/s")) {
                             curUnits = "W";
                         }
                         // CR7783 fix
-                        if (UtilityRoutines::SameString(curUnits, "kWh/s")) {
+                        if (Util::SameString(curUnits, "kWh/s")) {
                             curUnits = "W";
                             curConversionFactor *= 3600000.0;
                         }
-                        if (UtilityRoutines::SameString(curUnits, "GJ/s")) {
+                        if (Util::SameString(curUnits, "GJ/s")) {
                             curUnits = "kW";
                             curConversionFactor *= 1000000.0;
                         }
-                        if (UtilityRoutines::SameString(curUnits, "MJ/s")) {
+                        if (Util::SameString(curUnits, "MJ/s")) {
                             curUnits = "kW";
                             curConversionFactor *= 1000.0;
                         }
-                        if (UtilityRoutines::SameString(curUnits, "therm/s")) {
+                        if (Util::SameString(curUnits, "therm/s")) {
                             curUnits = "kBtu/h";
                             curConversionFactor *= 360000.0;
                         }
-                        if (UtilityRoutines::SameString(curUnits, "kBtu/s")) {
+                        if (Util::SameString(curUnits, "kBtu/s")) {
                             curUnits = "kBtu/h";
                             curConversionFactor *= 3600.0;
                         }
-                        if (UtilityRoutines::SameString(curUnits, "ton-hrs/s")) {
+                        if (Util::SameString(curUnits, "ton-hrs/s")) {
                             curUnits = "ton";
                             curConversionFactor *= 3600.0;
                         }
@@ -7221,31 +7219,31 @@ void WriteMonthlyTables(EnergyPlusData &state)
                         if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                             curUnits += "/s";
                         }
-                        if (UtilityRoutines::SameString(curUnits, "J/s")) {
+                        if (Util::SameString(curUnits, "J/s")) {
                             curUnits = "W";
                         }
                         // CR7783 fix
-                        if (UtilityRoutines::SameString(curUnits, "kWh/s")) {
+                        if (Util::SameString(curUnits, "kWh/s")) {
                             curUnits = "W";
                             curConversionFactor *= 3600000.0;
                         }
-                        if (UtilityRoutines::SameString(curUnits, "GJ/s")) {
+                        if (Util::SameString(curUnits, "GJ/s")) {
                             curUnits = "kW";
                             curConversionFactor *= 1000000.0;
                         }
-                        if (UtilityRoutines::SameString(curUnits, "MJ/s")) {
+                        if (Util::SameString(curUnits, "MJ/s")) {
                             curUnits = "kW";
                             curConversionFactor *= 1000.0;
                         }
-                        if (UtilityRoutines::SameString(curUnits, "therm/s")) {
+                        if (Util::SameString(curUnits, "therm/s")) {
                             curUnits = "kBtu/h";
                             curConversionFactor *= 360000.0;
                         }
-                        if (UtilityRoutines::SameString(curUnits, "kBtu/s")) {
+                        if (Util::SameString(curUnits, "kBtu/s")) {
                             curUnits = "kBtu/h";
                             curConversionFactor *= 3600.0;
                         }
-                        if (UtilityRoutines::SameString(curUnits, "ton-hrs/s")) {
+                        if (Util::SameString(curUnits, "ton-hrs/s")) {
                             curUnits = "ton";
                             curConversionFactor *= 3600.0;
                         }
@@ -7719,30 +7717,30 @@ void WriteBEPSTable(EnergyPlusData &state)
 
         if (produceTabular) {
             if (state.dataGlobal->createPerfLog) {
-                UtilityRoutines::appendPerfLog(state, "Electricity ABUPS Total [J]", format("{:.3R}", collapsedTotal(1)));
-                UtilityRoutines::appendPerfLog(state, "Natural Gas ABUPS Total [J]", format("{:.3R}", collapsedTotal(2)));
-                UtilityRoutines::appendPerfLog(state, "Gasoline ABUPS Total [J]", format("{:.3R}", collapsedTotal(3)));
-                UtilityRoutines::appendPerfLog(state, "Diesel ABUPS Total [J]", format("{:.3R}", collapsedTotal(4)));
-                UtilityRoutines::appendPerfLog(state, "Coal ABUPS Total [J]", format("{:.3R}", collapsedTotal(5)));
-                UtilityRoutines::appendPerfLog(state, "Fuel Oil No 1 ABUPS Total [J]", format("{:.3R}", collapsedTotal(6)));
-                UtilityRoutines::appendPerfLog(state, "Fuel Oil No 2 ABUPS Total [J]", format("{:.3R}", collapsedTotal(7)));
-                UtilityRoutines::appendPerfLog(state, "Propane ABUPS Total [J]", format("{:.3R}", collapsedTotal(8)));
-                UtilityRoutines::appendPerfLog(state, "Other Fuel 1 ABUPS Total [J]", format("{:.3R}", collapsedTotal(9)));
-                UtilityRoutines::appendPerfLog(state, "Other Fuel 2 ABUPS Total [J]", format("{:.3R}", collapsedTotal(10)));
-                UtilityRoutines::appendPerfLog(state, "District Cooling ABUPS Total [J]", format("{:.3R}", collapsedTotal(11)));
-                UtilityRoutines::appendPerfLog(state, "District Heating Water ABUPS Total [J]", format("{:.3R}", collapsedTotal(12)));
-                UtilityRoutines::appendPerfLog(state, "District Heating Steam ABUPS Total [J]", format("{:.3R}", collapsedTotal(13)));
-                UtilityRoutines::appendPerfLog(state, "Water ABUPS Total [m3]", format("{:.3R}", collapsedTotal(14)));
-                UtilityRoutines::appendPerfLog(state, "Values Gathered Over [hours]", format("{:.2R}", ort->gatherElapsedTimeBEPS));
-                UtilityRoutines::appendPerfLog(state,
-                                               "Facility Any Zone Oscillating Temperatures Time [hours]",
-                                               format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillate));
-                UtilityRoutines::appendPerfLog(state,
-                                               "Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
-                                               format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateDuringOccupancy));
-                UtilityRoutines::appendPerfLog(state,
-                                               "Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
-                                               format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateInDeadband));
+                Util::appendPerfLog(state, "Electricity ABUPS Total [J]", format("{:.3R}", collapsedTotal(1)));
+                Util::appendPerfLog(state, "Natural Gas ABUPS Total [J]", format("{:.3R}", collapsedTotal(2)));
+                Util::appendPerfLog(state, "Gasoline ABUPS Total [J]", format("{:.3R}", collapsedTotal(3)));
+                Util::appendPerfLog(state, "Diesel ABUPS Total [J]", format("{:.3R}", collapsedTotal(4)));
+                Util::appendPerfLog(state, "Coal ABUPS Total [J]", format("{:.3R}", collapsedTotal(5)));
+                Util::appendPerfLog(state, "Fuel Oil No 1 ABUPS Total [J]", format("{:.3R}", collapsedTotal(6)));
+                Util::appendPerfLog(state, "Fuel Oil No 2 ABUPS Total [J]", format("{:.3R}", collapsedTotal(7)));
+                Util::appendPerfLog(state, "Propane ABUPS Total [J]", format("{:.3R}", collapsedTotal(8)));
+                Util::appendPerfLog(state, "Other Fuel 1 ABUPS Total [J]", format("{:.3R}", collapsedTotal(9)));
+                Util::appendPerfLog(state, "Other Fuel 2 ABUPS Total [J]", format("{:.3R}", collapsedTotal(10)));
+                Util::appendPerfLog(state, "District Cooling ABUPS Total [J]", format("{:.3R}", collapsedTotal(11)));
+                Util::appendPerfLog(state, "District Heating Water ABUPS Total [J]", format("{:.3R}", collapsedTotal(12)));
+                Util::appendPerfLog(state, "District Heating Steam ABUPS Total [J]", format("{:.3R}", collapsedTotal(13)));
+                Util::appendPerfLog(state, "Water ABUPS Total [m3]", format("{:.3R}", collapsedTotal(14)));
+                Util::appendPerfLog(state, "Values Gathered Over [hours]", format("{:.2R}", ort->gatherElapsedTimeBEPS));
+                Util::appendPerfLog(state,
+                                    "Facility Any Zone Oscillating Temperatures Time [hours]",
+                                    format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillate));
+                Util::appendPerfLog(state,
+                                    "Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
+                                    format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateDuringOccupancy));
+                Util::appendPerfLog(state,
+                                    "Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
+                                    format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateInDeadband));
             }
         }
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
@@ -10750,7 +10748,7 @@ void writeRowReportPeriodInputVeri(const std::string &reportType,
                                    Array2D_string &tableBody,
                                    const int rowid,
                                    const int periodIdx,
-                                   const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData)
+                                   const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData)
 {
     tableBody(1, rowid) = reportType;
     tableBody(2, rowid) = std::to_string(periodIdx);
@@ -12052,7 +12050,7 @@ std::string formatReportPeriodTimestamp(const int year, const int month, const i
 void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
                                       const std::string &reportKeyWord,
                                       const int periodIdx,
-                                      const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData)
+                                      const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData)
 {
     WriteReportHeaders(
         state,
@@ -12081,8 +12079,7 @@ void WriteReportPeriodTimeConsumption(EnergyPlusData &state)
     Array1D_int columnWidth;
     Array1D_string rowHead;
     Array2D_string tableBody;
-    int numRowsReportPeriod =
-        state.dataWeatherManager->TotThermalReportPers + state.dataWeatherManager->TotCO2ReportPers + state.dataWeatherManager->TotVisualReportPers;
+    int numRowsReportPeriod = state.dataWeather->TotThermalReportPers + state.dataWeather->TotCO2ReportPers + state.dataWeather->TotVisualReportPers;
     rowHead.allocate(numRowsReportPeriod);
     columnHead.allocate(6);
     columnWidth.allocate(6);
@@ -12109,16 +12106,16 @@ void WriteReportPeriodTimeConsumption(EnergyPlusData &state)
     }
     // loop through rows
     int rowid = 1;
-    for (int periodIdx = 1; periodIdx <= state.dataWeatherManager->TotThermalReportPers; periodIdx++) {
-        writeRowReportPeriodInputVeri("Thermal", tableBody, rowid, periodIdx, state.dataWeatherManager->ThermalReportPeriodInput);
+    for (int periodIdx = 1; periodIdx <= state.dataWeather->TotThermalReportPers; periodIdx++) {
+        writeRowReportPeriodInputVeri("Thermal", tableBody, rowid, periodIdx, state.dataWeather->ThermalReportPeriodInput);
         rowid += 1;
     }
-    for (int periodIdx = 1; periodIdx <= state.dataWeatherManager->TotCO2ReportPers; periodIdx++) {
-        writeRowReportPeriodInputVeri("CO2", tableBody, rowid, periodIdx, state.dataWeatherManager->CO2ReportPeriodInput);
+    for (int periodIdx = 1; periodIdx <= state.dataWeather->TotCO2ReportPers; periodIdx++) {
+        writeRowReportPeriodInputVeri("CO2", tableBody, rowid, periodIdx, state.dataWeather->CO2ReportPeriodInput);
         rowid += 1;
     }
-    for (int periodIdx = 1; periodIdx <= state.dataWeatherManager->TotVisualReportPers; periodIdx++) {
-        writeRowReportPeriodInputVeri("Visual", tableBody, rowid, periodIdx, state.dataWeatherManager->VisualReportPeriodInput);
+    for (int periodIdx = 1; periodIdx <= state.dataWeather->TotVisualReportPers; periodIdx++) {
+        writeRowReportPeriodInputVeri("Visual", tableBody, rowid, periodIdx, state.dataWeather->VisualReportPeriodInput);
         rowid += 1;
     }
 
@@ -12153,8 +12150,8 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
     }
 
     std::string tableType = "Thermal";
-    WriteReportHeaderReportingPeriod(state, tableType, periodIdx, state.dataWeatherManager->ThermalReportPeriodInput);
-    std::string periodTitle = state.dataWeatherManager->ThermalReportPeriodInput(periodIdx).title;
+    WriteReportHeaderReportingPeriod(state, tableType, periodIdx, state.dataWeather->ThermalReportPeriodInput);
+    std::string periodTitle = state.dataWeather->ThermalReportPeriodInput(periodIdx).title;
 
     int columnNum = 5;
     Array1D_int columnWidth;
@@ -13139,8 +13136,8 @@ void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodId
     if (ort->WriteTabularFiles) {
         return;
     }
-    WriteReportHeaderReportingPeriod(state, "CO2", periodIdx, state.dataWeatherManager->CO2ReportPeriodInput);
-    std::string periodTitle = state.dataWeatherManager->CO2ReportPeriodInput(periodIdx).title;
+    WriteReportHeaderReportingPeriod(state, "CO2", periodIdx, state.dataWeather->CO2ReportPeriodInput);
+    std::string periodTitle = state.dataWeather->CO2ReportPeriodInput(periodIdx).title;
 
     Array1D_int columnWidth;
     columnWidth.allocate(numColumnCO2Tbl);
@@ -13243,8 +13240,8 @@ void WriteVisualResilienceTablesRepPeriod(EnergyPlusData &state, const int perio
         return;
     }
 
-    WriteReportHeaderReportingPeriod(state, "Visual", periodIdx, state.dataWeatherManager->VisualReportPeriodInput);
-    std::string periodTitle = state.dataWeatherManager->VisualReportPeriodInput(periodIdx).title;
+    WriteReportHeaderReportingPeriod(state, "Visual", periodIdx, state.dataWeather->VisualReportPeriodInput);
+    std::string periodTitle = state.dataWeather->VisualReportPeriodInput(periodIdx).title;
 
     Array1D_int columnWidth;
     columnWidth.allocate(numColumnVisualTbl);
@@ -13562,9 +13559,9 @@ void WritePredefinedTables(EnergyPlusData &state)
                                 // finally assign the entry to the place in the table body
                                 if (unitsStyle_cur == UnitsStyle::InchPound || unitsStyle_cur == UnitsStyle::JtoKWH) {
                                     int columnUnitConv = colUnitConv(colCurrent);
-                                    if (UtilityRoutines::SameString(state.dataOutRptPredefined->subTable(jSubTable).name, "SizingPeriod:DesignDay") &&
+                                    if (Util::SameString(state.dataOutRptPredefined->subTable(jSubTable).name, "SizingPeriod:DesignDay") &&
                                         unitsStyle_cur == UnitsStyle::InchPound) {
-                                        if (UtilityRoutines::SameString(columnHead(colCurrent), "Humidity Value")) {
+                                        if (Util::SameString(columnHead(colCurrent), "Humidity Value")) {
                                             std::string repTableTag;
                                             LookupSItoIP(state,
                                                          state.dataOutRptPredefined->tableEntry(lTableEntry + 1).charEntry,
@@ -13704,8 +13701,8 @@ void WriteComponentSizing(EnergyPlusData &state)
             // entries for the particular subtable.
             for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
                 if (!state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written) {
-                    if (UtilityRoutines::SameString(state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).typeField,
-                                                    state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField)) {
+                    if (Util::SameString(state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).typeField,
+                                         state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField)) {
                         state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active = true;
                     }
                 }
@@ -13722,7 +13719,7 @@ void WriteComponentSizing(EnergyPlusData &state)
                     curDesc = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).description;
                     // look through the list of unique items to see if it matches
                     for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
-                        if (UtilityRoutines::SameString(curDesc, uniqueDesc(jUnique))) {
+                        if (Util::SameString(curDesc, uniqueDesc(jUnique))) {
                             foundDesc = jUnique;
                             break;
                         }
@@ -13736,7 +13733,7 @@ void WriteComponentSizing(EnergyPlusData &state)
                     foundObj = 0;
                     curObj = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).nameField;
                     for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
-                        if (UtilityRoutines::SameString(curObj, uniqueObj(jUnique))) {
+                        if (Util::SameString(curObj, uniqueObj(jUnique))) {
                             foundObj = jUnique;
                             break;
                         }
@@ -13784,7 +13781,7 @@ void WriteComponentSizing(EnergyPlusData &state)
                     curDesc = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).description;
                     foundDesc = 0;
                     for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
-                        if (UtilityRoutines::SameString(uniqueDesc(jUnique), curDesc)) {
+                        if (Util::SameString(uniqueDesc(jUnique), curDesc)) {
                             foundDesc = jUnique;
                             break;
                         }
@@ -13792,7 +13789,7 @@ void WriteComponentSizing(EnergyPlusData &state)
                     curObj = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).nameField;
                     foundObj = 0;
                     for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
-                        if (UtilityRoutines::SameString(rowHead(jUnique), curObj)) {
+                        if (Util::SameString(rowHead(jUnique), curObj)) {
                             foundObj = jUnique;
                             break;
                         }
@@ -15750,10 +15747,10 @@ void CollectPeakZoneConditions(
 
         if (isCooling) {
             // Time of Peak Load
-            if ((size_t)desDaySelected <= state.dataWeatherManager->DesDayInput.size()) {
+            if ((size_t)desDaySelected <= state.dataWeather->DesDayInput.size()) {
                 compLoad.peakDateHrMin = format("{}/{} {}",
-                                                state.dataWeatherManager->DesDayInput(desDaySelected).Month,
-                                                state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
+                                                state.dataWeather->DesDayInput(desDaySelected).Month,
+                                                state.dataWeather->DesDayInput(desDaySelected).DayOfMonth,
                                                 state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
             } else {
                 compLoad.peakDateHrMin = thisCalcFinalZoneSizing.CoolPeakDateHrMin;
@@ -15806,10 +15803,10 @@ void CollectPeakZoneConditions(
 
         } else {
             // Time of Peak Load
-            if ((size_t)desDaySelected <= state.dataWeatherManager->DesDayInput.size()) {
+            if ((size_t)desDaySelected <= state.dataWeather->DesDayInput.size()) {
                 compLoad.peakDateHrMin = format("{}/{} {}",
-                                                state.dataWeatherManager->DesDayInput(desDaySelected).Month,
-                                                state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
+                                                state.dataWeather->DesDayInput(desDaySelected).Month,
+                                                state.dataWeather->DesDayInput(desDaySelected).DayOfMonth,
                                                 state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
             } else {
                 compLoad.peakDateHrMin = thisCalcFinalZoneSizing.HeatPeakDateHrMin;
@@ -16983,7 +16980,7 @@ void WriteTable(EnergyPlusData &state,
                 // if report name and subtable name the same add "record" to the end
                 ort->activeSubTableName = ConvertToElementTag(ort->activeSubTableName);
                 ort->activeReportNameNoSpace = ConvertToElementTag(ort->activeReportName);
-                if (UtilityRoutines::SameString(ort->activeSubTableName, ort->activeReportNameNoSpace)) {
+                if (Util::SameString(ort->activeSubTableName, ort->activeReportNameNoSpace)) {
                     ort->activeSubTableName += "Record";
                 }
                 // if no subtable name use the report name and add "record" to the end
@@ -17001,7 +16998,7 @@ void WriteTable(EnergyPlusData &state,
                         rowLabelTags(jRow) = "none";
                     }
                     rowUnitStrings(jRow) = GetUnitSubString(rowLabels(jRow));
-                    if (UtilityRoutines::SameString(rowUnitStrings(jRow), "Invalid/Undefined")) {
+                    if (Util::SameString(rowUnitStrings(jRow), "Invalid/Undefined")) {
                         rowUnitStrings(jRow) = "";
                     }
                 }
@@ -17011,7 +17008,7 @@ void WriteTable(EnergyPlusData &state,
                         columnLabelTags(iCol) = "none";
                     }
                     columnUnitStrings(iCol) = GetUnitSubString(columnLabels(iCol));
-                    if (UtilityRoutines::SameString(columnUnitStrings(iCol), "Invalid/Undefined")) {
+                    if (Util::SameString(columnUnitStrings(iCol), "Invalid/Undefined")) {
                         columnUnitStrings(iCol) = "";
                     }
                 }
@@ -17429,12 +17426,12 @@ void DetermineBuildingFloorArea(EnergyPlusData &state)
         // check if this zone is also a return plenum or a supply plenum
         // found = 0
         // if (NumZoneReturnPlenums > 0) THEN
-        //  found = UtilityRoutines::FindItemInList(thisZone%Name, ZoneRetPlenCond%ZoneName, NumZoneReturnPlenums)
+        //  found = Util::FindItemInList(thisZone%Name, ZoneRetPlenCond%ZoneName, NumZoneReturnPlenums)
         // endif
         // IF (found /= 0)  curZoneArea = 0.0d0
         // found = 0
         // if (NumZoneSupplyPlenums > 0) THEN
-        //  found = UtilityRoutines::FindItemInList(thisZone%Name, ZoneSupPlenCond%ZoneName, NumZoneSupplyPlenums)
+        //  found = Util::FindItemInList(thisZone%Name, ZoneSupPlenCond%ZoneName, NumZoneSupplyPlenums)
         // endif
         // IF (found /= 0)  curZoneArea = 0.0d0
 
@@ -18572,7 +18569,7 @@ void LookupSItoIP(EnergyPlusData &state, std::string const &stringInWithSI, int 
     int constexpr misParen(2);
     int constexpr misBrce(3);
     int constexpr misNoHint(4);
-    std::string const stringInUpper(UtilityRoutines::makeUPPER(stringInWithSI));
+    std::string const stringInUpper(Util::makeUPPER(stringInWithSI));
     auto &ort = state.dataOutRptTab;
 
     stringOutWithIP = "";
@@ -18604,7 +18601,7 @@ void LookupSItoIP(EnergyPlusData &state, std::string const &stringInWithSI, int 
     int foundConv = 0;
     int firstOfSeveral = 0;
     for (int iUnit = 1; iUnit <= ort->UnitConvSize; ++iUnit) {
-        if (UtilityRoutines::SameString(ort->UnitConv(iUnit).siName, unitSIOnly)) {
+        if (Util::SameString(ort->UnitConv(iUnit).siName, unitSIOnly)) {
             if (ort->UnitConv(iUnit).several) {
                 if (firstOfSeveral == 0) firstOfSeveral = iUnit;
                 if (ort->UnitConv(iUnit).is_default) defaultConv = iUnit;
@@ -18886,8 +18883,8 @@ Real64 getSpecificUnitMultiplier(EnergyPlusData &state, std::string const &SIuni
     auto &ort = state.dataOutRptTab;
 
     for (state.dataOutRptTab->iUnitGsum = 1; state.dataOutRptTab->iUnitGsum <= ort->UnitConvSize; ++state.dataOutRptTab->iUnitGsum) {
-        if (UtilityRoutines::SameString(ort->UnitConv(state.dataOutRptTab->iUnitGsum).siName, SIunit)) {
-            if (UtilityRoutines::SameString(ort->UnitConv(state.dataOutRptTab->iUnitGsum).ipName, IPunit)) {
+        if (Util::SameString(ort->UnitConv(state.dataOutRptTab->iUnitGsum).siName, SIunit)) {
+            if (Util::SameString(ort->UnitConv(state.dataOutRptTab->iUnitGsum).ipName, IPunit)) {
                 state.dataOutRptTab->foundGsum = state.dataOutRptTab->iUnitGsum;
                 break;
             }
@@ -19000,8 +18997,8 @@ Real64 getSpecificUnitIndex(EnergyPlusData &state, std::string const &SIunit, st
     auto &ort = state.dataOutRptTab;
 
     for (state.dataOutRptTab->iUnitGsui = 1; state.dataOutRptTab->iUnitGsui <= ort->UnitConvSize; ++state.dataOutRptTab->iUnitGsui) {
-        if (UtilityRoutines::SameString(ort->UnitConv(state.dataOutRptTab->iUnitGsui).siName, SIunit)) {
-            if (UtilityRoutines::SameString(ort->UnitConv(state.dataOutRptTab->iUnitGsui).ipName, IPunit)) {
+        if (Util::SameString(ort->UnitConv(state.dataOutRptTab->iUnitGsui).siName, SIunit)) {
+            if (Util::SameString(ort->UnitConv(state.dataOutRptTab->iUnitGsui).ipName, IPunit)) {
                 state.dataOutRptTab->foundGsui = state.dataOutRptTab->iUnitGsui;
                 break;
             }

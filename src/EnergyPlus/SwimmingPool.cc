@@ -219,13 +219,13 @@ void GetSwimmingPool(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
-        UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
         state.dataSwimmingPools->Pool(Item).Name = Alphas(1);
 
         state.dataSwimmingPools->Pool(Item).SurfaceName = Alphas(2);
         state.dataSwimmingPools->Pool(Item).SurfacePtr = 0;
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (UtilityRoutines::SameString(state.dataSurface->Surface(SurfNum).Name, state.dataSwimmingPools->Pool(Item).SurfaceName)) {
+            if (Util::SameString(state.dataSurface->Surface(SurfNum).Name, state.dataSwimmingPools->Pool(Item).SurfaceName)) {
                 state.dataSwimmingPools->Pool(Item).SurfacePtr = SurfNum;
                 break;
             }
@@ -653,9 +653,9 @@ void SwimmingPoolData::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::MainsWater,
-                        "Heating",
+                        OutputProcessor::SOVEndUseCat::Heating,
                         {},
-                        "System");
+                        OutputProcessor::SOVGroup::HVAC);
     SetupOutputVariable(state,
                         "Indoor Pool Makeup Water Temperature",
                         Constant::Units::C,
@@ -714,9 +714,9 @@ void SwimmingPoolData::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::EnergyTransfer,
-                        "HEATINGCOILS",
+                        OutputProcessor::SOVEndUseCat::HeatingCoils,
                         {},
-                        "System");
+                        OutputProcessor::SOVGroup::HVAC);
     SetupOutputVariable(state,
                         "Indoor Pool Radiant to Convection by Cover",
                         Constant::Units::W,

@@ -152,7 +152,7 @@ void SimPIU(EnergyPlusData &state,
 
     // Get the powered induction unit index
     if (CompIndex == 0) {
-        PIUNum = UtilityRoutines::FindItemInList(CompName, state.dataPowerInductionUnits->PIU);
+        PIUNum = Util::FindItemInList(CompName, state.dataPowerInductionUnits->PIU);
         if (PIUNum == 0) {
             ShowFatalError(state, format("SimPIU: PIU Unit not found={}", CompName));
         }
@@ -316,8 +316,7 @@ void GetPIUs(EnergyPlusData &state)
         thisPIU.MaxTotAirVolFlow = state.dataIPShortCut->rNumericArgs(1);
         thisPIU.MaxPriAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
         thisPIU.MinPriAirFlowFrac = state.dataIPShortCut->rNumericArgs(3);
-
-        thisPIU.HCoilType = static_cast<HtgCoilType>(getEnumValue(HCoilNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
+        thisPIU.HCoilType = static_cast<HtgCoilType>(getEnumValue(HCoilNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
         switch (thisPIU.HCoilType) {
         case HtgCoilType::SimpleHeating: {
             thisPIU.HCoil_PlantType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
@@ -553,12 +552,12 @@ void GetPIUs(EnergyPlusData &state)
         thisPIU.MaxSecAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
         thisPIU.MinPriAirFlowFrac = state.dataIPShortCut->rNumericArgs(3);
         thisPIU.FanOnFlowFrac = state.dataIPShortCut->rNumericArgs(4);
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:WATER")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:WATER")) {
             thisPIU.HCoilType = HtgCoilType::SimpleHeating;
             thisPIU.HCoil_PlantType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:FUEL")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:FUEL")) {
             thisPIU.HCoilType = HtgCoilType::Gas;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:STEAM")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:STEAM")) {
             thisPIU.HCoilType = HtgCoilType::SteamAirHeating;
             thisPIU.HCoil_PlantType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
             thisPIU.HCoil_FluidIndex = FindRefrigerant(state, "Steam");
@@ -570,7 +569,7 @@ void GetPIUs(EnergyPlusData &state)
                 ErrorsFound = true;
                 SteamMessageNeeded = false;
             }
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:ELECTRIC")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:ELECTRIC")) {
             thisPIU.HCoilType = HtgCoilType::Electric;
         } else {
             ShowSevereError(state, format("Illegal {} = {}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
@@ -1117,7 +1116,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
 
         // get system sizing id if a sizing run has been done for this system
         if (SizingDesRunThisAirSys) {
-            SysSizNum = UtilityRoutines::FindItemInList(
+            SysSizNum = Util::FindItemInList(
                 state.dataSize->FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
             if (SysSizNum == 0) {
                 SysSizNum = 1; // use first when none applicable
@@ -1322,7 +1321,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
             }
         } else {
             CheckZoneSizing(state, thisPIU.UnitType, thisPIU.Name);
-            if (UtilityRoutines::SameString(HCoilNamesUC[static_cast<int>(thisPIU.HCoilType)], "Coil:Heating:Water")) {
+            if (Util::SameString(HCoilNamesUC[static_cast<int>(thisPIU.HCoilType)], "Coil:Heating:Water")) {
 
                 int const CoilWaterInletNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", thisPIU.HCoil, ErrorsFound);
                 int const CoilWaterOutletNode = GetCoilWaterOutletNode(state, "Coil:Heating:Water", thisPIU.HCoil, ErrorsFound);
@@ -1422,7 +1421,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                     state, thisPIU.UnitType, thisPIU.Name, "User-Specified Maximum Reheat Steam Flow Rate [m3/s]", thisPIU.MaxVolHotWaterFlow);
             }
         } else {
-            if (UtilityRoutines::SameString(HCoilNames[static_cast<int>(thisPIU.HCoilType)], "Coil:Heating:Steam")) {
+            if (Util::SameString(HCoilNames[static_cast<int>(thisPIU.HCoilType)], "Coil:Heating:Steam")) {
 
                 int const CoilSteamInletNode = GetCoilSteamInletNode(state, "Coil:Heating:Steam", thisPIU.HCoil, ErrorsFound);
                 int const CoilSteamOutletNode = GetCoilSteamOutletNode(state, "Coil:Heating:Steam", thisPIU.HCoil, ErrorsFound);
@@ -2119,7 +2118,7 @@ bool PIUnitHasMixer(EnergyPlusData &state, std::string_view CompName) // compone
     }
 
     if (state.dataPowerInductionUnits->NumPIUs > 0) {
-        int const ItemNum = UtilityRoutines::FindItemInList(CompName, state.dataPowerInductionUnits->PIU, &PowIndUnitData::MixerName);
+        int const ItemNum = Util::FindItemInList(CompName, state.dataPowerInductionUnits->PIU, &PowIndUnitData::MixerName);
         if (ItemNum > 0) {
             YesNo = true;
         }

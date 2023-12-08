@@ -350,12 +350,11 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
         }
 
         if (NumAlphas > 15) {
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "HotWater") ||
-                UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "HotWater")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "HotWater") ||
+                Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "HotWater")) {
                 thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Water;
                 //       Default to Steam if left blank
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), fluidNameSteam) ||
-                       state.dataIPShortCut->cAlphaArgs(16).empty()) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), fluidNameSteam) || state.dataIPShortCut->cAlphaArgs(16).empty()) {
                 thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
             } else {
                 ShowWarningError(state, format("{}, Name={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -589,9 +588,9 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::Electricity,
-                        "Cooling",
+                        OutputProcessor::SOVEndUseCat::Cooling,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Cooling Rate",
@@ -610,9 +609,9 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::EnergyTransfer,
-                        "CHILLERS",
+                        OutputProcessor::SOVEndUseCat::Chillers,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Inlet Temperature",
@@ -655,9 +654,9 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::EnergyTransfer,
-                        "HEATREJECTION",
+                        OutputProcessor::SOVEndUseCat::HeatRejection,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Condenser Inlet Temperature",
@@ -701,9 +700,9 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                             this->Name,
                             {},
                             Constant::eResource::EnergyTransfer, 
-                            "Cooling",
+                            OutputProcessor::SOVEndUseCat::Cooling,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
     } else {
         if (this->GenInputOutputNodesUsed) {
             SetupOutputVariable(state,
@@ -723,9 +722,9 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 this->Name,
                                 {},
                                 Constant::eResource::PlantLoopHeatingDemand, 
-                                "CHILLERS",
+                                OutputProcessor::SOVEndUseCat::Chillers,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
         } else {
             SetupOutputVariable(state,
                                 "Chiller Source Steam Rate",
@@ -744,9 +743,9 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 this->Name,
                                 {},
                                 Constant::eResource::DistrictHeatingSteam,
-                                "Cooling",
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
         }
     }
 

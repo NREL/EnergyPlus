@@ -136,8 +136,7 @@ void InitEnergyReports(EnergyPlusData &state)
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);
             if (!thisZoneEquipConfig.IsControlled) continue;
-            thisZoneEquipConfig.EquipListIndex =
-                UtilityRoutines::FindItemInList(thisZoneEquipConfig.EquipListName, state.dataZoneEquip->ZoneEquipList);
+            thisZoneEquipConfig.EquipListIndex = Util::FindItemInList(thisZoneEquipConfig.EquipListName, state.dataZoneEquip->ZoneEquipList);
             auto &thisZoneEquipList = state.dataZoneEquip->ZoneEquipList(thisZoneEquipConfig.EquipListIndex);
             for (int ZoneInletNodeNum = 1; ZoneInletNodeNum <= thisZoneEquipConfig.NumInletNodes; ++ZoneInletNodeNum) {
                 int AirLoopNum = thisZoneEquipConfig.InletNodeAirLoopNum(ZoneInletNodeNum);
@@ -294,8 +293,7 @@ void InitEnergyReports(EnergyPlusData &state)
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);
             if (!thisZoneEquipConfig.IsControlled) continue;
-            thisZoneEquipConfig.EquipListIndex =
-                UtilityRoutines::FindItemInList(thisZoneEquipConfig.EquipListName, state.dataZoneEquip->ZoneEquipList);
+            thisZoneEquipConfig.EquipListIndex = Util::FindItemInList(thisZoneEquipConfig.EquipListName, state.dataZoneEquip->ZoneEquipList);
             int ListNum = thisZoneEquipConfig.EquipListIndex;
             // loop over the zone supply air path inlet nodes
             for (int ZoneInletNodeNum = 1; ZoneInletNodeNum <= thisZoneEquipConfig.NumInletNodes; ++ZoneInletNodeNum) {
@@ -315,7 +313,7 @@ void InitEnergyReports(EnergyPlusData &state)
                 if (ListNum > 0 && AirDistUnitNum > 0) {
                     auto &thisZoneEquipList = state.dataZoneEquip->ZoneEquipList(ListNum);
                     for (int VarNum = 1; VarNum <= thisZoneEquipList.EquipData(AirDistUnitNum).NumMeteredVars; ++VarNum) {
-                        if (thisZoneEquipList.EquipData(AirDistUnitNum).MeteredVar(VarNum).ResourceType == Constant::eResource::EnergyTransfer) {
+                        if (thisZoneEquipList.EquipData(AirDistUnitNum).MeteredVar(VarNum).resource == Constant::eResource::EnergyTransfer) {
                             thisZoneEquipList.EquipData(AirDistUnitNum).EnergyTransComp = EnergyTransfer;
                             const std::string &CompType = thisZoneEquipList.EquipData(AirDistUnitNum).TypeOf;
                             const std::string &CompName = thisZoneEquipList.EquipData(AirDistUnitNum).Name;
@@ -335,7 +333,7 @@ void InitEnergyReports(EnergyPlusData &state)
                     for (int SubEquipNum = 1; SubEquipNum <= thisZoneEquipList.EquipData(AirDistUnitNum).NumSubEquip; ++SubEquipNum) {
                         for (int VarNum = 1; VarNum <= thisZoneEquipList.EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).NumMeteredVars;
                              ++VarNum) {
-                            if (thisZoneEquipList.EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).MeteredVar(VarNum).ResourceType ==
+                            if (thisZoneEquipList.EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).MeteredVar(VarNum).resource ==
                                 Constant::eResource::EnergyTransfer) {
                                 thisZoneEquipList.EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).EnergyTransComp = EnergyTransfer;
                                 const std::string &CompType = thisZoneEquipList.EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).TypeOf;
@@ -365,7 +363,7 @@ void InitEnergyReports(EnergyPlusData &state)
                                         .SubEquipData(SubEquipNum)
                                         .SubSubEquipData(SubSubEquipNum)
                                         .MeteredVar(VarNum)
-                                        .ResourceType == Constant::eResource::EnergyTransfer) {
+                                        .resource == Constant::eResource::EnergyTransfer) {
                                     thisZoneEquipList.EquipData(AirDistUnitNum)
                                         .SubEquipData(SubEquipNum)
                                         .SubSubEquipData(SubSubEquipNum)
@@ -912,25 +910,25 @@ void InitEnergyReports(EnergyPlusData &state)
                 auto &pasBranchComp = pasBranch.Comp(CompNum);
                 for (int VarNum = 1; VarNum <= pasBranchComp.NumMeteredVars; ++VarNum) {
                     auto &pasBranchCompMeter = pasBranchComp.MeteredVar(VarNum);
-                    OutputProcessor::VariableType VarType = pasBranchCompMeter.ReportVarType;
-                    int VarIndex = pasBranchCompMeter.ReportVarIndex;
-                    pasBranchCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
+                    OutputProcessor::VariableType VarType = pasBranchCompMeter.varType;
+                    int VarIndex = pasBranchCompMeter.num;
+                    pasBranchCompMeter.curMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                 }
                 for (int SubCompNum = 1; SubCompNum <= pasBranchComp.NumSubComps; ++SubCompNum) {
                     auto &pasBranchSubComp = pasBranchComp.SubComp(SubCompNum);
                     for (int VarNum = 1; VarNum <= pasBranchSubComp.NumMeteredVars; ++VarNum) {
                         auto &pasBranchSubCompMeter = pasBranchSubComp.MeteredVar(VarNum);
-                        OutputProcessor::VariableType VarType = pasBranchSubCompMeter.ReportVarType;
-                        int VarIndex = pasBranchSubCompMeter.ReportVarIndex;
-                        pasBranchSubCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
+                        OutputProcessor::VariableType VarType = pasBranchSubCompMeter.varType;
+                        int VarIndex = pasBranchSubCompMeter.num;
+                        pasBranchSubCompMeter.curMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                     }
                     for (int SubSubCompNum = 1; SubSubCompNum <= pasBranchSubComp.NumSubSubComps; ++SubSubCompNum) {
                         auto &pasBranchSubSubComp = pasBranchSubComp.SubSubComp(SubSubCompNum);
                         for (int VarNum = 1; VarNum <= pasBranchSubSubComp.NumMeteredVars; ++VarNum) {
                             auto &pasBranchSubSubCompMeter = pasBranchSubSubComp.MeteredVar(VarNum);
-                            OutputProcessor::VariableType VarType = pasBranchSubSubCompMeter.ReportVarType;
-                            int VarIndex = pasBranchSubSubCompMeter.ReportVarIndex;
-                            pasBranchSubSubCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
+                            OutputProcessor::VariableType VarType = pasBranchSubSubCompMeter.varType;
+                            int VarIndex = pasBranchSubSubCompMeter.num;
+                            pasBranchSubSubCompMeter.curMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                         }
                     }
                 }
@@ -946,25 +944,25 @@ void InitEnergyReports(EnergyPlusData &state)
             auto &zelEquipData = zel.EquipData(CompNum);
             for (int VarNum = 1; VarNum <= zelEquipData.NumMeteredVars; ++VarNum) {
                 auto &zelEquipDataMeter = zelEquipData.MeteredVar(VarNum);
-                OutputProcessor::VariableType VarType = zelEquipDataMeter.ReportVarType;
-                int VarIndex = zelEquipDataMeter.ReportVarIndex;
-                zelEquipDataMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
+                OutputProcessor::VariableType VarType = zelEquipDataMeter.varType;
+                int VarIndex = zelEquipDataMeter.num;
+                zelEquipDataMeter.curMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
             }
             for (int SubCompNum = 1; SubCompNum <= zelEquipData.NumSubEquip; ++SubCompNum) {
                 auto &zelSubEquipData = zelEquipData.SubEquipData(SubCompNum);
                 for (int VarNum = 1; VarNum <= zelSubEquipData.NumMeteredVars; ++VarNum) {
                     auto &zelSubEquipDataMeter = zelSubEquipData.MeteredVar(VarNum);
-                    OutputProcessor::VariableType VarType = zelSubEquipDataMeter.ReportVarType;
-                    int VarIndex = zelSubEquipDataMeter.ReportVarIndex;
-                    zelSubEquipDataMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
+                    OutputProcessor::VariableType VarType = zelSubEquipDataMeter.varType;
+                    int VarIndex = zelSubEquipDataMeter.num;
+                    zelSubEquipDataMeter.curMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                 }
                 for (int SubSubCompNum = 1; SubSubCompNum <= zelSubEquipData.NumSubSubEquip; ++SubSubCompNum) {
                     auto &zelSubSubEquipData = zelSubEquipData.SubSubEquipData(SubSubCompNum);
                     for (int VarNum = 1; VarNum <= zelSubSubEquipData.NumMeteredVars; ++VarNum) {
                         auto &zelSubSubEquipDataMeter = zelSubSubEquipData.MeteredVar(VarNum);
-                        OutputProcessor::VariableType VarType = zelSubSubEquipDataMeter.ReportVarType;
-                        int VarIndex = zelSubSubEquipDataMeter.ReportVarIndex;
-                        zelSubSubEquipDataMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex); // Sankar Corrected zone array
+                        OutputProcessor::VariableType VarType = zelSubSubEquipDataMeter.varType;
+                        int VarIndex = zelSubSubEquipDataMeter.num;
+                        zelSubSubEquipDataMeter.curMeterReading = GetInternalVariableValue(state, VarType, VarIndex); // Sankar Corrected zone array
                     }
                 }
             }
@@ -981,9 +979,9 @@ void InitEnergyReports(EnergyPlusData &state)
                     auto &vrpBranchComp = vrpBranch.Comp(CompNum);
                     for (int VarNum = 1; VarNum <= vrpBranchComp.NumMeteredVars; ++VarNum) {
                         auto &vrpBranchCompMeter = vrpBranchComp.MeteredVar(VarNum);
-                        OutputProcessor::VariableType VarType = vrpBranchCompMeter.ReportVarType;
-                        int VarIndex = vrpBranchCompMeter.ReportVarIndex;
-                        vrpBranchCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
+                        OutputProcessor::VariableType VarType = vrpBranchCompMeter.varType;
+                        int VarIndex = vrpBranchCompMeter.num;
+                        vrpBranchCompMeter.curMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                     }
                 }
             }
@@ -998,9 +996,9 @@ void InitEnergyReports(EnergyPlusData &state)
                     auto &vrcBranchComp = vrcBranch.Comp(CompNum);
                     for (int VarNum = 1; VarNum <= vrcBranchComp.NumMeteredVars; ++VarNum) {
                         auto &vrcBranchCompMeter = vrcBranchComp.MeteredVar(VarNum);
-                        OutputProcessor::VariableType VarType = vrcBranchCompMeter.ReportVarType;
-                        int VarIndex = vrcBranchCompMeter.ReportVarIndex;
-                        vrcBranchCompMeter.CurMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
+                        OutputProcessor::VariableType VarType = vrcBranchCompMeter.varType;
+                        int VarIndex = vrcBranchCompMeter.num;
+                        vrcBranchCompMeter.curMeterReading = GetInternalVariableValue(state, VarType, VarIndex);
                     }
                 }
             }
@@ -2358,29 +2356,21 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         ModeFlagOn = true;
                         for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
                             {
+                                thisComp.MeteredVar(VarNum) = meteredVars(VarNum); // Copy
                                 auto &thisVar = thisComp.MeteredVar(VarNum);
-                                auto const &meteredVar = meteredVars(VarNum);
-                                thisVar.ReportVarName = meteredVar.name;
-                                thisVar.ReportVarUnits = meteredVar.units;
-                                thisVar.ReportVarIndex = meteredVar.num;
-                                thisVar.ReportVarIndexType = meteredVar.timeStepType;
-                                thisVar.ReportVarType = meteredVar.varType;
-                                thisVar.ResourceType = meteredVar.resource;
-                                thisVar.EndUse = meteredVar.endUse;
-                                if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
+                                if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
                                     for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                        thisComp.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::HeatingOnly;
+                                        thisComp.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
                                     }
                                     ModeFlagOn = false;
-                                } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
+                                } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
                                     for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                        thisComp.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::CoolingOnly;
+                                        thisComp.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
                                     }
                                     ModeFlagOn = false;
                                 } else if (ModeFlagOn) {
-                                    thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
+                                    thisVar.heatOrCool = Constant::HeatOrCool::NoHeatNoCool;
                                 }
-                                thisVar.Group = meteredVar.group;
                             }
                         }
 
@@ -2399,29 +2389,21 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             ModeFlagOn = true;
                             for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
                                 {
+                                    thisComp.SubComp(SubCompNum).MeteredVar(VarNum) = meteredVars(VarNum);
                                     auto &thisVar = thisComp.SubComp(SubCompNum).MeteredVar(VarNum);
-                                    auto const &meteredVar = meteredVars(VarNum);
-                                    thisVar.ReportVarName = meteredVar.name;
-                                    thisVar.ReportVarUnits = meteredVar.units;
-                                    thisVar.ReportVarIndex = meteredVar.num;
-                                    thisVar.ReportVarIndexType = meteredVar.timeStepType;
-                                    thisVar.ReportVarType = meteredVar.varType;
-                                    thisVar.ResourceType = meteredVar.resource;
-                                    thisVar.EndUse = meteredVar.endUse;
-                                    if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
+                                    if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
                                         for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                            thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).EndUse_CompMode = EndUseType::HeatingOnly;
+                                            thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
                                         }
                                         ModeFlagOn = false;
-                                    } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
+                                    } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
                                         for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                            thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).EndUse_CompMode = EndUseType::CoolingOnly;
+                                            thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
                                         }
                                         ModeFlagOn = false;
                                     } else if (ModeFlagOn) {
-                                        thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
+                                        thisVar.heatOrCool = Constant::HeatOrCool::NoHeatNoCool;
                                     }
-                                    thisVar.Group = meteredVar.group;
                                 }
                             }
 
@@ -2443,31 +2425,23 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 ModeFlagOn = true;
                                 for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
                                     {
+                                        thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar(VarNum) = meteredVars(VarNum);
                                         auto &thisVar = thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar(VarNum);
-                                        auto const &meteredVar = meteredVars(VarNum);
-                                        thisVar.ReportVarName = meteredVar.name;
-                                        thisVar.ReportVarUnits = meteredVar.units;
-                                        thisVar.ReportVarIndex = meteredVar.num;
-                                        thisVar.ReportVarIndexType = meteredVar.timeStepType;
-                                        thisVar.ReportVarType = meteredVar.varType;
-                                        thisVar.ResourceType = meteredVar.resource;
-                                        thisVar.EndUse = meteredVar.endUse;
-                                        if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
+                                        if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
                                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                                thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar(VarNum1).EndUse_CompMode =
-                                                    EndUseType::HeatingOnly;
+                                                thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar(VarNum1).heatOrCool =
+                                                    Constant::HeatOrCool::HeatingOnly;
                                             }
                                             ModeFlagOn = false;
-                                        } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
+                                        } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
                                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                                thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar(VarNum1).EndUse_CompMode =
-                                                    EndUseType::CoolingOnly;
+                                                thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar(VarNum1).heatOrCool =
+                                                    Constant::HeatOrCool::CoolingOnly;
                                             }
                                             ModeFlagOn = false;
                                         } else if (ModeFlagOn) {
-                                            thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
+                                            thisVar.heatOrCool = Constant::HeatOrCool::NoHeatNoCool;
                                         }
-                                        thisVar.Group = meteredVar.group;
                                     }
                                 }
 
@@ -2531,29 +2505,21 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     ModeFlagOn = true;
                     for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
                         {
+                            thisEquipData.MeteredVar(VarNum) = meteredVars(VarNum);
                             auto &thisVar = thisEquipData.MeteredVar(VarNum);
-                            auto const &meteredVar = meteredVars(VarNum);
-                            thisVar.ReportVarName = meteredVar.name;
-                            thisVar.ReportVarUnits = meteredVar.units;
-                            thisVar.ReportVarIndex = meteredVar.num;
-                            thisVar.ReportVarIndexType = meteredVar.timeStepType;
-                            thisVar.ReportVarType = meteredVar.varType;
-                            thisVar.ResourceType = meteredVar.resource;
-                            thisVar.EndUse = meteredVar.endUse;
-                            if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
+                            if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                    thisEquipData.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::HeatingOnly;
+                                    thisEquipData.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
                                 }
                                 ModeFlagOn = false;
-                            } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
+                            } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                    thisEquipData.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::CoolingOnly;
+                                    thisEquipData.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
                                 }
                                 ModeFlagOn = false;
                             } else if (ModeFlagOn) {
-                                thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
+                                thisVar.heatOrCool = Constant::HeatOrCool::NoHeatNoCool;
                             }
-                            thisVar.Group = meteredVar.group;
                         }
                     }
 
@@ -2669,29 +2635,21 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     
                     ModeFlagOn = true;
                     for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
+                        thisSubEquipData.MeteredVar(VarNum) = meteredVars(VarNum);
                         auto &thisVar = thisSubEquipData.MeteredVar(VarNum);
-                        auto const &meteredVar = meteredVars(VarNum);
-                        thisVar.ReportVarName = meteredVar.name;
-                        thisVar.ReportVarUnits = meteredVar.units;
-                        thisVar.ReportVarIndex = meteredVar.num;
-                        thisVar.ReportVarIndexType = meteredVar.timeStepType;
-                        thisVar.ReportVarType = meteredVar.varType;
-                        thisVar.ResourceType = meteredVar.resource;
-                        thisVar.EndUse = meteredVar.endUse;
-                        if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
+                        if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                    thisSubEquipData.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::HeatingOnly;
+                                    thisSubEquipData.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
                             }
                             ModeFlagOn = false;
-                        } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
+                        } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                    thisSubEquipData.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::CoolingOnly;
+                                    thisSubEquipData.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
                             }
                             ModeFlagOn = false;
                         } else if (ModeFlagOn) {
-                            thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
+                            thisVar.heatOrCool = Constant::HeatOrCool::NoHeatNoCool;
                         }
-                        thisVar.Group = meteredVar.group;
                     }
 
                     meteredVars.deallocate();
@@ -2710,29 +2668,21 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         GetMeteredVariables(state, NameOfSubSubComp, meteredVars);
                         ModeFlagOn = true;
                         for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
+                            thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum) = meteredVars(VarNum);
                             auto &thisVar = thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum);
-                            auto const &meteredVar = meteredVars(VarNum);
-                            thisVar.ReportVarName = meteredVar.name;
-                            thisVar.ReportVarUnits = meteredVar.units;
-                            thisVar.ReportVarIndex = meteredVar.num;
-                            thisVar.ReportVarIndexType = meteredVar.timeStepType;
-                            thisVar.ReportVarType = meteredVar.varType;
-                            thisVar.ResourceType = meteredVar.resource;
-                            thisVar.EndUse = meteredVar.endUse;
-                            if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
+                            if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                    thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum1).EndUse_CompMode = EndUseType::HeatingOnly;
+                                    thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
                                 }
                                 ModeFlagOn = false;
-                            } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
+                            } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                    thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum1).EndUse_CompMode = EndUseType::CoolingOnly;
+                                    thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
                                 }
                                 ModeFlagOn = false;
                             } else if (ModeFlagOn) {
-                                thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
+                                thisVar.heatOrCool = Constant::HeatOrCool::NoHeatNoCool;
                             }
-                            thisVar.Group = meteredVar.group;
                         }
                         
                         meteredVars.deallocate();
@@ -2917,30 +2867,21 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         ModeFlagOn = true;
 
                         for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
+                            thisComp.MeteredVar(VarNum) = meteredVars(VarNum);
                             auto &thisVar = thisComp.MeteredVar(VarNum);
-                            auto const &meteredVar = meteredVars(VarNum);
-                            
-                            thisVar.ReportVarName = meteredVar.name;
-                            thisVar.ReportVarUnits = meteredVar.units;
-                            thisVar.ReportVarIndex = meteredVar.num;
-                            thisVar.ReportVarIndexType = meteredVar.timeStepType;
-                            thisVar.ReportVarType = meteredVar.varType;
-                            thisVar.ResourceType = meteredVar.resource;
-                            thisVar.EndUse = meteredVar.endUse;
-                            if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
+                            if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                    thisComp.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::HeatingOnly;
+                                    thisComp.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
                                 }
                                 ModeFlagOn = false;
-                            } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
+                            } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                    thisComp.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::CoolingOnly;
+                                    thisComp.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
                                 }
                                 ModeFlagOn = false;
                             } else if (ModeFlagOn) {
-                                thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
+                                thisVar.heatOrCool = Constant::HeatOrCool::NoHeatNoCool;
                             }
-                            thisVar.Group = meteredVar.group;
                         }
 
                         meteredVars.deallocate();
@@ -2960,29 +2901,21 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             ModeFlagOn = true;
 
                             for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
+                                thisComp.SubComp(SubCompNum).MeteredVar(VarNum) = meteredVars(VarNum);
                                 auto &thisVar = thisComp.SubComp(SubCompNum).MeteredVar(VarNum);
-                                auto const &meteredVar = meteredVars(VarNum);
-                                thisVar.ReportVarName = meteredVar.name;
-                                thisVar.ReportVarUnits = meteredVar.units;
-                                thisVar.ReportVarIndex = meteredVar.num;
-                                thisVar.ReportVarIndexType = meteredVar.timeStepType;
-                                thisVar.ReportVarType = meteredVar.varType;
-                                thisVar.ResourceType = meteredVar.resource;
-                                thisVar.EndUse = meteredVar.endUse;
-                                if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
+                                if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
                                     for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                        thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).EndUse_CompMode = EndUseType::HeatingOnly;
+                                        thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
                                     }
                                     ModeFlagOn = false;
-                                } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
+                                } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
                                     for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                        thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).EndUse_CompMode = EndUseType::CoolingOnly;
+                                        thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
                                     }
                                     ModeFlagOn = false;
                                 } else if (ModeFlagOn) {
-                                    thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
+                                    thisVar.heatOrCool = Constant::HeatOrCool::NoHeatNoCool;
                                 }
-                                thisVar.Group = meteredVar.group;
                             }
 
                             meteredVars.deallocate();
@@ -3022,7 +2955,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
     int CompNum;
     int SubCompNum;
     int SubSubCompNum;
-    EndUseType CompMode;
+    Constant::HeatOrCool CompMode;
     int InletNodeNum;
     int OutletNodeNum;
     int ADUNum;
@@ -3109,9 +3042,9 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                 CompLoadFlag = false;
                 for (VarNum = 1; VarNum <= pasBranchComp.NumMeteredVars; ++VarNum) {
                     auto const &pasBranchCompMeter = pasBranchComp.MeteredVar(VarNum);
-                    CompMode = pasBranchCompMeter.EndUse_CompMode;
-                    CompEnergyUse = pasBranchCompMeter.CurMeterReading;
-                    EnergyType = pasBranchCompMeter.ResourceType;
+                    CompMode = pasBranchCompMeter.heatOrCool;
+                    CompEnergyUse = pasBranchCompMeter.curMeterReading;
+                    EnergyType = pasBranchCompMeter.resource;
                     CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                 }
 
@@ -3130,9 +3063,9 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                     CompLoadFlag = false;
                     for (VarNum = 1; VarNum <= pasBranchSubComp.NumMeteredVars; ++VarNum) {
                         auto const &pasBranchSubCompMeter = pasBranchSubComp.MeteredVar(VarNum);
-                        CompMode = pasBranchSubCompMeter.EndUse_CompMode;
-                        CompEnergyUse = pasBranchSubCompMeter.CurMeterReading;
-                        EnergyType = pasBranchSubCompMeter.ResourceType;
+                        CompMode = pasBranchSubCompMeter.heatOrCool;
+                        CompEnergyUse = pasBranchSubCompMeter.curMeterReading;
+                        EnergyType = pasBranchSubCompMeter.resource;
                         CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                     }
 
@@ -3152,16 +3085,16 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                         CompLoadFlag = false;
                         for (VarNum = 1; VarNum <= pasBranchSubSubComp.NumMeteredVars; ++VarNum) {
                             auto const &pasBranchSubSubCompMeter = pasBranchSubSubComp.MeteredVar(VarNum);
-                            CompMode = pasBranchSubSubCompMeter.EndUse_CompMode;
-                            CompEnergyUse = pasBranchSubSubCompMeter.CurMeterReading;
-                            EnergyType = pasBranchSubSubCompMeter.ResourceType;
+                            CompMode = pasBranchSubSubCompMeter.heatOrCool;
+                            CompEnergyUse = pasBranchSubSubCompMeter.curMeterReading;
+                            EnergyType = pasBranchSubSubCompMeter.resource;
                             CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchSubSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                         }
-                    }
-                }
-            }
-        }
-    }
+                    } // for (SubSubCompNum)
+                } // for (SubCompNum)
+            } // for (CompNum)
+        } // for (BranchNum)
+    } // for (AirLoopNum)
 
     for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
         auto const &zecCtrlZone = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);
@@ -3230,8 +3163,8 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                 CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                 CompLoadFlag = false;
                 for (VarNum = 1; VarNum <= zelEquipData.NumMeteredVars; ++VarNum) {
-                    CompEnergyUse = zelEquipData.MeteredVar(VarNum).CurMeterReading;
-                    EnergyType = zelEquipData.MeteredVar(VarNum).ResourceType;
+                    CompEnergyUse = zelEquipData.MeteredVar(VarNum).curMeterReading;
+                    EnergyType = zelEquipData.MeteredVar(VarNum).resource;
                     CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                 }
 
@@ -3249,8 +3182,8 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                     CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                     CompLoadFlag = false;
                     for (VarNum = 1; VarNum <= zelSubEquipData.NumMeteredVars; ++VarNum) {
-                        CompEnergyUse = zelSubEquipData.MeteredVar(VarNum).CurMeterReading;
-                        EnergyType = zelSubEquipData.MeteredVar(VarNum).ResourceType;
+                        CompEnergyUse = zelSubEquipData.MeteredVar(VarNum).curMeterReading;
+                        EnergyType = zelSubEquipData.MeteredVar(VarNum).resource;
                         CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                     }
 
@@ -3269,8 +3202,8 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                         CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelSubSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                         CompLoadFlag = false;
                         for (VarNum = 1; VarNum <= zelSubSubEquipData.NumMeteredVars; ++VarNum) {
-                            CompEnergyUse = zelSubSubEquipData.MeteredVar(VarNum).CurMeterReading;
-                            EnergyType = zelSubSubEquipData.MeteredVar(VarNum).ResourceType;
+                            CompEnergyUse = zelSubSubEquipData.MeteredVar(VarNum).curMeterReading;
+                            EnergyType = zelSubSubEquipData.MeteredVar(VarNum).resource;
                             CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, zelSubSubEquipData.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                         }
                     } // SubSubCompNum
@@ -3800,8 +3733,7 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     default:
         int found = 0;
         if (state.dataSysRpts->NumCompTypes > 0) {
-            found = UtilityRoutines::FindItemInList(
-                CompType, state.dataSysRpts->CompTypeErrors, &CompTypeError::CompType, state.dataSysRpts->NumCompTypes);
+            found = Util::FindItemInList(CompType, state.dataSysRpts->CompTypeErrors, &CompTypeError::CompType, state.dataSysRpts->NumCompTypes);
         }
         if (found == 0) {
             state.dataSysRpts->CompTypeErrors(++state.dataSysRpts->NumCompTypes).CompType = CompType;
@@ -4432,7 +4364,7 @@ void MatchPlantSys(EnergyPlusData &state,
         {
             auto &thisComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum);
             for (int VarNum = 1; VarNum <= thisComp.NumMeteredVars; ++VarNum) {
-                if (thisComp.MeteredVar(VarNum).ResourceType == Constant::eResource::EnergyTransfer) {
+                if (thisComp.MeteredVar(VarNum).resource == Constant::eResource::EnergyTransfer) {
                     thisComp.EnergyTransComp = EnergyTrans;
                     const std::string &CompType = thisComp.TypeOf;
                     const std::string &CompName = thisComp.Name;
@@ -4454,7 +4386,7 @@ void MatchPlantSys(EnergyPlusData &state,
                 {
                     auto &thisSubComp(thisComp.SubComp(SubCompNum));
                     for (int VarNum = 1; VarNum <= thisSubComp.NumMeteredVars; ++VarNum) {
-                        if (thisSubComp.MeteredVar(VarNum).ResourceType == Constant::eResource::EnergyTransfer) {
+                        if (thisSubComp.MeteredVar(VarNum).resource == Constant::eResource::EnergyTransfer) {
                             thisSubComp.EnergyTransComp = EnergyTrans;
                             const std::string &CompType = thisComp.TypeOf;
                             const std::string &CompName = thisComp.Name;
@@ -4477,7 +4409,7 @@ void MatchPlantSys(EnergyPlusData &state,
                         {
                             auto &thisSubSubComp = thisSubComp.SubSubComp(SubSubCompNum);
                             for (int VarNum = 1; VarNum <= thisSubSubComp.NumMeteredVars; ++VarNum) {
-                                if (thisSubSubComp.MeteredVar(VarNum).ResourceType == Constant::eResource::EnergyTransfer) {
+                                if (thisSubSubComp.MeteredVar(VarNum).resource == Constant::eResource::EnergyTransfer) {
                                     thisSubSubComp.EnergyTransComp = EnergyTrans;
                                     const std::string &CompType = thisComp.TypeOf;
                                     const std::string &CompName = thisComp.Name;
@@ -4558,16 +4490,16 @@ void FindDemandSideMatch(EnergyPlusData &state,
                      PassCompNum <=
                      state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).Branch(PassBranchNum).TotalComponents;
                      ++PassCompNum) {
-                    if (UtilityRoutines::SameString(CompType,
-                                                    state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
-                                                        .Branch(PassBranchNum)
-                                                        .Comp(PassCompNum)
-                                                        .TypeOf) &&
-                        UtilityRoutines::SameString(CompName,
-                                                    state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
-                                                        .Branch(PassBranchNum)
-                                                        .Comp(PassCompNum)
-                                                        .Name)) {
+                    if (Util::SameString(CompType,
+                                         state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
+                                             .Branch(PassBranchNum)
+                                             .Comp(PassCompNum)
+                                             .TypeOf) &&
+                        Util::SameString(CompName,
+                                         state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
+                                             .Branch(PassBranchNum)
+                                             .Comp(PassCompNum)
+                                             .Name)) {
                         // Found a match on the plant demand side--increment the counter
                         MatchFound = true;
                         MatchLoopType = 1;
@@ -4592,16 +4524,16 @@ void FindDemandSideMatch(EnergyPlusData &state,
                      PassCompNum <=
                      state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).Branch(PassBranchNum).TotalComponents;
                      ++PassCompNum) {
-                    if (UtilityRoutines::SameString(CompType,
-                                                    state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
-                                                        .Branch(PassBranchNum)
-                                                        .Comp(PassCompNum)
-                                                        .TypeOf) &&
-                        UtilityRoutines::SameString(CompName,
-                                                    state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
-                                                        .Branch(PassBranchNum)
-                                                        .Comp(PassCompNum)
-                                                        .Name)) {
+                    if (Util::SameString(CompType,
+                                         state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
+                                             .Branch(PassBranchNum)
+                                             .Comp(PassCompNum)
+                                             .TypeOf) &&
+                        Util::SameString(CompName,
+                                         state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
+                                             .Branch(PassBranchNum)
+                                             .Comp(PassCompNum)
+                                             .Name)) {
                         // Found a match on the plant demand side--increment the counter
                         MatchFound = true;
                         MatchLoopType = 2;

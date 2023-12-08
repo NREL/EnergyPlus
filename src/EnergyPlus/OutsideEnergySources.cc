@@ -541,16 +541,16 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, loop.MaxVolFlowRate);
 
     std::string reportVarPrefix = "District Heating Water ";
-    std::string heatingOrCooling = "Heating";
+    OutputProcessor::SOVEndUseCat heatingOrCooling = OutputProcessor::SOVEndUseCat::Heating;
     Constant::eResource meterTypeKey = Constant::eResource::DistrictHeatingWater;
 
     if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater) {
         reportVarPrefix = "District Cooling Water ";
-        heatingOrCooling = "Cooling";
+        heatingOrCooling = OutputProcessor::SOVEndUseCat::Cooling;
         meterTypeKey = Constant::eResource::DistrictCooling;
     } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchSteam) {
         reportVarPrefix = "District Heating Steam ";
-        heatingOrCooling = "Heating";
+        heatingOrCooling = OutputProcessor::SOVEndUseCat::Heating;
         meterTypeKey = Constant::eResource::DistrictHeatingSteam;
     }
     SetupOutputVariable(state,
@@ -564,7 +564,7 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
                         meterTypeKey,
                         heatingOrCooling,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
     SetupOutputVariable(state,
                         format("{}Rate", reportVarPrefix),
                         Constant::Units::W,

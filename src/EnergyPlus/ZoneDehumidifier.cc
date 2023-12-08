@@ -144,7 +144,7 @@ namespace ZoneDehumidifier {
 
         // Find the correct zone dehumidifier
         if (CompIndex == 0) {
-            ZoneDehumidNum = UtilityRoutines::FindItemInList(CompName, state.dataZoneDehumidifier->ZoneDehumid);
+            ZoneDehumidNum = Util::FindItemInList(CompName, state.dataZoneDehumidifier->ZoneDehumid);
             if (ZoneDehumidNum == 0) {
                 ShowFatalError(state, format("SimZoneDehumidifier: Unit not found= {}", CompName));
             }
@@ -251,7 +251,7 @@ namespace ZoneDehumidifier {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             // A1,  \field Name
             state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name = Alphas(1);
@@ -532,9 +532,9 @@ namespace ZoneDehumidifier {
                                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name,
                                 {},
                                 Constant::eResource::Electricity,
-                                "COOLING",
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Zone Dehumidifier Off Cycle Parasitic Electricity Rate",
                                 Constant::Units::W,
@@ -588,9 +588,9 @@ namespace ZoneDehumidifier {
                                     state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name,
                                     {},
                                     Constant::eResource::OnSiteWater,
-                                    "Condensate",
+                                    OutputProcessor::SOVEndUseCat::Condensate,
                                     {},
-                                    "System");
+                                    OutputProcessor::SOVGroup::HVAC);
             }
         }
     }

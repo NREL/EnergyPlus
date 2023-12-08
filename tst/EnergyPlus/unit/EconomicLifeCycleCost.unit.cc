@@ -487,19 +487,19 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetMonthNumber)
 {
-    EXPECT_EQ(0, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("January")));
-    EXPECT_EQ(1, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("February")));
-    EXPECT_EQ(2, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("March")));
-    EXPECT_EQ(3, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("April")));
-    EXPECT_EQ(4, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("May")));
-    EXPECT_EQ(5, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("June")));
-    EXPECT_EQ(6, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("July")));
-    EXPECT_EQ(7, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("August")));
-    EXPECT_EQ(8, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("September")));
-    EXPECT_EQ(9, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("October")));
-    EXPECT_EQ(10, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("November")));
-    EXPECT_EQ(11, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("December")));
-    EXPECT_EQ(-1, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("Hexember")));
+    EXPECT_EQ(0, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("January")));
+    EXPECT_EQ(1, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("February")));
+    EXPECT_EQ(2, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("March")));
+    EXPECT_EQ(3, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("April")));
+    EXPECT_EQ(4, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("May")));
+    EXPECT_EQ(5, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("June")));
+    EXPECT_EQ(6, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("July")));
+    EXPECT_EQ(7, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("August")));
+    EXPECT_EQ(8, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("September")));
+    EXPECT_EQ(9, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("October")));
+    EXPECT_EQ(10, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("November")));
+    EXPECT_EQ(11, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("December")));
+    EXPECT_EQ(-1, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("Hexember")));
 }
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
@@ -597,6 +597,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput_EnsureFuelTypesAllRecog
     const json &enum_values = resource_field.at("enum");
 
     // Should support all fuels + ElectricityXXX (Purchased, Produced, SurplusSold, Net)
+    // THIS IS BRITTLE AS HECK.  DON'T RELY ON SUBSETS OF ENUMERATIONS BEING IN SOME ORDER.
     constexpr size_t numResources = static_cast<size_t>(Constant::eFuel::Num) + 3;
     // Constant::eFuel::Num has 15 fuel types including "None" (which is a fuel type for "OtherEquipment")
     // "LifeCycleCost:UsePriceEscalation" has 18 fuel types including  ElectricityXXX (Purchased, Produced, SurplusSold, Net)
@@ -619,10 +620,11 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput_EnsureFuelTypesAllRecog
     });
     // All should be valid resources
     for (const auto &enum_value : enum_values) {
-        const std::string enum_string = enum_value.get<std::string>();
+        const std::string enum_string = Util::makeUPPER(enum_value.get<std::string>());
 
         const auto resource = static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, enum_string));
-        EXPECT_TRUE(compare_enums(Constant::eResource::Invalid, resource)) << "Failed for " << enum_string;
+        // WHY IS COMPARE ENUMS THIS WAY? 
+        EXPECT_FALSE(compare_enums(Constant::eResource::Invalid, resource, false)) << "Failed for " << enum_string;
 
         idf_objects += fmt::format(R"idf(
 LifeCycleCost:UsePriceEscalation,

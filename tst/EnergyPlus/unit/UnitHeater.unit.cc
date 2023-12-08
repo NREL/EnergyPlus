@@ -1129,6 +1129,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
 
+    UpdateMeterReporting(*state);
+
     SizingManager::ManageSizing(*state);
 
     EXPECT_FALSE(ErrorsFound);

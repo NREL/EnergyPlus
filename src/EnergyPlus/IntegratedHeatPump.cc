@@ -111,7 +111,7 @@ void SimIHP(EnergyPlusData &state,
     }
 
     if (CompIndex == 0) {
-        DXCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataIntegratedHP->IntegratedHeatPumps);
+        DXCoilNum = Util::FindItemInList(CompName, state.dataIntegratedHP->IntegratedHeatPumps);
         if (DXCoilNum == 0) {
             ShowFatalError(state, format("Integrated Heat Pump not found={}", CompName));
         }
@@ -1704,7 +1704,7 @@ int GetCoilIndexIHP(EnergyPlusData &state,
         state.dataIntegratedHP->GetCoilsInputFlag = false;
     }
 
-    IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
+    IndexNum = Util::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
 
     if (IndexNum == 0) {
         ShowSevereError(state, format(R"(GetCoilIndexIHP: Could not find CoilType="{}" with Name="{}")", CoilType, CoilName));
@@ -1743,7 +1743,7 @@ int GetCoilInletNodeIHP(EnergyPlusData &state,
         state.dataIntegratedHP->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
     if (WhichCoil != 0) {
         NodeNumber = state.dataIntegratedHP->IntegratedHeatPumps(WhichCoil).AirCoolInletNodeNum;
     }
@@ -1786,7 +1786,7 @@ int GetDWHCoilInletNodeIHP(EnergyPlusData &state,
         state.dataIntegratedHP->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
     if (WhichCoil != 0) {
         NodeNumber = state.dataIntegratedHP->IntegratedHeatPumps(WhichCoil).ODAirInletNodeNum;
     }
@@ -1829,7 +1829,7 @@ int GetDWHCoilOutletNodeIHP(EnergyPlusData &state,
         state.dataIntegratedHP->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
     if (WhichCoil != 0) {
         NodeNumber = state.dataIntegratedHP->IntegratedHeatPumps(WhichCoil).ODAirOutletNodeNum;
     }
@@ -1873,7 +1873,7 @@ int GetIHPDWHCoilPLFFPLR(EnergyPlusData &state,
         state.dataIntegratedHP->GetCoilsInputFlag = false;
     }
 
-    int WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
+    int WhichCoil = Util::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
     if (WhichCoil != 0) {
 
         auto &ihp = state.dataIntegratedHP->IntegratedHeatPumps(WhichCoil);
@@ -1927,7 +1927,7 @@ Real64 GetDWHCoilCapacityIHP(EnergyPlusData &state,
         state.dataIntegratedHP->GetCoilsInputFlag = false;
     }
 
-    int WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
+    int WhichCoil = Util::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
     if (WhichCoil != 0) {
 
         auto &ihp = state.dataIntegratedHP->IntegratedHeatPumps(WhichCoil);

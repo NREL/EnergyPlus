@@ -227,19 +227,24 @@ struct ErrorObjectHeader
     std::string_view objectName;
 };
 
+
 void ShowSevereDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh);
-void ShowSevereEmptyField(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName);
+void ShowSevereEmptyField(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName,
+                          std::string_view depFieldName = {}, std::string_view depFieldValue = {});
 void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
 void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
+void ShowSevereInvalidBool(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
 
 void ShowSevereCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg);
 void ShowWarningDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh);
-void ShowWarningEmptyField(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName);
-void ShowWarningItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
-void ShowWarningInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
+void ShowWarningEmptyField(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view defaultValue,
+                           std::string_view depFieldName = {}, std::string_view depFieldValue = {});
+void ShowWarningItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
+void ShowWarningInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
+void ShowWarningInvalidBool(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
 void ShowWarningCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg);
         
-namespace UtilityRoutines {
+namespace Util {
 
     static constexpr std::array<std::string_view, 12> MonthNamesCC{
         "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
@@ -262,7 +267,7 @@ namespace UtilityRoutines {
 
     inline int FindItemInList(std::string_view const String, Array1_string const &ListOfItems)
     {
-        return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
+        return Util::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
     int FindItemInList(std::string_view const String, Array1S_string const ListOfItems, int NumItems);
@@ -279,7 +284,7 @@ namespace UtilityRoutines {
 
     inline int FindItemInList(std::string_view const String, Array1S_string const ListOfItems)
     {
-        return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
+        return Util::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename A> inline int FindItemInList(std::string_view const String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
@@ -292,7 +297,7 @@ namespace UtilityRoutines {
 
     template <typename A> inline int FindItemInList(std::string_view const String, MArray1<A, std::string> const &ListOfItems)
     {
-        return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
+        return Util::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
@@ -319,14 +324,14 @@ namespace UtilityRoutines {
     // Container needs and operator[i] and elements need Name
     inline int FindItemInPtrList(std::string_view const String, Container const &ListOfItems)
     {
-        return UtilityRoutines::FindItemInPtrList(String, ListOfItems, ListOfItems.isize());
+        return Util::FindItemInPtrList(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs isize() and operator[i] and elements need Name
     inline int FindItemInList(std::string_view const String, Container const &ListOfItems)
     {
-        return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
+        return Util::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
@@ -344,7 +349,7 @@ namespace UtilityRoutines {
     // Container needs isize() and operator[i] and value_type
     inline int FindItemInList(std::string_view const String, Container const &ListOfItems, std::string Container::value_type::*name_p)
     {
-        return UtilityRoutines::FindItemInList(String, ListOfItems, name_p, ListOfItems.isize());
+        return Util::FindItemInList(String, ListOfItems, name_p, ListOfItems.isize());
     }
 
     int FindItemInSortedList(std::string_view const string, Array1S_string const ListOfItems, int NumItems);
@@ -433,7 +438,7 @@ namespace UtilityRoutines {
 
     template <typename A> inline int FindItem(std::string_view const String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
     {
-        int const item_number(UtilityRoutines::FindItemInList(String, ListOfItems, NumItems));
+        int const item_number(Util::FindItemInList(String, ListOfItems, NumItems));
         if (item_number != 0) return item_number;
         for (int Count = 1; Count <= NumItems; ++Count) {
             if (equali(String, ListOfItems(Count))) return Count;
@@ -450,7 +455,7 @@ namespace UtilityRoutines {
     // Container needs size() and operator[i] and elements need Name
     inline int FindItem(std::string_view const String, Container const &ListOfItems, int const NumItems)
     {
-        int const item_number(UtilityRoutines::FindItemInList(String, ListOfItems, NumItems));
+        int const item_number(Util::FindItemInList(String, ListOfItems, NumItems));
         if (item_number != 0) return item_number;
         for (typename Container::size_type i = 0, e = NumItems; i < e; ++i) {
             if (equali(String, ListOfItems[i].Name)) return i + 1; // 1-based return index
@@ -469,7 +474,7 @@ namespace UtilityRoutines {
     // Container needs size() and operator[i] and value_type
     inline int FindItem(std::string_view const String, Container const &ListOfItems, std::string Container::value_type::*name_p, int const NumItems)
     {
-        int const item_number(UtilityRoutines::FindItemInList(String, ListOfItems, name_p, NumItems));
+        int const item_number(Util::FindItemInList(String, ListOfItems, name_p, NumItems));
         if (item_number != 0) return item_number;
         for (typename Container::size_type i = 0, e = NumItems; i < e; ++i) {
             if (equali(String, ListOfItems[i].*name_p)) return i + 1; // 1-based return index
@@ -666,7 +671,7 @@ namespace UtilityRoutines {
 
     void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn = false);
 
-} // namespace UtilityRoutines
+} // namespace Util
 
 constexpr int getEnumValue(const gsl::span<const std::string_view> sList, const std::string_view s)
 {

@@ -1279,7 +1279,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     state->files.inputWeatherFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/HeatBalanceKivaManagerOSkyTest.epw";
-    state->dataWeatherManager->WeatherFileExists = true;
+    state->dataWeather->WeatherFileExists = true;
     HeatBalanceManager::GetHeatBalanceInput(*state);
 
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
@@ -2500,21 +2500,19 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     EXPECT_DOUBLE_EQ(0.25, state->dataSurface->Surface(3).ViewFactorSkyIR);
     EXPECT_DOUBLE_EQ(0.25, state->dataSurface->Surface(3).ViewFactorGroundIR);
     // Test if sky and grd view factor and temperature correctly overwritten
-    EXPECT_DOUBLE_EQ(
-        (Constant::StefanBoltzmann * 0.9 * 0.3 * (pow_4(20.0 + Constant::KelvinConv) - pow_4(15.0 + Constant::KelvinConv)) / (20.0 - 15.0)),
-        state->dataHeatBalSurf->SurfHSkyExt(1));
-    EXPECT_DOUBLE_EQ(
-        (Constant::StefanBoltzmann * 0.9 * 0.1 * (pow_4(20.0 + Constant::KelvinConv) - pow_4(22.0 + Constant::KelvinConv)) / (20.0 - 22.0)),
-        state->dataHeatBalSurf->SurfHGrdExt(1));
+    EXPECT_DOUBLE_EQ((Constant::StefanBoltzmann * 0.9 * 0.3 * (pow_4(20.0 + Constant::Kelvin) - pow_4(15.0 + Constant::Kelvin)) / (20.0 - 15.0)),
+                     state->dataHeatBalSurf->SurfHSkyExt(1));
+    EXPECT_DOUBLE_EQ((Constant::StefanBoltzmann * 0.9 * 0.1 * (pow_4(20.0 + Constant::Kelvin) - pow_4(22.0 + Constant::Kelvin)) / (20.0 - 22.0)),
+                     state->dataHeatBalSurf->SurfHGrdExt(1));
 
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 * 0.6 * (pow_4(25.0 + Constant::KelvinConv) - pow_4(20.0 + Constant::KelvinConv)),
+    EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 * 0.6 * (pow_4(25.0 + Constant::Kelvin) - pow_4(20.0 + Constant::Kelvin)),
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(1));
     EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 *
-                         (0.3 * (pow_4(25.0 + Constant::KelvinConv) - pow_4(20.0 + Constant::KelvinConv)) +
-                          0.3 * (pow_4(25.0 + Constant::KelvinConv) - pow_4(20.0 + Constant::KelvinConv))),
+                         (0.3 * (pow_4(25.0 + Constant::Kelvin) - pow_4(20.0 + Constant::Kelvin)) +
+                          0.3 * (pow_4(25.0 + Constant::Kelvin) - pow_4(20.0 + Constant::Kelvin))),
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(2));
-    EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 * 0.5 * (pow_4(25.0 + Constant::KelvinConv) - pow_4(20.0 + Constant::KelvinConv)),
+    EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 * 0.5 * (pow_4(25.0 + Constant::Kelvin) - pow_4(20.0 + Constant::Kelvin)),
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(3));
     EXPECT_DOUBLE_EQ(0.0, state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(4));
 }
@@ -3727,15 +3725,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportR
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    state->dataWeatherManager->TotReportPers = 2;
+    state->dataWeather->TotReportPers = 2;
 
-    WeatherManager::GetReportPeriodData(*state, state->dataWeatherManager->TotReportPers, ErrorsFound);
-    state->dataWeatherManager->TotThermalReportPers = 0;
-    state->dataWeatherManager->TotCO2ReportPers = 0;
-    state->dataWeatherManager->TotVisualReportPers = 0;
-    WeatherManager::GroupReportPeriodByType(*state, state->dataWeatherManager->TotReportPers);
+    Weather::GetReportPeriodData(*state, state->dataWeather->TotReportPers, ErrorsFound);
+    state->dataWeather->TotThermalReportPers = 0;
+    state->dataWeather->TotCO2ReportPers = 0;
+    state->dataWeather->TotVisualReportPers = 0;
+    Weather::GroupReportPeriodByType(*state, state->dataWeather->TotReportPers);
 
-    EXPECT_EQ(state->dataWeatherManager->TotThermalReportPers, 2);
+    EXPECT_EQ(state->dataWeather->TotThermalReportPers, 2);
 
     state->dataGlobal->NumOfZones = 1;
     state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather;
@@ -3759,28 +3757,22 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportR
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.dimension(state->dataGlobal->NumOfZones, 22.0);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.dimension(state->dataGlobal->NumOfZones, 28.0);
 
-    state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
-    state->dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
-    state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                          state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHumidexHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
     state->dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                              state->dataWeatherManager->TotThermalReportPers);
-    state->dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                        state->dataWeatherManager->TotThermalReportPers);
-    state->dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                            state->dataWeatherManager->TotThermalReportPers);
-    state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                         state->dataWeatherManager->TotThermalReportPers);
-    state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                         state->dataWeatherManager->TotThermalReportPers);
-    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                        state->dataWeatherManager->TotThermalReportPers);
+                                                                              state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHumidexOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHumidexOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneColdHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHeatHourOfSafetyBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
     state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccuHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                                   state->dataWeatherManager->TotThermalReportPers);
+                                                                                   state->dataWeather->TotThermalReportPers);
     state->dataHeatBalFanSys->ZoneDiscomfortWtExceedOccupiedHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones,
-                                                                                       state->dataWeatherManager->TotThermalReportPers);
-    state->dataHeatBalFanSys->CrossedColdThreshRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
-    state->dataHeatBalFanSys->CrossedHeatThreshRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+                                                                                       state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->CrossedColdThreshRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->CrossedHeatThreshRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
     state->dataHeatBalFanSys->CrossedColdThreshRepPeriod = false;
     state->dataHeatBalFanSys->CrossedHeatThreshRepPeriod = false;
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.dimension(state->dataGlobal->NumOfZones, 22.0);
@@ -3800,12 +3792,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestThermalResilienceReportR
     state->dataScheduleMgr->Schedule.allocate(1);
 
     state->dataThermalComforts->ThermalComfortData.allocate(state->dataHeatBal->TotPeople);
-    state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
-    state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
-    state->dataHeatBalFanSys->lowSETLongestHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
-    state->dataHeatBalFanSys->highSETLongestHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
-    state->dataHeatBalFanSys->lowSETLongestStartRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
-    state->dataHeatBalFanSys->highSETLongestStartRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->ZoneHighSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->lowSETLongestHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->highSETLongestHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->lowSETLongestStartRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
+    state->dataHeatBalFanSys->highSETLongestStartRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotThermalReportPers);
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 31;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
 
@@ -4221,19 +4213,19 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestCO2ResilienceReportRepPe
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    state->dataWeatherManager->TotReportPers = 2;
+    state->dataWeather->TotReportPers = 2;
 
-    WeatherManager::GetReportPeriodData(*state, state->dataWeatherManager->TotReportPers, ErrorsFound);
-    state->dataWeatherManager->TotThermalReportPers = 0;
-    state->dataWeatherManager->TotCO2ReportPers = 0;
-    state->dataWeatherManager->TotVisualReportPers = 0;
-    WeatherManager::GroupReportPeriodByType(*state, state->dataWeatherManager->TotReportPers);
+    Weather::GetReportPeriodData(*state, state->dataWeather->TotReportPers, ErrorsFound);
+    state->dataWeather->TotThermalReportPers = 0;
+    state->dataWeather->TotCO2ReportPers = 0;
+    state->dataWeather->TotVisualReportPers = 0;
+    Weather::GroupReportPeriodByType(*state, state->dataWeather->TotReportPers);
 
-    EXPECT_EQ(state->dataWeatherManager->TotCO2ReportPers, 2);
+    EXPECT_EQ(state->dataWeather->TotCO2ReportPers, 2);
 
-    state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotCO2ReportPers);
-    state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotCO2ReportPers);
-    state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotCO2ReportPers);
+    state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod.allocate(1, state->dataWeather->TotCO2ReportPers);
+    state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod.allocate(1, state->dataWeather->TotCO2ReportPers);
+    state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod.allocate(1, state->dataWeather->TotCO2ReportPers);
 
     state->dataGlobal->NumOfZones = 1;
     state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather;
@@ -4256,7 +4248,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestCO2ResilienceReportRepPe
 
     int NoBins = 3;
 
-    for (int i = 1; i <= state->dataWeatherManager->TotCO2ReportPers; i++) {
+    for (int i = 1; i <= state->dataWeather->TotCO2ReportPers; i++) {
         state->dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
         state->dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
         state->dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
@@ -4375,19 +4367,19 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestVisualResilienceReportRe
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    state->dataWeatherManager->TotReportPers = 2;
+    state->dataWeather->TotReportPers = 2;
 
-    WeatherManager::GetReportPeriodData(*state, state->dataWeatherManager->TotReportPers, ErrorsFound);
-    state->dataWeatherManager->TotThermalReportPers = 0;
-    state->dataWeatherManager->TotCO2ReportPers = 0;
-    state->dataWeatherManager->TotVisualReportPers = 0;
-    WeatherManager::GroupReportPeriodByType(*state, state->dataWeatherManager->TotReportPers);
+    Weather::GetReportPeriodData(*state, state->dataWeather->TotReportPers, ErrorsFound);
+    state->dataWeather->TotThermalReportPers = 0;
+    state->dataWeather->TotCO2ReportPers = 0;
+    state->dataWeather->TotVisualReportPers = 0;
+    Weather::GroupReportPeriodByType(*state, state->dataWeather->TotReportPers);
 
-    EXPECT_EQ(state->dataWeatherManager->TotVisualReportPers, 2);
+    EXPECT_EQ(state->dataWeather->TotVisualReportPers, 2);
 
-    state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotVisualReportPers);
-    state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotVisualReportPers);
-    state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod.allocate(1, state->dataWeatherManager->TotVisualReportPers);
+    state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod.allocate(1, state->dataWeather->TotVisualReportPers);
+    state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod.allocate(1, state->dataWeather->TotVisualReportPers);
+    state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod.allocate(1, state->dataWeather->TotVisualReportPers);
 
     state->dataGlobal->NumOfZones = 1;
     state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather;
@@ -4424,7 +4416,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestVisualResilienceReportRe
 
     int NoBins = 4;
 
-    for (int i = 1; i <= state->dataWeatherManager->TotVisualReportPers; i++) {
+    for (int i = 1; i <= state->dataWeather->TotVisualReportPers; i++) {
         state->dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
         state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
         state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, i).assign(NoBins, 0.0);
@@ -7121,11 +7113,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySurfToGndLWR
     state->dataSurface->SurfTAirRef(3) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
 
     // default surface view factors
-    int SurfNum = UtilityRoutines::FindItemInList("LIVING:NORTH", state->dataSurface->Surface);
+    int SurfNum = Util::FindItemInList("LIVING:NORTH", state->dataSurface->Surface);
     auto &Surface_Living_North = state->dataSurface->Surface(SurfNum);
-    SurfNum = UtilityRoutines::FindItemInList("LIVING:EAST", state->dataSurface->Surface);
+    SurfNum = Util::FindItemInList("LIVING:EAST", state->dataSurface->Surface);
     auto &Surface_Living_East = state->dataSurface->Surface(SurfNum);
-    SurfNum = UtilityRoutines::FindItemInList("LIVING:SOUTH", state->dataSurface->Surface);
+    SurfNum = Util::FindItemInList("LIVING:SOUTH", state->dataSurface->Surface);
     auto &Surface_Living_South = state->dataSurface->Surface(SurfNum);
 
     // check exterior default surfaces sky and ground view factors
@@ -7168,8 +7160,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySurfToGndLWR
     Real64 result_LWRExchangeCoeff_surf2 = 0.0;
     Real64 result_LWRExchangeCoeff_surf3 = 0.0;
     // set exterior surface and ground surface temperatures
-    Real64 surf_TK = 20.0 + Constant::KelvinConv;
-    Real64 grnd_TK = 22.0 + Constant::KelvinConv;
+    Real64 surf_TK = 20.0 + Constant::Kelvin;
+    Real64 grnd_TK = 22.0 + Constant::Kelvin;
     // calculate LWR exchange coefficent from exterior surface to ground
     result_LWRExchangeCoeff_surf1 = Constant::StefanBoltzmann * 0.9 * 0.5 * (pow_4(surf_TK) - pow_4(grnd_TK)) / (surf_TK - grnd_TK);
     result_LWRExchangeCoeff_surf2 = Constant::StefanBoltzmann * 0.9 * 0.2 * (pow_4(surf_TK) - pow_4(grnd_TK)) / (surf_TK - grnd_TK);
@@ -7401,12 +7393,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageTemp)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
     // test surface property object inputs
-    int SrdSurfsNum = UtilityRoutines::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
+    int SrdSurfsNum = Util::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
     EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(SrdSurfsNum).SurroundingSurfsPtr);
-    int GndSurfsNum = UtilityRoutines::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
+    int GndSurfsNum = Util::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
     EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(GndSurfsNum).GroundSurfsPtr);
     // set local derived data vars
-    int SurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    int SurfNum = Util::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
     SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
     auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
     GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
@@ -7437,7 +7429,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageTemp)
     // test 1: surface viewing grass, parking and lake areas
     // calculate ground surfaces average temperature
     GetGroundSurfacesTemperatureAverage(*state);
-    Real64 dTK = Constant::KelvinConv;
+    Real64 dTK = Constant::Kelvin;
     Real64 results_gndSurfsAvgTemp = 0.0;
     results_gndSurfsAvgTemp = root_4((0.2 * pow_4(25.0 + dTK) + 0.1 * pow_4(28.0 + dTK) + 0.1 * pow_4(22.0 + dTK)) / (0.2 + 0.1 + 0.1)) - dTK;
     // check ground surfaces average temperature
@@ -7722,12 +7714,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageRefl)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
     // test surface property object inputs
-    int SrdSurfsNum = UtilityRoutines::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
+    int SrdSurfsNum = Util::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
     EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(SrdSurfsNum).SurroundingSurfsPtr);
-    int GndSurfsNum = UtilityRoutines::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
+    int GndSurfsNum = Util::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
     EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(GndSurfsNum).GroundSurfsPtr);
     // set local derived data vars
-    int SurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    int SurfNum = Util::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
     SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
     auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
     GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
@@ -8367,11 +8359,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsR
     state->dataSurface->SurfTAirRef(3) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
 
     // check default surface view factors
-    int SurfNum = UtilityRoutines::FindItemInList("LIVING:NORTH", state->dataSurface->Surface);
+    int SurfNum = Util::FindItemInList("LIVING:NORTH", state->dataSurface->Surface);
     auto &Surface_Living_North = state->dataSurface->Surface(SurfNum);
-    SurfNum = UtilityRoutines::FindItemInList("LIVING:EAST", state->dataSurface->Surface);
+    SurfNum = Util::FindItemInList("LIVING:EAST", state->dataSurface->Surface);
     auto &Surface_Living_East = state->dataSurface->Surface(SurfNum);
-    SurfNum = UtilityRoutines::FindItemInList("LIVING:SOUTH", state->dataSurface->Surface);
+    SurfNum = Util::FindItemInList("LIVING:SOUTH", state->dataSurface->Surface);
     auto &Surface_Living_South = state->dataSurface->Surface(SurfNum);
     // check exterior default surfaces sky and ground view factors
     EXPECT_DOUBLE_EQ(0.5, Surface_Living_North.ViewFactorSkyIR);
@@ -8382,17 +8374,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsR
     EXPECT_DOUBLE_EQ(0.5, Surface_Living_South.ViewFactorGroundIR);
 
     // set local derived data vars
-    SurfNum = UtilityRoutines::FindItemInList("LIVING:NORTH", state->dataSurface->Surface);
+    SurfNum = Util::FindItemInList("LIVING:NORTH", state->dataSurface->Surface);
     int SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
     auto &SrdSurfsProperty_1 = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
     int GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
     auto &GndSurfsProperty_1 = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
-    SurfNum = UtilityRoutines::FindItemInList("LIVING:EAST", state->dataSurface->Surface);
+    SurfNum = Util::FindItemInList("LIVING:EAST", state->dataSurface->Surface);
     SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
     auto &SrdSurfsProperty_2 = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
     GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
     auto &GndSurfsProperty_2 = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
-    SurfNum = UtilityRoutines::FindItemInList("LIVING:SOUTH", state->dataSurface->Surface);
+    SurfNum = Util::FindItemInList("LIVING:SOUTH", state->dataSurface->Surface);
     SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
     auto &SrdSurfsProperty_3 = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
     GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
@@ -8905,10 +8897,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurroundingSurfacesTempTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
     // test surface property object inputs
-    int srdSurfsPropNum = UtilityRoutines::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
+    int srdSurfsPropNum = Util::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
     EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(srdSurfsPropNum).SurroundingSurfsPtr);
     // set local derived data vars
-    int surfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    int surfNum = Util::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
     auto &surface = state->dataSurface->Surface(surfNum);
     int srdSurfsNum = state->dataSurface->Surface(surfNum).SurfSurroundingSurfacesNum;
     auto &srdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(srdSurfsNum);
@@ -8919,10 +8911,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurroundingSurfacesTempTest)
     Real64 SrdSurfaceTemp = 0.0;
     Real64 SrdSurfaceTempSum = 0.0;
     for (auto &surdSurfs : srdSurfsProperty.SurroundingSurfs) {
-        SrdSurfaceTemp = ScheduleManager::GetCurrentScheduleValue(*state, surdSurfs.TempSchNum) + Constant::KelvinConv;
+        SrdSurfaceTemp = ScheduleManager::GetCurrentScheduleValue(*state, surdSurfs.TempSchNum) + Constant::Kelvin;
         SrdSurfaceTempSum += surdSurfs.ViewFactor * pow_4(SrdSurfaceTemp);
     }
-    Real64 srdSurfacesTemp_result = root_4(SrdSurfaceTempSum / surface.ViewFactorSrdSurfs) - Constant::KelvinConv;
+    Real64 srdSurfacesTemp_result = root_4(SrdSurfaceTempSum / surface.ViewFactorSrdSurfs) - Constant::Kelvin;
     // check average temperature of surrounding surfaces
     EXPECT_DOUBLE_EQ(srdSurfacesTemp_result, surface.SrdSurfTemp);
 }

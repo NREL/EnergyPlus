@@ -94,7 +94,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
                         "Lite1",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electric Energy",
@@ -105,7 +105,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
                         "Lite2",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electric Energy",
@@ -116,7 +116,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
                         "Lite3",
                         {},
                         Constant::eResource::Electricity,
-                        "Exterior Lights",
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electric Power",

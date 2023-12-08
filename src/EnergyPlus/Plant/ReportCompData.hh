@@ -49,7 +49,6 @@
 #define PlantReportingReportCompData_hh_INCLUDED
 
 #include <EnergyPlus/Plant/Connection.hh>
-#include <EnergyPlus/Plant/MeterData.hh>
 #include <EnergyPlus/Plant/Subcomponents.hh>
 
 namespace EnergyPlus {
@@ -73,7 +72,7 @@ namespace DataPlant {
         Real64 TotPlantSupplyPurch;
         Real64 TotPlantSupplyOther;
         PlantConnection ConnectPlant;  // Index of energy output report data
-        Array1D<MeterData> MeteredVar; // Index of energy output report data
+        Array1D<OutputProcessor::MeterData> MeteredVar; // Index of energy output report data
         Array1D<SubcomponentData> SubComp;
 
         // Default Constructor

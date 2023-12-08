@@ -564,7 +564,7 @@ namespace OutputReportTabular {
 
     void AddTOCReportPeriod(const int nReportPeriods,
                             const std::string &kw,
-                            const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                            const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData,
                             std::ostream &tbl_stream);
 
     //======================================================================================================================
@@ -650,7 +650,7 @@ namespace OutputReportTabular {
                                        Array2D_string &tableBody,
                                        const int rowid,
                                        const int periodIdx,
-                                       const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData);
+                                       const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData);
 
     void WriteVeriSumTable(EnergyPlusData &state);
 
@@ -663,7 +663,7 @@ namespace OutputReportTabular {
     void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
                                           const std::string &reportKeyWord,
                                           const int periodIdx,
-                                          const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData);
+                                          const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData);
 
     void WriteReportPeriodTimeConsumption(EnergyPlusData &state);
 
@@ -1048,14 +1048,14 @@ struct OutputReportTabularData : BaseGlobalStruct
     // arrays that hold the meter numbers that are initialized at get input
 
 
-    Array1D_int meterNumTotalsBEPS = Array1D_int(OutputReportTabular::numResourceTypes, 0);
-    Array1D_int meterNumTotalsSource = Array1D_int(OutputReportTabular::numSourceTypes, 0);
+    Array1D_int meterNumTotalsBEPS = Array1D_int(OutputReportTabular::numResourceTypes, -1);
+    Array1D_int meterNumTotalsSource = Array1D_int(OutputReportTabular::numSourceTypes, -1);
     Array1D_bool fuelfactorsused = Array1D_bool(OutputReportTabular::numSourceTypes, false);
     Array1D_bool ffUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
     Array1D<Real64> SourceFactors = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
     Array1D_bool ffSchedUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
     Array1D_int ffSchedIndex = Array1D_int(OutputReportTabular::numResourceTypes, 0);
-    Array2D_int meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, static_cast<int>(Constant::EndUse::Num), 0);
+    Array2D_int meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, static_cast<int>(Constant::EndUse::Num), -1);
     Array3D_int meterNumEndUseSubBEPS;
     Array3D_int meterNumEndUseSpTypeBEPS;
     // arrays that hold the names of the resource and end uses

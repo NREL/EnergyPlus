@@ -467,9 +467,9 @@ void FluidCoolerspecs::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::Electricity,
-                        "HeatRejection",
+                        OutputProcessor::SOVEndUseCat::HeatRejection,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 }
 
 bool FluidCoolerspecs::validateSingleSpeedInputs(EnergyPlusData &state,
@@ -563,7 +563,7 @@ bool FluidCoolerspecs::validateSingleSpeedInputs(EnergyPlusData &state,
     }
 
     //   Check various inputs for both the performance input methods
-    if (UtilityRoutines::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
+    if (Util::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
         this->PerformanceInputMethod_Num = PerfInputMethod::U_FACTOR;
         if (this->HighSpeedFluidCoolerUA <= 0.0 && this->HighSpeedFluidCoolerUA != DataSizing::AutoSize) {
             ShowSevereError(state,
@@ -575,7 +575,7 @@ bool FluidCoolerspecs::validateSingleSpeedInputs(EnergyPlusData &state,
                                    AlphArray(4)));
             ErrorsFound = true;
         }
-    } else if (UtilityRoutines::SameString(AlphArray(4), "NominalCapacity")) {
+    } else if (Util::SameString(AlphArray(4), "NominalCapacity")) {
         this->PerformanceInputMethod_Num = PerfInputMethod::NOMINAL_CAPACITY;
         if (this->FluidCoolerNominalCapacity <= 0.0) {
             ShowSevereError(state,
@@ -738,7 +738,7 @@ bool FluidCoolerspecs::validateTwoSpeedInputs(EnergyPlusData &state,
         ErrorsFound = true;
     }
 
-    if (UtilityRoutines::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
+    if (Util::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
         this->PerformanceInputMethod_Num = PerfInputMethod::U_FACTOR;
         if (this->HighSpeedFluidCoolerUA <= 0.0 && !this->HighSpeedFluidCoolerUAWasAutoSized) {
             ShowSevereError(state,
@@ -767,7 +767,7 @@ bool FluidCoolerspecs::validateTwoSpeedInputs(EnergyPlusData &state,
                                    this->Name));
             ErrorsFound = true;
         }
-    } else if (UtilityRoutines::SameString(AlphArray(4), "NominalCapacity")) {
+    } else if (Util::SameString(AlphArray(4), "NominalCapacity")) {
         this->PerformanceInputMethod_Num = PerfInputMethod::NOMINAL_CAPACITY;
         if (this->FluidCoolerNominalCapacity <= 0.0) {
             ShowSevereError(state,

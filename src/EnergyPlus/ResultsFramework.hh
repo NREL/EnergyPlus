@@ -378,6 +378,7 @@ namespace ResultsFramework {
         void initializeMeters(const std::vector<OutputProcessor::Meter*> &EnergyMeters, const ReportFreq reportFrequency);
 
         std::array<DataFrame, (int)TimeStepType::Num> detailedTSData = {
+            DataFrame("Dummy"),
             DataFrame("Detailed-Zone"), 
             DataFrame("Detailed-HVAC")
         };

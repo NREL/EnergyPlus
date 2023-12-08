@@ -153,7 +153,7 @@ namespace MatrixDataManager {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             ++MatNum;
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataMatrixDataManager->MatData(MatNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             NumRows = std::floor(state.dataIPShortCut->rNumericArgs(1));
@@ -209,7 +209,7 @@ namespace MatrixDataManager {
 
         // METHODOLOGY EMPLOYED:
         // inputs name of matrix and returns integer index
-        // currently uses UtilityRoutines::FindItemInList( which is case sensitive
+        // currently uses Util::FindItemInList( which is case sensitive
 
         // Return value
         int MatrixIndexPtr; // Function result
@@ -222,7 +222,7 @@ namespace MatrixDataManager {
         }
 
         if (state.dataMatrixDataManager->NumMats > 0) {
-            MatrixIndexPtr = UtilityRoutines::FindItemInList(MatrixName, state.dataMatrixDataManager->MatData);
+            MatrixIndexPtr = Util::FindItemInList(MatrixName, state.dataMatrixDataManager->MatData);
         } else {
             MatrixIndexPtr = 0;
         }

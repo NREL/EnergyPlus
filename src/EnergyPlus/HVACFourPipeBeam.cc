@@ -398,9 +398,9 @@ namespace FourPipeBeam {
                                 thisBeam->name,
                                 {},
                                 Constant::eResource::EnergyTransfer,
-                                "COOLINGCOILS",
+                                OutputProcessor::SOVEndUseCat::CoolingCoils,
                                 {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Beam Sensible Cooling Rate",
                                 Constant::Units::W,
@@ -419,9 +419,9 @@ namespace FourPipeBeam {
                                 thisBeam->name,
                                 {},
                                 Constant::eResource::EnergyTransfer,
-                                "HEATINGCOILS",
+                                OutputProcessor::SOVEndUseCat::HeatingCoils,
                                 {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Beam Sensible Heating Rate",
                                 Constant::Units::W,

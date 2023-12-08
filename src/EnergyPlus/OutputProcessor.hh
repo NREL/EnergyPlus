@@ -56,7 +56,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -116,6 +115,7 @@ namespace OutputProcessor {
     enum class VariableType
     {
         Invalid = -1,
+        NotFound, // ref: GetVariableKeyCountandType, 0 = not found // TODO: This is actually used separately from Invalid, need to get rid of it
         Integer, // ref: GetVariableKeyCountandType, 1 = integer
         Real,     // ref: GetVariableKeyCountandType, 2 = real
         Meter,    // ref: GetVariableKeyCountandType, 3 = meter
@@ -193,14 +193,15 @@ namespace OutputProcessor {
     enum class StoreType
     {
         Invalid = -1,
-        Averaged,     // Type value for "averaged" variables
+        Averaged = 1,     // Type value for "averaged" variables // TODO: is this just for printing annual tables
         Summed,       // Type value for "summed" variables
         Num
     };
 
     constexpr std::array<std::string_view, (int)StoreType::Num> storeTypeNames = {
-       "Average", // Averaged
-       "Sum" // Summed
+        "UNUSED",
+        "Average", // Averaged
+        "Sum" // Summed
     };
 
     constexpr std::array<StoreType, (int)SOVStoreType::Num> sovStoreType2StoreType = {
@@ -212,12 +213,13 @@ namespace OutputProcessor {
     enum class TimeStepType
     {
         Invalid = -1,
-        Zone,   // Type value for "zone" timestep variables
+        Zone = 1, // Type value for "zone" timestep variables // TODO: is this just for printing Annual tables?
         System, // Type value for "system" timestep variables
         Num
     };
 
     constexpr std::array<std::string_view, (int)TimeStepType::Num> timeStepNames = {
+        "UNUSED",
         "Zone", // Zone
         "HVAC" // System
     };
@@ -228,6 +230,235 @@ namespace OutputProcessor {
         TimeStepType::System, // HVAC
         TimeStepType::Zone, // Zone
         TimeStepType::System}; // Plant
+
+    enum class SOVEndUseCat
+    {
+        Invalid = -1,
+        Heating,
+        Cooling,
+        InteriorLights,
+        ExteriorLights,
+        InteriorEquipment,
+        ExteriorEquipment,
+        Fans,
+        Pumps,
+        HeatRejection,
+        Humidification,
+        HeatRecovery,
+        WaterSystem,
+        Refrigeration,
+        Cogeneration,
+        Baseboard,
+        Boilers,
+        CarbonEquivalentEmissions,
+        Chillers,
+        CoalEmissions,
+        ColdStorageCharge,
+        ColdStorageDischarge,
+        Condensate,
+        CoolingCoils,
+        CoolingPanel,
+        DieselEmissions,
+        DistrictChilledWater,
+        DistrictHotWater,
+        ElectricityEmissions,
+        ElectricStorage,
+        FreeCooling,
+        FuelOilNo1Emissions,
+        FuelOilNo2Emissions,
+        GasolineEmissions,
+        HeatingCoils,
+        HeatProduced,
+        HeatRecoveryForCooling,
+        HeatRecoveryForHeating,
+        LoopToLoop,
+        MainsWater,
+        NaturalGasEmissions,
+        OtherFuel1Emissions,
+        OtherFuel2Emissions,
+        Photovoltaic,
+        PowerConversion,
+        PropaneEmissions,
+        PurchasedElectricityEmissions,
+        RainWater,
+        SoldElectricityEmissions,
+        WellWater,
+        WindTurbine,
+        Num
+    };
+
+    static constexpr std::array<std::string_view, (int)SOVEndUseCat::Num> sovEndUseCatNames = {
+        "Heating",
+        "Cooling",
+        "InteriorLights",
+        "ExteriorLights",
+        "InteriorEquipment",
+        "ExteriorEquipment",
+        "Fans",
+        "Pumps",
+        "HeatRejection",
+        "Humidifier",
+        "HeatRecovery",
+        "WaterSystems",
+        "Refrigeration",
+        "Cogeneration",
+        "Baseboard",
+        "Boilers",
+        "CarbonEquivalentEmissions",
+        "Chillers",
+        "CoalEmissions",
+        "ColdStorageCharge",
+        "ColdStorageDischarge",
+        "Condensate",
+        "CoolingCoils",
+        "CoolingPanel",
+        "DieselEmissions",
+        "DistrictChilledWater",
+        "DistrictHotWater",
+        "ElectricityEmissions",
+        "ElectricStorage",
+        "FreeCooling",
+        "FuelOilNo1Emissions",
+        "FuelOilNo2Emissions",
+        "GasolineEmissions",
+        "HeatingCoils",
+        "HeatProduced",
+        "HeatRecoveryForCooling",
+        "HeatRecoveryForHeating",
+        "LoopToLoop",
+        "MainsWater",
+        "NaturalGasEmissions",
+        "OtherFuel1Emissions",
+        "OtherFuel2Emissions",
+        "Photovoltaic",
+        "PowerConversion",
+        "PropaneEmissions",
+        "PurchasedElectricityEmissions",
+        "RainWater",
+        "SoldElectricityEmissions",
+        "WellWater",
+        "WindTurbine"
+    }; 
+
+    static constexpr std::array<std::string_view, (int)SOVEndUseCat::Num> sovEndUseCatNamesUC = {
+        "HEATING",
+        "COOLING",
+        "INTERIORLIGHTS",
+        "EXTERIORLIGHTS",
+        "INTERIOREQUIPMENT",
+        "EXTERIOREQUIPMENT",
+        "FANS",
+        "PUMPS",
+        "HEATREJECTION",
+        "HUMIDIFIER",
+        "HEATRECOVERY",
+        "WATERSYSTEMS",
+        "REFRIGERATION",
+        "COGENERATION",
+        "BASEBOARD",
+        "BOILERS",
+        "CARBONEQUIVALENTEMISSIONS",
+        "CHILLERS",
+        "COALEMISSIONS",
+        "COLDSTORAGECHARGE",
+        "COLDSTORAGEDISCHARGE",
+        "CONDENSATE",
+        "COOLINGCOILS",
+        "COOLINGPANEL",
+        "DIESELEMISSIONS",
+        "DISTRICTCHILLEDWATER",
+        "DISTRICTHOTWATER",
+        "ELECTRICITYEMISSIONS",
+        "ELECTRICSTORAGE",
+        "FREECOOLING",
+        "FUELOILNO1EMISSIONS",
+        "FUELOILNO2EMISSIONS",
+        "GASOLINEEMISSIONS",
+        "HEATINGCOILS",
+        "HEATPRODUCED",
+        "HEATRECOVERYFORCOOLING",
+        "HEATRECOVERYFORHEATING",
+        "LOOPTOLOOP",
+        "MAINSWATER",
+        "NATURALGASEMISSIONS",
+        "OTHERFUEL1EMISSIONS",
+        "OTHERFUEL2EMISSIONS",
+        "PHOTOVOLTAIC",
+        "POWERCONVERSION",
+        "PROPANEEMISSIONS",
+        "PURCHASEDELECTRICITYEMISSIONS",
+        "RAINWATER",
+        "SOLDELECTRICITYEMISSIONS",
+        "WELLWATER",
+        "WINDTURBINE"
+    }; 
+        
+    static constexpr std::array<Constant::EndUse, (int)SOVEndUseCat::Num> sovEndUseCat2endUse = {
+        Constant::EndUse::Heating, // Heating
+        Constant::EndUse::Cooling, // Cooling
+        Constant::EndUse::InteriorLights, // InteriorLights
+        Constant::EndUse::ExteriorLights, // ExteriorLights
+        Constant::EndUse::InteriorEquipment, // InteriorEquipment
+        Constant::EndUse::ExteriorEquipment, // ExteriorEquipment
+        Constant::EndUse::Fans, // Fans
+        Constant::EndUse::Pumps, // Pumps
+        Constant::EndUse::HeatRejection, // HeatRejection
+        Constant::EndUse::Humidification, // Humidification
+        Constant::EndUse::HeatRecovery, // HeatRecovery
+        Constant::EndUse::WaterSystem, // WaterSystem
+        Constant::EndUse::Refrigeration, // Refrigeration
+        Constant::EndUse::Cogeneration, // Cogeneration
+        Constant::EndUse::Invalid, // Baseboard
+        Constant::EndUse::Invalid, // Boilers
+        Constant::EndUse::Invalid, // CarbonEquivalentEmissions
+        Constant::EndUse::Invalid, // Chillers
+        Constant::EndUse::Invalid, // CoalEmissions
+        Constant::EndUse::Invalid, // ColdStorageCharge
+        Constant::EndUse::Invalid, // ColdStorageDischarge
+        Constant::EndUse::Invalid, // Condensate
+        Constant::EndUse::Invalid, // CoolingCoils
+        Constant::EndUse::Invalid, // CoolingPanel
+        Constant::EndUse::Invalid, // DieselEmissions
+        Constant::EndUse::Invalid, // DistrictChilledWater
+        Constant::EndUse::Invalid, // DistrictHotWater
+        Constant::EndUse::Invalid, // ElectricityEmissions
+        Constant::EndUse::Invalid, // ElectricStorage
+        Constant::EndUse::Invalid, // FreeCooling
+        Constant::EndUse::Invalid, // FuelOilNo1Emissions
+        Constant::EndUse::Invalid, // FuelOilNo2Emissions
+        Constant::EndUse::Invalid, // GasolineEmissions
+        Constant::EndUse::Invalid, // HeatingCoils
+        Constant::EndUse::Invalid, // HeatProduced
+        Constant::EndUse::Invalid, // HeatRecoveryForCooling
+        Constant::EndUse::Invalid, // HeatRecoveryForHeating
+        Constant::EndUse::Invalid, // LoopToLoop
+        Constant::EndUse::Invalid, // MainsWater
+        Constant::EndUse::Invalid, // NaturalGasEmissions
+        Constant::EndUse::Invalid, // OtherFuel1Emissions
+        Constant::EndUse::Invalid, // OtherFuel2Emissions
+        Constant::EndUse::Invalid, // Photovoltaic
+        Constant::EndUse::Invalid, // PowerConversion
+        Constant::EndUse::Invalid, // PropaneEmissions
+        Constant::EndUse::Invalid, // PurchasedElectricityEmissions
+        Constant::EndUse::Invalid, // RainWater
+        Constant::EndUse::Invalid, // SoldElectricityEmissions
+        Constant::EndUse::Invalid, // WellWater,
+        Constant::EndUse::Invalid, // WindTurbine,
+    };
+        
+    enum class SOVGroup
+    {
+        Invalid = -1,
+        Building,
+        HVAC,
+        Plant,
+        Zone,
+        SpaceType,
+        Num
+    };
+        
+    static constexpr std::array<std::string_view, (int)SOVGroup::Num> sovGroupNames = {"Building", "HVAC", "Plant", "Zone", "SpaceType"};
+    static constexpr std::array<std::string_view, (int)SOVGroup::Num> sovGroupNamesUC = {"BUILDING", "HVAC", "PLANT", "ZONE", "SPACETYPE"};
 
     struct TimeSteps
     {
@@ -280,6 +511,8 @@ namespace OutputProcessor {
         Real64 *Which = nullptr;       // Pointer to the actual variable holding the value
         Real64 MaxValue = -9999.0;     // Maximum reporting (only for Averaged variables, and those greater than Time Step)
         Real64 MinValue = 9999.0;      // Minimum reporting (only for Averaged variables, and those greater than Time Step)
+
+        OutVarReal() { varType = VariableType::Real; } 
     };
 
     struct OutVarInt : public OutVar
@@ -288,6 +521,8 @@ namespace OutputProcessor {
         int *Which = nullptr;          // The POINTER to the actual variable holding the value
         int MaxValue = -9999;          // Maximum reporting (only for Averaged variables, and those greater than Time Step)
         int MinValue = 9999;           // Minimum reporting (only for Averaged variables, and those greater than Time Step)
+
+        OutVarInt() { varType = VariableType::Integer; } 
     };
 
     struct DDOutVar 
@@ -297,7 +532,7 @@ namespace OutputProcessor {
         TimeStepType timeStepType = TimeStepType::Invalid;     // Type whether Zone or HVAC
         StoreType storeType = StoreType::Invalid;           // Variable Type (Summed/Non-Static or Average/Static)
         VariableType variableType = VariableType::Invalid;     // Integer, Real.
-        int Next = 0;                      // Next variable of same name (different units)
+        int Next = -1;                      // Next variable of same name (different units)
         bool ReportedOnDDFile = false;   // true after written to .rdd/.mdd file
         Constant::Units units = Constant::Units::Invalid;   // Units for Variable
         std::string unitNameCustomEMS = ""; // name of units when customEMS is used for EMS variables that are unusual
@@ -323,9 +558,9 @@ namespace OutputProcessor {
     {
         Real64 Value = 0.0;          // Daily Value
         Real64 MaxVal = MaxSetValue;         // Maximum Value
-        int MaxValDate = 0;        // Date stamp of maximum
+        int MaxValDate = -1;        // Date stamp of maximum
         Real64 MinVal = MinSetValue;         // Minimum Value
-        int MinValDate = 0;        // Date stamp of minimum
+        int MinValDate = -1;        // Date stamp of minimum
 
         bool Rpt = false;              // Report at End of Day
         bool RptFO = false;            // Report at End of Day -- meter file only
@@ -344,9 +579,9 @@ namespace OutputProcessor {
         std::string Name = "";                          // Name of the meter
         MeterType type = MeterType::Invalid;                       // type of meter
         Constant::eResource resource = Constant::eResource::Invalid;              // Resource Type of the meter
-        std::string EndUse = "";                        // End Use of the meter
+        SOVEndUseCat sovEndUseCat = SOVEndUseCat::Invalid;                        // End Use of the meter
         std::string EndUseSub = "";                     // End Use subcategory of the meter
-        std::string Group = "";                         // Group of the meter
+        SOVGroup sovGroup = SOVGroup::Invalid;                         // Group of the meter
         Constant::Units units = Constant::Units::Invalid;               // Units for the Meter
         RT_IPUnits RT_forIPUnits; // Resource type number for IP Units (tabular) reporting
 
@@ -372,17 +607,27 @@ namespace OutputProcessor {
 
     struct MeteredVar
     {
-        int num;
-        std::string name;
-        Constant::eResource resource;
-        Constant::Units units;
-        VariableType varType;
-        TimeStepType timeStepType;
-        std::string endUse;
-        std::string group;
-        int rptNum;
+        int num = -1;
+        std::string name = "";
+        Constant::eResource resource = Constant::eResource::Invalid;
+        Constant::Units units = Constant::Units::Invalid;
+        VariableType varType = VariableType::Invalid;
+        TimeStepType timeStepType = TimeStepType::Invalid;
+        SOVEndUseCat sovEndUseCat = SOVEndUseCat::Invalid;
+        SOVGroup sovGroup = SOVGroup::Invalid;
+        int rptNum = -1;
     };
         
+    struct MeterData : MeteredVar
+    {
+        Constant::HeatOrCool heatOrCool = Constant::HeatOrCool::NoHeatNoCool;
+        Real64 curMeterReading = 0.0;
+
+        // C++ doesn't figure this out automatically, so we have to do it ourselves
+        MeterData& operator=(MeteredVar const &mv) { MeteredVar::operator=(mv); return *this; }
+            
+    };
+
     struct EndUseCategoryType
     {
         // Members
@@ -428,10 +673,10 @@ namespace OutputProcessor {
                  std::string const &Name,         // Name for the meter
                  Constant::Units units,  // Units for the meter
                  Constant::eResource resource, // ResourceType for the meter
-                 std::string_view const EndUse,       // EndUse for the meter
+                 SOVEndUseCat sovEndUseCat,       // EndUse for the meter
                  std::string_view const EndUseSub,    // EndUse subcategory for the meter
-                 std::string_view const Group, // Group for the meter
-                 int const outVarNum // Index of variable that this meter tracks
+                 SOVGroup sovGroup, // Group for the meter
+                 int outVarNum
     );
 
     int AddCustomMeter(EnergyPlusData &state,
@@ -441,9 +686,9 @@ namespace OutputProcessor {
     void AttachMeters(EnergyPlusData &state,
                       Constant::Units units, // Units for this meter
                       Constant::eResource resource,               // Electricity, Gas, etc.
-                      std::string_view const EndUse,                        // End-use category (Lights, Heating, etc.)
+                      SOVEndUseCat sovEndUseCat,                        // End-use category (Lights, Heating, etc.)
                       std::string_view const EndUseSub,                     // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
-                      std::string_view const Group,                         // Group key (Facility, Zone, Building, etc.)
+                      SOVGroup sovGroup,                         // Group key (Facility, Zone, Building, etc.)
                       std::string const &ZoneName,                // Zone key only applicable for Building group
                       std::string const &SpaceTypeName,           // Space Type key only applicable for Building group
                       int RepVarNum                               // Number of this report variable
@@ -483,13 +728,13 @@ namespace OutputProcessor {
                                   int reportID,                                      // The ID of the time stamp
                                   std::string const &DayOfSimChr,                    // the number of days simulated so far
                                   bool writeToSQL,                                   // write to SQLite
-                                  ObjexxFCL::Optional_int_const Month = _,           // the month of the reporting interval
-                                  ObjexxFCL::Optional_int_const DayOfMonth = _,      // The day of the reporting interval
-                                  ObjexxFCL::Optional_int_const Hour = _,            // The hour of the reporting interval
-                                  ObjexxFCL::Optional<Real64 const> EndMinute = _,   // The last minute in the reporting interval
-                                  ObjexxFCL::Optional<Real64 const> StartMinute = _, // The starting minute of the reporting interval
-                                  ObjexxFCL::Optional_int_const DST = _,             // A flag indicating whether daylight savings time is observed
-                                  ObjexxFCL::Optional_string_const DayType = _       // The day tied for the data (e.g., Monday)
+                                  int const Month = -1,           // the month of the reporting interval
+                                  int const DayOfMonth = -1,      // The day of the reporting interval
+                                  int const Hour = -1,            // The hour of the reporting interval
+                                  Real64 const EndMinute = -1.0,   // The last minute in the reporting interval
+                                  Real64 const StartMinute = -1.0, // The starting minute of the reporting interval
+                                  int const DST = -1,             // A flag indicating whether daylight savings time is observed
+                                  std::string_view const DayType = ""       // The day tied for the data (e.g., Monday)
     );
 
     void WriteYearlyTimeStamp(EnergyPlusData &state,
@@ -603,11 +848,9 @@ namespace OutputProcessor {
         std::string varKey;
     };
 
-    std::string standardizeGroup(std::string_view const group);
-    std::string standardizeEndUse(std::string_view const endUse);
-    std::string standardizeEndUseSub(std::string_view endUse, std::string_view const endUseSub);
-    void addEndUseSubcategory(EnergyPlusData &state, std::string_view const endUseName, std::string_view const endUseSubName);
-    void addEndUseSpaceType(EnergyPlusData &state, std::string_view const endUseName, std::string_view const endUseSpTypeName);
+    std::string standardizeEndUseSub(SOVEndUseCat sovEndUseCat, std::string_view const endUseSub);
+    void addEndUseSubcategory(EnergyPlusData &state, SOVEndUseCat sovEndUseCat, std::string_view const endUseSubName);
+    void addEndUseSpaceType(EnergyPlusData &state, SOVEndUseCat sovEndUseCat, std::string_view const endUseSpTypeName);
 } // namespace OutputProcessor
 
 //==============================================================================================
@@ -619,24 +862,25 @@ namespace OutputProcessor {
 // *****************************************************************************
 
 void SetupOutputVariable(EnergyPlusData &state,
-                         std::string_view const VariableName,              // String Name of variable (with units)
-                         Constant::Units VariableUnit,               // Actual units corresponding to the actual variable
-                         Real64 &ActualVariable,                           // Actual Variable, used to set up pointer
-                         OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
-                         std::string const &KeyedValue,                // Associated Key for this variable
-                         OutputProcessor::ReportFreq freq = OutputProcessor::ReportFreq::Hour,           // Internal use -- causes reporting at this freqency
-                         Constant::eResource resource = Constant::eResource::Invalid,      // Meter Resource Type (Electricity, Gas, etc)
-                         std::string_view const endUse = {},            // Meter End Use Key (Lights, Heating, Cooling, etc)
-                         std::string_view const EndUseSub = {},         // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                         std::string_view const Group = {},             // Meter Super Group Key (Building, System, Plant)
-                         std::string_view const Zone = {},              // Meter Zone Key (zone name)
-                         int const ZoneMult = 1,                           // Zone Multiplier, defaults to 1
-                         int const ZoneListMult = 1,                       // Zone List Multiplier, defaults to 1
-                         int const indexGroupKey = -999,                   // Group identifier for SQL output
-                         std::string_view const customUnitName = {},       // the custom name for the units from EMS definition of units
-                         std::string_view const SpaceType = {}             // Space type (applicable for Building group only)
+                         std::string_view const name,                // String Name of variable (with units)
+                         Constant::Units units,                 // Actual units corresponding to the actual variable
+                         Real64 &ActualVariable,                             // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType timeStepType,   // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType variableType,      // State, Average=1, NonState, Sum=2
+                         std::string const &key,                  // Associated Key for this variable
+                         OutputProcessor::ReportFreq reportFreq = OutputProcessor::ReportFreq::Hour, // Internal use -- causes reporting at this freqency
+                         Constant::eResource resource = Constant::eResource::Invalid, // Meter Resource Type (Electricity, Gas, etc)
+                         OutputProcessor::SOVEndUseCat sovEndUseCat = OutputProcessor::SOVEndUseCat::Invalid, // Meter End Use Key (Lights, Heating, etc)
+                         std::string_view const endUseSub = {},           // Meter End Use Sub Key (General Lights, Task Lights, etc)
+                         OutputProcessor::SOVGroup sovGroup = OutputProcessor::SOVGroup::Invalid, // Meter Super Group Key (Building, System, Plant)
+                         std::string const &zone = {},                // Meter Zone Key (zone name)
+                         int const zoneMult = 1,                             // Zone Multiplier, defaults to 1
+                         int const zoneListMult = 1,                         // Zone List Multiplier, defaults to 1
+                         int const indexGroupKey = -999,                     // Group identifier for SQL output
+                         std::string_view const customUnitName = {},         // the custom name for the units from EMS definition of units
+                         std::string const &spaceType = {}               // Space type (applicable for Building group only)
 );
+
 
 void SetupOutputVariable(EnergyPlusData &state,
                          std::string_view const VariableName,              // String Name of variable
@@ -645,7 +889,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string const &KeyedValue,                // Associated Key for this variable
-                         OutputProcessor::ReportFreq freq = OutputProcessor::ReportFreq::Invalid, // Internal use -- causes reporting at this freqency
+                         OutputProcessor::ReportFreq freq = OutputProcessor::ReportFreq::Hour,  // Internal use -- causes reporting at this freqency
                          int const indexGroupKey = -999                    // Group identifier for SQL output
 );
 
@@ -705,6 +949,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
 void GetVariableKeys(EnergyPlusData &state,
                      std::string const &varName, // Standard variable name
                      OutputProcessor::VariableType varType,
+                     Array1D_string &keyNames,
                      Array1D_int &keyVarNums // Array index for
 );
 
@@ -727,7 +972,6 @@ int initErrorFile(EnergyPlusData &state);
 
 struct OutputProcessorData : BaseGlobalStruct
 {
-    int CurrentReportNumber = 0;
     int NumVariablesForOutput = 0;
     int MaxVariablesForOutput = 0;
     int NumTotalRVariable = 0;
@@ -749,8 +993,8 @@ struct OutputProcessorData : BaseGlobalStruct
     int NumEnergyMeters = 0;                 // Current number of Energy Meters
     std::vector<Real64> meterValues;              // This holds the current timestep value for each meter.
 
-    std::array<int, (int)OutputProcessor::ReportFreq::Num> freqStampReportNums = {0};
-    std::array<bool, (int)OutputProcessor::ReportFreq::Num> freqTrackingVariables = {false};    // Requested Hourly Report Variables
+    std::array<int, (int)OutputProcessor::ReportFreq::Num> freqStampReportNums = {-1, -1, -1, -1, -1, -1, -1};
+    std::array<bool, (int)OutputProcessor::ReportFreq::Num> freqTrackingVariables = {false, false, false, false, false, false, false};    
 
     Real64 TimeStepZoneSec = 0;              // Seconds from NumTimeStepInHour
     bool ErrorsLogged = false;
@@ -776,10 +1020,6 @@ struct OutputProcessorData : BaseGlobalStruct
     std::map<std::string, int> meterMap;    
 
     char stamp[OutputProcessor::N_WriteTimeStampFormatData];
-    char s_WriteReportRealData[129];
-    char s_WriteCumulativeReportMeterData[129];
-    char s_WriteReportMeterData[129];
-    char s_WriteNumericData[129];
     bool Rept = false;
     bool OpaqSurfWarned = false;
 
@@ -790,7 +1030,6 @@ struct OutputProcessorData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->CurrentReportNumber = 0;
         this->NumVariablesForOutput = 0;
         this->MaxVariablesForOutput = 0;
         this->NumOfRVariable_Setup = 0;
@@ -809,7 +1048,7 @@ struct OutputProcessorData : BaseGlobalStruct
         this->NumOfReqVariables = 0;
         this->NumEnergyMeters = 0;
         this->meterValues.clear();
-        this->freqStampReportNums = {0};
+        this->freqStampReportNums = {-1, -1, -1, -1, -1, -1, -1};
         this->freqTrackingVariables = {false};
         this->TimeStepZoneSec = 0;
         this->ErrorsLogged = false;

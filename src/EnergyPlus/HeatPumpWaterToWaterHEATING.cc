@@ -373,9 +373,9 @@ void GetGshpInput(EnergyPlusData &state)
                             thisGSHP.Name,
                             {},
                             Constant::eResource::Electricity,
-                            "Heating",
+                            OutputProcessor::SOVEndUseCat::Heating,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
 
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Rate",

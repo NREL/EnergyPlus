@@ -516,7 +516,7 @@ namespace PlantPipingSystemsManager {
 
             // Get the name, validate
             thisDomain.Name = state.dataIPShortCut->cAlphaArgs(1);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
             // Mesh extents, validated by IP
             thisDomain.Extents.xMax = state.dataIPShortCut->rNumericArgs(1);
             thisDomain.Extents.yMax = state.dataIPShortCut->rNumericArgs(2);
@@ -622,9 +622,9 @@ namespace PlantPipingSystemsManager {
             thisDomain.Moisture.Theta_sat = state.dataIPShortCut->rNumericArgs(14) / 100.0;
 
             // check if there is a basement
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "YES")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "YES")) {
                 thisDomain.HasBasement = true;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "NO")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "NO")) {
                 thisDomain.HasBasement = false;
             } else {
                 IssueSevereInputFieldError(state,
@@ -680,9 +680,9 @@ namespace PlantPipingSystemsManager {
 
                 // check for dimension shift
                 CurIndex = 8;
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(CurIndex), "YES")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(CurIndex), "YES")) {
                     thisDomain.BasementZone.ShiftPipesByWidth = true;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(CurIndex), "NO")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(CurIndex), "NO")) {
                     thisDomain.BasementZone.ShiftPipesByWidth = false;
                 } else {
                     IssueSevereInputFieldError(state,
@@ -699,7 +699,7 @@ namespace PlantPipingSystemsManager {
                 CurIndex = 9;
                 thisDomain.BasementZone.WallBoundaryOSCMName = state.dataIPShortCut->cAlphaArgs(CurIndex);
                 thisDomain.BasementZone.WallBoundaryOSCMIndex =
-                    UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName, state.dataSurface->OSCM);
+                    Util::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName, state.dataSurface->OSCM);
                 if (thisDomain.BasementZone.WallBoundaryOSCMIndex <= 0) {
                     IssueSevereInputFieldError(state,
                                                RoutineName,
@@ -729,7 +729,7 @@ namespace PlantPipingSystemsManager {
                 CurIndex = 10;
                 thisDomain.BasementZone.FloorBoundaryOSCMName = state.dataIPShortCut->cAlphaArgs(CurIndex);
                 thisDomain.BasementZone.FloorBoundaryOSCMIndex =
-                    UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName, state.dataSurface->OSCM);
+                    Util::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName, state.dataSurface->OSCM);
                 if (thisDomain.BasementZone.FloorBoundaryOSCMIndex <= 0) {
                     IssueSevereInputFieldError(state,
                                                RoutineName,
@@ -866,9 +866,9 @@ namespace PlantPipingSystemsManager {
             thisDomain.VertInsDepth = state.dataIPShortCut->rNumericArgs(11);
 
             // Set flag for slab in-grade or slab on-grade
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "INGRADE")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "INGRADE")) {
                 thisDomain.SlabInGradeFlag = true;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "ONGRADE")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "ONGRADE")) {
                 thisDomain.SlabInGradeFlag = false;
             } else {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
@@ -878,8 +878,8 @@ namespace PlantPipingSystemsManager {
 
             // Get slab material properties
             if (thisDomain.SlabInGradeFlag) {
-                thisDomain.SlabMaterialNum = UtilityRoutines::FindItemInPtrList(
-                    state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
+                thisDomain.SlabMaterialNum =
+                    Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
                 if (thisDomain.SlabMaterialNum == 0) {
                     ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
@@ -894,9 +894,9 @@ namespace PlantPipingSystemsManager {
 
             // set flag for horizontal insulation
             if (thisDomain.SlabInGradeFlag) {
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "NO")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "NO")) {
                     thisDomain.HorizInsPresentFlag = false;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "YES")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "YES")) {
                     thisDomain.HorizInsPresentFlag = true;
                 } else {
                     ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
@@ -907,8 +907,8 @@ namespace PlantPipingSystemsManager {
 
             // Get horizontal insulation material properties
             if (thisDomain.HorizInsPresentFlag) {
-                thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInPtrList(
-                    state.dataIPShortCut->cAlphaArgs(8), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
+                thisDomain.HorizInsMaterialNum =
+                    Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(8), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
                 if (thisDomain.HorizInsMaterialNum == 0) {
                     ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8)));
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
@@ -926,7 +926,7 @@ namespace PlantPipingSystemsManager {
                 }
 
                 // Set flag for horizontal insulation extents
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "PERIMETER")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "PERIMETER")) {
                     thisDomain.FullHorizInsPresent = false;
                     // Horizontal insulation perimeter width
                     if (thisDomain.HorizInsWidth <= 0.0) {
@@ -934,7 +934,7 @@ namespace PlantPipingSystemsManager {
                         ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                         ErrorsFound = true;
                     }
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "FULL")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "FULL")) {
                     thisDomain.FullHorizInsPresent = true;
                 } else {
                     ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
@@ -944,9 +944,9 @@ namespace PlantPipingSystemsManager {
             }
 
             // set flag for vertical insulation
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "NO")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "NO")) {
                 thisDomain.VertInsPresentFlag = false;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "YES")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "YES")) {
                 thisDomain.VertInsPresentFlag = true;
             } else {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10)));
@@ -956,8 +956,8 @@ namespace PlantPipingSystemsManager {
 
             // Get vertical insulation material properties
             if (thisDomain.VertInsPresentFlag) {
-                thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInPtrList(
-                    state.dataIPShortCut->cAlphaArgs(11), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
+                thisDomain.VertInsMaterialNum =
+                    Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(11), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
                 if (thisDomain.VertInsMaterialNum == 0) {
                     ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11)));
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
@@ -983,9 +983,9 @@ namespace PlantPipingSystemsManager {
             }
 
             // Set simulation interval flag
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(12), "TIMESTEP")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(12), "TIMESTEP")) {
                 thisDomain.SimTimeStepFlag = true;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(12), "HOURLY")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(12), "HOURLY")) {
                 thisDomain.SimHourlyFlag = true;
             } else {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(12), state.dataIPShortCut->cAlphaArgs(12)));
@@ -999,7 +999,7 @@ namespace PlantPipingSystemsManager {
             thisDomain.HasZoneCoupledSlab = true;
 
             // get boundary condition model names and indices -- error check
-            thisDomain.ZoneCoupledOSCMIndex = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataSurface->OSCM);
+            thisDomain.ZoneCoupledOSCMIndex = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataSurface->OSCM);
             if (thisDomain.ZoneCoupledOSCMIndex <= 0) {
                 IssueSevereInputFieldError(state,
                                            RoutineName,
@@ -1185,7 +1185,7 @@ namespace PlantPipingSystemsManager {
             CurIndex = 4;
             thisDomain.BasementZone.FloorBoundaryOSCMName = state.dataIPShortCut->cAlphaArgs(CurIndex);
             thisDomain.BasementZone.FloorBoundaryOSCMIndex =
-                UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName, state.dataSurface->OSCM);
+                Util::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName, state.dataSurface->OSCM);
             if (thisDomain.BasementZone.FloorBoundaryOSCMIndex <= 0) {
                 IssueSevereInputFieldError(state,
                                            RoutineName,
@@ -1217,7 +1217,7 @@ namespace PlantPipingSystemsManager {
             CurIndex = 8;
             thisDomain.BasementZone.WallBoundaryOSCMName = state.dataIPShortCut->cAlphaArgs(CurIndex);
             thisDomain.BasementZone.WallBoundaryOSCMIndex =
-                UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName, state.dataSurface->OSCM);
+                Util::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName, state.dataSurface->OSCM);
             if (thisDomain.BasementZone.WallBoundaryOSCMIndex <= 0) {
                 IssueSevereInputFieldError(state,
                                            RoutineName,
@@ -1275,9 +1275,9 @@ namespace PlantPipingSystemsManager {
 
             // set flag for horizontal insulation
             // Check state.dataIPShortCut->cAlphaArgs value
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "NO")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "NO")) {
                 thisDomain.HorizInsPresentFlag = false;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "YES")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "YES")) {
                 thisDomain.HorizInsPresentFlag = true;
             } else {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
@@ -1287,8 +1287,8 @@ namespace PlantPipingSystemsManager {
 
             // Get horizontal insulation material properties
             if (thisDomain.HorizInsPresentFlag) {
-                thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInPtrList(
-                    state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
+                thisDomain.HorizInsMaterialNum =
+                    Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
                 if (thisDomain.HorizInsMaterialNum == 0) {
                     ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
@@ -1306,7 +1306,7 @@ namespace PlantPipingSystemsManager {
                 }
 
                 // Set flag for horizontal insulation extents
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "PERIMETER")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "PERIMETER")) {
                     thisDomain.FullHorizInsPresent = false;
                     // Horizontal insulation perimeter width
                     if (thisDomain.HorizInsWidth <= 0.0) {
@@ -1314,7 +1314,7 @@ namespace PlantPipingSystemsManager {
                         ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                         ErrorsFound = true;
                     }
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "FULL")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "FULL")) {
                     thisDomain.FullHorizInsPresent = true;
                 } else {
                     ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
@@ -1324,9 +1324,9 @@ namespace PlantPipingSystemsManager {
             }
 
             // set flag for vertical insulation
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "NO")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "NO")) {
                 thisDomain.VertInsPresentFlag = false;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "YES")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "YES")) {
                 thisDomain.VertInsPresentFlag = true;
             } else {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
@@ -1342,8 +1342,8 @@ namespace PlantPipingSystemsManager {
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
                     ErrorsFound = true;
                 }
-                thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInPtrList(
-                    state.dataIPShortCut->cAlphaArgs(10), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
+                thisDomain.VertInsMaterialNum =
+                    Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(10), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
                 if (thisDomain.VertInsMaterialNum == 0) {
                     ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10)));
                     ShowContinueError(state, format("Found in: {}", thisDomain.Name));
@@ -1362,9 +1362,9 @@ namespace PlantPipingSystemsManager {
             }
 
             // Set simulation interval flag
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(11), "TIMESTEP")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(11), "TIMESTEP")) {
                 thisDomain.SimTimeStepFlag = true;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(11), "HOURLY")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(11), "HOURLY")) {
                 thisDomain.SimHourlyFlag = true;
             } else {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(11), state.dataIPShortCut->cAlphaArgs(11)));
@@ -1481,7 +1481,7 @@ namespace PlantPipingSystemsManager {
 
             // Get the name, validate
             thisCircuit.Name = state.dataIPShortCut->cAlphaArgs(1);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // Read pipe thermal properties, validated by IP
             thisCircuit.PipeProperties.Conductivity = state.dataIPShortCut->rNumericArgs(1);
@@ -1765,7 +1765,7 @@ namespace PlantPipingSystemsManager {
 
             // Get the name, validate
             thisSegment.Name = state.dataIPShortCut->cAlphaArgs(1);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
             // Read in the pipe location, validated as positive by IP
             // -- note that these values will be altered by the main GetInput routine in two ways:
             //   1) shift for basement wall if selected
@@ -1842,7 +1842,7 @@ namespace PlantPipingSystemsManager {
 
             // Get the name, validate
             std::string thisTrenchName = state.dataIPShortCut->cAlphaArgs(1);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             int const NumPipeSegments = static_cast<int>(state.dataIPShortCut->rNumericArgs(3));
             Real64 const thisInterPipeSpacing = state.dataIPShortCut->rNumericArgs(4);

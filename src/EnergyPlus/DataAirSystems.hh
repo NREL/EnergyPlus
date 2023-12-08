@@ -68,7 +68,7 @@ struct EnergyPlusData;
 namespace DataAirSystems {
 
     // Using/Aliasing
-    using DataPlant::MeterData;
+    using OutputProcessor::MeterData;
     using DataPlant::SubcomponentData;
 
     // Data

@@ -663,7 +663,6 @@ namespace DataHeatBalance {
         int ZoneContamControllerSchedIndex = 0;              // Index for this schedule
         bool FlagCustomizedZoneCap = false;                  // True if customized Zone Capacitance Multiplier is used
         std::vector<Constant::eFuel> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this zone
-        std::vector<std::string> otherEquipFuelTypeNames;    // List of fuel types used by other equipment in this zone
 
         // Hybrid Modeling
         Real64 ZoneMeasuredTemperature = 0.0;               // Measured zone air temperature input by user

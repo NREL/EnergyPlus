@@ -156,7 +156,7 @@ namespace ICEngineElectricGenerator {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             state.dataICEngElectGen->ICEngineGenerator(genNum).Name = AlphArray(1);
 
@@ -327,9 +327,9 @@ namespace ICEngineElectricGenerator {
                             this->Name,
                             {},
                             Constant::eResource::ElectricityProduced,
-                            "COGENERATION",
+                            OutputProcessor::SOVEndUseCat::Cogeneration,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
 
         SetupOutputVariable(state,
                             format("Generator {} Rate", sFuelType),
@@ -348,9 +348,9 @@ namespace ICEngineElectricGenerator {
                             this->Name,
                             {},
                             Constant::eFuel2eResource[(int)this->FuelType],
-                            "COGENERATION",
+                            OutputProcessor::SOVEndUseCat::Cogeneration,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
 
         //    general fuel use report to match other generators.
         SetupOutputVariable(state,
@@ -411,9 +411,9 @@ namespace ICEngineElectricGenerator {
                                 this->Name,
                                 {},
                                 Constant::eResource::EnergyTransfer,
-                                "HEATRECOVERY",
+                                OutputProcessor::SOVEndUseCat::HeatRecovery,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             SetupOutputVariable(state,
                                 "Generator Lube Heat Recovery Rate",
@@ -432,9 +432,9 @@ namespace ICEngineElectricGenerator {
                                 this->Name,
                                 {},
                                 Constant::eResource::EnergyTransfer,
-                                "HEATRECOVERY",
+                                OutputProcessor::SOVEndUseCat::HeatRecovery,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             SetupOutputVariable(state,
                                 "Generator Exhaust Heat Recovery Rate",
@@ -453,9 +453,9 @@ namespace ICEngineElectricGenerator {
                                 this->Name,
                                 {},
                                 Constant::eResource::EnergyTransfer,
-                                "HEATRECOVERY",
+                                OutputProcessor::SOVEndUseCat::HeatRecovery,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             SetupOutputVariable(state,
                                 "Generator Produced Thermal Rate",

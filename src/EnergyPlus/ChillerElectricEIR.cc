@@ -313,11 +313,11 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                            state.dataIPShortCut->cAlphaArgs(6),
                                            "Chilled Water Nodes");
 
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "WaterCooled")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "WaterCooled")) {
             thisChiller.CondenserType = DataPlant::CondenserType::WaterCooled;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "AirCooled")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "AirCooled")) {
             thisChiller.CondenserType = DataPlant::CondenserType::AirCooled;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "EvaporativelyCooled")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "EvaporativelyCooled")) {
             thisChiller.CondenserType = DataPlant::CondenserType::EvapCooled;
         } else {
             ShowSevereError(state, format("{}{}: {}", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -790,9 +790,9 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::Electricity, 
-                        "Cooling",
+                        OutputProcessor::SOVEndUseCat::Cooling,
                         this->EndUseSubcategory,
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Cooling Rate",
@@ -811,9 +811,9 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::EnergyTransfer,
-                        "CHILLERS",
+                        OutputProcessor::SOVEndUseCat::Chillers,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller False Load Heat Transfer Rate",
@@ -872,9 +872,9 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::EnergyTransfer,
-                        "HEATREJECTION",
+                        OutputProcessor::SOVEndUseCat::HeatRejection,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller COP",
@@ -953,9 +953,9 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 this->Name,
                                 {},
                                 Constant::eResource::EnergyTransfer, 
-                                "HEATRECOVERY",
+                                OutputProcessor::SOVEndUseCat::HeatRecovery,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             SetupOutputVariable(state,
                                 "Chiller Heat Recovery Inlet Temperature",
@@ -1017,9 +1017,9 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 this->Name,
                                 {},
                                 Constant::eResource::Electricity, 
-                                "Cooling",
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
         }
         if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             SetupOutputVariable(state,
@@ -1031,9 +1031,9 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 this->Name,
                                 {},
                                 Constant::eResource::Water, 
-                                "Cooling",
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
 
             SetupOutputVariable(state,
                                 "Chiller Evaporative Condenser Mains Supply Water Volume",
@@ -1044,9 +1044,9 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 this->Name,
                                 {},
                                 Constant::eResource::MainsWater, 
-                                "Cooling",
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
 
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(state,
@@ -1066,9 +1066,9 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                     this->Name,
                                     {},
                                     Constant::eResource::Electricity, 
-                                    "CHILLERS",
+                                    OutputProcessor::SOVEndUseCat::Chillers,
                                     {},
-                                    "Plant");
+                                    OutputProcessor::SOVGroup::Plant);
             }
         }
     }

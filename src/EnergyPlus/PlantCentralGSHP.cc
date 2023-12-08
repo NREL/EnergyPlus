@@ -589,7 +589,7 @@ void GetWrapperInput(EnergyPlusData &state)
 
         // initialize nth chiller heater index (including identical units) for current wrapper
         int NumChHtrPerWrapper = 0;
-        if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound)) {
+        if (Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound)) {
             continue;
         }
 
@@ -769,7 +769,7 @@ void GetWrapperInput(EnergyPlusData &state)
             if (state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectType ==
                 "CHILLERHEATERPERFORMANCE:ELECTRIC:EIR") {
                 std::string CompName = state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperComponentName;
-                int CompIndex = UtilityRoutines::FindItemInList(CompName, state.dataPlantCentralGSHP->ChillerHeater);
+                int CompIndex = Util::FindItemInList(CompName, state.dataPlantCentralGSHP->ChillerHeater);
                 // User may enter invalid name rather than selecting one from the object list
                 if (CompIndex <= 0) {
                     ShowSevereError(state, format("GetWrapperInput: Invalid Chiller Heater Modules Performance Component Name ={}", CompName));
@@ -809,9 +809,9 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::Electricity,
-                        "Cooling",
+                        OutputProcessor::SOVEndUseCat::Cooling,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Electricity Energy",
@@ -822,9 +822,9 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::Electricity,
-                        "Heating",
+                        OutputProcessor::SOVEndUseCat::Heating,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Electricity Rate",
@@ -851,9 +851,9 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::EnergyTransfer,
-                        "CHILLERS",
+                        OutputProcessor::SOVEndUseCat::Chillers,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Energy",
@@ -864,9 +864,9 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::EnergyTransfer,
-                        "BOILER",
+                        OutputProcessor::SOVEndUseCat::Boilers,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Source Heat Transfer Energy",
@@ -877,9 +877,9 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::EnergyTransfer, 
-                        "HEATREJECTION",
+                        OutputProcessor::SOVEndUseCat::HeatRejection,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Rate",
@@ -1214,7 +1214,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
         state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, CHErrorsFound);
+        Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, CHErrorsFound);
 
         state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondModeCooling = state.dataIPShortCut->cAlphaArgs(4);
 
@@ -1297,7 +1297,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
             }
         }
 
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "WaterCooled")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "WaterCooled")) {
             state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).condenserType = CondenserType::WaterCooled;
         } else {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));

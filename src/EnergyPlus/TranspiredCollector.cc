@@ -154,7 +154,7 @@ namespace TranspiredCollector {
 
         // Find the correct transpired collector with the Component name and/or index
         if (CompIndex == 0) {
-            UTSCNum = UtilityRoutines::FindItemInList(CompName, state.dataTranspiredCollector->UTSC);
+            UTSCNum = Util::FindItemInList(CompName, state.dataTranspiredCollector->UTSC);
             if (UTSCNum == 0) {
                 ShowFatalError(state, format("Transpired Collector not found={}", CompName));
             }
@@ -336,7 +336,7 @@ namespace TranspiredCollector {
                 for (ItemSplit = 1; ItemSplit <= NumUTSCSplitter; ++ItemSplit) {
                     state.dataInputProcessing->inputProcessor->getObjectItem(
                         state, CurrentModuleMultiObject, ItemSplit, AlphasSplit, NumAlphasSplit, NumbersSplit, NumNumbersSplit, IOStatusSplit);
-                    if (!(UtilityRoutines::SameString(AlphasSplit(1), Alphas(1)))) continue;
+                    if (!(Util::SameString(AlphasSplit(1), Alphas(1)))) continue;
                     SplitterNameOK(ItemSplit) = true;
                     state.dataTranspiredCollector->UTSC(Item).NumOASysAttached = std::floor(NumAlphasSplit / 4.0);
                     if (mod((NumAlphasSplit), 4) != 1) {
@@ -411,7 +411,7 @@ namespace TranspiredCollector {
             }         // any UTSC Multisystem present
 
             state.dataTranspiredCollector->UTSC(Item).OSCMName = Alphas(2);
-            Found = UtilityRoutines::FindItemInList(state.dataTranspiredCollector->UTSC(Item).OSCMName, state.dataSurface->OSCM);
+            Found = Util::FindItemInList(state.dataTranspiredCollector->UTSC(Item).OSCMName, state.dataSurface->OSCM);
             if (Found == 0) {
                 ShowSevereError(state,
                                 format("{} not found={} in {} ={}",
@@ -506,9 +506,9 @@ namespace TranspiredCollector {
                 continue;
             }
 
-            if (UtilityRoutines::SameString(Alphas(9), "Triangle")) {
+            if (Util::SameString(Alphas(9), "Triangle")) {
                 state.dataTranspiredCollector->UTSC(Item).Layout = Layout_Triangle;
-            } else if (UtilityRoutines::SameString(Alphas(9), "Square")) {
+            } else if (Util::SameString(Alphas(9), "Square")) {
                 state.dataTranspiredCollector->UTSC(Item).Layout = Layout_Square;
             } else {
                 ShowSevereError(state,
@@ -521,9 +521,9 @@ namespace TranspiredCollector {
                 continue;
             }
 
-            if (UtilityRoutines::SameString(Alphas(10), "Kutscher1994")) {
+            if (Util::SameString(Alphas(10), "Kutscher1994")) {
                 state.dataTranspiredCollector->UTSC(Item).Correlation = Correlation_Kutscher1994;
-            } else if (UtilityRoutines::SameString(Alphas(10), "VanDeckerHollandsBrunger2001")) {
+            } else if (Util::SameString(Alphas(10), "VanDeckerHollandsBrunger2001")) {
                 state.dataTranspiredCollector->UTSC(Item).Correlation = Correlation_VanDeckerHollandsBrunger2001;
             } else {
                 ShowSevereError(state,
@@ -538,17 +538,15 @@ namespace TranspiredCollector {
 
             Roughness = Alphas(11);
             // Select the correct Number for the associated ascii name for the roughness type
-            if (UtilityRoutines::SameString(Roughness, "VeryRough"))
+            if (Util::SameString(Roughness, "VeryRough"))
                 state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::VeryRough;
-            if (UtilityRoutines::SameString(Roughness, "Rough"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::Rough;
-            if (UtilityRoutines::SameString(Roughness, "MediumRough"))
+            if (Util::SameString(Roughness, "Rough")) state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::Rough;
+            if (Util::SameString(Roughness, "MediumRough"))
                 state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::MediumRough;
-            if (UtilityRoutines::SameString(Roughness, "MediumSmooth"))
+            if (Util::SameString(Roughness, "MediumSmooth"))
                 state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::MediumSmooth;
-            if (UtilityRoutines::SameString(Roughness, "Smooth"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::Smooth;
-            if (UtilityRoutines::SameString(Roughness, "VerySmooth"))
+            if (Util::SameString(Roughness, "Smooth")) state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::Smooth;
+            if (Util::SameString(Roughness, "VerySmooth"))
                 state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::VerySmooth;
 
             // Was it set?
@@ -573,7 +571,7 @@ namespace TranspiredCollector {
             state.dataTranspiredCollector->UTSC(Item).SurfPtrs.allocate(state.dataTranspiredCollector->UTSC(Item).NumSurfs);
             state.dataTranspiredCollector->UTSC(Item).SurfPtrs = 0;
             for (ThisSurf = 1; ThisSurf <= state.dataTranspiredCollector->UTSC(Item).NumSurfs; ++ThisSurf) {
-                Found = UtilityRoutines::FindItemInList(Alphas(ThisSurf + AlphaOffset), state.dataSurface->Surface);
+                Found = Util::FindItemInList(Alphas(ThisSurf + AlphaOffset), state.dataSurface->Surface);
                 if (Found == 0) {
                     ShowSevereError(state,
                                     format("Surface Name not found={} in {} ={}",
@@ -797,9 +795,9 @@ namespace TranspiredCollector {
                                 state.dataTranspiredCollector->UTSC(Item).Name,
                                 {},
                                 Constant::eResource::SolarAir,
-                                "HeatProduced",
+                                OutputProcessor::SOVEndUseCat::HeatProduced,
                                 {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
 
             SetupOutputVariable(state,
                                 "Solar Collector Natural Ventilation Air Change Rate",
@@ -1195,8 +1193,8 @@ namespace TranspiredCollector {
             AbsThermSurf =
                 dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
                     ->AbsorpThermal;
-            TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + Constant::KelvinConv;
-            TscollK = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast + Constant::KelvinConv;
+            TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + Constant::Kelvin;
+            TscollK = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast + Constant::Kelvin;
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TscollK) - pow_4(TsoK)) / (TscollK - TsoK);
         }
         //        AreaSum = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
@@ -1637,7 +1635,7 @@ namespace TranspiredCollector {
             state.dataTranspiredCollector->GetInputFlag = false;
         }
 
-        WhichUTSC = UtilityRoutines::FindItemInList(UTSCName, state.dataTranspiredCollector->UTSC);
+        WhichUTSC = Util::FindItemInList(UTSCName, state.dataTranspiredCollector->UTSC);
         if (WhichUTSC != 0) {
             NodeNum = state.dataTranspiredCollector->UTSC(WhichUTSC).InletNode(1);
         } else {
@@ -1672,7 +1670,7 @@ namespace TranspiredCollector {
             state.dataTranspiredCollector->GetInputFlag = false;
         }
 
-        WhichUTSC = UtilityRoutines::FindItemInList(UTSCName, state.dataTranspiredCollector->UTSC);
+        WhichUTSC = Util::FindItemInList(UTSCName, state.dataTranspiredCollector->UTSC);
         if (WhichUTSC != 0) {
             NodeNum = state.dataTranspiredCollector->UTSC(WhichUTSC).OutletNode(1);
         } else {
@@ -1809,8 +1807,8 @@ namespace TranspiredCollector {
             Real64 AbsThermSurf =
                 dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
                     ->AbsorpThermal;
-            Real64 TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + Constant::KelvinConv;
-            Real64 TsBaffK = TmpTsBaf + Constant::KelvinConv;
+            Real64 TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + Constant::Kelvin;
+            Real64 TsBaffK = TmpTsBaf + Constant::Kelvin;
             if (TsBaffK == TsoK) {        // avoid divide by zero
                 HPlenARR(ThisSurf) = 0.0; // no net heat transfer if same temperature
             } else {
@@ -1872,7 +1870,7 @@ namespace TranspiredCollector {
         Real64 Isc =
             sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, state.dataSurface->Surface, &DataSurfaces::SurfaceData::Area, SurfPtrARR) / A;
         // average of surface temps , for Beta in Grashoff no.
-        Real64 TmeanK = 0.5 * (TmpTsBaf + Tso) + Constant::KelvinConv;
+        Real64 TmeanK = 0.5 * (TmpTsBaf + Tso) + Constant::Kelvin;
         // Grasshof number for natural convection calc
         Real64 Gr = g * pow_3(GapThick) * std::abs(Tso - TmpTsBaf) * pow_2(RhoAir) / (TmeanK * pow_2(nu));
 
@@ -1883,14 +1881,14 @@ namespace TranspiredCollector {
         Real64 VdotWind = Cv * (VentArea / 2.0) * Vwind; // volume flow rate of nat. vent due to wind
 
         if (TaGap > Tamb) {
-            VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (TaGap - Tamb) / (TaGap + Constant::KelvinConv));
+            VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (TaGap - Tamb) / (TaGap + Constant::Kelvin));
         } else if (TaGap == Tamb) {
             VdotThermal = 0.0;
         } else {
             if ((std::abs(Tilt) < 5.0) || (std::abs(Tilt - 180.0) < 5.0)) {
                 VdotThermal = 0.0; // stable buoyancy situation
             } else {
-                VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (Tamb - TaGap) / (Tamb + Constant::KelvinConv));
+                VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (Tamb - TaGap) / (Tamb + Constant::Kelvin));
             }
         }
 

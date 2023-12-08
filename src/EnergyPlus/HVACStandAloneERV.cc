@@ -126,7 +126,7 @@ void SimStandAloneERV(EnergyPlusData &state,
 
     // Find the correct Stand Alone ERV unit index
     if (CompIndex == 0) {
-        StandAloneERVNum = UtilityRoutines::FindItem(CompName, state.dataHVACStandAloneERV->StandAloneERV);
+        StandAloneERVNum = Util::FindItem(CompName, state.dataHVACStandAloneERV->StandAloneERV);
         if (StandAloneERVNum == 0) {
             ShowFatalError(state, format("SimStandAloneERV: Unit not found={}", CompName));
         }
@@ -725,7 +725,7 @@ void GetStandAloneERV(EnergyPlusData &state)
 
         thisOAController.Name = Alphas(1);
         thisOAController.ControllerType = MixedAir::MixedAirControllerType::ControllerStandAloneERV;
-        int WhichERV = UtilityRoutines::FindItemInList(Alphas(1), state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
+        int WhichERV = Util::FindItemInList(Alphas(1), state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
         if (WhichERV != 0) {
             AirFlowRate = state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirVolFlow;
             state.dataHVACStandAloneERV->StandAloneERV(WhichERV).ControllerIndex = OutAirNum;
@@ -854,9 +854,9 @@ void GetStandAloneERV(EnergyPlusData &state)
         Real64 HighRHOARatio = 1.0;
         //   READ Modify Air Flow Data
         //   High humidity control option is YES, read in additional data
-        if (UtilityRoutines::SameString(Alphas(6), "Yes")) {
+        if (Util::SameString(Alphas(6), "Yes")) {
 
-            HStatZoneNum = UtilityRoutines::FindItemInList(Alphas(7), state.dataHeatBal->Zone);
+            HStatZoneNum = Util::FindItemInList(Alphas(7), state.dataHeatBal->Zone);
             thisOAController.HumidistatZoneNum = HStatZoneNum;
 
             // Get the node number for the zone with the humidistat
@@ -911,17 +911,17 @@ void GetStandAloneERV(EnergyPlusData &state)
                 HighRHOARatio = 1.0;
             }
 
-            if (UtilityRoutines::SameString(Alphas(8), "Yes")) {
+            if (Util::SameString(Alphas(8), "Yes")) {
                 thisOAController.ModifyDuringHighOAMoisture = false;
             } else {
                 thisOAController.ModifyDuringHighOAMoisture = true;
             }
 
-        } else if (!UtilityRoutines::SameString(Alphas(6), "No") && NumAlphas > 4 && (!lAlphaBlanks(5))) {
+        } else if (!Util::SameString(Alphas(6), "No") && NumAlphas > 4 && (!lAlphaBlanks(5))) {
             ShowWarningError(state, format("{} \"{}\"", CurrentModuleObject, Alphas(1)));
             ShowContinueError(state, format("... Invalid {} = {}", cAlphaFields(6), Alphas(6)));
             ShowContinueError(state, format("... {} is assumed to be \"No\" and the simulation continues.", cAlphaFields(6)));
-        } // IF(UtilityRoutines::SameString(Alphas(6),'Yes'))THEN
+        } // IF(Util::SameString(Alphas(6),'Yes'))THEN
 
         thisOAController.HighRHOAFlowRatio = HighRHOARatio;
         if (WhichERV != 0) {
@@ -1654,8 +1654,8 @@ Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
         state.dataHVACStandAloneERV->GetERVInputFlag = false;
     }
 
-    if (UtilityRoutines::SameString(ERVType, "ZoneHVAC:EnergyRecoveryVentilator")) {
-        int WhichERV = UtilityRoutines::FindItem(ERVCtrlName, state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
+    if (Util::SameString(ERVType, "ZoneHVAC:EnergyRecoveryVentilator")) {
+        int WhichERV = Util::FindItem(ERVCtrlName, state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
         if (WhichERV != 0) {
             return state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirVolFlow;
         }

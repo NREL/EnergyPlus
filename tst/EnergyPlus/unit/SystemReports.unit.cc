@@ -108,10 +108,9 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NodeNumOut = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NumMeteredVars = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar.allocate(1);
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).EndUse_CompMode = SystemReports::EndUseType::CoolingOnly;
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).CurMeterReading = 100.0;
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType =
-        static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, UtilityRoutines::makeUPPER("NaturalGas")));
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).curMeterReading = 100.0;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).resource = Constant::eResource::NaturalGas;
 
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).Name = "Main Gas Heating Coil";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf = "COIL:HEATING:DESUPERHEATER";
@@ -119,10 +118,9 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).NodeNumOut = 2;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).NumMeteredVars = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar.allocate(1);
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).EndUse_CompMode = SystemReports::EndUseType::CoolingOnly;
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).CurMeterReading = 100.0;
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType =
-        static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, UtilityRoutines::makeUPPER("NaturalGas")));
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).curMeterReading = 100.0;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).resource = Constant::eResource::NaturalGas;
 
     state->dataLoopNodes->Node(1).MassFlowRate = 1.0;
     state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
@@ -134,7 +132,7 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
                         CompLoadFlag,
                         AirLoopNum,
                         state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf,
-                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).resource,
                         CompLoad,
                         CompEnergyUse);
 
@@ -143,7 +141,7 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
                         CompLoadFlag,
                         AirLoopNum,
                         state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf,
-                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).resource,
                         CompLoad,
                         CompEnergyUse);
 
@@ -159,17 +157,15 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     state->dataSysRpts->SysLoadRepVars(1).HCCompNaturalGas = 0;
     state->dataSysRpts->SysLoadRepVars(1).TotNaturalGas = 0;
 
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType =
-        static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, UtilityRoutines::makeUPPER("Propane")));
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType =
-        static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, UtilityRoutines::makeUPPER("Propane")));
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).resource = Constant::eResource::Propane;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).resource = Constant::eResource::Propane;
 
     // Calculate SysHumidPropane ("Air System Humidifier Propane Energy" Output Variable)
     CalcSystemEnergyUse(*state,
                         CompLoadFlag,
                         AirLoopNum,
                         state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf,
-                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).resource,
                         CompLoad,
                         CompEnergyUse);
 
@@ -178,7 +174,7 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
                         CompLoadFlag,
                         AirLoopNum,
                         state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf,
-                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).resource,
                         CompLoad,
                         CompEnergyUse);
 

@@ -48,7 +48,7 @@
 #ifndef PlantTopologySubcomponents_hh_INCLUDED
 #define PlantTopologySubcomponents_hh_INCLUDED
 
-#include <EnergyPlus/Plant/MeterData.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {
@@ -82,7 +82,7 @@ namespace DataPlant {
         Real64 Capacity;
         Real64 Efficiency;
         int OpMode;
-        Array1D<MeterData> MeteredVar; // Index of energy output report data
+        Array1D<OutputProcessor::MeterData> MeteredVar; // Index of energy output report data
         int AirSysToPlantPtr;          // 0=No plant connection, >0 = index to AirSysToPlant array
 
         // Default Constructor
@@ -128,7 +128,7 @@ namespace DataPlant {
         Real64 PeakPlantSupplyOtherEff;
         int AirSysToPlantPtr; // 0=No plant connection, >0 = index to AirSysToPlant array
         Real64 LoopLoadFrac;
-        Array1D<MeterData> MeteredVar;           // Index of energy output report data
+        Array1D<OutputProcessor::MeterData> MeteredVar;           // Index of energy output report data
         Array1D<SubSubcomponentData> SubSubComp; // Component list
 
         // Default Constructor

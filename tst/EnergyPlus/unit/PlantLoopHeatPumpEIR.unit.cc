@@ -3163,11 +3163,11 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
 
     EXPECT_EQ(2, NumFound);
     EXPECT_TRUE(compare_enums(meteredVars(1).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER
-    EXPECT_EQ(meteredVars(1).endUse, "");
-    EXPECT_EQ(meteredVars(1).group, "PLANT");
+    EXPECT_TRUE(compare_enums(meteredVars(1).sovEndUseCat, OutputProcessor::SOVEndUseCat::Invalid));
+    EXPECT_TRUE(compare_enums(meteredVars(1).sovGroup, OutputProcessor::SOVGroup::Plant));
     EXPECT_TRUE(compare_enums(meteredVars(2).resource, Constant::eResource::Electricity)); // Electric
-    EXPECT_EQ(meteredVars(2).endUse, "COOLING");
-    EXPECT_EQ(meteredVars(2).group, "PLANT");
+    EXPECT_TRUE(compare_enums(meteredVars(2).sovEndUseCat, OutputProcessor::SOVEndUseCat::Cooling));
+    EXPECT_TRUE(compare_enums(meteredVars(2).sovGroup, OutputProcessor::SOVGroup::Plant));
 }
 
 TEST_F(EnergyPlusFixture, HeatingMetering)
@@ -3254,11 +3254,11 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
 
     EXPECT_EQ(2, NumFound);
     EXPECT_TRUE(compare_enums(meteredVars(1).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER
-    EXPECT_EQ(meteredVars(1).endUse, "");
-    EXPECT_EQ(meteredVars(1).group, "PLANT");
+    EXPECT_TRUE(compare_enums(meteredVars(1).sovEndUseCat, OutputProcessor::SOVEndUseCat::Invalid));
+    EXPECT_TRUE(compare_enums(meteredVars(1).sovGroup, OutputProcessor::SOVGroup::Plant));
     EXPECT_TRUE(compare_enums(meteredVars(2).resource, Constant::eResource::Electricity)); // Electric
-    EXPECT_EQ(meteredVars(2).endUse, "HEATING");
-    EXPECT_EQ(meteredVars(2).group, "PLANT");
+    EXPECT_TRUE(compare_enums(meteredVars(2).sovEndUseCat, OutputProcessor::SOVEndUseCat::Heating));
+    EXPECT_TRUE(compare_enums(meteredVars(2).sovGroup, OutputProcessor::SOVGroup::Plant));
 }
 
 TEST_F(EnergyPlusFixture, TestOperatingFlowRates_FullyAutosized_AirSource)

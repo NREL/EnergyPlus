@@ -5516,8 +5516,8 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
     GetCurveInput(*state);
     Fans::GetFanInput(*state);
     GetDXCoils(*state);
-    int dXCoilIndex = UtilityRoutines::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
-    int fanIndex = UtilityRoutines::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::FanName);
+    int dXCoilIndex = Util::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
+    int fanIndex = Util::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::FanName);
     auto &coolcoilTwoSpeed = state->dataDXCoils->DXCoil(dXCoilIndex);
     auto &supplyFan = state->dataFans->Fan(fanIndex);
     coolcoilTwoSpeed.SupplyFanIndex = fanIndex;
@@ -5754,8 +5754,8 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatings_Curve_Fix_Test)
     GetCurveInput(*state);
     Fans::GetFanInput(*state);
     GetDXCoils(*state);
-    int dXCoilIndex = UtilityRoutines::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
-    int fanIndex = UtilityRoutines::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::FanName);
+    int dXCoilIndex = Util::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
+    int fanIndex = Util::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::FanName);
     auto &coolcoilTwoSpeed = state->dataDXCoils->DXCoil(dXCoilIndex);
     auto &supplyFan = state->dataFans->Fan(fanIndex);
     coolcoilTwoSpeed.SupplyFanIndex = fanIndex;
@@ -6855,11 +6855,11 @@ TEST_F(EnergyPlusFixture, Test_DHW_End_Use_Cat_Removal)
     EXPECT_EQ(24, state->dataOutputProcessor->meters.size());
     EXPECT_EQ(state->dataOutputProcessor->meters[19]->Name, "WaterSystems:Electricity");
     EXPECT_EQ(state->dataOutputProcessor->meters[19]->resource, Constant::eResource::Electricity);
-    EXPECT_EQ(state->dataOutputProcessor->meters[19]->EndUse, "WaterSystems");
+    EXPECT_EQ(state->dataOutputProcessor->meters[19]->sovEndUseCat, OutputProcessor::SOVEndUseCat::WaterSystem);
 
     EXPECT_EQ(state->dataOutputProcessor->meters[20]->Name, "General:WaterSystems:Electricity");
     EXPECT_EQ(state->dataOutputProcessor->meters[20]->resource, Constant::eResource::Electricity);
-    EXPECT_EQ(state->dataOutputProcessor->meters[20]->EndUse, "WaterSystems");
+    EXPECT_EQ(state->dataOutputProcessor->meters[20]->sovEndUseCat, OutputProcessor::SOVEndUseCat::WaterSystem);
 }
 
 } // namespace EnergyPlus

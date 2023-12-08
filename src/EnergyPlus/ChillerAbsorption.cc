@@ -342,11 +342,10 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                                            "Condenser (not tested) Nodes");
 
         if (NumAlphas > 8) {
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "HotWater") ||
-                UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "HotWater")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "HotWater") ||
+                Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "HotWater")) {
                 thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Water;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), fluidNameSteam) ||
-                       state.dataIPShortCut->cAlphaArgs(9).empty()) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), fluidNameSteam) || state.dataIPShortCut->cAlphaArgs(9).empty()) {
                 thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
             } else {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
@@ -509,9 +508,9 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::Electricity,
-                        "Cooling",
+                        OutputProcessor::SOVEndUseCat::Cooling,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
     SetupOutputVariable(state,
                         "Chiller Evaporator Cooling Rate",
                         Constant::Units::W,
@@ -528,9 +527,9 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::EnergyTransfer,
-                        "CHILLERS",
+                        OutputProcessor::SOVEndUseCat::Chillers,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
     SetupOutputVariable(state,
                         "Chiller Evaporator Inlet Temperature",
                         Constant::Units::C,
@@ -569,9 +568,9 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eResource::EnergyTransfer,
-                        "HEATREJECTION",
+                        OutputProcessor::SOVEndUseCat::HeatRejection,
                         {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
     SetupOutputVariable(state,
                         "Chiller Condenser Inlet Temperature",
                         Constant::Units::C,
@@ -611,9 +610,9 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                             this->Name,
                             {},
                             Constant::eResource::PlantLoopHeatingDemand,
-                            "CHILLERS",
+                            OutputProcessor::SOVEndUseCat::Chillers,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
     } else {
         if (this->GenInputOutputNodesUsed) {
             SetupOutputVariable(state,
@@ -632,9 +631,9 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 this->Name,
                                 {},
                                 Constant::eResource::PlantLoopHeatingDemand, 
-                                "CHILLERS",
+                                OutputProcessor::SOVEndUseCat::Chillers,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
         } else {
             SetupOutputVariable(state,
                                 "Chiller Source Steam Rate",
@@ -652,9 +651,9 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 this->Name,
                                 {},
                                 Constant::eResource::DistrictHeatingSteam, 
-                                "Cooling",
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
         }
     }
 

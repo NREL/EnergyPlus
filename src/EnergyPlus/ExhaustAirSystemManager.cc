@@ -124,7 +124,7 @@ namespace ExhaustAirSystemManager {
                 ++exhSysNum;
                 auto const &objectFields = instance.value();
                 auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(exhSysNum);
-                thisExhSys.Name = UtilityRoutines::makeUPPER(instance.key());
+                thisExhSys.Name = Util::makeUPPER(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
                 std::string zoneMixerName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_mixer_name");
@@ -158,9 +158,9 @@ namespace ExhaustAirSystemManager {
                 int centralFanTypeNum = 0;
                 // getEnumValue()?
 
-                if (UtilityRoutines::SameString(centralFanType, "Fan:SystemModel")) {
+                if (Util::SameString(centralFanType, "Fan:SystemModel")) {
                     centralFanTypeNum = DataHVACGlobals::FanType_SystemModelObject;
-                } else if (UtilityRoutines::SameString(centralFanType, "Fan:ComponentModel")) {
+                } else if (Util::SameString(centralFanType, "Fan:ComponentModel")) {
                     centralFanTypeNum = DataHVACGlobals::FanType_ComponentModel;
                 } else {
                     ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
@@ -474,7 +474,7 @@ namespace ExhaustAirSystemManager {
                 ++exhCtrlNum;
                 auto const &objectFields = instance.value();
                 auto &thisExhCtrl = state.dataZoneEquip->ZoneExhaustControlSystem(exhCtrlNum);
-                thisExhCtrl.Name = UtilityRoutines::makeUPPER(instance.key());
+                thisExhCtrl.Name = Util::makeUPPER(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
                 std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_schedule_name");
@@ -494,10 +494,10 @@ namespace ExhaustAirSystemManager {
 
                 std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
                 thisExhCtrl.ZoneName = zoneName;
-                int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
+                int zoneNum = Util::FindItemInList(zoneName, state.dataHeatBal->Zone);
                 thisExhCtrl.ZoneNum = zoneNum;
 
-                thisExhCtrl.ControlledZoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
+                thisExhCtrl.ControlledZoneNum = Util::FindItemInList(zoneName, state.dataHeatBal->Zone);
 
                 // These two nodes are required inputs:
                 std::string inletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "inlet_node_name");
@@ -532,9 +532,8 @@ namespace ExhaustAirSystemManager {
                 Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate");
                 thisExhCtrl.DesignExhaustFlowRate = designExhaustFlowRate;
 
-                std::string flowControlTypeName =
-                    UtilityRoutines::makeUPPER(ip->getAlphaFieldValue(objectFields, objectSchemaProps, "flow_control_type"));
-                // std::string flowControlTypeName = UtilityRoutines::makeUPPER(fields.at("flow_control_type").get<std::string>());
+                std::string flowControlTypeName = Util::makeUPPER(ip->getAlphaFieldValue(objectFields, objectSchemaProps, "flow_control_type"));
+                // std::string flowControlTypeName = Util::makeUPPER(fields.at("flow_control_type").get<std::string>());
                 thisExhCtrl.FlowControlOption =
                     static_cast<ZoneExhaustControl::FlowControlType>(getEnumValue(flowControlTypeNamesUC, flowControlTypeName));
 
@@ -922,7 +921,7 @@ namespace ExhaustAirSystemManager {
         }
 
         return // ( state.dataZoneEquip->NumExhaustAirSystems > 0) &&
-            (UtilityRoutines::FindItemInList(CompName, state.dataZoneEquip->ExhaustAirSystem, &ExhaustAir::ZoneMixerName) > 0);
+            (Util::FindItemInList(CompName, state.dataZoneEquip->ExhaustAirSystem, &ExhaustAir::ZoneMixerName) > 0);
     }
 
 } // namespace ExhaustAirSystemManager

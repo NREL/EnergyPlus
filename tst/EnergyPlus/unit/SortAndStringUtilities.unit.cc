@@ -45,27 +45,55 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PlantOperationCallingOrder_hh_INCLUDED
-#define PlantOperationCallingOrder_hh_INCLUDED
+// EnergyPlus::SortAndStringUtilities Unit Tests
 
-#include <EnergyPlus/Plant/Enums.hh>
+// Google Test Headers
+#include <gtest/gtest.h>
 
-namespace EnergyPlus {
-namespace DataPlant {
+// ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
 
-    struct PlantCallingOrderInfoStruct
-    {
-        // Members
-        int LoopIndex;                        // plant or condenser loop indexes in calling order
-        DataPlant::LoopSideLocation LoopSide; // plant or condenser loop sides in calling order
-        int LoopPumpSimulationType;           // type of pump topology on half loop
+// EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/SortAndStringUtilities.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
-        // Default Constructor
-        PlantCallingOrderInfoStruct() : LoopIndex(0), LoopSide(DataPlant::LoopSideLocation::Invalid), LoopPumpSimulationType(0)
-        {
-        }
-    };
-} // namespace DataPlant
-} // namespace EnergyPlus
+using namespace EnergyPlus;
+using namespace EnergyPlus::SortAndStringUtilities;
 
-#endif
+TEST_F(EnergyPlusFixture, SortAndStringUtilitiesTest_Basic)
+{
+    Array1D_string Alphas({"ZEBRA", "LION", "RACOON", "BOA", "LEMUR"});
+    Array1D_int iAlphas(5);
+    SetupAndSort(Alphas, iAlphas);
+    EXPECT_TRUE(eq(Array1D_int({4, 5, 2, 3, 1}), iAlphas));
+}
+
+TEST_F(EnergyPlusFixture, SortAndStringUtilitiesTest_findItemInSortedListUnderscoreTest)
+{
+    static Array1D_string ListOfObjects; // stored variable names
+    static Array1D_int iListOfObjects;
+    ListOfObjects.allocate(7);
+
+    ListOfObjects = Array1D_string({
+        // list which has been incorrectly sorted
+        "SYSTEM NODE STANDARD DENSITY VOLUME FLOW RATE",
+        "SYSTEM NODE TEMPERATURE",
+        "SYSTEM NODE WETBULB TEMPERATURE",
+        "S_CCFRAC",
+        "T_TRIG",
+        "VRF HEAT PUMP CONDENSER INLET TEMPERATURE",
+        "VRF HEAT PUMP COOLING COP",
+    });
+
+    int NumObjectDefs = ListOfObjects.size();
+
+    iListOfObjects.allocate(NumObjectDefs);
+    SetupAndSort(ListOfObjects, iListOfObjects); // list is resorted
+
+    auto index = Util::FindItemInSortedList("SYSTEM NODE TEMPERATURE", ListOfObjects, NumObjectDefs);
+
+    EXPECT_EQ(3, index);
+}

@@ -154,7 +154,7 @@ namespace ZoneAirLoopEquipmentManager {
 
         // Find the correct Zone Air Distribution Unit Equipment
         if (CompIndex == 0) {
-            AirDistUnitNum = UtilityRoutines::FindItemInList(ZoneAirLoopEquipName, state.dataDefineEquipment->AirDistUnit);
+            AirDistUnitNum = Util::FindItemInList(ZoneAirLoopEquipName, state.dataDefineEquipment->AirDistUnit);
             if (AirDistUnitNum == 0) {
                 ShowFatalError(state, format("ManageZoneAirLoopEquipment: Unit not found={}", ZoneAirLoopEquipName));
             }
@@ -252,7 +252,7 @@ namespace ZoneAirLoopEquipmentManager {
                                                                          lAlphaBlanks,
                                                                          cAlphaFields,
                                                                          cNumericFields); //  data for one zone
-                UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
+                Util::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
                 airDistUnit.Name = AlphArray(1);
                 // Input Outlet Node Num
@@ -301,7 +301,7 @@ namespace ZoneAirLoopEquipmentManager {
                 // DesignSpecification:AirTerminal:Sizing name
                 airDistUnit.AirTerminalSizingSpecIndex = 0;
                 if (!lAlphaBlanks(5)) {
-                    airDistUnit.AirTerminalSizingSpecIndex = UtilityRoutines::FindItemInList(AlphArray(5), state.dataSize->AirTerminalSizingSpec);
+                    airDistUnit.AirTerminalSizingSpecIndex = Util::FindItemInList(AlphArray(5), state.dataSize->AirTerminalSizingSpec);
                     if (airDistUnit.AirTerminalSizingSpecIndex == 0) {
                         ShowSevereError(state, format("{} = {} not found.", cAlphaFields(5), AlphArray(5)));
                         ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, airDistUnit.Name));
@@ -309,7 +309,7 @@ namespace ZoneAirLoopEquipmentManager {
                     }
                 }
 
-                const std::string typeNameUC = UtilityRoutines::makeUPPER(airDistUnit.EquipType(AirDistCompUnitNum));
+                const std::string typeNameUC = Util::makeUPPER(airDistUnit.EquipType(AirDistCompUnitNum));
                 airDistUnit.EquipTypeEnum(AirDistCompUnitNum) = static_cast<ZnAirLoopEquipType>(getEnumValue(ZnAirLoopEquipTypeNamesUC, typeNameUC));
                 // Validate EquipType for Air Distribution Unit
                 switch (airDistUnit.EquipTypeEnum(AirDistCompUnitNum)) {

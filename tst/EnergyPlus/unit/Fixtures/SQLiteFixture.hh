@@ -105,6 +105,7 @@ protected:
         ss->str(std::string());
     }
 
+#ifdef GET_OUT        
     std::string storageType(const int storageTypeIndex)
     {
         return state->dataSQLiteProcedures->sqlite->storageType(storageTypeIndex);
@@ -119,7 +120,7 @@ protected:
     {
         return state->dataSQLiteProcedures->sqlite->reportingFreqName(reportingFreqIndex);
     }
-
+#endif // GET_OUT
     std::string columnText(const unsigned char *column)
     {
         return std::string(reinterpret_cast<const char *>(column));

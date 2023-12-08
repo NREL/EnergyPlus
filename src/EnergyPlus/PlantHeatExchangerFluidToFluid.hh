@@ -166,7 +166,7 @@ namespace PlantHeatExchangerFluidToFluid {
         Real64 MaxOperationTemp;
         PlantConnectionStruct DemandSideLoop; // plant connections and data for the side of HX connected to demand side
         PlantConnectionStruct SupplySideLoop;
-        std::string HeatTransferMeteringEndUse;
+        OutputProcessor::SOVEndUseCat HeatTransferMeteringEndUse = OutputProcessor::SOVEndUseCat::Invalid;
         std::string ComponentUserName; // user name for control-associated  component
         DataPlant::PlantEquipmentType ComponentType;
         PlantLocatorStruct OtherCompSupplySideLoop;

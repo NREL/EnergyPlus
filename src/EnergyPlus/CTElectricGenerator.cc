@@ -376,9 +376,9 @@ namespace CTElectricGenerator {
                             this->Name,
                             {},
                             Constant::eResource::ElectricityProduced,
-                            "COGENERATION",
+                            OutputProcessor::SOVEndUseCat::Cogeneration,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
 
         SetupOutputVariable(state,
                             format("Generator {} Rate", sFuelType),
@@ -397,9 +397,9 @@ namespace CTElectricGenerator {
                             this->Name,
                             {},
                             Constant::eFuel2eResource[(int)this->FuelType],
-                            "COGENERATION",
+                            OutputProcessor::SOVEndUseCat::Cogeneration,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
 
         //    general fuel use report (to match other generators)
         SetupOutputVariable(state,
@@ -452,9 +452,9 @@ namespace CTElectricGenerator {
                                 this->Name,
                                 {},
                                 Constant::eResource::EnergyTransfer,
-                                "HEATRECOVERY",
+                                OutputProcessor::SOVEndUseCat::HeatRecovery,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             SetupOutputVariable(state,
                                 "Generator Lube Heat Recovery Rate",
@@ -473,9 +473,9 @@ namespace CTElectricGenerator {
                                 this->Name,
                                 {},
                                 Constant::eResource::EnergyTransfer,
-                                "HEATRECOVERY",
+                                OutputProcessor::SOVEndUseCat::HeatRecovery,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             SetupOutputVariable(state,
                                 "Generator Produced Thermal Rate",

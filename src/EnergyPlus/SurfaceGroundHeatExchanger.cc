@@ -230,7 +230,7 @@ namespace SurfaceGroundHeatExchanger {
             state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).ConstructionName = state.dataIPShortCut->cAlphaArgs(2);
             state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).ConstructionNum =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
 
             if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).ConstructionNum == 0) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -329,9 +329,9 @@ namespace SurfaceGroundHeatExchanger {
             }
 
             // get lower b.c. type
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "GROUND")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "GROUND")) {
                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).LowerSurfCond = SurfCond_Ground;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "EXPOSED")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "EXPOSED")) {
                 state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).LowerSurfCond = SurfCond_Exposed;
             } else {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
@@ -477,7 +477,7 @@ namespace SurfaceGroundHeatExchanger {
         // get QTF data - only once
         if (this->InitQTF) {
             for (Cons = 1; Cons <= state.dataHeatBal->TotConstructs; ++Cons) {
-                if (UtilityRoutines::SameString(state.dataConstruction->Construct(Cons).Name, this->ConstructionName)) {
+                if (Util::SameString(state.dataConstruction->Construct(Cons).Name, this->ConstructionName)) {
                     // some error checking ??
                     // CTF stuff
                     LayerNum = state.dataConstruction->Construct(Cons).TotLayers;
@@ -1244,8 +1244,8 @@ namespace SurfaceGroundHeatExchanger {
         // set previous surface temp
         OldSurfTemp = this->TtopHistory[1];
         // absolute temperatures
-        SurfTempAbs = OldSurfTemp + Constant::KelvinConv;
-        SkyTempAbs = ThisSkyTemp + Constant::KelvinConv;
+        SurfTempAbs = OldSurfTemp + Constant::Kelvin;
+        SkyTempAbs = ThisSkyTemp + Constant::Kelvin;
 
         // ASHRAE simple convection coefficient model for external surfaces.
         ConvCoef = Convect::CalcASHRAESimpExtConvCoeff(this->TopRoughness, ThisWindSpeed);
@@ -1296,8 +1296,8 @@ namespace SurfaceGroundHeatExchanger {
             // make a surface heat balance and solve for temperature
             OldSurfTemp = this->TbtmHistory[1];
             // absolute temperatures
-            SurfTempAbs = OldSurfTemp + Constant::KelvinConv;
-            ExtTempAbs = ThisDryBulb + Constant::KelvinConv;
+            SurfTempAbs = OldSurfTemp + Constant::Kelvin;
+            ExtTempAbs = ThisDryBulb + Constant::Kelvin;
 
             // ASHRAE simple convection coefficient model for external surfaces.
             ConvCoef = Convect::CalcASHRAESimpExtConvCoeff(this->TopRoughness, ThisWindSpeed);

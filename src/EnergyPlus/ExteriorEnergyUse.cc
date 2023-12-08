@@ -208,9 +208,9 @@ namespace ExteriorEnergyUse {
             }
             if (ipsc->lAlphaFieldBlanks(3)) {
                 state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode = ExteriorEnergyUse::LightControlType::ScheduleOnly;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "ScheduleNameOnly")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "ScheduleNameOnly")) {
                 state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode = ExteriorEnergyUse::LightControlType::ScheduleOnly;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "AstronomicalClock")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "AstronomicalClock")) {
                 state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode = ExteriorEnergyUse::LightControlType::AstroClockOverride;
             } else {
                 ShowSevereError(state,
@@ -257,7 +257,7 @@ namespace ExteriorEnergyUse {
                                 state.dataExteriorEnergyUse->ExteriorLights(Item).Name,
                                 {},
                                 Constant::eResource::Electricity,
-                                "Exterior Lights",
+                                OutputProcessor::SOVEndUseCat::ExteriorLights,
                                 EndUseSubcategoryName);
 
             // entries for predefined tables
@@ -323,7 +323,7 @@ namespace ExteriorEnergyUse {
                 ErrorsFound = true;
                 
             } else if ((exteriorEquip.FuelType = static_cast<Constant::eFuel>
-                        (getEnumValue(Constant::eFuelNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(2))))) == Constant::eFuel::Invalid) {
+                        (getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(2))))) == Constant::eFuel::Invalid) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 ErrorsFound = true;
 
@@ -344,7 +344,7 @@ namespace ExteriorEnergyUse {
                                      exteriorEquip.Name,
                                      {},
                                      exteriorFuel2eResource[(int)exteriorEquip.FuelType],
-                                     "ExteriorEquipment",
+                                     OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                                      EndUseSubcategoryName);
             } else {
                 SetupOutputVariable(state,
@@ -363,7 +363,7 @@ namespace ExteriorEnergyUse {
                                     exteriorEquip.Name,
                                     {},
                                     exteriorFuel2eResource[(int)exteriorEquip.FuelType],
-                                    "ExteriorEquipment",
+                                    OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                                     EndUseSubcategoryName);
             }
 
@@ -533,7 +533,7 @@ namespace ExteriorEnergyUse {
                                 exteriorEquip.Name,
                                 {},
                                 Constant::eResource::Water,
-                                "ExteriorEquipment",
+                                OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                                 EndUseSubcategoryName);
             SetupOutputVariable(state,
                                 "Exterior Equipment Mains Water Volume",
@@ -544,7 +544,7 @@ namespace ExteriorEnergyUse {
                                 exteriorEquip.Name,
                                 {},
                                 Constant::eResource::MainsWater,
-                                "ExteriorEquipment",
+                                OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                                 EndUseSubcategoryName);
         }
 

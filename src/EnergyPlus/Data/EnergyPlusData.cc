@@ -213,7 +213,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataPlantValves = std::make_unique<PlantValvesData>();
     this->dataPlnt = std::make_unique<DataPlantData>();
     this->dataPluginManager = std::make_unique<PluginManagerData>();
-    this->dataPollutionModule = std::make_unique<PollutionModuleData>();
+    this->dataPollution = std::make_unique<PollutionData>();
     this->dataPondGHE = std::make_unique<PondGroundHeatExchangerData>();
     this->dataPowerInductionUnits = std::make_unique<PoweredInductionUnitsData>();
     this->dataPsychrometrics = std::make_unique<PsychrometricsData>();
@@ -286,7 +286,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataWaterToAirHeatPump = std::make_unique<WaterToAirHeatPumpData>();
     this->dataWaterToAirHeatPumpSimple = std::make_unique<WaterToAirHeatPumpSimpleData>();
     this->dataWaterUse = std::make_unique<WaterUseData>();
-    this->dataWeatherManager = std::make_unique<WeatherManagerData>();
+    this->dataWeather = std::make_unique<WeatherManagerData>();
     this->dataWindTurbine = std::make_unique<WindTurbineData>();
     this->dataWindowAC = std::make_unique<WindowACData>();
     this->dataWindowComplexManager = std::make_unique<WindowComplexManagerData>();
@@ -469,7 +469,7 @@ void EnergyPlusData::clear_state()
     this->dataPlantValves->clear_state();
     this->dataPlnt->clear_state();
     this->dataPluginManager->clear_state();
-    this->dataPollutionModule->clear_state();
+    this->dataPollution->clear_state();
     this->dataPondGHE->clear_state();
     this->dataPowerInductionUnits->clear_state();
     this->dataPsychrometrics->clear_state();
@@ -542,7 +542,7 @@ void EnergyPlusData::clear_state()
     this->dataWaterToAirHeatPump->clear_state();
     this->dataWaterToAirHeatPumpSimple->clear_state();
     this->dataWaterUse->clear_state();
-    this->dataWeatherManager->clear_state();
+    this->dataWeather->clear_state();
     this->dataWindTurbine->clear_state();
     this->dataWindowAC->clear_state();
     this->dataWindowComplexManager->clear_state();

@@ -215,28 +215,6 @@ namespace DataZoneEquipment {
         Num
     };
 
-    struct EquipMeterData
-    {
-        // Members
-        std::string ReportVarName;
-        Constant::Units ReportVarUnits;
-        Constant::eResource ResourceType = Constant::eResource::Invalid;
-        std::string EndUse;
-        SystemReports::EndUseType EndUse_CompMode;
-        std::string Group;
-        int ReportVarIndex;
-        OutputProcessor::TimeStepType ReportVarIndexType;
-        OutputProcessor::VariableType ReportVarType;
-        Real64 CurMeterReading;
-
-        // Default Constructor
-        EquipMeterData()
-            : ReportVarUnits(Constant::Units::Invalid), EndUse_CompMode(SystemReports::EndUseType::NoHeatNoCool), ReportVarIndex(0),
-              ReportVarIndexType(OutputProcessor::TimeStepType::Zone), ReportVarType(OutputProcessor::VariableType::Invalid), CurMeterReading(0.0)
-        {
-        }
-    };
-
     struct SubSubEquipmentData // data for an individual component
     {
         // Members
@@ -247,7 +225,7 @@ namespace DataZoneEquipment {
         int InletNodeNum;
         int OutletNodeNum;
         int NumMeteredVars;
-        Array1D<EquipMeterData> MeteredVar; // Index of energy output report data
+        Array1D<OutputProcessor::MeterData> MeteredVar; // Index of energy output report data
         int EnergyTransComp;                // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
         int ZoneEqToPlantPtr;               // 0=No plant loop connection, >=0 index to ZoneEqToPlant array
         int OpMode;
@@ -277,7 +255,7 @@ namespace DataZoneEquipment {
         int InletNodeNum;
         int OutletNodeNum;
         int NumMeteredVars;
-        Array1D<EquipMeterData> MeteredVar;           // Index of energy output report data
+        Array1D<OutputProcessor::MeterData> MeteredVar;           // Index of energy output report data
         Array1D<SubSubEquipmentData> SubSubEquipData; // Component list
         int EnergyTransComp;                          // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
         int ZoneEqToPlantPtr;                         // 0=No plant loop connection, >0 index to ZoneEqToPlant array
@@ -405,7 +383,7 @@ namespace DataZoneEquipment {
         Array1D_int InletNodeNums;
         Array1D_int OutletNodeNums;
         int NumMeteredVars;
-        Array1D<EquipMeterData> MeteredVar;     // Index of energy output report data
+        Array1D<OutputProcessor::MeterData> MeteredVar;     // Index of energy output report data
         Array1D<SubEquipmentData> SubEquipData; // Component list
         int EnergyTransComp;                    // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
         int ZoneEqToPlantPtr;                   // 0=No plant loop connection, >0 index to ZoneEqToPlant array

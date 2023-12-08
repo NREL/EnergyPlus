@@ -305,7 +305,7 @@ namespace WaterUse {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+                Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
                 thisWEq.Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 thisWEq.EndUseSubcatName = state.dataIPShortCut->cAlphaArgs(2);
@@ -361,7 +361,7 @@ namespace WaterUse {
                 }
 
                 if ((NumAlphas > 6) && (!state.dataIPShortCut->lAlphaFieldBlanks(7))) {
-                    thisWEq.Zone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(7), state.dataHeatBal->Zone);
+                    thisWEq.Zone = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7), state.dataHeatBal->Zone);
 
                     if (thisWEq.Zone == 0) {
                         ShowSevereError(state,
@@ -418,7 +418,7 @@ namespace WaterUse {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+                Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
                 auto &waterConnection = state.dataWaterUse->WaterConnections(WaterConnNum);
                 waterConnection.Name = state.dataIPShortCut->cAlphaArgs(1);
 
@@ -502,7 +502,7 @@ namespace WaterUse {
                 if ((!state.dataIPShortCut->lAlphaFieldBlanks(8)) && (state.dataIPShortCut->cAlphaArgs(8) != "NONE")) {
                     waterConnection.HeatRecovery = true;
                     waterConnection.HeatRecoveryHX =
-                        static_cast<HeatRecovHX>(getEnumValue(HeatRecoverHXNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
+                        static_cast<HeatRecovHX>(getEnumValue(HeatRecoverHXNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
                     if (waterConnection.HeatRecoveryHX == HeatRecovHX::Invalid) {
                         ShowSevereError(state,
                                         format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8)));
@@ -510,8 +510,8 @@ namespace WaterUse {
                         ErrorsFound = true;
                     }
 
-                    waterConnection.HeatRecoveryConfig = static_cast<HeatRecovConfig>(
-                        getEnumValue(HeatRecoveryConfigNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
+                    waterConnection.HeatRecoveryConfig =
+                        static_cast<HeatRecovConfig>(getEnumValue(HeatRecoveryConfigNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
                     if (waterConnection.HeatRecoveryConfig == HeatRecovConfig::Invalid) {
                         ShowSevereError(state,
                                         format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
@@ -525,8 +525,7 @@ namespace WaterUse {
                 waterConnection.myWaterEquipArr.allocate(NumAlphas - 9);
 
                 for (AlphaNum = 10; AlphaNum <= NumAlphas; ++AlphaNum) {
-                    int WaterEquipNum =
-                        UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(AlphaNum), state.dataWaterUse->WaterEquipment);
+                    int WaterEquipNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(AlphaNum), state.dataWaterUse->WaterEquipment);
 
                     if (WaterEquipNum == 0) {
                         ShowSevereError(
@@ -667,9 +666,9 @@ namespace WaterUse {
                             this->Name,
                             {},
                             Constant::eResource::Water,
-                            "WATERSYSTEMS",
+                            OutputProcessor::SOVEndUseCat::WaterSystem,
                             this->EndUseSubcatName,
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
         SetupOutputVariable(state,
                             "Water Use Equipment Mains Water Volume",
                             Constant::Units::m3,
@@ -679,9 +678,9 @@ namespace WaterUse {
                             this->Name,
                             {},
                             Constant::eResource::MainsWater,
-                            "WATERSYSTEMS",
+                            OutputProcessor::SOVEndUseCat::WaterSystem,
                             this->EndUseSubcatName,
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
 
         SetupOutputVariable(state,
                             "Water Use Equipment Hot Water Temperature",
@@ -741,9 +740,9 @@ namespace WaterUse {
                                 this->Name,
                                 {},
                                 Constant::eResource::DistrictHeatingWater,
-                                "WATERSYSTEMS",
+                                OutputProcessor::SOVEndUseCat::WaterSystem,
                                 this->EndUseSubcatName,
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
         } else if (state.dataWaterUse->WaterConnections(this->Connections).StandAlone) {
             SetupOutputVariable(state,
@@ -755,9 +754,9 @@ namespace WaterUse {
                                 this->Name,
                                 {},
                                 Constant::eResource::DistrictHeatingWater,
-                                "WATERSYSTEMS",
+                                OutputProcessor::SOVEndUseCat::WaterSystem,
                                 this->EndUseSubcatName,
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
         } else { // The EQUIPMENT is coupled to a plant loop via a CONNECTIONS object
             SetupOutputVariable(state,
@@ -769,9 +768,9 @@ namespace WaterUse {
                                 this->Name,
                                 {},
                                 Constant::eResource::EnergyTransfer,
-                                "WATERSYSTEMS",
+                                OutputProcessor::SOVEndUseCat::WaterSystem,
                                 this->EndUseSubcatName,
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
         }
 
         if (this->Zone > 0) {
@@ -1007,9 +1006,9 @@ namespace WaterUse {
                                 this->Name,
                                 {},
                                 Constant::eResource::PlantLoopHeatingDemand,
-                                "WATERSYSTEMS",
+                                OutputProcessor::SOVEndUseCat::WaterSystem,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
         }
     }
 

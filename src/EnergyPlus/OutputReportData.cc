@@ -88,13 +88,15 @@ void AnnualFieldSet::getVariableKeysFromFldSt(EnergyPlusData &state,
 {
     // this hides the Objexx arrays and returns regular vectors
     Array1D_int tmpVarNums;
+    Array1D_string tmpVarNames;
     tmpVarNums.allocate(keyCount);
-    GetVariableKeys(state, m_variMeter, typeVar, tmpVarNums); // call outputprocessor routine with member variable
+    tmpVarNames.allocate(keyCount);
+    GetVariableKeys(state, m_variMeter, typeVar, tmpVarNames, tmpVarNums); // call outputprocessor routine with member variable
     namesOfKeys.clear();
     indexesForKeyVar.clear();
     for (int iKey = 1; iKey <= keyCount; ++iKey) {
         indexesForKeyVar.push_back(tmpVarNums(iKey));
-        namesOfKeys.push_back(state.dataOutputProcessor->outVars[tmpVarNums(iKey)]->keyUC);
+        namesOfKeys.push_back(tmpVarNames(iKey));
     }
 }
 

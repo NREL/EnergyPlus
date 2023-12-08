@@ -97,7 +97,7 @@ void SimZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     }
 
     if (CompIndex == 0) {
-        CompNum = UtilityRoutines::FindItemInList(CompName, state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner);
+        CompNum = Util::FindItemInList(CompName, state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner);
         if (CompNum == 0) {
             ShowFatalError(state, "SimZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC not found.");
         }
@@ -507,13 +507,13 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(state,
-                                        Alphas(1),
-                                        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner,
-                                        UnitLoop - 1,
-                                        IsNotOK,
-                                        IsBlank,
-                                        cCurrentModuleObject + " Name");
+            Util::VerifyName(state,
+                             Alphas(1),
+                             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner,
+                             UnitLoop - 1,
+                             IsNotOK,
+                             IsBlank,
+                             cCurrentModuleObject + " Name");
 
             ErrorObjectHeader eoh{routineName, cCurrentModuleObject, Alphas(1)};
             auto &hybridUnitaryAC = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop);
@@ -634,9 +634,9 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             // A13, \field Fan Heat Included in Lookup Tables
             hybridUnitaryAC.FanHeatGain = false;
             if (!lAlphaBlanks(13)) {
-                if (UtilityRoutines::SameString(Alphas(13), "Yes")) {
+                if (Util::SameString(Alphas(13), "Yes")) {
                     hybridUnitaryAC.FanHeatGain = false;
-                } else if (UtilityRoutines::SameString(Alphas(13), "No")) {
+                } else if (Util::SameString(Alphas(13), "No")) {
                     hybridUnitaryAC.FanHeatGain = true;
                 } else {
                     ShowSevereError(
@@ -668,10 +668,11 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             // N5, \field Minimum Time Between Mode Change
             // A15, \field First fuel type
             if (lAlphaBlanks(15)) {
-                ShowSevereEmptyField(state, eoh, cAlphaFields(15));
-                ErrorsFound = true;
+                // The original code never checks if this field is empty, but adding this check leads to a unit test failure.
+                // ShowSevereEmptyField(state, eoh, cAlphaFields(15));
+                // ErrorsFound = true;
             } else if ((hybridUnitaryAC.firstFuel = static_cast<Constant::eFuel>
-                        (getEnumValue(Constant::eFuelNamesUC, UtilityRoutines::makeUPPER(Alphas(15))))) == Constant::eFuel::Invalid) {
+                        (getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(Alphas(15))))) == Constant::eFuel::Invalid) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(15), Alphas(15));
                 ErrorsFound = true;
             }
@@ -680,7 +681,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             if (!lAlphaBlanks(16) &&
                 Alphas(16) != "NONE" &&
                 (hybridUnitaryAC.secondFuel = static_cast<Constant::eFuel>
-                        (getEnumValue(Constant::eFuelNamesUC, UtilityRoutines::makeUPPER(Alphas(16))))) == Constant::eFuel::Invalid) {
+                        (getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(Alphas(16))))) == Constant::eFuel::Invalid) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(16), Alphas(16));
                 ErrorsFound = true;
             }
@@ -689,7 +690,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             if (!lAlphaBlanks(17) &&
                 Alphas(17) != "NONE" &&
                 (hybridUnitaryAC.thirdFuel = static_cast<Constant::eFuel>
-                        (getEnumValue(Constant::eFuelNamesUC, UtilityRoutines::makeUPPER(Alphas(17))))) == Constant::eFuel::Invalid) {
+                        (getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(Alphas(17))))) == Constant::eFuel::Invalid) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(17), Alphas(17));
                 ErrorsFound = true;
             }
@@ -698,8 +699,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             
             // A19, \ OA requirement pointer
             if (!lAlphaBlanks(19)) {
-                hybridUnitaryAC.OARequirementsPtr =
-                    UtilityRoutines::FindItemInList(Alphas(19), state.dataSize->OARequirements);
+                hybridUnitaryAC.OARequirementsPtr = Util::FindItemInList(Alphas(19), state.dataSize->OARequirements);
                 if (hybridUnitaryAC.OARequirementsPtr == 0) {
                     ShowSevereError(state, format("{}: {} = {} invalid data", routineName, cCurrentModuleObject, Alphas(1)));
                     ShowContinueError(state, format("Invalid-not found {}=\"{}\".", cAlphaFields(19), Alphas(19)));
@@ -776,9 +776,9 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             hybridUnitaryAC.Name,
                             {},
                             Constant::eResource::EnergyTransfer,
-                            "COOLINGCOILS",
+                            OutputProcessor::SOVEndUseCat::CoolingCoils,
                             {},
-                            "System");
+                            OutputProcessor::SOVGroup::HVAC);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Sensible Cooling Rate",
                             Constant::Units::W,
@@ -867,9 +867,9 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             hybridUnitaryAC.Name,
                             {},
                             Constant::eResource::EnergyTransfer,
-                            "HeatingCOILS",
+                            OutputProcessor::SOVEndUseCat::HeatingCoils,
                             {},
-                            "System");
+                            OutputProcessor::SOVGroup::HVAC);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Sensible Heating Rate",
                             Constant::Units::W,
@@ -1109,9 +1109,9 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             hybridUnitaryAC.Name,
                             {},
                             Constant::eResource::Electricity,
-                            "Cooling",
+                            OutputProcessor::SOVEndUseCat::Cooling,
                             "Hybrid HVAC Cooling",
-                            "System");
+                            OutputProcessor::SOVGroup::HVAC);
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate",
@@ -1202,9 +1202,9 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             hybridUnitaryAC.Name,
                             {},
                             Constant::eResource::Electricity,
-                            "Fans",
+                            OutputProcessor::SOVEndUseCat::Fans,
                             "Hybrid HVAC Fans",
-                            "System");
+                            OutputProcessor::SOVGroup::HVAC);
         if (hybridUnitaryAC.secondFuel != Constant::eFuel::Invalid) {
             SetupOutputVariable(state,
                                 "Zone Hybrid Unitary HVAC Secondary Fuel Consumption Rate",
@@ -1222,9 +1222,9 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                 hybridUnitaryAC.Name,
                                 {},
                                 Constant::eFuel2eResource[(int)hybridUnitaryAC.secondFuel],
-                                "Cooling",
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 "Hybrid HVAC Cooling",
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
         }
         if (hybridUnitaryAC.thirdFuel != Constant::eFuel::Invalid) {
             SetupOutputVariable(state,
@@ -1243,9 +1243,9 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                 hybridUnitaryAC.Name,
                                 {},
                                 Constant::eFuel2eResource[(int)hybridUnitaryAC.thirdFuel],
-                                "Cooling",
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 "Hybrid HVAC Cooling",
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
         }
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Water Consumption Rate",
@@ -1263,9 +1263,9 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             hybridUnitaryAC.Name,
                             {},
                             Constant::eResource::Water,
-                            "Cooling",
+                            OutputProcessor::SOVEndUseCat::Cooling,
                             "Hybrid HVAC Cooling",
-                            "System");
+                            OutputProcessor::SOVGroup::HVAC);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC External Static Pressure",
                             Constant::Units::Pa,

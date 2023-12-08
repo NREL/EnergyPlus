@@ -150,7 +150,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetElectricInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->ElectricChiller) {
-            if (UtilityRoutines::makeUPPER(thisChiller.Name) == chillerName) {
+            if (Util::makeUPPER(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -204,7 +204,7 @@ namespace PlantChillers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(state,
@@ -218,7 +218,7 @@ namespace PlantChillers {
             thisChiller.ChillerType = DataPlant::PlantEquipmentType::Chiller_Electric;
 
             thisChiller.CondenserType = static_cast<DataPlant::CondenserType>(
-                getEnumValue(DataPlant::CondenserTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
+                getEnumValue(DataPlant::CondenserTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
             switch (thisChiller.CondenserType) {
             case DataPlant::CondenserType::AirCooled:
             case DataPlant::CondenserType::WaterCooled:
@@ -633,9 +633,9 @@ namespace PlantChillers {
                             this->Name,
                             {},
                             Constant::eResource::Electricity,
-                            "Cooling",
+                            OutputProcessor::SOVEndUseCat::Cooling,
                             this->EndUseSubcategory,
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
 
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Rate",
@@ -653,9 +653,9 @@ namespace PlantChillers {
                             this->Name,
                             {},
                             Constant::eResource::EnergyTransfer, 
-                            "CHILLERS",
+                            OutputProcessor::SOVEndUseCat::Chillers,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
                             Constant::Units::C,
@@ -693,9 +693,9 @@ namespace PlantChillers {
                             this->Name,
                             {},
                             Constant::eResource::EnergyTransfer, 
-                            "HEATREJECTION",
+                            OutputProcessor::SOVEndUseCat::HeatRejection,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
         SetupOutputVariable(state,
                             "Chiller COP",
                             Constant::Units::W_W,
@@ -746,9 +746,9 @@ namespace PlantChillers {
                                     this->Name,
                                     {},
                                     Constant::eResource::Electricity,
-                                    "CHILLERS",
+                                    OutputProcessor::SOVEndUseCat::Chillers,
                                     {},
-                                    "Plant");
+                                    OutputProcessor::SOVGroup::Plant);
             }
         }
 
@@ -770,9 +770,9 @@ namespace PlantChillers {
                                 this->Name,
                                 {},
                                 Constant::eResource::EnergyTransfer, 
-                                "HEATRECOVERY",
+                                OutputProcessor::SOVEndUseCat::HeatRecovery,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
             SetupOutputVariable(state,
                                 "Chiller Heat Recovery Inlet Temperature",
                                 Constant::Units::C,
@@ -2139,7 +2139,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetEngineDrivenInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->EngineDrivenChiller) {
-            if (UtilityRoutines::makeUPPER(thisChiller.Name) == chillerName) {
+            if (Util::makeUPPER(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -2228,7 +2228,7 @@ namespace PlantChillers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(state,
@@ -2680,9 +2680,9 @@ namespace PlantChillers {
                             this->Name,
                             {},
                             Constant::eResource::EnergyTransfer, 
-                            "CHILLERS",
+                            OutputProcessor::SOVEndUseCat::Chillers,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
                             Constant::Units::C,
@@ -2720,9 +2720,9 @@ namespace PlantChillers {
                             this->Name,
                             {},
                             Constant::eResource::EnergyTransfer, 
-                            "HEATREJECTION",
+                            OutputProcessor::SOVEndUseCat::HeatRejection,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
 
         SetupOutputVariable(state,
                             "Chiller Condenser Inlet Temperature",
@@ -2767,9 +2767,9 @@ namespace PlantChillers {
                                     this->Name,
                                     {},
                                     Constant::eResource::Electricity,
-                                    "CHILLERS",
+                                    OutputProcessor::SOVEndUseCat::Chillers,
                                     {},
-                                    "Plant");
+                                    OutputProcessor::SOVGroup::Plant);
             }
         }
 
@@ -2790,9 +2790,9 @@ namespace PlantChillers {
                             this->Name,
                             {},
                             Constant::eFuel2eResource[(int)this->FuelType],
-                            "Cooling",
+                            OutputProcessor::SOVEndUseCat::Cooling,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
 
         SetupOutputVariable(state,
                             "Chiller COP",
@@ -2841,9 +2841,9 @@ namespace PlantChillers {
                                 this->Name,
                                 {},
                                 Constant::eResource::EnergyTransfer,
-                                "HEATRECOVERY",
+                                OutputProcessor::SOVEndUseCat::HeatRecovery,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             SetupOutputVariable(state,
                                 "Chiller Lube Recovered Heat Rate",
@@ -2861,9 +2861,9 @@ namespace PlantChillers {
                                 this->Name,
                                 {},
                                 Constant::eResource::EnergyTransfer,
-                                "HEATRECOVERY",
+                                OutputProcessor::SOVEndUseCat::HeatRecovery,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             SetupOutputVariable(state,
                                 "Chiller Exhaust Recovered Heat Rate",
@@ -2881,9 +2881,9 @@ namespace PlantChillers {
                                 this->Name,
                                 {},
                                 Constant::eResource::EnergyTransfer,
-                                "HEATRECOVERY",
+                                OutputProcessor::SOVEndUseCat::HeatRecovery,
                                 {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             SetupOutputVariable(state,
                                 "Chiller Total Recovered Heat Rate",
@@ -4210,7 +4210,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetGasTurbineInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->GTChiller) {
-            if (UtilityRoutines::makeUPPER(thisChiller.Name) == chillerName) {
+            if (Util::makeUPPER(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -4300,7 +4300,7 @@ namespace PlantChillers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(state,
@@ -4726,9 +4726,9 @@ namespace PlantChillers {
                             this->Name,
                             {},
                             Constant::eResource::EnergyTransfer,
-                            "CHILLERS",
+                            OutputProcessor::SOVEndUseCat::Chillers,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
                             Constant::Units::C,
@@ -4766,9 +4766,9 @@ namespace PlantChillers {
                             this->Name,
                             {},
                             Constant::eResource::EnergyTransfer,
-                            "HEATREJECTION",
+                            OutputProcessor::SOVEndUseCat::HeatRejection,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
 
         SetupOutputVariable(state,
                             "Chiller Condenser Inlet Temperature",
@@ -4813,9 +4813,9 @@ namespace PlantChillers {
                                     this->Name,
                                     {},
                                     Constant::eResource::Electricity,
-                                    "CHILLERS",
+                                    OutputProcessor::SOVEndUseCat::Chillers,
                                     {},
-                                    "Plant");
+                                    OutputProcessor::SOVGroup::Plant);
             }
         }
 
@@ -4835,9 +4835,9 @@ namespace PlantChillers {
                             this->Name,
                             {},
                             Constant::eResource::EnergyTransfer,
-                            "HeatRecovery",
+                            OutputProcessor::SOVEndUseCat::HeatRecovery,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
 
         std::string_view const sFuelType = Constant::eFuelNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
@@ -4857,9 +4857,9 @@ namespace PlantChillers {
                             this->Name,
                             {},
                             Constant::eFuel2eResource[(int)this->FuelType],
-                            "Cooling",
+                            OutputProcessor::SOVEndUseCat::Cooling,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
 
         SetupOutputVariable(state,
                             format("Chiller {} Mass Flow Rate", sFuelType),
@@ -6203,7 +6203,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetConstCOPInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->ConstCOPChiller) {
-            if (UtilityRoutines::makeUPPER(thisChiller.Name) == chillerName) {
+            if (Util::makeUPPER(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -6285,7 +6285,7 @@ namespace PlantChillers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(state,
@@ -6577,9 +6577,9 @@ namespace PlantChillers {
                             this->Name,
                             {},
                             Constant::eResource::Electricity,
-                            "Cooling",
+                            OutputProcessor::SOVEndUseCat::Cooling,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Rate",
                             Constant::Units::W,
@@ -6596,9 +6596,9 @@ namespace PlantChillers {
                             this->Name,
                             {},
                             Constant::eResource::EnergyTransfer,
-                            "CHILLERS",
+                            OutputProcessor::SOVEndUseCat::Chillers,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
                             Constant::Units::C,
@@ -6643,9 +6643,9 @@ namespace PlantChillers {
                             this->Name,
                             {},
                             Constant::eResource::EnergyTransfer,
-                            "HEATREJECTION",
+                            OutputProcessor::SOVEndUseCat::HeatRejection,
                             {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
 
         SetupOutputVariable(state,
                             "Chiller Condenser Inlet Temperature",
@@ -6690,9 +6690,9 @@ namespace PlantChillers {
                                     this->Name,
                                     {},
                                     Constant::eResource::Electricity,
-                                    "CHILLERS",
+                                    OutputProcessor::SOVEndUseCat::Chillers,
                                     {},
-                                    "Plant");
+                                    OutputProcessor::SOVGroup::Plant);
             }
         }
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {

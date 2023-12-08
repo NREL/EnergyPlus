@@ -426,8 +426,8 @@ void InitExtConvCoeff(EnergyPlusData &state,
         state.dataConvect->GetUserSuppliedConvectionCoeffs = false;
     }
 
-    Real64 TAir = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + Constant::KelvinConv;
-    Real64 TSurf = TempExt + Constant::KelvinConv;
+    Real64 TAir = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + Constant::Kelvin;
+    Real64 TSurf = TempExt + Constant::Kelvin;
     Real64 TSky = state.dataEnvrn->SkyTempKelvin;
     Real64 TGround = TAir;
     HSrdSurf = 0.0;
@@ -436,13 +436,13 @@ void InitExtConvCoeff(EnergyPlusData &state,
         int SrdSurfsNum = surface.SurfSurroundingSurfacesNum;
         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
             TSky = ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum) +
-                   Constant::KelvinConv;
+                   Constant::Kelvin;
         }
         HSrdSurf = SurroundingSurfacesRadCoeffAverage(state, SurfNum, TSurf, AbsExt);
     }
     if (surface.UseSurfPropertyGndSurfTemp) {
         int gndSurfsNum = surface.SurfPropertyGndSurfIndex;
-        TGround = state.dataSurface->GroundSurfsProperty(gndSurfsNum).SurfsTempAvg + Constant::KelvinConv;
+        TGround = state.dataSurface->GroundSurfsProperty(gndSurfsNum).SurfsTempAvg + Constant::Kelvin;
     }
 
     int BaseSurf = surface.BaseSurf; // If this is a base surface, BaseSurf = SurfNum
@@ -855,7 +855,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
         extConvUserCurve.Name = ipsc->cAlphaArgs(1);
 
         ErrorObjectHeader eoh{RoutineName, CurrentModuleObject, extConvUserCurve.Name};
-        extConvUserCurve.windSpeedType = static_cast<RefWind>(getEnumValue(RefWindNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(2))));
+        extConvUserCurve.windSpeedType = static_cast<RefWind>(getEnumValue(RefWindNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(2))));
         if (extConvUserCurve.windSpeedType == RefWind::Invalid) {
             ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
             ErrorsFound = true;
@@ -1016,7 +1016,8 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                                                                  ipsc->cNumericFieldNames);
 
         ErrorObjectHeader eoh{RoutineName, CurrentModuleObject, ""};
-        int surfNum = UtilityRoutines::FindItemInList(Alphas(1), Surface);
+        int surfNum = Util::FindItemInList(Alphas(1), Surface);
+
         if (surfNum == 0) {
             ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), Alphas(1));
             ErrorsFound = true;
@@ -1119,7 +1120,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                     userExtConvModel.SurfaceName = Alphas(1);
                     userExtConvModel.WhichSurface = surfNum;
                     userExtConvModel.overrideType = OverrideType::UserCurve;
-                    userExtConvModel.UserCurveIndex = UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvect->hcExtUserCurve);
+                    userExtConvModel.UserCurveIndex = Util::FindItemInList(Alphas(Ptr + 3), state.dataConvect->hcExtUserCurve);
                     if (userExtConvModel.UserCurveIndex == 0) {
                         ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(Ptr + 3), Alphas(Ptr + 3));
                         ErrorsFound = true;
@@ -1254,7 +1255,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                     userIntConvModel.SurfaceName = Alphas(1);
                     userIntConvModel.WhichSurface = surfNum;
                     userIntConvModel.overrideType = OverrideType::UserCurve;
-                    userIntConvModel.UserCurveIndex = UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvect->hcIntUserCurve);
+                    userIntConvModel.UserCurveIndex = Util::FindItemInList(Alphas(Ptr + 3), state.dataConvect->hcIntUserCurve);
                     if (userIntConvModel.UserCurveIndex == 0) {
                         ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(Ptr + 3), Alphas(Ptr + 3));
                         ErrorsFound = true;
@@ -1389,7 +1390,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                     userExtConvModel.SurfaceName = Alphas(Ptr);
                     userExtConvModel.WhichSurface = -999;
                     userExtConvModel.overrideType = OverrideType::UserCurve;
-                    userExtConvModel.UserCurveIndex = UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvect->hcExtUserCurve);
+                    userExtConvModel.UserCurveIndex = Util::FindItemInList(Alphas(Ptr + 3), state.dataConvect->hcExtUserCurve);
                     if (userExtConvModel.UserCurveIndex == 0) {
                         ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(Ptr + 3), Alphas(Ptr + 3));
                         ErrorsFound = true;
@@ -1506,7 +1507,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                     userIntConvModel.SurfaceName = Alphas(Ptr);
                     userIntConvModel.WhichSurface = -999;
                     userIntConvModel.overrideType = OverrideType::UserCurve;
-                    userIntConvModel.UserCurveIndex = UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvect->hcIntUserCurve);
+                    userIntConvModel.UserCurveIndex = Util::FindItemInList(Alphas(Ptr + 3), state.dataConvect->hcIntUserCurve);
                     if (userIntConvModel.UserCurveIndex == 0) {
                         ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(Ptr + 3), Alphas(Ptr + 3));
                         ErrorsFound = true;
@@ -1595,8 +1596,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(i), ipsc->cAlphaArgs(i));
                 ErrorsFound = true;
             } else if (intAlgo.intConvClassEqNums[iInConvClass] == HcInt::UserCurve) {
-                intAlgo.intConvClassUserCurveNums[iInConvClass] =
-                    UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(i + 1), state.dataConvect->hcIntUserCurve);
+                intAlgo.intConvClassUserCurveNums[iInConvClass] = Util::FindItemInList(ipsc->cAlphaArgs(i + 1), state.dataConvect->hcIntUserCurve);
                 if (intAlgo.intConvClassUserCurveNums[iInConvClass] == 0) {
                     ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(i + 1), ipsc->cAlphaArgs(i + 1));
                     ErrorsFound = true;
@@ -1634,8 +1634,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                 ErrorsFound = true;
 
             } else if (extAlgo.extConvClass2EqNums[iOutConvClass] == HcExt::UserCurve) {
-                extAlgo.extConvClass2UserCurveNums[iOutConvClass] =
-                    UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(i + 1), state.dataConvect->hcExtUserCurve);
+                extAlgo.extConvClass2UserCurveNums[iOutConvClass] = Util::FindItemInList(ipsc->cAlphaArgs(i + 1), state.dataConvect->hcExtUserCurve);
                 if (extAlgo.extConvClass2UserCurveNums[iOutConvClass] == 0) {
                     ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(i + 1), ipsc->cAlphaArgs(i + 1));
                     ErrorsFound = true;
@@ -2364,11 +2363,11 @@ void CalcTrombeWallIntConvCoeff(EnergyPlusData &state,
         // NOTE: this is not ideal.  could have circumstances that reverse this?
         Real64 Tso, Tsi;
         if (SurfaceTemperatures(Surf1) > SurfaceTemperatures(Surf2)) {
-            Tsi = SurfaceTemperatures(Surf1) + Constant::KelvinConv;
-            Tso = SurfaceTemperatures(Surf2) + Constant::KelvinConv;
+            Tsi = SurfaceTemperatures(Surf1) + Constant::Kelvin;
+            Tso = SurfaceTemperatures(Surf2) + Constant::Kelvin;
         } else {
-            Tso = SurfaceTemperatures(Surf1) + Constant::KelvinConv;
-            Tsi = SurfaceTemperatures(Surf2) + Constant::KelvinConv;
+            Tso = SurfaceTemperatures(Surf1) + Constant::Kelvin;
+            Tsi = SurfaceTemperatures(Surf2) + Constant::Kelvin;
         }
 
         Real64 beta = 2.0 / (Tso + Tsi);                                       // volumetric thermal expansion coefficient
@@ -2639,8 +2638,8 @@ Real64 CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
     Real64 constexpr g(9.81); // acceleration due to gravity [m/s2]
     Real64 Nuint(0.0);        // Nusselt number for interior surface convection
 
-    Real64 SurfTempKelvin = SurfaceTemperature + Constant::KelvinConv;
-    Real64 AirTempKelvin = AirTemperature + Constant::KelvinConv;
+    Real64 SurfTempKelvin = SurfaceTemperature + Constant::Kelvin;
+    Real64 AirTempKelvin = AirTemperature + Constant::Kelvin;
     Real64 DeltaTemp = SurfaceTemperature - AirTemperature;
 
     // protect against wildly out of range temperatures
@@ -3441,7 +3440,7 @@ Real64 EvaluateIntHcModels(EnergyPlusData &state, int const SurfNum, HcInt const
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcFohannoPolidoriVerticalWall(Tsurf - Tamb,
                                                        WallHeight,
-                                                       Tsurf - Constant::KelvinConv, // Kiva already uses Kelvin, but algorithm expects C
+                                                       Tsurf - Constant::Kelvin, // Kiva already uses Kelvin, but algorithm expects C
                                                        QdotConvection);
             };
         } else {
@@ -4179,7 +4178,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             }
         }
         GrH = (g * (Tmax - Tmin) * pow_3(zone.CeilingHeight)) /
-              ((state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).MAT + Constant::KelvinConv) * pow_2(v));
+              ((state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).MAT + Constant::Kelvin) * pow_2(v));
 
         // Reynolds number = Vdot supply / v * cube root of zone volume (Goldstein and Noveselac 2010)
         if (zoneNode.MassFlowRate > 0.0) {
@@ -5656,7 +5655,7 @@ Real64 CalcFohannoPolidoriVerticalWall(Real64 const DeltaTemp, // [C] temperatur
     Real64 constexpr k = 0.0263;   // thermal conductivity (W/m K) for air at 300 K
     Real64 constexpr Pr = 0.71;    // Prandtl number for air at ?
 
-    Real64 BetaFilm = 1.0 / (Constant::KelvinConv + SurfTemp + 0.5 * DeltaTemp); // TODO check sign on DeltaTemp
+    Real64 BetaFilm = 1.0 / (Constant::Kelvin + SurfTemp + 0.5 * DeltaTemp); // TODO check sign on DeltaTemp
     Real64 RaH = (g * BetaFilm * QdotConv * pow_4(Height) * Pr) / (k * pow_2(v));
 
     if (RaH <= 6.3e09) {
@@ -6290,7 +6289,7 @@ Real64 CalcClearRoof(EnergyPlusData &state,
 
     Real64 Ln = (RoofPerimeter > 0.0) ? (RoofArea / RoofPerimeter) : std::sqrt(RoofArea);
     Real64 DeltaTemp = SurfTemp - AirTemp;
-    Real64 BetaFilm = 1.0 / (Constant::KelvinConv + SurfTemp + 0.5 * DeltaTemp);
+    Real64 BetaFilm = 1.0 / (Constant::Kelvin + SurfTemp + 0.5 * DeltaTemp);
     Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, AirTemp, state.dataEnvrn->OutHumRat);
 
     Real64 GrLn = g * pow_2(AirDensity) * pow_3(Ln) * std::abs(DeltaTemp) * BetaFilm / pow_2(v);
@@ -6546,7 +6545,7 @@ Real64 SurroundingSurfacesRadCoeffAverage(EnergyPlusData &state, int const SurfN
     // the surface.SrdSurfTemp is weighed by surrounding surfaces view factor
     Real64 HSrdSurf = 0.0;
     auto &surface = state.dataSurface->Surface(SurfNum);
-    Real64 SrdSurfsTK = surface.SrdSurfTemp + Constant::KelvinConv;
+    Real64 SrdSurfsTK = surface.SrdSurfTemp + Constant::Kelvin;
     if (TSurfK != SrdSurfsTK) {
         HSrdSurf = Constant::StefanBoltzmann * AbsExt * surface.ViewFactorSrdSurfs * (pow_4(TSurfK) - pow_4(SrdSurfsTK)) / (TSurfK - SrdSurfsTK);
     }

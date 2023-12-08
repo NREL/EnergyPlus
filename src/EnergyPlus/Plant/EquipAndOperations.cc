@@ -294,8 +294,8 @@ namespace DataPlant {
                 for (int compNum = 1; compNum <= NumComps; ++compNum) {
                     auto &this_equip(this->CoolingOnlyEquipList(equipListNum).Comp(compNum));
                     PlantLocation compLoc;
-                    DataPlant::PlantEquipmentType Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_equip.TypeOf)));
+                    DataPlant::PlantEquipmentType Type =
+                        static_cast<DataPlant::PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);
@@ -381,8 +381,7 @@ namespace DataPlant {
                     auto &this_equip(this->HeatingOnlyEquipList(equipListNum).Comp(compNum));
                     PlantLocation compLoc;
                     DataPlant::PlantEquipmentType Type;
-                    Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_equip.TypeOf)));
+                    Type = static_cast<DataPlant::PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);
@@ -471,8 +470,7 @@ namespace DataPlant {
                     auto &this_equip(this->SimultHeatCoolCoolingEquipList(equipListNum).Comp(compNum));
                     PlantLocation compLoc;
                     DataPlant::PlantEquipmentType Type;
-                    Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_equip.TypeOf)));
+                    Type = static_cast<DataPlant::PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);
@@ -560,8 +558,7 @@ namespace DataPlant {
                     auto &this_equip(this->SimultHeatCoolHeatingEquipList(equipListNum).Comp(compNum));
                     PlantLocation compLoc;
                     DataPlant::PlantEquipmentType Type;
-                    Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_equip.TypeOf)));
+                    Type = static_cast<DataPlant::PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);
@@ -676,9 +673,9 @@ namespace DataPlant {
             bool founditCooling = false;
             bool founditHeating = false;
             for (auto &thisHP : state.dataEIRPlantLoopHeatPump->heatPumps) {
-                std::string const thisPLHPName = UtilityRoutines::makeUPPER(thisHP.name);
+                std::string const thisPLHPName = Util::makeUPPER(thisHP.name);
                 // find cooling side heat pump
-                std::string const targetDedHRCoolName = UtilityRoutines::makeUPPER(this->DedicatedHR_ChWRetControl_Name);
+                std::string const targetDedHRCoolName = Util::makeUPPER(this->DedicatedHR_ChWRetControl_Name);
                 if (thisPLHPName == targetDedHRCoolName) {  // found it
                     this->DedicatedHR_CoolingPLHP = thisHP; // store pointer to cooling side of heat pump
                     founditCooling = true;
@@ -725,7 +722,7 @@ namespace DataPlant {
                 }
 
                 // find heating side heat pump
-                std::string const targetDedHRHeatName = UtilityRoutines::makeUPPER(this->DedicatedHR_HWRetControl_Name);
+                std::string const targetDedHRHeatName = Util::makeUPPER(this->DedicatedHR_HWRetControl_Name);
                 if (thisPLHPName == targetDedHRHeatName) {  // found it
                     this->DedicatedHR_HeatingPLHP = thisHP; // store pointer to heating side of heat pump
                     founditHeating = true;

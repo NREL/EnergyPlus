@@ -136,7 +136,7 @@ namespace HWBaseboardRadiator {
 
         // Find the correct Baseboard Equipment
         if (CompIndex == 0) {
-            BaseboardNum = UtilityRoutines::FindItemInList(EquipName, state.dataHWBaseboardRad->HWBaseboard, &HWBaseboardParams::Name);
+            BaseboardNum = Util::FindItemInList(EquipName, state.dataHWBaseboardRad->HWBaseboard, &HWBaseboardParams::Name);
             if (BaseboardNum == 0) {
                 ShowFatalError(state, format("SimHWBaseboard: Unit not found={}", EquipName));
             }
@@ -450,7 +450,7 @@ namespace HWBaseboardRadiator {
             thisHWBaseboard.EquipType = DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water; //'ZoneHVAC:Baseboard:RadiantConvective:Water'
 
             thisHWBaseboard.designObjectName = state.dataIPShortCut->cAlphaArgs(2); // Name of the design object for this baseboard
-            thisHWBaseboard.DesignObjectPtr = UtilityRoutines::FindItemInList(thisHWBaseboard.designObjectName, HWBaseboardDesignNames);
+            thisHWBaseboard.DesignObjectPtr = Util::FindItemInList(thisHWBaseboard.designObjectName, HWBaseboardDesignNames);
             HWBaseboardDesignData &HWBaseboardDesignDataObject =
                 state.dataHWBaseboardRad->HWBaseboardDesignObject(thisHWBaseboard.DesignObjectPtr); // Contains the data for the design object
 
@@ -726,9 +726,9 @@ namespace HWBaseboardRadiator {
                                 thisHWBaseboard.Name,
                                 {},
                                 Constant::eResource::EnergyTransfer,
-                                "BASEBOARD",
+                                OutputProcessor::SOVEndUseCat::Baseboard,
                                 {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
 
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Energy",
@@ -753,9 +753,9 @@ namespace HWBaseboardRadiator {
                                 thisHWBaseboard.Name,
                                 {},
                                 Constant::eResource::PlantLoopHeatingDemand,
-                                "BASEBOARD",
+                                OutputProcessor::SOVEndUseCat::Baseboard,
                                 {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Baseboard Hot Water Mass Flow Rate",
                                 Constant::Units::kg_s,
@@ -1577,7 +1577,7 @@ namespace HWBaseboardRadiator {
 
         // Find the correct baseboard
         if (CompIndex == 0) {
-            BaseboardNum = UtilityRoutines::FindItemInList(BaseboardName, state.dataHWBaseboardRad->HWBaseboard, &HWBaseboardParams::Name);
+            BaseboardNum = Util::FindItemInList(BaseboardName, state.dataHWBaseboardRad->HWBaseboard, &HWBaseboardParams::Name);
             if (BaseboardNum == 0) {
                 ShowFatalError(state, format("UpdateHWBaseboardPlantConnection: Specified baseboard not valid ={}", BaseboardName));
             }

@@ -138,7 +138,7 @@ namespace Humidifiers {
 
         // Get the humidifier unit index
         if (CompIndex == 0) {
-            HumNum = UtilityRoutines::FindItemInList(CompName, Humidifier);
+            HumNum = Util::FindItemInList(CompName, Humidifier);
             if (HumNum == 0) {
                 ShowFatalError(state, format("SimHumidifier: Unit not found={}", CompName));
             }
@@ -484,9 +484,9 @@ namespace Humidifiers {
                                     Humidifier(HumNum).Name,
                                     {},
                                     Constant::eResource::Water,
-                                    "HUMIDIFIER",
+                                    OutputProcessor::SOVEndUseCat::Humidification,
                                     {},
-                                    "SYSTEM");
+                                    OutputProcessor::SOVGroup::HVAC);
                 SetupOutputVariable(state,
                                     "Humidifier Starved Storage Tank Water Volume Flow Rate",
                                     Constant::Units::m3_s,
@@ -503,9 +503,9 @@ namespace Humidifiers {
                                     Humidifier(HumNum).Name,
                                     {},
                                     Constant::eResource::Water,
-                                    "HUMIDIFIER",
+                                    OutputProcessor::SOVEndUseCat::Humidification,
                                     {},
-                                    "SYSTEM");
+                                    OutputProcessor::SOVGroup::HVAC);
                 SetupOutputVariable(state,
                                     "Humidifier Mains Water Volume",
                                     Constant::Units::m3,
@@ -515,9 +515,9 @@ namespace Humidifiers {
                                     Humidifier(HumNum).Name,
                                     {},
                                     Constant::eResource::MainsWater,
-                                    "HUMIDIFIER",
+                                    OutputProcessor::SOVEndUseCat::Humidification,
                                     {},
-                                    "SYSTEM");
+                                    OutputProcessor::SOVGroup::HVAC);
 
             } else {
                 SetupOutputVariable(state,
@@ -536,9 +536,9 @@ namespace Humidifiers {
                                     Humidifier(HumNum).Name,
                                     {},
                                     Constant::eResource::Water,
-                                    "HUMIDIFIER",
+                                    OutputProcessor::SOVEndUseCat::Humidification,
                                     {},
-                                    "System");
+                                    OutputProcessor::SOVGroup::HVAC);
                 SetupOutputVariable(state,
                                     "Humidifier Mains Water Volume",
                                     Constant::Units::m3,
@@ -548,9 +548,9 @@ namespace Humidifiers {
                                     Humidifier(HumNum).Name,
                                     {},
                                     Constant::eResource::MainsWater,
-                                    "HUMIDIFIER",
+                                    OutputProcessor::SOVEndUseCat::Humidification,
                                     {},
-                                    "System");
+                                    OutputProcessor::SOVGroup::HVAC);
             }
             if (Humidifier(HumNum).HumType == HumidType::Electric) {
                 SetupOutputVariable(state,
@@ -569,9 +569,9 @@ namespace Humidifiers {
                                     Humidifier(HumNum).Name,
                                     {},
                                     Constant::eResource::Electricity,
-                                    "HUMIDIFIER",
+                                    OutputProcessor::SOVEndUseCat::Humidification,
                                     {},
-                                    "System");
+                                    OutputProcessor::SOVGroup::HVAC);
             } else if (Humidifier(HumNum).HumType == HumidType::Gas) {
                 SetupOutputVariable(state,
                                     "Humidifier NaturalGas Use Thermal Efficiency",
@@ -596,9 +596,9 @@ namespace Humidifiers {
                                     Humidifier(HumNum).Name,
                                     {},
                                     Constant::eResource::NaturalGas,
-                                    "HUMIDIFIER",
+                                    OutputProcessor::SOVEndUseCat::Humidification,
                                     {},
-                                    "System");
+                                    OutputProcessor::SOVGroup::HVAC);
                 SetupOutputVariable(state,
                                     "Humidifier Auxiliary Electricity Rate",
                                     Constant::Units::W,
@@ -615,9 +615,9 @@ namespace Humidifiers {
                                     Humidifier(HumNum).Name,
                                     {},
                                     Constant::eResource::Electricity,
-                                    "HUMIDIFIER",
+                                    OutputProcessor::SOVEndUseCat::Humidification,
                                     {},
-                                    "System");
+                                    OutputProcessor::SOVGroup::HVAC);
             }
         }
 
@@ -1427,7 +1427,7 @@ namespace Humidifiers {
             state.dataHumidifiers->GetInputFlag = false;
         }
 
-        WhichHumidifier = UtilityRoutines::FindItemInList(HumidifierName, state.dataHumidifiers->Humidifier);
+        WhichHumidifier = Util::FindItemInList(HumidifierName, state.dataHumidifiers->Humidifier);
         if (WhichHumidifier != 0) {
             NodeNum = state.dataHumidifiers->Humidifier(WhichHumidifier).AirInNode;
         } else {
@@ -1450,7 +1450,7 @@ namespace Humidifiers {
             state.dataHumidifiers->GetInputFlag = false;
         }
 
-        int WhichHumidifier = UtilityRoutines::FindItemInList(HumidifierName, state.dataHumidifiers->Humidifier);
+        int WhichHumidifier = Util::FindItemInList(HumidifierName, state.dataHumidifiers->Humidifier);
         if (WhichHumidifier != 0) {
             return state.dataHumidifiers->Humidifier(WhichHumidifier).AirOutNode;
         } else {

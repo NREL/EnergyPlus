@@ -622,9 +622,9 @@ namespace InternalHeatGains {
 
                     // Following is an optional parameter (ASHRAE 55 warnings
                     if (IHGNumAlphas >= 6) {
-                        if (UtilityRoutines::SameString(IHGAlphas(6), "Yes")) {
+                        if (Util::SameString(IHGAlphas(6), "Yes")) {
                             thisPeople.Show55Warning = true;
-                        } else if (!UtilityRoutines::SameString(IHGAlphas(6), "No") && !IHGAlphaFieldBlanks(6)) {
+                        } else if (!Util::SameString(IHGAlphas(6), "No") && !IHGAlphaFieldBlanks(6)) {
                             if (Item1 == 1) {
                                 ShowSevereError(state,
                                                 format("{}{}=\"{}\", {} field should be Yes or No",
@@ -748,7 +748,7 @@ namespace InternalHeatGains {
 
                                 } else if (mrtType == "SURFACEWEIGHTED") {
                                     thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::SurfaceWeighted;
-                                    thisPeople.SurfacePtr = UtilityRoutines::FindItemInList(IHGAlphas(8), state.dataSurface->Surface);
+                                    thisPeople.SurfacePtr = Util::FindItemInList(IHGAlphas(8), state.dataSurface->Surface);
                                     if (thisPeople.SurfacePtr == 0 && ModelWithAdditionalInputs) {
                                         if (Item1 == 1) {
                                             ShowSevereError(state,
@@ -2825,7 +2825,7 @@ namespace InternalHeatGains {
                                                othEqModuleObject,
                                                thisOthEqInput.Name,
                                                IHGNumericFieldNames(DesignLevelFieldNumber)));
-                        ShowContinueError(state, format("... when a fuel type of {} is specified.", ExteriorEnergyUse::exteriorFuelNames[(int)thisZoneOthEq.OtherEquipFuelType]));
+                        ShowContinueError(state, format("... when a fuel type of {} is specified.", Constant::eFuelNames[(int)thisZoneOthEq.OtherEquipFuelType]));
                         ErrorsFound = true;
                     }
 
@@ -2942,9 +2942,9 @@ namespace InternalHeatGains {
                     if (IHGAlphaFieldBlanks(3)) {
                         thisZoneITEq.FlowControlWithApproachTemps = false;
                     } else {
-                        if (UtilityRoutines::SameString(IHGAlphas(3), "FlowFromSystem")) {
+                        if (Util::SameString(IHGAlphas(3), "FlowFromSystem")) {
                             thisZoneITEq.FlowControlWithApproachTemps = false;
-                        } else if (UtilityRoutines::SameString(IHGAlphas(3), "FlowControlWithApproachTemperatures")) {
+                        } else if (Util::SameString(IHGAlphas(3), "FlowControlWithApproachTemperatures")) {
                             thisZoneITEq.FlowControlWithApproachTemps = true;
                             state.dataHeatBal->Zone(thisZoneITEq.ZonePtr).HasAdjustedReturnTempByITE = true;
                             state.dataHeatBal->Zone(thisZoneITEq.ZonePtr).NoHeatToReturnAir = false;
@@ -3191,12 +3191,12 @@ namespace InternalHeatGains {
                         }
 
                         // Environmental class
-                        thisZoneITEq.Class = static_cast<ITEClass>(getEnumValue(ITEClassNamesUC, UtilityRoutines::makeUPPER(IHGAlphas(10))));
+                        thisZoneITEq.Class = static_cast<ITEClass>(getEnumValue(ITEClassNamesUC, Util::makeUPPER(IHGAlphas(10))));
                         ErrorsFound = ErrorsFound || (thisZoneITEq.Class == ITEClass::Invalid);
 
                         // Air and supply inlet connections
                         thisZoneITEq.AirConnectionType =
-                            static_cast<ITEInletConnection>(getEnumValue(ITEInletConnectionNamesUC, UtilityRoutines::makeUPPER(IHGAlphas(11))));
+                            static_cast<ITEInletConnection>(getEnumValue(ITEInletConnectionNamesUC, Util::makeUPPER(IHGAlphas(11))));
                         if (thisZoneITEq.AirConnectionType == ITEInletConnection::RoomAirModel) {
                             // ZoneITEq(Loop).AirConnectionType = ITEInletConnection::RoomAirModel;
                             ShowWarningError(state,
@@ -3549,11 +3549,11 @@ namespace InternalHeatGains {
                                                                      IHGAlphaFieldBlanks,
                                                                      IHGAlphaFieldNames,
                                                                      IHGNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, IHGAlphas(1), contamSSModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, IHGAlphas(1), contamSSModuleObject, ErrorsFound);
 
             state.dataHeatBal->ZoneCO2Gen(Loop).Name = IHGAlphas(1);
 
-            state.dataHeatBal->ZoneCO2Gen(Loop).ZonePtr = UtilityRoutines::FindItemInList(IHGAlphas(2), state.dataHeatBal->Zone);
+            state.dataHeatBal->ZoneCO2Gen(Loop).ZonePtr = Util::FindItemInList(IHGAlphas(2), state.dataHeatBal->Zone);
             if (state.dataHeatBal->ZoneCO2Gen(Loop).ZonePtr == 0) {
                 ShowSevereError(
                     state,
@@ -4172,7 +4172,7 @@ namespace InternalHeatGains {
             int counter = 0;
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &objectFields = instance.value();
-                std::string const &thisObjectName = UtilityRoutines::makeUPPER(instance.key());
+                std::string const &thisObjectName = Util::makeUPPER(instance.key());
                 ip->markObjectAsUsed(objectType, instance.key());
 
                 // For incoming idf, maintain object order
@@ -4187,7 +4187,7 @@ namespace InternalHeatGains {
                 }
                 std::string areaName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, areaFieldName);
 
-                int zoneNum = UtilityRoutines::FindItemInList(areaName, state.dataHeatBal->Zone);
+                int zoneNum = Util::FindItemInList(areaName, state.dataHeatBal->Zone);
                 if (zoneNum > 0) {
                     inputObjects(objNum).spaceStartPtr = numGainInstances + 1;
                     int numSpaces = state.dataHeatBal->Zone(zoneNum).numSpaces;
@@ -4205,7 +4205,7 @@ namespace InternalHeatGains {
                     }
                     continue;
                 }
-                int spaceNum = UtilityRoutines::FindItemInList(areaName, state.dataHeatBal->space);
+                int spaceNum = Util::FindItemInList(areaName, state.dataHeatBal->space);
                 if (spaceNum > 0) {
                     inputObjects(objNum).spaceStartPtr = numGainInstances + 1;
                     ++numGainInstances;
@@ -4216,7 +4216,7 @@ namespace InternalHeatGains {
                     inputObjects(objNum).names.emplace_back(inputObjects(objNum).Name);
                     continue;
                 }
-                int zoneListNum = UtilityRoutines::FindItemInList(areaName, state.dataHeatBal->ZoneList);
+                int zoneListNum = Util::FindItemInList(areaName, state.dataHeatBal->ZoneList);
                 if (zoneListNum > 0) {
                     if (zoneListNotAllowed) {
                         ShowSevereError(
@@ -4240,7 +4240,7 @@ namespace InternalHeatGains {
                     }
                     continue;
                 }
-                int spaceListNum = UtilityRoutines::FindItemInList(areaName, state.dataHeatBal->spaceList);
+                int spaceListNum = Util::FindItemInList(areaName, state.dataHeatBal->spaceList);
                 if (spaceListNum > 0) {
                     if (zoneListNotAllowed) {
                         ShowSevereError(
@@ -4790,9 +4790,9 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Lights(lightsNum).Name,
                                 {},
                                 Constant::eResource::Electricity,
-                                "InteriorLights",
+                                OutputProcessor::SOVEndUseCat::InteriorLights,
                                 state.dataHeatBal->Lights(lightsNum).EndUseSubcategory,
-                                "Building",
+                                OutputProcessor::SOVGroup::Building,
                                 state.dataHeatBal->Zone(state.dataHeatBal->Lights(lightsNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->Lights(lightsNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->Lights(lightsNum).ZonePtr).ListMultiplier,
@@ -5005,9 +5005,9 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->ZoneElectric(elecEqNum).Name,
                                 {},
                                 Constant::eResource::Electricity,
-                                "InteriorEquipment",
+                                OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneElectric(elecEqNum).EndUseSubcategory,
-                                "Building",
+                                OutputProcessor::SOVGroup::Building,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(elecEqNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(elecEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(elecEqNum).ZonePtr).ListMultiplier,
@@ -5293,9 +5293,9 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->ZoneGas(gasEqNum).Name,
                                 {},
                                 Constant::eResource::NaturalGas,
-                                "InteriorEquipment",
+                                OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneGas(gasEqNum).EndUseSubcategory,
-                                "Building",
+                                OutputProcessor::SOVGroup::Building,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(gasEqNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(gasEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(gasEqNum).ZonePtr).ListMultiplier,
@@ -5584,9 +5584,9 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->ZoneHWEq(hwEqNum).Name,
                                 {},
                                 Constant::eResource::DistrictHeatingWater,
-                                "InteriorEquipment",
+                                OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneHWEq(hwEqNum).EndUseSubcategory,
-                                "Building",
+                                OutputProcessor::SOVGroup::Building,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(hwEqNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(hwEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(hwEqNum).ZonePtr).ListMultiplier,
@@ -5873,9 +5873,9 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->ZoneSteamEq(stmEqNum).Name,
                                 {},
                                 Constant::eResource::DistrictHeatingSteam,
-                                "InteriorEquipment",
+                                OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneSteamEq(stmEqNum).EndUseSubcategory,
-                                "Building",
+                                OutputProcessor::SOVGroup::Building,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(stmEqNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(stmEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(stmEqNum).ZonePtr).ListMultiplier,
@@ -6166,9 +6166,9 @@ namespace InternalHeatGains {
                                     zoneOtherEq.Name,
                                     {},
                                     ExteriorEnergyUse::exteriorFuel2eResource[(int)zoneOtherEq.OtherEquipFuelType],
-                                    "InteriorEquipment",
+                                    OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                     zoneOtherEq.EndUseSubcategory,
-                                    "Building",
+                                    OutputProcessor::SOVGroup::Building,
                                     state.dataHeatBal->Zone(zoneOtherEq.ZonePtr).Name,
                                     state.dataHeatBal->Zone(zoneOtherEq.ZonePtr).Multiplier,
                                     state.dataHeatBal->Zone(zoneOtherEq.ZonePtr).ListMultiplier,
@@ -6256,15 +6256,17 @@ namespace InternalHeatGains {
                     Constant::eFuel fuelType = state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums[i];
                     if (fuelType == Constant::eFuel::Invalid || fuelType == Constant::eFuel::None) continue;
 
+                    std::string_view fuelName = Constant::eFuelNames[(int)state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums[i]];
+                    
                     SetupOutputVariable(state,
-                                        "Zone Other Equipment " + state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNames[i] + " Rate",
+                                        format("Zone Other Equipment {} Rate", fuelName), 
                                         Constant::Units::W,
                                         state.dataHeatBal->ZoneRpt(zoneNum).OtherPower[(int)fuelType],
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataHeatBal->Zone(zoneNum).Name);
                     SetupOutputVariable(state,
-                                        "Zone Other Equipment " + state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNames[i] + " Energy",
+                                        format("Zone Other Equipment {} Energy", fuelName),
                                         Constant::Units::J,
                                         state.dataHeatBal->ZoneRpt(zoneNum).OtherConsump[(int)fuelType],
                                         OutputProcessor::SOVTimeStepType::Zone,
@@ -6478,9 +6480,9 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->ZoneITEq(itEqNum).Name,
                                 {},
                                 Constant::eResource::Electricity,
-                                "InteriorEquipment",
+                                OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryCPU,
-                                "Building",
+                                OutputProcessor::SOVGroup::Building,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
@@ -6497,9 +6499,9 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->ZoneITEq(itEqNum).Name,
                                 {},
                                 Constant::eResource::Electricity,
-                                "InteriorEquipment",
+                                OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryFan,
-                                "Building",
+                                OutputProcessor::SOVGroup::Building,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
@@ -6515,9 +6517,9 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->ZoneITEq(itEqNum).Name,
                                 {},
                                 Constant::eResource::Electricity,
-                                "InteriorEquipment",
+                                OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryUPS,
-                                "Building",
+                                OutputProcessor::SOVGroup::Building,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
@@ -6975,9 +6977,9 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->ZoneBBHeat(bbHeatNum).Name,
                                 {},
                                 Constant::eResource::Electricity,
-                                "InteriorEquipment",
+                                OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneBBHeat(bbHeatNum).EndUseSubcategory,
-                                "Building",
+                                OutputProcessor::SOVGroup::Building,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(bbHeatNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(bbHeatNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(bbHeatNum).ZonePtr).ListMultiplier,
@@ -9452,8 +9454,7 @@ namespace InternalHeatGains {
             return DeviceIndex;
         }
         for (DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-            if ((UtilityRoutines::SameString(state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompObjectName,
-                                             intGainName.data())) &&
+            if ((Util::SameString(state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompObjectName, intGainName.data())) &&
                 (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == intGainType)) {
                 DeviceIndex = DeviceNum;
                 break;
