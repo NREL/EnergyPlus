@@ -2783,11 +2783,11 @@ namespace VentilatedSlab {
             break;
         }
         case ControlType::MeanRadTemp: {
-            SetPointTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
+            SetPointTemp = thisZoneHB.MRT;
             break;
         }
         case ControlType::OperativeTemp: {
-            SetPointTemp = 0.5 * (thisZoneHB.MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
+            SetPointTemp = 0.5 * (thisZoneHB.MAT + thisZoneHB.MRT);
             break;
         }
         case ControlType::OutdoorDryBulbTemp: {

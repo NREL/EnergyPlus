@@ -169,7 +169,6 @@ namespace HeatBalanceManager {
         if (state.dataHeatBalMgr->ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(state); // Obtains heat balance related parameters from input file
             if (state.dataGlobal->DoingSizing) state.dataHeatBal->doSpaceHeatBalance = state.dataHeatBal->doSpaceHeatBalanceSizing;
-            HeatBalanceIntRadExchange::InitSolarViewFactors(state);
 
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
@@ -309,6 +308,9 @@ namespace HeatBalanceManager {
         if (ErrorsFound) {
             ShowFatalError(state, "Errors found in Building Input, Program Stopped");
         }
+
+        // Set up enclosures before processing internal gains input
+        HeatBalanceIntRadExchange::InitSolarViewFactors(state);
 
         // following is done to "get internal heat gains" input so that lights are gotten before
         // daylighting input
@@ -2956,10 +2958,6 @@ namespace HeatBalanceManager {
         if (!state.dataHeatBal->ZoneIntGain.allocated()) {
             DataHeatBalance::AllocateIntGains(state);
         }
-        state.dataHeatBal->ZoneMRT.allocate(state.dataGlobal->NumOfZones);
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            state.dataHeatBal->ZoneMRT(zoneNum) = 0.0;
-        }
         state.dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state.dataGlobal->NumOfZones);
         // Always allocate spaceHeatBalance, even if doSpaceHeatBalance is false, because it's used to gather some of the zone totals
         state.dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(state.dataGlobal->numSpaces);
@@ -3093,17 +3091,6 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->highSETLongestStartRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeather->TotThermalReportPers);
 
         state.dataHeatBalMgr->CountWarmupDayPoints = 0;
-
-        for (int loop = 1; loop <= state.dataGlobal->NumOfZones; ++loop) {
-            // CurrentModuleObject='Zone'
-            SetupOutputVariable(state,
-                                "Zone Mean Radiant Temperature",
-                                Constant::Units::C,
-                                state.dataHeatBal->ZoneMRT(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
-                                state.dataHeatBal->Zone(loop).Name);
-        }
     }
 
     // End Initialization Section of the Module

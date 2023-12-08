@@ -79,7 +79,7 @@ namespace ZoneTempPredictorCorrector {
         std::string HeatTempSetptSchedName;
         int HeatTempSchedIndex = 0;
         std::string CoolTempSetptSchedName;
-        int CoolTempSchedIndex;
+        int CoolTempSchedIndex = 0;
     };
 
     struct ZoneComfortFangerControl
@@ -90,7 +90,7 @@ namespace ZoneTempPredictorCorrector {
         std::string HeatPMVSetptSchedName; // Name of PMV heating set point schedule
         int HeatPMVSchedIndex = 0;         // Index to PMV heating set point schedule
         std::string CoolPMVSetptSchedName; // Name of PMV cooling set point schedule
-        int CoolPMVSchedIndex;             // INdex to PMV cooling set point schedule
+        int CoolPMVSchedIndex = 0;         // INdex to PMV cooling set point schedule
     };
 
     struct AdaptiveComfortDailySetPointSchedule
@@ -120,6 +120,7 @@ namespace ZoneTempPredictorCorrector {
 
         // Zone or space air drybulb temperature conditions
         Real64 MAT = DataHeatBalance::ZoneInitialTemp;      // Mean Air Temperature at end of zone time step [C]
+        Real64 MRT = DataHeatBalance::ZoneInitialTemp;      // Mean Radiant Temperature [C]
         Real64 ZTAV = DataHeatBalance::ZoneInitialTemp;     // Air Temperature Averaged over the zone time step (during HVAC Time Steps)
         Real64 ZT = DataHeatBalance::ZoneInitialTemp;       // Air Temperature Averaged over the system time step
         Real64 ZTAVComf = DataHeatBalance::ZoneInitialTemp; // Air Temperature Averaged used in thermal comfort models (currently Fanger model only) -

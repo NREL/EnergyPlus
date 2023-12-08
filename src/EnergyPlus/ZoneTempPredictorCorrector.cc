@@ -3275,6 +3275,13 @@ void ZoneSpaceHeatBalanceData::setUpOutputVars(EnergyPlusData &state, std::strin
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         name);
+    SetupOutputVariable(state,
+                        format("{} Mean Radiant Temperature", prefix),
+                        Constant::Units::C,
+                        this->MRT,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::State,
+                        name);
 }
 
 void PredictSystemLoads(EnergyPlusData &state,
@@ -6228,10 +6235,10 @@ void AdjustAirSetPointsforOpTempCntrl(EnergyPlusData &state, int const TempContr
                           : tempControlledZone.FixedRadiativeFraction;
 
     // get mean radiant temperature for zone
-    Real64 thisMRT = state.dataHeatBal->ZoneMRT(ActualZoneNum);
+    Real64 thisMRT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ActualZoneNum).MRT;
 
     // modify setpoint for operative temperature control
-    //  traping for MRT fractions between 0.0 and 0.9 during get input, so shouldn't be able to divide by zero here.
+    //  trapping for MRT fractions between 0.0 and 0.9 during get input, so shouldn't be able to divide by zero here.
     ZoneAirSetPoint = (ZoneAirSetPoint - thisMRTFraction * thisMRT) / (1.0 - thisMRTFraction);
 }
 

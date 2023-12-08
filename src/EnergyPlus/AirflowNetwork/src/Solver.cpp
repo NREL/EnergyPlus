@@ -6773,7 +6773,7 @@ namespace AirflowNetwork {
         // Add a new table and performance curve
         std::string contextString = "CalcWindPressureCoeffs: Creating table \"" + name + "\"";
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(Curve::BtwxtMessageCallback, &callbackPair);
+        state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
 
         int CurveNum = static_cast<int>(state.dataCurveManager->PerfCurve.size()) + 1;
         state.dataCurveManager->PerfCurve.push_back(new Curve::Curve());
@@ -6935,9 +6935,13 @@ namespace AirflowNetwork {
 
         std::vector<Real64> dirs30 = {0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360};
         std::vector<Btwxt::GridAxis> dirs30Axes;
-        dirs30Axes.emplace_back(dirs30, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
+        dirs30Axes.emplace_back(dirs30,
+                                "30 Degree Increment",
+                                Btwxt::InterpolationMethod::linear,
+                                Btwxt::ExtrapolationMethod::linear,
+                                std::pair<double, double>{0.0, 360.0});
 
-        auto dirs30GridIndex = m_state.dataCurveManager->btwxtManager.addGrid("30 Degree Increments", Btwxt::GriddedData(dirs30Axes));
+        auto dirs30GridIndex = m_state.dataCurveManager->btwxtManager.addGrid("30 Degree Increments", dirs30Axes);
 
         if (AirflowNetworkNumOfSingleSideZones == 0) { // do the standard surface average coefficient calculation
             // Create the array of wind directions
@@ -7079,9 +7083,13 @@ namespace AirflowNetwork {
                                           190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360};
 
             std::vector<Btwxt::GridAxis> dirs10Axes;
-            dirs10Axes.emplace_back(dirs10, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
+            dirs10Axes.emplace_back(dirs10,
+                                    "10 Degree Increments",
+                                    Btwxt::InterpolationMethod::linear,
+                                    Btwxt::ExtrapolationMethod::linear,
+                                    std::pair<double, double>{0.0, 360.0});
 
-            auto dirs10GridIndex = m_state.dataCurveManager->btwxtManager.addGrid("10 Degree Increments", Btwxt::GriddedData(dirs10Axes));
+            auto dirs10GridIndex = m_state.dataCurveManager->btwxtManager.addGrid("10 Degree Increments", dirs10Axes);
 
             for (FacadeNum = 1; FacadeNum <= 4; ++FacadeNum) {
                 valsByFacade[FacadeNum - 1].push_back(valsByFacade[FacadeNum - 1][0]); // Enforce periodicity
@@ -12805,7 +12813,8 @@ namespace AirflowNetwork {
             Tcomfort = CurveValue(state, ComfortHighTempCurveNum, OutDryBulb);
         }
         ComfortBand = -0.0028 * (100 - MaxPPD) * (100 - MaxPPD) + 0.3419 * (100 - MaxPPD) - 6.6275;
-        Toperative = 0.5 * (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
+        Toperative = 0.5 * (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT +
+                            state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MRT);
 
         if (Toperative > (Tcomfort + ComfortBand)) {
             if (opening_probability(state, ZoneNum, TimeCloseDuration)) {

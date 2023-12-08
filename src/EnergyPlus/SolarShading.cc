@@ -78,6 +78,7 @@
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EnergyPlusLogger.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -493,8 +494,9 @@ void GetShadowingInput(EnergyPlusData &state)
             state.dataIPShortCut->cAlphaArgs(aNum) = "PolygonClipping";
 #else
             if (Penumbra::Penumbra::is_valid_context()) {
-                std::shared_ptr<EnergyPlusLogger> penumbra_logger = std::make_shared<EnergyPlus::EnergyPlusLogger>();
-                penumbra_logger->set_message_context(&state);
+                std::shared_ptr<EnergyPlusLogger> penumbra_logger = std::make_shared<EnergyPlusLogger>(EnergyPlusLogger::Log_level::Info);
+                state.dataSolarShading->LoggerContext = std::make_pair<EnergyPlusData *, std::string>(&state, "");
+                penumbra_logger->set_message_context(&state.dataSolarShading->LoggerContext);
                 state.dataSolarShading->penumbra = std::make_unique<Penumbra::Penumbra>(pixelRes, penumbra_logger);
             } else {
                 ShowWarningError(state, "No GPU found (required for PixelCounting)");
@@ -12922,31 +12924,3 @@ void TimestepInitComplexFenestration(EnergyPlusData &state)
 }
 
 } // namespace EnergyPlus::SolarShading
-
-#ifndef EP_NO_OPENGL
-namespace EnergyPlus {
-
-void EnergyPlusLogger::error(const std::string_view message)
-{
-    auto *state = reinterpret_cast<EnergyPlusData *>(message_context);
-    std::string message_string(message);
-    ShowSevereError(*state, message_string);
-}
-void EnergyPlusLogger::warning(const std::string_view message)
-{
-    auto *state = reinterpret_cast<EnergyPlusData *>(message_context);
-    std::string message_string(message);
-    ShowWarningError(*state, message_string);
-}
-void EnergyPlusLogger::info(const std::string_view message)
-{
-    auto *state = reinterpret_cast<EnergyPlusData *>(message_context);
-    std::string message_string(message);
-    ShowMessage(*state, message_string);
-}
-void EnergyPlusLogger::debug(const std::string_view message)
-{
-    info(message);
-}
-} // namespace EnergyPlus
-#endif
