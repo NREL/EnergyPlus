@@ -70,6 +70,8 @@
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <iostream>
+#include <fstream>
 
 namespace EnergyPlus {
 
@@ -416,6 +418,20 @@ namespace IndoorGreen {
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataIndoorGreen->indoorgreens(IndoorGreenNum).IndoorGreenName);
+                SetupOutputVariable(state,
+                                    "Evapotranspiration rate for indoor greenery system",
+                                    OutputProcessor::Unit::J_kg,//LW to add mm/s; kg/(m2s)  
+                                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).IndoorGreenName);
+                SetupOutputVariable(state,
+                                    "Inside surface heat loss per m2 from evapotranspiration for indoor greenery system",
+                                    OutputProcessor::Unit::J_kg,//LW to add J_kg_m2 
+                                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LambdaET,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).IndoorGreenName);
             }
         }
     }
@@ -466,7 +482,7 @@ namespace IndoorGreen {
             Real64 ZoneSatHum;     // Saturated humidity ratio 
             Real64 ZoneCO2;        // Indoor zone co2 concentration (ppm)
             Real64 ZonePPFD;       // Indoor net radiation (PPFD)
-            Real64 ETRate=0.0;         // mm/s; kg/(m2s)
+            //Real64 ETRate=0.0;         // mm/s; kg/(m2s)
             Real64 Timestep;       // s
             Real64 ETTotal;        // kg
             Real64 rhoair;         // kg/m3
@@ -506,15 +522,16 @@ namespace IndoorGreen {
 
                 //ET Calculation
                 if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETCalculationMethod == 1) {
-                ETRate=ETPenmanMonteith(state,ZonePreTemp,ZonePreHum,ZoneCO2,ZonePPFD);
+                        state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETRate =
+                            ETPenmanMonteith(state, ZonePreTemp, ZonePreHum, ZoneCO2, ZonePPFD);
                 } 
                 else if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETCalculationMethod == 2) {
-                ETRate=ETStanghellini(state);
+                        state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETRate = ETStanghellini(state);
                 } 
                 else if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETCalculationMethod == 3) {
                 // set with EMS value if being called for.
                    if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).EMSETCalOverrideOn){
-                   ETRate = state.dataIndoorGreen->indoorgreens(IndoorGreenNum).EMSET;
+                       state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETRate = state.dataIndoorGreen->indoorgreens(IndoorGreenNum).EMSET;
                    }
                 //ETRate=ETDatadriven(state);
                    else {
@@ -529,7 +546,8 @@ namespace IndoorGreen {
                 Timestep = state.dataHVACGlobal->TimeStepSysSec; // unit s
                 //debug 
                 //ETRate = 0.0;
-                ETTotal = ETRate * Timestep * state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LeafArea *
+                ETTotal = state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETRate * Timestep *
+                          state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LeafArea *
                            ScheduleManager::GetCurrentScheduleValue(state, state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedPtr); //kg
                 Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp) / std::pow(10, 6); // Latent heat of vaporization (MJ/kg)
                state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LambdaET =
@@ -537,7 +555,7 @@ namespace IndoorGreen {
                     state.dataSurface->Surface(state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SurfPtr).Area; // (J/(kg m2))
                state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(
                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SurfPtr) = -1.0 *state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LambdaET;// negative sign indicates heat loss from inside surface
-               rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZonePreTemp, ZonePreHum);
+                rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZonePreTemp, ZonePreHum);
                 ZoneAirVol = state.dataHeatBal->Zone(state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr).Volume;
                 ZoneNewHum =
                 ZonePreHum + ETTotal / (rhoair * ZoneAirVol);
@@ -556,7 +574,11 @@ namespace IndoorGreen {
                 //state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LatentRate = 0.0;
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SensibleRate = ZoneAirVol * rhoair * (HMid - HCons) / Timestep; // unit W
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LatentRate = ZoneAirVol * rhoair * (HCons - HMid) / Timestep;   // unit W
-               
+                std::ofstream fout("indoorgreenvariables.txt", std::fstream::app);
+                fout << state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETRate << ","
+                     << state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LambdaET << ","
+                     << state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SensibleRate << ","
+                     << state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LatentRate << "," << std::endl;
             }
     }
 
