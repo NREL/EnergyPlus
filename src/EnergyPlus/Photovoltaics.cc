@@ -695,7 +695,6 @@ namespace Photovoltaics {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPhotovoltaic->PVarray(PVnum).Name,
-                                {},
                                 Constant::eResource::ElectricityProduced,
                                 OutputProcessor::SOVEndUseCat::Photovoltaic,
                                 {},

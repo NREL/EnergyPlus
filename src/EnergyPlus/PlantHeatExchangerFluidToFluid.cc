@@ -559,7 +559,6 @@ void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        {},
                         Constant::eResource::EnergyTransfer,
                         this->HeatTransferMeteringEndUse,
                         {},

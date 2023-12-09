@@ -970,7 +970,6 @@ void GetFanInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisFan.FanName,
-                            {},
                             Constant::eResource::Electricity,
                             OutputProcessor::SOVEndUseCat::Fans,
                             thisFan.EndUseSubcategoryName,

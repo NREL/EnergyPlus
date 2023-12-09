@@ -793,7 +793,6 @@ namespace TranspiredCollector {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataTranspiredCollector->UTSC(Item).Name,
-                                {},
                                 Constant::eResource::SolarAir,
                                 OutputProcessor::SOVEndUseCat::HeatProduced,
                                 {},

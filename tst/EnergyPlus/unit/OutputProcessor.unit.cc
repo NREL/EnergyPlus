@@ -2894,7 +2894,7 @@ namespace OutputProcessor {
         GetReportVariableInput(*state);
 
         EXPECT_EQ(5, state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Output:Variable"));
-        EXPECT_EQ(5, op->NumOfReqVariables);
+        EXPECT_EQ(5, op->reqVars.size());
 
         EXPECT_EQ("", op->reqVars[0]->key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", op->reqVars[0]->name);
@@ -3223,7 +3223,6 @@ namespace OutputProcessor {
         // GetReportVariableInput(*state);
 
         EXPECT_EQ(2, op->reqVars.size());
-        EXPECT_EQ(2, op->NumOfReqVariables);
         auto *varLatentRegex = op->reqVars[0];
         EXPECT_EQ("Liv.*", varLatentRegex->key);
         EXPECT_FALSE(varLatentRegex->is_simple_string);
@@ -3526,7 +3525,6 @@ namespace OutputProcessor {
                             SOVTimeStepType::System,
                             SOVStoreType::Summed,
                             "Cool-1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::Cooling,
                             {}, // EndUseSubKey
@@ -3540,7 +3538,6 @@ namespace OutputProcessor {
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "RailroadCrossing", // EndUseSubKey
@@ -3557,7 +3554,6 @@ namespace OutputProcessor {
                             SOVTimeStepType::System,
                             SOVStoreType::Summed,
                             "Site",
-                            {},
                             Constant::eResource::CO2,
                             SOVEndUseCat::FuelOilNo2Emissions,
                             {}, // EndUseSubKey
@@ -3923,7 +3919,7 @@ namespace OutputProcessor {
         std::vector<int> reqVarList;
         CheckReportVariable(*state, var_name, keyed_value, reqVarList);
 
-        EXPECT_EQ(5, op->NumOfReqVariables);
+        EXPECT_EQ(5, op->reqVars.size());
 
         EXPECT_EQ("", op->reqVars[0]->key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", op->reqVars[0]->name);
@@ -3977,7 +3973,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                                 SOVTimeStepType::Zone,
                                 SOVStoreType::Summed,
                                 format("SPACE {} LIGHTS", i),
-                                {},
                                 Constant::eResource::Electricity,
                                 SOVEndUseCat::InteriorLights,
                                 "GeneralLights",
@@ -4043,7 +4038,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4058,7 +4052,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4073,7 +4066,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4088,7 +4080,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4103,7 +4094,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4345,7 +4335,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4360,7 +4349,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4375,7 +4363,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4390,7 +4377,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4405,7 +4391,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4640,7 +4625,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4655,7 +4639,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4670,7 +4653,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4685,7 +4667,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4700,7 +4681,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4958,7 +4938,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4973,7 +4952,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -4988,7 +4966,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -5003,7 +4980,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -5018,7 +4994,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -5209,7 +5184,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -5304,7 +5278,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -5379,7 +5352,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
         GetReportVariableInput(*state);
 
         EXPECT_EQ(2, op->reqVars.size());
-        EXPECT_EQ(2, op->NumOfReqVariables);
         auto const *varSetpTempRegex = op->reqVars[0];
         EXPECT_EQ("(Air Loop 1|Air Supply) InletNode", varSetpTempRegex->key);
         EXPECT_EQ("SYSTEM NODE SETPOINT TEMPERATURE", varSetpTempRegex->name);
@@ -5407,7 +5379,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
-                            {},
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
@@ -5699,11 +5670,13 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
         std::string errMsg = delimited_string(
             {"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid Output Variable or Meter Name=\"DISTRICTHEATINGWATER:FACILITY\".",
              "   **   ~~~   ** ...will not be shown with the Meter results.",
-             "   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", no items assigned ",
+             "   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", no items assigned",
              "   **   ~~~   ** ...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another "
              "Meter:Custom.",
              "   ** Warning ** Meter:Custom=\"CUSTOMMETER2\", contains a reference to another Meter:Custom in field: Output Variable or Meter "
-             "Name=\"CUSTOMMETER1\"."});
+             "Name=\"CUSTOMMETER1\".",
+             "   ** Warning ** Meter:Custom=\"CUSTOMMETER2\", no items assigned",
+             "   **   ~~~   ** ...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom."});
         compare_err_stream(errMsg);
     }
 
@@ -5914,7 +5887,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::System,
                             SOVStoreType::Summed,
                             "Cool-1",
-                            ReportFreq::Hour,
                             Constant::eResource::Electricity,
                             SOVEndUseCat::Cooling,
                             {}, // EndUseSubKey
@@ -5928,7 +5900,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::Zone,
                             SOVStoreType::Summed,
                             "LIGHTS 1",
-                            ReportFreq::Hour,
                             Constant::eResource::Electricity,
                             SOVEndUseCat::InteriorLights,
                             "RailroadCrossing", // EndUseSubKey
@@ -5945,7 +5916,6 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
                             SOVTimeStepType::System,
                             SOVStoreType::Summed,
                             "Site",
-                            ReportFreq::Hour,
                             Constant::eResource::CO2,
                             SOVEndUseCat::FuelOilNo2Emissions,
                             {}, // EndUseSubKey

@@ -396,7 +396,6 @@ namespace SteamCoils {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataSteamCoils->SteamCoil(CoilNum).Name,
-                                {},
                                 Constant::eResource::EnergyTransfer,
                                 OutputProcessor::SOVEndUseCat::HeatingCoils,
                                 {},

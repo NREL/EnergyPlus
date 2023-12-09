@@ -74,7 +74,6 @@
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
-#include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
@@ -4786,7 +4785,6 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->Lights(lightsNum).Name,
-                                {},
                                 Constant::eResource::Electricity,
                                 OutputProcessor::SOVEndUseCat::InteriorLights,
                                 state.dataHeatBal->Lights(lightsNum).EndUseSubcategory,
@@ -5001,7 +4999,6 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneElectric(elecEqNum).Name,
-                                {},
                                 Constant::eResource::Electricity,
                                 OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneElectric(elecEqNum).EndUseSubcategory,
@@ -5289,7 +5286,6 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneGas(gasEqNum).Name,
-                                {},
                                 Constant::eResource::NaturalGas,
                                 OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneGas(gasEqNum).EndUseSubcategory,
@@ -5580,7 +5576,6 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneHWEq(hwEqNum).Name,
-                                {},
                                 Constant::eResource::DistrictHeatingWater,
                                 OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneHWEq(hwEqNum).EndUseSubcategory,
@@ -5869,7 +5864,6 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneSteamEq(stmEqNum).Name,
-                                {},
                                 Constant::eResource::DistrictHeatingSteam,
                                 OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneSteamEq(stmEqNum).EndUseSubcategory,
@@ -6147,23 +6141,21 @@ namespace InternalHeatGains {
             addZoneOutputs(zoneOtherEq.ZonePtr) = true;
             addSpaceOutputs(zoneOtherEq.spaceIndex) = true;
             if (zoneOtherEq.OtherEquipFuelType != Constant::eFuel::Invalid) {
-                std::string fuelTypeString = zoneOtherEq.otherEquipFuelTypeString;
                 SetupOutputVariable(state,
-                                    format("Other Equipment {} Rate", ExteriorEnergyUse::exteriorFuelNames[(int)zoneOtherEq.OtherEquipFuelType]),
+                                    format("Other Equipment {} Rate", Constant::eFuelNames[(int)zoneOtherEq.OtherEquipFuelType]),
                                     Constant::Units::W,
                                     zoneOtherEq.Power,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     zoneOtherEq.Name);
                 SetupOutputVariable(state,
-                                    "Other Equipment " + fuelTypeString + " Energy",
+                                    format("Other Equipment {} Energy", Constant::eFuelNames[(int)zoneOtherEq.OtherEquipFuelType]),
                                     Constant::Units::J,
                                     zoneOtherEq.Consumption,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Summed,
                                     zoneOtherEq.Name,
-                                    {},
-                                    ExteriorEnergyUse::exteriorFuel2eResource[(int)zoneOtherEq.OtherEquipFuelType],
+                                    Constant::eFuel2eResource[(int)zoneOtherEq.OtherEquipFuelType],
                                     OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                     zoneOtherEq.EndUseSubcategory,
                                     OutputProcessor::SOVGroup::Building,
@@ -6476,7 +6468,6 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneITEq(itEqNum).Name,
-                                {},
                                 Constant::eResource::Electricity,
                                 OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryCPU,
@@ -6495,7 +6486,6 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneITEq(itEqNum).Name,
-                                {},
                                 Constant::eResource::Electricity,
                                 OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryFan,
@@ -6513,7 +6503,6 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneITEq(itEqNum).Name,
-                                {},
                                 Constant::eResource::Electricity,
                                 OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryUPS,
@@ -6973,7 +6962,6 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneBBHeat(bbHeatNum).Name,
-                                {},
                                 Constant::eResource::Electricity,
                                 OutputProcessor::SOVEndUseCat::InteriorEquipment,
                                 state.dataHeatBal->ZoneBBHeat(bbHeatNum).EndUseSubcategory,

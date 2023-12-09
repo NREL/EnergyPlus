@@ -187,7 +187,6 @@ namespace PVWatts {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            {},
                             Constant::eResource::ElectricityProduced,
                             OutputProcessor::SOVEndUseCat::Photovoltaic,
                             {},

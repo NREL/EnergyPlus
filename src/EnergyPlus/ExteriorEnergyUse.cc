@@ -255,7 +255,6 @@ namespace ExteriorEnergyUse {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataExteriorEnergyUse->ExteriorLights(Item).Name,
-                                {},
                                 Constant::eResource::Electricity,
                                 OutputProcessor::SOVEndUseCat::ExteriorLights,
                                 EndUseSubcategoryName);
@@ -336,14 +335,13 @@ namespace ExteriorEnergyUse {
                                      OutputProcessor::SOVStoreType::Average,
                                      exteriorEquip.Name);
                  SetupOutputVariable(state,
-                                     format("Exterior Equipment {} Energy", exteriorFuelNames[(int)exteriorEquip.FuelType]),
+                                     format("Exterior Equipment {} Energy", Constant::eFuelNames[(int)exteriorEquip.FuelType]),
                                      Constant::Units::J,
                                      exteriorEquip.CurrentUse,
                                      OutputProcessor::SOVTimeStepType::Zone,
                                      OutputProcessor::SOVStoreType::Summed,
                                      exteriorEquip.Name,
-                                     {},
-                                     exteriorFuel2eResource[(int)exteriorEquip.FuelType],
+                                     Constant::eFuel2eResource[(int)exteriorEquip.FuelType],
                                      OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                                      EndUseSubcategoryName);
             } else {
@@ -355,14 +353,13 @@ namespace ExteriorEnergyUse {
                                     OutputProcessor::SOVStoreType::Average,
                                     exteriorEquip.Name);
                 SetupOutputVariable(state,
-                                    format("Exterior Equipment {} Volume", exteriorFuelNames[(int)exteriorEquip.FuelType]),
+                                    format("Exterior Equipment {} Volume", Constant::eFuelNames[(int)exteriorEquip.FuelType]),
                                     Constant::Units::m3,
                                     exteriorEquip.CurrentUse,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Summed,
                                     exteriorEquip.Name,
-                                    {},
-                                    exteriorFuel2eResource[(int)exteriorEquip.FuelType],
+                                    Constant::eFuel2eResource[(int)exteriorEquip.FuelType],
                                     OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                                     EndUseSubcategoryName);
             }
@@ -531,7 +528,6 @@ namespace ExteriorEnergyUse {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 exteriorEquip.Name,
-                                {},
                                 Constant::eResource::Water,
                                 OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                                 EndUseSubcategoryName);
@@ -542,7 +538,6 @@ namespace ExteriorEnergyUse {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 exteriorEquip.Name,
-                                {},
                                 Constant::eResource::MainsWater,
                                 OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                                 EndUseSubcategoryName);

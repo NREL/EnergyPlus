@@ -230,7 +230,9 @@ namespace Constant {
         eResource::OtherFuel2,
         eResource::DistrictCooling,
         eResource::DistrictHeatingWater,
-        eResource::DistrictHeatingSteam
+        eResource::DistrictHeatingSteam,
+        eResource::Water,
+        eResource::None
     };
 
     static constexpr std::array<std::string_view, (int)eResource::Num> eResourceNamesUC = {
@@ -348,7 +350,9 @@ namespace Constant {
         eResourceNamesUC[(int)eFuel2eResource[(int)eFuel::OtherFuel2]],
         eResourceNamesUC[(int)eFuel2eResource[(int)eFuel::DistrictCooling]],
         eResourceNamesUC[(int)eFuel2eResource[(int)eFuel::DistrictHeatingWater]],
-        eResourceNamesUC[(int)eFuel2eResource[(int)eFuel::DistrictHeatingSteam]]
+        eResourceNamesUC[(int)eFuel2eResource[(int)eFuel::DistrictHeatingSteam]],
+        eResourceNamesUC[(int)eFuel2eResource[(int)eFuel::Water]],
+        eResourceNamesUC[(int)eFuel2eResource[(int)eFuel::None]]
     };
 
     static constexpr std::array<std::string_view, (int)eFuel::Num> eFuelNames = {
@@ -364,7 +368,9 @@ namespace Constant {
         eResourceNames[(int)eFuel2eResource[(int)eFuel::OtherFuel2]],
         eResourceNames[(int)eFuel2eResource[(int)eFuel::DistrictCooling]],
         eResourceNames[(int)eFuel2eResource[(int)eFuel::DistrictHeatingWater]],
-        eResourceNames[(int)eFuel2eResource[(int)eFuel::DistrictHeatingSteam]]
+        eResourceNames[(int)eFuel2eResource[(int)eFuel::DistrictHeatingSteam]],
+        eResourceNames[(int)eFuel2eResource[(int)eFuel::Water]],
+        eResourceNames[(int)eFuel2eResource[(int)eFuel::None]]
     };
 
     enum class Units

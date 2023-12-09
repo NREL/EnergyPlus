@@ -882,6 +882,16 @@ namespace SystemAvailabilityManager {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     optimumStartMgr.Name,
+                                    Constant::eResource::None,
+                                    OutputProcessor::SOVEndUseCat::Invalid,
+                                    {},
+                                    OutputProcessor::SOVGroup::Invalid,
+                                    {}, // Zone
+                                    1,
+                                    1,
+                                    -999,
+                                    {}, // custom units
+                                    {}, // space type
                                     OutputProcessor::ReportFreq::Day);
             }
         }

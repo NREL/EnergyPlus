@@ -485,10 +485,9 @@ namespace OutputProcessor {
         }
 
         cCurrentModuleObject = "Output:Variable";
-        op->NumOfReqVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        op->reqVars.reserve(op->NumOfReqVariables);
+        int numReqVariables = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        for (int Loop = 1; Loop <= op->NumOfReqVariables; ++Loop) {
+        for (int Loop = 1; Loop <= numReqVariables; ++Loop) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -696,6 +695,7 @@ namespace OutputProcessor {
 
         int numCustomMeters = 0, numCustomDecMeters = 0;
         std::vector<std::string> customMeterNames;
+        std::vector<std::string> customDecMeterNames;
         if (auto const found = ip->epJSON.find("Meter:Custom"); found != ip->epJSON.end()) {
             for (auto meterInstance = found.value().begin(); meterInstance != found.value().end(); ++meterInstance, ++numCustomMeters)
                 customMeterNames.push_back(Util::makeUPPER(meterInstance.key()));
@@ -703,7 +703,7 @@ namespace OutputProcessor {
 
         if (auto const found = ip->epJSON.find("Meter:CustomDecrement"); found != ip->epJSON.end()) {
             for (auto meterInstance = found.value().begin(); meterInstance != found.value().end(); ++meterInstance, ++numCustomDecMeters)
-                customMeterNames.push_back(Util::makeUPPER(meterInstance.key()));
+                customDecMeterNames.push_back(Util::makeUPPER(meterInstance.key()));
         }
 
         ipsc->cCurrentModuleObject = "Meter:Custom";
@@ -723,150 +723,250 @@ namespace OutputProcessor {
 
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
 
-            std::string meterNameUC = Util::makeUPPER(ipsc->cAlphaArgs(1));
-            std::string::size_type lbrackPos = index(meterNameUC, '[');
-            if (lbrackPos != std::string::npos) meterNameUC.erase(lbrackPos);
+            std::string meterName = ipsc->cAlphaArgs(1);
+            std::string::size_type lbrackPos = index(meterName, '[');
+            if (lbrackPos != std::string::npos) meterName.erase(lbrackPos);
 
+            std::string meterNameUC = Util::makeUPPER(meterName);
+
+            // Check for duplicate name
             if (op->meterMap.find(meterNameUC) != op->meterMap.end()) {
                 ShowSevereDuplicateName(state, eoh);
                 ErrorsFound = true;
                 continue;
             }
 
-
-            int meterNum = AddCustomMeter(state, ipsc->cAlphaArgs(1));
-            auto *meter = op->meters[meterNum];
-            meter->type = MeterType::Custom;
-            // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
-            meter->resource = static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC,
+            // Check for invalid resource
+            Constant::eResource resource = static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC,
                                                                             Util::makeUPPER(ipsc->cAlphaArgs(2))));
-            if (meter->resource == Constant::eResource::Invalid) {
+            if (resource == Constant::eResource::Invalid) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
-                BigErrorsFound = true;
+                ErrorsFound = true;
+                continue;
             }
 
-
-            // This could be integrated into the loop below but then this error would appear in the wrong place in one of the unit tests.
-            bool foundCustomMeterRef = false;
+            Constant::Units units = Constant::Units::Invalid;
+            
+            // We essentially have to do this loop twice, once to
+            // check for errors and once to construct the meter.  The
+            // reason is that meters are cross-linked with source
+            // meters and variables and those back-links will be
+            // tricky to undo later.
+            bool foundBadSrc = false;
+            bool itemsAssigned = false;
+            
             for (int fldIndex = 3; fldIndex <= NumAlpha; fldIndex += 2) {
+                if (ipsc->lAlphaFieldBlanks(fldIndex + 1)) {
+                    ShowSevereEmptyField(state, eoh, ipsc->cAlphaFieldNames(fldIndex + 1));
+                    foundBadSrc = true;
+                    break;
+                }
+
+                std::string meterOrVarNameUC = Util::makeUPPER(ipsc->cAlphaArgs(fldIndex + 1));
+                std::string::size_type lbrackPos = index(meterOrVarNameUC, '[');
+                if (lbrackPos != std::string::npos) meterOrVarNameUC.erase(lbrackPos);
+
                 // A custom meter cannot reference another custom meter
-                if (std::find(customMeterNames.begin(), customMeterNames.end(), Util::makeUPPER(ipsc->cAlphaArgs(fldIndex + 1))) != customMeterNames.end()) {
+                if (std::find(customMeterNames.begin(), customMeterNames.end(), meterOrVarNameUC) != customMeterNames.end()) {
                     ShowWarningError(state,
                                      format("Meter:Custom=\"{}\", contains a reference to another Meter:Custom in field: {}=\"{}\".",
                                             ipsc->cAlphaArgs(1),
                                             ipsc->cAlphaFieldNames(fldIndex + 1),
                                             ipsc->cAlphaArgs(fldIndex + 1)));
-                    foundCustomMeterRef = true;
+                    foundBadSrc = true;
                     break;
                 }
-            }
-
-            if (foundCustomMeterRef) {
-                continue;
-            }
-
-            for (int fldIndex = 3; fldIndex <= NumAlpha; fldIndex += 2) {
-                bool KeyIsStar = (ipsc->cAlphaArgs(fldIndex) == "*" || ipsc->lAlphaFieldBlanks(fldIndex));
-
-                if (ipsc->lAlphaFieldBlanks(fldIndex + 1)) {
-                    ShowSevereEmptyField(state, eoh, ipsc->cAlphaFieldNames(fldIndex + 1));
-                    ShowContinueError(state, "...cannot create custom meter.");
-                    BigErrorsFound = true;
-                    continue;
+                
+                // A custom meter cannot reference another customDec meter
+                if (std::find(customDecMeterNames.begin(), customDecMeterNames.end(), meterOrVarNameUC) != customDecMeterNames.end()) {
+                    ShowWarningError(state,
+                                     format("Meter:Custom=\"{}\", contains a reference to another Meter:CustomDecrement in field: {}=\"{}\".",
+                                            ipsc->cAlphaArgs(1),
+                                            ipsc->cAlphaFieldNames(fldIndex + 1),
+                                            ipsc->cAlphaArgs(fldIndex + 1)));
+                    foundBadSrc = true;
+                    break;
                 }
 
-                std::string meterOrVarName = ipsc->cAlphaArgs(fldIndex + 1);
-                
-                // Don't build/check things out if there were errors anywhere.  Use "GetVariableKeys" to map to actual variables...
-                std::string::size_type lbrackPos = index(meterOrVarName, '[');
-                if (lbrackPos != std::string::npos) meterOrVarName.erase(lbrackPos);
-
-                // This is a meter
-                if (auto foundSrcMeter = op->meterMap.find(meterOrVarName); foundSrcMeter != op->meterMap.end()) {
+                if (auto foundSrcMeter = op->meterMap.find(meterOrVarNameUC); foundSrcMeter != op->meterMap.end()) {
                     int srcMeterNum = foundSrcMeter->second;
                     auto *srcMeter = op->meters[srcMeterNum];
                     assert(srcMeter->type == MeterType::Normal);
 
                     // If it's the first meter, it gets to set the units
-                    if (meter->units == Constant::Units::Invalid) {
-                        meter->units = srcMeter->units;
-                        meter->RT_forIPUnits = GetResourceIPUnits(state, meter->resource, meter->units, errFlag);
-                        if (errFlag) {
-                            ShowContinueError(state, format("..on {}=\"{}\".", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
-                            ShowContinueError(state, "..requests for IP units from this meter will be ignored.");
-                        }
-
-                    } else if (meter->units != srcMeter->units) {
+                    if (units == Constant::Units::Invalid) {
+                        units = srcMeter->units;
+                        itemsAssigned = true;
+                    } else if (units != srcMeter->units) {
                         ShowWarningCustomMessage(state, eoh, format("{}=\"{}\", differing units in {}=\"{}\".",
-                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarName));
+                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
                         ShowContinueError(state, format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
-                                                        Constant::unitNames[(int)meter->units], Constant::unitNames[(int)srcMeter->units]));
-                        continue;
+                                                        Constant::unitNames[(int)units], Constant::unitNames[(int)srcMeter->units]));
+                        foundBadSrc = true;
+                        break;
                     }
 
-                    // Check for duplicates
-                    if (std::find(meter->srcMeterNums.begin(), meter->srcMeterNums.end(), srcMeterNum) != meter->srcMeterNums.end()) {
-                        ShowWarningCustomMessage(state, eoh, format("{}=\"{}\" referenced multiple times, only first instance will be used",
-                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarName));
-                        continue;
-                    }
-
-                    // Link meter to src meter and var and vice versa
-                    meter->srcMeterNums.push_back(srcMeterNum);
-                    srcMeter->dstMeterNums.push_back(meterNum);
-                    meter->srcVarNums.push_back(srcMeter->outVarNum);
-                    op->outVars[srcMeter->outVarNum]->meterNums.push_back(meterNum);
-
-                // This is a variable
-                } else if (auto foundSrcDDVar = op->ddOutVarMap.find(meterOrVarName); foundSrcDDVar != op->ddOutVarMap.end()) {
+                // It's a variable
+                } else if (auto foundSrcDDVar = op->ddOutVarMap.find(meterOrVarNameUC); foundSrcDDVar != op->ddOutVarMap.end()) {
                     int srcDDVarNum = foundSrcDDVar->second;
                     auto *srcDDVar = op->ddOutVars[srcDDVarNum];
 
                     // Has to be a summed variable
                     if (srcDDVar->storeType != StoreType::Summed) {
                         ShowWarningCustomMessage(state, eoh, format("{}=\"{}\", variable not summed variable {}=\"{}\".",
-                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarName));
+                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
                         ShowContinueError(state, format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
-                                                        Constant::unitNames[(int)meter->units], Constant::unitNames[(int)srcDDVar->units]));
-                        continue;
+                                                        Constant::unitNames[(int)units], Constant::unitNames[(int)srcDDVar->units]));
+                        foundBadSrc = true;
+                        break;
                     }
                     
                     // If it's the first variable, it gets to set the units
-                    if (meter->units == Constant::Units::Invalid) {
-                        meter->units = srcDDVar->units;
-                        meter->RT_forIPUnits = GetResourceIPUnits(state, meter->resource, meter->units, errFlag);
-                        if (errFlag) {
-                            ShowContinueError(state, format("..on {}=\"{}\".", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
-                            ShowContinueError(state, "..requests for IP units from this meter will be ignored.");
+                    if (units == Constant::Units::Invalid) {
+                        units = srcDDVar->units;
+                    // Otherwise it has to match the existing units
+                    } else if (units != srcDDVar->units) {
+                        ShowWarningCustomMessage(state, eoh, format("differing units in {}=\"{}\".",
+                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                        ShowContinueError(state, format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
+                                                        Constant::unitNames[(int)units], Constant::unitNames[(int)srcDDVar->units]));
+                        foundBadSrc = true;
+                        break;
+                    }
+
+                    bool KeyIsStar = (ipsc->cAlphaArgs(fldIndex) == "*" || ipsc->lAlphaFieldBlanks(fldIndex));
+                    // Have already checked for mismatching units between meter and source variable and assigned units
+                    if (KeyIsStar) {
+                        if (srcDDVar->keyOutVarNums.size() == 0) {
+                            ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC);
+                            foundBadSrc = true;
+                            break;
                         }
 
-                    // Otherwise it has to match the existing units
-                    } else if (meter->units != srcDDVar->units) {
-                        ShowWarningCustomMessage(state, eoh, format("differing units in {}=\"{}\".",
-                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarName));
-                        ShowContinueError(state, format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
-                                                        Constant::unitNames[(int)meter->units], Constant::unitNames[(int)srcDDVar->units]));
-                        continue;
-                    }
-                    
-                    if (KeyIsStar) {
-                        if (srcDDVar->keyOutVarNums.size() > 0) {
-                            for (int keyOutVarNum : srcDDVar->keyOutVarNums) {
-                                if (std::find(meter->srcVarNums.begin(), meter->srcVarNums.end(), keyOutVarNum) != meter->srcVarNums.end()) {
-                                    ShowWarningCustomMessage(state, eoh, format("Output variable \"{}\" referenced multiple times (directly or via meter)", 
-                                                                                op->outVars[keyOutVarNum]->keyColonNameUC));
-                                        
-                                } else {
-                                    meter->srcVarNums.push_back(keyOutVarNum);
-                                    op->outVars[keyOutVarNum]->meterNums.push_back(meterNum);
-                                }
-                            }
-                        } else {
-                            ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarName);
-                            ErrorsFound = true;
-                        }
+                        itemsAssigned = true;
                     } else { // Key is not "*"
                         bool foundKey = false;
+                        for (int keyOutVarNum : srcDDVar->keyOutVarNums) {
+                            if (op->outVars[keyOutVarNum]->keyUC == ipsc->cAlphaArgs(fldIndex)) {
+                                foundKey = true;
+                                itemsAssigned = true;
+                                break;
+                            }
+                        }
+                        if (!foundKey) {
+                            ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC);
+                            foundBadSrc = true;
+                            break;
+                        }
+                    } // if (keyIsStar)
+
+                // Not a meter or a variable
+                } else {
+                    // Cannot use ShowWarningItemNotFound because this string appears in a unit test
+                    ShowWarningError(state,
+                                     format("Meter:Custom=\"{}\", invalid {}=\"{}\".",
+                                            ipsc->cAlphaArgs(1),
+                                            ipsc->cAlphaFieldNames(fldIndex + 1),
+                                            ipsc->cAlphaArgs(fldIndex + 1)));
+                    ShowContinueError(state, "...will not be shown with the Meter results.");
+                    foundBadSrc = true;
+                    break;
+                }                    
+                
+            } // for (fldIndex)
+
+            // Somehow, this meter is not linked to any variables either directly or via another meter
+            if (itemsAssigned == false) {
+                ShowWarningError(state, format("Meter:Custom=\"{}\", no items assigned", ipsc->cAlphaArgs(1)));
+                ShowContinueError(state, "...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom.");
+                continue;
+            }
+
+            // One of the sources is bad
+            if (foundBadSrc) {
+                continue;
+            }
+
+            auto *meter = new Meter(meterName);
+            meter->type = MeterType::Custom;
+            meter->resource = resource;
+            meter->units = units;
+            meter->RT_forIPUnits = GetResourceIPUnits(state, meter->resource, meter->units, errFlag);
+            if (errFlag) {
+                ShowContinueError(state, format("..on {}=\"{}\".", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
+                ShowContinueError(state, "..requests for IP units from this meter will be ignored.");
+            }
+
+            // This meter is good
+            int meterNum = op->meters.size();
+            op->meters.push_back(meter);
+            op->meterMap.insert_or_assign(meterNameUC, meterNum);
+        
+            for (int iPeriod = 0; iPeriod < (int)ReportFreq::Num; ++iPeriod) {
+                meter->periods[iPeriod].RptNum = ++op->ReportNumberCounter;
+            }
+        
+            for (int iPeriod = 0; iPeriod < (int)ReportFreq::Num; ++iPeriod) {
+                meter->periods[iPeriod].accRptNum = ++op->ReportNumberCounter;
+            }
+
+            // Do the loop again, this time without error checking
+            for (int fldIndex = 3; fldIndex <= NumAlpha; fldIndex += 2) {
+                // No need to check for empty fields
+                std::string meterOrVarNameUC = Util::makeUPPER(ipsc->cAlphaArgs(fldIndex + 1));
+                std::string::size_type lbrackPos = index(meterOrVarNameUC, '[');
+                if (lbrackPos != std::string::npos) meterOrVarNameUC.erase(lbrackPos);
+
+                // No need to check for custom source meters
+                if (auto foundSrcMeter = op->meterMap.find(meterOrVarNameUC); foundSrcMeter != op->meterMap.end()) {
+                    int srcMeterNum = foundSrcMeter->second;
+                    auto *srcMeter = op->meters[srcMeterNum];
+                    assert(srcMeter->type == MeterType::Normal);
+
+                    // No need to check for units
+                    // No need to check for duplicates
+
+                    // Check for duplicates
+                    if (std::find(meter->srcMeterNums.begin(), meter->srcMeterNums.end(), srcMeterNum) != meter->srcMeterNums.end()) {
+                        ShowWarningCustomMessage(state, eoh, format("{}=\"{}\" referenced multiple times, only first instance will be used",
+                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                        continue;
+                    }
+
+                    // Link meter to src meter and var and vice versa
+                    meter->srcMeterNums.push_back(srcMeterNum);
+                    srcMeter->dstMeterNums.push_back(meterNum);
+
+                    for (int srcVarNum : srcMeter->srcVarNums) {
+                        if (std::find(meter->srcVarNums.begin(), meter->srcVarNums.end(), srcVarNum) == meter->srcVarNums.end()) {
+                            meter->srcVarNums.push_back(srcVarNum);
+                            op->outVars[srcVarNum]->meterNums.push_back(meterNum);
+                        }
+                    }
+
+                // It's a variable
+                } else if (auto foundSrcDDVar = op->ddOutVarMap.find(meterOrVarNameUC); foundSrcDDVar != op->ddOutVarMap.end()) {
+                    int srcDDVarNum = foundSrcDDVar->second;
+                    auto *srcDDVar = op->ddOutVars[srcDDVarNum];
+
+                    // No need to check for a summed variable
+                    // No need to check for units match or to assign units
+
+                    bool KeyIsStar = (ipsc->cAlphaArgs(fldIndex) == "*" || ipsc->lAlphaFieldBlanks(fldIndex));
+                    // Have already checked for mismatching units between meter and source variable and assigned units
+                    if (KeyIsStar) {
+                        // No need to check for empty keys
+                        for (int keyOutVarNum : srcDDVar->keyOutVarNums) {
+                            if (std::find(meter->srcVarNums.begin(), meter->srcVarNums.end(), keyOutVarNum) != meter->srcVarNums.end()) {
+                                ShowWarningCustomMessage(state, eoh, format("Output variable \"{}\" referenced multiple times (directly or via meter)", 
+                                                                            op->outVars[keyOutVarNum]->keyColonNameUC));
+                                        
+                            } else {
+                                meter->srcVarNums.push_back(keyOutVarNum);
+                                op->outVars[keyOutVarNum]->meterNums.push_back(meterNum);
+                            }
+                        }
+                    } else { // Key is not "*"
                         for (int keyOutVarNum : srcDDVar->keyOutVarNums) {
                             if (op->outVars[keyOutVarNum]->keyUC == ipsc->cAlphaArgs(fldIndex)) {
                                 if (std::find(meter->srcVarNums.begin(), meter->srcVarNums.end(), keyOutVarNum) != meter->srcVarNums.end()) {
@@ -876,40 +976,13 @@ namespace OutputProcessor {
                                     meter->srcVarNums.push_back(keyOutVarNum);
                                     op->outVars[keyOutVarNum]->meterNums.push_back(meterNum);
                                 }
-                                foundKey = true;
                                 break;
                             }
                         }
-                        if (!foundKey) {
-                            ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarName);
-                            ErrorsFound = true;
-                        }
-                    }
+                    } // if (keyIsStar)
+                } // if (meter or variable)
 
-                // Neither a meter nor a variable    
-                } else {                        
-                    // Should this only be a warning? If I had a custom meter and one of its components was
-                    // wrong, I would want the entire custom meter to "fail", rather than for that component
-                    // to be ommitted with only a warning.
-
-                    // Cannot use ShowWarningItemNotFound because this string appears in a unit test
-                    ShowWarningError(state,
-                                     format("{}=\"{}\", invalid {}=\"{}\".",
-                                            "Meter:Custom",
-                                            ipsc->cAlphaArgs(1),
-                                            ipsc->cAlphaFieldNames(fldIndex + 1),
-                                            ipsc->cAlphaArgs(fldIndex + 1)));
-                    ShowContinueError(state, "...will not be shown with the Meter results.");
-                    continue;
-                }                    
-                
             } // for (fldIndex)
-
-            // Somehow, this meter is not linked to any variables either directly or via another meter
-            if (meter->srcVarNums.size() == 0) {
-                ShowWarningError(state, format("Meter:Custom=\"{}\", no items assigned ", ipsc->cAlphaArgs(1)));
-                ShowContinueError(state, "...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom.");
-            }
         } // for (Loop)
 
         ipsc->cCurrentModuleObject = "Meter:CustomDecrement";
@@ -928,30 +1001,45 @@ namespace OutputProcessor {
                               ipsc->cNumericFieldNames);
 
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
-            std::string meterNameUC = Util::makeUPPER(ipsc->cAlphaArgs(1));
-            std::string::size_type lbrackPos = index(meterNameUC, '[');
-            if (lbrackPos != std::string::npos) meterNameUC.erase(lbrackPos);
 
+            std::string meterName = ipsc->cAlphaArgs(1);
+            std::string::size_type lbrackPos = index(meterName, '[');
+            if (lbrackPos != std::string::npos) meterName.erase(lbrackPos);
+            std::string meterNameUC = Util::makeUPPER(meterName);
+
+            // Search for duplicate name
             if (op->meterMap.find(meterNameUC) != op->meterMap.end()) {
                 ShowSevereDuplicateName(state, eoh);
                 ErrorsFound = true;
                 continue;
             }
 
-            int meterNum = AddCustomMeter(state, ipsc->cAlphaArgs(1));
-            auto *meter = op->meters[meterNum];
-            meter->type = MeterType::CustomDec;
             // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
-            meter->resource = static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC,
-                                                                                   Util::makeUPPER(ipsc->cAlphaArgs(2))));
-            if (meter->resource == Constant::eResource::Invalid) {
+            Constant::eResource resource = static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC,
+                                                                                         Util::makeUPPER(ipsc->cAlphaArgs(2))));
+            if (resource == Constant::eResource::Invalid) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
-                BigErrorsFound = true;
+                ErrorsFound = true;
+                continue;
             }
 
-            std::string decMeterName = Util::makeUPPER(ipsc->cAlphaArgs(3));
+            bool itemsAssigned = false;
+
+            std::string decMeterName = ipsc->cAlphaArgs(3);
             lbrackPos = index(decMeterName, '[');
             if (lbrackPos != std::string::npos) decMeterName.erase(lbrackPos);
+            std::string decMeterNameUC = Util::makeUPPER(decMeterName);
+
+            // DecMeter cannot be a Meter:Custom
+            if (std::find(customDecMeterNames.begin(), customDecMeterNames.end(), decMeterNameUC) != customDecMeterNames.end()) {
+                ShowWarningError(state,
+                                 format("Meter:CustomDec=\"{}\", contains a reference to another Meter:CustomDecrement in field: {}=\"{}\".",
+                                        ipsc->cAlphaArgs(1),
+                                        ipsc->cAlphaFieldNames(3),
+                                        ipsc->cAlphaArgs(3)));
+                ErrorsFound = true;
+                continue;
+            }
             
             auto foundDecMeter = op->meterMap.find(decMeterName);
             if (foundDecMeter == op->meterMap.end()) {
@@ -959,16 +1047,164 @@ namespace OutputProcessor {
                 ErrorsFound = true;
                 continue;
             }
-        
-            meter->decMeterNum = foundDecMeter->second;
-            auto *decMeter = op->meters[meter->decMeterNum];
+
+            int decMeterNum = foundDecMeter->second;
+            auto *decMeter = op->meters[decMeterNum];
             assert(decMeter->type == MeterType::Normal);
 
-            meter->units = decMeter->units;
+            Constant::Units units = decMeter->units;
+
+            itemsAssigned = true;
+            
+            // We essentially have to do this loop twice, once to
+            // check for errors and once to construct the meter.  The
+            // reason is that meters are cross-linked with source
+            // meters and variables and those back-links will be
+            // tricky to undo later.
+            bool foundBadSrc = false;
+            
+            for (int fldIndex = 4; fldIndex <= NumAlpha; fldIndex += 2) {
+                if (ipsc->lAlphaFieldBlanks(fldIndex + 1)) {
+                    ShowSevereEmptyField(state, eoh, ipsc->cAlphaFieldNames(fldIndex + 1));
+                    foundBadSrc = true;
+                    break;
+                }
+
+                std::string meterOrVarNameUC = Util::makeUPPER(ipsc->cAlphaArgs(fldIndex + 1));
+                std::string::size_type lbrackPos = index(meterOrVarNameUC, '[');
+                if (lbrackPos != std::string::npos) meterOrVarNameUC.erase(lbrackPos);
+
+                // A custom meter cannot reference another custom meter
+                if (std::find(customDecMeterNames.begin(), customDecMeterNames.end(), meterOrVarNameUC) != customDecMeterNames.end()) {
+                    ShowWarningError(state,
+                                     format("Meter:Custom=\"{}\", contains a reference to another Meter:CustomDecrement in field: {}=\"{}\".",
+                                            ipsc->cAlphaArgs(1),
+                                            ipsc->cAlphaFieldNames(fldIndex + 1),
+                                            ipsc->cAlphaArgs(fldIndex + 1)));
+                    foundBadSrc = true;
+                    break;
+                }
+
+                if (auto foundSrcMeter = op->meterMap.find(meterOrVarNameUC); foundSrcMeter != op->meterMap.end()) {
+                    int srcMeterNum = foundSrcMeter->second;
+                    auto *srcMeter = op->meters[srcMeterNum];
+                    assert(srcMeter->type == MeterType::Normal || srcMeter->type == MeterType::Custom);
+
+                    // If it's the first meter, it gets to set the units
+                    if (units == Constant::Units::Invalid) {
+                        units = srcMeter->units;
+                        itemsAssigned = true;
+                    } else if (units != srcMeter->units) {
+                        ShowWarningCustomMessage(state, eoh, format("{}=\"{}\", differing units in {}=\"{}\".",
+                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                        ShowContinueError(state, format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
+                                                        Constant::unitNames[(int)units], Constant::unitNames[(int)srcMeter->units]));
+                        foundBadSrc = true;
+                        break;
+                    }
+
+                // It's a variable
+                } else if (auto foundSrcDDVar = op->ddOutVarMap.find(meterOrVarNameUC); foundSrcDDVar != op->ddOutVarMap.end()) {
+                    int srcDDVarNum = foundSrcDDVar->second;
+                    auto *srcDDVar = op->ddOutVars[srcDDVarNum];
+
+                    // Has to be a summed variable
+                    if (srcDDVar->storeType != StoreType::Summed) {
+                        ShowWarningCustomMessage(state, eoh, format("{}=\"{}\", variable not summed variable {}=\"{}\".",
+                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                        ShowContinueError(state, format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
+                                                        Constant::unitNames[(int)units], Constant::unitNames[(int)srcDDVar->units]));
+                        foundBadSrc = true;
+                        break;
+                    }
+                    
+                    // If it's the first variable, it gets to set the units
+                    if (units == Constant::Units::Invalid) {
+                        units = srcDDVar->units;
+                    // Otherwise it has to match the existing units
+                    } else if (units != srcDDVar->units) {
+                        ShowWarningCustomMessage(state, eoh, format("differing units in {}=\"{}\".",
+                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                        ShowContinueError(state, format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
+                                                        Constant::unitNames[(int)units], Constant::unitNames[(int)srcDDVar->units]));
+                        foundBadSrc = true;
+                        break;
+                    }
+
+                    bool KeyIsStar = (ipsc->cAlphaArgs(fldIndex) == "*" || ipsc->lAlphaFieldBlanks(fldIndex));
+                    // Have already checked for mismatching units between meter and source variable and assigned units
+                    if (KeyIsStar) {
+                        if (srcDDVar->keyOutVarNums.size() == 0) {
+                            ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC);
+                            foundBadSrc = true;
+                            break;
+                        }
+
+                        itemsAssigned = true;
+                    } else { // Key is not "*"
+                        bool foundKey = false;
+                        for (int keyOutVarNum : srcDDVar->keyOutVarNums) {
+                            if (op->outVars[keyOutVarNum]->keyUC == ipsc->cAlphaArgs(fldIndex)) {
+                                foundKey = true;
+                                itemsAssigned = true;
+                                break;
+                            }
+                        }
+                        if (!foundKey) {
+                            ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC);
+                            foundBadSrc = true;
+                            break;
+                        }
+                    } // if (keyIsStar)
+
+                // Not a meter or a variable
+                } else {
+                    // Cannot use ShowWarningItemNotFound because this string appears in a unit test
+                    ShowWarningError(state,
+                                     format("Meter:Custom=\"{}\", invalid {}=\"{}\".",
+                                            ipsc->cAlphaArgs(1),
+                                            ipsc->cAlphaFieldNames(fldIndex + 1),
+                                            ipsc->cAlphaArgs(fldIndex + 1)));
+                    ShowContinueError(state, "...will not be shown with the Meter results.");
+                    foundBadSrc = true;
+                    break;
+                }                    
+                
+            } // for (fldIndex)
+
+            // Somehow, this meter is not linked to any variables either directly or via another meter
+            if (itemsAssigned == false) {
+                ShowWarningError(state, format("Meter:Custom=\"{}\", no items assigned", ipsc->cAlphaArgs(1)));
+                ShowContinueError(state, "...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom.");
+                continue;
+            }
+
+            // One of the sources is bad
+            if (foundBadSrc) {
+                continue;
+            }
+
+            auto *meter = new Meter(meterName);
+            meter->type = MeterType::CustomDec;
+            meter->resource = resource;
+            meter->units = units;
             meter->RT_forIPUnits = GetResourceIPUnits(state, meter->resource, meter->units, errFlag);
             if (errFlag) {
                 ShowContinueError(state, format("..on {}=\"{}\".", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                 ShowContinueError(state, "..requests for IP units from this meter will be ignored.");
+            }
+            
+            // This meter is good
+            int meterNum = op->meters.size();
+            op->meters.push_back(meter);
+            op->meterMap.insert_or_assign(meterNameUC, meterNum);
+        
+            for (int iPeriod = 0; iPeriod < (int)ReportFreq::Num; ++iPeriod) {
+                meter->periods[iPeriod].RptNum = ++op->ReportNumberCounter;
+            }
+        
+            for (int iPeriod = 0; iPeriod < (int)ReportFreq::Num; ++iPeriod) {
+                meter->periods[iPeriod].accRptNum = ++op->ReportNumberCounter;
             }
 
             //  Links meter to dec meter and its output variable and vice versa
@@ -980,93 +1216,64 @@ namespace OutputProcessor {
                 meter->srcVarNums.push_back(srcVarNum);
                 op->outVars[srcVarNum]->meterNums.push_back(meterNum);
             }
-                
+
+            // Do the loop again, this time without error checking
             for (int fldIndex = 4; fldIndex <= NumAlpha; fldIndex += 2) {
-                bool KeyIsStar = (ipsc->cAlphaArgs(fldIndex) == "*" || ipsc->lAlphaFieldBlanks(fldIndex));
+                // No need to check for empty fields
+                std::string meterOrVarNameUC = Util::makeUPPER(ipsc->cAlphaArgs(fldIndex + 1));
+                std::string::size_type lbrackPos = index(meterOrVarNameUC, '[');
+                if (lbrackPos != std::string::npos) meterOrVarNameUC.erase(lbrackPos);
 
-                if (ipsc->lAlphaFieldBlanks(fldIndex + 1)) {
-                    ShowSevereEmptyField(state, eoh, ipsc->cAlphaFieldNames(fldIndex + 1));
-                    ShowContinueError(state, "...cannot create custom meter.");
-                    BigErrorsFound = true;
-                    continue;
-                }
-
-                std::string meterOrVarName = Util::makeUPPER(ipsc->cAlphaArgs(fldIndex + 1));
-                
-                lbrackPos = index(meterOrVarName, '[');
-                if (lbrackPos != std::string::npos) meterOrVarName.erase(lbrackPos);
-
-                // This is a meter
-                if (auto foundSrcMeter = op->meterMap.find(meterOrVarName); foundSrcMeter != op->meterMap.end()) {
+                // No need to check for custom source meters
+                if (auto foundSrcMeter = op->meterMap.find(meterOrVarNameUC); foundSrcMeter != op->meterMap.end()) {
                     int srcMeterNum = foundSrcMeter->second;
                     auto *srcMeter = op->meters[srcMeterNum];
-                    // Do we need to do this check?
-                    // assert(srcMeter->type == MeterType::Normal);
+                    assert(srcMeter->type == MeterType::Normal || srcMeter->type == MeterType::Custom);
 
-                    // Units must match
-                    if (meter->units != srcMeter->units) {
-                        ShowWarningCustomMessage(state, eoh, format("differing units in {}=\"{}\".",
-                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarName));
-                        ShowContinueError(state, format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
-                                                        Constant::unitNames[(int)meter->units], Constant::unitNames[(int)srcMeter->units]));
-                        continue;
-                    }
-                    
-                    if (srcMeterNum == meter->decMeterNum ||
-                        std::find(meter->srcMeterNums.begin(), meter->srcMeterNums.end(), srcMeterNum) != meter->srcMeterNums.end()) {
-                        ShowWarningCustomMessage(state, eoh, format("{}=\"{}\" is referenced multiple times, only first instance will be used",
-                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarName));
+                    // No need to check for units
+                    // No need to check for duplicates
+
+                    // Check for duplicates
+                    if (std::find(meter->srcMeterNums.begin(), meter->srcMeterNums.end(), srcMeterNum) != meter->srcMeterNums.end()) {
+                        ShowWarningCustomMessage(state, eoh, format("{}=\"{}\" referenced multiple times, only first instance will be used",
+                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
                         continue;
                     }
 
-                    // Link to source meter and its variable and vice versa
+                    // Link meter to src meter and var and vice versa
                     meter->srcMeterNums.push_back(srcMeterNum);
                     srcMeter->dstMeterNums.push_back(meterNum);
 
                     for (int srcVarNum : srcMeter->srcVarNums) {
-                        if (std::find(meter->srcVarNums.begin(), meter->srcVarNums.end(), srcVarNum) != meter->srcVarNums.end()) continue; // Already linked
-                        meter->srcVarNums.push_back(srcVarNum);
-                        op->outVars[srcVarNum]->meterNums.push_back(meterNum);
+                        if (std::find(meter->srcVarNums.begin(), meter->srcVarNums.end(), srcVarNum) == meter->srcVarNums.end()) {
+                            meter->srcVarNums.push_back(srcVarNum);
+                            op->outVars[srcVarNum]->meterNums.push_back(meterNum);
+                        }
                     }
 
-                // This is a variable
-                } else if (auto foundSrcDDVar = op->ddOutVarMap.find(meterOrVarName); foundSrcDDVar != op->ddOutVarMap.end()) {
+                // It's a variable
+                } else if (auto foundSrcDDVar = op->ddOutVarMap.find(meterOrVarNameUC); foundSrcDDVar != op->ddOutVarMap.end()) {
                     int srcDDVarNum = foundSrcDDVar->second;
                     auto *srcDDVar = op->ddOutVars[srcDDVarNum];
 
-                    // Has to be a summed variable
-                    if (srcDDVar->storeType != StoreType::Summed) {
-                        ShowWarningCustomMessage(state, eoh, format("{}=\"{}\" is not summed variable.",
-                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarName));
-                        continue;
-                    }
-                    
-                    // It has to match the existing units
-                    if (meter->units != srcDDVar->units) {
-                        ShowWarningCustomMessage(state, eoh, format("differing units in {}=\"{}\"",
-                                                                    ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarName));
-                        ShowContinueError(state, format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
-                                                        Constant::unitNames[(int)meter->units], Constant::unitNames[(int)srcDDVar->units]));
-                        continue;
-                    }
-                    
+                    // No need to check for a summed variable
+                    // No need to check for units match or to assign units
+
+                    bool KeyIsStar = (ipsc->cAlphaArgs(fldIndex) == "*" || ipsc->lAlphaFieldBlanks(fldIndex));
+                    // Have already checked for mismatching units between meter and source variable and assigned units
                     if (KeyIsStar) {
-                        if (srcDDVar->keyOutVarNums.size() > 0) {
-                            for (int keyOutVarNum : srcDDVar->keyOutVarNums) {
-                                if (std::find(meter->srcVarNums.begin(), meter->srcVarNums.end(), keyOutVarNum) != meter->srcVarNums.end()) {
-                                    ShowWarningCustomMessage(state, eoh, format("Output variable \"{}\" referenced multiple times (directly or via meter)", 
-                                                                                op->outVars[keyOutVarNum]->keyColonNameUC));
-                                } else {
-                                    meter->srcVarNums.push_back(keyOutVarNum);
-                                    op->outVars[keyOutVarNum]->meterNums.push_back(meterNum);
-                                }
+                        // No need to check for empty keys
+                        for (int keyOutVarNum : srcDDVar->keyOutVarNums) {
+                            if (std::find(meter->srcVarNums.begin(), meter->srcVarNums.end(), keyOutVarNum) != meter->srcVarNums.end()) {
+                                ShowWarningCustomMessage(state, eoh, format("Output variable \"{}\" referenced multiple times (directly or via meter)", 
+                                                                            op->outVars[keyOutVarNum]->keyColonNameUC));
+                                        
+                            } else {
+                                meter->srcVarNums.push_back(keyOutVarNum);
+                                op->outVars[keyOutVarNum]->meterNums.push_back(meterNum);
                             }
-                        } else {
-                            ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarName);
-                            ErrorsFound = true;
                         }
                     } else { // Key is not "*"
-                        bool foundKey = false;
                         for (int keyOutVarNum : srcDDVar->keyOutVarNums) {
                             if (op->outVars[keyOutVarNum]->keyUC == ipsc->cAlphaArgs(fldIndex)) {
                                 if (std::find(meter->srcVarNums.begin(), meter->srcVarNums.end(), keyOutVarNum) != meter->srcVarNums.end()) {
@@ -1076,28 +1283,13 @@ namespace OutputProcessor {
                                     meter->srcVarNums.push_back(keyOutVarNum);
                                     op->outVars[keyOutVarNum]->meterNums.push_back(meterNum);
                                 }
-                                foundKey = true;
                                 break;
                             }
                         }
-                        if (!foundKey) {
-                            ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarName);
-                            ErrorsFound = true;
-                        }
-                    }
-
-                // This is neither a meter nor a variable
-                } else {
-                    ShowWarningItemNotFound(state, eoh, ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarName, 
-                                                "...will not be shown with the Meter results.");
-                    continue;
-                }
+                    } // if (keyIsStar)
+                } // if (meter or variable)
 
             } // for (fldIndex)
-            
-            if (meter->srcVarNums.size() == 0) {
-                ShowWarningCustomMessage(state, eoh, format("no items assigned ... will not be shown with the Meter results"));
-            }
         }
 
         if (BigErrorsFound) ErrorsFound = true;
@@ -1177,8 +1369,8 @@ namespace OutputProcessor {
             
     }
 
-    int AddCustomMeter(EnergyPlusData &state,
-                       std::string const &Name              // Name for the meter
+    int AddCustomMeter([[maybe_unused]] EnergyPlusData &state,
+                       [[maybe_unused]] std::string const &Name              // Name for the meter
     )
     {
 
@@ -1188,32 +1380,7 @@ namespace OutputProcessor {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine adds a meter to the current definition set of meters.
-
-        // Make sure this isn't already in the list of meter names
-        auto &op = state.dataOutputProcessor;
-
-        std::string nameUC = Util::makeUPPER(Name);
-        
-        if (auto found = op->meterMap.find(nameUC); found != op->meterMap.end()) {
-            ShowFatalError(state, format("Requested to Add Meter which was already present={}", Name));
-            return found->second;
-        }
-        
-        auto *meter = new Meter(Name);
-        op->meters.push_back(meter);
-        op->meterMap.insert_or_assign(nameUC, op->meters.size() - 1);
-        
-        for (int iPeriod = 0; iPeriod < (int)ReportFreq::Num; ++iPeriod) {
-            auto &period = meter->periods[iPeriod];
-            period.RptNum = ++op->ReportNumberCounter;
-        }
-        
-        for (int iPeriod = 0; iPeriod < (int)ReportFreq::Num; ++iPeriod) {
-            auto &period = meter->periods[iPeriod];
-            period.accRptNum = ++op->ReportNumberCounter;
-        }
-
-        return op->meters.size() - 1;
+        return -1;
     }
         
     void AttachMeters(EnergyPlusData &state,
@@ -2004,14 +2171,17 @@ namespace OutputProcessor {
             if (var->meterNums.size() == 0) continue;
 
             print(state.files.mtd,
-                  "\n Meters for {},{}{}{}\n",
+                  "\n Meters for {},{} [{}]{}\n",
                   var->ReportID,
                   var->keyColonName,
                   Constant::unitNames[(int)var->units],
                   var->multiplierString());
 
             for (int const meterNum : var->meterNums) {
-                print(state.files.mtd, "  On{}Meter={}\n", (op->meters[meterNum]->type == MeterType::Normal) ? "" : "Custom", op->meters[meterNum]->Name);
+                auto const *meter = op->meters[meterNum];
+                    
+                print(state.files.mtd, "  On{}Meter={} [{}]\n",
+                      (meter->type == MeterType::Normal) ? "" : "Custom", meter->Name, Constant::unitNames[(int)meter->units]);
             }
         } // for (var)
 
@@ -2019,7 +2189,7 @@ namespace OutputProcessor {
         for (auto const *meter : op->meters) {
                 
             print(state.files.mtd, "\n For Meter={} [{}]", meter->Name, Constant::unitNames[(int)meter->units]);
-            if (meter->resource == Constant::eResource::Invalid) {
+            if (meter->resource != Constant::eResource::Invalid) {
                 print(state.files.mtd, ", ResourceType={}", Constant::eResourceNames[(int)meter->resource]);
             }
             if (meter->sovEndUseCat != SOVEndUseCat::Invalid) {
@@ -2953,7 +3123,6 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType sovTimeStep,     // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType sovStore,           // State, Average=1, NonState, Sum=2
                          std::string const &key,                                 // Associated Key for this variable
-                         OutputProcessor::ReportFreq freq,                       // Internal use -- causes reporting at this frequency
                          Constant::eResource resource,                           // Meter Resource Type (Electricity, Gas, etc)
                          OutputProcessor::SOVEndUseCat sovEndUseCat,                          // Meter End Use Key (Lights, Heating, Cooling, etc)
                          std::string_view const EndUseSub,                       // Meter End Use Sub Key (General Lights, Task Lights, etc)
@@ -2963,7 +3132,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          int const ZoneListMult,                                 // Zone List Multiplier, defaults to 1
                          int const indexGroupKey,                                // Group identifier for SQL output
                          std::string_view const customUnitName,                  // the custom name for the units from EMS definition of units
-                         std::string const &spaceType                        // Space type (applicable for Building group only)
+                         std::string const &spaceType,                        // Space type (applicable for Building group only)
+                         OutputProcessor::ReportFreq freq                       // Internal use -- causes reporting at this frequency
 )
 {
 
@@ -3019,11 +3189,12 @@ void SetupOutputVariable(EnergyPlusData &state,
     int firstAddedOutVarNum = (int)op->outVars.size();
 
     op->NumTotalRVariable += reqVarList.size();
-    if (store == StoreType::Summed) ++op->NumOfRVariable_Sum;
-    if (OnMeter) ++op->NumOfRVariable_Meter;
     
     if (!OnMeter && !ThisOneOnTheList) return;
 
+    if (store == StoreType::Summed) ++op->NumOfRVariable_Sum;
+    if (OnMeter) ++op->NumOfRVariable_Meter;
+    
     for (int reqVarNum : reqVarList) {
             
         ++op->NumOfRVariable;
@@ -3094,8 +3265,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType sovTimeStepType, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType sovStoreType,    // State, Average=1, NonState, Sum=2
                          std::string const &key,                      // Associated Key for this variable
-                         OutputProcessor::ReportFreq freq,                       // Internal use -- causes reporting at this freqency
-                         int const indexGroupKey                                 // Group identifier for SQL output
+                         int const indexGroupKey,                                 // Group identifier for SQL output
+                         OutputProcessor::ReportFreq freq                       // Internal use -- causes reporting at this freqency
 )
 {
 
@@ -3128,21 +3299,22 @@ void SetupOutputVariable(EnergyPlusData &state,
     StoreType storeType = sovStoreType2StoreType[(int)sovStoreType];
 
     // DataOutputs::OutputVariablesForSimulation is case-insentitive
-    bool ThisOneOnTheList = DataOutputs::FindItemInVariableList(state, key, name);
-    if (!ThisOneOnTheList)
-        return;
-    
     int ddOutVarNum = AddDDOutVar(state, name, timeStepType, storeType, VariableType::Integer, units);
     auto *ddOutVar = op->ddOutVars[ddOutVarNum];
     
     ++op->NumOfIVariable_Setup;
+
+    op->NumTotalIVariable += (reqVarNums.size() > 0) ? reqVarNums.size() : 1;
+    bool ThisOneOnTheList = DataOutputs::FindItemInVariableList(state, key, name);
+    if (!ThisOneOnTheList)
+        return;
+    
     if (storeType == StoreType::Summed) {
         ++op->NumOfIVariable_Sum;
     }
 
     for (int Loop = 0; Loop < (int)reqVarNums.size(); ++Loop) {
 
-        ++op->NumTotalIVariable;
         ++op->NumOfIVariable;
         
         OutVarInt *var = new OutVarInt;
@@ -4723,7 +4895,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
 
     if (op->ProduceReportVDD == ReportVDD::Yes || op->ProduceReportVDD == ReportVDD::IDF) {
         auto miVar = op->ddOutVarMap.begin();
-        for (int aiVar = 0; aiVar < (int)op->outVars.size() && miVar != op->ddOutVarMap.end(); ++aiVar, ++miVar) {
+        for (int aiVar = 0; aiVar < (int)op->ddOutVars.size() && miVar != op->ddOutVarMap.end(); ++aiVar, ++miVar) {
             int iVar = (SortByName) ? miVar->second : aiVar; // Choose either map (sorted) order or array (unsorted) order
             auto *ddVar = op->ddOutVars[iVar];
 
@@ -4774,13 +4946,13 @@ void ProduceRDDMDD(EnergyPlusData &state)
         auto *meter = op->meters[iMeter];
         std::string_view unitName = Constant::unitNames[(int)meter->units];
         if (op->ProduceReportVDD == ReportVDD::Yes) {
-            print(state.files.mdd, "Zone,Meter,{}[{}]\n", meter->Name, unitName);
-            rf->MDD.push_back(format("Zone,Meter,{},[{}]", meter->Name, unitName));
+            print(state.files.mdd, "Zone,Meter,{} [{}]\n", meter->Name, unitName);
+            rf->MDD.push_back(format("Zone,Meter,{}, [{}]", meter->Name, unitName));
         } else if (op->ProduceReportVDD == ReportVDD::IDF) {
-            print(state.files.mdd, "Output:Meter,{},hourly; !-[{}]\n", meter->Name, unitName);
-            rf->MDD.push_back(format("Output:Meter,{},[{}]", meter->Name, unitName));
-            print(state.files.mdd, "Output:Meter:Cumulative,{},hourly; !-[{}]\n", meter->Name, unitName);
-            rf->MDD.push_back(format("Output:Meter:Cumulative,{},[{}]", meter->Name, unitName));
+            print(state.files.mdd, "Output:Meter,{},hourly; !- [{}]\n", meter->Name, unitName);
+            rf->MDD.push_back(format("Output:Meter,{}, [{}]", meter->Name, unitName));
+            print(state.files.mdd, "Output:Meter:Cumulative,{},hourly; !- [{}]\n", meter->Name, unitName);
+            rf->MDD.push_back(format("Output:Meter:Cumulative,{}, [{}]", meter->Name, unitName));
         }
     }
     state.files.mdd.close();

@@ -868,7 +868,6 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType timeStepType,   // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType variableType,      // State, Average=1, NonState, Sum=2
                          std::string const &key,                  // Associated Key for this variable
-                         OutputProcessor::ReportFreq reportFreq = OutputProcessor::ReportFreq::Hour, // Internal use -- causes reporting at this freqency
                          Constant::eResource resource = Constant::eResource::Invalid, // Meter Resource Type (Electricity, Gas, etc)
                          OutputProcessor::SOVEndUseCat sovEndUseCat = OutputProcessor::SOVEndUseCat::Invalid, // Meter End Use Key (Lights, Heating, etc)
                          std::string_view const endUseSub = {},           // Meter End Use Sub Key (General Lights, Task Lights, etc)
@@ -878,7 +877,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          int const zoneListMult = 1,                         // Zone List Multiplier, defaults to 1
                          int const indexGroupKey = -999,                     // Group identifier for SQL output
                          std::string_view const customUnitName = {},         // the custom name for the units from EMS definition of units
-                         std::string const &spaceType = {}               // Space type (applicable for Building group only)
+                         std::string const &spaceType = {},               // Space type (applicable for Building group only)
+                         OutputProcessor::ReportFreq reportFreq = OutputProcessor::ReportFreq::Hour // Internal use -- causes reporting at this freqency
 );
 
 
@@ -889,8 +889,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string const &KeyedValue,                // Associated Key for this variable
-                         OutputProcessor::ReportFreq freq = OutputProcessor::ReportFreq::Hour,  // Internal use -- causes reporting at this freqency
-                         int const indexGroupKey = -999                    // Group identifier for SQL output
+                         int const indexGroupKey = -999,                    // Group identifier for SQL output
+                         OutputProcessor::ReportFreq freq = OutputProcessor::ReportFreq::Hour  // Internal use -- causes reporting at this freqency
 );
 
 void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType TimeStepTypeKey); // What kind of data to update (Zone, HVAC)
@@ -979,18 +979,14 @@ struct OutputProcessorData : BaseGlobalStruct
     int NumOfRVariable_Setup = 0;
     int NumOfRVariable_Sum = 0;
     int NumOfRVariable_Meter = 0;
-    int MaxRVariable = 0;
     int NumOfIVariable = 0;
     int NumOfIVariable_Setup = 0;
     int NumTotalIVariable = 0;
     int NumOfIVariable_Sum = 0;
-    int MaxIVariable = 0;
     bool OutputInitialized = false;
     OutputProcessor::ReportVDD ProduceReportVDD = OutputProcessor::ReportVDD::No;
     int NumHoursInMonth = 0;
     int NumHoursInSim = 0;
-    int NumOfReqVariables = 0;               // Current number of Requested Report Variables
-    int NumEnergyMeters = 0;                 // Current number of Energy Meters
     std::vector<Real64> meterValues;              // This holds the current timestep value for each meter.
 
     std::array<int, (int)OutputProcessor::ReportFreq::Num> freqStampReportNums = {-1, -1, -1, -1, -1, -1, -1};
@@ -1036,17 +1032,13 @@ struct OutputProcessorData : BaseGlobalStruct
         this->NumTotalRVariable = 0;
         this->NumOfRVariable_Sum = 0;
         this->NumOfRVariable_Meter = 0;
-        this->MaxRVariable = 0;
         this->NumOfIVariable_Setup = 0;
         this->NumTotalIVariable = 0;
         this->NumOfIVariable_Sum = 0;
-        this->MaxIVariable = 0;
         this->OutputInitialized = false;
         this->ProduceReportVDD = OutputProcessor::ReportVDD::No;
         this->NumHoursInMonth = 0;
         this->NumHoursInSim = 0;
-        this->NumOfReqVariables = 0;
-        this->NumEnergyMeters = 0;
         this->meterValues.clear();
         this->freqStampReportNums = {-1, -1, -1, -1, -1, -1, -1};
         this->freqTrackingVariables = {false};

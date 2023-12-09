@@ -245,7 +245,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
         //   but only if there are any other electricity components set up (yet) for metering
         int anyElectricityPresent = GetMeterIndex(state, "ELECTRICITY:FACILITY");
         int anyPlantLoadProfilePresent = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "LoadProfile:Plant");
-        if (anyElectricityPresent > 0 || anyPlantLoadProfilePresent > 0) {
+        if (anyElectricityPresent > -1 || anyPlantLoadProfilePresent > 0) {
             elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(state, 0));
             numLoadCenters_ = 1;
         }
@@ -326,7 +326,6 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            {},
                             Constant::eResource::ElectricityPurchased,
                             OutputProcessor::SOVEndUseCat::Cogeneration,
                             {},
@@ -346,7 +345,6 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            {},
                             Constant::eResource::ElectricitySurplusSold,
                             OutputProcessor::SOVEndUseCat::Cogeneration,
                             {},
@@ -366,7 +364,6 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            {},
                             Constant::eResource::ElectricityNet,
                             OutputProcessor::SOVEndUseCat::Cogeneration,
                             {},
@@ -2678,7 +2675,6 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            {},
                             Constant::eResource::ElectricityProduced,
                             OutputProcessor::SOVEndUseCat::PowerConversion,
                             {},
@@ -2711,7 +2707,6 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            {},
                             Constant::eResource::Electricity,
                             OutputProcessor::SOVEndUseCat::Cogeneration,
                             "DCtoACInverter Ancillary",
@@ -3138,7 +3133,6 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            {},
                             Constant::eResource::ElectricityProduced,
                             OutputProcessor::SOVEndUseCat::PowerConversion,
                             {},
@@ -3171,7 +3165,6 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            {},
                             Constant::eResource::Electricity,
                             OutputProcessor::SOVEndUseCat::Cogeneration,
                             "ACtoDCConverter Ancillary",
@@ -3718,7 +3711,6 @@ ElectricStorage::ElectricStorage( // main constructor
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            {},
                             Constant::eResource::ElectricityProduced,
                             OutputProcessor::SOVEndUseCat::ElectricStorage,
                             {},
@@ -3737,7 +3729,6 @@ ElectricStorage::ElectricStorage( // main constructor
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            {},
                             Constant::eResource::ElectricityProduced,
                             OutputProcessor::SOVEndUseCat::ElectricStorage,
                             {},
@@ -4950,7 +4941,6 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 name_,
-                                {},
                                 Constant::eResource::Electricity,
                                 OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                                 "Transformer",
@@ -4964,7 +4954,6 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 name_,
-                                {},
                                 Constant::eResource::ElectricityProduced,
                                 OutputProcessor::SOVEndUseCat::PowerConversion,
                                 {},
@@ -4978,7 +4967,6 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 name_,
-                                {},
                                 Constant::eResource::ElectricityProduced,
                                 OutputProcessor::SOVEndUseCat::PowerConversion,
                                 {},

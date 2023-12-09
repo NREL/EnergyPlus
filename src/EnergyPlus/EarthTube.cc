@@ -553,9 +553,8 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::NonState,
                                     zone.Name,
-                                    {},
                                     Constant::eResource::Electricity,
-                                    {},
+                                    OutputProcessor::SOVEndUseCat::Invalid,
                                     {},
                                     OutputProcessor::SOVGroup::Building);
                 SetupOutputVariable(state,

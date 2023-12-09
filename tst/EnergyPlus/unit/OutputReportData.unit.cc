@@ -92,7 +92,6 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
-                        {},
                         Constant::eResource::Electricity,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
@@ -103,7 +102,6 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
-                        {},
                         Constant::eResource::Electricity,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
@@ -114,7 +112,6 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
-                        {},
                         Constant::eResource::Electricity,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");

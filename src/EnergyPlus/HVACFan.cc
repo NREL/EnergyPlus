@@ -631,7 +631,6 @@ namespace HVACFan {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name,
-                            {},
                             Constant::eResource::Electricity,
                             OutputProcessor::SOVEndUseCat::Fans,
                             m_endUseSubcategoryName,

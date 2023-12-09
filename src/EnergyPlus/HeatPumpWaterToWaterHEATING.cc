@@ -371,7 +371,6 @@ void GetGshpInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisGSHP.Name,
-                            {},
                             Constant::eResource::Electricity,
                             OutputProcessor::SOVEndUseCat::Heating,
                             {},

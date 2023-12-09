@@ -689,7 +689,6 @@ namespace WindTurbine {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 windTurbine.Name,
-                                {},
                                 Constant::eResource::ElectricityProduced,
                                 OutputProcessor::SOVEndUseCat::WindTurbine,
                                 {},

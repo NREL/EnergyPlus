@@ -952,7 +952,6 @@ namespace HeatBalFiniteDiffManager {
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Summed,
                                         state.dataSurface->Surface(SurfNum).Name,
-                                        {},
                                         Constant::eResource::Electricity,
                                         OutputProcessor::SOVEndUseCat::Heating,
                                         {},

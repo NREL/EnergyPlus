@@ -140,7 +140,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
-                        {},
                         Constant::eResource::Electricity,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
@@ -151,7 +150,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
-                        {},
                         Constant::eResource::Electricity,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
@@ -162,7 +160,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
-                        {},
                         Constant::eResource::Electricity,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
@@ -232,7 +229,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
-                        {},
                         Constant::eResource::Electricity,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
@@ -243,7 +239,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
-                        {},
                         Constant::eResource::Electricity,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
@@ -254,7 +249,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
-                        {},
                         Constant::eResource::Electricity,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
@@ -386,7 +380,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
-                        {},
                         Constant::eResource::Electricity,
                         OutputProcessor::SOVEndUseCat::InteriorLights, // Was "Facility"
                         "General"); // create an electric meter
@@ -450,7 +443,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
-                        {},
                         Constant::eResource::Electricity,
                         OutputProcessor::SOVEndUseCat::InteriorLights, // Was "Facility"
                         "General"); // create an electric meter
