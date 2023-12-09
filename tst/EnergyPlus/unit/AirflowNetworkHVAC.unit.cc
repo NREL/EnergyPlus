@@ -13890,6 +13890,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestIntraZoneLinkageZoneIndex)
         "    autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
         "    autosize,                !- Heating Supply Air Flow Rate {m3/s}",
         "    ,                        !- No Load Supply Air Flow Rate {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}",
         "    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}",
         "    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}",

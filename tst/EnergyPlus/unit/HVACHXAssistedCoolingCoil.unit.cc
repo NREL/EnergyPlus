@@ -148,6 +148,7 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
         "  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+        "    ,                     !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "  80;                     !- Maximum Supply Air Temperature{ C }",
 
         "  CoilSystem:Cooling:DX:HeatExchangerAssisted,",
@@ -756,8 +757,10 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_NewDXCoil_Processing_Test)
         "  ,                       !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required{ m3/s-m2 }",
         "  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
         "  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
+        "  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+        "  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "  80;                     !- Maximum Supply Air Temperature{ C }",
 
         "  CoilSystem:Cooling:DX:HeatExchangerAssisted,",

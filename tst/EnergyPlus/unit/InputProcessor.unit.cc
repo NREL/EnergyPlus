@@ -2847,6 +2847,7 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
         "  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+        "  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed ",
         "  80;                     !- Maximum Supply Air Temperature{ C }",
     });
 
@@ -2884,7 +2885,7 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
                                                               cAlphaFields,
                                                               cNumericFields);
 
-    EXPECT_EQ(22, NumAlphas);
+    EXPECT_EQ(23, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"GASHEAT DXAC FURNACE 1",
                                                              "LOAD",
                                                              "EAST ZONE",
@@ -2907,6 +2908,7 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
                                                              "SUPPLYAIRFLOWRATE",
                                                              "SUPPLYAIRFLOWRATE",
                                                              "SUPPLYAIRFLOWRATE",
+                                                             "YES",
                                                              "",
                                                              "",
                                                              "",
@@ -2915,7 +2917,7 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
                                    Alphas));
     EXPECT_TRUE(
         compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-                                              false, true,  true,  false, false, false, false, false, true,  true,  true,  true,  true}),
+                                              false, true,  true,  false, false, false, false, false, true,  true,  true,  true,  true,  true}),
                            lAlphaBlanks));
 
     EXPECT_EQ(17, NumNumbers);
