@@ -6140,7 +6140,8 @@ namespace InternalHeatGains {
 
             addZoneOutputs(zoneOtherEq.ZonePtr) = true;
             addSpaceOutputs(zoneOtherEq.spaceIndex) = true;
-            if (zoneOtherEq.OtherEquipFuelType != Constant::eFuel::Invalid) {
+            if (zoneOtherEq.OtherEquipFuelType != Constant::eFuel::Invalid &&
+                zoneOtherEq.OtherEquipFuelType != Constant::eFuel::None) {
                 SetupOutputVariable(state,
                                     format("Other Equipment {} Rate", Constant::eFuelNames[(int)zoneOtherEq.OtherEquipFuelType]),
                                     Constant::Units::W,

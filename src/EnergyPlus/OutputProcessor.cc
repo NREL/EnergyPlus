@@ -2151,7 +2151,7 @@ namespace OutputProcessor {
     std::string OutVar::multiplierString() const
     {
         return (ZoneMult == 1 && ZoneListMult == 1) ? "" :
-                format(" * {} (Zone Multiplier = {}, Zone List Multiplier = {})", ZoneMult * ZoneListMult, ZoneMult, ZoneListMult);
+                format(" * {}  (Zone Multiplier = {}, Zone List Multiplier = {})", ZoneMult * ZoneListMult, ZoneMult, ZoneListMult);
     }
         
     void ReportMeterDetails(EnergyPlusData &state)
