@@ -1164,7 +1164,7 @@ namespace HeatRecovery {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
-                                Constant::eResource::EnergyTransfer,
+                                Constant::eResource::Electricity,
                                 OutputProcessor::SOVEndUseCat::HeatRecovery,
                                 {},
                                 OutputProcessor::SOVGroup::HVAC);

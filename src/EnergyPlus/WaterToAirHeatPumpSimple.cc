@@ -736,7 +736,7 @@ namespace WaterToAirHeatPumpSimple {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 simpleWAHP.Name,
-                                Constant::eResource::PlantLoopCoolingDemand,
+                                Constant::eResource::PlantLoopHeatingDemand,
                                 OutputProcessor::SOVEndUseCat::HeatingCoils,
                                 {},
                                 OutputProcessor::SOVGroup::HVAC);
