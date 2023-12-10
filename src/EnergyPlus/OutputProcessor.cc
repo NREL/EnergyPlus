@@ -4327,7 +4327,7 @@ Real64 GetInstantMeterValue(EnergyPlusData &state,
     auto &op = state.dataOutputProcessor;
     auto *meter = op->meters[meterNum];
 
-    if (meter->type == MeterType::Normal) {
+    if (meter->type == MeterType::Normal || meter->type == MeterType::Custom) {
         for (int srcVarNum : meter->srcVarNums) { 
             auto *var = op->outVars[srcVarNum];
             // Separate the Zone variables from the HVAC variables using TimeStepType
@@ -4848,17 +4848,6 @@ void ProduceRDDMDD(EnergyPlusData &state)
     std::string VarOption2;
     bool DoReport;
     bool SortByName;
-    int ItemPtr;
-
-    struct VariableTypes
-    {
-        // Members
-        int RealIntegerType = 0; // Real= 1, Integer=2
-        int VarPtr = 0;          // pointer to real/integer VariableTypes structures
-        int TimeStepType = 0;
-        int StoreType = 0;
-        std::string UnitsString;
-    };
 
     auto &op = state.dataOutputProcessor;
     auto &rf = state.dataResultsFramework->resultsFramework;
@@ -4897,9 +4886,22 @@ void ProduceRDDMDD(EnergyPlusData &state)
     }
 
     if (op->ProduceReportVDD == ReportVDD::Yes || op->ProduceReportVDD == ReportVDD::IDF) {
+            
         auto miVar = op->ddOutVarMap.begin();
-        for (int aiVar = 0; aiVar < (int)op->ddOutVars.size() && miVar != op->ddOutVarMap.end(); ++aiVar, ++miVar) {
-            int iVar = (SortByName) ? miVar->second : aiVar; // Choose either map (sorted) order or array (unsorted) order
+        int aiVar = 0;
+        for (;;) {
+            int iVar = -1;
+            // Too complicated to do this logic in the for loop header
+            if (SortByName) {
+                if (miVar == op->ddOutVarMap.end()) break;
+                iVar = miVar->second;
+                ++miVar;
+            } else {
+                if (aiVar == (int)op->ddOutVars.size()) break;
+                iVar = aiVar;
+                ++aiVar;
+            }
+
             auto *ddVar = op->ddOutVars[iVar];
 
             if (ddVar->ReportedOnDDFile) continue;
@@ -4917,28 +4919,25 @@ void ProduceRDDMDD(EnergyPlusData &state)
             }
                 
             ddVar->ReportedOnDDFile = true;
-            while (ddVar->Next != -1) {
-                if (SortByName) {
-                    ++ItemPtr;
-                } else {
-                    ItemPtr = ddVar->Next;
-                }
-                ddVar = op->ddOutVars[ItemPtr];
+            if (SortByName) {
+                while (ddVar->Next != -1) {
+                    ddVar = op->ddOutVars[ddVar->Next];
 
-                std::string_view timeStepName = timeStepNames[(int)ddVar->timeStepType];
-                std::string_view storeTypeName = storeTypeNames[(int)ddVar->storeType];
-                std::string_view varName = ddVar->name;
-                std::string_view unitName = (ddVar->units == Constant::Units::customEMS) ? ddVar->unitNameCustomEMS : Constant::unitNames[(int)ddVar->units];
+                    std::string_view timeStepName = timeStepNames[(int)ddVar->timeStepType];
+                    std::string_view storeTypeName = storeTypeNames[(int)ddVar->storeType];
+                    std::string_view varName = ddVar->name;
+                    std::string_view unitName = (ddVar->units == Constant::Units::customEMS) ? ddVar->unitNameCustomEMS : Constant::unitNames[(int)ddVar->units];
                 
-                if (op->ProduceReportVDD == ReportVDD::Yes) {
-                    print(state.files.rdd, "{},{},{} [{}]\n", timeStepName, storeTypeName, varName, unitName);
-                    rf->RDD.push_back(format("{},{},{} [{}]", timeStepName, storeTypeName, varName, unitName));
-                } else {
-                    print(state.files.rdd, "Output:Variable,*,{},hourly; !- {} {} [{}]\n", varName, timeStepName, storeTypeName, unitName);
-                    rf->RDD.push_back(format("{},{},{} [{}]", timeStepName, storeTypeName, varName, unitName));
-                }
-                ddVar->ReportedOnDDFile = true;
-            } // while (ddVar->Next != 0)
+                    if (op->ProduceReportVDD == ReportVDD::Yes) {
+                        print(state.files.rdd, "{},{},{} [{}]\n", timeStepName, storeTypeName, varName, unitName);
+                        rf->RDD.push_back(format("{},{},{} [{}]", timeStepName, storeTypeName, varName, unitName));
+                    } else {
+                        print(state.files.rdd, "Output:Variable,*,{},hourly; !- {} {} [{}]\n", varName, timeStepName, storeTypeName, unitName);
+                        rf->RDD.push_back(format("{},{},{} [{}]", timeStepName, storeTypeName, varName, unitName));
+                    }
+                    ddVar->ReportedOnDDFile = true;
+                } // while (ddVar->Next != 0)
+            } // if (SortByName)
         } // for (aiVar, miVar) 
     } // if (produceReportVDD)
     state.files.rdd.close();

@@ -601,7 +601,7 @@ namespace EMSManager {
                 thisSensor.OutputVarName = cAlphaArgs(3);
 
                 int VarIndex = GetMeterIndex(state, cAlphaArgs(3));
-                if (VarIndex > 0) {
+                if (VarIndex > -1) {
                     if (!lAlphaFieldBlanks(2)) {
                         ShowWarningError(state, format("Unused{}={}", cAlphaFieldNames(2), cAlphaArgs(2)));
                         ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
@@ -1220,6 +1220,8 @@ namespace EMSManager {
             GetVariableKeys(state, VarName, VarType, keyName, KeyIndex);
 
             if (VarType == OutputProcessor::VariableType::Schedule) {
+                VarIndex = KeyIndex(1);
+            } else if (keyName(1) == "ENVIRONMENT") {
                 VarIndex = KeyIndex(1);
             } else {
                 for (int KeyNum = 1; KeyNum <= NumKeys; ++KeyNum) {
