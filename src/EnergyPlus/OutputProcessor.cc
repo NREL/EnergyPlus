@@ -1193,6 +1193,8 @@ namespace OutputProcessor {
                 ShowContinueError(state, format("..on {}=\"{}\".", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                 ShowContinueError(state, "..requests for IP units from this meter will be ignored.");
             }
+
+            meter->decMeterNum = decMeterNum;
             
             // This meter is good
             int meterNum = op->meters.size();
@@ -4216,6 +4218,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
         if (!period.Rpt) {
             period.Rpt = true;
             if (MeterFileOnlyIndicator) period.RptFO = true;
+            else op->freqTrackingVariables[(int)freq] = true;
             int indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, meter->Name);
             std::string indexGroup = DetermineIndexGroupFromMeterGroup(meter);
             WriteMeterDictionaryItem(state,
