@@ -141,17 +141,17 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
 
         Real64 RatedAirMassFlowRateMaxSpeed(bool useAlternateMode) override {
             if (useAlternateMode) {
-                return alternateMode.speeds.back().RatedCondAirMassFlowRate;
+                return alternateMode.speeds.back().RatedAirMassFlowRate;
             } else {
-                return normalMode.speeds.back().RatedCondAirMassFlowRate;
+                return normalMode.speeds.back().RatedAirMassFlowRate;
             }
         }
 
         Real64 RatedAirMassFlowRateMinSpeed(bool useAlternateMode) override {
             if (useAlternateMode) {
-                return alternateMode.speeds.front().RatedCondAirMassFlowRate;
+                return alternateMode.speeds.front().RatedAirMassFlowRate;
             } else {
-                return normalMode.speeds.front().RatedCondAirMassFlowRate;
+                return normalMode.speeds.front().RatedAirMassFlowRate;
             }
         }
 
@@ -222,7 +222,6 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
             return normalMode.speeds[speed].evap_condenser_effectiveness;
         }
 
-        Real64 crankcaseHeaterCap = 0.0;
         Real64 maxOutdoorDrybulbForBasin = 0.0;
         bool mySizeFlag = true;
 
