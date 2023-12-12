@@ -382,7 +382,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !                 CurArgs = CurArgs + 1
 
               ! If your original object starts with A, insert the rules here
-
+              CASE('AIRLOOPHVAC:UNITARYSYSTEM') ! add new input field No Load Supply Air Flow Rate Control Set To Low Speed
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(38)=InArgs(38)
+                  ! OutArgs(39) is added. If existing coil is VS DX cooling or heating coil then set YES, otherwise set NO
+                  IF ( SameString(InArgs(12),'Coil:Heating:DX:VariableSpeed') .or. SameString(InArgs(15),'Coil:Cooling:DX:VariableSpeed') ) THEN
+                      OutArgs(39) = 'YES'
+                  ELSE
+                      OutArgs(39) = 'NO'
+                  END IF
+                  OutArgs(40:CurArgs+1)=InArgs(39:CurArgs)
+                  CurArgs = CurArgs + 1
               ! If your original object starts with C, insert the rules here
               CASE('COMFORTVIEWFACTORANGLES')
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -434,6 +445,37 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with W, insert the rules here
 
               ! If your original object starts with Z, insert the rules here
+              CASE('ZONEHVAC:PACKAGEDTERMINALAIRCONDTIIONER') ! add new input field No Load Supply Air Flow Rate Control Set To Low Speed
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(9)=InArgs(9)
+                  ! OutArgs(39) is added. If existing coil is VS DX cooling or heating coil then set YES, otherwise set NO
+                  IF ( SameString(InArgs(18),'Coil:Cooling:DX:VariableSpeed') ) THEN
+                      OutArgs(10) = 'YES'
+                  ELSE
+                      OutArgs(10) = 'NO'
+                  END IF
+                  OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
+                  CurArgs = CurArgs + 1
+              CASE('ZONEHVAC:PACKAGEDTERMINALHEATPUMP') ! add new input field No Load Supply Air Flow Rate Control Set To Low Speed
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(9)=InArgs(9)
+                  ! OutArgs(39) is added. If existing coil is VS DX cooling or heating coil then set YES, otherwise set NO
+                  IF ( SameString(InArgs(16),'Coil:Heating:DX:VariableSpeed') .or. SameString(InArgs(19),'Coil:Cooling:DX:VariableSpeed') ) THEN
+                      OutArgs(10) = 'YES'
+                  ELSE
+                      OutArgs(10) = 'NO'
+                  END IF
+                  OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
+                  CurArgs = CurArgs + 1
+              CASE('ZONEHVAC:WATERTOAIRHEATPUMP') ! add new input field No Load Supply Air Flow Rate Control Set To Low Speed
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(9)=InArgs(9)
+                  OutArgs(10) = 'NO' ! Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit was not previously used to set no load air flow rate
+                  OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
+                  CurArgs = CurArgs + 1
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                   Changes for report variables, meters, tables -- update names                                   !
