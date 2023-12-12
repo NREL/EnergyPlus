@@ -51,8 +51,8 @@
 
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
-#include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXAshrae205Performance.hh>
+#include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -85,11 +85,9 @@ std::shared_ptr<CoilCoolingDXPerformanceBase> CoilCoolingDX::makePerformanceSubc
     const auto a205_object_name = CoilCoolingDX205Performance::object_name;
     const auto curve_fit_object_name = CoilCoolingDXCurveFitPerformance::object_name;
 
-    if (findPerformanceSubclass(state, a205_object_name, performance_object_name))
-    {
+    if (findPerformanceSubclass(state, a205_object_name, performance_object_name)) {
         return std::make_shared<CoilCoolingDX205Performance>(state, performance_object_name);
-    }
-    else if (findPerformanceSubclass(state, curve_fit_object_name, performance_object_name)) {
+    } else if (findPerformanceSubclass(state, curve_fit_object_name, performance_object_name)) {
         return std::make_shared<CoilCoolingDXCurveFitPerformance>(state, performance_object_name);
     }
 
@@ -663,15 +661,15 @@ void CoilCoolingDX::getDataAfterSizing(Real64 &_normalModeRatedEvapAirFlowRate,
     _normalModeRatedCapacity = this->performance->RatedGrossTotalCap();
 }
 
-//CoilCoolingDXCurveFitSpeed &CoilCoolingDX::normModeNomSpeed()
+// CoilCoolingDXCurveFitSpeed &CoilCoolingDX::normModeNomSpeed()
 //{
-//    return this->performance.normalMode.speeds[this->performance.normalMode.nominalSpeedIndex];
-//}
+//     return this->performance.normalMode.speeds[this->performance.normalMode.nominalSpeedIndex];
+// }
 //
-//CoilCoolingDXCurveFitSpeed &CoilCoolingDX::altModeNomSpeed()
+// CoilCoolingDXCurveFitSpeed &CoilCoolingDX::altModeNomSpeed()
 //{
-//    return this->performance.alternateMode.speeds[this->performance.alternateMode.nominalSpeedIndex];
-//}
+//     return this->performance.alternateMode.speeds[this->performance.alternateMode.nominalSpeedIndex];
+// }
 
 Real64 CoilCoolingDX::condMassFlowRate(bool const useAlternateMode)
 {
@@ -721,17 +719,17 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     this->performance->OperatingMode = 0;
     this->performance->ModeRatio = 0.0;
     this->performance->simulate(state,
-                               evapInletNode,
-                               evapOutletNode,
-                               useAlternateMode,
-                               PLR,
-                               speedNum,
-                               speedRatio,
-                               fanOpMode,
-                               condInletNode,
-                               condOutletNode,
-                               singleMode,
-                               LoadSHR);
+                                evapInletNode,
+                                evapOutletNode,
+                                useAlternateMode,
+                                PLR,
+                                speedNum,
+                                speedRatio,
+                                fanOpMode,
+                                condInletNode,
+                                condOutletNode,
+                                singleMode,
+                                LoadSHR);
     CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor
@@ -760,9 +758,8 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     // update requests for evaporative condenser tank
     if (this->evaporativeCondSupplyTankIndex > 0) {
         if (speedNum > 0) {
-            Real64 condInletTemp =
-                state.dataEnvrn->OutWetBulbTemp + (state.dataEnvrn->OutDryBulbTemp - state.dataEnvrn->OutWetBulbTemp) *
-                                                      (1.0 - this->performance->EvapCondenserEffectivenessAtSpeed(speedNum-1));
+            Real64 condInletTemp = state.dataEnvrn->OutWetBulbTemp + (state.dataEnvrn->OutDryBulbTemp - state.dataEnvrn->OutWetBulbTemp) *
+                                                                         (1.0 - this->performance->EvapCondenserEffectivenessAtSpeed(speedNum - 1));
             Real64 condInletHumRat =
                 Psychrometrics::PsyWFnTdbTwbPb(state, condInletTemp, state.dataEnvrn->OutWetBulbTemp, state.dataEnvrn->OutBaroPress, RoutineName);
             Real64 outdoorHumRat = state.dataEnvrn->OutHumRat;
@@ -772,7 +769,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
             this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
             this->evaporativeCondSupplyTankConsump = this->evaporativeCondSupplyTankVolumeFlow * reportingConstant;
             if (useAlternateMode == DataHVACGlobals::coilNormalMode) {
-                this->evapCondPumpElecPower = this->performance->CurrentEvapCondPumpPowerAtSpeed(speedNum-1);
+                this->evapCondPumpElecPower = this->performance->CurrentEvapCondPumpPowerAtSpeed(speedNum - 1);
             }
             state.dataWaterData->WaterStorage(this->evaporativeCondSupplyTankIndex).VdotRequestDemand(this->evaporativeCondSupplyTankARRID) =
                 this->evaporativeCondSupplyTankVolumeFlow;
@@ -914,16 +911,16 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                 Psychrometrics::PsyWFnTdbTwbPb(state, RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
 
             this->performance->simulate(state,
-                                       dummyEvapInlet,
-                                       dummyEvapOutlet,
-                                       false,
-                                       dummyPLR,
-                                       dummySpeedNum,
-                                       dummySpeedRatio,
-                                       dummyFanOpMode,
-                                       dummyCondInlet,
-                                       dummyCondOutlet,
-                                       dummySingleMode);
+                                        dummyEvapInlet,
+                                        dummyEvapOutlet,
+                                        false,
+                                        dummyPLR,
+                                        dummySpeedNum,
+                                        dummySpeedRatio,
+                                        dummyFanOpMode,
+                                        dummyCondInlet,
+                                        dummyCondOutlet,
+                                        dummySingleMode);
 
             // reset outdoor conditions back to previous state
             state.dataEnvrn->OutDryBulbTemp = holdOutDryBulbTemp;

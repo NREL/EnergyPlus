@@ -104,5 +104,5 @@ private:
                                 Real64 gross_sensible_capacity,
                                 Real64 air_mass_flow_rate);
 };
-}
+} // namespace EnergyPlus
 #endif // ENERGYPLUS_COILS_COIL_COOLING_DX_ASHRAE205_PERFORMANCE

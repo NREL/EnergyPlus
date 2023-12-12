@@ -280,16 +280,16 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
     auto &condOutletNode = state->dataLoopNodes->Node(thisCoil.condOutletNodeIndex);
     Real64 LoadSHR = 0.0;
     thisCoil.performance->simulate(*state,
-                                  evapInletNode,
-                                  evapOutletNode,
-                                  useAlternateMode,
-                                  PLR,
-                                  speedNum,
-                                  speedRatio,
-                                  fanOpMode,
-                                  condInletNode,
-                                  condOutletNode,
-                                  singleMode,
-                                  LoadSHR);
+                                   evapInletNode,
+                                   evapOutletNode,
+                                   useAlternateMode,
+                                   PLR,
+                                   speedNum,
+                                   speedRatio,
+                                   fanOpMode,
+                                   condInletNode,
+                                   condOutletNode,
+                                   singleMode,
+                                   LoadSHR);
     EXPECT_EQ(thisCoil.performance->crankcaseHeaterPower, 120.0);
 }
