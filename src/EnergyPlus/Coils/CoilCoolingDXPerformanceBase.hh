@@ -83,8 +83,9 @@ struct CoilCoolingDXPerformanceBase
     Real64 wasteHeatRate = 0.0;
     Real64 recoveredEnergyRate = 0.0;
 
-    Real64 crankcaseHeaterPower = 0.0;
     Real64 crankcaseHeaterCap = 0.0;
+    Real64 crankcaseHeaterPower = 0.0;
+    int crankcaseHeaterCapacityCurveIndex = 0;
     Real64 crankcaseHeaterElectricityConsumption = 0.0;
     Constant::eFuel compressorFuelType = Constant::eFuel::Invalid;
     std::string compressorFuelTypeForOutput;
