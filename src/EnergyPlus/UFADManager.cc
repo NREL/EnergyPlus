@@ -226,12 +226,6 @@ namespace RoomAir {
 
         using DataSizing::AutoSize;
 
-        Real64 ZoneElecConv(0.0);    // zone elec equip design convective gain [W]
-        Real64 ZoneGasConv(0.0);     // zone gas equip design convective gain [W]
-        Real64 ZoneOthEqConv(0.0);   // zone other equip design convective gain [W]
-        Real64 ZoneHWEqConv(0.0);    // zone hot water equip design convective gain [W]
-        Real64 ZoneSteamEqConv(0.0); // zone steam equip design convective gain [W]
-
         // This is for both UFADInt and UFADExt
         auto &zoneU = state.dataRoomAir->ZoneUFAD(state.dataRoomAir->ZoneUFADPtr(ZoneNum));
 
@@ -329,45 +323,8 @@ namespace RoomAir {
         }
 
         if (zoneU.PowerPerPlume == Constant::AutoCalculate) {
-            Real64 NumberOfPlumes = (NumberOfOccupants > 0.0) ? NumberOfOccupants : 1.0;
 
-            ZoneElecConv = 0.0;
-            for (auto const &zoneElectric : state.dataHeatBal->ZoneElectric) {
-                if (zoneElectric.ZonePtr == ZoneNum) {
-                    // Is the behavior for Exterior UFAD supposed to be different than for Interior UFAD?
-                    ZoneElecConv +=
-                        (model == RoomAirModel::UFADExt) ? zoneElectric.DesignLevel : (zoneElectric.DesignLevel * zoneElectric.FractionConvected);
-                }
-            }
-            ZoneGasConv = 0.0;
-            for (auto const &zoneGas : state.dataHeatBal->ZoneGas) {
-                if (zoneGas.ZonePtr == ZoneNum) {
-                    ZoneGasConv += (model == RoomAirModel::UFADExt) ? zoneGas.DesignLevel : (zoneGas.DesignLevel * zoneGas.FractionConvected);
-                }
-            }
-            ZoneOthEqConv = 0.0;
-            for (auto const &zoneOtherEq : state.dataHeatBal->ZoneOtherEq) {
-                if (zoneOtherEq.ZonePtr == ZoneNum) {
-                    ZoneOthEqConv +=
-                        (model == RoomAirModel::UFADExt) ? zoneOtherEq.DesignLevel : (zoneOtherEq.DesignLevel * zoneOtherEq.FractionConvected);
-                }
-            }
-            ZoneHWEqConv = 0.0;
-            for (auto const &zoneHWEq : state.dataHeatBal->ZoneHWEq) {
-                if (zoneHWEq.ZonePtr == ZoneNum) {
-                    ZoneHWEqConv += (model == RoomAirModel::UFADExt) ? zoneHWEq.DesignLevel : (zoneHWEq.DesignLevel * zoneHWEq.FractionConvected);
-                }
-            }
-
-            for (auto const &zoneSteamEq : state.dataHeatBal->ZoneSteamEq) {
-                ZoneSteamEqConv = 0.0; // I'm 99.72% sure this is a bug.
-                if (zoneSteamEq.ZonePtr == ZoneNum) {
-                    ZoneSteamEqConv +=
-                        (model == RoomAirModel::UFADExt) ? zoneSteamEq.DesignLevel : (zoneSteamEq.DesignLevel * zoneSteamEq.FractionConvected);
-                }
-            }
-            zoneU.PowerPerPlume =
-                (NumberOfOccupants * 73.0 + ZoneElecConv + ZoneGasConv + ZoneOthEqConv + ZoneHWEqConv + ZoneSteamEqConv) / NumberOfPlumes;
+            zoneU.PowerPerPlume = sumUFADConvGainPerPlume(state, ZoneNum, NumberOfOccupants);
 
             BaseSizer::reportSizerOutput(state, cCMO, zoneU.ZoneName, "Power per plume [W]", zoneU.PowerPerPlume);
 
@@ -382,6 +339,48 @@ namespace RoomAir {
 
             BaseSizer::reportSizerOutput(state, cCMO, zoneU.ZoneName, "Number of diffusers per zone", zoneU.DiffusersPerZone);
         }
+    }
+
+    Real64 sumUFADConvGainPerPlume(EnergyPlusData &state, int const zoneNum, Real64 const numOccupants)
+    {
+        Real64 zoneElecConv(0.0); // zone elec equip design convective gain [W]
+        for (auto const &zoneElectric : state.dataHeatBal->ZoneElectric) {
+            if (zoneElectric.ZonePtr == zoneNum) {
+                zoneElecConv += zoneElectric.DesignLevel * zoneElectric.FractionConvected;
+            }
+        }
+
+        Real64 zoneGasConv(0.0); // zone gas equip design convective gain [W]
+        for (auto const &zoneGas : state.dataHeatBal->ZoneGas) {
+            if (zoneGas.ZonePtr == zoneNum) {
+                zoneGasConv += zoneGas.DesignLevel * zoneGas.FractionConvected;
+            }
+        }
+
+        Real64 zoneOthEqConv(0.0); // zone other equip design convective gain [W]
+        for (auto const &zoneOtherEq : state.dataHeatBal->ZoneOtherEq) {
+            if (zoneOtherEq.ZonePtr == zoneNum) {
+                zoneOthEqConv += zoneOtherEq.DesignLevel * zoneOtherEq.FractionConvected;
+            }
+        }
+
+        Real64 zoneHWEqConv(0.0); // zone hot water equip design convective gain [W]
+        for (auto const &zoneHWEq : state.dataHeatBal->ZoneHWEq) {
+            if (zoneHWEq.ZonePtr == zoneNum) {
+                zoneHWEqConv += zoneHWEq.DesignLevel * zoneHWEq.FractionConvected;
+            }
+        }
+
+        Real64 zoneSteamEqConv(0.0); // zone steam equip design convective gain [W]
+        for (auto const &zoneSteamEq : state.dataHeatBal->ZoneSteamEq) {
+            if (zoneSteamEq.ZonePtr == zoneNum) {
+                zoneSteamEqConv += zoneSteamEq.DesignLevel * zoneSteamEq.FractionConvected;
+            }
+        }
+
+        Real64 numPlumes = (numOccupants > 0.0) ? numOccupants : 1.0;
+
+        return (numOccupants * 73.0 + zoneElecConv + zoneGasConv + zoneOthEqConv + zoneHWEqConv + zoneSteamEqConv) / numPlumes;
     }
 
     void HcUFAD(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight, UFADConvCoef &ufadCC)
@@ -808,15 +807,15 @@ namespace RoomAir {
             for (int InNodeIndex = 1; InNodeIndex <= zoneEquipConfig.NumInletNodes; ++InNodeIndex) {
                 Real64 NodeTemp = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(InNodeIndex)).Temp;
                 Real64 MassFlowRate = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(InNodeIndex)).MassFlowRate;
-                Real64 CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+                Real64 CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-                TotSysFlow += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, thisZoneHB.ZoneAirHumRat);
+                TotSysFlow += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, thisZoneHB.airHumRat);
                 TSupK += MassFlowRate * NodeTemp;
                 SumSysM += MassFlowRate;
             }
             if (TotSysFlow > 0.0) {
-                TSupK = TSupK / SumSysM + Constant::KelvinConv;
+                TSupK = TSupK / SumSysM + Constant::Kelvin;
             } else {
                 TSupK = 0.0;
             }
@@ -844,7 +843,7 @@ namespace RoomAir {
         Real64 NumberOfPlumes = (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) ? (PowerInPlumes / PowerPerPlume) : 1.0;
         Real64 NumDiffusersPerPlume = (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) ? (NumDiffusers / NumberOfPlumes) : 1.0;
 
-        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - Constant::KelvinConv) > thisZoneHB.MAT) {
+        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - Constant::Kelvin) > thisZoneHB.MAT) {
             // The system will mix
             HeightFrac = 0.0;
         } else {
@@ -883,13 +882,13 @@ namespace RoomAir {
                     state.dataHeatBal->Zone(ZoneNum).Volume *
                     (state.dataRoomAir->HeightTransition(ZoneNum) - min(state.dataRoomAir->HeightTransition(ZoneNum), 0.2)) / CeilingHeight *
                     state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens *
-                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAir->MATOC(ZoneNum), thisZoneHB.ZoneAirHumRat) *
-                    PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / TimeStepSysSec;
+                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAir->MATOC(ZoneNum), thisZoneHB.airHumRat) *
+                    PsyCpAirFnW(thisZoneHB.airHumRat) / TimeStepSysSec;
                 state.dataRoomAir->AIRRATMX(ZoneNum) =
                     state.dataHeatBal->Zone(ZoneNum).Volume * (CeilingHeight - state.dataRoomAir->HeightTransition(ZoneNum)) / CeilingHeight *
                     state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens *
-                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAir->MATMX(ZoneNum), thisZoneHB.ZoneAirHumRat) *
-                    PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / TimeStepSysSec;
+                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAir->MATMX(ZoneNum), thisZoneHB.airHumRat) *
+                    PsyCpAirFnW(thisZoneHB.airHumRat) / TimeStepSysSec;
 
                 if (state.dataHVACGlobal->UseZoneTimeStepHistory) {
                     state.dataRoomAir->ZTMOC(ZoneNum)[2] = state.dataRoomAir->XMATOC(ZoneNum)[2];
@@ -995,7 +994,7 @@ namespace RoomAir {
 
             for (int Ctd = 1; Ctd <= 3; ++Ctd) {
                 Real64 TempDepCoef = ufadCC.HA_MX + ufadCC.HA_OC + MCp_Total;
-                Real64 const thisZoneT1 = thisZoneHB.ZoneT1;
+                Real64 const thisZoneT1 = thisZoneHB.T1;
                 // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
                 Real64 TempIndCoef = ConvGains + ufadCC.HAT_MX + ufadCC.HAT_OC + MCpT_Total;
                 switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
@@ -1117,8 +1116,8 @@ namespace RoomAir {
         if (MIXFLAG) {
             state.dataRoomAir->Phi(ZoneNum) = 1.0;
         } else {
-            state.dataRoomAir->Phi(ZoneNum) = (state.dataRoomAir->ZTOC(ZoneNum) - (TSupK - Constant::KelvinConv)) /
-                                              (state.dataRoomAir->ZTMX(ZoneNum) - (TSupK - Constant::KelvinConv));
+            state.dataRoomAir->Phi(ZoneNum) =
+                (state.dataRoomAir->ZTOC(ZoneNum) - (TSupK - Constant::Kelvin)) / (state.dataRoomAir->ZTMX(ZoneNum) - (TSupK - Constant::Kelvin));
         }
 
         // Mixed for reporting purposes
@@ -1133,7 +1132,6 @@ namespace RoomAir {
 
     void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   January 2006
@@ -1231,15 +1229,15 @@ namespace RoomAir {
             for (int InNodeIndex = 1; InNodeIndex <= zoneEquipConfig.NumInletNodes; ++InNodeIndex) {
                 Real64 NodeTemp = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(InNodeIndex)).Temp;
                 Real64 MassFlowRate = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(InNodeIndex)).MassFlowRate;
-                Real64 CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+                Real64 CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-                TotSysFlow += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, thisZoneHB.ZoneAirHumRat);
+                TotSysFlow += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, thisZoneHB.airHumRat);
                 TSupK += MassFlowRate * NodeTemp;
                 SumSysM += MassFlowRate;
             }
             if (TotSysFlow > 0.0) {
-                TSupK = TSupK / SumSysM + Constant::KelvinConv;
+                TSupK = TSupK / SumSysM + Constant::Kelvin;
             } else {
                 TSupK = 0.0;
             }
@@ -1272,7 +1270,7 @@ namespace RoomAir {
         Real64 NumberOfPlumes = (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) ? (PowerInPlumes / PowerPerPlume) : 1.0;
         Real64 NumDiffusersPerPlume = (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) ? (NumDiffusers / NumberOfPlumes) : 1.0;
 
-        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - Constant::KelvinConv) > thisZoneHB.MAT) {
+        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - Constant::Kelvin) > thisZoneHB.MAT) {
             // The system will mix
             HeightFrac = 0.0;
         } else {
@@ -1343,13 +1341,13 @@ namespace RoomAir {
                     state.dataHeatBal->Zone(ZoneNum).Volume *
                     (state.dataRoomAir->HeightTransition(ZoneNum) - min(state.dataRoomAir->HeightTransition(ZoneNum), 0.2)) / CeilingHeight *
                     state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens *
-                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAir->MATOC(ZoneNum), thisZoneHB.ZoneAirHumRat) *
-                    PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / TimeStepSysSec;
+                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAir->MATOC(ZoneNum), thisZoneHB.airHumRat) *
+                    PsyCpAirFnW(thisZoneHB.airHumRat) / TimeStepSysSec;
                 state.dataRoomAir->AIRRATMX(ZoneNum) =
                     state.dataHeatBal->Zone(ZoneNum).Volume * (CeilingHeight - state.dataRoomAir->HeightTransition(ZoneNum)) / CeilingHeight *
                     state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens *
-                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAir->MATMX(ZoneNum), thisZoneHB.ZoneAirHumRat) *
-                    PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / TimeStepSysSec;
+                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAir->MATMX(ZoneNum), thisZoneHB.airHumRat) *
+                    PsyCpAirFnW(thisZoneHB.airHumRat) / TimeStepSysSec;
 
                 if (state.dataHVACGlobal->UseZoneTimeStepHistory) {
                     state.dataRoomAir->ZTMOC(ZoneNum)[2] = state.dataRoomAir->XMATOC(ZoneNum)[2];
@@ -1448,7 +1446,7 @@ namespace RoomAir {
             HeightFrac * CeilingHeight < state.dataUFADManager->ThickOccupiedSubzoneMin) {
             MIXFLAG = true;
             HeightFrac = 0.0;
-            Real64 const thisZoneT1 = thisZoneHB.ZoneT1;
+            Real64 const thisZoneT1 = thisZoneHB.T1;
 
             state.dataRoomAir->AvgTempGrad(ZoneNum) = 0.0;
             state.dataRoomAir->MaxTempGrad(ZoneNum) = 0.0;
@@ -1577,8 +1575,8 @@ namespace RoomAir {
         if (MIXFLAG) {
             state.dataRoomAir->Phi(ZoneNum) = 1.0;
         } else {
-            state.dataRoomAir->Phi(ZoneNum) = (state.dataRoomAir->ZTOC(ZoneNum) - (TSupK - Constant::KelvinConv)) /
-                                              (state.dataRoomAir->ZTMX(ZoneNum) - (TSupK - Constant::KelvinConv));
+            state.dataRoomAir->Phi(ZoneNum) =
+                (state.dataRoomAir->ZTOC(ZoneNum) - (TSupK - Constant::Kelvin)) / (state.dataRoomAir->ZTMX(ZoneNum) - (TSupK - Constant::Kelvin));
         }
 
         // Mixed for reporting purposes

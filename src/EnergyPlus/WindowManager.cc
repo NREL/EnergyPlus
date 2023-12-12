@@ -2515,7 +2515,7 @@ namespace WindowManager {
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                     if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-                        SrdSurfTempAbs = surface.SrdSurfTemp + Constant::KelvinConv;
+                        SrdSurfTempAbs = surface.SrdSurfTemp + Constant::Kelvin;
                         OutSrdIR = state.dataWindowManager->sigma * surface.ViewFactorSrdSurfs * pow_4(SrdSurfTempAbs);
                     }
                 }
@@ -2628,7 +2628,7 @@ namespace WindowManager {
         // or, for airflow windows, on either or the two glass faces in the airflow gap
         if (!state.dataConstruction->Construct(surface.Construction).WindowTypeEQL) {
             InsideGlassTemp = state.dataWindowManager->thetas[2 * state.dataWindowManager->ngllayer - 1] - state.dataWindowManager->TKelvin;
-            RoomHumRat = thisZoneHB.ZoneAirHumRat;
+            RoomHumRat = thisZoneHB.airHumRat;
             RoomDewPoint = PsyTdpFnWPb(state, RoomHumRat, state.dataEnvrn->OutBaroPress);
             state.dataSurface->SurfWinInsideGlassCondensationFlag(SurfNum) = 0;
             if (InsideGlassTemp < RoomDewPoint) state.dataSurface->SurfWinInsideGlassCondensationFlag(SurfNum) = 1;
@@ -3647,8 +3647,8 @@ namespace WindowManager {
                 }
                 CalcISO15099WindowIntConvCoeff(state,
                                                SurfNum,
-                                               state.dataWindowManager->thetas[InsideFaceIndex - 1] - Constant::KelvinConv,
-                                               state.dataWindowManager->tin - Constant::KelvinConv);
+                                               state.dataWindowManager->thetas[InsideFaceIndex - 1] - Constant::Kelvin,
+                                               state.dataWindowManager->tin - Constant::Kelvin);
                 state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
             }
 
@@ -3820,13 +3820,13 @@ namespace WindowManager {
                     state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Return) {
                     auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
                     if (state.dataSurface->SurfWinAirflowSource(SurfNum) == WindowAirFlowSource::Indoor) {
-                        InletAirHumRat = thisZoneHB.ZoneAirHumRat;
+                        InletAirHumRat = thisZoneHB.airHumRat;
                     } else { // AirflowSource = outside air
                         InletAirHumRat = state.dataEnvrn->OutHumRat;
                     }
                     Real64 ZoneTemp = thisZoneHB.MAT; // this should be Tin (account for different reference temps)
                     CpAirOutlet = PsyCpAirFnW(InletAirHumRat);
-                    CpAirZone = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+                    CpAirZone = PsyCpAirFnW(thisZoneHB.airHumRat);
                     state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum) =
                         TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
                     if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Indoor) {
@@ -3909,8 +3909,8 @@ namespace WindowManager {
                     ShowContinueError(state,
                                       format("Glazing face index = {} ; new temperature ={:.4R}C  ; previous temperature = {:.4R}C",
                                              i,
-                                             state.dataWindowManager->thetas[i - 1] - Constant::KelvinConv,
-                                             state.dataWindowManager->thetasPrev[i - 1] - Constant::KelvinConv));
+                                             state.dataWindowManager->thetas[i - 1] - Constant::Kelvin,
+                                             state.dataWindowManager->thetasPrev[i - 1] - Constant::Kelvin));
                 }
             }
 
@@ -7926,7 +7926,7 @@ namespace WindowManager {
                     state.dataMaterial->Screens(ScreenNum).ScreenDiameterToSpacingRatio = 1.0 - std::sqrt(thisMaterial->Trans);
 
                     state.dataMaterial->Screens(ScreenNum).screenBeamReflectanceModel = static_cast<Material::ScreenBeamReflectanceModel>(
-                        getEnumValue(ScreenBeamReflectanceModelNamesUC, UtilityRoutines::makeUPPER(thisMaterial->ReflectanceModeling)));
+                        getEnumValue(ScreenBeamReflectanceModelNamesUC, Util::makeUPPER(thisMaterial->ReflectanceModeling)));
 
                     // Reflectance of screen material only
                     state.dataMaterial->Screens(ScreenNum).ReflectCylinder = thisMaterial->ReflectShade / (1 - thisMaterial->Trans);
@@ -9132,7 +9132,7 @@ namespace WindowManager {
                                                                      IOStatus);
 
             // use default spectrum data, done!
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Default")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "Default")) {
                 state.dataWindowManager->RunMeOnceFlag = true;
                 return;
             }
@@ -9167,7 +9167,7 @@ namespace WindowManager {
                                                                          state.dataIPShortCut->rNumericArgs,
                                                                          NumNumbers,
                                                                          IOStatus);
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), cSolarSpectrum)) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(1), cSolarSpectrum)) {
                     iSolarSpectrum = Loop;
                     // overwrite the default solar spectrum
                     if (NumNumbers > 2 * state.dataWindowManager->nume) {
@@ -9188,7 +9188,7 @@ namespace WindowManager {
                         }
                     }
                 }
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), cVisibleSpectrum)) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(1), cVisibleSpectrum)) {
                     iVisibleSpectrum = Loop;
                     // overwrite the default solar spectrum
                     if (NumNumbers > 2 * state.dataWindowManager->numt3) {

@@ -4224,7 +4224,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
 
             auto &illumMap = state.dataDaylightingData->IllumMap(MapNum);
             illumMap.Name = ipsc->cAlphaArgs(1);
-            illumMap.zoneIndex = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(2), Zone);
+            illumMap.zoneIndex = Util::FindItemInList(ipsc->cAlphaArgs(2), Zone);
 
             if (illumMap.zoneIndex == 0) {
                 ShowSevereError(state,
@@ -4607,7 +4607,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
         daylightControl.Name = ipsc->cAlphaArgs(1);
 
         // Is it a space or zone name?
-        int const spaceNum = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(2), state.dataHeatBal->space);
+        int const spaceNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->space);
         if (spaceNum > 0) {
             daylightControl.spaceIndex = spaceNum;
             daylightControl.zoneIndex = state.dataHeatBal->space(spaceNum).zoneNum;
@@ -4624,7 +4624,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
                 continue;
             }
         } else {
-            int const zoneNum = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(2), state.dataHeatBal->Zone);
+            int const zoneNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (zoneNum == 0) {
                 ShowSevereError(state, format("{}: invalid {}=\"{}\".", ipsc->cCurrentModuleObject, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2)));
                 ErrorsFound = true;
@@ -4669,7 +4669,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             daylightControl.DaylightMethod = DaylightingMethod::SplitFlux;
         } else {
             daylightControl.DaylightMethod =
-                static_cast<DaylightingMethod>(getEnumValue(DaylightingMethodNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(3))));
+                static_cast<DaylightingMethod>(getEnumValue(DaylightingMethodNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(3))));
 
             if (daylightControl.DaylightMethod == DaylightingMethod::Invalid) {
                 daylightControl.DaylightMethod = DaylightingMethod::SplitFlux;
@@ -4703,8 +4703,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             daylightControl.AvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
         }
 
-        daylightControl.LightControlType =
-            static_cast<LtgCtrlType>(getEnumValue(LtgCtrlTypeNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(5))));
+        daylightControl.LightControlType = static_cast<LtgCtrlType>(getEnumValue(LtgCtrlTypeNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(5))));
         if (daylightControl.LightControlType == LtgCtrlType::Invalid) {
             ShowWarningError(state,
                              format("Invalid {} = {}, occurs in {}object for {}=\"{}",
@@ -4723,10 +4722,9 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             ipsc->rNumericArgs(4); // Field: Probability Lighting will be Reset When Needed in Manual Stepped Control
 
         if (!ipsc->lAlphaFieldBlanks(6)) { // Field: Glare Calculation Daylighting Reference Point Name
-            daylightControl.glareRefPtNumber =
-                UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(6),
-                                                state.dataDaylightingData->DaylRefPt,
-                                                &RefPointData::Name); // Field: Glare Calculation Daylighting Reference Point Name
+            daylightControl.glareRefPtNumber = Util::FindItemInList(ipsc->cAlphaArgs(6),
+                                                                    state.dataDaylightingData->DaylRefPt,
+                                                                    &RefPointData::Name); // Field: Glare Calculation Daylighting Reference Point Name
             if (daylightControl.glareRefPtNumber == 0) {
                 ShowSevereError(state,
                                 format("{}: invalid {}=\"{}\" for object named: {}",
@@ -4796,9 +4794,9 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
 
         int countRefPts = 0;
         for (int refPtNum = 1; refPtNum <= curTotalDaylRefPts; ++refPtNum) {
-            daylightControl.DaylRefPtNum(refPtNum) = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(6 + refPtNum),
-                                                                                     state.dataDaylightingData->DaylRefPt,
-                                                                                     &RefPointData::Name); // Field: Daylighting Reference Point Name
+            daylightControl.DaylRefPtNum(refPtNum) = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(6 + refPtNum),
+                                                                          state.dataDaylightingData->DaylRefPt,
+                                                                          &RefPointData::Name); // Field: Daylighting Reference Point Name
             if (daylightControl.DaylRefPtNum(refPtNum) == 0) {
                 ShowSevereError(state,
                                 format("{}: invalid {}=\"{}\" for object named: {}",
@@ -5075,9 +5073,9 @@ void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
                                                                  ipsc->cAlphaFieldNames,
                                                                  ipsc->cNumericFieldNames);
         pt.Name = ipsc->cAlphaArgs(1);
-        pt.ZoneNum = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(2), state.dataHeatBal->Zone);
+        pt.ZoneNum = Util::FindItemInList(ipsc->cAlphaArgs(2), state.dataHeatBal->Zone);
         if (pt.ZoneNum == 0) {
-            int spaceNum = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(2), state.dataHeatBal->space);
+            int spaceNum = Util::FindItemInList(ipsc->cAlphaArgs(2), state.dataHeatBal->space);
             if (spaceNum == 0) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {}=\"{}\".",
@@ -5168,8 +5166,8 @@ void AssociateWindowShadingControlWithDaylighting(EnergyPlusData &state)
         if (winShadeControl.DaylightingControlName.empty()) continue;
         int found = -1;
         for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
-            if (UtilityRoutines::SameString(winShadeControl.DaylightingControlName,
-                                            state.dataDaylightingData->daylightControl(daylightCtrlNum).Name)) {
+            if (Util::SameString(state.dataSurface->WindowShadingControl(iShadeCtrl).DaylightingControlName,
+                                 state.dataDaylightingData->daylightControl(daylightCtrlNum).Name)) {
                 found = daylightCtrlNum;
                 break;
             }
@@ -5236,7 +5234,7 @@ void GetLightWellData(EnergyPlusData &state, bool &ErrorsFound) // If errors fou
                                                                  ipsc->cAlphaFieldNames,
                                                                  ipsc->cNumericFieldNames);
 
-        int SurfNum = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(1), state.dataSurface->Surface);
+        int SurfNum = Util::FindItemInList(ipsc->cAlphaArgs(1), state.dataSurface->Surface);
         if (SurfNum == 0) {
             ShowSevereError(state,
                             format("{}: invalid {}=\"{}\" not found.", ipsc->cCurrentModuleObject, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1)));
@@ -5966,7 +5964,7 @@ void manageDaylighting(EnergyPlusData &state)
                     DayltgInterReflIllFrIntWins(state, enclNum);
                     for (int daylightCtrlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
                         auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
-                        DayltgGlareWithIntWins(state, thisDaylightControl.GlareIndexAtRefPt, enclNum);
+                        DayltgGlareWithIntWins(state, thisDaylightControl.GlareIndexAtRefPt, daylightCtrlNum);
                     }
                 }
             }

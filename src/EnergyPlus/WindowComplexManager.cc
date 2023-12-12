@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataShadowingCombinations.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/Material.hh>
@@ -2653,7 +2654,6 @@ namespace WindowComplexManager {
         int TotGlassLay;          // Total number of glass layers in a construction
         int k;                    // Layer counter
         int SurfNumAdj;           // An interzone surface's number in the adjacent zone
-        int ZoneNumAdj;           // An interzone surface's adjacent zone number
         WinShadingType ShadeFlag; // Flag indicating whether shade or blind is on, and shade/blind position
         int IMix;
 
@@ -2744,7 +2744,7 @@ namespace WindowComplexManager {
         CalcDeflection = state.dataMaterial->WindowThermalModel(ThermalModelNum).DeflectionModel;
         SDScalar = state.dataMaterial->WindowThermalModel(ThermalModelNum).SDScalar;
         VacuumPressure = state.dataMaterial->WindowThermalModel(ThermalModelNum).VacuumPressureLimit;
-        Tini = state.dataMaterial->WindowThermalModel(ThermalModelNum).InitialTemperature - Constant::KelvinConv;
+        Tini = state.dataMaterial->WindowThermalModel(ThermalModelNum).InitialTemperature - Constant::Kelvin;
         Pini = state.dataMaterial->WindowThermalModel(ThermalModelNum).InitialPressure;
 
         nlayer = state.dataConstruction->Construct(ConstrNum).TotSolidLayers;
@@ -2754,17 +2754,17 @@ namespace WindowComplexManager {
         if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
             ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
             Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
-            tind = RefAirTemp + Constant::KelvinConv; // Inside air temperature
+            tind = RefAirTemp + Constant::Kelvin; // Inside air temperature
 
             // now get "outside" air temperature
             if (SurfNumAdj > 0) { // Interzone window
 
-                ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
+                int enclNumAdj = state.dataSurface->Surface(SurfNumAdj).RadEnclIndex;
                 RefAirTemp = state.dataSurface->Surface(SurfNumAdj).getInsideAirTemperature(state, SurfNumAdj);
-                tout = RefAirTemp + Constant::KelvinConv; // outside air temperature
+                tout = RefAirTemp + Constant::Kelvin; // outside air temperature
 
-                tsky = state.dataHeatBal->ZoneMRT(ZoneNumAdj) +
-                       Constant::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
+                tsky = state.dataViewFactor->EnclRadInfo(enclNumAdj).MRT +
+                       Constant::Kelvin; // TODO this misses IR from sources such as high temp radiant and baseboards
 
                 //  ! Add long-wave radiation from adjacent zone absorbed by glass layer closest to the adjacent zone.
                 //  AbsRadGlassFace(1) = AbsRadGlassFace(1) + SurfQRadThermInAbs(SurfNumAdj)
@@ -2777,18 +2777,18 @@ namespace WindowComplexManager {
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                     if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-                        SrdSurfTempAbs = state.dataSurface->Surface(SurfNum).SrdSurfTemp + Constant::KelvinConv;
+                        SrdSurfTempAbs = state.dataSurface->Surface(SurfNum).SrdSurfTemp + Constant::Kelvin;
                         OutSrdIR = Constant::StefanBoltzmann * state.dataSurface->Surface(SurfNum).ViewFactorSrdSurfs * pow_4(SrdSurfTempAbs);
                     }
                 }
                 if (state.dataSurface->Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
                     if (state.dataEnvrn->IsRain) {                 // Raining: since wind exposed, outside window surface gets wet
-                        tout = state.dataSurface->SurfOutWetBulbTemp(SurfNum) + Constant::KelvinConv;
+                        tout = state.dataSurface->SurfOutWetBulbTemp(SurfNum) + Constant::Kelvin;
                     } else { // Dry
-                        tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + Constant::KelvinConv;
+                        tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + Constant::Kelvin;
                     }
                 } else { // Window not exposed to wind
-                    tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + Constant::KelvinConv;
+                    tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + Constant::Kelvin;
                 }
                 // tsky = SkyTemp + TKelvin
                 tsky = state.dataEnvrn->SkyTempKelvin;
@@ -3213,9 +3213,9 @@ namespace WindowComplexManager {
             // For all cases, get total window heat gain for reporting. See CalcWinFrameAndDividerTemps for
             // contribution of frame and divider.
 
-            SurfInsideTemp = theta(2 * nlayer) - Constant::KelvinConv;
+            SurfInsideTemp = theta(2 * nlayer) - Constant::Kelvin;
             state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) = SurfInsideTemp;
-            SurfOutsideTemp = theta(1) - Constant::KelvinConv;
+            SurfOutsideTemp = theta(1) - Constant::Kelvin;
             SurfOutsideEmiss = emis(1);
 
             IncidentSolar = state.dataSurface->Surface(SurfNum).Area * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
@@ -3284,8 +3284,8 @@ namespace WindowComplexManager {
             // WinGapConvHtFlowRep(SurfNum) = 0.0d0
             // WinGapConvHtFlowRepEnergy(SurfNum) = 0.0d0
             TotAirflowGap = state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
-            TAirflowGapOutlet = Constant::KelvinConv; // TODO Need to calculate this
-            TAirflowGapOutletC = TAirflowGapOutlet - Constant::KelvinConv;
+            TAirflowGapOutlet = Constant::Kelvin; // TODO Need to calculate this
+            TAirflowGapOutletC = TAirflowGapOutlet - Constant::Kelvin;
             state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum) = TAirflowGapOutletC;
             if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0) {
                 ConvHeatFlowForced = sum(qv); // TODO.  figure forced ventilation heat flow in Watts
@@ -3299,13 +3299,13 @@ namespace WindowComplexManager {
                     state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Return) {
                     auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
                     if (state.dataSurface->SurfWinAirflowSource(SurfNum) == WindowAirFlowSource::Indoor) {
-                        InletAirHumRat = thisZoneHB.ZoneAirHumRat;
+                        InletAirHumRat = thisZoneHB.airHumRat;
                     } else { // AirflowSource = outside air
                         InletAirHumRat = state.dataEnvrn->OutHumRat;
                     }
                     ZoneTemp = thisZoneHB.MAT; // this should be Tin (account for different reference temps)
                     CpAirOutlet = PsyCpAirFnW(InletAirHumRat);
-                    CpAirZone = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+                    CpAirZone = PsyCpAirFnW(thisZoneHB.airHumRat);
                     ConvHeatGainToZoneAir = TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
                     if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Indoor) {
                         state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
@@ -3374,17 +3374,17 @@ namespace WindowComplexManager {
             if (ShadeFlag == WinShadingType::IntShade) state.dataSurface->SurfWinConvCoeffWithShade(SurfNum) = 0.0;
 
             if (ShadeFlag == WinShadingType::IntShade) {
-                SurfInsideTemp = theta(2 * ngllayer + 2) - Constant::KelvinConv;
+                SurfInsideTemp = theta(2 * ngllayer + 2) - Constant::Kelvin;
 
                 // // Get properties of inside shading layer
 
                 Real64 EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[0];
                 Real64 EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[0];
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
-                    (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (theta(2 * ngllayer) - Constant::KelvinConv)) / (EffShBlEmiss + EffGlEmiss);
+                    (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (theta(2 * ngllayer) - Constant::Kelvin)) / (EffShBlEmiss + EffGlEmiss);
 
             } else {
-                SurfOutsideTemp = theta(1) - Constant::KelvinConv;
+                SurfOutsideTemp = theta(1) - Constant::Kelvin;
             }
 
             for (k = 1; k <= nlayer; ++k) {
@@ -3392,8 +3392,8 @@ namespace WindowComplexManager {
                 state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k) = theta(2 * k);
 
                 // temperatures for reporting
-                state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = theta(2 * k - 1) - Constant::KelvinConv;
-                state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, k) = theta(2 * k) - Constant::KelvinConv;
+                state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = theta(2 * k - 1) - Constant::Kelvin;
+                state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, k) = theta(2 * k) - Constant::Kelvin;
                 // thetas(k) = theta(k)
             }
         }

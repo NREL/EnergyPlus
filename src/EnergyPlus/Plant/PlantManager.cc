@@ -115,6 +115,7 @@
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
+#include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -379,17 +380,17 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
         }
-        UtilityRoutines::IsNameEmpty(state, Alpha(1), CurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, Alpha(1), CurrentModuleObject, ErrorsFound);
         this_loop.Name = Alpha(1); // Load the Plant Loop Name
 
-        if (UtilityRoutines::SameString(Alpha(2), "STEAM")) {
+        if (Util::SameString(Alpha(2), "STEAM")) {
             this_loop.FluidType = DataLoopNode::NodeFluidType::Steam;
             this_loop.FluidName = Alpha(2);
-        } else if (UtilityRoutines::SameString(Alpha(2), "WATER")) {
+        } else if (Util::SameString(Alpha(2), "WATER")) {
             this_loop.FluidType = DataLoopNode::NodeFluidType::Water;
             this_loop.FluidName = Alpha(2);
             this_loop.FluidIndex = FindGlycol(state, Alpha(2));
-        } else if (UtilityRoutines::SameString(Alpha(2), "USERDEFINEDFLUIDTYPE")) {
+        } else if (Util::SameString(Alpha(2), "USERDEFINEDFLUIDTYPE")) {
             this_loop.FluidType = DataLoopNode::NodeFluidType::Water;
             this_loop.FluidName = Alpha(3);
             // check for valid fluid name
@@ -504,15 +505,15 @@ void GetPlantLoopData(EnergyPlusData &state)
 
         // Load the load distribution scheme.
         LoadingScheme = Alpha(14);
-        if (UtilityRoutines::SameString(LoadingScheme, "Optimal")) {
+        if (Util::SameString(LoadingScheme, "Optimal")) {
             this_loop.LoadDistribution = DataPlant::LoadingScheme::Optimal;
-        } else if (UtilityRoutines::SameString(LoadingScheme, "SequentialLoad")) {
+        } else if (Util::SameString(LoadingScheme, "SequentialLoad")) {
             this_loop.LoadDistribution = DataPlant::LoadingScheme::Sequential;
-        } else if (UtilityRoutines::SameString(LoadingScheme, "UniformLoad")) {
+        } else if (Util::SameString(LoadingScheme, "UniformLoad")) {
             this_loop.LoadDistribution = DataPlant::LoadingScheme::Uniform;
-        } else if (UtilityRoutines::SameString(LoadingScheme, "UniformPLR")) {
+        } else if (Util::SameString(LoadingScheme, "UniformPLR")) {
             this_loop.LoadDistribution = DataPlant::LoadingScheme::UniformPLR;
-        } else if (UtilityRoutines::SameString(LoadingScheme, "SequentialUniformPLR")) {
+        } else if (Util::SameString(LoadingScheme, "SequentialUniformPLR")) {
             this_loop.LoadDistribution = DataPlant::LoadingScheme::SequentialUniformPLR;
         } else {
             ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
@@ -524,9 +525,9 @@ void GetPlantLoopData(EnergyPlusData &state)
         // When dual setpoint is allowed in condenser loop modify this code.
         if (this_loop.TypeOfLoop == LoopType::Plant) {
             // Get the Loop Demand Calculation Scheme
-            if (UtilityRoutines::SameString(Alpha(16), "SingleSetpoint")) {
+            if (Util::SameString(Alpha(16), "SingleSetpoint")) {
                 this_loop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
-            } else if (UtilityRoutines::SameString(Alpha(16), "DualSetpointDeadband")) {
+            } else if (Util::SameString(Alpha(16), "DualSetpointDeadband")) {
                 if (this_loop.FluidType == DataLoopNode::NodeFluidType::Steam) {
                     ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                     ShowContinueError(state,
@@ -538,7 +539,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                 } else {
                     this_loop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand;
                 }
-            } else if (UtilityRoutines::SameString(Alpha(16), "")) {
+            } else if (Util::SameString(Alpha(16), "")) {
                 this_loop.LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
             } else {
                 ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
@@ -552,11 +553,11 @@ void GetPlantLoopData(EnergyPlusData &state)
 
         // When Commonpipe is allowed in condenser loop modify this code. Sankar 06/29/2009
         if (this_loop.TypeOfLoop == LoopType::Plant) {
-            if (UtilityRoutines::SameString(Alpha(17), "CommonPipe")) {
+            if (Util::SameString(Alpha(17), "CommonPipe")) {
                 this_loop.CommonPipeType = DataPlant::CommonPipeType::Single;
-            } else if (UtilityRoutines::SameString(Alpha(17), "TwoWayCommonPipe")) {
+            } else if (Util::SameString(Alpha(17), "TwoWayCommonPipe")) {
                 this_loop.CommonPipeType = DataPlant::CommonPipeType::TwoWay;
-            } else if (UtilityRoutines::SameString(Alpha(17), "None") || state.dataIPShortCut->lAlphaFieldBlanks(17)) {
+            } else if (Util::SameString(Alpha(17), "None") || state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                 this_loop.CommonPipeType = DataPlant::CommonPipeType::No;
             } else {
                 ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
@@ -599,7 +600,8 @@ void GetPlantLoopData(EnergyPlusData &state)
             MatchedPressureString = false;
 
             this_loop.PressureSimType =
-                static_cast<DataPlant::PressSimType>(getEnumValue(PressureSimTypeNamesUC, UtilityRoutines::makeUPPER(Alpha(PressSimAlphaIndex))));
+                static_cast<DataPlant::PressSimType>(getEnumValue(PressureSimTypeNamesUC, Util::makeUPPER(Alpha(PressSimAlphaIndex))));
+
             switch (this_loop.PressureSimType) {
                 // Check all types
             case DataPlant::PressSimType::NoPressure:
@@ -876,7 +878,7 @@ void GetPlantInput(EnergyPlusData &state)
                     this_comp.TypeOf = this_comp_type;
                     this_comp.location = EnergyPlus::PlantLocation(LoopNum, LoopSideNum, BranchNum, CompNum);
 
-                    this_comp.Type = static_cast<PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_comp_type)));
+                    this_comp.Type = static_cast<PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_comp_type)));
 
                     switch (this_comp.Type) {
                     case PlantEquipmentType::Pipe: {
@@ -1313,8 +1315,12 @@ void GetPlantInput(EnergyPlusData &state)
                         // now deal with demand components of the ZoneHVAC type served by ControlCompOutput
                         break;
                     }
+                    case PlantEquipmentType::SwimmingPool_Indoor: {
+                        this_comp.CurOpSchemeType = OpScheme::Demand;
+                        this_comp.compPtr = SwimmingPool::SwimmingPoolData::factory(state, CompNames(CompNum));
+                        break;
+                    }
                     case PlantEquipmentType::PackagedTESCoolingCoil:
-                    case PlantEquipmentType::SwimmingPool_Indoor:
                     case PlantEquipmentType::CoilWaterCooling:
                     case PlantEquipmentType::CoilWaterDetailedFlatCooling:
                     case PlantEquipmentType::CoilWaterSimpleHeating:
@@ -2936,8 +2942,8 @@ void InitOneTimePlantSizingInfo(EnergyPlusData &state, int const LoopNum) // loo
 
     if (state.dataPlnt->PlantLoop(LoopNum).PlantSizNum == 0) {
         if (state.dataSize->NumPltSizInput > 0) {
-            PlantSizNum = UtilityRoutines::FindItemInList(
-                state.dataPlnt->PlantLoop(LoopNum).Name, state.dataSize->PlantSizData, &PlantSizingData::PlantLoopName);
+            PlantSizNum =
+                Util::FindItemInList(state.dataPlnt->PlantLoop(LoopNum).Name, state.dataSize->PlantSizData, &PlantSizingData::PlantLoopName);
             if (PlantSizNum > 0) {
                 state.dataPlnt->PlantLoop(LoopNum).PlantSizNum = PlantSizNum;
             }
@@ -2991,8 +2997,8 @@ void SizePlantLoop(EnergyPlusData &state,
         // PlantSizData(PlantSizNum)%DesVolFlowRate = 0.0D0 ! DSU2
     } else {
         if (state.dataSize->NumPltSizInput > 0) {
-            PlantSizNum = UtilityRoutines::FindItemInList(
-                state.dataPlnt->PlantLoop(LoopNum).Name, state.dataSize->PlantSizData, &PlantSizingData::PlantLoopName);
+            PlantSizNum =
+                Util::FindItemInList(state.dataPlnt->PlantLoop(LoopNum).Name, state.dataSize->PlantSizData, &PlantSizingData::PlantLoopName);
         }
     }
     state.dataPlnt->PlantLoop(LoopNum).PlantSizNum = PlantSizNum;

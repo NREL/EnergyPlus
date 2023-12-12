@@ -739,9 +739,9 @@ TEST_F(EnergyPlusFixture, test_GetWindowAssemblyNfrcForReport_withIDF)
     double shgcRep{0.};
     double vtRep{0.};
 
-    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int windowSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     EXPECT_TRUE(windowSurfNum > 0);
-    int constructNum = UtilityRoutines::FindItemInList("DOUBLE PANE HW WINDOW", state->dataConstruction->Construct);
+    int constructNum = Util::FindItemInList("DOUBLE PANE HW WINDOW", state->dataConstruction->Construct);
     EXPECT_TRUE(constructNum > 0);
 
     GetWindowAssemblyNfrcForReport(

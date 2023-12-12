@@ -1417,7 +1417,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
     EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone);
+    int ZoneNum = Util::FindItemInList("EAST ZONE", state->dataHeatBal->Zone);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
     Dayltg::GetInputDayliteRefPt(*state, foundErrors);
@@ -1747,7 +1747,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone);
+    int ZoneNum = Util::FindItemInList("EAST ZONE", state->dataHeatBal->Zone);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
     Dayltg::GetInputDayliteRefPt(*state, foundErrors);
@@ -1793,7 +1793,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     int DayltgExtWin = 1;
     int Shaded = 2;
     int Unshaded = 1;
-    int IWin = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", state->dataSurface->Surface);
+    int IWin = Util::FindItemInList("ZN001:WALL001:WIN001", state->dataSurface->Surface);
     EXPECT_GT(IWin, 0);
 
     // Set un-shaded surface illuminance factor to 1.0 for RefPt1, 0.1 for RefPt2
@@ -3671,8 +3671,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgIlluminanceMap)
     state->dataGlobal->CurrentTime = 12.0;
     state->dataHeatBalMgr->CountWarmupDayPoints = 0;
     state->dataGlobal->EndDayFlag = false;
-    state->dataWeatherManager->Envrn = 1;
-    WeatherManager::ManageWeather(*state);
+    state->dataWeather->Envrn = 1;
+    Weather::ManageWeather(*state);
     HeatBalanceManager::ManageHeatBalance(*state);
     EXPECT_NEAR(16051, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(5), 1);
     EXPECT_NEAR(203, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(10), 1);

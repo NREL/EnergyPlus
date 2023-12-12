@@ -55,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -64,26 +65,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace ExteriorEnergyUse {
-
-    enum class ExteriorFuelUsage
-    {
-        Invalid = -1,
-        ElecUse,
-        GasUse,
-        WaterUse,
-        CoalUse,
-        FuelOil1Use,
-        FuelOil2Use,
-        PropaneUse,
-        GasolineUse,
-        DieselUse,
-        DistrictCoolUse,
-        DistrictHeatWaterUse,
-        DistrictHeatSteamUse,
-        OtherFuel1Use,
-        OtherFuel2Use,
-        Num
-    };
 
     enum class LightControlType
     {
@@ -121,7 +102,7 @@ namespace ExteriorEnergyUse {
     {
         // Members
         std::string Name; // Descriptive name -- will show on reporting
-        ExteriorFuelUsage FuelType;
+        Constant::eFuel FuelType;
         int SchedPtr;       // Can be scheduled
         Real64 DesignLevel; // Design Consumption (Watts, except for Water Equipment)
         Real64 Power;       // Power = DesignLevel * ScheduleValue
@@ -131,7 +112,7 @@ namespace ExteriorEnergyUse {
 
         // Default Constructor
         ExteriorEquipmentUsage()
-            : FuelType(ExteriorFuelUsage::Invalid), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
+            : FuelType(Constant::eFuel::Invalid), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
         {
         }
     };
@@ -139,15 +120,6 @@ namespace ExteriorEnergyUse {
     void ManageExteriorEnergyUse(EnergyPlusData &state);
 
     void GetExteriorEnergyUseInput(EnergyPlusData &state);
-
-    void ValidateFuelType(EnergyPlusData &state,
-                          ExteriorEnergyUse::ExteriorFuelUsage &FuelTypeNumber, // Fuel Type to be set in structure.
-                          std::string const &FuelTypeAlpha,                     // Fuel Type String
-                          std::string &FuelTypeString,                          // Standardized Fuel Type String (for variable naming)
-                          std::string_view CurrentModuleObject,                 // object being parsed
-                          std::string const &CurrentField,                      // current field being parsed
-                          std::string const &CurrentName                        // current object name being parsed
-    );
 
     void ReportExteriorEnergyUse(EnergyPlusData &state);
 

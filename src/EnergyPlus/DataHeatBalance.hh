@@ -60,6 +60,7 @@
 #include <EnergyPlus/ConvectionConstants.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
@@ -114,7 +115,7 @@ namespace DataHeatBalance {
     enum class CalcMRT
     {
         Invalid = -1,
-        ZoneAveraged,
+        EnclosureAveraged,
         SurfaceWeighted,
         AngleFactor,
         Num
@@ -279,6 +280,9 @@ namespace DataHeatBalance {
         FanSystemModel,
         Num
     };
+
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::CalcMRT::Num)> CalcMRTTypeNamesUC = {
+        "ENCLOSUREAVERAGED", "SURFACEWEIGHTED", "ANGLEFACTOR"};
 
     static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AirBalance::Num)> AirBalanceTypeNamesUC = {"NONE", "QUADRATURE"};
 
@@ -477,8 +481,8 @@ namespace DataHeatBalance {
         Real64 minOccupants = 0.0;     // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
         Real64 maxOccupants = 0.0;     // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
         bool isRemainderSpace = false; // True if this space is auto-generated "-Remainder" space
-        std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this space
-        std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this space
+        std::vector<Constant::eFuel> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this space
+        std::vector<std::string> otherEquipFuelTypeNames;    // List of fuel types used by other equipment in this space
 
         // Pointers to Surface Data Structure
         // |AllSurfF                                                                      |AllSurfL
@@ -653,17 +657,17 @@ namespace DataHeatBalance {
         bool HasLtsRetAirGain = false;       // TRUE means that zone lights return air heat > 0.0 calculated from plenum temperature
         bool HasAirFlowWindowReturn = false; // TRUE means that zone has return air flow from windows
         // from refrigeration cases for this zone
-        Real64 InternalHeatGains = 0.0;         // internal loads (W)
-        Real64 NominalInfilVent = 0.0;          // internal infiltration/ventilation
-        Real64 NominalMixing = 0.0;             // internal mixing/cross mixing
-        bool TempOutOfBoundsReported = false;   // if any temp out of bounds errors, first will show zone details.
-        bool EnforcedReciprocity = false;       // if zone/space required forced reciprocity -- less out of bounds temp errors allowed
-        int ZoneMinCO2SchedIndex = 0;           // Index for the schedule the schedule which determines minimum CO2 concentration
-        int ZoneMaxCO2SchedIndex = 0;           // Index for the schedule the schedule which determines maximum CO2 concentration
-        int ZoneContamControllerSchedIndex = 0; // Index for this schedule
-        bool FlagCustomizedZoneCap = false;     // True if customized Zone Capacitance Multiplier is used
-        std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this zone
-        std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this zone
+        Real64 InternalHeatGains = 0.0;                      // internal loads (W)
+        Real64 NominalInfilVent = 0.0;                       // internal infiltration/ventilation
+        Real64 NominalMixing = 0.0;                          // internal mixing/cross mixing
+        bool TempOutOfBoundsReported = false;                // if any temp out of bounds errors, first will show zone details.
+        bool EnforcedReciprocity = false;                    // if zone/space required forced reciprocity -- less out of bounds temp errors allowed
+        int ZoneMinCO2SchedIndex = 0;                        // Index for the schedule the schedule which determines minimum CO2 concentration
+        int ZoneMaxCO2SchedIndex = 0;                        // Index for the schedule the schedule which determines maximum CO2 concentration
+        int ZoneContamControllerSchedIndex = 0;              // Index for this schedule
+        bool FlagCustomizedZoneCap = false;                  // True if customized Zone Capacitance Multiplier is used
+        std::vector<Constant::eFuel> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this zone
+        std::vector<std::string> otherEquipFuelTypeNames;    // List of fuel types used by other equipment in this zone
 
         // Hybrid Modeling
         Real64 ZoneMeasuredTemperature = 0.0;               // Measured zone air temperature input by user
@@ -690,9 +694,8 @@ namespace DataHeatBalance {
         Real64 delta_T = 0.0;                               // Indoor and outdoor temperature
         Real64 delta_HumRat = 0.0;                          // Indoor and outdoor humidity ratio delta
 
-        Real64 ZeroSourceSumHATsurf = 0.0; // From Chilled Ceiling Panel, equal to the SumHATsurf for all the walls in a zone with no source
-        bool zoneOAQuadratureSum = false;  // True when zone OA balance method is Quadrature
-        int zoneOABalanceIndex = 0;        // Index to ZoneAirBalance for this zone, if any
+        bool zoneOAQuadratureSum = false; // True when zone OA balance method is Quadrature
+        int zoneOABalanceIndex = 0;       // Index to ZoneAirBalance for this zone, if any
 
         // Spaces
         bool anySurfacesWithoutSpace = false; // True if any surfaces in a zone do not have a space assigned in input
@@ -881,23 +884,22 @@ namespace DataHeatBalance {
         bool ManageDemand = false;           // Flag to indicate whether to use demand limiting
         Real64 DemandLimit = 0.0;            // Demand limit set by demand manager [W]
         // Report variables
-        Real64 Power = 0.0;                   // Electric/Gas/Fuel power [W]
-        Real64 RadGainRate = 0.0;             // Radiant heat gain [W]
-        Real64 ConGainRate = 0.0;             // Convective heat gain [W]
-        Real64 LatGainRate = 0.0;             // Latent heat gain [W]
-        Real64 LostRate = 0.0;                // Lost energy (converted to work) [W]
-        Real64 TotGainRate = 0.0;             // Total heat gain [W]
-        Real64 CO2GainRate = 0.0;             // CO2 gain rate [m3/s]
-        Real64 Consumption = 0.0;             // Electric/Gas/Fuel consumption [J]
-        Real64 RadGainEnergy = 0.0;           // Radiant heat gain [J]
-        Real64 ConGainEnergy = 0.0;           // Convective heat gain [J]
-        Real64 LatGainEnergy = 0.0;           // Latent heat gain [J]
-        Real64 LostEnergy = 0.0;              // Lost energy (converted to work) [J]
-        Real64 TotGainEnergy = 0.0;           // Total heat gain [J]
-        std::string EndUseSubcategory;        // user defined name for the end use category
-        std::string otherEquipFuelTypeString; // Fuel Type string for Other Equipment
-        ExteriorEnergyUse::ExteriorFuelUsage OtherEquipFuelType =
-            ExteriorEnergyUse::ExteriorFuelUsage::Invalid; // Fuel Type Number of the Other Equipment (defined in ExteriorEnergyUse.cc)
+        Real64 Power = 0.0;                                            // Electric/Gas/Fuel power [W]
+        Real64 RadGainRate = 0.0;                                      // Radiant heat gain [W]
+        Real64 ConGainRate = 0.0;                                      // Convective heat gain [W]
+        Real64 LatGainRate = 0.0;                                      // Latent heat gain [W]
+        Real64 LostRate = 0.0;                                         // Lost energy (converted to work) [W]
+        Real64 TotGainRate = 0.0;                                      // Total heat gain [W]
+        Real64 CO2GainRate = 0.0;                                      // CO2 gain rate [m3/s]
+        Real64 Consumption = 0.0;                                      // Electric/Gas/Fuel consumption [J]
+        Real64 RadGainEnergy = 0.0;                                    // Radiant heat gain [J]
+        Real64 ConGainEnergy = 0.0;                                    // Convective heat gain [J]
+        Real64 LatGainEnergy = 0.0;                                    // Latent heat gain [J]
+        Real64 LostEnergy = 0.0;                                       // Lost energy (converted to work) [J]
+        Real64 TotGainEnergy = 0.0;                                    // Total heat gain [J]
+        std::string EndUseSubcategory;                                 // user defined name for the end use category
+        std::string otherEquipFuelTypeString;                          // Fuel Type string for Other Equipment
+        Constant::eFuel OtherEquipFuelType = Constant::eFuel::Invalid; // Fuel Type Number of the Other Equipment
     };
 
     struct ExtVentedCavityStruct
@@ -1326,40 +1328,8 @@ namespace DataHeatBalance {
 
     struct SpaceZoneSimData // Calculated data by Space or Zone during each time step/hour
     {
-        // Members
-        Real64 NOFOCC = 0.0;  // Number of Occupants
-        Real64 QOCTOT = 0.0;  // Total Energy from Occupants
-        Real64 QOCSEN = 0.0;  // Sensible Energy from Occupants
-        Real64 QOCCON = 0.0;  // ENERGY CONVECTED FROM OCCUPANTS (WH)
-        Real64 QOCRAD = 0.0;  // ENERGY RADIATED FROM OCCUPANTS
-        Real64 QOCLAT = 0.0;  // LATENT ENERGY FROM OCCUPANTS
-        Real64 QLTTOT = 0.0;  // TOTAL ENERGY INTO LIGHTS (WH)
-        Real64 QLTCON = 0.0;  // ENERGY CONVECTED TO SPACE AIR FROM LIGHTS
-        Real64 QLTRAD = 0.0;  // ENERGY RADIATED TO SPACE FROM LIGHTS
-        Real64 QLTCRA = 0.0;  // ENERGY CONVECTED TO RETURN AIR FROM LIGHTS
-        Real64 QLTSW = 0.0;   // VISIBLE ENERGY FROM LIGHTS
-        Real64 QEECON = 0.0;  // ENERGY CONVECTED FROM ELECTRIC EQUIPMENT
-        Real64 QEERAD = 0.0;  // ENERGY RADIATED FROM ELECTRIC EQUIPMENT
-        Real64 QEELost = 0.0; // Energy from Electric Equipment (lost)
-        Real64 QEELAT = 0.0;  // LATENT ENERGY FROM Electric Equipment
-        Real64 QGECON = 0.0;  // ENERGY CONVECTED FROM GAS EQUIPMENT
-        Real64 QGERAD = 0.0;  // ENERGY RADIATED FROM GAS EQUIPMENT
-        Real64 QGELost = 0.0; // Energy from Gas Equipment (lost)
-        Real64 QGELAT = 0.0;  // LATENT ENERGY FROM Gas Equipment
-        Real64 QOECON = 0.0;  // ENERGY CONVECTED FROM OTHER EQUIPMENT
-        Real64 QOERAD = 0.0;  // ENERGY RADIATED FROM OTHER EQUIPMENT
-        Real64 QOELost = 0.0; // Energy from Other Equipment (lost)
-        Real64 QOELAT = 0.0;  // LATENT ENERGY FROM Other Equipment
-        Real64 QHWCON = 0.0;  // ENERGY CONVECTED FROM Hot Water EQUIPMENT
-        Real64 QHWRAD = 0.0;  // ENERGY RADIATED FROM Hot Water EQUIPMENT
-        Real64 QHWLost = 0.0; // Energy from Hot Water Equipment (lost)
-        Real64 QHWLAT = 0.0;  // LATENT ENERGY FROM Hot Water Equipment
-        Real64 QSECON = 0.0;  // ENERGY CONVECTED FROM Steam EQUIPMENT
-        Real64 QSERAD = 0.0;  // ENERGY RADIATED FROM Steam EQUIPMENT
-        Real64 QSELost = 0.0; // Energy from Steam Equipment (lost)
-        Real64 QSELAT = 0.0;  // LATENT ENERGY FROM Steam Equipment
-        Real64 QBBCON = 0.0;  // ENERGY CONVECTED FROM BASEBOARD HEATING
-        Real64 QBBRAD = 0.0;  // ENERGY RADIATED FROM BASEBOARD HEATING
+        Real64 NOFOCC = 0.0; // Number of Occupants
+        Real64 QLTSW = 0.0;  // VISIBLE ENERGY FROM LIGHTS
     };
 
     struct SpaceIntGainDeviceData
@@ -1428,7 +1398,7 @@ namespace DataHeatBalance {
         Real64 OperativeTemp = 0.0;          // Average of Mean Air Temperature {C} and Mean Radiant Temperature {C}
         Real64 MeanAirHumRat = 0.0;          // Mean Air Humidity Ratio {kg/kg} (averaged over zone time step)
         Real64 MeanAirDewPointTemp = 0.0;    // Mean Air Dewpoint Temperature {C}
-        Real64 ThermOperativeTemp = 0.0;     // Mix or MRT and MAT for Zone Control:Thermostatic:Operative Temperature {C}
+        Real64 ThermOperativeTemp = 0.0;     // Mix of MRT and MAT for Zone Control:Thermostatic:Operative Temperature {C}
         Real64 InfilHeatGain = 0.0;          // Heat Gain {J} due to infiltration
         Real64 InfilHeatLoss = 0.0;          // Heat Loss {J} due to infiltration
         Real64 InfilLatentGain = 0.0;        // Latent Gain {J} due to infiltration
@@ -1726,8 +1696,8 @@ namespace DataHeatBalance {
         Real64 SteamLostRate = 0.0;
         Real64 SteamTotGainRate = 0.0;
         // Other Equipment
-        Real64 OtherPower = 0.0;
-        Real64 OtherConsump = 0.0;
+        std::array<Real64, (int)Constant::eFuel::Num> OtherPower;
+        std::array<Real64, (int)Constant::eFuel::Num> OtherConsump;
         Real64 OtherRadGain = 0.0;
         Real64 OtherConGain = 0.0;
         Real64 OtherLatGain = 0.0;
@@ -1946,7 +1916,6 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> ZoneGroupSNLoadHeatRate;
     Array1D<Real64> ZoneGroupSNLoadCoolRate;
 
-    Array1D<Real64> ZoneMRT;        // MEAN RADIANT TEMPERATURE (C)
     Array1D<Real64> ZoneTransSolar; // Exterior beam plus diffuse solar entering zone sum of WinTransSolar for exterior windows in zone (W)
     Array1D<Real64>
         ZoneWinHeatGain; // Heat gain to zone from all exterior windows (includes oneTransSolar); sum of WinHeatGain for exterior windows in zone (W)

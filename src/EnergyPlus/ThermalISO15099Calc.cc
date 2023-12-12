@@ -2955,10 +2955,10 @@ void storeIterationResults(EnergyPlusData &state,
     print(files.TarcogIterationsFile, "*************************************************************************************************\n");
     print(files.TarcogIterationsFile, "Iteration number: {:5}\n", index);
 
-    print(files.TarcogIterationsFile, "Trmin = {:8.4F}\n", trmin - Constant::KelvinConv);
-    print(files.TarcogIterationsFile, "Troom = {:12.6F}\n", troom - Constant::KelvinConv);
-    print(files.TarcogIterationsFile, "Trmout = {:8.4F}\n", trmout - Constant::KelvinConv);
-    print(files.TarcogIterationsFile, "Tamb = {:12.6F}\n", tamb - Constant::KelvinConv);
+    print(files.TarcogIterationsFile, "Trmin = {:8.4F}\n", trmin - Constant::Kelvin);
+    print(files.TarcogIterationsFile, "Troom = {:12.6F}\n", troom - Constant::Kelvin);
+    print(files.TarcogIterationsFile, "Trmout = {:8.4F}\n", trmout - Constant::Kelvin);
+    print(files.TarcogIterationsFile, "Tamb = {:12.6F}\n", tamb - Constant::Kelvin);
 
     print(files.TarcogIterationsFile, "Ebsky = {:8.4F}\n", ebsky);
     print(files.TarcogIterationsFile, "Ebroom = {:8.4F}\n", ebroom);
@@ -3033,9 +3033,9 @@ void storeIterationResults(EnergyPlusData &state,
     print(files.TarcogIterationsFile, "\n");
 
     // write temperatures
-    print(files.TarcogIterationsFile, "{:16.8F}   \n", theta(1) - Constant::KelvinConv);
+    print(files.TarcogIterationsFile, "{:16.8F}   \n", theta(1) - Constant::Kelvin);
     for (i = 2; i <= 2 * nlayer; ++i) {
-        print(files.TarcogIterationsFile, "   {:16.8F}   \n", theta(i) - Constant::KelvinConv);
+        print(files.TarcogIterationsFile, "   {:16.8F}   \n", theta(i) - Constant::Kelvin);
     }
     print(files.TarcogIterationsFile, "\n");
 
@@ -3055,9 +3055,9 @@ void storeIterationResults(EnergyPlusData &state,
         print(files.IterationCSVFile, dynFormat);
         print(files.IterationCSVFile, "\n");
     }
-    print(files.IterationCSVFile, "{:16.8F}   \n", theta(1) - Constant::KelvinConv);
+    print(files.IterationCSVFile, "{:16.8F}   \n", theta(1) - Constant::Kelvin);
     for (i = 2; i <= 2 * nlayer; ++i) {
-        print(files.IterationCSVFile, "   {:16.8F}   \n", theta(i) - Constant::KelvinConv);
+        print(files.IterationCSVFile, "   {:16.8F}   \n", theta(i) - Constant::Kelvin);
     }
     print(files.IterationCSVFile, "\n");
 

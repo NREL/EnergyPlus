@@ -585,7 +585,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
                           "    ACTIVITY_SCH,            !- Activity Level Schedule Name",
                           "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}",
                           "    No,                      !- Enable ASHRAE 55 Comfort Warnings",
-                          "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+                          "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
                           "    ,                        !- Surface Name/Angle Factor List Name",
                           "    WORK_EFF_SCH,            !- Work Efficiency Schedule Name",
                           "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -1741,7 +1741,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     TestAirPathIntegrity(*state, ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     state->dataGlobal->KickOffSimulation = false;
@@ -2164,7 +2164,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
                           "    ACTIVITY_SCH,            !- Activity Level Schedule Name",
                           "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}",
                           "    No,                      !- Enable ASHRAE 55 Comfort Warnings",
-                          "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+                          "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
                           "    ,                        !- Surface Name/Angle Factor List Name",
                           "    WORK_EFF_SCH,            !- Work Efficiency Schedule Name",
                           "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -3320,7 +3320,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
 
     ASSERT_ANY_THROW(SimulationManager::SetupSimulation(*state, ErrorsFound));
 }
@@ -3658,7 +3658,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateHighOA)
                           "    ACTIVITY_SCH,            !- Activity Level Schedule Name",
                           "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}",
                           "    No,                      !- Enable ASHRAE 55 Comfort Warnings",
-                          "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+                          "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
                           "    ,                        !- Surface Name/Angle Factor List Name",
                           "    WORK_EFF_SCH,            !- Work Efficiency Schedule Name",
                           "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -4817,7 +4817,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateHighOA)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     TestAirPathIntegrity(*state, ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     state->dataGlobal->KickOffSimulation = false;

@@ -48,6 +48,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
@@ -206,9 +207,9 @@ namespace ExteriorEnergyUse {
             }
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode = ExteriorEnergyUse::LightControlType::ScheduleOnly;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "ScheduleNameOnly")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "ScheduleNameOnly")) {
                 state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode = ExteriorEnergyUse::LightControlType::ScheduleOnly;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "AstronomicalClock")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "AstronomicalClock")) {
                 state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode = ExteriorEnergyUse::LightControlType::AstroClockOverride;
             } else {
                 ShowSevereError(state,
@@ -312,15 +313,12 @@ namespace ExteriorEnergyUse {
                 EndUseSubcategoryName = "General";
             }
 
-            ExteriorEnergyUse::ValidateFuelType(state,
-                                                state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).FuelType,
-                                                state.dataIPShortCut->cAlphaArgs(2),
-                                                TypeString,
-                                                cCurrentModuleObject,
-                                                state.dataIPShortCut->cAlphaFieldNames(2),
-                                                state.dataIPShortCut->cAlphaArgs(2));
-            if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).FuelType ==
-                ExteriorEnergyUse::ExteriorFuelUsage::Invalid) {
+            state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).FuelType =
+                static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(2)));
+            TypeString = Constant::eFuelNames[static_cast<int>(
+                state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).FuelType)];
+
+            if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).FuelType == Constant::eFuel::Invalid) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                     ShowSevereError(state,
                                     format("{}{}: {} is required, missing for {}={}",
@@ -341,8 +339,7 @@ namespace ExteriorEnergyUse {
                 }
                 ErrorsFound = true;
             } else {
-                if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).FuelType !=
-                    ExteriorEnergyUse::ExteriorFuelUsage::WaterUse) {
+                if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).FuelType != Constant::eFuel::Water) {
                     SetupOutputVariable(state,
                                         "Exterior Equipment Fuel Rate",
                                         OutputProcessor::Unit::W,
@@ -465,8 +462,7 @@ namespace ExteriorEnergyUse {
 
             ++state.dataExteriorEnergyUse->NumExteriorEqs;
             state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).Name = state.dataIPShortCut->cAlphaArgs(1);
-            state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).FuelType =
-                ExteriorEnergyUse::ExteriorFuelUsage::WaterUse;
+            state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).FuelType = Constant::eFuel::Water;
             state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr =
                 GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
             if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).SchedPtr == 0) {
@@ -565,83 +561,6 @@ namespace ExteriorEnergyUse {
 
         if (ErrorsFound) {
             ShowFatalError(state, format("{}Errors found in input.  Program terminates.", RoutineName));
-        }
-    }
-
-    void ValidateFuelType(EnergyPlusData &state,
-                          ExteriorEnergyUse::ExteriorFuelUsage &FuelTypeNumber, // Fuel Type to be set in structure.
-                          std::string const &FuelTypeAlpha,                     // Fuel Type String
-                          std::string &FuelTypeString,                          // Standardized Fuel Type String (for variable naming)
-                          std::string_view CurrentModuleObject,                 // object being parsed
-                          std::string const &CurrentField,                      // current field being parsed
-                          std::string const &CurrentName                        // current object name being parsed
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   January 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine compares the input Fuel Type value against the
-        // valid values and sets the correct in the returned FuelTypeNumber.
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("ValidateFuelType: ");
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::Invalid;
-        FuelTypeString = "";
-
-        // Select the correct Number for the associated ascii name for the fuel type
-        if (UtilityRoutines::SameString(FuelTypeAlpha, "Electricity")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::ElecUse;
-            FuelTypeString = "Electricity";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "NaturalGas")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::GasUse;
-            FuelTypeString = "NaturalGas";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Coal")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::CoalUse;
-            FuelTypeString = "Coal";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOilNo1")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::FuelOil1Use;
-            FuelTypeString = "FuelOilNo1";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Propane")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::PropaneUse;
-            FuelTypeString = "Propane";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Gasoline")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::GasolineUse;
-            FuelTypeString = "Gasoline";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Diesel")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DieselUse;
-            FuelTypeString = "Diesel";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOilNo2")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::FuelOil2Use;
-            FuelTypeString = "FuelOilNo2";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "OtherFuel1")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::OtherFuel1Use;
-            FuelTypeString = "OtherFuel1";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "OtherFuel2")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::OtherFuel1Use;
-            FuelTypeString = "OtherFuel2";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Water")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::WaterUse;
-            FuelTypeString = "Water";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictCooling")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictCoolUse;
-            FuelTypeString = "DistrictCooling";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictHeatingWater")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictHeatWaterUse;
-            FuelTypeString = "DistrictHeatingWater";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictHeatingSteam")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictHeatSteamUse;
-            FuelTypeString = "DistrictHeatingSteam";
-        } else {
-            ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, CurrentName));
-            ShowFatalError(state, format("Heating source/fuel type not recognized. Check input field {}=\"{}", CurrentField, FuelTypeAlpha));
         }
     }
 

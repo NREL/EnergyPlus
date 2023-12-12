@@ -199,7 +199,7 @@ namespace CoolTower {
             }
 
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZoneName = state.dataIPShortCut->cAlphaArgs(3); // Name of zone where cooltower is serving
-            state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), Zone);
+            state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), Zone);
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr == 0) {
                 if (lAlphaBlanks(3)) {
                     ShowSevereError(state,
@@ -540,10 +540,10 @@ namespace CoolTower {
                                 OutputProcessor::SOVStoreType::Summed,
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name,
                                 {},
-                                "Electricity",
-                                "Cooling",
+                                eResourceSOV::Electricity,
+                                EndUseCatSOV::Cooling,
                                 {},
-                                "System");
+                                GroupSOV::HVAC); //"System");
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromMains) {
                 SetupOutputVariable(state,
                                     "Zone Cooltower Water Volume",
@@ -560,10 +560,10 @@ namespace CoolTower {
                                     OutputProcessor::SOVStoreType::Summed,
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name,
                                     {},
-                                    "MainsWater",
-                                    "Cooling",
+                                    eResourceSOV::MainsWater,
+                                    EndUseCatSOV::Cooling,
                                     {},
-                                    "System");
+                                    GroupSOV::HVAC); // "System");
             } else if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
                 SetupOutputVariable(state,
                                     "Zone Cooltower Water Volume",
@@ -587,10 +587,10 @@ namespace CoolTower {
                                     OutputProcessor::SOVStoreType::Summed,
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name,
                                     {},
-                                    "MainsWater",
-                                    "Cooling",
+                                    eResourceSOV::MainsWater,
+                                    EndUseCatSOV::Cooling,
                                     {},
-                                    "System");
+                                    GroupSOV::HVAC); // "System");
             }
         }
     }
@@ -718,7 +718,7 @@ namespace CoolTower {
                 thisZoneHB.CTMFL = thisZoneHB.MCPC / AirSpecHeat;
 
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SenHeatPower = thisZoneHB.MCPC * std::abs(thisZoneHB.ZT - OutletTemp);
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatPower = CVF_ZoneNum * std::abs(thisZoneHB.ZoneAirHumRat - OutletHumRat);
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatPower = CVF_ZoneNum * std::abs(thisZoneHB.airHumRat - OutletHumRat);
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletTemp = OutletTemp;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletHumRat = OutletHumRat;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRate = CVF_ZoneNum;

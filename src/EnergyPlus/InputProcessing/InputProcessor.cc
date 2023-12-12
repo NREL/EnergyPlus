@@ -144,7 +144,7 @@ json const &InputProcessor::getFields(EnergyPlusData &state, std::string const &
     if (it2 == objs.end()) {
         // HACK: this is not ideal and should be removed once everything is case sensitive internally
         for (auto it3 = objs.begin(); it3 != objs.end(); ++it3) {
-            if (UtilityRoutines::makeUPPER(it3.key()) == objectName) {
+            if (Util::makeUPPER(it3.key()) == objectName) {
                 return it3.value();
             }
         }
@@ -556,7 +556,7 @@ bool InputProcessor::findDefault(std::string &default_value, json const &schema_
             default_value = s;
         }
         if (schema_field_obj.find("retaincase") == schema_field_obj.end()) {
-            default_value = UtilityRoutines::makeUPPER(default_value);
+            default_value = Util::makeUPPER(default_value);
         }
         return true;
     }
@@ -736,7 +736,7 @@ std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string cons
         output.second = false;
     }
     if (schema_field_obj.find("retaincase") == schema_field_obj.end()) {
-        output.first = UtilityRoutines::makeUPPER(output.first);
+        output.first = Util::makeUPPER(output.first);
     }
     return output;
 }
@@ -1041,7 +1041,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
             if (name_iter.find("retaincase") != name_iter.end()) {
                 Alphas(alpha_index) = objectInfo.objectName;
             } else {
-                Alphas(alpha_index) = UtilityRoutines::makeUPPER(objectInfo.objectName);
+                Alphas(alpha_index) = Util::makeUPPER(objectInfo.objectName);
             }
             if (is_AlphaBlank) AlphaBlank()(alpha_index) = objectInfo.objectName.empty();
             if (is_AlphaFieldNames) {
@@ -1224,9 +1224,9 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
 
     int object_item_num = 1;
     bool found = false;
-    std::string const upperObjName = UtilityRoutines::makeUPPER(ObjName);
+    std::string const upperObjName = Util::makeUPPER(ObjName);
     for (auto it = obj->begin(); it != obj->end(); ++it) {
-        if (UtilityRoutines::makeUPPER(it.key()) == upperObjName) {
+        if (Util::makeUPPER(it.key()) == upperObjName) {
             found = true;
             break;
         }
@@ -1262,11 +1262,11 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
 
     int object_item_num = 1;
     bool found = false;
-    std::string const upperObjName = UtilityRoutines::makeUPPER(ObjName);
+    std::string const upperObjName = Util::makeUPPER(ObjName);
     for (auto it = obj->begin(); it != obj->end(); ++it) {
         auto it2 = it.value().find(NameTypeVal);
 
-        if ((it2 != it.value().end()) && (UtilityRoutines::makeUPPER(it2.value().get<std::string>()) == upperObjName)) {
+        if ((it2 != it.value().end()) && (Util::makeUPPER(it2.value().get<std::string>()) == upperObjName)) {
             found = true;
             break;
         }
@@ -1277,153 +1277,6 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
         return 0; // indicates object field name or value not found
     }
     return getIDFObjNum(state, ObjType, object_item_num); // if incoming input is idf, then return idf object order
-}
-
-void InputProcessor::lowerRangeCheck(EnergyPlusData &state,
-                                     bool &ErrorsFound,                    // Set to true if error detected
-                                     std::string const &WhatFieldString,   // Descriptive field for string
-                                     std::string const &WhatObjectString,  // Descriptive field for object, Zone Name, etc.
-                                     std::string const &ErrorLevel,        // 'Warning','Severe','Fatal')
-                                     std::string const &LowerBoundString,  // String for error message, if applicable
-                                     bool const LowerBoundCondition,       // Condition for error condition, if applicable
-                                     std::string_view const ValueString,   // Value with digits if to be displayed with error
-                                     std::string_view const WhatObjectName // ObjectName -- used for error messages
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   July 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine is a general purpose "range check" routine for GetInput routines.
-    // Using the standard "ErrorsFound" logical, this routine can produce a reasonable
-    // error message to describe the situation in addition to setting the ErrorsFound variable
-    // to true. This function is an overload to handle the lower bound check only. It is only
-    // used in WeatherManager.
-
-    std::string ErrorString; // Uppercase representation of ErrorLevel
-    std::string Message1;
-    std::string Message2;
-
-    bool Error = false;
-    if (!LowerBoundCondition) Error = true;
-
-    if (Error) {
-        ConvertCaseToUpper(ErrorLevel, ErrorString);
-        Message1 = WhatObjectString;
-        if (!WhatObjectName.empty()) {
-            Message1 += fmt::format("=\"{}\", out of range data", WhatObjectName);
-        }
-        Message2 = "Out of range value field=" + WhatFieldString;
-        if (!ValueString.empty()) {
-            Message2 += fmt::format(", Value=[{}]", ValueString);
-        }
-        Message2 += fmt::format(", range={{{}}}", LowerBoundString);
-
-        {
-            char const errorCheck = ErrorString[0];
-
-            if ((errorCheck == 'W') || (errorCheck == 'w')) {
-                ShowWarningError(state, Message1);
-                ShowContinueError(state, Message2);
-
-            } else if ((errorCheck == 'S') || (errorCheck == 's')) {
-                ShowSevereError(state, Message1);
-                ShowContinueError(state, Message2);
-                ErrorsFound = true;
-
-            } else if ((errorCheck == 'F') || (errorCheck == 'f')) {
-                ShowSevereError(state, Message1);
-                ShowContinueError(state, Message2);
-                ShowFatalError(state, "Program terminates due to preceding condition(s).");
-
-            } else {
-                ShowSevereError(state, Message1);
-                ShowContinueError(state, Message2);
-                ErrorsFound = true;
-            }
-        }
-    }
-}
-
-void InputProcessor::rangeCheck(EnergyPlusData &state,
-                                bool &ErrorsFound,                    // Set to true if error detected
-                                std::string const &WhatFieldString,   // Descriptive field for string
-                                std::string const &WhatObjectString,  // Descriptive field for object, Zone Name, etc.
-                                std::string const &ErrorLevel,        // 'Warning','Severe','Fatal')
-                                std::string const &LowerBoundString,  // String for error message, if applicable
-                                bool const LowerBoundCondition,       // Condition for error condition, if applicable
-                                std::string const &UpperBoundString,  // String for error message, if applicable
-                                bool const UpperBoundCondition,       // Condition for error condition, if applicable
-                                std::string_view const ValueString,   // Value with digits if to be displayed with error
-                                std::string_view const WhatObjectName // ObjectName -- used for error messages
-)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   July 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine is a general purpose "range check" routine for GetInput routines.
-    // Using the standard "ErrorsFound" logical, this routine can produce a reasonable
-    // error message to describe the situation in addition to setting the ErrorsFound variable
-    // to true. This function originally could do just the upper bound, but it was not used
-    // that way so that option has been removed. It is only used in WeatherManager.
-
-    std::string ErrorString; // Uppercase representation of ErrorLevel
-    std::string Message1;
-    std::string Message2;
-
-    bool Error = false;
-    if (!UpperBoundCondition) {
-        Error = true;
-    }
-    if (!LowerBoundCondition) {
-        Error = true;
-    }
-
-    if (Error) {
-        ConvertCaseToUpper(ErrorLevel, ErrorString);
-        Message1 = WhatObjectString;
-        if (!WhatObjectName.empty()) {
-            Message1 += fmt::format("=\"{}\", out of range data", WhatObjectName);
-        }
-        Message2 = "Out of range value field=" + WhatFieldString;
-        if (!ValueString.empty()) {
-            Message2 += fmt::format(", Value=[{}]", ValueString);
-        }
-        Message2 += fmt::format(", range={{{} and {}}}", LowerBoundString, UpperBoundString);
-
-        {
-            char const errorCheck = ErrorString[0];
-
-            if ((errorCheck == 'W') || (errorCheck == 'w')) {
-                ShowWarningError(state, Message1);
-                ShowContinueError(state, Message2);
-
-            } else if ((errorCheck == 'S') || (errorCheck == 's')) {
-                ShowSevereError(state, Message1);
-                ShowContinueError(state, Message2);
-                ErrorsFound = true;
-
-            } else if ((errorCheck == 'F') || (errorCheck == 'f')) {
-                ShowSevereError(state, Message1);
-                ShowContinueError(state, Message2);
-                ShowFatalError(state, "Program terminates due to preceding condition(s).");
-
-            } else {
-                ShowSevereError(state, Message1);
-                ShowContinueError(state, Message2);
-                ErrorsFound = true;
-            }
-        }
-    }
 }
 
 void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumeric)
@@ -2115,7 +1968,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    std::string const report_name = UtilityRoutines::makeUPPER(extensions.at("report_name").get<std::string>());
+                    std::string const report_name = Util::makeUPPER(extensions.at("report_name").get<std::string>());
                     if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
                         for (int i = 1; i <= DataOutputs::NumMonthlyReports; ++i) {
                             addVariablesForMonthlyReport(state, DataOutputs::MonthlyNamedReports(i));
@@ -2369,7 +2222,7 @@ void InputProcessor::addVariablesForMonthlyReport(EnergyPlusData &state, std::st
         addRecordToOutputVariableStructure(state, "*", "WATER HEATER HEAT LOSS ENERGY");
         addRecordToOutputVariableStructure(state, "*", "WATER HEATER TANK TEMPERATURE");
         addRecordToOutputVariableStructure(state, "*", "WATER HEATER HEAT RECOVERY SUPPLY ENERGY");
-        addRecordToOutputVariableStructure(state, "*", "WATER HEATER SOURCE ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "WATER HEATER SOURCE SIDE HEAT TRANSFER ENERGY");
 
     } else if (reportName == "GENERATORREPORTMONTHLY") {
         addRecordToOutputVariableStructure(state, "*", "GENERATOR PRODUCED AC ELECTRICITY ENERGY");
@@ -2513,8 +2366,8 @@ void InputProcessor::addRecordToOutputVariableStructure(EnergyPlusData &state, s
     if (found == state.dataOutput->OutputVariablesForSimulation.end()) {
         std::map<std::string,
                  DataOutputs::OutputReportingVariables,
-                 // UtilityRoutines::case_insensitive_hasher,
-                 UtilityRoutines::case_insensitive_comparator>
+                 // Util::case_insensitive_hasher,
+                 Util::case_insensitive_comparator>
             data;
         // data.reserve(32);
         data.emplace(KeyValue, DataOutputs::OutputReportingVariables(state, KeyValue, VarName));
