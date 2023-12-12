@@ -2031,6 +2031,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -2540,6 +2541,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -3049,6 +3051,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -3558,6 +3561,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -4067,6 +4071,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -4576,6 +4581,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -5085,6 +5091,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -5594,6 +5601,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -6103,6 +6111,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -6612,6 +6621,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -7121,6 +7131,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -7630,6 +7641,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -8118,6 +8130,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -8572,6 +8585,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -9060,6 +9074,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
