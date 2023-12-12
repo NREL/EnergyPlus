@@ -1320,6 +1320,7 @@
     ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
     ,                        !- No Load Supply Air Flow Rate Per Unit of Cooling Capacity
     ,                        !- No Load Supply Air Flow Rate Per Unit of Heating Capacity
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     80;                      !- Maximum Supply Air Temperature {C}
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
