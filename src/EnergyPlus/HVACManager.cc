@@ -577,31 +577,37 @@ void ManageHVAC(EnergyPlusData &state)
         }
         if ((ReportDebug) && (state.dataGlobal->DayOfSim > 0)) { // Report the node data
             if (size(state.dataLoopNodes->Node) > 0 && !state.dataHVACMgr->DebugNamesReported) {
-                print(state.files.debug, "{}\n", "node #   Name");
+                print(state.files.debug, "Day of Sim, Hour of Day, TimeStep,");
                 for (int NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
-                    print(state.files.debug, " {:3}     {}\n", NodeNum, state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: Temp,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassMinAv,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassMaxAv,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: TempSP,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassFlow,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassMin,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassMax,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassSP,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: Press,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: Enth,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: HumRat,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: Fluid Type,", state.dataLoopNodes->NodeID(NodeNum));
+                    if (NodeNum == isize(state.dataLoopNodes->Node)) print(state.files.debug, "\n");
                 }
                 state.dataHVACMgr->DebugNamesReported = true;
             }
             if (size(state.dataLoopNodes->Node) > 0) {
-                print(state.files.debug, "\n\n Day of Sim     Hour of Day    Time\n");
                 print(state.files.debug,
-                      "{:12}{:12} {:22.15N} \n",
+                      "{:12},{:12}, {:22.15N},",
                       state.dataGlobal->DayOfSim,
                       state.dataGlobal->HourOfDay,
                       state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone);
-                print(state.files.debug,
-                      "{}\n",
-                      "node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       MassMax        MassSP    Press        "
-                      "Enthal     HumRat Fluid Type");
             }
             for (int NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
                 static constexpr std::string_view Format_20{
-                    " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#7.0F}  {:11.2F}  {:9.5F}  {}\n"};
+                    " {:8.2F},  {:8.3F},  {:8.3F},  {:8.2F}, {:13.2F}, {:13.2F}, {:13.2F}, {:13.2F},  {:#7.0F},  {:11.2F},  {:9.5F},  {},"};
 
                 print(state.files.debug,
                       Format_20,
-                      NodeNum,
                       state.dataLoopNodes->Node(NodeNum).Temp,
                       state.dataLoopNodes->Node(NodeNum).MassFlowRateMinAvail,
                       state.dataLoopNodes->Node(NodeNum).MassFlowRateMaxAvail,
@@ -614,6 +620,7 @@ void ManageHVAC(EnergyPlusData &state)
                       state.dataLoopNodes->Node(NodeNum).Enthalpy,
                       state.dataLoopNodes->Node(NodeNum).HumRat,
                       DataLoopNode::NodeFluidTypeNames[static_cast<int>(state.dataLoopNodes->Node(NodeNum).FluidType)]);
+                if (NodeNum == isize(state.dataLoopNodes->Node)) print(state.files.debug, "\n");
             }
         }
     }
