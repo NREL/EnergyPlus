@@ -192,8 +192,8 @@ void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
                                             int &speedNum,
                                             Real64 &speedRatio,
                                             int const fanOpMode,
-                                            DataLoopNode::NodeData &, // condInletNode,
-                                            DataLoopNode::NodeData &condOutletNode)
+                                            DataLoopNode::NodeData &condInletNode,
+                                            DataLoopNode::NodeData &) // condOutletNode)
 {
     static constexpr std::string_view RoutineName = "CoilCoolingDX205Performance::calculate";
 
