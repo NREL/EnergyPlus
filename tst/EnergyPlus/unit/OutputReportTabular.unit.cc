@@ -12847,12 +12847,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthlyBlankVariable)
 
     InitializeTabularMonthly(*state);
 
-    std::string const expected_error = delimited_string({
-         "   ** Warning ** Output:Table:Monthly: Blank column specified in 'SPACE GAINS ANNUAL REPORT', need to provide a variable or meter name "
-        });
+    std::string const expected_error = delimited_string(
+        {"   ** Warning ** Output:Table:Monthly: Blank column specified in 'SPACE GAINS ANNUAL REPORT', need to provide a variable or meter name "});
     compare_err_stream(expected_error);
 }
-
 
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_NoWarnMonthlIfNoWeatherFileRun)
 {

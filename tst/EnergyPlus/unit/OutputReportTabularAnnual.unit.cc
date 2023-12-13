@@ -586,9 +586,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_WarnBlankVariable)
 
     std::vector<std::string> tableParams = firstTable->inspectTable();
 
-    std::string const expected_error = delimited_string(
-        {"   ** Warning ** Output:Table:Annual: Blank column specified in 'SPACE GAINS ANNUAL REPORT', need to provide a variable or meter or EMS variable name ",
-         "   ** Warning ** Invalid aggregation type=\"\"  Defaulting to SumOrAverage."});
+    std::string const expected_error = delimited_string({"   ** Warning ** Output:Table:Annual: Blank column specified in 'SPACE GAINS ANNUAL "
+                                                         "REPORT', need to provide a variable or meter or EMS variable name ",
+                                                         "   ** Warning ** Invalid aggregation type=\"\"  Defaulting to SumOrAverage."});
 
     compare_err_stream(expected_error);
 }
