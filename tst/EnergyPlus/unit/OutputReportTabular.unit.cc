@@ -12792,6 +12792,68 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthlyDisplayExtraWarn
     compare_err_stream(expected_error);
 }
 
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthlyBlankVariable)
+{
+    // #6919 - Warn instead of fatal on blank monthly table
+    std::string const idf_objects = delimited_string({
+        "Output:Table:Monthly,",
+        "  Space Gains Annual Report, !- Name",
+        "  2, !-  Digits After Decimal",
+        "  , !- Variable or Meter 1 Name",
+        "  SumOrAverage; !- Aggregation Type for Variable or Meter 1",
+
+        "Output:Table:SummaryReports,",
+        "  AllSummaryAndMonthly;              !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Real64 extLitUse;
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite1",
+                        {},
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite2",
+                        {},
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather; // Trigger the extra warning
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->DisplayExtraWarnings = true;
+
+    GetInputTabularMonthly(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
+    GetInputOutputTableSummaryReports(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, numNamedMonthly + 1);
+
+    InitializeTabularMonthly(*state);
+
+    std::string const expected_error = delimited_string({
+         "   ** Warning ** Output:Table:Monthly: Blank column specified in 'SPACE GAINS ANNUAL REPORT', need to provide a variable or meter name "
+        });
+    compare_err_stream(expected_error);
+}
+
+
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_NoWarnMonthlIfNoWeatherFileRun)
 {
     // #9621 - Only warn if a bad variable is defined in a Monthly table user requested, not on the AllSummaryAndMonthly ones
