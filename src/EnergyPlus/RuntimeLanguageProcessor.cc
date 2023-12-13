@@ -3535,7 +3535,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
                 // Resource Type
                 Constant::eResource resource = static_cast<Constant::eResource>
-                    (getEnumValue(Constant::eResourceNamesUC, Util::makeUPPER(cAlphaArgs(15))));
+                    (getEnumValue(Constant::eResourceNamesUC, Util::makeUPPER(cAlphaArgs(5))));
 
                 if (resource == Constant::eResource::Invalid) {
                     ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
