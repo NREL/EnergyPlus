@@ -947,7 +947,7 @@ namespace EMSManager {
 
             // try again to process sensor.
             int VarIndex = GetMeterIndex(state, state.dataRuntimeLang->Sensor(SensorNum).OutputVarName);
-            if (VarIndex > 0) {
+            if (VarIndex > -1) {
 
                 state.dataRuntimeLang->Sensor(SensorNum).VariableType = OutputProcessor::VariableType::Meter;
                 state.dataRuntimeLang->Sensor(SensorNum).Index = VarIndex;
@@ -968,7 +968,7 @@ namespace EMSManager {
                         ShowContinueError(state, "Output:Variable Name not found");
                         ErrorsFound = true;
                     }
-                } else if (VarIndex == 0) {
+                } else if (VarIndex == -1) {
                     if (reportErrors) {
                         ShowSevereError(state,
                                         format("Invalid Output:Variable or Output:Meter Index Key Name ={}",

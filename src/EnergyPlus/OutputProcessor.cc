@@ -2423,7 +2423,9 @@ namespace OutputProcessor {
         auto &rf = state.dataResultsFramework->resultsFramework;
         auto &sql = state.dataSQLiteProcedures->sqlite;
         
-        std::string_view unitsString = (units == Constant::Units::customEMS && !customUnitName.empty()) ? customUnitName : Constant::unitNames[(int)units];
+        std::string_view unitsString = (units == Constant::Units::customEMS && !customUnitName.empty()) ?
+                customUnitName :
+                ((units == Constant::Units::Invalid) ? "" : Constant::unitNames[(int)units]);
 
         if (state.files.eso.good()) {
             print(state.files.eso, "{},{},{},{} [{}]{}{}{}\n",
