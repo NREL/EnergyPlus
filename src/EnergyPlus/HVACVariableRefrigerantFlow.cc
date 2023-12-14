@@ -914,7 +914,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
 
                     vrf.DefrostPower = DefrostEIRTempModFac * (vrf.HeatingCapacity / 1.01667) * FractionalDefrostTime;
 
-                } else { // Defrost strategy is resistive   
+                } else { // Defrost strategy is resistive
                     vrf.DefrostPower = vrf.DefrostCapacity * FractionalDefrostTime;
                 }
             }
