@@ -906,8 +906,11 @@ namespace ElectricBaseboardRadiator {
         Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
         // Initialize arrays
-        for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
-            state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).ElecBaseboard = 0.0;
+        for (auto &elecBaseboard : state.dataElectBaseboardRad->ElecBaseboard) {
+            for (int radSurfNum = 1; radSurfNum <= elecBaseboard.TotSurfToDistrib; ++radSurfNum) {
+                int surfNum = elecBaseboard.SurfacePtr(radSurfNum);
+                state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).ElecBaseboard = 0.0;
+            }
         }
         state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson = 0.0;
 

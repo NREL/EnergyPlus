@@ -1589,15 +1589,15 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
     Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
     // Initialize arrays
-    for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
-        state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).CoolingPanel = 0.0;
+    for (auto &thisCP : state.dataChilledCeilingPanelSimple->CoolingPanel) {
+        for (int radSurfNum = 1; radSurfNum <= thisCP.TotSurfToDistrib; ++radSurfNum) {
+            int surfNum = thisCP.SurfacePtr(radSurfNum);
+            state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).CoolingPanel = 0.0;
+        }
     }
     state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson = 0.0;
 
-    for (int CoolingPanelNum = 1; CoolingPanelNum <= (int)state.dataChilledCeilingPanelSimple->CoolingPanel.size(); ++CoolingPanelNum) {
-
-        auto &thisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
-
+    for (auto &thisCP : state.dataChilledCeilingPanelSimple->CoolingPanel) {
         int ZoneNum = thisCP.ZonePtr;
         if (ZoneNum <= 0) continue;
         state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson(ZoneNum) += thisCP.CoolingPanelSource * thisCP.FracDistribPerson;

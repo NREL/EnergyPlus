@@ -1140,8 +1140,11 @@ namespace HighTempRadiantSystem {
         // Initialize arrays
         dataHBFS->SumConvHTRadSys = 0.0;
         dataHBFS->SumLatentHTRadSys = 0.0;
-        for (int surfNum : state.dataSurface->allGetsRadiantHeatSurfaceList) {
-            state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).HTRadSys = 0.0;
+        for (auto &thisHTR : state.dataHighTempRadSys->HighTempRadSys) {
+            for (int radSurfNum = 1; radSurfNum <= thisHTR.TotSurfToDistrib; ++radSurfNum) {
+                int surfNum = thisHTR.SurfacePtr(radSurfNum);
+                state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).HTRadSys = 0.0;
+            }
         }
         dataHBFS->ZoneQHTRadSysToPerson = 0.0;
 
