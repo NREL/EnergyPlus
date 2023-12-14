@@ -870,10 +870,8 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
             // Calculate defrost adjustment factors depending on defrost control type
             if (vrf.DefrostControl == StandardRatings::HPdefrostControl::Timed) {
                 FractionalDefrostTime = vrf.DefrostFraction;
-                if (FractionalDefrostTime > 0.0) {
-                    HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
-                    InputPowerMultiplier = 0.90 - 36.45 * OutdoorCoildw;
-                }
+                HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
+                InputPowerMultiplier = 0.90 - 36.45 * OutdoorCoildw;
             } else { // else defrost control is on-demand
                 FractionalDefrostTime = 1.0 / (1.0 + 0.01446 / OutdoorCoildw);
                 HeatingCapacityMultiplier = 0.875 * (1.0 - FractionalDefrostTime);
@@ -916,7 +914,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
 
                     vrf.DefrostPower = DefrostEIRTempModFac * (vrf.HeatingCapacity / 1.01667) * FractionalDefrostTime;
 
-                } else { // Defrost strategy is resistive
+                } else { // Defrost strategy is resistive   
                     vrf.DefrostPower = vrf.DefrostCapacity * FractionalDefrostTime;
                 }
             }
