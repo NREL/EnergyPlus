@@ -902,12 +902,12 @@ namespace OutputProcessor {
             op->meters.push_back(meter);
             op->meterMap.insert_or_assign(meterNameUC, meterNum);
         
-            for (int iPeriod = 0; iPeriod < (int)ReportFreq::Num; ++iPeriod) {
-                meter->periods[iPeriod].RptNum = ++op->ReportNumberCounter;
+            for (ReportFreq reportFreq : {ReportFreq::TimeStep, ReportFreq::Hour, ReportFreq::Day, ReportFreq::Month, ReportFreq::Year, ReportFreq::Simulation}) { 
+                meter->periods[(int)reportFreq].RptNum = ++op->ReportNumberCounter;
             }
         
-            for (int iPeriod = 0; iPeriod < (int)ReportFreq::Num; ++iPeriod) {
-                meter->periods[iPeriod].accRptNum = ++op->ReportNumberCounter;
+            for (ReportFreq reportFreq : {ReportFreq::TimeStep, ReportFreq::Hour, ReportFreq::Day, ReportFreq::Month, ReportFreq::Year, ReportFreq::Simulation}) { 
+                meter->periods[(int)reportFreq].accRptNum = ++op->ReportNumberCounter;
             }
 
             // Do the loop again, this time without error checking
@@ -1201,12 +1201,12 @@ namespace OutputProcessor {
             op->meters.push_back(meter);
             op->meterMap.insert_or_assign(meterNameUC, meterNum);
         
-            for (int iPeriod = 0; iPeriod < (int)ReportFreq::Num; ++iPeriod) {
-                meter->periods[iPeriod].RptNum = ++op->ReportNumberCounter;
+            for (ReportFreq reportFreq : {ReportFreq::TimeStep, ReportFreq::Hour, ReportFreq::Day, ReportFreq::Month, ReportFreq::Year, ReportFreq::Simulation}) { 
+                meter->periods[(int)reportFreq].RptNum = ++op->ReportNumberCounter;
             }
         
-            for (int iPeriod = 0; iPeriod < (int)ReportFreq::Num; ++iPeriod) {
-                meter->periods[iPeriod].accRptNum = ++op->ReportNumberCounter;
+            for (ReportFreq reportFreq : {ReportFreq::TimeStep, ReportFreq::Hour, ReportFreq::Day, ReportFreq::Month, ReportFreq::Year, ReportFreq::Simulation}) { 
+                meter->periods[(int)reportFreq].accRptNum = ++op->ReportNumberCounter;
             }
 
             //  Links meter to dec meter and its output variable and vice versa
@@ -1372,20 +1372,6 @@ namespace OutputProcessor {
             
     }
 
-    int AddCustomMeter([[maybe_unused]] EnergyPlusData &state,
-                       [[maybe_unused]] std::string const &Name              // Name for the meter
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   January 2001
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine adds a meter to the current definition set of meters.
-        return -1;
-    }
-        
     void AttachMeters(EnergyPlusData &state,
                       Constant::Units const units, // Units for this meter
                       Constant::eResource resource,         // Electricity, Gas, etc.
@@ -1587,8 +1573,9 @@ namespace OutputProcessor {
                 meter->periods[(int)ReportFreq::TimeStep].Value += op->meterValues[iMeter];
             // Is this correct? What is going on here?
             } else {
-                meter->periods[(int)ReportFreq::TimeStep].Value =
-                        op->meters[meter->decMeterNum]->periods[(int)ReportFreq::TimeStep].Value - op->meterValues[iMeter];
+                meter->periods[(int)ReportFreq::TimeStep].Value += op->meterValues[iMeter];
+                //                meter->periods[(int)ReportFreq::TimeStep].Value =
+                //        op->meters[meter->decMeterNum]->periods[(int)ReportFreq::TimeStep].Value - op->meterValues[iMeter];
             }
 
             Real64 TSValue = meter->periods[(int)ReportFreq::TimeStep].Value;
@@ -1603,32 +1590,33 @@ namespace OutputProcessor {
         // Set Max
         for (auto *meter : op->meters) {
             Real64 TSValue = meter->periods[(int)ReportFreq::TimeStep].Value;
-
+            Real64 TSValueComp = TSValue - 0.00001;
+            
             // Todo - HRMinVal, HRMaxVal not used
             auto &periodDY = meter->periods[(int)ReportFreq::Day];
-            if (TSValue <= periodDY.MaxVal) continue;
+            if (TSValueComp <= periodDY.MaxVal) continue;
             periodDY.MaxVal = TSValue;
             periodDY.MaxValDate = TimeStamp;
 
             auto &periodMN = meter->periods[(int)ReportFreq::Month];
-            if (TSValue <= periodMN.MaxVal) continue;
+            if (TSValueComp <= periodMN.MaxVal) continue;
             periodMN.MaxVal = TSValue;
             periodMN.MaxValDate = TimeStamp;
 
 
             auto &periodYR = meter->periods[(int)ReportFreq::Year];
-            if (TSValue > periodYR.MaxVal) {
+            if (TSValueComp > periodYR.MaxVal) {
                 periodYR.MaxVal = TSValue;
                 periodYR.MaxValDate = TimeStamp;
             }
 
             auto &periodSM = meter->periods[(int)ReportFreq::Simulation];
-            if (TSValue > periodSM.MaxVal) {
+            if (TSValueComp > periodSM.MaxVal) {
                 periodSM.MaxVal = TSValue;
                 periodSM.MaxValDate = TimeStamp;
             }
             
-            if (op->isFinalYear && TSValue > meter->periodFinYrSM.MaxVal) {
+            if (op->isFinalYear && TSValueComp > meter->periodFinYrSM.MaxVal) {
                 meter->periodFinYrSM.MaxVal = TSValue;
                 meter->periodFinYrSM.MaxValDate = TimeStamp;
             }
@@ -1637,32 +1625,33 @@ namespace OutputProcessor {
         // Set Min
         for (auto *meter : op->meters) {
             Real64 TSValue = meter->periods[(int)ReportFreq::TimeStep].Value;
-
+            Real64 TSValueComp = TSValue + 0.00001;
+            
             auto &periodDY = meter->periods[(int)ReportFreq::Day];
-            if (TSValue >= periodDY.MinVal) continue;
+            if (TSValueComp >= periodDY.MinVal) continue;
                     
             periodDY.MinVal = TSValue;
             periodDY.MinValDate = TimeStamp;
 
             auto &periodMN = meter->periods[(int)ReportFreq::Month];
-            if (TSValue >= periodMN.MinVal) continue;
+            if (TSValueComp >= periodMN.MinVal) continue;
             
             periodMN.MinVal = TSValue;
             periodMN.MinValDate = TimeStamp;
 
             auto &periodYR = meter->periods[(int)ReportFreq::Year];
-            if (TSValue < periodYR.MinVal) {
+            if (TSValueComp < periodYR.MinVal) {
                 periodYR.MinVal = TSValue;
                 periodYR.MinValDate = TimeStamp;
             }
 
             auto &periodSM = meter->periods[(int)ReportFreq::Simulation];
-            if (TSValue < periodSM.MinVal) {
+            if (TSValueComp < periodSM.MinVal) {
                 periodSM.MinVal = TSValue;
                 periodSM.MinValDate = TimeStamp;
             }
 
-            if (op->isFinalYear && TSValue < meter->periodFinYrSM.MinVal) {
+            if (op->isFinalYear && TSValueComp < meter->periodFinYrSM.MinVal) {
                 meter->periodFinYrSM.MinVal = TSValue;
                 meter->periodFinYrSM.MinValDate = TimeStamp;
             }
@@ -3615,31 +3604,24 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     for (int srcVarNum : meter->srcVarNums) { 
                        auto *var = op->outVars[srcVarNum];
                        // Separate the Zone variables from the HVAC variables using TimeStepType
-                       if (var->timeStepType != TimeStepType::Zone) continue;
-                       
-                       auto *rVar = dynamic_cast<OutVarReal *>(var);
-                       assert(rVar != nullptr);
-                       // Add to the total all of the appropriate variables
-                       op->meterValues[iMeter] += (*rVar->Which) * rVar->ZoneMult * rVar->ZoneListMult;
+                       if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
+                       // Add to the total all of the appropriate variables, make sure to use var->TSValue and not *var->Which
+                       op->meterValues[iMeter] += var->TSValue * var->ZoneMult * var->ZoneListMult;
                     }
                 } else if (meter->type == MeterType::CustomDec) { 
                     auto *decMeter = op->meters[meter->decMeterNum];
                     for (int srcVarNum : decMeter->srcVarNums) {
                         auto *var = op->outVars[srcVarNum];
                         if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
-                        auto *rVar = dynamic_cast<OutVarReal *>(var);
-                        assert(rVar != nullptr);
-                        op->meterValues[iMeter] += (*rVar->Which) * rVar->ZoneMult * rVar->ZoneListMult;
+                        op->meterValues[iMeter] += var->TSValue * var->ZoneMult * var->ZoneListMult;
                     }
                     for (int srcVarNum : meter->srcVarNums) {
                         auto *var = op->outVars[srcVarNum];
                         if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
-                        auto *rVar = dynamic_cast<OutVarReal *>(var);
-                        assert(rVar != nullptr);
-                        op->meterValues[iMeter] -= (*rVar->Which) * rVar->ZoneMult * rVar->ZoneListMult;
+                        op->meterValues[iMeter] -= var->TSValue * var->ZoneMult * var->ZoneListMult;
                     }
                 } else {
-                        assert(false);
+                    assert(false);
                 }
             } // for (iMeter)
         } // if (op->meterValues.capacity() > 0)

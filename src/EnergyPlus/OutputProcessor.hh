@@ -592,13 +592,9 @@ namespace OutputProcessor {
         MeterPeriod periodLastSM;
         MeterPeriod periodFinYrSM;
 
-        // These fields are only relevant for normal meters
-        int outVarNum = -1;                // Output variable for a normal meter
         std::vector<int> dstMeterNums; // Destination meters for custom meters
 
-        // These fields are only relevant for custom meters
-        // I thought of making NormalMeter and CustomMeter subclasses of Meter but decided it wasn't worth it
-        int decMeterNum = -1;       // for custom decrement meters, this is the meter number for the subtraction
+        int decMeterNum = -1;       // for custom decrement meters, the number of the meter being subtracted from
         std::vector<int> srcVarNums;   // Source variables for custom meters
         std::vector<int> srcMeterNums; // Source meters for custom meters
 
@@ -677,10 +673,6 @@ namespace OutputProcessor {
                  std::string_view const EndUseSub,    // EndUse subcategory for the meter
                  SOVGroup sovGroup, // Group for the meter
                  int outVarNum
-    );
-
-    int AddCustomMeter(EnergyPlusData &state,
-                       std::string const &Name         // Name for the meter
     );
 
     void AttachMeters(EnergyPlusData &state,

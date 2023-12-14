@@ -96,7 +96,7 @@ namespace OutputProcessor {
         meter->resource = Constant::eResource::Electricity;
         op->meters.push_back(meter);
 
-        meter->outVarNum = op->outVars.size() - 1;
+        meter->srcVarNums.push_back(op->outVars.size() - 1);
         realVar->meterNums.push_back(op->meters.size() - 1);
 
         NumFound = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
