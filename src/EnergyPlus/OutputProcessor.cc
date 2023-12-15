@@ -3247,7 +3247,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                                           var->timeStepType,
                                           var->units,
                                           var->unitNameCustomEMS,
-                                          (var->SchedPtr != 0) ? op->reqVars[reqVarNum]->SchedName : "");
+                                          (var->SchedPtr != 0) ? state.dataScheduleMgr->Schedule(var->SchedPtr).Name : "");
     }
 
 } // SetupOutputVariable()
@@ -3630,6 +3630,68 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
         for (auto *var : op->outVars) {
             if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
+            if (var->varType != VariableType::Real) continue;
+            // auto *rVar = dynamic_cast<OutVarReal *>(var);
+            // assert(rVar != nullptr);
+            
+            bool ReportNow = true;
+            if (var->SchedPtr > 0) ReportNow = (GetCurrentScheduleValue(state, var->SchedPtr) != 0.0); // SetReportNow(RVar%SchedPtr)
+            if (!ReportNow || !var->Report) {
+                var->TSValue = 0.0;
+            }
+            //        IF (RVar%StoreType == AveragedVar) THEN
+            //          RVar%Value=RVar%Value+RVar%TSValue/NumOfTimeStepInHour
+            //        ELSE
+            var->Value += var->TSValue;
+            //        ENDIF
+
+            if (!ReportNow || !var->Report) continue;
+            
+            if (var->freq == ReportFreq::TimeStep) {
+                if (TimePrint) {
+                    if (op->LHourP != state.dataGlobal->HourOfDay || std::abs(op->LStartMin - StartMinute) > 0.001 ||
+                        std::abs(op->LEndMin - op->TimeValue[(int)var->timeStepType].CurMinute) > 0.001) {
+                        int CurDayType = state.dataEnvrn->DayOfWeek;
+                        if (state.dataEnvrn->HolidayIndex > 0) {
+                            CurDayType = state.dataEnvrn->HolidayIndex;
+                        }
+                        WriteTimeStampFormatData(state,
+                                                 state.files.eso,
+                                                 ReportFreq::EachCall,
+                                                 op->freqStampReportNums[(int)ReportFreq::TimeStep],
+                                                 state.dataGlobal->DayOfSimChr,
+                                                 true,
+                                                 state.dataEnvrn->Month,
+                                                 state.dataEnvrn->DayOfMonth,
+                                                 state.dataGlobal->HourOfDay,
+                                                 op->TimeValue[(int)var->timeStepType].CurMinute,
+                                                 StartMinute,
+                                                 state.dataEnvrn->DSTIndicator,
+                                                 ScheduleManager::dayTypeNames[CurDayType]);
+                        op->LHourP = state.dataGlobal->HourOfDay;
+                        op->LStartMin = StartMinute;
+                        op->LEndMin = op->TimeValue[(int)var->timeStepType].CurMinute;
+                    }
+                    TimePrint = false;
+                } // if (TimePrint)
+                
+                WriteNumericData(state, var->ReportID, var->TSValue);
+                ++state.dataGlobal->StdOutputRecordCount;
+                
+                if (rf->timeSeriesEnabled()) {
+                    rf->freqTSData[(int)ReportFreq::TimeStep].pushVariableValue(var->ReportID, var->TSValue);
+                }
+            }
+            var->TSValue = 0.0;
+            var->thisTSStored = false;
+        } // for (var)
+
+        // Have to replicate this loop twice so that all integer
+        // variables appear after all real variables to avoid spurious
+        // diffs in ESO files.  After this PR is merged can go ahead and delete this.
+        for (auto *var : op->outVars) {
+            if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
+            if (var->varType != VariableType::Integer) continue;
             // auto *rVar = dynamic_cast<OutVarReal *>(var);
             // assert(rVar != nullptr);
             
@@ -3792,12 +3854,14 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
         op->NumHoursInMonth += 24;
         for (auto *var : op->outVars) {
             if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
-            
-            if (var->varType == VariableType::Real) {
-                WriteRealVariableOutput(state, dynamic_cast<OutVarReal *>(var), ReportFreq::Day);
-            } else if (var->varType == VariableType::Integer) {
-                WriteIntegerVariableOutput(state, dynamic_cast<OutVarInt *>(var), ReportFreq::Day);
-            }
+            if (var->varType != VariableType::Real) continue;
+            WriteRealVariableOutput(state, dynamic_cast<OutVarReal *>(var), ReportFreq::Day);
+        }
+
+        for (auto *var : op->outVars) {
+            if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
+            if (var->varType != VariableType::Integer) continue;
+            WriteIntegerVariableOutput(state, dynamic_cast<OutVarInt *>(var), ReportFreq::Day);
         } 
 
         ReportMeters(state, ReportFreq::Day, TimePrint);
@@ -3832,12 +3896,14 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
         state.dataEnvrn->EndMonthFlag = false;
         for (auto *var : op->outVars) {
             if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
-            
-            if (var->varType == VariableType::Real) {
-                WriteRealVariableOutput(state, dynamic_cast<OutVarReal *>(var), ReportFreq::Month);
-            } else if (var->varType == VariableType::Integer) {
-                WriteIntegerVariableOutput(state, dynamic_cast<OutVarInt *>(var), ReportFreq::Month);
-            }
+            if (var->varType != VariableType::Real) continue;
+            WriteRealVariableOutput(state, dynamic_cast<OutVarReal *>(var), ReportFreq::Month);
+        }
+        
+        for (auto *var : op->outVars) {
+            if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
+            if (var->varType != VariableType::Integer) continue;
+            WriteIntegerVariableOutput(state, dynamic_cast<OutVarInt *>(var), ReportFreq::Month);
         } // for (var)
 
         ReportMeters(state, ReportFreq::Month, TimePrint);
@@ -3866,11 +3932,14 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
         for (auto *var : op->outVars) {
             if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
-            if (var->varType == VariableType::Real) {
-                WriteRealVariableOutput(state, dynamic_cast<OutVarReal *>(var), ReportFreq::Simulation);
-            } else if (var->varType == VariableType::Integer) {
-                WriteIntegerVariableOutput(state, dynamic_cast<OutVarInt *>(var), ReportFreq::Simulation);
-            }
+            if (var->varType != VariableType::Real) continue;
+            WriteRealVariableOutput(state, dynamic_cast<OutVarReal *>(var), ReportFreq::Simulation);
+        }
+
+        for (auto *var : op->outVars) {
+            if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
+            if (var->varType != VariableType::Integer) continue;
+            WriteIntegerVariableOutput(state, dynamic_cast<OutVarInt *>(var), ReportFreq::Simulation);
         } // Number of I Variables
 
         ReportMeters(state, ReportFreq::Simulation, TimePrint);
@@ -3894,11 +3963,14 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
         for (auto *var : op->outVars) {
             if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
-            if (var->varType == VariableType::Real) {
-                WriteRealVariableOutput(state, dynamic_cast<OutVarReal *>(var), ReportFreq::Year);
-            } else if (var->varType == VariableType::Integer) {
-                WriteIntegerVariableOutput(state, dynamic_cast<OutVarInt *>(var), ReportFreq::Year);
-            }
+            if (var->varType != VariableType::Real) continue;
+            WriteRealVariableOutput(state, dynamic_cast<OutVarReal *>(var), ReportFreq::Year);
+        }
+        
+        for (auto *var : op->outVars) {
+            if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
+            if (var->varType != VariableType::Integer) continue;
+            WriteIntegerVariableOutput(state, dynamic_cast<OutVarInt *>(var), ReportFreq::Year);
         } // Number of I Variables
 
         ReportMeters(state, ReportFreq::Year, TimePrint);
