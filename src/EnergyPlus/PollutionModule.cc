@@ -344,10 +344,6 @@ void GetPollutionFactorInput(EnergyPlusData &state)
 
     } // End of the NumEnergyTypes Do Loop
 
-    for (int iMeter = 0; iMeter < (int)PollFacilityMeter::Num; ++iMeter) {
-        pm->facilityMeterNums[iMeter] = GetMeterIndex(state, std::string{pollFacilityMeterNames[iMeter]});
-    }
-
     if (pm->PollutionReportSetup) { // only do this if reporting on the pollution
         // Need to go through all of the Fuel Types and make sure a Fuel Factor was found for each type of energy being simulated
         // Check for Electricity
@@ -556,6 +552,12 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                         OutputProcessor::SOVEndUseCat::CarbonEquivalentEmissions,
                         {},
                         OutputProcessor::SOVGroup::Invalid);
+
+
+    // Connect pollution meters to energy meters
+    for (int iMeter = 0; iMeter < (int)PollFacilityMeter::Num; ++iMeter) {
+        pm->facilityMeterNums[iMeter] = GetMeterIndex(state, Util::makeUPPER(pollFacilityMeterNames[iMeter]));
+    }
 }
 
 void CheckPollutionMeterReporting(EnergyPlusData &state)

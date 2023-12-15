@@ -3624,6 +3624,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("Invalid {}={} for {}={}", cAlphaFieldNames(5), cAlphaArgs(5), cAlphaFieldNames(7), cAlphaArgs(7)));
                     ShowContinueError(state, format("Field {} is reset from {} to EnergyTransfer", cAlphaFieldNames(5), cAlphaArgs(5)));
+                    resource = Constant::eResource::EnergyTransfer;
                 }
 
                 if (!lAlphaFieldBlanks(8)) {
@@ -3636,7 +3637,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         sovTimeStepType,
                                         sovStoreType,
                                         "EMS",
-                                        Constant::eResource::EnergyTransfer,
+                                        resource, 
                                         sovEndUseCat,
                                         EndUseSubCatString,
                                         sovGroup);
