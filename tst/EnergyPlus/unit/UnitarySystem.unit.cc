@@ -848,6 +848,7 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     EXPECT_NEAR(fanDT, 0.7070, 0.0001);
     fanDT = thisSys->getFanDeltaTemp(*state, true, 0.5, 0.5);
     EXPECT_NEAR(fanDT, 0.7070, 0.0001);
+    EXPECT_TRUE(thisSys->m_noLoadLowSpeed);
 }
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
 {
@@ -1068,6 +1069,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
     EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(2).Temp);
+    EXPECT_TRUE(thisSys->m_noLoadLowSpeed);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
@@ -9436,7 +9438,7 @@ AirLoopHVAC:UnitarySystem,
   ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
-  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
+  No,                     !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80;                     !- Maximum Supply Air Temperature{ C }
 
 Fan:OnOff,
@@ -9855,6 +9857,7 @@ Curve:QuadLinear,
     // Unitary System mines data from coil objects
     EXPECT_EQ(thisSys->m_MinOATCompressorCooling, -1000.0);
     EXPECT_EQ(thisSys->m_MinOATCompressorHeating, -1000.0);
+    EXPECT_FALSE(thisSys->m_noLoadLowSpeed);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
