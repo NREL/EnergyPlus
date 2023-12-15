@@ -1047,6 +1047,8 @@ struct OutputProcessorData : BaseGlobalStruct
         this->GetMeterIndexFirstCall = true;
         this->InitFlag = true;
 
+        for (int i = 0; i < (int)OutputProcessor::TimeStepType::Num; ++i) new (&this->TimeValue[i]) OutputProcessor::TimeSteps(); 
+        
         for (int i = 0; i < (int)this->outVars.size(); ++i) delete this->outVars[i];
         this->outVars.clear();
         
