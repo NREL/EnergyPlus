@@ -11866,7 +11866,8 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 
         Real64 CompEvaporatingCAPSpdMaxCurrentTsuc = this->CoffEvapCap * this->RatedEvapCapacity *
                                                      CurveValue(state, this->OUCoolingCAPFT(NumOfCompSpdInput), Tdischarge, this->EvaporatingTemp);
-        Real64 CompEvaporatingPWRSpdMaxCurrentTsuc = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(NumOfCompSpdInput), Tdischarge, this->EvaporatingTemp);
+        Real64 CompEvaporatingPWRSpdMaxCurrentTsuc =
+            this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(NumOfCompSpdInput), Tdischarge, this->EvaporatingTemp);
         if ((Q_c_OU * C_cap_operation) > CompEvaporatingCAPSpdMaxCurrentTsuc + CompEvaporatingPWRSpdMaxCurrentTsuc) {
             CompSpdActual = this->CompressorSpeed(NumOfCompSpdInput);
             Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(NumOfCompSpdInput), Tdischarge, this->EvaporatingTemp);
