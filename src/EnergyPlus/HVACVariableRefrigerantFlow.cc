@@ -11372,7 +11372,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     Real64 SH_Comp;                  // Temperature difference between compressor inlet node and Tsuction [C]
     Real64 T_comp_in;                // temperature of refrigerant at compressor inlet, after piping loss (c) [C]
     Real64 TU_HeatingLoad;           // Heating load from terminal units, excluding heating loss [W]
-    Real64 TU_HeatingLoad_actual;    // TU_HeatingLoad trimed to maximum system capacity[W]
     Real64 TU_CoolingLoad;           // Cooling load from terminal units, excluding heating loss [W]
     Real64 Tdischarge;               // VRF Compressor discharge refrigerant temperature [C]
     Real64 Tsuction;                 // VRF compressor suction refrigerant temperature [C]
@@ -11441,7 +11440,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     }
     this->TUCoolingLoad = TU_CoolingLoad; // this is cooling coil load, not terminal unit load
     this->TUHeatingLoad = TU_HeatingLoad; // this is heating coil load, not terminal unit load
-    TU_HeatingLoad_actual = TU_HeatingLoad;
 
     // loop through TU's and calculate average inlet conditions for active coils
     for (NumTU = 1; NumTU <= NumTUInList; ++NumTU) {
@@ -11798,8 +11796,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                 RoutineName); // Quality=0
             h_IU_cond_out_ave = h_IU_cond_out;
             SC_IU_merged = 5;
-            TU_HeatingLoad_actual = min(TU_HeatingLoad, CompEvaporatingCAPSpdMax + CompEvaporatingPWRSpdMax);
-            m_ref_IU_cond = TU_HeatingLoad_actual / (h_IU_cond_in - h_IU_cond_out);
+            m_ref_IU_cond = TU_HeatingLoad / (h_IU_cond_in - h_IU_cond_out);
 
         } else {
             for (NumTU = 1; NumTU <= NumTUInList; NumTU++) {
@@ -11867,7 +11864,13 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                                                    CapMinTe + 8,
                                                    this->IUCondensingTemp - 5);
 
-        if ((Q_c_OU * C_cap_operation) <= CompEvaporatingCAPSpdMin) {
+        Real64 CompEvaporatingCAPSpdMaxCurrentTsuc = this->CoffEvapCap * this->RatedEvapCapacity *
+                                                     CurveValue(state, this->OUCoolingCAPFT(NumOfCompSpdInput), Tdischarge, this->EvaporatingTemp);
+        Real64 CompEvaporatingPWRSpdMaxCurrentTsuc = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(NumOfCompSpdInput), Tdischarge, this->EvaporatingTemp);
+        if ((Q_c_OU * C_cap_operation) > CompEvaporatingCAPSpdMaxCurrentTsuc + CompEvaporatingPWRSpdMaxCurrentTsuc) {
+            CompSpdActual = this->CompressorSpeed(NumOfCompSpdInput);
+            Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(NumOfCompSpdInput), Tdischarge, this->EvaporatingTemp);
+        } else if ((Q_c_OU * C_cap_operation) <= CompEvaporatingCAPSpdMin) {
             // Required heating load is smaller than the min heating capacity
 
             if (Q_c_OU == 0) {
@@ -11955,7 +11958,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                                               this->OUCoolingPWRFT(NumOfCompSpdInput),
                                               Tdischarge,
                                               Tsuction); // Include the piping loss, at the highest compressor speed
-        this->PipingCorrectionHeating = TU_HeatingLoad_actual / (TU_HeatingLoad_actual + Pipe_Q_h);
+        this->PipingCorrectionHeating = TU_HeatingLoad / (TU_HeatingLoad + Pipe_Q_h);
         state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) =
             this->HeatingCapacity; // for report, maximum condensing capacity the system can provide
 
@@ -13093,6 +13096,8 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         }
     }
     // calculate sensible load met using delta enthalpy
+    AirMassFlow = state.dataDXCoils->DXCoil(this->HeatCoilIndex).InletAirMassFlowRate;
+    TempIn = state.dataDXCoils->DXCoil(this->HeatCoilIndex).InletAirTemp;
     LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
     LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn);                                     // latent {kgWater/s}
     if (present(LatOutputProvided)) {
@@ -14538,7 +14543,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
     NumOfCompSpdInput = this->CompressorSpeed.size();
     CompEvaporatingPWRSpd.dimension(NumOfCompSpdInput);
     CompEvaporatingCAPSpd.dimension(NumOfCompSpdInput);
-    Q_evap_req = TU_load + Pipe_Q - Ncomp;
+    Q_evap_req = TU_load + Pipe_Q;
 
     TUListNum = this->ZoneTUListPtr;
     RefrigerantIndex = FindRefrigerant(state, this->RefrigerantName);
@@ -14557,6 +14562,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                                               RoutineName);
     C_cap_operation = this->VRFOU_CapModFactor(
         state, Pipe_h_comp_in, Pipe_h_out_ave, max(min(MinOutdoorUnitPe, RefPHigh), RefPLow), T_suction + this->SH, T_suction + 8, IUMaxCondTemp - 5);
+    C_cap_operation = 1.0;
 
     // Perform iterations to find the compressor speed that can meet the required heating load, Iteration DoName2
     for (CounterCompSpdTemp = 1; CounterCompSpdTemp <= NumOfCompSpdInput; CounterCompSpdTemp++) {
@@ -14566,7 +14572,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
         CompEvaporatingCAPSpd(CounterCompSpdTemp) =
             this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction);
 
-        if ((Q_evap_req * C_cap_operation) <= CompEvaporatingCAPSpd(CounterCompSpdTemp)) {
+        if ((Q_evap_req * C_cap_operation) <= CompEvaporatingCAPSpd(CounterCompSpdTemp) + CompEvaporatingPWRSpd(CounterCompSpdTemp)) {
             // Compressor Capacity is greater than the required, finish Iteration DoName2
 
             if (CounterCompSpdTemp > 1) {
@@ -14574,9 +14580,11 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                 CompSpdLB = CounterCompSpdTemp - 1;
                 CompSpdUB = CounterCompSpdTemp;
 
-                CompSpdActual = this->CompressorSpeed(CompSpdLB) + (this->CompressorSpeed(CompSpdUB) - this->CompressorSpeed(CompSpdLB)) /
-                                                                       (CompEvaporatingCAPSpd(CompSpdUB) - CompEvaporatingCAPSpd(CompSpdLB)) *
-                                                                       (Q_evap_req * C_cap_operation - CompEvaporatingCAPSpd(CompSpdLB));
+                CompSpdActual = this->CompressorSpeed(CompSpdLB) +
+                                (this->CompressorSpeed(CompSpdUB) - this->CompressorSpeed(CompSpdLB)) /
+                                    (CompEvaporatingCAPSpd(CompSpdUB) + CompEvaporatingPWRSpd(CompSpdUB) -
+                                     (CompEvaporatingCAPSpd(CompSpdLB) + CompEvaporatingPWRSpd(CompSpdLB))) *
+                                    (Q_evap_req * C_cap_operation - (CompEvaporatingCAPSpd(CompSpdLB) + CompEvaporatingPWRSpd(CompSpdLB)));
                 Modifi_SH = this->SH;
                 Ncomp = CompEvaporatingPWRSpd(CompSpdLB) + (CompEvaporatingPWRSpd(CompSpdUB) - CompEvaporatingPWRSpd(CompSpdLB)) /
                                                                (this->CompressorSpeed(CompSpdUB) - this->CompressorSpeed(CompSpdLB)) *
