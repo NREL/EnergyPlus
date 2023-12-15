@@ -3151,12 +3151,12 @@ void SetupOutputVariable(EnergyPlusData &state,
 
     if (!op->OutputInitialized) InitializeOutput(state);
 
-    std::vector<int>reqVarList;
+    std::vector<int>reqVarNums;
     
     // Determine whether to Report or not
-    CheckReportVariable(state, name, key, reqVarList);
-    if (reqVarList.size() == 0) {
-        reqVarList.push_back(-1);
+    CheckReportVariable(state, name, key, reqVarNums);
+    if (reqVarNums.size() == 0) {
+        reqVarNums.push_back(-1);
     }
 
     // Is this redundant with CheckReportVariable?
@@ -3182,14 +3182,14 @@ void SetupOutputVariable(EnergyPlusData &state,
     // If we add any output variables here at all, the first one will be at this index
     int firstAddedOutVarNum = (int)op->outVars.size();
 
-    op->NumTotalRVariable += reqVarList.size();
+    op->NumTotalRVariable += reqVarNums.size();
     
     if (!OnMeter && !ThisOneOnTheList) return;
 
     if (store == StoreType::Summed) ++op->NumOfRVariable_Sum;
     if (OnMeter) ++op->NumOfRVariable_Meter;
     
-    for (int reqVarNum : reqVarList) {
+    for (int reqVarNum : reqVarNums) {
             
         ++op->NumOfRVariable;
 
@@ -3288,6 +3288,9 @@ void SetupOutputVariable(EnergyPlusData &state,
     // Determine whether to Report or not
     std::vector<int> reqVarNums;
     CheckReportVariable(state, name, key, reqVarNums);
+    if (reqVarNums.size() == 0) {
+        reqVarNums.push_back(-1);
+    }
 
     TimeStepType timeStepType = sovTimeStep2TimeStep[(int)sovTimeStepType];
     StoreType storeType = sovStoreType2StoreType[(int)sovStoreType];
@@ -3307,7 +3310,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         ++op->NumOfIVariable_Sum;
     }
 
-    for (int Loop = 0; Loop < (int)reqVarNums.size(); ++Loop) {
+    for (int reqVarNum : reqVarNums) {
 
         ++op->NumOfIVariable;
         
@@ -3328,14 +3331,16 @@ void SetupOutputVariable(EnergyPlusData &state,
         var->ReportID = ++op->ReportNumberCounter;
         var->Which = &ActualVariable;
 
+        if (reqVarNum == -1) continue;
+
         var->Report = true;
 
         if (freq != ReportFreq::Hour) {
             var->freq = freq;
             var->SchedPtr = 0;
         } else {
-            var->freq = op->reqVars[reqVarNums[Loop]]->freq;
-            var->SchedPtr = op->reqVars[reqVarNums[Loop]]->SchedPtr;
+            var->freq = op->reqVars[reqVarNum]->freq;
+            var->SchedPtr = op->reqVars[reqVarNum]->SchedPtr;
         }
 
         WriteReportVariableDictionaryItem(state,
@@ -3348,7 +3353,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                                           name, 
                                           var->timeStepType,
                                           var->units,
-                                          (var->SchedPtr != 0) ? op->reqVars[reqVarNums[Loop]]->SchedName : "");
+                                          (var->SchedPtr != 0) ? state.dataScheduleMgr->Schedule(var->SchedPtr).Name : "");
     }
 } // SetOutputVariable()
 
@@ -3787,6 +3792,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
         op->TimeValue[(int)TimeStepType::System].CurMinute = 0.0;
 
         for (auto *var : op->outVars) {
+            if (var->varType != VariableType::Real) continue;
             if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
             
             //        ReportNow=.TRUE.
@@ -3814,8 +3820,39 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             var->thisTSStored = false;
             var->thisTSCount = 0;
             var->Value = 0.0;
-        } // Number of R Variables
+        } // for (var)
 
+        for (auto *var : op->outVars) {
+            if (var->varType != VariableType::Integer) continue;
+            if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
+            
+            //        ReportNow=.TRUE.
+            //        IF (RVar%SchedPtr > 0) &
+            //          ReportNow=(GetCurrentScheduleValue(state, RVar%SchedPtr) /= 0.0)  !SetReportNow(RVar%SchedPtr)
+            
+            //        IF (ReportNow) THEN
+            if (var->tsStored) {
+                if (var->storeType == StoreType::Averaged) {
+                    var->Value /= double(var->thisTSCount);
+                }
+                if (var->Report && var->freq == ReportFreq::Hour && var->Stored) {
+                    WriteNumericData(state, var->ReportID, var->Value);
+                    ++state.dataGlobal->StdOutputRecordCount;
+                    var->Stored = false;
+                    // add time series value for hourly to data store
+                    if (rf->timeSeriesEnabled()) {
+                            rf->freqTSData[(int)ReportFreq::Hour].pushVariableValue(var->ReportID, var->Value);
+                    }
+                }
+                var->StoreValue += var->Value;
+                ++var->NumStored;
+            }
+            var->tsStored = false;
+            var->thisTSStored = false;
+            var->thisTSCount = 0;
+            var->Value = 0.0;
+        } // for (var)
+        
         ReportMeters(state, ReportFreq::Hour, TimePrint);
     } // Hour Block
 
