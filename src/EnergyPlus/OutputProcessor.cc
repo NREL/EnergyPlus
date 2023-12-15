@@ -1584,7 +1584,7 @@ namespace OutputProcessor {
             meter->periods[(int)ReportFreq::Month].Value += TSValue;
             meter->periods[(int)ReportFreq::Year].Value += TSValue;
             meter->periods[(int)ReportFreq::Simulation].Value += TSValue;
-            if (op->isFinalYear) meter->periodFinYrSM.Value += TSValue;
+            meter->periodFinYrSM.Value += TSValue;
         } // for (iMeter)
         
         // Set Max
@@ -1603,7 +1603,6 @@ namespace OutputProcessor {
             periodMN.MaxVal = TSValue;
             periodMN.MaxValDate = TimeStamp;
 
-
             auto &periodYR = meter->periods[(int)ReportFreq::Year];
             if (TSValueComp > periodYR.MaxVal) {
                 periodYR.MaxVal = TSValue;
@@ -1616,7 +1615,7 @@ namespace OutputProcessor {
                 periodSM.MaxValDate = TimeStamp;
             }
             
-            if (op->isFinalYear && TSValueComp > meter->periodFinYrSM.MaxVal) {
+            if (TSValueComp > meter->periodFinYrSM.MaxVal) {
                 meter->periodFinYrSM.MaxVal = TSValue;
                 meter->periodFinYrSM.MaxValDate = TimeStamp;
             }
@@ -1651,7 +1650,7 @@ namespace OutputProcessor {
                 periodSM.MinValDate = TimeStamp;
             }
 
-            if (op->isFinalYear && TSValueComp < meter->periodFinYrSM.MinVal) {
+            if (TSValueComp < meter->periodFinYrSM.MinVal) {
                 meter->periodFinYrSM.MinVal = TSValue;
                 meter->periodFinYrSM.MinValDate = TimeStamp;
             }
@@ -1921,8 +1920,11 @@ namespace OutputProcessor {
                                                                       // EnergyMeters(Loop)%HRMaxVal, EnergyMeters(Loop)%HRMaxValDate, &
                 rfMeters.pushVariableValue(period.RptNum, period.Value);
                 period.Value = 0.0;
-                period.MinVal = MinSetValue;
-                period.MaxVal = MaxSetValue;
+
+                if (freq != ReportFreq::Hour) {
+                    period.MinVal = MinSetValue;
+                    period.MaxVal = MaxSetValue;
+                }
             }
 
             if (period.accRpt) {
