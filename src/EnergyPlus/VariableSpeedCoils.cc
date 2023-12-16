@@ -4809,13 +4809,24 @@ namespace VariableSpeedCoils {
                 if (state.dataSize->CurOASysNum > 0 && state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).AirLoopDOASNum > -1) {
                     auto &thisAirloopDOAS =
                         state.dataAirLoopHVACDOAS->airloopDOAS[state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).AirLoopDOASNum];
-                    VolFlowRate = thisAirloopDOAS.SizingMassFlow / state.dataEnvrn->StdRhoAir;
+                    VolFlowRate = varSpeedCoil.RatedAirVolFlowRate;
                     MixTemp = thisAirloopDOAS.SizingCoolOATemp;
                     SupTemp = thisAirloopDOAS.PrecoolTemp;
                     MixHumRat = thisAirloopDOAS.SizingCoolOAHumRat;
                     SupHumRat = thisAirloopDOAS.PrecoolHumRat;
                     RatedCapCoolTotalDes = VolFlowRate * state.dataEnvrn->StdRhoAir *
                                            (Psychrometrics::PsyHFnTdbW(MixTemp, MixHumRat) - Psychrometrics::PsyHFnTdbW(SupTemp, SupHumRat));
+                    if (varSpeedCoil.MSCCapFTemp(varSpeedCoil.NormSpedLevel) > 0) {
+                        MixWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
+                        if (varSpeedCoil.CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
+                            RatedSourceTempCool = thisAirloopDOAS.SizingCoolOATemp;
+                        } else {
+                            RatedSourceTempCool = GetVSCoilRatedSourceTemp(state, DXCoilNum);
+                        }
+                        TotCapTempModFac =
+                            Curve::CurveValue(state, varSpeedCoil.MSCCapFTemp(varSpeedCoil.NormSpedLevel), MixWetBulb, RatedSourceTempCool);
+                        RatedCapCoolTotalDes /= TotCapTempModFac;
+                    }
                 } else {
                     auto &finalSysSizing = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum);
                     VolFlowRate = varSpeedCoil.RatedAirVolFlowRate;
