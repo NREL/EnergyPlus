@@ -17563,32 +17563,64 @@ void ControlVRFIUCoil(EnergyPlusData &state,
         BF = state.dataDXCoils->DXCoil(CoilIndex).RateBFVRFIUCond;
 
         // Coil sensible heat transfer_minimum value
-        CalcVRFCoilSenCap(state, FlagHeatMode, CoilIndex, Tin, TeTc, SC, BF, QinSenPerFlowRate, Ts_1);
-        To_1 = QinSenPerFlowRate / 1005 + Tin;
-        QinSenMin1 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds real SH
-
         CalcVRFCoilSenCap(state, FlagHeatMode, CoilIndex, Tin, TeTc, MaxSC, BF, QinSenPerFlowRate, Ts_2);
         To_2 = QinSenPerFlowRate / 1005 + Tin;
         QinSenMin2 = FanSpdRatioMin * Garate * QinSenPerFlowRate; // Corresponds maximum SH
 
-        if (QCoilSenHeatingLoad > QinSenMin1) {
-            // Modulate fan speed to meet room sensible load; SC is not updated
-            FanSpdRatioMax = 1.0;
-            auto f = [QCoilSenHeatingLoad, Ts_1, Tin, Garate, BF](Real64 FanSpdRto) {
-                return FanSpdResidualHeat(FanSpdRto, QCoilSenHeatingLoad, Ts_1, Tin, Garate, BF);
+        Real64 SCmin = 0.0;
+        Real64 QinSenPerFlowRateSCmin;
+        Real64 Ts_1_SCmin;
+        CalcVRFCoilSenCap(state, FlagHeatMode, CoilIndex, Tin, TeTc, SCmin, BF, QinSenPerFlowRateSCmin, Ts_1_SCmin);
+        Real64 SCini = SC;
+        Real64 QinSenPerFlowRateSCini;
+        Real64 Ts_1_SCini;
+        CalcVRFCoilSenCap(state, FlagHeatMode, CoilIndex, Tin, TeTc, SCini, BF, QinSenPerFlowRateSCini, Ts_1_SCini);
+        Real64 SCmax = MaxSC;
+        Real64 QinSenPerFlowRateSCmax;
+        Real64 Ts_1_SCmax;
+        CalcVRFCoilSenCap(state, FlagHeatMode, CoilIndex, Tin, TeTc, SCmax, BF, QinSenPerFlowRateSCmax, Ts_1_SCmax);
+
+        FanSpdRatioMax = 1.0;
+        CoilOnOffRatio = 1.0;
+        if (QCoilSenHeatingLoad > FanSpdRatioMax * Garate * QinSenPerFlowRateSCmin) {
+            // cannot control to the target
+            SCact = SCmin;
+            FanSpdRatio = FanSpdRatioMax;
+            Tout = Tin + (Ts_1_SCmin - Tin) * (1 - BF);
+        } else if (QCoilSenHeatingLoad > FanSpdRatioMax * Garate * QinSenPerFlowRateSCini) {
+            FanSpdRatio = FanSpdRatioMax;
+            auto f = [&state, QCoilSenHeatingLoad, FanSpdRatioMax, Garate, CoilIndex, Tin, TeTc, BF](Real64 SC) {
+                Real64 QinSenPerFlowRate = 0.0;
+                Real64 Ts_1 = 0.0;
+                CalcVRFCoilSenCap(state, FlagHeatMode, CoilIndex, Tin, TeTc, SC, BF, QinSenPerFlowRate, Ts_1);
+                return (QCoilSenHeatingLoad - FanSpdRatioMax * Garate * QinSenPerFlowRate);
             };
-            General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, f, FanSpdRatioMin, FanSpdRatioMax);
-            // this will likely cause problems eventually, -1 and -2 mean different things
-            if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
-            FanSpdRatio = Ratio1;
-            CoilOnOffRatio = 1.0;
-
+            General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SCact, f, SCmin, SCini);
+            assert(SolFla > 0.0);
+            CalcVRFCoilSenCap(state, FlagHeatMode, CoilIndex, Tin, TeTc, SCact, BF, QinSenPerFlowRate, Ts_1);
             Tout = Tin + (Ts_1 - Tin) * (1 - BF);
-            Wout = Win;
-            Hout = PsyHFnTdbW(Tout, Wout);
-            SHact = 999.0;
-            SCact = SC;
-
+        } else if (QCoilSenHeatingLoad > FanSpdRatioMin * Garate * QinSenPerFlowRateSCini) {
+            // Modulate fan speed to meet room sensible load; SC is not updated
+            // TotCap = FanSpdRto * Garate * 1005.0 * (Tout - Tin);
+            // fan speed ratio = QCoilSenHeatingLoad / Garate * 1005.0 * (Ts_1 - Tin) * (1 - BF)
+            //                 = QCoilSenHeatingLoad / (Garate * Q_sen)
+            FanSpdRatio = QCoilSenHeatingLoad / (Garate * QinSenPerFlowRateSCini);
+            Tout = Tin + (Ts_1_SCini - Tin) * (1 - BF);
+            SCact = SCini;
+            assert(FanSpdRatio <= 1.0);
+        } else if (QCoilSenHeatingLoad > FanSpdRatioMin * Garate * QinSenPerFlowRateSCmax) {
+            FanSpdRatio = FanSpdRatioMin;
+            auto f = [&state, QCoilSenHeatingLoad, FanSpdRatioMin, Garate, CoilIndex, Tin, TeTc, BF](Real64 SC) {
+                Real64 QinSenPerFlowRate = 0.0;
+                Real64 Ts_1 = 0.0;
+                CalcVRFCoilSenCap(state, FlagHeatMode, CoilIndex, Tin, TeTc, SC, BF, QinSenPerFlowRate, Ts_1);
+                return (QCoilSenHeatingLoad - FanSpdRatioMin * Garate * QinSenPerFlowRate);
+            };
+            General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SCact, f, SCini, SCmax);
+            assert(SolFla > 0.0);
+            // recompute the coil surface temperature with adjusted SC
+            CalcVRFCoilSenCap(state, FlagHeatMode, CoilIndex, Tin, TeTc, SCact, BF, QinSenPerFlowRate, Ts_1);
+            Tout = Tin + (Ts_1 - Tin) * (1 - BF);
         } else {
             // Low load modification algorithm
             // Need to increase SC to further reduce coil heating capacity
@@ -17620,10 +17652,10 @@ void ControlVRFIUCoil(EnergyPlusData &state,
                 Tout = CoilOnOffRatio * To_2 + (1 - CoilOnOffRatio) * Tin;
             }
 
-            Wout = Win;
-            Hout = PsyHFnTdbW(Tout, Wout);
-            SHact = 999.0;
         }
+        Wout = Win;
+        Hout = PsyHFnTdbW(Tout, Wout);
+        SHact = 999.0;
     }
 }
 
