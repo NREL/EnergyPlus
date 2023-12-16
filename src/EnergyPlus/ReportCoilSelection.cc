@@ -548,7 +548,7 @@ void ReportCoilSelection::doAirLoopSetup(EnergyPlusData &state, int const coilVe
 {
     // this routine sets up some things for central air systems, needs to follow setting of an airloop num
     auto &c(coilSelectionDataObjs[coilVecIndex]);
-    if (c->airloopNum > 0 && c->airloopNum <= state.dataAirSystemsData->PrimaryAirSystems.size()) {
+    if (c->airloopNum > 0 && c->airloopNum <= int(state.dataAirSystemsData->PrimaryAirSystems.size())) {
         // see if there is an OA controller
         if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysExists) {
             // loop over OA controllers and match node num ?
@@ -1505,6 +1505,41 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
             state, c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
         c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
+    } else if (curOASysNum > 0 && c->airloopNum > state.dataHVACGlobal->NumPrimaryAirSys) {
+        if (!state.dataAirLoopHVACDOAS->airloopDOAS.empty()) {
+            int DOASSysNum = state.dataAirLoop->OutsideAirSys(curOASysNum).AirLoopDOASNum;
+            c->coilDesEntTemp = state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].SizingCoolOATemp;
+            c->coilDesEntHumRat = state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].SizingCoolOAHumRat;
+            if (c->coilDesEntTemp > -999.0 && c->coilDesEntHumRat > -999.0) {
+                c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
+                    state, c->coilDesEntTemp, c->coilDesEntHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
+                c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
+            }
+            c->coilDesLvgTemp = state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].PrecoolTemp;
+            c->coilDesLvgHumRat = state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].PrecoolHumRat;
+            if (c->coilDesLvgTemp > -999.0 && c->coilDesLvgHumRat > -999.0) {
+                c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
+                    state, c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
+                c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
+            }
+            int sizMethod = 0;
+            bool sizMethodsAreTheSame = true;
+            for (int airLoopNum = 0; airLoopNum < state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].m_AirLoopNum.size(); ++airLoopNum) {
+                int actualAirLoopNum = state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].m_AirLoopNum[airLoopNum];
+                if (airLoopNum == 0) {
+                    sizMethod = state.dataSize->FinalSysSizing(actualAirLoopNum).SizingOption;
+                } else {
+                    if (sizMethod != state.dataSize->FinalSysSizing(actualAirLoopNum).SizingOption) {
+                        sizMethodsAreTheSame = false;
+                    }
+                }
+            }
+            if (sizMethodsAreTheSame) {
+                c->coilSizingMethodConcurrence = sizMethod;
+            } else {
+                // c->coilSizingMethodConcurrence = DataSizing::Combination;
+            }
+        }
     } else {
         // do nothing
     }
