@@ -17651,7 +17651,6 @@ void ControlVRFIUCoil(EnergyPlusData &state,
                 // outlet air temperature is time-weighted
                 Tout = CoilOnOffRatio * To_2 + (1 - CoilOnOffRatio) * Tin;
             }
-
         }
         Wout = Win;
         Hout = PsyHFnTdbW(Tout, Wout);
