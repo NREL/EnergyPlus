@@ -764,6 +764,10 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
             c->coilSizingMethodConcurrenceName = "Non-Coincident";
         } else if (c->coilSizingMethodConcurrence == DataSizing::Coincident) {
             c->coilSizingMethodConcurrenceName = "Coincident";
+        } else if (c->coilSizingMethodConcurrence == DataSizing::Combination) {
+            c->coilSizingMethodConcurrenceName = "Combination";
+        } else {
+            c->coilSizingMethodConcurrenceName = "N/A";
         }
 
         if (c->coilSizingMethodCapacity == DataSizing::CoolingDesignCapacity) {
@@ -1381,6 +1385,8 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             c->rmSensibleAtPeak = finalSysSizing.SysCoolCoinSpaceSens;
         } else if (c->coilSizingMethodConcurrence == DataSizing::NonCoincident) {
             c->rmSensibleAtPeak = sumSensLoad;
+        } else { // DataSizing::Combination or other
+            c->rmSensibleAtPeak = sumSensLoad;
         }
 
         // now set Coil Ent And Lvg Conditions
@@ -1524,7 +1530,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             }
             int sizMethod = 0;
             bool sizMethodsAreTheSame = true;
-            for (int airLoopNum = 0; airLoopNum < state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].m_AirLoopNum.size(); ++airLoopNum) {
+            for (int airLoopNum = 0; airLoopNum < state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].NumOfAirLoops; ++airLoopNum) {
                 int actualAirLoopNum = state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].m_AirLoopNum[airLoopNum];
                 if (airLoopNum == 0) {
                     sizMethod = state.dataSize->FinalSysSizing(actualAirLoopNum).SizingOption;
@@ -1537,7 +1543,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             if (sizMethodsAreTheSame) {
                 c->coilSizingMethodConcurrence = sizMethod;
             } else {
-                // c->coilSizingMethodConcurrence = DataSizing::Combination;
+                c->coilSizingMethodConcurrence = DataSizing::Combination;
             }
         }
     } else {
@@ -1576,7 +1582,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     doAirLoopSetup(state, index);
     c->zoneEqNum = curZoneEqNum;
     //    if ( c->zoneEqNum > 0 ) doZoneEqSetup( index );
-    if (curSysNum > 0 && c->zoneEqNum == 0 && curSysNum <= state.dataSize->FinalSysSizing.size()) {
+    if (curSysNum > 0 && c->zoneEqNum == 0 && curSysNum <= state.dataHVACGlobal->NumPrimaryAirSys) {
         auto &finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
         c->desDayNameAtSensPeak = finalSysSizing.HeatDesDay;
 
@@ -1821,7 +1827,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             }
             int sizMethod = 0;
             bool sizMethodsAreTheSame = true;
-            for (int airLoopNum = 0; airLoopNum < state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].m_AirLoopNum.size(); ++airLoopNum) {
+            for (int airLoopNum = 0; airLoopNum < state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].NumOfAirLoops; ++airLoopNum) {
                 int actualAirLoopNum = state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].m_AirLoopNum[airLoopNum];
                 if (airLoopNum == 0) {
                     sizMethod = state.dataSize->FinalSysSizing(actualAirLoopNum).SizingOption;
@@ -1834,7 +1840,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             if (sizMethodsAreTheSame) {
                 c->coilSizingMethodConcurrence = sizMethod;
             } else {
-                //  c->coilSizingMethodConcurrence = DataSizing::Combination; // TRANE
+                c->coilSizingMethodConcurrence = DataSizing::Combination;
             }
         }
     } else {
