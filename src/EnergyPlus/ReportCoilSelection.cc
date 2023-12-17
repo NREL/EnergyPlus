@@ -1807,7 +1807,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
             state, c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
         c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
-    } else if (curOASysNum > 0 && c->airloopNum >= int(state.dataSize->FinalSysSizing.size())) {
+    } else if (curOASysNum > 0 && c->airloopNum > int(state.dataSize->FinalSysSizing.size())) {
         if (!state.dataAirLoopHVACDOAS->airloopDOAS.empty()) {
             c->oASysNum = curOASysNum; // where should this get set? It's -999 here.
             int DOASSysNum = state.dataAirLoop->OutsideAirSys(curOASysNum).AirLoopDOASNum;
