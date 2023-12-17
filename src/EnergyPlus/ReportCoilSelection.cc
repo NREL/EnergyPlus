@@ -1582,7 +1582,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     doAirLoopSetup(state, index);
     c->zoneEqNum = curZoneEqNum;
     //    if ( c->zoneEqNum > 0 ) doZoneEqSetup( index );
-    if (curSysNum > 0 && c->zoneEqNum == 0 && curSysNum <= state.dataHVACGlobal->NumPrimaryAirSys) {
+    if (curSysNum > 0 && c->zoneEqNum == 0 && curSysNum <= int(state.dataSize->FinalSysSizing.size())) {
         auto &finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
         c->desDayNameAtSensPeak = finalSysSizing.HeatDesDay;
 
@@ -1807,7 +1807,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
             state, c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
         c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
-    } else if (curOASysNum > 0 && c->airloopNum > state.dataHVACGlobal->NumPrimaryAirSys) {
+    } else if (curOASysNum > 0 && c->airloopNum >= int(state.dataSize->FinalSysSizing.size())) {
         if (!state.dataAirLoopHVACDOAS->airloopDOAS.empty()) {
             c->oASysNum = curOASysNum; // where should this get set? It's -999 here.
             int DOASSysNum = state.dataAirLoop->OutsideAirSys(curOASysNum).AirLoopDOASNum;
@@ -1860,7 +1860,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
                 c->coilDesMassFlow = finalZoneSizing.DesHeatMassFlow;
                 c->coilDesVolFlow = c->coilDesMassFlow / state.dataEnvrn->StdRhoAir;
             }
-        } else if (curSysNum > 0 && curSysNum <= state.dataHVACGlobal->NumPrimaryAirSys) {
+        } else if (curSysNum > 0 && curSysNum <= int(state.dataSize->FinalSysSizing.size())) {
             auto &finalSysSizing = state.dataSize->FinalSysSizing(curSysNum);
             if (curOASysNum > 0 && allocated(state.dataSize->OASysEqSizing)) {
                 auto &oASysEqSizing = state.dataSize->OASysEqSizing(curSysNum);
