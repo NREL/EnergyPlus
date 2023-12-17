@@ -497,7 +497,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_setupKivaInstances_ThermalComfort)
         "  3.82e-08,                !- Carbon Dioxide Generation Rate",
 
         "  Yes,                     !- Enable ASHRAE 55 Comfort Warnings",
-        "  ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "  EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "  ,                        !- Surface NameAngle Factor List Name",
         "  Work Eff Sched,          !- Work Efficiency Schedule Name",
         "  ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",

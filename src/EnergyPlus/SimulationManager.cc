@@ -289,15 +289,15 @@ namespace SimulationManager {
 
             NodeInputManager::SetupNodeVarsForReporting(state);
             state.dataGlobal->MetersHaveBeenInitialized = true;
-            PollutionModule::SetupPollutionMeterReporting(state);
+            Pollution::SetupPollutionMeterReporting(state);
             SystemReports::AllocateAndSetUpVentReports(state);
             if (state.dataPluginManager->pluginManager) {
                 EnergyPlus::PluginManagement::PluginManager::setupOutputVariables(state);
             }
             UpdateMeterReporting(state);
-            PollutionModule::CheckPollutionMeterReporting(state);
+            Pollution::CheckPollutionMeterReporting(state);
             state.dataElectPwrSvcMgr->facilityElectricServiceObj->verifyCustomMetersElecPowerMgr(state);
-            PollutionModule::SetupPollutionCalculations(state);
+            Pollution::SetupPollutionCalculations(state);
             DemandManager::InitDemandManagers(state);
             BranchInputManager::TestBranchIntegrity(state, ErrFound);
             if (ErrFound) TerminalError = true;

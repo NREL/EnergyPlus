@@ -438,10 +438,10 @@ namespace BaseboardRadiator {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipID,
                                 {},
-                                "ENERGYTRANSFER",
-                                "BASEBOARD",
+                                eResourceSOV::EnergyTransfer,
+                                EndUseCatSOV::Baseboard,
                                 {},
-                                "System");
+                                GroupSOV::HVAC); // "System");
 
             SetupOutputVariable(state,
                                 "Baseboard Hot Water Energy",
@@ -451,10 +451,10 @@ namespace BaseboardRadiator {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipID,
                                 {},
-                                "PLANTLOOPHEATINGDEMAND",
-                                "BASEBOARD",
+                                eResourceSOV::PlantLoopHeatingDemand,
+                                EndUseCatSOV::Baseboard,
                                 {},
-                                "System");
+                                GroupSOV::HVAC); // "System");
 
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Rate",

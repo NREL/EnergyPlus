@@ -383,10 +383,10 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         {},
-                        "ENERGYTRANSFER",
-                        "BOILERS",
+                        eResourceSOV::EnergyTransfer,
+                        EndUseCatSOV::Boilers,
                         {},
-                        "Plant");
+                        GroupSOV::Plant);
     SetupOutputVariable(state,
                         format("Boiler {} Rate", sFuelType),
                         OutputProcessor::Unit::W,
@@ -442,10 +442,10 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         {},
-                        "ELECTRICITY",
-                        "Heating",
+                        eResourceSOV::Electricity,
+                        EndUseCatSOV::Heating,
                         "Boiler Parasitic",
-                        "Plant");
+                        GroupSOV::Plant);
     if (this->FuelType != Constant::eFuel::Electricity) {
         SetupOutputVariable(state,
                             format("Boiler Ancillary {} Rate", sFuelType),

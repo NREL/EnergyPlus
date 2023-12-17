@@ -99,7 +99,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SteamBaseboardRadiator.hh>
-#include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/ThermalChimney.hh>
 #include <EnergyPlus/UnitHeater.hh>
@@ -3098,10 +3097,6 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
     }
 
     FirstCall = false;
-
-    // Simulate all of the pools. These have a potential impact on surface heat balances, zone air heat balances, and moisture balances.
-    // These should be simulated first so that any systems or zone equipment devices deal with the effects of the pool properly.
-    SwimmingPool::SimSwimmingPool(state, FirstHVACIteration);
 
     // Loop over all the primary air loop; simulate their components (equipment)
     // and controllers

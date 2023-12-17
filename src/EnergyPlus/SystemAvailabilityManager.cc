@@ -4737,7 +4737,7 @@ namespace SystemAvailabilityManager {
             } break;
             case HybridVentMode_OperT80: {
                 if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
-                    hybridVentMgr.OperativeTemp = 0.5 * (thisZoneHB.MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
+                    hybridVentMgr.OperativeTemp = 0.5 * (thisZoneHB.MAT + thisZoneHB.MRT);
                     minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 14.3;
                     maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 21.3;
                     hybridVentMgr.minAdaTem = minAdaTem;
@@ -4754,7 +4754,7 @@ namespace SystemAvailabilityManager {
             } break;
             case HybridVentMode_OperT90: {
                 if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
-                    hybridVentMgr.OperativeTemp = 0.5 * (thisZoneHB.MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
+                    hybridVentMgr.OperativeTemp = 0.5 * (thisZoneHB.MAT + thisZoneHB.MRT);
                     minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 15.3;
                     maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 20.3;
                     hybridVentMgr.minAdaTem = minAdaTem;

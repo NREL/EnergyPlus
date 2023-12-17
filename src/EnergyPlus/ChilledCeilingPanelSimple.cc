@@ -1223,7 +1223,8 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
         CoolingPanelOn = false;
     }
     // Calculate the "zone" temperature for determining the output of the cooling panel
-    Real64 Tzone = Xr * state.dataHeatBal->ZoneMRT(ZoneNum) + ((1.0 - Xr) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
+    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+    Real64 Tzone = Xr * thisZoneHB.MRT + ((1.0 - Xr) * thisZoneHB.MAT);
 
     // Logical controls: if the WaterInletTemperature is higher than Tzone, do not run the panel
     if (waterInletTemp >= Tzone) CoolingPanelOn = false;
@@ -1455,10 +1456,11 @@ Real64 CoolingPanelParams::getCoolingPanelControlTemp(EnergyPlusData &state, int
         return state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
     } break;
     case ClgPanelCtrlType::MRT: {
-        return state.dataHeatBal->ZoneMRT(ZoneNum);
+        return state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MRT;
     } break;
     case ClgPanelCtrlType::Operative: {
-        return 0.5 * (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
+        return 0.5 * (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT +
+                      state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MRT);
     } break;
     case ClgPanelCtrlType::ODB: {
         return state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;

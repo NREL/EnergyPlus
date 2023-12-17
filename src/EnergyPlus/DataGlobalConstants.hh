@@ -151,27 +151,6 @@ namespace Constant {
         Num
     };
 
-    enum class ePollutant
-    {
-        Invalid = -1,
-        SO2,
-        NOx,
-        N2O,
-        PM,
-        PM2_5,
-        PM10,
-        CO,
-        CO2,
-        CH4,
-        NH3,
-        NMVOC,
-        Hg,
-        Pb,
-        NuclearHigh,
-        NuclearLow,
-        Num
-    };
-
     constexpr std::array<eFuel, static_cast<int>(eResource::Num)> eResource2eFuel = {eFuel::Electricity,
                                                                                      eFuel::NaturalGas,
                                                                                      eFuel::Gasoline,
@@ -236,32 +215,6 @@ namespace Constant {
                                                                                      eResource::DistrictHeatingSteam,
                                                                                      eResource::Water,
                                                                                      eResource::None};
-
-    constexpr std::array<ePollutant, static_cast<int>(eResource::Num)> eResource2ePollutant = {
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid,     ePollutant::Invalid,
-        ePollutant::Invalid, ePollutant::Invalid, ePollutant::Invalid, ePollutant::SO2,     ePollutant::NOx,         ePollutant::N2O,
-        ePollutant::PM,      ePollutant::PM2_5,   ePollutant::PM10,    ePollutant::CO,      ePollutant::CO2,         ePollutant::CH4,
-        ePollutant::NH3,     ePollutant::NMVOC,   ePollutant::Hg,      ePollutant::Pb,      ePollutant::NuclearHigh, ePollutant::NuclearLow};
-
-    constexpr std::array<eResource, static_cast<int>(ePollutant::Num)> ePollutant2eResource = {eResource::SO2,
-                                                                                               eResource::NOx,
-                                                                                               eResource::N2O,
-                                                                                               eResource::PM,
-                                                                                               eResource::PM2_5,
-                                                                                               eResource::PM10,
-                                                                                               eResource::CO,
-                                                                                               eResource::CO2,
-                                                                                               eResource::CH4,
-                                                                                               eResource::NH3,
-                                                                                               eResource::NMVOC,
-                                                                                               eResource::Hg,
-                                                                                               eResource::Pb,
-                                                                                               eResource::NuclearHigh,
-                                                                                               eResource::NuclearLow};
 
     static constexpr std::array<std::string_view, static_cast<int>(eResource::Num)> eResourceNamesUC = {"ELECTRICITY",
                                                                                                         "NATURALGAS",
@@ -394,40 +347,6 @@ namespace Constant {
         eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::DistrictHeatingSteam)])],
         eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::Water)])],
         eResourceNames[static_cast<int>(eFuel2eResource[static_cast<int>(eFuel::None)])]};
-
-    static constexpr std::array<std::string_view, static_cast<int>(ePollutant::Num)> ePollutantNamesUC = {
-        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::SO2)])],
-        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NOx)])],
-        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::N2O)])],
-        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::PM)])],
-        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::PM2_5)])],
-        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::PM10)])],
-        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::CO)])],
-        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::CO2)])],
-        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::CH4)])],
-        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NH3)])],
-        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NMVOC)])],
-        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::Hg)])],
-        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::Pb)])],
-        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NuclearHigh)])],
-        eResourceNamesUC[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NuclearLow)])]};
-
-    static constexpr std::array<std::string_view, static_cast<int>(ePollutant::Num)> ePollutantNames = {
-        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::SO2)])],
-        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NOx)])],
-        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::N2O)])],
-        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::PM)])],
-        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::PM2_5)])],
-        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::PM10)])],
-        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::CO)])],
-        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::CO2)])],
-        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::CH4)])],
-        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NH3)])],
-        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NMVOC)])],
-        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::Hg)])],
-        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::Pb)])],
-        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NuclearHigh)])],
-        eResourceNames[static_cast<int>(ePollutant2eResource[static_cast<int>(ePollutant::NuclearLow)])]};
 
     enum class CallIndicator
     {

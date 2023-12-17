@@ -540,10 +540,10 @@ namespace CoolTower {
                                 OutputProcessor::SOVStoreType::Summed,
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name,
                                 {},
-                                "Electricity",
-                                "Cooling",
+                                eResourceSOV::Electricity,
+                                EndUseCatSOV::Cooling,
                                 {},
-                                "System");
+                                GroupSOV::HVAC); //"System");
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromMains) {
                 SetupOutputVariable(state,
                                     "Zone Cooltower Water Volume",
@@ -560,10 +560,10 @@ namespace CoolTower {
                                     OutputProcessor::SOVStoreType::Summed,
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name,
                                     {},
-                                    "MainsWater",
-                                    "Cooling",
+                                    eResourceSOV::MainsWater,
+                                    EndUseCatSOV::Cooling,
                                     {},
-                                    "System");
+                                    GroupSOV::HVAC); // "System");
             } else if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
                 SetupOutputVariable(state,
                                     "Zone Cooltower Water Volume",
@@ -587,10 +587,10 @@ namespace CoolTower {
                                     OutputProcessor::SOVStoreType::Summed,
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name,
                                     {},
-                                    "MainsWater",
-                                    "Cooling",
+                                    eResourceSOV::MainsWater,
+                                    EndUseCatSOV::Cooling,
                                     {},
-                                    "System");
+                                    GroupSOV::HVAC); // "System");
             }
         }
     }

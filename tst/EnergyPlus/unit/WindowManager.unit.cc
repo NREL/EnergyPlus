@@ -207,12 +207,10 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->OutBaroPress = 100000;
 
-    state->dataHeatBal->ZoneMRT.allocate(1);
-
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 0.0;
-    state->dataHeatBal->ZoneMRT(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MRT = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.0;
 
     HeatBalanceManager::ManageHeatBalance(*state);
@@ -7680,12 +7678,10 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    state->dataHeatBal->ZoneMRT.allocate(1);
-
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 0.0;
-    state->dataHeatBal->ZoneMRT(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MRT = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.0;
 
     HeatBalanceManager::ManageHeatBalance(*state);

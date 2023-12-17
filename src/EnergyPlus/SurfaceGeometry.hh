@@ -90,7 +90,9 @@ namespace SurfaceGeometry {
 
     void CreateMissingSpaces(EnergyPlusData &state, Array1D<SurfaceGeometry::SurfaceData> &Surfaces);
 
-    void createSpaceSurfaceLists(EnergyPlusData &state, bool &ErrorsFound);
+    void createSpaceSurfaceLists(EnergyPlusData &state);
+
+    void setSurfaceFirstLast(EnergyPlusData &state);
 
     void checkSubSurfAzTiltNorm(EnergyPlusData &state,
                                 SurfaceData &baseSurface, // Base surface data (in)

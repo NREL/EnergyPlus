@@ -558,9 +558,10 @@ namespace SurfaceGeometry {
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             auto &thisZone = state.dataHeatBal->Zone(ZoneNum);
             bool nonInternalMassSurfacesPresent = false;
+            bool internalMassSurfacesPresent = false;
             Real64 TotSurfArea = 0.0;
             thisZone.Centroid = Vector(0.0, 0.0, 0.0);
-            if (state.dataSurface->Surface(thisZone.AllSurfaceFirst).Sides > 0) {
+            if ((thisZone.AllSurfaceFirst > 0) && (state.dataSurface->Surface(thisZone.AllSurfaceFirst).Sides > 0)) {
                 thisZone.MinimumX = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).x;
                 thisZone.MaximumX = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).x;
                 thisZone.MinimumY = state.dataSurface->Surface(thisZone.AllSurfaceFirst).Vertex(1).y;
@@ -573,8 +574,11 @@ namespace SurfaceGeometry {
 
                 for (int SurfNum = thisSpace.AllSurfaceFirst; SurfNum <= thisSpace.AllSurfaceLast; ++SurfNum) {
                     auto &thisSurface = state.dataSurface->Surface(SurfNum);
-                    if (thisSurface.Class == SurfaceClass::IntMass) continue;
-                    nonInternalMassSurfacesPresent = true;
+                    if (thisSurface.Class == SurfaceClass::IntMass) {
+                        internalMassSurfacesPresent = true;
+                        continue;
+                    }
+                    if (!thisSurface.IsAirBoundarySurf) nonInternalMassSurfacesPresent = true;
                     if (thisSurface.Class == SurfaceClass::Wall || (thisSurface.Class == SurfaceClass::Roof) ||
                         (thisSurface.Class == SurfaceClass::Floor)) {
 
@@ -596,7 +600,7 @@ namespace SurfaceGeometry {
                 thisZone.Centroid.y /= TotSurfArea;
                 thisZone.Centroid.z /= TotSurfArea;
             }
-            if (!nonInternalMassSurfacesPresent) {
+            if (internalMassSurfacesPresent && !nonInternalMassSurfacesPresent) {
                 ShowSevereError(
                     state, format("{}Zone=\"{}\" has only internal mass surfaces.  Need at least one other surface.", RoutineName, thisZone.Name));
                 ErrorsFound = true;
@@ -1739,7 +1743,7 @@ namespace SurfaceGeometry {
 
         state.dataSurfaceGeometry->SurfaceTmp.deallocate(); // DeAllocate the Temp Surface derived type
 
-        createSpaceSurfaceLists(state, ErrorsFound);
+        createSpaceSurfaceLists(state);
 
         //  For each Base Surface Type (Wall, Floor, Roof)
 
@@ -2257,110 +2261,7 @@ namespace SurfaceGeometry {
             }
         }
 
-        //**********************************************************************************
-        //   Set up Zone Surface Pointers
-        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                for (int SurfNum = 1; SurfNum <= MovedSurfs; ++SurfNum) { // TotSurfaces
-                    if (state.dataSurface->Surface(SurfNum).spaceNum == spaceNum) {
-                        if (thisSpace.AllSurfaceFirst == 0) {
-                            thisSpace.AllSurfaceFirst = SurfNum;
-                        }
-                        if (state.dataSurface->Surface(SurfNum).IsAirBoundarySurf) {
-                            state.dataSurface->Surface(SurfNum).HeatTransSurf = false;
-                            continue;
-                        }
-                        if (thisSpace.HTSurfaceFirst == 0) {
-                            thisSpace.HTSurfaceFirst = SurfNum;
-                            // Non window surfaces are grouped next within each zone
-                            thisSpace.OpaqOrIntMassSurfaceFirst = SurfNum;
-                        }
-                        if ((thisSpace.WindowSurfaceFirst == 0) &&
-                            ((state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) ||
-                             (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::GlassDoor) ||
-                             (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::TDD_Diffuser))) {
-                            // Window surfaces are grouped last within each zone
-                            thisSpace.WindowSurfaceFirst = SurfNum;
-                            thisSpace.OpaqOrIntMassSurfaceLast = SurfNum - 1;
-                        }
-                        if ((thisSpace.TDDDomeFirst == 0) && (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::TDD_Dome)) {
-                            // Window surfaces are grouped last within each zone
-                            thisSpace.TDDDomeFirst = SurfNum;
-                            if (thisSpace.WindowSurfaceFirst != 0) {
-                                thisSpace.WindowSurfaceLast = SurfNum - 1;
-                            } else {
-                                // No window in the zone.
-                                thisSpace.OpaqOrIntMassSurfaceLast = SurfNum - 1;
-                                thisSpace.WindowSurfaceLast = -1;
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-            int firstSpaceNum = state.dataHeatBal->Zone(ZoneNum).spaceIndexes(1);
-            state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst = state.dataHeatBal->space(firstSpaceNum).AllSurfaceFirst;
-        }
-        //  Surface First pointers are set, set last
-        if (state.dataGlobal->NumOfZones > 0) {
-            state.dataHeatBal->Zone(state.dataGlobal->NumOfZones).AllSurfaceLast = state.dataSurface->TotSurfaces;
-            int lastSpaceNum = state.dataHeatBal->Zone(state.dataGlobal->NumOfZones)
-                                   .spaceIndexes(state.dataHeatBal->Zone(state.dataGlobal->NumOfZones).spaceIndexes.size());
-            state.dataHeatBal->space(lastSpaceNum).AllSurfaceLast = state.dataSurface->TotSurfaces;
-        }
-        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (ZoneNum < state.dataGlobal->NumOfZones) {
-                state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast = state.dataHeatBal->Zone(ZoneNum + 1).AllSurfaceFirst - 1;
-            }
-            auto &thisSpaceList = state.dataHeatBal->Zone(ZoneNum).spaceIndexes;
-            int numSpacesInZone = thisSpaceList.size();
-            if (numSpacesInZone > 1) {
-                for (int spaceCount = 1; spaceCount <= numSpacesInZone - 1; ++spaceCount) {
-                    auto &thisSpace = state.dataHeatBal->space(thisSpaceList(spaceCount));
-                    auto &nextSpace = state.dataHeatBal->space(thisSpaceList(spaceCount + 1));
-                    thisSpace.AllSurfaceLast = nextSpace.AllSurfaceFirst - 1;
-                }
-                state.dataHeatBal->space(thisSpaceList(numSpacesInZone)).AllSurfaceLast = state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast;
-            } else if (numSpacesInZone == 1) {
-                auto &thisSpace = state.dataHeatBal->space(thisSpaceList(numSpacesInZone));
-                thisSpace.AllSurfaceFirst = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst;
-                thisSpace.AllSurfaceLast = state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast;
-            }
-        }
-        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                if (state.dataSurface->Surface(thisSpace.AllSurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Dome) {
-                    thisSpace.TDDDomeLast = thisSpace.AllSurfaceLast;
-                } else if ((state.dataSurface->Surface(thisSpace.AllSurfaceLast).Class == DataSurfaces::SurfaceClass::Window) ||
-                           (state.dataSurface->Surface(thisSpace.AllSurfaceLast).Class == DataSurfaces::SurfaceClass::GlassDoor) ||
-                           (state.dataSurface->Surface(thisSpace.AllSurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Diffuser)) {
-                    thisSpace.TDDDomeLast = -1;
-                    thisSpace.WindowSurfaceLast = thisSpace.AllSurfaceLast;
-                } else {
-                    // If there are no windows in the zone, then set this to -1 so any for loops on WindowSurfaceFirst to WindowSurfaceLast
-                    // will not execute. Same for TDDDome and its indices
-                    thisSpace.TDDDomeLast = -1;
-                    thisSpace.WindowSurfaceLast = -1;
-                    thisSpace.OpaqOrIntMassSurfaceLast = thisSpace.AllSurfaceLast;
-                }
-                if (thisSpace.HTSurfaceFirst > 0) {
-                    thisSpace.OpaqOrWinSurfaceFirst = thisSpace.HTSurfaceFirst;
-                    thisSpace.OpaqOrWinSurfaceLast = std::max(thisSpace.OpaqOrIntMassSurfaceLast, thisSpace.WindowSurfaceLast);
-                    thisSpace.HTSurfaceLast = thisSpace.AllSurfaceLast;
-                } else {
-                    // If no heat transfer surfaces, make sure all others are set correctly
-                    thisSpace.HTSurfaceLast = -1;
-                    thisSpace.WindowSurfaceFirst = 0;
-                    thisSpace.WindowSurfaceLast = -1;
-                    thisSpace.OpaqOrWinSurfaceFirst = 0;
-                    thisSpace.OpaqOrWinSurfaceLast = -1;
-                    thisSpace.OpaqOrIntMassSurfaceFirst = 0;
-                    thisSpace.OpaqOrIntMassSurfaceLast = -1;
-                }
-            }
-        }
+        setSurfaceFirstLast(state);
 
         // Set up Floor Areas for Zones and Spaces
         Real64 constexpr floorAreaTolerance(0.05);
@@ -3001,7 +2902,7 @@ namespace SurfaceGeometry {
         }
     }
 
-    void createSpaceSurfaceLists(EnergyPlusData &state, bool &ErrorsFound)
+    void createSpaceSurfaceLists(EnergyPlusData &state)
     {
         static constexpr std::string_view RoutineName("createSpaceSurfaceLists: ");
         // Build Space surface lists now that all of the surface sorting is complete
@@ -3011,12 +2912,64 @@ namespace SurfaceGeometry {
             // Add to Space's list of surfaces
             state.dataHeatBal->space(thisSurf.spaceNum).surfaces.emplace_back(surfNum);
         }
-        // TODO MJW: Is this necessary? Check that all Spaces have at least one Surface
-        for (int spaceNum = 1; spaceNum < state.dataGlobal->numSpaces; ++spaceNum) {
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             if (int(state.dataHeatBal->space(spaceNum).surfaces.size()) == 0) {
-                ShowSevereError(state, format("{}Space = {} has no surfaces.", RoutineName, state.dataHeatBal->space(spaceNum).Name));
-                ErrorsFound = true;
+                ShowWarningError(state, format("{}Space={} has no surfaces.", RoutineName, state.dataHeatBal->space(spaceNum).Name));
             }
+        }
+    }
+
+    void setSurfaceFirstLast(EnergyPlusData &state)
+    {
+        // Set Zone and Space Surface First/Last Pointers
+        // Space surface lists have been built earlier in createSpaceSurfaceLists
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                for (int SurfNum : thisSpace.surfaces) {
+                    if (thisSpace.AllSurfaceFirst == 0) {
+                        thisSpace.AllSurfaceFirst = SurfNum;
+                    }
+                    thisSpace.AllSurfaceLast = SurfNum;
+
+                    if (state.dataSurface->Surface(SurfNum).IsAirBoundarySurf) {
+                        state.dataSurface->Surface(SurfNum).HeatTransSurf = false;
+                        continue;
+                    }
+                    // Non window surfaces are grouped next within each space
+                    if (thisSpace.HTSurfaceFirst == 0) {
+                        thisSpace.HTSurfaceFirst = SurfNum;
+                        thisSpace.OpaqOrIntMassSurfaceFirst = SurfNum;
+                        thisSpace.OpaqOrWinSurfaceFirst = SurfNum;
+                    }
+                    thisSpace.HTSurfaceLast = SurfNum;
+
+                    // Window surfaces are grouped next within each space
+                    if ((state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) ||
+                        (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::GlassDoor) ||
+                        (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::TDD_Diffuser)) {
+                        if (thisSpace.WindowSurfaceFirst == 0) {
+                            thisSpace.WindowSurfaceFirst = SurfNum;
+                        }
+                        thisSpace.WindowSurfaceLast = SurfNum;
+                    } else if (state.dataSurface->Surface(SurfNum).Class != DataSurfaces::SurfaceClass::TDD_Dome) {
+                        thisSpace.OpaqOrIntMassSurfaceLast = SurfNum;
+                    }
+
+                    // TDDDome surfaces are grouped last within each space
+                    if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::TDD_Dome) {
+                        if (thisSpace.TDDDomeFirst == 0) {
+                            thisSpace.TDDDomeFirst = SurfNum;
+                        }
+                        thisSpace.TDDDomeLast = SurfNum;
+                    } else {
+                        thisSpace.OpaqOrWinSurfaceLast = SurfNum;
+                    }
+                }
+                state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast = thisSpace.AllSurfaceLast;
+            }
+            int firstSpaceNum = state.dataHeatBal->Zone(ZoneNum).spaceIndexes(1);
+            state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst = state.dataHeatBal->space(firstSpaceNum).AllSurfaceFirst;
         }
     }
 
@@ -15638,8 +15591,20 @@ namespace SurfaceGeometry {
         }
         if (radiantSetup) {
             assert(state.dataViewFactor->NumOfRadiantEnclosures <= int(Enclosures.size()));
+            Enclosures.resize(state.dataViewFactor->NumOfRadiantEnclosures);
         } else {
             assert(state.dataViewFactor->NumOfSolarEnclosures <= int(Enclosures.size()));
+            Enclosures.resize(state.dataViewFactor->NumOfSolarEnclosures);
+        }
+
+        for (auto &thisEnclosure : state.dataViewFactor->EnclRadInfo) {
+            SetupOutputVariable(state,
+                                "Enclosure Mean Radiant Temperature",
+                                OutputProcessor::Unit::C,
+                                thisEnclosure.MRT,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
+                                thisEnclosure.Name);
         }
 
         // TODO MJW: For now, set the max and min enclosure numbers for each zone to be used in CalcInteriorRadExchange with ZoneToResimulate

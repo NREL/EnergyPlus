@@ -105,29 +105,23 @@ namespace EnergyPlus::SwimmingPool {
 // 4. Smith, C., R. Jones, and G. Lof (1993). Energy Requirements and Potential Savings for Heated
 //    Indoor Swimming Pools. ASHRAE Transactions 99(2), p.864-874.
 
-void SimSwimmingPool(EnergyPlusData &state, bool FirstHVACIteration)
+SwimmingPoolData *SwimmingPoolData::factory(EnergyPlusData &state, std::string const &objectName)
 {
-    // Process the input data if it hasn't been done already
     if (state.dataSwimmingPools->getSwimmingPoolInput) {
         GetSwimmingPool(state);
         state.dataSwimmingPools->getSwimmingPoolInput = false;
     }
-
-    // System wide (for all pools) inits
-    state.dataHeatBalFanSys->SumConvPool = 0.0;
-    state.dataHeatBalFanSys->SumLatentPool = 0.0;
-
-    PlantLocation A(0, DataPlant::LoopSideLocation::Invalid, 0, 0);
-    Real64 CurLoad = 0.0;
-    bool RunFlag = true;
-
-    for (auto &thisPool : state.dataSwimmingPools->Pool) {
-        thisPool.simulate(state, A, FirstHVACIteration, CurLoad, RunFlag);
+    // Now look for this particular swimming pool in the list
+    for (auto &pool : state.dataSwimmingPools->Pool) {
+        if (pool.Name == objectName) {
+            return &pool;
+        }
     }
-
-    if (state.dataSwimmingPools->NumSwimmingPools > 0) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
-
-    ReportSwimmingPool(state);
+    // If we didn't find it, fatal
+    ShowFatalError(state,
+                   format("LocalSwimmingPoolFactory: Error getting inputs or index for swimming pool named: {}", objectName)); // LCOV_EXCL_LINE
+    // Shut up the compiler
+    return nullptr; // LCOV_EXCL_LINE
 }
 
 void SwimmingPoolData::simulate(EnergyPlusData &state,
@@ -136,11 +130,21 @@ void SwimmingPoolData::simulate(EnergyPlusData &state,
                                 [[maybe_unused]] Real64 &CurLoad,
                                 [[maybe_unused]] bool RunFlag)
 {
+    state.dataHeatBalFanSys->SumConvPool(this->ZonePtr) = 0.0;
+    state.dataHeatBalFanSys->SumLatentPool(this->ZonePtr) = 0.0;
+
+    CurLoad = 0.0;
+    RunFlag = true;
+
     this->initialize(state, FirstHVACIteration);
 
     this->calculate(state);
 
     this->update(state);
+
+    if (state.dataSwimmingPools->NumSwimmingPools > 0) HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
+
+    this->report(state);
 }
 
 void GetSwimmingPool(EnergyPlusData &state)
@@ -1011,11 +1015,59 @@ void SwimmingPoolData::update(EnergyPlusData &state)
     Real64 WaterMassFlow = state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate; // water mass flow rate
     if (WaterMassFlow > 0.0) state.dataLoopNodes->Node(this->WaterOutletNode).Temp = this->PoolWaterTemp;
 }
+
 void SwimmingPoolData::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
 {
 }
+
 void SwimmingPoolData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
+}
+
+void SwimmingPoolData::report(EnergyPlusData &state)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Rick Strand, Ho-Sung Kim
+    //       DATE WRITTEN   October 2014
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine simply produces output for the swimming pool model.
+
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    static constexpr std::string_view RoutineName("SwimmingPoolData::report");
+    Real64 constexpr MinDensity = 1.0; // to avoid a divide by zero
+
+    int SurfNum = this->SurfacePtr; // surface number index
+
+    // First transfer the surface inside temperature data to the current pool water temperature
+    this->PoolWaterTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
+
+    // Next calculate the amount of heating done by the plant loop
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex,
+                                                       RoutineName); // specific heat of water
+    this->HeatPower = this->WaterMassFlowRate * Cp * (this->WaterInletTemp - this->PoolWaterTemp);
+
+    // Now the power consumption of miscellaneous equipment
+    Real64 Density = FluidProperties::GetDensityGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex,
+                                                       RoutineName); // density of water
+    if (Density > MinDensity) {
+        this->MiscEquipPower = this->MiscPowerFactor * this->WaterMassFlowRate / Density;
+    } else {
+        this->MiscEquipPower = 0.0;
+    }
+
+    // Also the radiant exchange converted to convection by the pool cover
+    this->RadConvertToConvectRep = this->RadConvertToConvect * state.dataSurface->Surface(SurfNum).Area;
+
+    // Finally calculate the summed up report variables
+    Real64 thisTimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
+    this->MiscEquipEnergy = this->MiscEquipPower * thisTimeStepSysSec;
+    this->HeatEnergy = this->HeatPower * thisTimeStepSysSec;
+    this->MakeUpWaterMass = this->MakeUpWaterMassFlowRate * thisTimeStepSysSec;
+    this->EvapEnergyLoss = this->EvapHeatLossRate * thisTimeStepSysSec;
+
+    this->MakeUpWaterVolFlowRate = MakeUpWaterVolFlowFunct(this->MakeUpWaterMassFlowRate, Density);
+    this->MakeUpWaterVol = MakeUpWaterVolFunct(this->MakeUpWaterMass, Density);
 }
 
 void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRUE. if the swimming pool "runs" this zone time step
@@ -1087,68 +1139,6 @@ void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRU
                 }
             }
         }
-    }
-}
-
-void ReportSwimmingPool(EnergyPlusData &state)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Rick Strand, Ho-Sung Kim
-    //       DATE WRITTEN   October 2014
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine simply produces output for the swimming pool model.
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("ReportSwimmingPool");
-    Real64 constexpr MinDensity = 1.0; // to avoid a divide by zero
-
-    for (int PoolNum = 1; PoolNum <= state.dataSwimmingPools->NumSwimmingPools; ++PoolNum) {
-
-        int SurfNum = state.dataSwimmingPools->Pool(PoolNum).SurfacePtr; // surface number index
-
-        // First transfer the surface inside temperature data to the current pool water temperature
-        state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
-
-        // Next calculate the amount of heating done by the plant loop
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                           "WATER",
-                                                           state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp,
-                                                           state.dataSwimmingPools->Pool(PoolNum).GlycolIndex,
-                                                           RoutineName); // specific heat of water
-        state.dataSwimmingPools->Pool(PoolNum).HeatPower =
-            state.dataSwimmingPools->Pool(PoolNum).WaterMassFlowRate * Cp *
-            (state.dataSwimmingPools->Pool(PoolNum).WaterInletTemp - state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp);
-
-        // Now the power consumption of miscellaneous equipment
-        Real64 Density = FluidProperties::GetDensityGlycol(state,
-                                                           "WATER",
-                                                           state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp,
-                                                           state.dataSwimmingPools->Pool(PoolNum).GlycolIndex,
-                                                           RoutineName); // density of water
-        if (Density > MinDensity) {
-            state.dataSwimmingPools->Pool(PoolNum).MiscEquipPower =
-                state.dataSwimmingPools->Pool(PoolNum).MiscPowerFactor * state.dataSwimmingPools->Pool(PoolNum).WaterMassFlowRate / Density;
-        } else {
-            state.dataSwimmingPools->Pool(PoolNum).MiscEquipPower = 0.0;
-        }
-
-        // Also the radiant exchange converted to convection by the pool cover
-        state.dataSwimmingPools->Pool(PoolNum).RadConvertToConvectRep =
-            state.dataSwimmingPools->Pool(PoolNum).RadConvertToConvect * state.dataSurface->Surface(SurfNum).Area;
-
-        // Finally calculate the summed up report variables
-        state.dataSwimmingPools->Pool(PoolNum).MiscEquipEnergy =
-            state.dataSwimmingPools->Pool(PoolNum).MiscEquipPower * state.dataHVACGlobal->TimeStepSysSec;
-        state.dataSwimmingPools->Pool(PoolNum).HeatEnergy = state.dataSwimmingPools->Pool(PoolNum).HeatPower * state.dataHVACGlobal->TimeStepSysSec;
-        state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMass =
-            state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMassFlowRate * state.dataHVACGlobal->TimeStepSysSec;
-        state.dataSwimmingPools->Pool(PoolNum).EvapEnergyLoss =
-            state.dataSwimmingPools->Pool(PoolNum).EvapHeatLossRate * state.dataHVACGlobal->TimeStepSysSec;
-
-        state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterVolFlowRate =
-            MakeUpWaterVolFlowFunct(state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMassFlowRate, Density);
-        state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterVol = MakeUpWaterVolFunct(state.dataSwimmingPools->Pool(PoolNum).MakeUpWaterMass, Density);
     }
 }
 

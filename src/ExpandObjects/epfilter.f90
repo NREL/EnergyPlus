@@ -1507,7 +1507,7 @@ INTEGER,PARAMETER :: gndTempSurfDecOff = 12
 INTEGER,PARAMETER :: blrhwNameOff = 1
 INTEGER,PARAMETER :: blrhwInletNodeOff = 11
 INTEGER,PARAMETER :: blrhwOutletNodeOff = 12
-INTEGER,PARAMETER :: blrhwLastFieldOff = 17
+INTEGER,PARAMETER :: blrhwLastFieldOff = 18
 
   ! Chiller:Electric:EIR (for use with HVACTemplate:Plant:Chiller:ObjectReference)
 INTEGER,PARAMETER :: chleirNameOff = 1
@@ -2305,7 +2305,7 @@ CALL AddObjToProcess('HVACTemplate:Zone:WaterToAirHeatPump',.TRUE., wahpTStatNam
 CALL AddObjToProcess('HVACTemplate:Plant:MixedWaterLoop',.TRUE.,    mwpNameOff,                  mwpLdDistSchmOff,          17)
 CALL AddObjToProcess('HVACTemplate:System:DedicatedOutdoorAir',.TRUE.,doasNameOff,              doasHumidSetPtSchedNameOff, 46)
 ! Detailed Plant Objects
-CALL AddObjToProcess('Boiler:HotWater',.FALSE.,                     blrhwOutletNodeOff,          blrhwLastFieldOff,         17)
+CALL AddObjToProcess('Boiler:HotWater',.FALSE.,                     blrhwOutletNodeOff,          blrhwLastFieldOff,         18)
 CALL AddObjToProcess('Chiller:Electric:EIR',.FALSE.,                chleirCondTypeOff,           chleirLastFieldOff,        30)
 CALL AddObjToProcess('Chiller:Electric:ReformulatedEIR',.FALSE.,    chlreirCondOutletNodeOff,    chlreirLastFieldOff,       26)
 CALL AddObjToProcess('CoolingTower:SingleSpeed',.FALSE.,            twrssOutletNodeOff,          twrssLastFieldOff,         29)

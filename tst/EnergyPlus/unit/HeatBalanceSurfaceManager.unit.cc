@@ -745,7 +745,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
@@ -819,6 +819,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataSurface->SurfTAirRef(3) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
 
     // with supply air
+    HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
     CalcHeatBalanceInsideSurf(*state);
     EXPECT_EQ(24.0, state->dataHeatBal->SurfTempEffBulkAir(1));
     EXPECT_EQ(23.0, state->dataHeatBal->SurfTempEffBulkAir(2));
@@ -1069,7 +1070,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
         "  3.82e-08,                !- Carbon Dioxide Generation Rate",
 
         "  Yes,                     !- Enable ASHRAE 55 Comfort Warnings",
-        "  ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "  EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "  ,                        !- Surface NameAngle Factor List Name",
         "  Work Eff Sched,          !- Work Efficiency Schedule Name",
         "  ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
