@@ -2,12 +2,12 @@
 **NFP/Design -- Digital Alchemy**
 
 **Revisions**
--   New Feature Proposal -- 15-November-2023
--   New Feature Design & Updates -- (original) 15-November-23
+-   New Feature Proposal -- 15-Nov23
+-   New Feature Design & Updates -- 15-Nov-23; 18-Dec-23
 
 ## Justification for New Feature
 Many new metrics were established in the ASHRAE 90.1-2019 \[1\] standard.
-EnergyPlus should be updated to stay in-sync with these new metrics.
+EnergyPlus should be updated to predict these new metrics for equipment used in simulation.
 
 ## Overview
 We have identified and investigated the following commonly used
@@ -167,18 +167,27 @@ The EPlusout-EIO.tex files will be updated to document these metrics for (2) Coi
 The Engineering Reference will be updated with a high-level description of the calculations with links/references to Formulae defined in the standard - for the (2) coil types listed above. 
 
 ## Example Files and Transition Changes
-Example files that include Coil:Cooling:DX:TwoSpeed and Coil:Cooling:DX:VariableSpeed will need to be updated.
-
--   For IEER: There are dozens of example files that feature various configurations of DX coils listed above.
--   Testing will be done for some or all of these.  We will begin with one example for each of: TwoSpeed and VariableSpeed:
-    -   5ZoneAutoDXVAV.idf					              – Two speed cooling (Condenser:EvapCooled)
-    -   PackagedTerminalHeatPumpVSAS.idf	    – Variable speed cooling & heating (Condenser:AirCooled)
+Example files for Coil:Cooling:DX:TwoSpeed in which the condenser is air-cooled:
+    -   Coil:Cooling:DX:TwoSpeed.idf
+    -   ASHRAE9012016_OfficeMedium_Denver.idf
+    -   RefBldgPrimarySchoolNew2004_Chicago.idf
+Example files for Coil:Cooling:DX:VariableSpeed in which the condenser is air-cooled:    
+    -   5Zone_Unitary_HXAssistedCoil.idf
+    -   HeatPumpVSAS.idf
+    -   PackagedTerminalAirConditionerVSAS.idf
+    -   PackagedTerminalHeatPumpVSAS.idf
 
 ## E-mail and Conference Call Conclusions ##
-To be collected after peer review.
-
+[15-Nov-23] During NFP presentation, posed the question about whether EnergyPlus support simulation of the 'lock-out' feature described in Case 3 of the Two-Stage calculations section of the AHRI Standard 210/240.  As loosely described, this feature avoids unnessary cycling through low stage in very hot outdoor temperatures -- instead cycling direct to Full stage.  Mike Witte suggested that we pose this question for R.Raustad and N.Bereket in email.
+[1-Dec-23] Response from R.Raustad covered the following:
+- Data for both Coil:Cooling:DX:TwoSpeed and Coil:Cooling:DX:VariableSpeed in EnergyPlus - include fields for 'Minimum Outdoor Dry-Bulb Temperature for Compressor operation.  However we are looking for a high temperature at which Low Stage operation is skipped; cycling instead directly to Full Stage.
+- ZoneControl:Thermostat:StagedDualSetpoint can be used to cycle between off and full stage operation.
+[2-Dec-23] Response from N.Bereket included the following:
+- Calculation for Coil:Cooling:DX:MultiSpeed and Coil:Cooling:DX:VariableSpeed will both use calculations described in the standard for Variable Speed systems.
+- Coil:Cooling:DX:TwoSpeed implementation in EnergyPlus may be more realistic because it does address multi-stage compressors
+- Equations in the AHRI standard approximate results measured in test labs and include some assumptions and approximations.  Consequently, some adjustment may be required.
 ## Acknowledgments
-TBD
+Thanks to R.Raustad and N.Bereket for their responses to questions raised in the NFP review.
 
 ## References
 \[1\] ASHRAE, ANSI/ASHRAE/IES Standard 90.1-2019: Energy Standard for
