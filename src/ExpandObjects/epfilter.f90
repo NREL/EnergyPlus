@@ -13105,6 +13105,7 @@ LOGICAL :: isControlZonePlenumBlank
 LOGICAL :: isEconoLowLimitBlank
 LOGICAL :: isMinOARateAutosize
 REAL    :: htRecSens75
+REAL    :: htRecSens100
 REAL    :: htRecLat75
 CHARACTER(len=1) :: SchType
 INTEGER :: supFanPlacement=0
@@ -15392,7 +15393,9 @@ DO iSys = 1, numCompactSysUnitHP
   ENDIF
   IF (isHeatRecSensible) THEN
     htRecSens75 = StringToReal(FldVal(base + uhpsHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + uhpsHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     !Object ==> HeatExchanger:AirToAir:SensibleAndLatent
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + uhpsAirHandlerNameOff,' Heat Recovery')
@@ -15400,12 +15403,8 @@ DO iSys = 1, numCompactSysUnitHP
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + uhpsMinOutsideFlowOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + uhpsHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow','0')
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + uhpsHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow','0')
     CALL AddToObjFld('Supply Air Inlet Node Name', base + uhpsAirHandlerNameOff,' Outside Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + uhpsAirHandlerNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + uhpsAirHandlerNameOff,' Relief Air Outlet')
@@ -15416,7 +15415,43 @@ DO iSys = 1, numCompactSysUnitHP
     CALL AddToObjStr('Frost Control Type','ExhaustOnly')
     CALL AddToObjStr('Threshold Temperature','-1.1')
     CALL AddToObjStr('Initial Defrost Time Fraction','0.167')
-    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.024',.TRUE.)
+    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.024')
+    CALL AddToObjStr('Economizer Lockout','')
+    CALL AddToObjFld('Sensible Effectiveness of Heating Air Flow Curve Name', base + uhpsAirHandlerNameOff,' SenEffectivenessTable')
+    CALL AddToObjStr('Latent Effectiveness of Heating Air Flow Curve Name', '')
+    CALL AddToObjFld('Sensible Effectiveness of Cooling Air Flow Curve Name', base + uhpsAirHandlerNameOff,' SenEffectivenessTable')
+    CALL AddToObjStr('Latent Effectiveness of Cooling Air Flow Curve Name', '',.TRUE.)
+    ! create curve objects for the heat exchanger start
+    CALL CreateNewObj('Table:IndependentVariable')
+    CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' airFlowRatio')
+    CALL AddToObjStr('Interpolation Method', 'Linear')
+    CALL AddToObjStr('Extrapolation Method', 'Linear')
+    CALL AddToObjStr('Minimum Value', '0.0')
+    CALL AddToObjStr('Maximum Value', '10.0')
+    CALL AddToObjStr('Normalization Reference Value', '')
+    CALL AddToObjStr('Unit Type', 'Dimensionless')
+    CALL AddToObjStr('External File Name', '')
+    CALL AddToObjStr('External File Column Number', '')
+    CALL AddToObjStr('External File Starting Row Number', '')
+    CALL AddToObjStr('Value 1', '0.75')
+    CALL AddToObjStr('Value 2', '1.0',.TRUE.)
+    CALL CreateNewObj('Table:IndependentVariableList')
+    CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' effectiveness_IndependentVariableList')
+    CALL AddToObjFld('Independent Variable 1 Name', base + uhpsAirHandlerNameOff,' airFlowRatio',.TRUE.)
+    CALL CreateNewObj('Table:Lookup')
+    CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' SenEffectivenessTable')
+    CALL AddToObjFld('Independent Variable List Name', base + uhpsAirHandlerNameOff,' effectiveness_IndependentVariableList')
+    CALL AddToObjStr('Normalization Method', 'DivisorOnly')
+    CALL AddToObjStr('Normalization Divisor', '0.7')
+    CALL AddToObjStr('Minimum Output', '0.0')
+    CALL AddToObjStr('Maximum Output', '10.0')
+    CALL AddToObjStr('Output Unit Type', 'Dimensionless')
+    CALL AddToObjStr('External File Name', '')
+    CALL AddToObjStr('External File Column Number', '')
+    CALL AddToObjStr('External File Starting Row Number', '')
+    CALL AddToObjStr('Value 1', RealToStr(htRecSens75))
+    CALL AddToObjStr('Value 2', RealToStr(htRecSens100),.TRUE.)
+    ! create curve objects for the heat exchanger end
   END IF
   IF (isHeatRecEnthalpy) THEN
     htRecSens75 = StringToReal(FldVal(base + uhpsHeatRecSenEffOff)) + 0.05
