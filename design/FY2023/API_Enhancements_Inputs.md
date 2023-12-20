@@ -143,7 +143,7 @@ The implementation of this function will almost certainly be easiest to maintain
 
 As of right now, my preferred path forward would be the following steps:
 - Each of the above discrete EMS actuators should have an enum class that they are using internally, move these to a single header file just containing the enums
-- Create an API worker function that just relies on this one enum header, the basic GetEnumValue (sp?) function, and the MakeUPPERCase function, to return a meaningful integer value or ::Invalid
+- Create an API worker function that just relies on this one enum header, the basic GetEnumValue (sp?) function, and the MakeUPPER function, to return a meaningful integer value or ::Invalid
 - Evaluate the -1 magic number being used on the window shading control type, and how to proceed there.
 
 ## Improvements to User-Defined Components

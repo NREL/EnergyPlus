@@ -219,7 +219,7 @@ void resetErrorFlag(EnergyPlusState state)
     thisState->dataPluginManager->apiErrorFlag = false;
 }
 
-const char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize)
+char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     auto &epjson = thisState->dataInputProcessing->inputProcessor->epJSON;
@@ -239,21 +239,23 @@ const char **getObjectNames(EnergyPlusState state, const char *objectType, unsig
     return data;
 }
 
-void freeObjectNames(const char **objectNames, unsigned int arraySize)
+void freeObjectNames(char **objectNames, unsigned int arraySize)
 {
     // as of right now we don't actually need to free the underlying strings, they exist in the epJSON instance, so just delete our array of pointers
     (void)arraySize; // no op to avoid compiler warning that this variable is unused, in the future, this may be needed so keeping it in the API now
     delete[] objectNames;
 }
 
-enum class DummyEnum1
+enum class AirLoopHVAC_AvailabilityStatus  // This does not have an enum internally
 {
     Invalid = -1,
-    Hello,
-    World,
+    NoAction,
+    ForceOff,
+    CycleOn,
+    CycleOnZoneFansOnly,
     Num
 };
-constexpr std::array<std::string_view, (int)DummyEnum1::Num> dummyEnum1UC = {"HELLO", "WORLD"};
+constexpr std::array<std::string_view, (int)AirLoopHVAC_AvailabilityStatus::Num> AirLoopHVAC_AvailabilityStatus_UC = {"NO_ACTION", "FORCE_OFF", "CYCLE_ON", "CYCLE_ON_ZONE_FANS_ONLY"};
 enum class Beatles
 {
     Invalid = -1,
@@ -265,17 +267,48 @@ enum class Beatles
 };
 constexpr std::array<std::string_view, (int)Beatles::Num> beatlesUC = {"RINGO", "PAUL", "JOHN", "GEORGE"};
 
-int getEnergyPlusEnumValue(const char *enumClass, const char *enumKey)
+int getEnergyPlusEnumValue(EnergyPlusState state, const char *enumClass, const char *enumKey)
 {
-    std::string className = EnergyPlus::UtilityRoutines::MakeUPPERCase(enumClass);
-    std::string controlType = EnergyPlus::UtilityRoutines::MakeUPPERCase(enumKey);
-    if (className == "DUMMYENUM1") {
-        return EnergyPlus::getEnumerationValue(dummyEnum1UC, controlType);
+    (void) state; // not currently used -- probably never, but future-proofing just in case
+    std::string className = EnergyPlus::UtilityRoutines::makeUPPER(enumClass);
+    std::string controlType = EnergyPlus::UtilityRoutines::makeUPPER(enumKey);
+    if (className == "AIRLOOPHVAC_AVAILABILITYSTATUS") {
+        return EnergyPlus::getEnumValue(AirLoopHVAC_AvailabilityStatus_UC, controlType);
     } else if (className == "BEATLES") {
-        return EnergyPlus::getEnumerationValue(beatlesUC, controlType);
+        return EnergyPlus::getEnumValue(beatlesUC, controlType);
     } else {
         return -1;
     }
+}
+char **getAllEnumKeys(EnergyPlusState state, unsigned int *resultingSize)
+{
+    (void) state; // not currently used -- probably never, but future-proofing the API signature just in case
+    *resultingSize = (
+        AirLoopHVAC_AvailabilityStatus_UC.size() + beatlesUC.size()
+    );
+    auto *data = new char *[*resultingSize];
+    unsigned int i = -1;
+    for (std::string_view sv : AirLoopHVAC_AvailabilityStatus_UC) {
+        i++;
+        std::string s = "AirLoopHVAC_AvailabilityStatus::" + std::string(sv);
+        data[i] = new char[std::strlen(s.data()) + 1];
+        std::strcpy(data[i], s.data());
+    }
+    for (std::string_view sv : beatlesUC) {
+        i++;
+        std::string s = "Beatles::" + std::string(sv);
+        data[i] = new char[std::strlen(s.data()) + 1];
+        std::strcpy(data[i], s.data());
+    }
+    return data;
+}
+void freeEnumKeys(char **enumKeys, unsigned int arraySize)
+{
+    // these strings were allocated on the heap, and we need to clean them as well as the array of pointers to the strings
+    for (unsigned int i = 0; i < arraySize; i++) {
+        delete enumKeys[i];
+    }
+    delete[] enumKeys;
 }
 
 int getNumNodesInCondFDSurfaceLayer(EnergyPlusState state, const char *surfName, const char *matName)

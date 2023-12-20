@@ -130,6 +130,12 @@ class DataExchange:
         self.api.getObjectNames.restype = POINTER(c_char_p)
         self.api.freeObjectNames.argtypes = [POINTER(c_char_p), c_int]
         self.api.freeObjectNames.restype = c_void_p
+        self.api.getAllEnumKeys.argtypes = [c_void_p, POINTER(c_int)]
+        self.api.getAllEnumKeys.restype = POINTER(c_char_p)
+        self.api.freeEnumKeys.argtypes = [POINTER(c_char_p), c_int]
+        self.api.freeEnumKeys.restype = c_void_p
+        self.api.getEnergyPlusEnumValue.argtypes = [c_void_p, c_char_p, c_char_p]
+        self.api.getEnergyPlusEnumValue.restype = c_int
         self.api.apiDataFullyReady.argtypes = [c_void_p]
         self.api.apiDataFullyReady.restype = c_int
         self.api.apiErrorFlag.argtypes = [c_void_p]
@@ -301,6 +307,28 @@ class DataExchange:
         ]
         self.api.freeAPIData(r, count)  # free the underlying C memory now that we have a Python copy
         return list_response
+
+    def get_enum_list(self, state: c_void_p) -> List[str]:
+        count = c_int()
+        r = self.api.getAllEnumKeys(state, byref(count))
+        list_response = [r[i].decode('utf-8') for i in range(count.value)]
+        self.api.freeEnumKeys(r, count)
+        return list_response
+
+    def get_enum_value(self, state: c_void_p, object_class: Union[str, bytes], control_signal: Union[str, bytes]):
+        if isinstance(object_class, str):
+            object_class = object_class.encode('utf-8')
+        elif not isinstance(object_class, bytes):
+            raise EnergyPlusException(
+                "`get_enum_value` expects `object_class` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(object_class))
+        if isinstance(control_signal, str):
+            control_signal = control_signal.encode('utf-8')
+        elif not isinstance(control_signal, bytes):
+            raise EnergyPlusException(
+                "`get_enum_value` expects `control_signal` as a `str` or UTF-8 encoded `bytes`, not "
+                "'{}'".format(control_signal))
+        return self.api.getEnergyPlusEnumValue(state, object_class, control_signal)
 
     def list_available_api_data_csv(self, state: c_void_p) -> bytes:
         """
