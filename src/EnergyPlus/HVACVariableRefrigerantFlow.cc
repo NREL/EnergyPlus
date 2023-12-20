@@ -11869,8 +11869,13 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         Real64 CompEvaporatingPWRSpdMaxCurrentTsuc =
             this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(NumOfCompSpdInput), Tdischarge, this->EvaporatingTemp);
         if ((Q_c_OU * C_cap_operation) > CompEvaporatingCAPSpdMaxCurrentTsuc + CompEvaporatingPWRSpdMaxCurrentTsuc) {
+            Q_c_OU = CompEvaporatingCAPSpdMaxCurrentTsuc;
             CompSpdActual = this->CompressorSpeed(NumOfCompSpdInput);
-            Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(NumOfCompSpdInput), Tdischarge, this->EvaporatingTemp);
+            Ncomp = CompEvaporatingPWRSpdMaxCurrentTsuc;
+            m_air = this->OUAirFlowRate * RhoAir;
+            SH_OU = this->SH;
+            this->VRFOU_TeTc(
+                state, HXOpMode::EvapMode, Q_c_OU, SH_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->EvaporatingTemp);
         } else if ((Q_c_OU * C_cap_operation) <= CompEvaporatingCAPSpdMin) {
             // Required heating load is smaller than the min heating capacity
 
