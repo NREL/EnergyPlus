@@ -10064,6 +10064,7 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
     ASSERT_TRUE(process_idf(idf_objects));
 
     Meter *meter = new Meter("Electricity:Facility");
+    meter->units = Constant::Units::J;
     state->dataOutputProcessor->meters.push_back(meter);
     state->dataOutputProcessor->meterMap.insert_or_assign("ELECTRICITY:FACILITY", (int)state->dataOutputProcessor->meters.size()-1);
     // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported

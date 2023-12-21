@@ -432,7 +432,7 @@ namespace EMSManager {
         // Update sensors with current data
         for (int SensorNum = 1; SensorNum <= state.dataRuntimeLang->NumSensors; ++SensorNum) {
             int ErlVariableNum = state.dataRuntimeLang->Sensor(SensorNum).VariableNum;
-            if ((ErlVariableNum > 0) && (state.dataRuntimeLang->Sensor(SensorNum).Index > 0)) {
+            if ((ErlVariableNum > 0) && (state.dataRuntimeLang->Sensor(SensorNum).Index > -1)) {
                 if (state.dataRuntimeLang->Sensor(SensorNum).SchedNum == 0) { // not a schedule so get from output processor
 
                     state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value = RuntimeLanguageProcessor::SetErlValueNumber(
