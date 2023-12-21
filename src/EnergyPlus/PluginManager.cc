@@ -62,12 +62,10 @@ namespace EnergyPlus::PluginManagement {
 PluginTrendVariable::PluginTrendVariable(EnergyPlusData &state, std::string _name, int _numValues, int _indexOfPluginVariable)
     : name(std::move(_name)), numValues(_numValues), indexOfPluginVariable(_indexOfPluginVariable)
 {
-    // initialize the deque so it can be queried immediately, even with just zeroes
+    // initialize the deque, so it can be queried immediately, even with just zeroes
     for (int i = 1; i <= this->numValues; i++) {
         this->values.push_back(0);
-    }
-    for (int loop = 1; loop <= _numValues; ++loop) {
-        this->times.push_back(-loop * state.dataGlobal->TimeStepZone);
+        this->times.push_back(-i * state.dataGlobal->TimeStepZone);
     }
 }
 
@@ -379,42 +377,27 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
 #endif
 }
 
-PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(state.dataPluginManager->eplusRunningViaPythonAPI)
-{
-    // Now read all the actual plugins and interpret them
-    // IMPORTANT -- DO NOT CALL setup() UNTIL ALL INSTANCES ARE DONE
-    std::string const sPlugins = "PythonPlugin:Instance";
-    int pluginInstances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sPlugins);
-    if (pluginInstances == 0) {
-        return;
-    }
-
 #if LINK_WITH_PYTHON
+#if PY_MINOR_VERSION <= 10 // fix this
+void PluginManager::initPython([[maybe_unused]] EnergyPlusData &state, fs::path const &pathToPythonPackages)
+{
     // this frozen flag tells Python that the package and library have been frozen for embedding, so it shouldn't warn about missing prefixes
     Py_FrozenFlag = 1;
 
-    // we'll need the program directory for a few things so get it once here at the top and sanitize it
-    fs::path programDir;
-    if (state.dataGlobal->installRootOverride) {
-        programDir = state.dataStrGlobals->exeDirectoryPath;
-    } else {
-        programDir = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
-    }
-
     // I think we need to set the python path before initializing the library
     // make this relative to the binary
-    fs::path const pathToPythonPackages = programDir / "python_standard_lib";
-    if constexpr (std::is_same_v<typename fs::path::value_type, wchar_t>) {
-        std::wstring const ws = pathToPythonPackages.generic_wstring();
-        Py_SetPath(ws.c_str());
-        Py_SetPythonHome(ws.c_str());
-    } else {
-        // TODO: Py_DecodeLocale shouldn't be called before Python is PreInitialized. Also, this should be replaced by PyConfig
-        wchar_t *a = Py_DecodeLocale(pathToPythonPackages.generic_string().c_str(), nullptr); // This allocates!
-        Py_SetPath(a);
-        Py_SetPythonHome(a);
-        PyMem_RawFree(a);
-    }
+#ifdef _WIN32
+    // on Posix this is always false, leading to a compiler warning, can we just check for Windows instead of this?
+    std::wstring const ws = pathToPythonPackages.generic_wstring();
+    Py_SetPath(ws.c_str());
+    Py_SetPythonHome(ws.c_str());
+#else
+    // TODO: Py_DecodeLocale shouldn't be called before Python is PreInitialized. Also, this should be replaced by PyConfig
+    wchar_t *a = Py_DecodeLocale(pathToPythonPackages.generic_string().c_str(), nullptr); // This allocates!
+    Py_SetPath(a);
+    Py_SetPythonHome(a);
+    PyMem_RawFree(a);
+#endif
 
     // must be called before Py_Initialize
     // tells the interpreter the value of argv[0] to the main() function
@@ -428,6 +411,85 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
     if (!alreadyInitialized) {
         Py_InitializeEx(0);
     }
+}
+#else
+void PluginManager::initPython(EnergyPlusData &state, fs::path const &pathToPythonPackages)
+{
+    PyStatus status;
+
+    // first pre-config Python so that it can speak UTF-8
+    PyPreConfig preConfig;
+    PyPreConfig_InitPythonConfig(&preConfig);
+    preConfig.utf8_mode = 1;
+    status = Py_PreInitialize(&preConfig);
+    if (PyStatus_Exception(status)) {
+        ShowFatalError(state, "Could not pre-initialize Python to speak UTF-8...weird");
+    }
+
+    PyConfig config;
+    PyConfig_InitIsolatedConfig(&config);
+    config.isolated = 1;
+
+    status = PyConfig_SetBytesString(&config, &config.program_name, programName);
+    if (PyStatus_Exception(status)) {
+        ShowFatalError(state, "Could not initialize program_name on PyConfig...weird");
+    }
+
+    status = PyConfig_Read(&config);
+    if (PyStatus_Exception(status)) {
+        ShowFatalError(state, "Could not read back the PyConfig...weird");
+    }
+
+#ifdef _WIN32
+    // TODO: Test this on Windows...
+    //    std::wstring const ws = pathToPythonPackages.generic_wstring();
+    //    status = PyConfig_SetBytesString(&config, &config.home, ws.c_str())
+    //    Py_SetPath(ws.c_str());
+    //    Py_SetPythonHome(ws.c_str());
+#else
+    status = PyConfig_SetBytesString(&config, &config.home, pathToPythonPackages.generic_string().c_str());
+    if (PyStatus_Exception(status)) {
+        ShowFatalError(state, "Could not set home on PyConfig...weird");
+    }
+    status = PyConfig_SetBytesString(&config, &config.base_prefix, pathToPythonPackages.generic_string().c_str());
+    if (PyStatus_Exception(status)) {
+        ShowFatalError(state, "Could not set home on PyConfig...weird");
+    }
+#endif
+
+    config.module_search_paths_set = 1;
+    std::wstring s = pathToPythonPackages.generic_wstring();
+    status = PyWideStringList_Append(&config.module_search_paths, s.c_str());
+    if (PyStatus_Exception(status)) {
+        ShowFatalError(state, "Could not add items to path on PyConfig...weird");
+    }
+
+    Py_InitializeFromConfig(&config);
+}
+#endif // Python version check
+#endif // LINK_WITH_PYTHON
+
+PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(state.dataPluginManager->eplusRunningViaPythonAPI)
+{
+    // Now read all the actual plugins and interpret them
+    // IMPORTANT -- DO NOT CALL setup() UNTIL ALL INSTANCES ARE DONE
+    std::string const sPlugins = "PythonPlugin:Instance";
+    int pluginInstances = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sPlugins);
+    if (pluginInstances == 0) {
+        return;
+    }
+
+    // we'll need the program directory for a few things so get it once here at the top and sanitize it
+    fs::path programDir;
+    if (state.dataGlobal->installRootOverride) {
+        programDir = state.dataStrGlobals->exeDirectoryPath;
+    } else {
+        programDir = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+    }
+    fs::path const pathToPythonPackages = programDir / "python_standard_lib";
+
+#ifdef LINK_WITH_PYTHON
+    PluginManager::initPython(state, pathToPythonPackages);
 
     // Take control of the global interpreter lock while we are here, make sure to release it...
     PyGILState_STATE gil = PyGILState_Ensure();
@@ -690,7 +752,7 @@ void PluginInstance::reportPythonError([[maybe_unused]] EnergyPlusData &state)
             return;
         }
 
-        unsigned long numVals = PyList_Size(pyth_val);
+        Py_ssize_t numVals = PyList_Size(pyth_val);
         if (numVals == 0) {
             EnergyPlus::ShowContinueError(state, "No traceback available");
             return;
@@ -700,7 +762,7 @@ void PluginInstance::reportPythonError([[maybe_unused]] EnergyPlusData &state)
 
         EnergyPlus::ShowContinueError(state, "```");
 
-        for (unsigned long itemNum = 0; itemNum < numVals; itemNum++) {
+        for (Py_ssize_t itemNum = 0; itemNum < numVals; itemNum++) {
             PyObject *item = PyList_GetItem(pyth_val, itemNum);
             if (PyUnicode_Check(item)) { // NOLINT(hicpp-signed-bitwise) -- something inside Python code causes warning
                 std::string traceback_line = PyUnicode_AsUTF8(item);
@@ -727,14 +789,14 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
     // this first section is really all about just ultimately getting a full Python class instance
     // this answer helped with a few things: https://ru.stackoverflow.com/a/785927
 
-    PyObject *pModuleName = nullptr;
-    if constexpr (std::is_same_v<typename fs::path::value_type, wchar_t>) {
-        const std::wstring ws = this->modulePath.generic_wstring();
-        pModuleName = PyUnicode_FromWideChar(ws.c_str(), static_cast<Py_ssize_t>(ws.size())); // New reference
-    } else {
-        const std::string s = this->modulePath.generic_string();
-        pModuleName = PyUnicode_FromString(s.c_str()); // New reference
-    }
+    PyObject *pModuleName;
+#ifdef _WIN32
+    const std::wstring ws = this->modulePath.generic_wstring();
+    pModuleName = PyUnicode_FromWideChar(ws.c_str(), static_cast<Py_ssize_t>(ws.size())); // New reference
+#else
+    const std::string s = this->modulePath.generic_string();
+    pModuleName = PyUnicode_FromString(s.c_str()); // New reference
+#endif
     if (pModuleName == nullptr) {
         EnergyPlus::ShowFatalError(state, format("Failed to convert the Module Path \"{}\" for import", this->modulePath.generic_string()));
     }
@@ -753,6 +815,7 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
         EnergyPlus::ShowFatalError(state, "Python import error causes program termination");
     }
     PyObject *pModuleDict = PyModule_GetDict(this->pModule);
+    // printDict(pModuleDict);
     if (!pModuleDict) {
         EnergyPlus::ShowSevereError(state, format("Failed to read module dictionary from module \"{}\"", this->modulePath.generic_string()));
         if (PyErr_Occurred()) {
@@ -769,16 +832,14 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
         // import from database or something
         ShowFatalError(state, "Could not get full path");
     } else {
-        PyObject *pStrObj = PyUnicode_AsUTF8String(pFullPath);
-        char *zStr = PyBytes_AsString(pStrObj);
-        std::string s(zStr);
-        Py_DECREF(pStrObj); // PyUnicode_AsUTF8String returns a new reference, decrement it
-        ShowMessage(state, format("PythonPlugin: Class {} imported from: {}", className, s));
+        const char *zStr = PyUnicode_AsUTF8(pFullPath);
+        std::string sHere(zStr);
+        ShowMessage(state, format("PythonPlugin: Class {} imported from: {}", className, sHere));
     }
     PyObject *pClass = PyDict_GetItemString(pModuleDict, className.c_str());
     // Py_DECREF(pModuleDict);  // PyModule_GetDict returns a borrowed reference, DO NOT decrement
     if (!pClass) {
-        EnergyPlus::ShowSevereError(state, format("Failed to get class type \"{}\" from module \"{}\"", className, modulePath.generic_string()));
+        EnergyPlus::ShowSevereError(state, format(R"(Failed to get class type "{}" from module "{}")", className, modulePath.generic_string()));
         if (PyErr_Occurred()) {
             PluginInstance::reportPythonError(state);
         } else {
@@ -816,7 +877,7 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
     PyObject *detectFunction = PyObject_GetAttrString(this->pClassInstance, detectOverriddenFunctionName.c_str());
     if (!detectFunction || !PyCallable_Check(detectFunction)) {
         EnergyPlus::ShowSevereError(state,
-                                    format("Could not find or call function \"{}\" on class \"{}.{}\"",
+                                    format(R"(Could not find or call function "{}" on class "{}.{}")",
                                            detectOverriddenFunctionName,
                                            this->modulePath.generic_string(),
                                            this->className));
@@ -841,14 +902,14 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
     if (!PyList_Check(pFunctionResponse)) { // NOLINT(hicpp-signed-bitwise)
         EnergyPlus::ShowFatalError(state, format("Invalid return from _detect_overridden() on class \"{}\", this is weird", this->stringIdentifier));
     }
-    unsigned long numVals = PyList_Size(pFunctionResponse);
+    Py_ssize_t numVals = PyList_Size(pFunctionResponse);
     // at this point we know which base class methods are being overridden by the derived class
     // we can loop over them and based on the name check the appropriate flag and assign the function pointer
     if (numVals == 0) {
         EnergyPlus::ShowFatalError(
             state, format("Python plugin \"{}\" did not override any base class methods; must override at least one", this->stringIdentifier));
     }
-    for (unsigned long itemNum = 0; itemNum < numVals; itemNum++) {
+    for (Py_ssize_t itemNum = 0; itemNum < numVals; itemNum++) {
         PyObject *item = PyList_GetItem(pFunctionResponse, itemNum);
         if (PyUnicode_Check(item)) { // NOLINT(hicpp-signed-bitwise) -- something inside Python code causes warning
             std::string functionName = PyUnicode_AsUTF8(item);
@@ -1067,7 +1128,7 @@ bool PluginInstance::run(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledF
                                    format("Program terminates after call to {}() on {} failed!", functionNameAsString, this->stringIdentifier));
     }
     if (PyLong_Check(pFunctionResponse)) { // NOLINT(hicpp-signed-bitwise)
-        int exitCode = PyLong_AsLong(pFunctionResponse);
+        long exitCode = PyLong_AsLong(pFunctionResponse);
         if (exitCode == 0) {
             // success
         } else if (exitCode == 1) {
@@ -1102,9 +1163,9 @@ bool PluginInstance::run([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]
 std::vector<std::string> PluginManager::currentPythonPath()
 {
     PyObject *sysPath = PySys_GetObject("path"); // Borrowed reference
-    size_t const n = PyList_Size(sysPath);       // Py_ssize_t
+    Py_ssize_t const n = PyList_Size(sysPath);   // Py_ssize_t
     std::vector<std::string> pathLibs(n);
-    for (size_t i = 0; i < n; ++i) {
+    for (Py_ssize_t i = 0; i < n; ++i) {
         PyObject *element = PyList_GetItem(sysPath, i); // Borrowed reference
         pathLibs[i] = std::string{PyUnicode_AsUTF8(element)};
     }
@@ -1120,14 +1181,14 @@ void PluginManager::addToPythonPath(EnergyPlusData &state, const fs::path &inclu
     // We use generic_string / generic_wstring here, which will always use a forward slash as directory separator even on windows
     // This doesn't handle the (very strange, IMHO) case were on unix you have backlashes (which are VALID filenames on Unix!)
     // Could use FileSystem::makeNativePath first to convert the backslashes to forward slashes on Unix
-    PyObject *unicodeIncludePath = nullptr;
-    if constexpr (std::is_same_v<typename fs::path::value_type, wchar_t>) {
-        const std::wstring ws = includePath.generic_wstring();
-        unicodeIncludePath = PyUnicode_FromWideChar(ws.c_str(), static_cast<Py_ssize_t>(ws.size())); // New reference
-    } else {
-        const std::string s = includePath.generic_string();
-        unicodeIncludePath = PyUnicode_FromString(s.c_str()); // New reference
-    }
+    PyObject *unicodeIncludePath;
+#ifdef _WIN32
+    const std::wstring ws = includePath.generic_wstring();
+    unicodeIncludePath = PyUnicode_FromWideChar(ws.c_str(), static_cast<Py_ssize_t>(ws.size())); // New reference
+#else
+    const std::string s = includePath.generic_string();
+    unicodeIncludePath = PyUnicode_FromString(s.c_str()); // New reference
+#endif
     if (unicodeIncludePath == nullptr) {
         EnergyPlus::ShowFatalError(state,
                                    format("ERROR converting the path \"{}\" for addition to the sys.path in Python", includePath.generic_string()));
@@ -1180,16 +1241,17 @@ void PluginManager::addGlobalVariable([[maybe_unused]] EnergyPlusData &state, [[
 int PluginManager::getGlobalVariableHandle(EnergyPlusData &state, const std::string &name, bool const suppress_warning)
 { // note zero is a valid handle
     std::string const varNameUC = EnergyPlus::Util::makeUPPER(name);
-    auto const it = std::find(state.dataPluginManager->globalVariableNames.begin(), state.dataPluginManager->globalVariableNames.end(), varNameUC);
-    if (it != state.dataPluginManager->globalVariableNames.end()) {
-        return std::distance(state.dataPluginManager->globalVariableNames.begin(), it);
+    auto const &gVarNames = state.dataPluginManager->globalVariableNames;
+    auto const it = std::find(gVarNames.begin(), gVarNames.end(), varNameUC);
+    if (it != gVarNames.end()) {
+        return (int)std::distance(gVarNames.begin(), it);
     } else {
         if (suppress_warning) {
             return -1;
         } else {
             EnergyPlus::ShowSevereError(state, "Tried to retrieve handle for a nonexistent plugin global variable");
             EnergyPlus::ShowContinueError(state, format("Name looked up: \"{}\", available names: ", varNameUC));
-            for (auto const &gvName : state.dataPluginManager->globalVariableNames) {
+            for (auto const &gvName : gVarNames) {
                 EnergyPlus::ShowContinueError(state, format("    \"{}\"", gvName));
             }
             EnergyPlus::ShowFatalError(state, "Plugin global variable problem causes program termination");
@@ -1213,7 +1275,7 @@ int PluginManager::getTrendVariableHandle(EnergyPlusData &state, const std::stri
     for (size_t i = 0; i < state.dataPluginManager->trends.size(); i++) {
         auto &thisTrend = state.dataPluginManager->trends[i];
         if (thisTrend.name == varNameUC) {
-            return i;
+            return (int)i;
         }
     }
     return -1;
@@ -1407,7 +1469,7 @@ int PluginManager::getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::st
     for (size_t handle = 0; handle < state.dataPluginManager->plugins.size(); handle++) {
         auto const &thisPlugin = state.dataPluginManager->plugins[handle];
         if (Util::makeUPPER(thisPlugin.emsAlias) == Util::makeUPPER(_programName)) {
-            return handle;
+            return (int)handle;
         }
     }
     return -1;
