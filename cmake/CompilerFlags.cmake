@@ -86,9 +86,10 @@ elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" O
 
   # COMPILER FLAGS
   target_compile_options(project_options INTERFACE -pipe) # Faster compiler processing
-  target_compile_options(project_warnings INTERFACE -Wpedantic
-  )# Turn on warnings about constructs/situations that may be non-portable or outside of the standard
-  target_compile_options(project_warnings INTERFACE -Wall -Wextra) # Turn on warnings
+  target_compile_options(project_warnings INTERFACE -Wpedantic)
+  # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
+  target_compile_options(project_warnings INTERFACE -Wall) # Turn on warnings
+  target_compile_options(project_warnings INTERFACE -Wextra) # Turn on warnings
   target_compile_options(project_warnings INTERFACE -Wno-unknown-pragmas)
   if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
     target_compile_options(project_warnings INTERFACE -Wno-deprecated-copy)
@@ -101,6 +102,11 @@ elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" O
     target_compile_options(project_warnings INTERFACE -Wno-unused-but-set-parameter -Wno-unused-but-set-variable)
     target_compile_options(project_warnings INTERFACE -Wno-maybe-uninitialized)
     target_compile_options(project_warnings INTERFACE -Wno-aggressive-loop-optimizations)
+    # Sadly, GCC 13.2 is throwing many false positives on dangling references and compile time array-bounds
+    # https://gcc.gnu.org/git/gitweb.cgi?p=gcc.git;h=6b927b1297e66e26e62e722bf15c921dcbbd25b9
+    target_compile_options(project_warnings INTERFACE -Wno-dangling-reference)
+    target_compile_options(project_warnings INTERFACE -Wno-array-bounds)
+    target_compile_options(project_warnings INTERFACE -Wno-stringop-overflow)
   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0)
       # Suppress unused-but-set warnings until more serious ones are addressed
