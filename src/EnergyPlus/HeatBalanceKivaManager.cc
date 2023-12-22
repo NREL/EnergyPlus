@@ -839,7 +839,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
                     Real64 surfHeight = Surfaces(wl).get_average_height(state);
                     // round to avoid numerical precision differences
-                    surfHeight = std::round((surfHeight) * 1000.0) / 1000.0;
+                    surfHeight = std::round((surfHeight)*1000.0) / 1000.0;
 
                     if (combinationMap.count({Surfaces(wl).Construction, surfHeight}) == 0) {
                         // create new combination
