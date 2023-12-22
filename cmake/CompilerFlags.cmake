@@ -77,6 +77,9 @@ if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/RTCsu>) # Runtime checks
   target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:/fp:strict>) # Floating point model
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/DMSVC_DEBUG>) # Triggers code in main.cc to catch floating point NaNs
+
+  target_compile_options(turn_off_warnings INTERFACE /W0)
+
 elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") # g++/Clang
 
   # TODO: after we fix all test, enable this by default on Debug builds
@@ -139,6 +142,8 @@ elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" O
   target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:-fno-stack-protector>)
   # ADD_CXX_RELEASE_DEFINITIONS("-Ofast") # -Ofast (or -ffast-math) needed to auto-vectorize floating point loops
 
+  target_compile_options(turn_off_warnings INTERFACE -w)
+
 elseif(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 
   # Disabled Warnings: Enable some of these as more serious warnings are addressed
@@ -192,6 +197,8 @@ elseif(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:/Qfp-stack-check>)
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/traceback>) # Enables traceback on error
 
+  target_compile_options(turn_off_warnings INTERFACE /w)
+
 elseif(UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 
   # Disabled Warnings: Enable some of these as more serious warnings are addressed
@@ -237,6 +244,7 @@ elseif(UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:-fp-stack-check>) # Check the floating point stack after every function call
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-traceback>) # Enables traceback on error
 
+  target_compile_options(turn_off_warnings INTERFACE -w)
 endif() # COMPILER TYPE
 
 # Add Color Output if Using Ninja:

@@ -59,6 +59,8 @@ add_library(project_fp_options INTERFACE)
 
 add_library(project_warnings INTERFACE)
 
+add_library(turn_off_warnings INTERFACE)
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads)
 target_link_libraries(project_options INTERFACE Threads::Threads)

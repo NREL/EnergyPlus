@@ -73,6 +73,9 @@ set(CMAKE_CXX_STANDARD 17)
 #Note: the Tarcog files are improperly initializing their virtual base classes, and this 4589 warning
 # on MSVC is legitimate, but silencing the warning because it's a third-party library
 
+# Shush every warning for any lib added after it?
+# link_libraries(turn_off_warnings)
+
 if(NOT MSVC)
   add_compile_options(-Wno-pedantic -Wno-unused-parameter -Wno-unknown-pragmas)
 else()
@@ -93,7 +96,7 @@ set(RE2_BUILD_TESTING
 #      CACHE BOOL "" FORCE)
 #endif()
 
-# We don't want to enable the global warnings for any of the third party projects
+# We don't want to enable the global project_warnings for any of the third party projects
 link_libraries(project_options)
 add_subdirectory(SQLite)
 set_target_properties(sqlite PROPERTIES FOLDER ThirdParty/SQLite)
@@ -132,15 +135,15 @@ set_target_properties(epexpat PROPERTIES FOLDER ThirdParty/Expat)
 
 add_subdirectory(FMI)
 set_target_properties(epfmiimport PROPERTIES FOLDER ThirdParty/FMI)
-target_compile_options(epfmiimport PRIVATE "-w")
+target_link_libraries(epfmiimport turn_off_warnings)
 
 add_subdirectory(zlib)
 set_target_properties(miniziplib PROPERTIES FOLDER ThirdParty/zlib)
-target_compile_options(miniziplib PRIVATE "-w")
+target_link_libraries(miniziplib PRIVATE turn_off_warnings)
 
 add_subdirectory(DElight)
 set_target_properties(DElight PROPERTIES FOLDER ThirdParty/DElight)
-target_compile_options(DElight PRIVATE "-w")
+target_link_libraries(DElight PRIVATE turn_off_warnings)
 
 add_subdirectory(re2)
 set_target_properties(re2 PROPERTIES FOLDER ThirdParty/re2)
@@ -165,7 +168,7 @@ set(KIVA_COVERAGE OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(kiva)
 set_target_properties(libkiva PROPERTIES FOLDER ThirdParty/Kiva)
-target_compile_options(libkiva PRIVATE "-w")
+target_link_libraries(libkiva PRIVATE turn_off_warnings)
 
 if(NOT APPLE)
   add_subdirectory(FMUParser)
