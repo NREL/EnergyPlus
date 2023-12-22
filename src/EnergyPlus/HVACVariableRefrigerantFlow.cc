@@ -12492,6 +12492,15 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         this->ElecHeatingPower = 0;
     }
     this->VRFCondRTF = VRFRTF;
+    // consider cycling in fan calculation
+    for (int TUListNum = 1; TUListNum <= state.dataHVACVarRefFlow->NumVRFTULists; ++TUListNum) {
+        auto &thisTUList = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum);
+        for (int TUNum = 1; TUNum <= thisTUList.NumTUInList; ++TUNum) {
+            auto &fan = state.dataFans->Fan(state.dataHVACVarRefFlow->VRFTU(TUNum).FanIndex);
+            fan.FanPower *= state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondCyclingRatio;
+            fan.FanEnergy = fan.FanPower * state.dataHVACGlobal->TimeStepSysSec;
+        }
+    }
 
     // Calculate CrankCaseHeaterPower: VRF Heat Pump Crankcase Heater Electric Power [W]
     if (this->MaxOATCCHeater > OutdoorDryBulb) {
