@@ -67,7 +67,7 @@ elseif(MSVC) # VisualStudio
 endif()
 target_compile_features(ssc PRIVATE cxx_std_11)
 
-# C++17 flag is intentionally after ssd
+# C++17 flag is intentionally after ssc
 set(CMAKE_CXX_STANDARD 17)
 
 #Note: the Tarcog files are improperly initializing their virtual base classes, and this 4589 warning
@@ -123,21 +123,32 @@ endif()
 
 add_subdirectory(ObjexxFCL)
 set_target_properties(objexx PROPERTIES FOLDER ThirdParty/ObjexxFCL)
+
 add_subdirectory(BCVTB)
 set_target_properties(bcvtb PROPERTIES FOLDER ThirdParty/BCVTB)
+
 add_subdirectory(Expat)
 set_target_properties(epexpat PROPERTIES FOLDER ThirdParty/Expat)
+
 add_subdirectory(FMI)
 set_target_properties(epfmiimport PROPERTIES FOLDER ThirdParty/FMI)
+target_compile_options(epfmiimport PRIVATE "-w")
+
 add_subdirectory(zlib)
 set_target_properties(miniziplib PROPERTIES FOLDER ThirdParty/zlib)
+target_compile_options(miniziplib PRIVATE "-w")
+
 add_subdirectory(DElight)
 set_target_properties(DElight PROPERTIES FOLDER ThirdParty/DElight)
+target_compile_options(DElight PRIVATE "-w")
+
 add_subdirectory(re2)
 set_target_properties(re2 PROPERTIES FOLDER ThirdParty/re2)
+
 add_subdirectory(fmt-8.0.1)
 target_compile_definitions(fmt PRIVATE FMT_USE_FULL_CACHE_DRAGONBOX=1)
 set_target_properties(fmt PROPERTIES FOLDER ThirdParty/fmt)
+
 add_subdirectory(cpgfunctionEP)
 set_target_properties(cpgfunctionEP PROPERTIES FOLDER ThirdParty/cpgfunctionEP)
 
@@ -152,8 +163,9 @@ set(KIVA_3D OFF CACHE BOOL "" FORCE)
 set(KIVA_GROUND_PLOT ${BUILD_GROUND_PLOT} CACHE BOOL "" FORCE)
 set(KIVA_COVERAGE OFF CACHE BOOL "" FORCE)
 
-add_subdirectory("kiva")
+add_subdirectory(kiva)
 set_target_properties(libkiva PROPERTIES FOLDER ThirdParty/Kiva)
+target_compile_options(libkiva PRIVATE "-w")
 
 if(NOT APPLE)
   add_subdirectory(FMUParser)
