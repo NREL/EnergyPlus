@@ -3371,7 +3371,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
 
-                if (curUnit != Constant::Units::unknown) {
+                if (curUnit != Constant::Units::Invalid) {
                     SetupOutputVariable(state,
                                         cAlphaArgs(1),
                                         curUnit,
