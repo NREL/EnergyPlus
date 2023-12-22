@@ -227,6 +227,12 @@ void GetBoilerInput(EnergyPlusData &state)
             ShowContinueError(state, format("Invalid {}={:.3R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
             ShowSevereError(state, format("...{} must be greater than 0.0", state.dataIPShortCut->cNumericFieldNames(2)));
             ErrorsFound = true;
+        } else if (state.dataIPShortCut->rNumericArgs(2) > 1.0) {
+            ShowWarningError(state,
+                             fmt::format("{} = {}: {} should not typically be greater than 1.",
+                                         state.dataIPShortCut->cCurrentModuleObject,
+                                         state.dataIPShortCut->cAlphaArgs(1),
+                                         state.dataIPShortCut->cNumericFieldNames(2)));
         }
 
         if (state.dataIPShortCut->cAlphaArgs(3) == "ENTERINGBOILER") {

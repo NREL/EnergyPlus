@@ -2451,6 +2451,13 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 
         if (state.dataIPShortCut->rNumericArgs(8) > 0.0) {
             Tank.Efficiency = state.dataIPShortCut->rNumericArgs(8);
+            if (state.dataIPShortCut->rNumericArgs(8) > 1.0) {
+                ShowWarningError(state,
+                                 fmt::format("{} = {}: {} should not typically be greater than 1.",
+                                             state.dataIPShortCut->cCurrentModuleObject,
+                                             state.dataIPShortCut->cAlphaArgs(1),
+                                             state.dataIPShortCut->cNumericFieldNames(8)));
+            }
         } else {
             ShowSevereError(state,
                             format("{} = {}:  Heater Thermal Efficiency must be greater than zero",
@@ -3016,6 +3023,13 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         if (state.dataIPShortCut->rNumericArgs(11) > 0.0) {
             Tank.Efficiency = state.dataIPShortCut->rNumericArgs(11);
+            if (state.dataIPShortCut->rNumericArgs(11) > 1.0) {
+                ShowWarningError(state,
+                                 fmt::format("{} = {}: {} should not typically be greater than 1.",
+                                             state.dataIPShortCut->cCurrentModuleObject,
+                                             state.dataIPShortCut->cAlphaArgs(1),
+                                             state.dataIPShortCut->cNumericFieldNames(11)));
+            }
         } else {
             ShowSevereError(state,
                             format("{} = {}:  Heater Thermal Efficiency must be greater than zero",
