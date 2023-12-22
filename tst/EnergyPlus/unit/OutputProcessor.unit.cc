@@ -5670,12 +5670,12 @@ EXPECT_EQ((int)ReportFreq::Simulation, (int)op->reqVars[4]->freq);
         std::string errMsg = delimited_string(
             {"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid Output Variable or Meter Name=\"DISTRICTHEATINGWATER:FACILITY\".",
              "   **   ~~~   ** ...will not be shown with the Meter results.",
-             "   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", no items assigned",
+             "   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", no items assigned ",
              "   **   ~~~   ** ...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another "
              "Meter:Custom.",
              "   ** Warning ** Meter:Custom=\"CUSTOMMETER2\", contains a reference to another Meter:Custom in field: Output Variable or Meter "
              "Name=\"CUSTOMMETER1\".",
-             "   ** Warning ** Meter:Custom=\"CUSTOMMETER2\", no items assigned",
+             "   ** Warning ** Meter:Custom=\"CUSTOMMETER2\", no items assigned ",
              "   **   ~~~   ** ...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom."});
         compare_err_stream(errMsg);
     }
