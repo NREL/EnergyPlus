@@ -877,7 +877,7 @@ namespace OutputProcessor {
 
             // Somehow, this meter is not linked to any variables either directly or via another meter
             if (itemsAssigned == false) {
-                ShowWarningError(state, format("Meter:Custom=\"{}\", no items assigned", ipsc->cAlphaArgs(1)));
+                ShowWarningError(state, format("Meter:Custom=\"{}\", no items assigned ", ipsc->cAlphaArgs(1)));
                 ShowContinueError(state, "...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom.");
                 continue;
             }
@@ -1174,7 +1174,7 @@ namespace OutputProcessor {
 
             // Somehow, this meter is not linked to any variables either directly or via another meter
             if (itemsAssigned == false) {
-                ShowWarningError(state, format("Meter:Custom=\"{}\", no items assigned", ipsc->cAlphaArgs(1)));
+                ShowWarningError(state, format("Meter:Custom=\"{}\", no items assigned ", ipsc->cAlphaArgs(1)));
                 ShowContinueError(state, "...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom.");
                 continue;
             }
@@ -4845,11 +4845,13 @@ bool ReportingThisVariable(EnergyPlusData &state, std::string const &RepVarName)
         
     auto &op = state.dataOutputProcessor;
 
+    std::string name = Util::makeUPPER(RepVarName);
+
     for (int iReqVar = 0; iReqVar < (int)op->reqVars.size(); ++iReqVar) {
-        if (op->reqVars[iReqVar]->name == RepVarName) return true;
+        if (op->reqVars[iReqVar]->name == name) return true;
     }
 
-    if (auto found = op->meterMap.find(RepVarName); found != op->meterMap.end()) {
+    if (auto found = op->meterMap.find(name); found != op->meterMap.end()) {
         auto const *meter = op->meters[found->second];
         for (int iFreq = (int)ReportFreq::TimeStep; iFreq < (int)ReportFreq::Num; ++iFreq) {
             if (iFreq == (int)ReportFreq::Year) continue;

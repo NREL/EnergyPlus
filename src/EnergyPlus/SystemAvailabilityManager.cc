@@ -882,7 +882,7 @@ namespace SystemAvailabilityManager {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     optimumStartMgr.Name,
-                                    Constant::eResource::None,
+                                    Constant::eResource::Invalid,
                                     OutputProcessor::SOVEndUseCat::Invalid,
                                     {},
                                     OutputProcessor::SOVGroup::Invalid,
