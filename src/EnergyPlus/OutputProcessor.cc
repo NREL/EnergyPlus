@@ -1590,7 +1590,7 @@ namespace OutputProcessor {
         // Set Max
         for (auto *meter : op->meters) {
             Real64 TSValue = meter->periods[(int)ReportFreq::TimeStep].Value;
-            Real64 TSValueComp = TSValue - 0.00001;
+            Real64 TSValueComp = TSValue; //  - 0.00001;
             
             // Todo - HRMinVal, HRMaxVal not used
             auto &periodDY = meter->periods[(int)ReportFreq::Day];
@@ -1624,7 +1624,7 @@ namespace OutputProcessor {
         // Set Min
         for (auto *meter : op->meters) {
             Real64 TSValue = meter->periods[(int)ReportFreq::TimeStep].Value;
-            Real64 TSValueComp = TSValue + 0.00001;
+            Real64 TSValueComp = TSValue; // + 0.00001;
             
             auto &periodDY = meter->periods[(int)ReportFreq::Day];
             if (TSValueComp >= periodDY.MinVal) continue;
