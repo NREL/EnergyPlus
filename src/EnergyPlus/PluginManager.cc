@@ -412,7 +412,7 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
 }
 
 #if LINK_WITH_PYTHON
-void PluginManager::initPython(EnergyPlusData &state, fs::path const &pathToPythonPackages)
+void initPython(EnergyPlusData &state, fs::path const &pathToPythonPackages)
 {
     PyStatus status;
 
@@ -507,7 +507,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
     }
     fs::path const pathToPythonPackages = programDir / "python_standard_lib";
 
-    PluginManager::initPython(state, pathToPythonPackages);
+    initPython(state, pathToPythonPackages);
 
     // Take control of the global interpreter lock while we are here, make sure to release it...
     PyGILState_STATE gil = PyGILState_Ensure();
