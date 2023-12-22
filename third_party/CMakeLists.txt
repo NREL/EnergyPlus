@@ -168,7 +168,6 @@ set(KIVA_COVERAGE OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(kiva)
 set_target_properties(libkiva PROPERTIES FOLDER ThirdParty/Kiva)
-target_link_libraries(libkiva PRIVATE turn_off_warnings)
 
 if(NOT APPLE)
   add_subdirectory(FMUParser)
