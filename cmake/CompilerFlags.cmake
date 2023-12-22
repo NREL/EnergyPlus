@@ -104,8 +104,13 @@ elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" O
     target_compile_options(project_warnings INTERFACE -Wno-aggressive-loop-optimizations)
     # Sadly, GCC 13.2 is throwing many false positives on dangling references and compile time array-bounds
     # https://gcc.gnu.org/git/gitweb.cgi?p=gcc.git;h=6b927b1297e66e26e62e722bf15c921dcbbd25b9
+    # https://trofi.github.io/posts/264-gcc-s-new-Wdangling-reference-warning.html
     target_compile_options(project_warnings INTERFACE -Wno-dangling-reference)
+    # The array-bounds appears to be problematic as well depending on the optimization level chosen
+    # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100430
     target_compile_options(project_warnings INTERFACE -Wno-array-bounds)
+    # depending on the level of overflow check selected, the stringop-overflow can also emit false positives
+    # https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wstringop-overflow
     target_compile_options(project_warnings INTERFACE -Wno-stringop-overflow)
   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0)

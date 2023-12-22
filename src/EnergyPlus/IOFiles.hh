@@ -141,9 +141,6 @@ private:
     std::string_view spec_builder()
     {
         buffer.clear();
-        // This line seems to be the culprit with some array-bounds warnings
-        // during compilation on GCC 13.2.  I don't see how at the moment.
-        // I tried pragma-ing it away but it didn't help
         buffer.push_back('{');
         buffer.push_back(':');
         //    [[fill]align][sign]["#"]["0"][width]["." precision]["L"][type]
