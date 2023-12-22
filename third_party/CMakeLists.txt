@@ -10,7 +10,7 @@ target_compile_definitions(
 )
 target_include_directories(
         nlohmann_json
-        INTERFACE
+        SYSTEM INTERFACE
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/nlohmann>
 )
 
