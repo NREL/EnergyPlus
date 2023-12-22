@@ -13,6 +13,11 @@ target_include_directories(
         SYSTEM INTERFACE
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/nlohmann>
 )
+set_source_files_properties(
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/nlohmann>/json.hpp
+  TARGET_DIRECTORY nlohmann_json
+  PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations
+)
 
 # To avoid modifying every third_party library
 # we link the project_options in here for every library in this
