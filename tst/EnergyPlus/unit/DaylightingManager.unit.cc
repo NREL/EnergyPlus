@@ -1428,7 +1428,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
     // Set the following values to make thisDaylightControl.SourceLumFromWinAtRefPt much larger than
     // luminance threshold of 2000 (WindowShadingControl SetPoint2)
     for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
-        state->dataDayltg->GILSK[iHr] = {8.0, 8.0, 8.0, 8.0};
+        state->dataDayltg->horIllum[iHr].sky = {8.0, 8.0, 8.0, 8.0};
     }
     state->dataGlobal->WeightNow = 0.54;
     state->dataEnvrn->HISUNF = 28500.0;
@@ -1444,20 +1444,20 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
         for (int iWin = 1; iWin <= numExtWins; ++iWin) {
             for (int iRefPt = 1; iRefPt <= numRefPts; ++iRefPt) {
                 for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) {
-                    thisDaylgtCtrl.DaylIllFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.2, 0.2, 0.2, 0.2};
-                    thisDaylgtCtrl.DaylBackFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.01, 0.01, 0.01, 0.01};
-                    thisDaylgtCtrl.DaylSourceFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.9, 0.9, 0.9, 0.9};
+                    thisDaylgtCtrl.DaylIllumFac(iHr, iWin, iRefPt, iSlatAng).sky = {0.2, 0.2, 0.2, 0.2};
+                    thisDaylgtCtrl.DaylIllumFac(iHr, iWin, iRefPt, iSlatAng).sun = 0.02;
+                    thisDaylgtCtrl.DaylIllumFac(iHr, iWin, iRefPt, iSlatAng).sunDisk = 0.01;
+                    
+                    thisDaylgtCtrl.DaylBackFac(iHr, iWin, iRefPt, iSlatAng).sky = {0.01, 0.01, 0.01, 0.01};
+                    thisDaylgtCtrl.DaylBackFac(iHr, iWin, iRefPt, iSlatAng).sun = 0.01;
+                    thisDaylgtCtrl.DaylBackFac(iHr, iWin, iRefPt, iSlatAng).sunDisk = 0.01;
+                    thisDaylgtCtrl.DaylSourceFac(iHr, iWin, iRefPt, iSlatAng).sky = {0.9, 0.9, 0.9, 0.9};
+                    thisDaylgtCtrl.DaylSourceFac(iHr, iWin, iRefPt, iSlatAng).sun = 0.26;
+                    thisDaylgtCtrl.DaylSourceFac(iHr, iWin, iRefPt, iSlatAng).sunDisk = 0.0;
                 }
             }
         }
     }
-
-    thisDaylgtCtrl.DaylIllFacSun = 0.02;
-    thisDaylgtCtrl.DaylIllFacSunDisk = 0.01;
-    thisDaylgtCtrl.DaylBackFacSun = 0.01;
-    thisDaylgtCtrl.DaylBackFacSunDisk = 0.01;
-    thisDaylgtCtrl.DaylSourceFacSun = 0.26;
-    thisDaylgtCtrl.DaylSourceFacSunDisk = 0.0;
 
     state->dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::IntShadeConditionallyOff;
     Dayltg::DayltgInteriorIllum(*state, ZoneNum);
@@ -1465,7 +1465,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
 
     // Set the following values to make thisDaylightControl.SourceLumFromWinAtRefPt 0
     for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
-        state->dataDayltg->GILSK[iHr] = {100.0, 100.0, 100.0, 100.0};
+        state->dataDayltg->horIllum[iHr].sky = {100.0, 100.0, 100.0, 100.0};
     }
     state->dataGlobal->WeightNow = 1.0;
     state->dataEnvrn->HISUNF = 100.0;
@@ -1476,20 +1476,13 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
         for (int iWin = 1; iWin <= numExtWins; ++iWin) {
             for (int iRefPt = 1; iRefPt <= numRefPts; ++iRefPt) {
                 for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) {
-                    thisDaylgtCtrl.DaylIllFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
-                    thisDaylgtCtrl.DaylBackFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
-                    thisDaylgtCtrl.DaylSourceFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
+                    thisDaylgtCtrl.DaylIllumFac(iHr, iWin, iRefPt, iSlatAng) = Illums();
+                    thisDaylgtCtrl.DaylBackFac(iHr, iWin, iRefPt, iSlatAng) = Illums();
+                    thisDaylgtCtrl.DaylSourceFac(iHr, iWin, iRefPt, iSlatAng) = Illums();
                 }
             }
         }
     }
-
-    thisDaylgtCtrl.DaylIllFacSun = 0.0;
-    thisDaylgtCtrl.DaylIllFacSunDisk = 0.0;
-    thisDaylgtCtrl.DaylBackFacSun = 0.0;
-    thisDaylgtCtrl.DaylBackFacSunDisk = 0.0;
-    thisDaylgtCtrl.DaylSourceFacSun = 0.0;
-    thisDaylgtCtrl.DaylSourceFacSunDisk = 0.0;
 
     state->dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::IntShadeConditionallyOff;
     Dayltg::DayltgInteriorIllum(*state, ZoneNum);
@@ -1754,7 +1747,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     Dayltg::GetDaylightingParametersInput(*state);
 
     for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
-        state->dataDayltg->GILSK[iHr] = {100.0, 100.0, 100.0, 100.0};
+        state->dataDayltg->horIllum[iHr].sky = {100.0, 100.0, 100.0, 100.0};
     }
 
     state->dataGlobal->WeightNow = 1.0;
@@ -1771,21 +1764,14 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
         for (int iWin = 1; iWin <= numExtWins; ++iWin) {
             for (int iRefPt = 1; iRefPt <= numRefPts; ++iRefPt) {
                 for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) {
-                    thisDaylgtCtrl.DaylIllFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
-                    thisDaylgtCtrl.DaylBackFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
-                    thisDaylgtCtrl.DaylSourceFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
+                    thisDaylgtCtrl.DaylIllumFac(iHr, iWin, iRefPt, iSlatAng) = Illums();
+                    thisDaylgtCtrl.DaylBackFac(iHr, iWin, iRefPt, iSlatAng) = Illums();
+                    thisDaylgtCtrl.DaylSourceFac(iHr, iWin, iRefPt, iSlatAng) = Illums();
                 }
             }
         }
     }
 
-    // Set all daylighting factors to zero
-    thisDaylgtCtrl.DaylIllFacSun = 0.0;
-    thisDaylgtCtrl.DaylIllFacSunDisk = 0.0;
-    thisDaylgtCtrl.DaylBackFacSun = 0.0;
-    thisDaylgtCtrl.DaylBackFacSunDisk = 0.0;
-    thisDaylgtCtrl.DaylSourceFacSun = 0.0;
-    thisDaylgtCtrl.DaylSourceFacSunDisk = 0.0;
     Dayltg::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDayltg->DaylIllum(1), 0.0, 0.001);
 
@@ -1799,11 +1785,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     // Set un-shaded surface illuminance factor to 1.0 for RefPt1, 0.1 for RefPt2
     // Set shaded surface illuminance factor to 0.5 for RefPt1, 0.05 for RefPt2
     int RefPt = 1;
-    thisDaylgtCtrl.DaylIllFacSky(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Unshaded).sky[iSky] = 1.0;
-    thisDaylgtCtrl.DaylIllFacSky(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Shaded).sky[iSky] = 0.5;
+    thisDaylgtCtrl.DaylIllumFac(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Unshaded).sky[iSky] = 1.0;
+    thisDaylgtCtrl.DaylIllumFac(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Shaded).sky[iSky] = 0.5;
     RefPt = 2;
-    thisDaylgtCtrl.DaylIllFacSky(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Unshaded).sky[iSky] = 0.1;
-    thisDaylgtCtrl.DaylIllFacSky(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Shaded).sky[iSky] = 0.05;
+    thisDaylgtCtrl.DaylIllumFac(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Unshaded).sky[iSky] = 0.1;
+    thisDaylgtCtrl.DaylIllumFac(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Shaded).sky[iSky] = 0.05;
 
     // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
     state->dataSurface->SurfWinWindowModelType(IWin) = WindowModel::Detailed;

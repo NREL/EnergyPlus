@@ -527,24 +527,12 @@ struct DaylightingData : BaseGlobalStruct
     // I = 1 for clear sky, 2 for clear turbid, 3 for intermediate, 4 for overcast;
     // J = 1 for bare window, 2 - 12 for shaded;
     // K = sun position index.
-    Array2D<Dayltg::Illums> EINTSK; // Sky-related portion of internally reflected illuminance
-    Array2D<Real64> EINTSU;         // Sun-related portion of internally reflected illuminance,
-    // excluding entering beam
-    Array2D<Real64> EINTSUdisk; // Sun-related portion of internally reflected illuminance
-    // due to entering beam
-    Array2D<Dayltg::Illums> WLUMSK; // Sky-related window luminance
-    Array2D<Real64> WLUMSU;         // Sun-related window luminance, excluding view of solar disk
-    Array2D<Real64> WLUMSUdisk;     // Sun-related window luminance, due to view of solar disk
+   std::array<Dayltg::Illums, (int)Constant::HoursInDay+1> horIllum = {Dayltg::Illums()}; // Horizontal illuminance from sky, by sky type, for each hour of the day
+    Array2D<Dayltg::Illums> dirIllum; // Sky-related component of direct illuminance
+    Array2D<Dayltg::Illums> reflIllum; // Sky-related portion of internally reflected illuminance
+    Array2D<Dayltg::Illums> winLum; // Sky-related window luminance
 
-   std::array<Dayltg::Illums, (int)Constant::HoursInDay+1> GILSK = {Dayltg::Illums()}; // Horizontal illuminance from sky, by sky type, for each hour of the day
-   std::array<Real64, (int)Constant::HoursInDay+1> GILSU = {0.0};  // Horizontal illuminance from sun for each hour of the day
-
-    Array2D<Dayltg::Illums> EDIRSK; // Sky-related component of direct illuminance
-    Array2D<Real64> EDIRSU;         // Sun-related component of direct illuminance (excluding beam solar at ref pt)
-    Array2D<Real64> EDIRSUdisk;     // Sun-related component of direct illuminance due to beam solar at ref pt
-    Array2D<Dayltg::Illums> AVWLSK; // Sky-related average window luminance
-    Array2D<Real64> AVWLSU;         // Sun-related average window luminance, excluding view of solar disk
-    Array2D<Real64> AVWLSUdisk;     // Sun-related average window luminance due to view of solar disk
+    Array2D<Dayltg::Illums> avgWinLum; // Sky-related average window luminance
 
     // Allocatable daylight factor arrays  -- are in the ZoneDaylight Structure
 
@@ -582,6 +570,12 @@ struct DaylightingData : BaseGlobalStruct
     Array1D<Real64> SetPnt;                     // Illuminance setpoint at reference points (lux)
     Array1D<Real64> GLRNDX;                     // Glare index at reference point
     Array1D<Real64> GLRNEW;                     // New glare index at reference point 
+
+    // Not sure why these need to be state variables and can't local
+    // variable of DayltgInterReflectIllum(), but some EMS tests break
+    // if they are made local
+    std::array<std::array<Real64, Dayltg::NTHMAX + 1>, Dayltg::NPHMAX + 1> SkyObstructionMult;
+    std::array<std::array<Real64, Dayltg::NTHMAX + 1>, Dayltg::NPHMAX + 1> ObTransM; // ObTrans value for each (TH,PH) direction
 
     Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>> tmpIllumFromWinAtRefPt;
     Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>> tmpBackLumFromWinAtRefPt;
@@ -627,20 +621,13 @@ void clear_state() override
         this->maxNumRefPtInAnyEncl = 0;
         this->sunAngles = Dayltg::SunAngles();
         this->sunAnglesHr = {Dayltg::SunAngles()};
-        this->EINTSK.deallocate();
-        this->EINTSU.deallocate();
-        this->EINTSUdisk.deallocate();
-        this->WLUMSK.deallocate();
-        this->WLUMSU.deallocate();
-        this->WLUMSUdisk.deallocate();
-        this->GILSK = {Dayltg::Illums()};
-        this->GILSU = {0.0};
-        this->EDIRSK.deallocate();
-        this->EDIRSU.deallocate();
-        this->EDIRSUdisk.deallocate();
-        this->AVWLSK.deallocate();
-        this->AVWLSU.deallocate();
-        this->AVWLSUdisk.deallocate();
+
+        this->horIllum = {Dayltg::Illums()};
+        this->dirIllum.deallocate();
+        this->reflIllum.deallocate();
+        this->winLum.deallocate();
+        this->avgWinLum.deallocate();
+        
         this->TDDTransVisBeam.deallocate();
         this->TDDFluxInc.deallocate();
         this->TDDFluxTrans.deallocate();
