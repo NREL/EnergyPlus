@@ -461,7 +461,7 @@ namespace Dayltg {
 
     void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state);
 
-    std::size_t CreateShadeDeploymentOrder(EnergyPlusData &state, int const enclNum);
+    void CreateShadeDeploymentOrder(EnergyPlusData &state, int const enclNum);
 
     void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int const enclNum);
 
@@ -484,7 +484,11 @@ namespace Dayltg {
 
 struct DaylightingData : BaseGlobalStruct
 {
-    int maxRefPointsPerControl = 0;
+    int maxControlRefPoints = 0;
+    int maxShadeDeployOrderExtWins = 0;
+    int maxDayltgExtWins = 0;
+    int maxEnclSubSurfaces = 0;
+
     bool mapResultsToReport = false; // used when only partial hour has "sun up"
     bool mapResultsReported = false; // when no map results are ever reported this will still be false
     char MapColSep;                  // Character for separating map columns (tab, space, comma)
@@ -552,24 +556,16 @@ struct DaylightingData : BaseGlobalStruct
     std::array<Real64, 2 * DataSurfaces::AzimAngStepsForSolReflCalc + 1> cos_Theta = {0.0}; // cos( Theta ) table
     std::array<Real64, 2 * DataSurfaces::AzimAngStepsForSolReflCalc + 1> sin_Theta = {0.0}; // sin( Theta ) table
 
-    // int IConstShaded = 0; // The shaded window construction for switchable windows
-    Real64 VTDark = 0.0; // Visible transmittance (VT) of electrochromic (EC) windows in fully dark state
-                         // Real64 VTMULT = 1.0;  // VT multiplier for EC windows // I don't think this is used anywhere
-    Dayltg::Illums WinLumSK;                                                           // Sky related window luminance
-    Dayltg::Illums EDirSky;                                                            // Sky related direct illuminance
+    // Dayltg::Illums WinLumSK;                                                           // Sky related window luminance
+    // Dayltg::Illums EDirSky;                                                            // Sky related direct illuminance
 
-    Array1D<Real64> BACLUM;
-    Array1D<Real64> DayltgInteriorMapIllumGLRNDX;
-    Array1D<Real64> daylight_illum;
-
+    // Array1D<Real64> BACLUM;
+    // Array1D<Real64> DayltgInteriorMapIllumGLRNDX;
     std::array<Real64, Dayltg::NPH + 1> PH;     // Altitude of sky element (radians)
 
         // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
     std::array<Real64, Dayltg::NTH + 1> TH;     // Azimuth of sky element (radians)
     std::array<Real64, Dayltg::NPH + 1> SPHCPH; // Sine times cosine of altitude of sky element
-    Array1D<Real64> SetPnt;                     // Illuminance setpoint at reference points (lux)
-    Array1D<Real64> GLRNDX;                     // Glare index at reference point
-    Array1D<Real64> GLRNEW;                     // New glare index at reference point 
 
     // Not sure why these need to be state variables and can't local
     // variable of DayltgInterReflectIllum(), but some EMS tests break
@@ -577,27 +573,12 @@ struct DaylightingData : BaseGlobalStruct
     std::array<std::array<Real64, Dayltg::NTHMAX + 1>, Dayltg::NPHMAX + 1> SkyObstructionMult;
     std::array<std::array<Real64, Dayltg::NTHMAX + 1>, Dayltg::NPHMAX + 1> ObTransM; // ObTrans value for each (TH,PH) direction
 
-    Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>> tmpIllumFromWinAtRefPt;
-    Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>> tmpBackLumFromWinAtRefPt;
-    Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>> tmpSourceLumFromWinAtRefPt;
     Array1D_bool FirstTimeMaps;
     Array1D_bool EnvrnPrint;
     Array1D_string SavedMnDy;
     Array1D<Real64> XValue;
     Array1D<Real64> YValue;
     Array2D<Real64> IllumValue;
-    Array1D<Real64> DILLSW;         // Illuminance a ref point from a group of windows that can be switched together,
-    Array1D<Real64> DILLUN;         //  and from those that aren't (lux)
-    Array1D_bool previously_shaded; // array of flags to indicate that previously groups would have already shaded this window
-    Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>> WDAYIL; // Illuminance from window at reference point (second index)
-    //   the number of shade deployment groups (third index)
-    Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>> WBACLU; // Background illuminance from window at reference point (second index)
-    //   the number of shade deployment groups (third index)
-    Array2D<Real64> RDAYIL; // Illuminance from window at reference point after closing shade
-    Array2D<Real64> RBACLU; // Background illuminance from window at reference point after closing shade
-    Array1D<Real64> TVIS1;  // Visible transmittance at normal incidence of unswitched glazing
-    Array1D<Real64> TVIS2;  // Visible transmittance at normal incidence of fully-switched glazing
-    Array1D<Real64> ASETIL; // Illuminance ratio (lux)
 
 void clear_state() override
     {
@@ -643,34 +624,34 @@ void clear_state() override
         this->sin_Theta = {0.0}; 
 
         // this->IConstShaded = 0;
-        this->VTDark = 0.0;
+        // this->VTDark = 0.0;
         // this->VTMULT = 1.0;
 
-        this->BACLUM.clear();
-        this->DayltgInteriorMapIllumGLRNDX.clear();
-        this->daylight_illum.clear();
-        this->SetPnt.clear();
-        this->GLRNDX.clear();
-        this->GLRNEW.clear();
-        this->tmpIllumFromWinAtRefPt.clear();
-        this->tmpBackLumFromWinAtRefPt.clear();
-        this->tmpSourceLumFromWinAtRefPt.clear();
+        // this->BACLUM.clear();
+        // this->DayltgInteriorMapIllumGLRNDX.clear();
+        // this->daylight_illum.clear();
+        // this->SetPnt.clear();
+        // this->GLRNDX.clear();
+        // this->GLRNEW.clear();
+        // this->tmpIllumFromWinAtRefPt.clear();
+        // this->tmpBackLumFromWinAtRefPt.clear();
+        // this->tmpSourceLumFromWinAtRefPt.clear();
         this->FirstTimeMaps.clear();
         this->EnvrnPrint.clear();
         this->SavedMnDy.clear();
         this->XValue.clear();
         this->YValue.clear();
         this->IllumValue.clear();
-        this->DILLSW.clear();
-        this->DILLUN.clear();
-        this->previously_shaded.clear();
-        this->WDAYIL.clear();
-        this->WBACLU.clear();
-        this->RDAYIL.clear();
-        this->RBACLU.clear();
-        this->TVIS1.clear();
-        this->TVIS2.clear();
-        this->ASETIL.clear();
+        // this->DILLSW.clear();
+        // this->DILLUN.clear();
+        // this->previously_shaded.clear();
+        // this->WDAYIL.clear();
+        // this->WBACLU.clear();
+        // this->RDAYIL.clear();
+        // this->RBACLU.clear();
+        // this->TVIS1.clear();
+        // this->TVIS2.clear();
+        // this->ASETIL.clear();
     }
 };
 
