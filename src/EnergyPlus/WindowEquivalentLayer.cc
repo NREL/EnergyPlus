@@ -8137,9 +8137,9 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
         for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
             if (IsVBLayer(CFS(EQLNum).L(Lay))) {
                 if (CFS(EQLNum).L(Lay).LTYPE == LayerType::VBHOR) {
-                    ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal, ProfAngVer);
+                    ProfAngVer = ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal);
                 } else if (CFS(EQLNum).L(Lay).LTYPE == LayerType::VBVER) {
-                    ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Vertical, ProfAngHor);
+                    ProfAngHor = ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Vertical);
                 }
             }
         }
@@ -8153,9 +8153,9 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
             for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                 if (IsVBLayer(CFS(EQLNum).L(Lay))) {
                     if (CFS(EQLNum).L(Lay).LTYPE == LayerType::VBHOR) {
-                        ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal, ProfAngVer);
+                        ProfAngVer = ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal);
                     } else if (CFS(EQLNum).L(Lay).LTYPE == LayerType::VBVER) {
-                        ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Vertical, ProfAngHor);
+                        ProfAngHor = ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Vertical);
                     }
                 }
             }

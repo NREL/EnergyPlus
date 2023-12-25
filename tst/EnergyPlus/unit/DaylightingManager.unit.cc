@@ -946,20 +946,20 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
     CosDirSun(2) = 0.470492;
     CosDirSun(3) = 0.003513;
 
-    ProfileAngle(*state, 1, CosDirSun, horiz, ProfAng);
+    ProfAng = ProfileAngle(*state, 1, CosDirSun, horiz);
     EXPECT_NEAR(0.00747, ProfAng, 0.00001);
 
-    ProfileAngle(*state, 1, CosDirSun, vert, ProfAng);
+    ProfAng = ProfileAngle(*state, 1, CosDirSun, vert);
     EXPECT_NEAR(2.06065, ProfAng, 0.00001);
 
     CosDirSun(1) = 0.92318;
     CosDirSun(2) = 0.36483;
     CosDirSun(3) = 0.12094;
 
-    ProfileAngle(*state, 1, CosDirSun, horiz, ProfAng);
+    ProfAng = ProfileAngle(*state, 1, CosDirSun, horiz);
     EXPECT_NEAR(0.32010, ProfAng, 0.00001);
 
-    ProfileAngle(*state, 1, CosDirSun, vert, ProfAng);
+    ProfAng = ProfileAngle(*state, 1, CosDirSun, vert);
     EXPECT_NEAR(1.94715, ProfAng, 0.00001);
 }
 

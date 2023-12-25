@@ -627,7 +627,7 @@ namespace WindowComplexManager {
                             // skip surfaces that face away from the ground point
                             if (dot(SunDir, state.dataSurface->Surface(JSurf).NewellSurfaceNormalVector) >= 0.0) continue;
                             // Looking for surfaces between GndPt and sun
-                            PierceSurface(state, JSurf, gndPt, SunDir, HitPt, hit);
+                            hit = PierceSurface(state, JSurf, gndPt, SunDir, HitPt);
                             if (hit) {
                                 // Are not going into the details of whether a hit surface is transparent
                                 // Since this is ultimately simply weighting the transmittance, so great
@@ -680,7 +680,7 @@ namespace WindowComplexManager {
                     // skip surfaces that face away from the ground point
                     if (dot(SunDir, state.dataSurface->Surface(JSurf).NewellSurfaceNormalVector) >= 0.0) continue;
                     // Looking for surfaces between GndPt and sun
-                    PierceSurface(state, JSurf, gndPt, SunDir, HitPt, hit);
+                    hit = PierceSurface(state, JSurf, gndPt, SunDir, HitPt);
                     if (hit) {
                         // Are not going into the details of whether a hit surface is transparent
                         // Since this is ultimately simply weighting the transmittance, so great
@@ -1375,7 +1375,7 @@ namespace WindowComplexManager {
                 //  skip surfaces that face away from the window
                 DotProd = dot(Geom.sInc(IRay), state.dataSurface->Surface(JSurf).NewellSurfaceNormalVector);
                 if (DotProd >= 0.0) continue;
-                PierceSurface(state, JSurf, state.dataSurface->Surface(ISurf).Centroid, Geom.sInc(IRay), HitPt, hit);
+                hit = PierceSurface(state, JSurf, state.dataSurface->Surface(ISurf).Centroid, Geom.sInc(IRay), HitPt);
                 if (!hit) continue; // Miss: Try next surface
                 if (TotHits == 0) {
                     //  First hit for this ray
@@ -1559,7 +1559,7 @@ namespace WindowComplexManager {
             for (KBkSurf = 1; KBkSurf <= NBkSurf; ++KBkSurf) {                        // back surf loop
                 BaseSurf = state.dataSurface->Surface(ISurf).BaseSurf;                // ShadowComb is organized by base surface
                 JSurf = state.dataShadowComb->ShadowComb(BaseSurf).BackSurf(KBkSurf); // these are all proper back surfaces
-                PierceSurface(state, JSurf, state.dataSurface->Surface(ISurf).Centroid, Geom.sTrn(IRay), HitPt, hit);
+                hit = PierceSurface(state, JSurf, state.dataSurface->Surface(ISurf).Centroid, Geom.sTrn(IRay), HitPt);
                 if (!hit) continue; // Miss: Try next surface
                 if (TotHits == 0) {
                     //  First hit for this ray

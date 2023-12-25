@@ -9957,7 +9957,6 @@ void WindowShadingManager(EnergyPlusData &state)
                     if (BlNum > 0) {
                         Real64 InputSlatAngle = state.dataMaterial->Blind(BlNum).SlatAngle *
                                                 Constant::DegToRadians; // Slat angle of associated Material:WindowBlind (rad)
-                        Real64 ProfAng;                                 // Solar profile angle (rad)
                         Real64 SlatAng;                                 // Slat angle this time step (rad)
                         Real64 PermeabilityA;                           // Intermediate variables in blind permeability calc
                         Real64 PermeabilityB;
@@ -9965,12 +9964,10 @@ void WindowShadingManager(EnergyPlusData &state)
                         Real64 ThetaBlock1; // Slat angles that just block beam solar (rad)
                         Real64 ThetaBlock2;
 
-                        Dayltg::ProfileAngle(state,
-                                             ISurf,
-                                             state.dataEnvrn->SOLCOS,
-                                             state.dataMaterial->Blind(BlNum).SlatOrientation,
-                                             state.dataSurface->SurfWinProfileAng(ISurf));
-                        ProfAng = state.dataSurface->SurfWinProfileAng(ISurf);
+                        auto const &blind = state.dataMaterial->Blind(BlNum);
+                        Real64 ProfAng = state.dataSurface->SurfWinProfileAng(ISurf) =
+                                Dayltg::ProfileAngle(state, ISurf, state.dataEnvrn->SOLCOS, blind.SlatOrientation);
+
                         if (ProfAng > Constant::PiOvr2 || ProfAng < -Constant::PiOvr2) {
                             ProfAng = min(max(ProfAng, -Constant::PiOvr2), Constant::PiOvr2);
                         }
@@ -9979,29 +9976,25 @@ void WindowShadingManager(EnergyPlusData &state)
                         state.dataSurface->SurfWinProfAngInterpFac(ISurf) =
                             (ProfAng + Constant::PiOvr2 - (ProfAngIndex - 1) * DeltaProfAng) / DeltaProfAng;
 
-                        if (state.dataMaterial->Blind(BlNum).SlatWidth > state.dataMaterial->Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
+                        if (blind.SlatWidth > blind.SlatSeparation && BeamSolarOnWindow > 0.0) {
                             ProfAng = state.dataSurface->SurfWinProfileAng(ISurf);
-                            Real64 ThetaBase = std::acos(std::cos(ProfAng) * state.dataMaterial->Blind(BlNum).SlatSeparation /
-                                                         state.dataMaterial->Blind(BlNum).SlatWidth);
+                            Real64 ThetaBase = std::acos(std::cos(ProfAng) * blind.SlatSeparation / blind.SlatWidth);
                             // There are two solutions for the slat angle that just blocks beam radiation
                             ThetaBlock1 = ProfAng + ThetaBase;
                             ThetaBlock2 = ProfAng + Constant::Pi - ThetaBase;
                             state.dataSolarShading->ThetaSmall = min(ThetaBlock1, ThetaBlock2);
                             state.dataSolarShading->ThetaBig = max(ThetaBlock1, ThetaBlock2);
-                            state.dataSolarShading->ThetaMin = state.dataMaterial->Blind(BlNum).MinSlatAngle * Constant::DegToRadians;
-                            state.dataSolarShading->ThetaMax = state.dataMaterial->Blind(BlNum).MaxSlatAngle * Constant::DegToRadians;
+                            state.dataSolarShading->ThetaMin = blind.MinSlatAngle * Constant::DegToRadians;
+                            state.dataSolarShading->ThetaMax = blind.MaxSlatAngle * Constant::DegToRadians;
                         }
 
                         // TH 5/20/2010, CR 8064: Slat Width <= Slat Separation
-                        if (state.dataMaterial->Blind(BlNum).SlatWidth <= state.dataMaterial->Blind(BlNum).SlatSeparation &&
-                            BeamSolarOnWindow > 0.0) {
+                        if (blind.SlatWidth <= blind.SlatSeparation && BeamSolarOnWindow > 0.0) {
                             if (state.dataSurface->WindowShadingControl(IShadingCtrl).slatAngleControl == SlatAngleControl::BlockBeamSolar) {
                                 ProfAng = state.dataSurface->SurfWinProfileAng(ISurf);
-                                if (std::abs(std::cos(ProfAng) * state.dataMaterial->Blind(BlNum).SlatSeparation /
-                                             state.dataMaterial->Blind(BlNum).SlatWidth) <= 1.0) {
+                                if (std::abs(std::cos(ProfAng) * blind.SlatSeparation / blind.SlatWidth) <= 1.0) {
                                     // set to block 100% of beam solar, not necessarily to block maximum solar (beam + diffuse)
-                                    ThetaBase = std::acos(std::cos(ProfAng) * state.dataMaterial->Blind(BlNum).SlatSeparation /
-                                                          state.dataMaterial->Blind(BlNum).SlatWidth);
+                                    ThetaBase = std::acos(std::cos(ProfAng) * blind.SlatSeparation / blind.SlatWidth);
                                     state.dataSurface->SurfWinSlatsBlockBeam(ISurf) = true;
                                 } else {
                                     // cannot block 100% of beam solar, turn slats to be perpendicular to sun beam to block maximal beam solar
@@ -10014,8 +10007,8 @@ void WindowShadingManager(EnergyPlusData &state)
 
                                 state.dataSolarShading->ThetaSmall = min(ThetaBlock1, ThetaBlock2);
                                 state.dataSolarShading->ThetaBig = max(ThetaBlock1, ThetaBlock2);
-                                state.dataSolarShading->ThetaMin = state.dataMaterial->Blind(BlNum).MinSlatAngle * Constant::DegToRadians;
-                                state.dataSolarShading->ThetaMax = state.dataMaterial->Blind(BlNum).MaxSlatAngle * Constant::DegToRadians;
+                                state.dataSolarShading->ThetaMin = blind.MinSlatAngle * Constant::DegToRadians;
+                                state.dataSolarShading->ThetaMax = blind.MaxSlatAngle * Constant::DegToRadians;
                             }
                         }
 
@@ -10024,26 +10017,25 @@ void WindowShadingManager(EnergyPlusData &state)
                             state.dataSurface->SurfWinSlatAngThisTS(ISurf) = InputSlatAngle;
                             if ((state.dataSurface->SurfWinSlatAngThisTS(ISurf) <= state.dataSolarShading->ThetaSmall ||
                                  state.dataSurface->SurfWinSlatAngThisTS(ISurf) >= state.dataSolarShading->ThetaBig) &&
-                                (state.dataMaterial->Blind(BlNum).SlatWidth > state.dataMaterial->Blind(BlNum).SlatSeparation) &&
-                                (BeamSolarOnWindow > 0.0))
+                                (blind.SlatWidth > blind.SlatSeparation) && (BeamSolarOnWindow > 0.0))
                                 state.dataSurface->SurfWinSlatsBlockBeam(ISurf) = true;
                         } break;
                         case SlatAngleControl::Scheduled: { // 'SCHEDULEDSLATANGLE'
                             state.dataSurface->SurfWinSlatAngThisTS(ISurf) =
                                 GetCurrentScheduleValue(state, state.dataSurface->WindowShadingControl(IShadingCtrl).SlatAngleSchedule);
                             state.dataSurface->SurfWinSlatAngThisTS(ISurf) =
-                                max(state.dataMaterial->Blind(BlNum).MinSlatAngle,
-                                    min(state.dataSurface->SurfWinSlatAngThisTS(ISurf), state.dataMaterial->Blind(BlNum).MaxSlatAngle)) *
+                                max(blind.MinSlatAngle,
+                                    min(state.dataSurface->SurfWinSlatAngThisTS(ISurf), blind.MaxSlatAngle)) *
                                 Constant::DegToRadians;
                             if ((state.dataSurface->SurfWinSlatAngThisTS(ISurf) <= state.dataSolarShading->ThetaSmall ||
                                  state.dataSurface->SurfWinSlatAngThisTS(ISurf) >= state.dataSolarShading->ThetaBig) &&
-                                (state.dataMaterial->Blind(BlNum).SlatWidth > state.dataMaterial->Blind(BlNum).SlatSeparation) &&
+                                (blind.SlatWidth > blind.SlatSeparation) &&
                                 (BeamSolarOnWindow > 0.0))
                                 state.dataSurface->SurfWinSlatsBlockBeam(ISurf) = true;
                         } break;
                         case SlatAngleControl::BlockBeamSolar: { // 'BLOCKBEAMSOLAR'
                             if (BeamSolarOnWindow > 0.0) {
-                                if (state.dataMaterial->Blind(BlNum).SlatSeparation >= state.dataMaterial->Blind(BlNum).SlatWidth) {
+                                if (blind.SlatSeparation >= blind.SlatWidth) {
                                     // TH 5/20/2010. CR 8064.
                                     // The following line of code assumes slats are always vertical/closed to minimize solar penetration
                                     // The slat angle can however change if the only goal is to block maximum amount of direct beam solar
@@ -10102,18 +10094,11 @@ void WindowShadingManager(EnergyPlusData &state)
                         }
                         // Air flow permeability for calculation of convective air flow between blind and glass
                         SlatAng = state.dataSurface->SurfWinSlatAngThisTS(ISurf);
-                        PermeabilityA =
-                            std::sin(SlatAng) - state.dataMaterial->Blind(BlNum).SlatThickness / state.dataMaterial->Blind(BlNum).SlatSeparation;
-                        PermeabilityB = 1.0 - (std::abs(state.dataMaterial->Blind(BlNum).SlatWidth * std::cos(SlatAng)) +
-                                               state.dataMaterial->Blind(BlNum).SlatThickness * std::sin(SlatAng)) /
-                                                  state.dataMaterial->Blind(BlNum).SlatSeparation;
+                        PermeabilityA = std::sin(SlatAng) - blind.SlatThickness / blind.SlatSeparation;
+                        PermeabilityB = 1.0 - (std::abs(blind.SlatWidth * std::cos(SlatAng)) + blind.SlatThickness * std::sin(SlatAng)) / blind.SlatSeparation;
                         state.dataSurface->SurfWinBlindAirFlowPermeability(ISurf) = min(1.0, max(0.0, PermeabilityA, PermeabilityB));
                         state.dataSurface->SurfWinBlindBmBmTrans(ISurf) =
-                            WindowManager::BlindBeamBeamTrans(ProfAng,
-                                                              SlatAng,
-                                                              state.dataMaterial->Blind(BlNum).SlatWidth,
-                                                              state.dataMaterial->Blind(BlNum).SlatSeparation,
-                                                              state.dataMaterial->Blind(BlNum).SlatThickness);
+                            WindowManager::BlindBeamBeamTrans(ProfAng, SlatAng, blind.SlatWidth, blind.SlatSeparation, blind.SlatThickness);
                         // Calculate blind interpolation factors and indices.
                         if (state.dataSurface->SurfWinMovableSlats(ISurf)) {
                             if (SlatAng > Constant::Pi || SlatAng < 0.0) {

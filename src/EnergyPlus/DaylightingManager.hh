@@ -343,27 +343,25 @@ namespace Dayltg {
                              Real64 &HISU  // Horizontal illuminance from sun for unit beam normal
     );
 
-    void DayltgHitObstruction(EnergyPlusData &state,
-                              int const IHOUR,           // Hour number
-                              int const IWin,            // Window index
-                              Vector3<Real64> const &R1, // Origin of ray (m)
-                              Vector3<Real64> const &RN, // Unit vector along ray
-                              Real64 &ObTrans            // Product of solar transmittances of exterior obstructions
+    // Product of solar transmittances of exterior obstructions
+    Real64 DayltgHitObstruction(EnergyPlusData &state,
+                                int const IHOUR,           // Hour number
+                                int const IWin,            // Window index
+                                Vector3<Real64> const &R1, // Origin of ray (m)
+                                Vector3<Real64> const &RN  // Destination of ray (m)
     );
 
-    void DayltgHitInteriorObstruction(EnergyPlusData &state,
+    bool DayltgHitInteriorObstruction(EnergyPlusData &state,
                                       int const IWin,            // Window index
                                       Vector3<Real64> const &R1, // Origin of ray (m)
-                                      Vector3<Real64> const &R2, // Destination of ray (m)
-                                      bool &hit                  // True iff ray hits an obstruction
+                                      Vector3<Real64> const &R2 // Destination of ray (m)
     );
 
-    void DayltgHitBetWinObstruction(EnergyPlusData &state,
+    bool DayltgHitBetWinObstruction(EnergyPlusData &state,
                                     int const IWin1,           // Surface number of origin window
                                     int const IWin2,           // Surface number of destination window
                                     Vector3<Real64> const &R1, // Origin of ray (on IWin1) (m)
-                                    Vector3<Real64> const &R2, // Destination of ray (on IWin2) (m)
-                                    bool &hit                  // True iff ray hits an obstruction
+                                    Vector3<Real64> const &R2 // Destination of ray (on IWin2) (m)
     );
 
     void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefirstTime);
@@ -393,8 +391,6 @@ namespace Dayltg {
                                        int const IHR,
                                        int const iRefPoint,
                                        Array1D<Illums> &ElementLuminanceSky,     // sky related luminance at window element (exterior side)
-                                       Array1D<Real64> &ElementLuminanceSun,     // sun related luminance at window element (exterior side),
-                                       Array1D<Real64> &ElementLuminanceSunDisk, // sun related luminance at window element (exterior side),
                                        CalledFor const CalledFrom,
                                        int const MapNum = 0);
 
@@ -429,11 +425,11 @@ namespace Dayltg {
                               Real64 const THSKY, // Azimuth and altitude of sky element (radians)
                               Real64 const PHSKY);
 
-    void ProfileAngle(EnergyPlusData &state,
-                      int const SurfNum,                                      // Surface number
-                      Vector3<Real64> const &CosDirSun,                       // Solar direction cosines
-                      DataWindowEquivalentLayer::Orientation const HorOrVert, // If HORIZONTAL, calculates ProfileAngHor
-                      Real64 &ProfileAng                                      // Solar profile angle (radians).
+    // Solar profile angle (radians).
+    Real64 ProfileAngle(EnergyPlusData &state,            
+                        int const SurfNum,                                      // Surface number
+                        Vector3<Real64> const &CosDirSun,                       // Solar direction cosines
+                        DataWindowEquivalentLayer::Orientation const HorOrVert // If HORIZONTAL, calculates ProfileAngHor
     );
 
     void DayltgClosestObstruction(EnergyPlusData &state,
@@ -443,12 +439,12 @@ namespace Dayltg {
                                   Vector3<Real64> &NearestHitPt  // Ray's hit point on nearest obstruction (m)
     );
 
-    void DayltgSurfaceLumFromSun(EnergyPlusData &state,
-                                 int const IHR,                    // Hour number
-                                 Vector3<Real64> const &Ray,       // Ray from window to reflecting surface (m)
-                                 int const ReflSurfNum,            // Number of surface for which luminance is being calculated
-                                 Vector3<Real64> const &ReflHitPt, // Point on ReflSurfNum for luminance calculation (m)
-                                 Real64 &LumAtReflHitPtFrSun       // Luminance at ReflHitPt from beam solar reflection for unit
+    // Luminance at ReflHitPt from beam solar reflection for unit
+    Real64 DayltgSurfaceLumFromSun(EnergyPlusData &state,
+                                   int const IHR,                    // Hour number
+                                   Vector3<Real64> const &Ray,       // Ray from window to reflecting surface (m)
+                                   int const ReflSurfNum,            // Number of surface for which luminance is being calculated
+                                   Vector3<Real64> const &ReflHitPt // Point on ReflSurfNum for luminance calculation (m)
     );
 
     void DayltgInteriorMapIllum(EnergyPlusData &state);

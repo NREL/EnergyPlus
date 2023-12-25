@@ -173,9 +173,6 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
     // Based on DOE-2.1E subroutine DAVREF
     auto &dl = state.dataDayltg;
         
-    Real64 AREA; // Inside surface area (m2)
-    Real64 ETA;  // Ratio of floor-to-window-center height and average floor-to-ceiling height
-
     // Total inside surface area, including windows
     Real64 AInsTot = 0.0;
     // Sum of products of inside surface area * vis reflectance
@@ -186,7 +183,7 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
     std::array<Real64, (int)FWC::Num> ARH = {0.0, 0.0, 0.0};
     // Loop over surfaces in the zone's enclosure
 
-    auto &thisEnclosure(state.dataViewFactor->EnclSolInfo(enclNum));
+    auto &thisEnclosure = state.dataViewFactor->EnclSolInfo(enclNum);
     for (int ISurf : thisEnclosure.SurfacePtr) {
         SurfaceClass IType = state.dataSurface->Surface(ISurf).Class;
         // Error if window has multiplier > 1 since this causes incorrect illuminance calc
@@ -209,7 +206,7 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
         }
         if (IType == SurfaceClass::Wall || IType == SurfaceClass::Floor || IType == SurfaceClass::Roof || IType == SurfaceClass::Window ||
             IType == SurfaceClass::Door) {
-            AREA = state.dataSurface->Surface(ISurf).Area;
+            Real64 AREA = state.dataSurface->Surface(ISurf).Area;
             // In following, FrameArea and DividerArea can be non-zero only for exterior windows
             AInsTot += AREA + state.dataSurface->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(ISurf)) +
                        state.dataSurface->SurfWinDividerArea(ISurf) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(ISurf));
@@ -245,89 +242,85 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
 
     for (int ISurf : thisEnclosure.SurfacePtr) {
         auto const &surf = state.dataSurface->Surface(ISurf);
-        SurfaceClass IType = surf.Class;
-        if (IType == SurfaceClass::Wall || IType == SurfaceClass::Floor || IType == SurfaceClass::Roof) {
-            // Remove this surface from the space inside surface area and area*reflectivity
-            // The resulting areas are AP(ITILT). The resulting area*reflectivity is ARHP(ITILT).
-            // Initialize gross area of surface (including subsurfaces)
-            Real64 ATWL = surf.Area; // This is the surface area less subsurfaces
-            // Area * reflectance for this surface, excluding attached windows and doors
-            Real64 ARHTWL = surf.Area * state.dataConstruction->Construct(surf.Construction).ReflectVisDiffBack;
+        if (surf.Class != SurfaceClass::Wall && surf.Class != SurfaceClass::Floor && surf.Class != SurfaceClass::Roof)
+            continue;
+        
+        // Remove this surface from the space inside surface area and area*reflectivity
+        // The resulting areas are AP(ITILT). The resulting area*reflectivity is ARHP(ITILT).
+        // Initialize gross area of surface (including subsurfaces)
+        Real64 ATWL = surf.Area; // This is the surface area less subsurfaces
+        // Area * reflectance for this surface, excluding attached windows and doors
+        Real64 ARHTWL = surf.Area * state.dataConstruction->Construct(surf.Construction).ReflectVisDiffBack;
+        
+        FWC fwc = (surf.Tilt > 45.0 && surf.Tilt < 135.0) ? FWC::Wall : ((surf.Tilt >= 135.0) ? FWC::Floor : FWC::Ceiling);
 
-            FWC fwc;
-            if (surf.Tilt > 45.0 && surf.Tilt < 135.0) {
-                fwc = FWC::Wall; // Wall
-            } else if (surf.Tilt >= 135.0) {
-                fwc = FWC::Floor; // Floor
-            } else {
-                fwc = FWC::Ceiling; // Ceiling
-            }
-            // Loop over windows and doors on this wall
-            for (int IWinDr : thisEnclosure.SurfacePtr) {
-                if ((state.dataSurface->Surface(IWinDr).Class == SurfaceClass::Window ||
-                     state.dataSurface->Surface(IWinDr).Class == SurfaceClass::Door) &&
-                    state.dataSurface->Surface(IWinDr).BaseSurf == ISurf) {
-                    ATWL += state.dataSurface->Surface(IWinDr).Area +
-                            state.dataSurface->SurfWinFrameArea(IWinDr) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(IWinDr)) +
-                            state.dataSurface->SurfWinDividerArea(IWinDr) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(IWinDr));
-                    ARHTWL += state.dataSurface->Surface(IWinDr).Area *
-                                  state.dataConstruction->Construct(state.dataSurface->Surface(IWinDr).Construction).ReflectVisDiffBack +
-                              state.dataSurface->SurfWinFrameArea(IWinDr) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(IWinDr)) *
-                                  (1.0 - state.dataSurface->SurfWinFrameSolAbsorp(IWinDr)) +
-                              state.dataSurface->SurfWinDividerArea(IWinDr) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(IWinDr)) *
-                                  (1.0 - state.dataSurface->SurfWinDividerSolAbsorp(IWinDr));
-                }
-            }
-
-            std::array<Real64, (int)FWC::Num> AP;
-            std::array<Real64, (int)FWC::Num> ARHP;
-            // Inside surface area of floor, walls and ceilings, minus surface ISurf and its subsurfaces
-            for (int iFWC = (int)FWC::Floor; iFWC < (int)FWC::Num; ++iFWC) {
-                if (iFWC == (int)fwc) {
-                    AP[iFWC] = AR[iFWC] - ATWL;
-                    ARHP[iFWC] = ARH[iFWC] - ARHTWL;
-                } else {
-                    AP[iFWC] = AR[iFWC];
-                    ARHP[iFWC] = ARH[iFWC];
-                }
-            }
-            state.dataSurface->SurfaceWindow(ISurf).EnclAreaMinusThisSurf = AP;
-            state.dataSurface->SurfaceWindow(ISurf).EnclAreaReflProdMinusThisSurf = ARHP;
+        // Loop over windows and doors on this wall
+        for (int IWinDr : thisEnclosure.SurfacePtr) {
+            auto const &surfWinDr = state.dataSurface->Surface(IWinDr);
+            if ((surfWinDr.Class != SurfaceClass::Window && surfWinDr.Class != SurfaceClass::Door) || surfWinDr.BaseSurf != ISurf)
+                continue;
+                
+            ATWL += surfWinDr.Area +
+                    state.dataSurface->SurfWinFrameArea(IWinDr) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(IWinDr)) +
+                    state.dataSurface->SurfWinDividerArea(IWinDr) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(IWinDr));
+            ARHTWL += surfWinDr.Area *
+                    state.dataConstruction->Construct(surfWinDr.Construction).ReflectVisDiffBack +
+                    state.dataSurface->SurfWinFrameArea(IWinDr) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(IWinDr)) *
+                    (1.0 - state.dataSurface->SurfWinFrameSolAbsorp(IWinDr)) +
+                    state.dataSurface->SurfWinDividerArea(IWinDr) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(IWinDr)) *
+                    (1.0 - state.dataSurface->SurfWinDividerSolAbsorp(IWinDr));
         }
-    } // End of loop over opaque surfaces in enclosure
+
+        std::array<Real64, (int)FWC::Num> AP;
+        std::array<Real64, (int)FWC::Num> ARHP;
+        // Inside surface area of floor, walls and ceilings, minus surface ISurf and its subsurfaces
+        for (int iFWC = (int)FWC::Floor; iFWC < (int)FWC::Num; ++iFWC) {
+            if (iFWC == (int)fwc) {
+                AP[iFWC] = AR[iFWC] - ATWL;
+                ARHP[iFWC] = ARH[iFWC] - ARHTWL;
+            } else {
+                AP[iFWC] = AR[iFWC];
+                ARHP[iFWC] = ARH[iFWC];
+            }
+        }
+        state.dataSurface->SurfaceWindow(ISurf).EnclAreaMinusThisSurf = AP;
+        state.dataSurface->SurfaceWindow(ISurf).EnclAreaReflProdMinusThisSurf = ARHP;
+    } // for (ISurf)
 
     for (int IWin : thisEnclosure.SurfacePtr) {
-        if (state.dataSurface->Surface(IWin).Class == SurfaceClass::Window) {
-            int ISurf = state.dataSurface->Surface(IWin).BaseSurf;
-            int zoneNum = state.dataSurface->Surface(IWin).Zone;
+        auto const &surf = state.dataSurface->Surface(IWin);
+        if (surf.Class != SurfaceClass::Window)
+                continue;
+        
+        int ISurf = surf.BaseSurf;
+        int zoneNum = surf.Zone;
             // Ratio of floor-to-window-center height and average floor-to-ceiling height
-            ETA = max(0.0,
-                      min(1.0,
-                          (state.dataSurface->SurfaceWindow(IWin).WinCenter.z - state.dataHeatBal->Zone(zoneNum).OriginZ) *
-                              state.dataHeatBal->Zone(zoneNum).FloorArea / state.dataHeatBal->Zone(zoneNum).Volume));
+        Real64 ETA = max(0.0,
+                         min(1.0,
+                             (state.dataSurface->SurfaceWindow(IWin).WinCenter.z - state.dataHeatBal->Zone(zoneNum).OriginZ) *
+                             state.dataHeatBal->Zone(zoneNum).FloorArea / state.dataHeatBal->Zone(zoneNum).Volume));
 
-            std::array<Real64, (int)FWC::Num> AP = state.dataSurface->SurfaceWindow(ISurf).EnclAreaMinusThisSurf;
-            std::array<Real64, (int)FWC::Num> ARHP = state.dataSurface->SurfaceWindow(ISurf).EnclAreaReflProdMinusThisSurf;
-            // Average reflectance seen by light moving up (RhoCeilingWall) and down (RhoFloorWall)
-            // across horizontal plane through center of window
-            state.dataSurface->SurfWinRhoCeilingWall(IWin) =
-                (ARHP[(int)FWC::Wall] * (1.0 - ETA) + ARHP[(int)FWC::Ceiling]) / (AP[(int)FWC::Wall] * (1.0 - ETA) + AP[(int)FWC::Ceiling] + 1.0e-5);
-            state.dataSurface->SurfWinRhoFloorWall(IWin) =
-                (ARHP[(int)FWC::Wall] * ETA + ARHP[(int)FWC::Floor]) / (AP[(int)FWC::Wall] * ETA + AP[(int)FWC::Floor] + 1.e-9);
+        std::array<Real64, (int)FWC::Num> AP = state.dataSurface->SurfaceWindow(ISurf).EnclAreaMinusThisSurf;
+        std::array<Real64, (int)FWC::Num> ARHP = state.dataSurface->SurfaceWindow(ISurf).EnclAreaReflProdMinusThisSurf;
+        // Average reflectance seen by light moving up (RhoCeilingWall) and down (RhoFloorWall)
+        // across horizontal plane through center of window
+        state.dataSurface->SurfWinRhoCeilingWall(IWin) =
+            (ARHP[(int)FWC::Wall] * (1.0 - ETA) + ARHP[(int)FWC::Ceiling]) / (AP[(int)FWC::Wall] * (1.0 - ETA) + AP[(int)FWC::Ceiling] + 1.0e-5);
+        state.dataSurface->SurfWinRhoFloorWall(IWin) =
+            (ARHP[(int)FWC::Wall] * ETA + ARHP[(int)FWC::Floor]) / (AP[(int)FWC::Wall] * ETA + AP[(int)FWC::Floor] + 1.e-9);
 
-            // Angle factor for windows with diffusing shades. SurfaceWindow(IWin)%FractionUpgoing is
-            // fraction of light from the shade that goes up toward ceiling and upper part of walls.
-            // 1 - SurfaceWindow(IWin)%FractionUpgoing is fraction that goes down toward floor and lower part of walls.
-            state.dataSurface->SurfWinFractionUpgoing(IWin) = state.dataSurface->Surface(IWin).Tilt / 180.0;
-
-            // Daylighting shelf simplification:  All light goes up to the ceiling regardless of orientation of shelf
-            if (state.dataSurface->SurfDaylightingShelfInd(IWin) > 0) {
-                if (state.dataDaylightingDevicesData->Shelf(state.dataSurface->SurfDaylightingShelfInd(IWin)).InSurf > 0)
+        // Angle factor for windows with diffusing shades. SurfaceWindow(IWin)%FractionUpgoing is
+        // fraction of light from the shade that goes up toward ceiling and upper part of walls.
+        // 1 - SurfaceWindow(IWin)%FractionUpgoing is fraction that goes down toward floor and lower part of walls.
+        state.dataSurface->SurfWinFractionUpgoing(IWin) = surf.Tilt / 180.0;
+        
+        // Daylighting shelf simplification:  All light goes up to the ceiling regardless of orientation of shelf
+        if (state.dataSurface->SurfDaylightingShelfInd(IWin) > 0) {
+            if (state.dataDaylightingDevicesData->Shelf(state.dataSurface->SurfDaylightingShelfInd(IWin)).InSurf > 0)
                     state.dataSurface->SurfWinFractionUpgoing(IWin) = 1.0;
-            }
         }
-    }
-}
+    } // for (IWin)
+} // DayltgAveInteriorReflectance()
 
 void CalcDayltgCoefficients(EnergyPlusData &state)
 {
@@ -398,15 +391,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
     // REFERENCES:
     // Based on DOE-2.1E subroutine DCOF.
 
-    //    int IHR;        // Hour of day counter
-    //    int IWin;       // Window counter
-    //    int loop;       // DO loop indices
     auto &dl = state.dataDayltg;
-
-    Real64 DaylFac; // sky daylight factor at ref pt i
-
-    Real64 SlatAngle;
-    int ISA;
 
     if (dl->CalcDayltghCoefficients_firstTime) {
         GetDaylightingParametersInput(state);
@@ -550,7 +535,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
 
                 for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
                     for (int refPtNum = 1; refPtNum <= thisDaylightControl.TotalDaylRefPoints; ++refPtNum) {
-                        DaylFac = thisDaylightControl.DaylIllumFac(12, windowCounter, refPtNum, 1).sky[iSky];
+                        Real64 DaylFac = thisDaylightControl.DaylIllumFac(12, windowCounter, refPtNum, 1).sky[iSky];
                         print(state.files.eio,
                               " Sky Daylight Factors,{},{},{},{},{},{},{:.4R}\n",
                               skyTypeStrings[iSky],
@@ -614,6 +599,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
             // component will not be calculated for these windows until the time-step loop.
             if (state.dataSurface->Surface(windowSurfNum).SolarEnclIndex == enclNum) {
 
+                int ISA;
                 if (state.dataSurface->SurfWinMovableSlats(windowSurfNum)) {
                     // variable slat angle - MaxSlatangle sets
                     ISA = Material::MaxSlatAngs + 1;
@@ -645,7 +631,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                               state.dataSurface->Surface(windowSurfNum).Name);
                     } else {
                         // blind with variable slat angle
-                        SlatAngle = 180.0 / double(Material::MaxSlatAngs - 1) * double(ISlatAngle - 2);
+                        Real64 SlatAngle = 180.0 / double(Material::MaxSlatAngs - 1) * double(ISlatAngle - 2);
                         print(state.files.dfs,
                               "{},{},{},{},{:.1R}\n",
                               state.dataEnvrn->CurMnDy,
@@ -676,7 +662,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
             }             // if (SolarEnclIndex == enclNum)
         }                 // for (windowCounter) exterior windows in enclosure
     }                     // for (controlNum) daylighting control
-}
+} // CalcDayltgCoefficients()
 
 void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state)
 {
@@ -739,7 +725,7 @@ void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state)
             }
         }
     }
-}
+} // CalcDayltgCoeffsRefMapPoints()
 
 void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
 {
@@ -753,8 +739,6 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
     // Provides calculations for Daylighting Coefficients for daylighting reference points
     auto &dl = state.dataDayltg;
 
-    int NRF;       // Number of daylighting reference points in a zone
-    Real64 AZVIEW; // Azimuth of view vector in absolute coord system for
     //  glare calculation (radians)
     int IConst;            // Construction counter
     int ICtrl;             // Window control counter
@@ -820,7 +804,7 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
     auto &thisEnclDaylight = dl->enclDaylight(thisDaylightControl.enclIndex);
     int zoneNum = thisDaylightControl.zoneIndex;
     // Azimuth of view vector in absolute coord sys
-    AZVIEW = (thisDaylightControl.ViewAzimuthForGlare + state.dataHeatBal->Zone(zoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth +
+    Real64 AZVIEW = (thisDaylightControl.ViewAzimuthForGlare + state.dataHeatBal->Zone(zoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth +
               state.dataHeatBal->BuildingRotationAppendixG) *
              Constant::DegToRadians;
     // View vector components in absolute coord sys
@@ -857,10 +841,9 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
         }         // for (iWin)
     }             // for (iHr)
 
-    NRF = thisDaylightControl.TotalDaylRefPoints;
     BRef = 0;
 
-    for (int IL = 1; IL <= NRF; ++IL) {
+    for (int IL = 1; IL <= thisDaylightControl.TotalDaylRefPoints; ++IL) {
         // Reference point in absolute coordinate system
         Vector3<Real64> RREF = thisDaylightControl.DaylRefPtAbsCoord(IL); // ( x, y, z )
 
@@ -1116,7 +1099,6 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
     //  In the following four variables, I=1 for clear sky, 2 for overcast.
     int numRefPts; // Number of daylighting reference points in a zone
     int IL;        // Reference point counter
-    Real64 AZVIEW; // Azimuth of view vector in absolute coord system for
     //  glare calculation (radians)
     int IConst;            // Construction counter
     int ICtrl;             // Window control counter
@@ -1185,7 +1167,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
 
     // Azimuth of view vector in absolute coord sys - set to zero here, because glare isn't calculated for map points
     // but these are arguments to some of the functions that are shared with regular reference points, so initalize here.
-    AZVIEW = 0.0;
+    Real64 AZVIEW = 0.0;
     // View vector components in absolute coord sys
     VIEWVC = {0.0, 0.0, 0.0};
 
@@ -1486,9 +1468,6 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
     auto &dl = state.dataDayltg;
         
     int ShelfNum; // Daylighting shelf object number
-    Real64 WW;    // Window width (m)
-    Real64 HW;    // Window height (m)
-
     int NDIVX;  // Number of window x divisions for daylighting calc
     int NDIVY;  // Number of window y divisions for daylighting calc
     Real64 ALF; // Distance from reference point to window plane (m)
@@ -1593,8 +1572,8 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
     // center point of window, and vector from ref pt to center of window
     W21 = W1 - W2;
     W23 = W3 - W2;
-    HW = W21.magnitude();
-    WW = W23.magnitude();
+    Real64 HW = W21.magnitude();
+    Real64 WW = W23.magnitude();
     if (is_Rectangle) {
         WC = W2 + (W23 + W21) / 2.0;
     } else if (is_Triangle) {
@@ -1902,23 +1881,13 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
     // switch as need to serve both reference points and map points based on calledFrom
     auto &dl = state.dataDayltg;
         
-    Real64 DIS;    // Distance between reference point and center of window element (m)
-    Real64 DAXY1;  // For triangle, area of window element at end of column
-    Real64 POSFAC; // Position factor for a window element / ref point / view vector combination
     Real64 RR;     // Distance from ref point to intersection of view vector
     //  and plane normal to view vector and window element (m)
     Real64 ASQ; // Square of distance from above intersection to window element (m2)
     Real64 YD;  // Vertical displacement of window element wrt ref point
-    Real64 XR;  // Horizontal displacement ratio
-    Real64 YR;  // Vertical displacement ratio
 
     Real64 COSBIntWin; // Cos of angle between int win outward normal and ray betw ref pt and
     //  exterior window element or between ref pt and sun
-
-    Real64 Alfa;   // Intermediate variable
-    Real64 Beta;   // Intermediate variable
-    Real64 HorDis; // Distance between ground hit point and proj'n of center
-    //  of window element onto ground (m)
 
     // Local complex fenestration variables
     Real64 TransBeam; // Obstructions transmittance for incoming BSDF rays (temporary variable)
@@ -1934,7 +1903,7 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
     RWIN2 = U2 + (double(iXelement) - 0.5) * U23 * DWX + (double(iYelement) - 0.5) * U21 * DWY;
 
     // Distance between ref pt and window element
-    DIS = distance(RWIN, RREF);
+    Real64 DIS = distance(RWIN, RREF);
 
     // Unit vector along ray from ref pt to element
     Ray = (RWIN - RREF) / DIS;
@@ -1954,14 +1923,14 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
         }
 
         // Solid angle subtended by element wrt ref pt.
-        DAXY1 = DAXY;
+        Real64 DAXY1 = DAXY; // For triangle, area of window element at end of column
         // For triangle, at end of Y column only one half of parallelopiped's area contributes
         if (is_Triangle && iYelement == NWYlim) DAXY1 = 0.5 * DAXY;
         DOMEGA = DAXY1 * COSB / (DIS * DIS);
 
         // Calculate position factor (used in glare calculation) for this
         // win element / ref pt / view-vector combination
-        POSFAC = 0.0;
+        Real64 POSFAC = 0.0;
 
         // Distance from ref pt to intersection of view vector and plane
         // normal to view vector containing the window element
@@ -1974,8 +1943,8 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
                 // Vertical displacement of win element wrt ref pt
                 YD = RWIN2.z - RREF2.z;
                 // Horizontal and vertical displacement ratio and position factor
-                XR = std::sqrt(std::abs(ASQ - YD * YD)) / RR;
-                YR = std::abs(YD / RR);
+                Real64 XR = std::sqrt(std::abs(ASQ - YD * YD)) / RR;
+                Real64 YR = std::abs(YD / RR);
                 POSFAC = DayltgGlarePositionFactor(XR, YR);
             }
         }
@@ -2022,7 +1991,7 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
                             if (state.dataSurface->Surface(state.dataSurface->Surface(IntWin).ExtBoundCond).Zone ==
                                 state.dataSurface->Surface(IWin).Zone) {
 
-                                PierceSurface(state, IntWin, RREF, Ray, HitPtIntWin, hitIntWin);
+                                hitIntWin = PierceSurface(state, IntWin, RREF, Ray, HitPtIntWin);
                                 if (hitIntWin) {
                                     IntWinHitNum = IntWin;
                                     COSBIntWin = dot(state.dataSurface->Surface(IntWin).OutNormVec, Ray);
@@ -2056,15 +2025,15 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
             // Returns hitIntObs = true iff obstruction is hit
             // (Example of interior obstruction is a wall in an L-shaped room that lies
             // between reference point and window.)
-            DayltgHitInteriorObstruction(state, IWin, RREF, RWIN, hitIntObs);
+            hitIntObs = DayltgHitInteriorObstruction(state, IWin, RREF, RWIN);
         }
 
         if (extWinType == ExtWinType::AdjZone && IntWinHitNum > 0 && !hitIntObs) {
             // Check for obstruction between ref point and interior window through which ray passes
-            DayltgHitInteriorObstruction(state, IntWinHitNum, RREF, HitPtIntWin, hitIntObs);
+            hitIntObs = DayltgHitInteriorObstruction(state, IntWinHitNum, RREF, HitPtIntWin);
             if (!hitIntObs) {
                 // Check for obstruction between intersection point on int window and ext win element
-                DayltgHitBetWinObstruction(state, IntWinHitNum, IWin, HitPtIntWin, RWIN, hitIntObs);
+                hitIntObs = DayltgHitBetWinObstruction(state, IntWinHitNum, IWin, HitPtIntWin, RWIN);
             }
         }
         if (CalledFrom == CalledFor::RefPoint) {
@@ -2093,7 +2062,7 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
                 // the IHR (now HourOfDay) here is/was not correct, this is outside of hour loop
                 // the hour is used to query schedule for transmission , not sure what to do
                 // it will work for detailed and never did work correctly before.
-                DayltgHitObstruction(state, state.dataGlobal->HourOfDay, IWin2, RWIN2, Ray, ObTrans);
+                ObTrans = DayltgHitObstruction(state, state.dataGlobal->HourOfDay, IWin2, RWIN2, Ray);
                 if (ObTrans < 1.0) hitExtObs = true;
             } else {
                 // Transmittance from exterior obstruction surfaces is calculated here. This needs to be done for each timestep
@@ -2118,7 +2087,7 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
                     }
                     Vector3<Real64> RayVector = state.dataBSDFWindow->ComplexWind(IWin).Geom(CplxFenState).sInc(RayIndex);
                     // It will get product of all transmittances
-                    DayltgHitObstruction(state, state.dataGlobal->HourOfDay, IWin, RWIN, RayVector, TransBeam);
+                    TransBeam = DayltgHitObstruction(state, state.dataGlobal->HourOfDay, IWin, RWIN, RayVector);
                     // IF (TransBeam > 0.0d0) ObTrans = TransBeam
                     if (CalledFrom == CalledFor::RefPoint) {
                         state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CplxFenState).RefPoint(iRefPoint).TransOutSurf(ICplxFen, WinEl) =
@@ -2141,9 +2110,10 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
             // (obstructed sky diffuse at ground point)/(unobstructed sky diffuse at ground point).
             // This ratio is calculated for an isotropic sky.
             // Ground point hit by the ray:
-            Alfa = std::acos(-Ray.z);
-            Beta = std::atan2(Ray.y, Ray.x);
-            HorDis = (RWIN2.z - state.dataSurface->GroundLevelZ) * std::tan(Alfa);
+            Real64 Alfa = std::acos(-Ray.z);
+            Real64 Beta = std::atan2(Ray.y, Ray.x);
+            // Distance between ground hit point and proj'n of center of window element onto ground (m)
+            Real64 HorDis = (RWIN2.z - state.dataSurface->GroundLevelZ) * std::tan(Alfa);
             Vector3<Real64> GroundHitPt = {RWIN2.x + HorDis * std::cos(Beta), RWIN2.y + HorDis * std::sin(Beta), state.dataSurface->GroundLevelZ};
 
             SkyObstructionMult = CalcObstrMultiplier(state, GroundHitPt, DataSurfaces::AltAngStepsForSolReflCalc, DataSurfaces::AzimAngStepsForSolReflCalc);
@@ -2172,58 +2142,43 @@ void InitializeCFSDaylighting(EnergyPlusData &state,
     // Routine also calculates intersection points with ground and exterior reflection surfaces.
     auto &dl = state.dataDayltg;
 
-    Real64 WinElArea; // Window element area
-
-    Vector3<Real64> W1;
-    Vector3<Real64> W2;
-    Vector3<Real64> W3;
-    Vector3<Real64> W21;
-    Vector3<Real64> W23;
-    Vector3<Real64> WNorm;
-
-    // Position factor variables
-    Real64 AZVIEW; // Azimuth of view vector
-
     // Object Data
     DataBSDFWindow::BSDFDaylghtPosition elPos; // altitude and azimuth of intersection element
     Vector Vec;                                // temporary vector variable
 
     int NumOfWinEl = NWX * NWY; // Number of window elements
 
-    Real64 DWX = state.dataSurface->Surface(IWin).Width / NWX; // Window element width
-    Real64 DWY = state.dataSurface->Surface(IWin).Height / NWY; // Window element height
+    auto &surf = state.dataSurface->Surface(IWin);
+    Real64 DWX = surf.Width / NWX; // Window element width
+    Real64 DWY = surf.Height / NWY; // Window element height
 
     int zoneNum = dl->daylightControl(daylightCtrlNum).zoneIndex;
-    AZVIEW = (dl->daylightControl(daylightCtrlNum).ViewAzimuthForGlare + state.dataHeatBal->Zone(zoneNum).RelNorth +
+    Real64 AZVIEW = (dl->daylightControl(daylightCtrlNum).ViewAzimuthForGlare + state.dataHeatBal->Zone(zoneNum).RelNorth +
               state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) *
              Constant::DegToRadians;
 
     // Perform necessary calculations for window coordinates and vectors.  This will be used to calculate centroids for
     // each window element
-    W1 = 0.0;
-    W2 = 0.0;
-    W3 = 0.0;
+    Vector3<Real64> W1 = {0.0, 0.0, 0.0};
+    Vector3<Real64> W2 = {0.0, 0.0, 0.0};
+    Vector3<Real64> W3 = {0.0, 0.0, 0.0};
 
-    if (state.dataSurface->Surface(IWin).Sides == 4) {
-        W3 = state.dataSurface->Surface(IWin).Vertex(2);
-        W2 = state.dataSurface->Surface(IWin).Vertex(3);
-        W1 = state.dataSurface->Surface(IWin).Vertex(4);
-    } else if (state.dataSurface->Surface(IWin).Sides == 3) {
-        W3 = state.dataSurface->Surface(IWin).Vertex(2);
-        W2 = state.dataSurface->Surface(IWin).Vertex(3);
-        W1 = state.dataSurface->Surface(IWin).Vertex(1);
+    if (surf.Sides == 4) {
+        W3 = surf.Vertex(2);
+        W2 = surf.Vertex(3);
+        W1 = surf.Vertex(4);
+    } else if (surf.Sides == 3) {
+        W3 = surf.Vertex(2);
+        W2 = surf.Vertex(3);
+        W1 = surf.Vertex(1);
     }
 
-    W21 = W1 - W2;
-    W23 = W3 - W2;
+    Vector3<Real64> W21 = W1 - W2; W21 /= surf.Height;
+    Vector3<Real64> W23 = W3 - W2; W23 /= surf.Width;
+    Vector3<Real64> WNorm = surf.lcsz;
 
-    W21 /= state.dataSurface->Surface(IWin).Height;
-    W23 /= state.dataSurface->Surface(IWin).Width;
-
-    WNorm = state.dataSurface->Surface(IWin).lcsz;
-
-    WinElArea = DWX * DWY;
-    if (state.dataSurface->Surface(IWin).Sides == 3) {
+    Real64 WinElArea = DWX * DWY;
+    if (surf.Sides == 3) {
         WinElArea *= std::sqrt(1.0 - pow_2(dot(W21, W23)));
     }
 
@@ -2422,7 +2377,7 @@ void InitializeCFSStateData(EnergyPlusData &state,
                     DotProd = dot(state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sInc(IRay),
                                   state.dataSurface->Surface(JSurf).NewellSurfaceNormalVector);
                     if (DotProd >= 0) continue;
-                    PierceSurface(state, JSurf, Centroid, state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sInc(IRay), HitPt, hit);
+                    hit = PierceSurface(state, JSurf, Centroid, state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sInc(IRay), HitPt);
                     if (!hit) continue; // Miss: Try next surface
                     if (TotHits == 0) {
                         // First hit for this ray
@@ -2717,14 +2672,6 @@ void CFSRefPointPosFactor(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // Calculate position factor for given reference point.
 
-    // SUBROUTINE LOCAL VARIABLES
-    Real64 XR;
-    Real64 YR;
-    bool hit;
-
-    // Object Data
-    DataBSDFWindow::BSDFDaylghtPosition elPos; // altitude and azimuth of intersection element
-
     auto const &sTrn = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sTrn;
     for (int iTrnRay = 1; iTrnRay <= NTrnBasis; ++iTrnRay) {
         Vector3<Real64> V = sTrn(iTrnRay);
@@ -2732,14 +2679,15 @@ void CFSRefPointPosFactor(EnergyPlusData &state,
 
         Vector3<Real64> InterPoint;
 
-        PierceSurface(state, iWin, RefPoint, V, InterPoint, hit);
+
+        bool hit = PierceSurface(state, iWin, RefPoint, V, InterPoint);
         if (hit) {
             RefPointMap.RefPointIntersection(iTrnRay) = true;
 
-            elPos = WindowComplexManager::DaylghtAltAndAzimuth(V);
+            DataBSDFWindow::BSDFDaylghtPosition elPos = WindowComplexManager::DaylghtAltAndAzimuth(V);
 
-            XR = std::tan(std::abs(Constant::PiOvr2 - AZVIEW - elPos.Azimuth) + 0.001);
-            YR = std::tan(elPos.Altitude + 0.001);
+            Real64 XR = std::tan(std::abs(Constant::PiOvr2 - AZVIEW - elPos.Azimuth) + 0.001);
+            Real64 YR = std::tan(elPos.Altitude + 0.001);
             RefPointMap.RefPtIntPosFac(iTrnRay) = DayltgGlarePositionFactor(XR, YR);
         }
     }
@@ -2765,9 +2713,6 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
     // azimuth Theta and create upward-going ground ray unit vector at each Phi,Theta pair.
     // Phi = 0 at the horizon; Phi = Pi/2 at the zenith.
 
-    // Return value
-    Real64 ObstrMultiplier;
-
     // Locals
     auto &dl = state.dataDayltg;
 
@@ -2780,9 +2725,6 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
 
     Real64 DPhi = Constant::PiOvr2 / (AltSteps / 2.0); // Phi increment (radians)
     Real64 DTheta = Constant::Pi / AzimSteps; // Theta increment (radians)
-
-    Real64 SkyGndObs = 0.0; // Obstructed sky irradiance at a ground point
-    Real64 SkyGndUnObs = 0.0; // Unobstructed sky irradiance at a ground point
 
     // Tuned Precompute Phi trig table
     if (AltSteps != dl->AltSteps_last) {
@@ -2802,6 +2744,9 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
         }
         dl->AzimSteps_last = AzimSteps;
     }
+
+    Real64 SkyGndObs = 0.0; // Obstructed sky irradiance at a ground point
+    Real64 SkyGndUnObs = 0.0; // Unobstructed sky irradiance at a ground point
 
     // Altitude loop
     for (int IPhi = 1, IPhi_end = (AltSteps / 2); IPhi <= IPhi_end; ++IPhi) {
@@ -2824,7 +2769,7 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
             if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
                 for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
-                    PierceSurface(state, ObsSurfNum, GroundHitPt, URay, ObsHitPt, hitObs); // Check if ray pierces surface
+                    hitObs = PierceSurface(state, ObsSurfNum, GroundHitPt, URay, ObsHitPt); // Check if ray pierces surface
                     if (hitObs) break;
                 }
 
@@ -2833,8 +2778,8 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
                 // Lambda function for the octree to test for surface hit
                 auto surfaceHit = [&GroundHitPt, &hitObs, &URay, &ObsHitPt](SurfaceData const &surface) -> bool {
                     if (surface.IsShadowPossibleObstruction) {
-                        PierceSurface(surface, GroundHitPt, URay, ObsHitPt, hitObs); // Check if ray pierces surface
-                        return hitObs;                                               // Ray pierces surface
+                        hitObs = PierceSurface(surface, GroundHitPt, URay, ObsHitPt); // Check if ray pierces surface
+                        return hitObs;
                     } else {
                         return false;
                     }
@@ -2853,13 +2798,7 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
 
     // in case ground point is surrounded by obstructions (SkyGndUnObs == 0), then multiplier will be equal to zero
     // This should not happen anyway because in that case ray would not be able to reach ground point
-    ObstrMultiplier = 0.0;
-
-    if (SkyGndUnObs != 0.0) {
-        ObstrMultiplier = SkyGndObs / SkyGndUnObs;
-    }
-
-    return ObstrMultiplier;
+    return (SkyGndUnObs != 0.0) ? (SkyGndObs / SkyGndUnObs) : 0.0;
 }
 
 void FigureDayltgCoeffsAtPointsForSunPosition(
@@ -2918,31 +2857,18 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Vector3<Real64> RREF {0.0, 0.0, 0.0};   // Location of a reference point in absolute coordinate system //Autodesk Was used uninitialized:
-    Real64 ProfAng;                         // Solar profile angle on a window (radians)
-    Real64 POSFAC;                          // Position factor for a window element / ref point / view vector combination
-    Real64 XR;                              // Horizontal displacement ratio
-    Real64 YR;                              // Vertical displacement ratio
 
     Real64 ObTransDisk;     // Product of solar transmittances of exterior obstructions hit by ray from reference point to sun
     Real64 LumAtHitPtFrSun; // Luminance at hit point of obstruction by reflection of direct light from sun (cd/m2)
 
-    Real64 ELUM;  // Sky or ground luminance (cd/m2)
-    Real64 DEDIR; // Illuminance contribution at reference point from window element (lux)
-    Real64 COSI;  // Cosine of angle between direct sun and window outward normal
     Real64 TVISS; // Direct solar visible transmittance of window at given angle of incidence
     //  (times light well efficiency, if appropriate)
     Real64 XAVWL; // XAVWL*TVISS is contribution of window luminance from solar disk (cd/m2)
 
-    Real64 SlatAng;       // Blind slat angle (rad)
-    Real64 Alfa;          // Intermediate variables
     bool hitObs;          // True iff obstruction is hit
     Real64 ObsVisRefl;    // Visible reflectance of obstruction
     Real64 SkyReflVisLum; // Reflected sky luminance at hit point divided by
 
-    Real64 CosIncAngRefl;   // Cos of angle of incidence of beam on reflecting surface
-    Real64 CosIncAngRec;    // Cos of angle of incidence of reflected beam on receiving window
-    Real64 ReflDistanceSq;  // Distance squared between ref pt and hit point on reflecting surf (m^2)
-    Real64 ReflDistance;    // Distance between ref pt and hit point on reflecting surf (m)
     Real64 SpecReflectance; // Specular reflectance of a reflecting surface
     Real64 TVisRefl;        // Bare window vis trans for reflected beam
     //  (times light well efficiency, if appropriate)
@@ -3027,7 +2953,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
             // Beam solar reflected from nearest obstruction
 
-            DayltgSurfaceLumFromSun(state, iHour, Ray, NearestHitSurfNum, NearestHitPt, LumAtHitPtFrSun);
+            LumAtHitPtFrSun = DayltgSurfaceLumFromSun(state, iHour, Ray, NearestHitSurfNum, NearestHitPt);
             dl->avgWinLum(iHour, 1).sun += LumAtHitPtFrSun * TVISB;
             if (PHRAY >= 0.0) dl->dirIllum(iHour, 1).sun += LumAtHitPtFrSun * DOMEGA_Ray_3 * TVISB;
 
@@ -3112,11 +3038,12 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
             Vector3<Real64> GroundHitPt; // Coordinates of point that ray hits ground (m)
             // Tuned Hoisted operations out of loop and linear indexing
             if (state.dataSurface->CalcSolRefl) { // Coordinates of ground point hit by the ray
-                Alfa = std::acos(-Ray_3);
+                Real64 Alfa = std::acos(-Ray_3);
                 Real64 const Ray_1(Ray.x);
                 Real64 const Ray_2(Ray.y);
                 //                    Beta = std::atan2( Ray_2, Ray_1 ); //Unused Tuning below eliminated use
-                Real64 HorDis((RWIN2.z - state.dataSurface->GroundLevelZ) * std::tan(Alfa)); // Distance between ground hit point and proj'n of center
+                // Distance between ground hit point and proj'n of center of window element onto ground (m)
+                Real64 HorDis = (RWIN2.z - state.dataSurface->GroundLevelZ) * std::tan(Alfa); 
                 GroundHitPt.z = state.dataSurface->GroundLevelZ;
                 // Tuned Replaced by below: sqrt is faster than sincos
                 //                    GroundHitPt( 1 ) = RWIN2( 1 ) + HorDis * std::cos( Beta );
@@ -3142,9 +3069,9 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
             for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
                 if (PHRAY > 0.0) { // Ray heads upward to sky
-                    ELUM = DayltgSkyLuminance(state, static_cast<SkyType>(iSky), THRAY, PHRAY);
+                    Real64 ELUM = DayltgSkyLuminance(state, static_cast<SkyType>(iSky), THRAY, PHRAY); // Sky or ground luminance (cd/m2)
                     XDirIllum.sky[iSky] = ELUM * DOMEGA_Ray_3;
-                    DEDIR = XDirIllum.sky[iSky] * TVISB;
+                    Real64 DEDIR = XDirIllum.sky[iSky] * TVISB; // Illuminance contribution at reference point from window element (lux)
                     edirsk.sky[iSky] += DEDIR * ObTrans;
                     avwlsk.sky[iSky] += ELUM * TVISB_ObTrans;
                     XAvgWinLum.sky[iSky] = ELUM * ObTrans;
@@ -3165,7 +3092,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                     hitObs = false;
                     Vector3<Real64> ObsHitPt; // Coordinates of hit point on an obstruction (m)
                     for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
-                        PierceSurface(state, ObsSurfNum, GroundHitPt, SUNCOS_iHour, ObsHitPt, hitObs);
+                        hitObs = PierceSurface(state, ObsSurfNum, GroundHitPt, SUNCOS_iHour, ObsHitPt);
                         if (hitObs) break;
                     }
                     // if ( hitObs ) SunObstructionMult = 0.0;
@@ -3190,20 +3117,20 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
         RAYCOS.z = dl->sunAngles.sinPhi;
 
         // Is sun on front side of exterior window?
-        COSI = dot(WNORM2, RAYCOS);
+        Real64 COSI = dot(WNORM2, RAYCOS); // Cosine of angle between direct sun and window outward normal
         bool hit;    // True if ray from ref point thru window element hits an obstruction
         bool hitWin; // True if ray passes thru window
         Vector3<Real64> HP;
         if (COSI > 0.0) {
 
             // Does RAYCOS pass thru exterior window? HP is point that RAYCOS intersects window plane.
-            PierceSurface(state, IWin2, RREF2, RAYCOS, HP, hitWin);
+            hitWin = PierceSurface(state, IWin2, RREF2, RAYCOS, HP);
             // True if ray from ref pt to sun hits an interior obstruction
             if (hitWin) {
                 bool hitIntObsDisk = false;
                 if (extWinType == ExtWinType::InZone) {
                     // Check for interior obstructions between reference point and HP.
-                    DayltgHitInteriorObstruction(state, IWin2, RREF2, HP, hitIntObsDisk);
+                    hitIntObsDisk = DayltgHitInteriorObstruction(state, IWin2, RREF2, HP);
                 }
                 ObTransDisk = 0.0; // Init value
                 // Init flag for vector from RP to sun passing through interior window
@@ -3225,7 +3152,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             if (state.dataSurface->Surface(IntWinDisk).ExtBoundCond >= 1) {
                                 if (state.dataSurface->Surface(state.dataSurface->Surface(IntWinDisk).ExtBoundCond).Zone ==
                                     state.dataSurface->Surface(IWin2).Zone) {
-                                    PierceSurface(state, IntWinDisk, RREF, RAYCOS, HitPtIntWinDisk, hitIntWinDisk);
+                                    hitIntWinDisk = PierceSurface(state, IntWinDisk, RREF, RAYCOS, HitPtIntWinDisk);
                                     if (hitIntWinDisk) {
                                         IntWinDiskHitNum = IntWinDisk;
                                         COSBIntWin = dot(state.dataSurface->Surface(IntWinDisk).OutNormVec, RAYCOS);
@@ -3252,11 +3179,11 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                     // Check for interior obstructions between ref point and interior window
                     hitIntObsDisk = false;
                     if (hitIntWinDisk) {
-                        DayltgHitInteriorObstruction(state, IntWinDiskHitNum, RREF, HitPtIntWinDisk, hitIntObsDisk);
+                        hitIntObsDisk = DayltgHitInteriorObstruction(state, IntWinDiskHitNum, RREF, HitPtIntWinDisk);
                         // If no obstruction between RP and hit int win, check for obstruction
                         // between int win and ext win
                         if (!hitIntObsDisk) {
-                            DayltgHitBetWinObstruction(state, IntWinDiskHitNum, IWin2, HitPtIntWinDisk, HP, hitIntObsDisk);
+                            hitIntObsDisk = DayltgHitBetWinObstruction(state, IntWinDiskHitNum, IWin2, HitPtIntWinDisk, HP);
                         }
                     }
                     if (hitIntObsDisk) ObTransDisk = 0.0;
@@ -3270,7 +3197,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                 if (!hitIntObsDisk) { // No interior obstruction was hit
                     // Net transmittance of exterior obstructions encountered by RAYCOS
                     // ObTransDisk = 1.0 will be returned if no exterior obstructions are hit.
-                    DayltgHitObstruction(state, iHour, IWin2, RREF2, RAYCOS, ObTransDisk);
+                    ObTransDisk = DayltgHitObstruction(state, iHour, IWin2, RREF2, RAYCOS);
                     //                        if ( ObTransDisk < 1.0 ) hitExtObsDisk = true; //Unused Set but never used
                     // RJH 08-26-07 However, if this is a case of interior window
                     // and vector to sun does not pass through interior window
@@ -3304,21 +3231,22 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
                     std::array<Real64, (int)Material::MaxSlatAngs + 1> transBmBmMult;
                     std::fill(transBmBmMult.begin(), transBmBmMult.end(), 0.0);
+
                     if (ANY_BLIND(ShType)) {
-                        ProfileAngle(state, IWin, RAYCOS, state.dataMaterial->Blind(BlNum).SlatOrientation, ProfAng);
+                        auto const &blind = state.dataMaterial->Blind(BlNum);
+                            
+                        Real64 ProfAng = ProfileAngle(state, IWin, RAYCOS, blind.SlatOrientation);
                         // Contribution of beam passing through slats and reaching reference point
                         for (int JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
                             // IF (.NOT.SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
-                            if (state.dataSurface->SurfWinMovableSlats(IWin)) {
-                                SlatAng = (JB - 1) * Constant::Pi / (Material::MaxSlatAngs - 1);
-                            } else {
-                                SlatAng = state.dataMaterial->Blind(BlNum).SlatAngle * Constant::DegToRadians;
-                            }
+                            Real64 SlatAng = (state.dataSurface->SurfWinMovableSlats(IWin)) ? 
+                                    ((JB - 1) * Constant::Pi / (Material::MaxSlatAngs - 1)) :
+                                    (blind.SlatAngle * Constant::DegToRadians);
                             transBmBmMult[JB] = WindowManager::BlindBeamBeamTrans(ProfAng,
                                                                                   SlatAng,
-                                                                                  state.dataMaterial->Blind(BlNum).SlatWidth,
-                                                                                  state.dataMaterial->Blind(BlNum).SlatSeparation,
-                                                                                  state.dataMaterial->Blind(BlNum).SlatThickness);
+                                                                                  blind.SlatWidth,
+                                                                                  blind.SlatSeparation,
+                                                                                  blind.SlatThickness);
                             dl->dirIllum(iHour, JB + 1).sunDisk = RAYCOS.z * TVISS * transBmBmMult[JB] * ObTransDisk;
 
                             // do this only once for fixed slat blinds
@@ -3341,9 +3269,9 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
                         // Position factor for sun (note that AZVIEW is wrt y-axis and THSUN is wrt
                         // x-axis of absolute coordinate system.
-                        XR = std::tan(std::abs(Constant::PiOvr2 - AZVIEW - dl->sunAngles.theta) + 0.001);
-                        YR = std::tan(dl->sunAngles.phi + 0.001);
-                        POSFAC = DayltgGlarePositionFactor(XR, YR);
+                        Real64 XR = std::tan(std::abs(Constant::PiOvr2 - AZVIEW - dl->sunAngles.theta) + 0.001);
+                        Real64 YR = std::tan(dl->sunAngles.phi + 0.001);
+                        Real64 POSFAC = DayltgGlarePositionFactor(XR, YR); // Position factor for a window element / ref point / view vector combination
 
                         WindowSolidAngleDaylightPoint = state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint);
 
@@ -3367,10 +3295,10 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                 dl->avgWinLum(iHour, 2).sunDisk = XAVWL * TVISS * transBmBmMult[1] * ObTransDisk;
                             }
                         } // Position Factor
-                    }
-                } // Beam avoids all obstructions
-            }     // Beam passes thru window
-        }         // Sun on front side
+                    } // if (calledFrom == RefPt)
+                } // if (ObTransDisk > 1e-6) // Beam avoids all obstructions
+            } // if (hitWin)
+        } // if (COSI > 0.0) // Sun on front side
 
         // Beam solar reaching reference point after beam-beam (specular) reflection from
         // an exterior surface
@@ -3407,19 +3335,19 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             // reach reference point in this case
                             if (SunVecMir.z <= 0.0) continue;
                             // Cosine of incidence angle of reflected beam on window
-                            CosIncAngRec = dot(state.dataSurface->Surface(IWin2).OutNormVec, SunVecMir);
+                            Real64 CosIncAngRec = dot(state.dataSurface->Surface(IWin2).OutNormVec, SunVecMir);
                             if (CosIncAngRec <= 0.0) continue;
                             // Does ray from ref. pt. along SunVecMir pass through window?
-                            PierceSurface(state, IWin2, RREF2, SunVecMir, HP, hitWin);
+                            hitWin = PierceSurface(state, IWin2, RREF2, SunVecMir, HP);
                             if (!hitWin) continue; // Ray did not pass through window
                             // Check if this ray hits interior obstructions
-                            DayltgHitInteriorObstruction(state, IWin2, RREF2, HP, hit);
+                            hit = DayltgHitInteriorObstruction(state, IWin2, RREF2, HP);
                             if (hit) continue; // Interior obstruction was hit
                             // Does ray hit this reflecting surface?
-                            PierceSurface(state, ReflSurfNum, RREF2, SunVecMir, HitPtRefl, hitRefl);
+                            hitRefl = PierceSurface(state, ReflSurfNum, RREF2, SunVecMir, HitPtRefl);
                             if (!hitRefl) continue; // Ray did not hit this reflecting surface
-                            ReflDistanceSq = distance_squared(HitPtRefl, RREF2);
-                            ReflDistance = std::sqrt(ReflDistanceSq);
+                            Real64 ReflDistanceSq = distance_squared(HitPtRefl, RREF2);
+                            Real64 ReflDistance = std::sqrt(ReflDistanceSq);
                             // Is ray from ref. pt. to reflection point (HitPtRefl) obstructed?
                             bool hitObsRefl = false;
                             Vector3<Real64> HitPtObs; // Hit point on obstruction
@@ -3428,7 +3356,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                  ++loop2) {
                                 int const ObsSurfNum = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).PossibleObsSurfNums(loop2);
                                 if (ObsSurfNum == ReflSurfNum || ObsSurfNum == state.dataSurface->Surface(ReflSurfNum).BaseSurf) continue;
-                                PierceSurface(state, ObsSurfNum, RREF2, SunVecMir, ReflDistance, HitPtObs, hitObs); // ReflDistance cutoff added
+                                hitObs = PierceSurface(state, ObsSurfNum, RREF2, SunVecMir, ReflDistance, HitPtObs); // ReflDistance cutoff added
                                 if (hitObs) { // => Could skip distance check (unless < vs <= ReflDistance really matters)
                                     if (distance_squared(HitPtObs, RREF2) < ReflDistanceSq) { // Distance squared from ref pt to reflection point
                                         hitObsRefl = true;
@@ -3451,7 +3379,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                          ++loop2) {
                                         int const ObsSurfNum =
                                             state.dataSolarReflectionManager->SolReflRecSurf(ReflSurfRecNum).PossibleObsSurfNums(loop2);
-                                        PierceSurface(state, ObsSurfNum, HitPtRefl, RAYCOS, HitPtObs, hitObs);
+                                        hitObs = PierceSurface(state, ObsSurfNum, HitPtRefl, RAYCOS, HitPtObs);
                                         if (hitObs) break;
                                     }
                                 }
@@ -3459,7 +3387,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                 // Reflecting surface is a building shade
                                 for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
                                     if (ObsSurfNum == ReflSurfNum) continue;
-                                    PierceSurface(state, ObsSurfNum, HitPtRefl, RAYCOS, HitPtObs, hitObs);
+                                    hitObs = PierceSurface(state, ObsSurfNum, HitPtRefl, RAYCOS, HitPtObs);
                                     if (hitObs) break;
                                 }
                             } // End of check if reflector is a window or shadowing surface
@@ -3468,7 +3396,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
                             // No obstructions. Calculate reflected beam illuminance at ref. pt. from this reflecting surface.
                             SpecReflectance = 0.0;
-                            CosIncAngRefl = std::abs(dot(RAYCOS, ReflNorm));
+                            Real64 CosIncAngRefl = std::abs(dot(RAYCOS, ReflNorm)); // Cos of angle of incidence of beam on reflecting surface
                             if (state.dataSurface->Surface(ReflSurfNum).Class == SurfaceClass::Window) {
                                 int const ConstrNumRefl = state.dataSurface->SurfActiveConstruction(ReflSurfNum);
                                 SpecReflectance =
@@ -3486,21 +3414,21 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
                             TransBmBmMultRefl = 0.0;
                             if (ANY_BLIND(ShType)) {
-                                ProfileAngle(state, IWin, SunVecMir, state.dataMaterial->Blind(BlNum).SlatOrientation, ProfAng);
+                                auto const &blind = state.dataMaterial->Blind(BlNum);
+                                Real64 ProfAng = ProfileAngle(state, IWin, SunVecMir, blind.SlatOrientation);
                                 // Contribution of reflected beam passing through slats and reaching reference point
                                 Real64 const Pi_SlatAng_fac(Constant::Pi / (Material::MaxSlatAngs - 1));
                                 for (int JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
                                     // IF (.NOT.SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
-                                    if (state.dataSurface->SurfWinMovableSlats(IWin)) {
-                                        SlatAng = double(JB - 1) * Pi_SlatAng_fac;
-                                    } else {
-                                        SlatAng = state.dataMaterial->Blind(BlNum).SlatAngle * Constant::DegToRadians;
-                                    }
+                                    Real64 SlatAng = (state.dataSurface->SurfWinMovableSlats(IWin)) ?
+                                            (double(JB - 1) * Pi_SlatAng_fac) :
+                                            (blind.SlatAngle * Constant::DegToRadians);
+
                                     TransBmBmMultRefl(JB) = WindowManager::BlindBeamBeamTrans(ProfAng,
                                                                                               SlatAng,
-                                                                                              state.dataMaterial->Blind(BlNum).SlatWidth,
-                                                                                              state.dataMaterial->Blind(BlNum).SlatSeparation,
-                                                                                              state.dataMaterial->Blind(BlNum).SlatThickness);
+                                                                                              blind.SlatWidth,
+                                                                                              blind.SlatSeparation,
+                                                                                              blind.SlatThickness);
                                     dl->dirIllum(iHour, JB + 1).sunDisk +=
                                         SunVecMir.z * SpecReflectance * TVisRefl * TransBmBmMultRefl(JB);
 
@@ -3523,9 +3451,9 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
                             PHSUNrefl = SunVecMir.z;
                             THSUNrefl = std::atan2(SunVecMir.y, SunVecMir.x);
-                            XR = std::tan(std::abs(Constant::PiOvr2 - AZVIEW - THSUNrefl) + 0.001);
-                            YR = std::tan(PHSUNrefl + 0.001);
-                            POSFAC = DayltgGlarePositionFactor(XR, YR);
+                            Real64 XR = std::tan(std::abs(Constant::PiOvr2 - AZVIEW - THSUNrefl) + 0.001);
+                            Real64 YR = std::tan(PHSUNrefl + 0.001);
+                            Real64 POSFAC = DayltgGlarePositionFactor(XR, YR);
                             if (POSFAC != 0.0 && state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint) > 0.000001) {
                                 XAVWL = 14700.0 * std::sqrt(0.000068 * POSFAC) * double(NWX * NWY) /
                                         std::pow(state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint), 0.8);
@@ -3616,8 +3544,6 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &dl = state.dataDayltg;
 
-    Real64 VTR; // For switchable glazing, ratio of visible transmittance of fully-switched state to that of the unswitched state
-
     if (state.dataSurface->SurfSunCosHourly(iHour).z < DataEnvironment::SunIsUpValue) return;
 
     ++ISunPos;
@@ -3664,21 +3590,17 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
 
         if (dl->horIllum[iHour].sun > tmpDFCalc) {
             thisDaylightControl.DaylIllumFac(iHour, loopwin, iRefPoint, JSH).sun =
-                (dl->dirIllum(iHour, JSH).sun + dl->reflIllum(iHour, JSH).sun) /
-                (dl->horIllum[iHour].sun + 0.0001);
+                (dl->dirIllum(iHour, JSH).sun + dl->reflIllum(iHour, JSH).sun) / (dl->horIllum[iHour].sun + 0.0001);
             thisDaylightControl.DaylIllumFac(iHour, loopwin, iRefPoint, JSH).sunDisk =
-                (dl->dirIllum(iHour, JSH).sunDisk + dl->reflIllum(iHour, JSH).sunDisk) /
-                (dl->horIllum[iHour].sun + 0.0001);
+                (dl->dirIllum(iHour, JSH).sunDisk + dl->reflIllum(iHour, JSH).sunDisk) / (dl->horIllum[iHour].sun + 0.0001);
             thisDaylightControl.DaylSourceFac(iHour, loopwin, iRefPoint, JSH).sun =
                 dl->avgWinLum(iHour, JSH).sun / (NWX * NWY * (dl->horIllum[iHour].sun + 0.0001));
             thisDaylightControl.DaylSourceFac(iHour, loopwin, iRefPoint, JSH).sunDisk =
                 dl->avgWinLum(iHour, JSH).sunDisk / (NWX * NWY * (dl->horIllum[iHour].sun + 0.0001));
             thisDaylightControl.DaylBackFac(iHour, loopwin, iRefPoint, JSH).sun =
-                dl->reflIllum(iHour, JSH).sun * dl->enclDaylight(enclNum).aveVisDiffReflect /
-                (Constant::Pi * (dl->horIllum[iHour].sun + 0.0001));
+                dl->reflIllum(iHour, JSH).sun * dl->enclDaylight(enclNum).aveVisDiffReflect / (Constant::Pi * (dl->horIllum[iHour].sun + 0.0001));
             thisDaylightControl.DaylBackFac(iHour, loopwin, iRefPoint, JSH).sunDisk =
-                dl->reflIllum(iHour, JSH).sunDisk * dl->enclDaylight(enclNum).aveVisDiffReflect /
-                (Constant::Pi * (dl->horIllum[iHour].sun + 0.0001));
+                dl->reflIllum(iHour, JSH).sunDisk * dl->enclDaylight(enclNum).aveVisDiffReflect / (Constant::Pi * (dl->horIllum[iHour].sun + 0.0001));
         } else {
             thisDaylightControl.DaylIllumFac(iHour, loopwin, iRefPoint, JSH).sun = 0.0;
             thisDaylightControl.DaylIllumFac(iHour, loopwin, iRefPoint, JSH).sunDisk = 0.0;
@@ -3693,7 +3615,8 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
 
     // For switchable glazing put daylighting factors for switched (dark) state in IS=2 location
     if (ICtrl > 0 && state.dataSurface->WindowShadingControl(ICtrl).ShadingType == WinShadingType::SwitchableGlazing) {
-        VTR = state.dataSurface->SurfWinVisTransRatio(IWin);
+        
+        Real64 VTR = state.dataSurface->SurfWinVisTransRatio(IWin); // Ratio of Tvis of fully-switched state to that of the unswitched state
         for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
             thisDaylightControl.DaylIllumFac(iHour, loopwin, iRefPoint, 2).sky[iSky] =
                 thisDaylightControl.DaylIllumFac(iHour, loopwin, iRefPoint, 1).sky[iSky] * VTR;
@@ -3742,9 +3665,6 @@ void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &dl = state.dataDayltg;
 
-    Real64 VTR; // For switchable glazing, ratio of visible transmittance of
-    //  fully-switched state to that of the unswitched state
-
     if (state.dataSurface->SurfSunCosHourly(iHour).z < DataEnvironment::SunIsUpValue) return;
 
     // Loop over shading index (1=bare window; 2=diffusing glazing, shade, screen or fixed slat-angle blind;
@@ -3771,11 +3691,9 @@ void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
 
         if (dl->horIllum[iHour].sun > tmpDFCalc) {
             illumMapCalc.DaylIllumFac(iHour, loopwin, iMapPoint, JSH).sun =
-                (dl->dirIllum(iHour, JSH).sun + dl->reflIllum(iHour, JSH).sun) /
-                (dl->horIllum[iHour].sun + 0.0001);
+                (dl->dirIllum(iHour, JSH).sun + dl->reflIllum(iHour, JSH).sun) / (dl->horIllum[iHour].sun + 0.0001);
             illumMapCalc.DaylIllumFac(iHour, loopwin, iMapPoint, JSH).sunDisk =
-                (dl->dirIllum(iHour, JSH).sunDisk + dl->reflIllum(iHour, JSH).sunDisk) /
-                (dl->horIllum[iHour].sun + 0.0001);
+                (dl->dirIllum(iHour, JSH).sunDisk + dl->reflIllum(iHour, JSH).sunDisk) / (dl->horIllum[iHour].sun + 0.0001);
         } else {
             illumMapCalc.DaylIllumFac(iHour, loopwin, iMapPoint, JSH).sun = 0.0;
             illumMapCalc.DaylIllumFac(iHour, loopwin, iMapPoint, JSH).sunDisk = 0.0;
@@ -3784,7 +3702,7 @@ void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
 
     // For switchable glazing put daylighting factors for switched (dark) state in IS=2 location
     if (ICtrl > 0 && state.dataSurface->WindowShadingControl(ICtrl).ShadingType == WinShadingType::SwitchableGlazing) {
-        VTR = state.dataSurface->SurfWinVisTransRatio(IWin);
+        Real64 VTR = state.dataSurface->SurfWinVisTransRatio(IWin); // ratio of Tvis of switched to unswitched state
         auto &illSky2 = illumMapCalc.DaylIllumFac(iHour, loopwin, iMapPoint, 2);
         auto const &illSky1 = illumMapCalc.DaylIllumFac(iHour, loopwin, iMapPoint, 1);
         for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
@@ -3959,67 +3877,70 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
 
     if (!state.dataHeatBal->AnyAirBoundary) {
         for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
-            if (state.dataSurface->Surface(SurfLoop).Class == SurfaceClass::Window && state.dataSurface->Surface(SurfLoop).ExtSolar) {
-                int const enclOfSurf = state.dataSurface->Surface(SurfLoop).SolarEnclIndex;
-                if (state.dataViewFactor->EnclSolInfo(enclOfSurf).TotalEnclosureDaylRefPoints > 0 &&
-                    !state.dataViewFactor->EnclSolInfo(enclOfSurf).HasInterZoneWindow &&
-                    dl->enclDaylight(enclOfSurf).hasSplitFluxDaylighting) {
-                    for (int refPtNum = 1; refPtNum <= state.dataViewFactor->EnclSolInfo(enclOfSurf).TotalEnclosureDaylRefPoints; ++refPtNum) {
-                        SetupOutputVariable(state,
-                                            format("Daylighting Window Reference Point {} Illuminance", refPtNum),
-                                            OutputProcessor::Unit::lux,
-                                            state.dataSurface->SurfaceWindow(SurfLoop).IllumFromWinAtRefPtRep(refPtNum),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataSurface->Surface(SurfLoop).Name);
-                        SetupOutputVariable(state,
-                                            format("Daylighting Window Reference Point {} View Luminance", refPtNum),
-                                            OutputProcessor::Unit::cd_m2,
-                                            state.dataSurface->SurfaceWindow(SurfLoop).LumWinFromRefPtRep(refPtNum),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataSurface->Surface(SurfLoop).Name);
-                    }
-                }
+            auto const &surf = state.dataSurface->Surface(SurfLoop);
+            if (surf.Class != SurfaceClass::Window || !surf.ExtSolar)
+                continue;
+                                                                                                                                             
+            int const enclOfSurf = surf.SolarEnclIndex;
+            auto const &enclSol = state.dataViewFactor->EnclSolInfo(enclOfSurf);
+            if (enclSol.TotalEnclosureDaylRefPoints == 0 || enclSol.HasInterZoneWindow || !dl->enclDaylight(enclOfSurf).hasSplitFluxDaylighting)
+                continue;
+            
+            for (int refPtNum = 1; refPtNum <= enclSol.TotalEnclosureDaylRefPoints; ++refPtNum) {
+                SetupOutputVariable(state,
+                                    format("Daylighting Window Reference Point {} Illuminance", refPtNum),
+                                    OutputProcessor::Unit::lux,
+                                    state.dataSurface->SurfaceWindow(SurfLoop).IllumFromWinAtRefPtRep(refPtNum),
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    surf.Name);
+                SetupOutputVariable(state,
+                                    format("Daylighting Window Reference Point {} View Luminance", refPtNum),
+                                    OutputProcessor::Unit::cd_m2,
+                                    state.dataSurface->SurfaceWindow(SurfLoop).LumWinFromRefPtRep(refPtNum),
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    surf.Name);
             }
         }
     } else {
         for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
-            for (int const enclSurfNum : state.dataViewFactor->EnclSolInfo(enclNum).SurfacePtr) {
-                if (state.dataSurface->Surface(enclSurfNum).Class == SurfaceClass::Window && state.dataSurface->Surface(enclSurfNum).ExtSolar) {
-                    if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints > 0 &&
-                        !state.dataViewFactor->EnclSolInfo(enclNum).HasInterZoneWindow &&
-                        dl->enclDaylight(enclNum).hasSplitFluxDaylighting) {
-                        int refPtCount = 0;
-                        for (int controlNum : dl->enclDaylight(enclNum).daylightControlIndexes) {
-                            for (int refPtNum = 1; refPtNum <= dl->daylightControl(controlNum).TotalDaylRefPoints;
-                                 ++refPtNum) {
-                                ++refPtCount; // Count reference points across each daylighting control in the same enclosure
-                                std::string const varKey =
-                                    state.dataSurface->Surface(enclSurfNum).Name + " to " +
-                                    state.dataDayltg
-                                        ->DaylRefPt(dl->daylightControl(controlNum).DaylRefPtNum(refPtNum))
-                                        .Name;
-                                SetupOutputVariable(state,
-                                                    "Daylighting Window Reference Point Illuminance",
-                                                    OutputProcessor::Unit::lux,
-                                                    state.dataSurface->SurfaceWindow(enclSurfNum).IllumFromWinAtRefPtRep(refPtCount),
-                                                    OutputProcessor::SOVTimeStepType::Zone,
-                                                    OutputProcessor::SOVStoreType::Average,
-                                                    varKey);
-                                SetupOutputVariable(state,
-                                                    "Daylighting Window Reference Point View Luminance",
-                                                    OutputProcessor::Unit::cd_m2,
-                                                    state.dataSurface->SurfaceWindow(enclSurfNum).LumWinFromRefPtRep(refPtCount),
-                                                    OutputProcessor::SOVTimeStepType::Zone,
-                                                    OutputProcessor::SOVStoreType::Average,
-                                                    varKey);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+            auto const &enclSol = state.dataViewFactor->EnclSolInfo(enclNum);
+            auto const &enclDayltg = dl->enclDaylight(enclNum);
+            for (int const enclSurfNum : enclSol.SurfacePtr) {
+                auto const &surf = state.dataSurface->Surface(enclSurfNum);
+                auto &surfWindow = state.dataSurface->SurfaceWindow(enclSurfNum);
+                
+                if (surf.Class != SurfaceClass::Window || !surf.ExtSolar)
+                    continue;
+                
+                if (enclSol.TotalEnclosureDaylRefPoints == 0 || enclSol.HasInterZoneWindow || !enclDayltg.hasSplitFluxDaylighting)
+                    continue;
+                
+                int refPtCount = 0;
+                for (int controlNum : enclDayltg.daylightControlIndexes) {
+                     auto const &control = dl->daylightControl(controlNum);
+                     for (int refPtNum = 1; refPtNum <= control.TotalDaylRefPoints; ++refPtNum) {
+                         ++refPtCount; // Count reference points across each daylighting control in the same enclosure
+                         std::string varKey = format("{} to {}", surf.Name, state.dataDayltg->DaylRefPt(control.DaylRefPtNum(refPtNum)).Name);
+                         SetupOutputVariable(state,
+                                             "Daylighting Window Reference Point Illuminance",
+                                             OutputProcessor::Unit::lux,
+                                             surfWindow.IllumFromWinAtRefPtRep(refPtCount),
+                                             OutputProcessor::SOVTimeStepType::Zone,
+                                             OutputProcessor::SOVStoreType::Average,
+                                             varKey);
+                         SetupOutputVariable(state,
+                                             "Daylighting Window Reference Point View Luminance",
+                                             OutputProcessor::Unit::cd_m2,
+                                             surfWindow.LumWinFromRefPtRep(refPtCount),
+                                             OutputProcessor::SOVTimeStepType::Zone,
+                                             OutputProcessor::SOVStoreType::Average,
+                                             varKey);
+                     }
+                } // for (controlNum)
+            } // for (enclSurfNum)
+        } // for (enclNum)
     }
 
     // RJH DElight Modification Begin - Calls to DElight preprocessing subroutines
@@ -5432,12 +5353,12 @@ void DayltgExtHorizIllum(EnergyPlusData &state,
     HISU = dl->sunAngles.sinPhi * 1.0;
 }
 
-void DayltgHitObstruction(EnergyPlusData &state,
+// Product of solar transmittances of exterior obstructions
+Real64 DayltgHitObstruction(EnergyPlusData &state,
                           int const IHOUR,           // Hour number
                           int const IWin,            // Window index
                           Vector3<Real64> const &R1, // Origin of ray (m)
-                          Vector3<Real64> const &RN, // Unit vector along ray
-                          Real64 &ObTrans            // Product of solar transmittances of exterior obstructions
+                          Vector3<Real64> const &RN // Unit vector along ray 
 )
 {
 
@@ -5465,10 +5386,10 @@ void DayltgHitObstruction(EnergyPlusData &state,
     // Local declarations
     bool hit; // True iff a particular obstruction is hit
 
-    ObTrans = 1.0;
+    Real64 ObTrans = 1.0;
 
-    auto const &window(state.dataSurface->Surface(IWin));
-    int const window_iBaseSurf(window.BaseSurf);
+    auto const &window = state.dataSurface->Surface(IWin);
+    int const window_iBaseSurf = window.BaseSurf;
 
     Vector3<Real64> DayltgHitObstructionHP;
     // Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
@@ -5480,13 +5401,13 @@ void DayltgHitObstruction(EnergyPlusData &state,
             auto const &surface = state.dataSurface->Surface(ISurf);
             SurfaceClass IType = surface.Class;
             if ((IType == SurfaceClass::Wall || IType == SurfaceClass::Roof || IType == SurfaceClass::Floor) && (ISurf != window_iBaseSurf)) {
-                PierceSurface(state, ISurf, R1, RN, DayltgHitObstructionHP, hit);
+                hit = PierceSurface(state, ISurf, R1, RN, DayltgHitObstructionHP);
                 if (hit) { // Building element is hit (assumed opaque)
                     ObTrans = 0.0;
                     break;
                 }
             } else if (surface.IsShadowing) {
-                PierceSurface(state, ISurf, R1, RN, DayltgHitObstructionHP, hit);
+                hit = PierceSurface(state, ISurf, R1, RN, DayltgHitObstructionHP);
                 if (hit) { // Shading surface is hit
                     // Get solar transmittance of the shading surface
                     Real64 const Trans(
@@ -5512,13 +5433,13 @@ void DayltgHitObstruction(EnergyPlusData &state,
             DataSurfaces::SurfaceClass const sClass(surface.Class);
             Vector3<Real64> HP;
             if ((sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && (&surface != window_base_p)) {
-                PierceSurface(surface, R1, RN, HP, hit);
+                hit = PierceSurface(surface, R1, RN, HP);
                 if (hit) { // Building element is hit (assumed opaque)
                     ObTrans = 0.0;
                     return true;
                 }
             } else if (surface.IsShadowing) {
-                PierceSurface(surface, R1, RN, HP, hit);
+                hit = PierceSurface(surface, R1, RN, HP);
                 if (hit) { // Shading surface is hit
                     // Get solar transmittance of the shading surface
                     Real64 const Trans(
@@ -5539,13 +5460,14 @@ void DayltgHitObstruction(EnergyPlusData &state,
         Vector3<Real64> const RN_inv(SurfaceOctreeCube::safe_inverse(RN));
         state.dataHeatBalMgr->surfaceOctree.processSomeSurfaceRayIntersectsCube(state, R1, RN, RN_inv, solarTransmittance);
     }
-}
 
-void DayltgHitInteriorObstruction(EnergyPlusData &state,
+    return ObTrans;
+} // DayltgHitObstruction()
+
+bool DayltgHitInteriorObstruction(EnergyPlusData &state,
                                   int const IWin,            // Window index
                                   Vector3<Real64> const &R1, // Origin of ray (m)
-                                  Vector3<Real64> const &R2, // Destination of ray (m)
-                                  bool &hit                  // True iff ray hits an obstruction
+                                  Vector3<Real64> const &R2 // Destination of ray (m)
 )
 {
 
@@ -5560,15 +5482,15 @@ void DayltgHitInteriorObstruction(EnergyPlusData &state,
     // Preconditions
     assert(magnitude(R2 - R1) > 0.0); // Protect normalize() from divide by zero
 
-    hit = false;
+    bool hit = false;
     Vector3<Real64> RN = (R2 - R1).normalize(); // Make unit vector
-    Real64 const d12(distance(R1, R2));         // Distance between R1 and R2
+    Real64 const d12 = distance(R1, R2);         // Distance between R1 and R2
 
-    auto const &window(state.dataSurface->Surface(IWin));
-    int const window_Enclosure(window.SolarEnclIndex);
-    int const window_iBaseSurf(window.BaseSurf);
-    auto const &window_base(window_iBaseSurf > 0 ? state.dataSurface->Surface(window_iBaseSurf) : window);
-    int const window_base_iExtBoundCond(window_base.ExtBoundCond);
+    auto const &window = state.dataSurface->Surface(IWin);
+    int const window_Enclosure = window.SolarEnclIndex;
+    int const window_iBaseSurf = window.BaseSurf;
+    auto const &window_base = window_iBaseSurf > 0 ? state.dataSurface->Surface(window_iBaseSurf) : window;
+    int const window_base_iExtBoundCond = window_base.ExtBoundCond;
 
     // Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
     if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
@@ -5583,27 +5505,27 @@ void DayltgHitInteriorObstruction(EnergyPlusData &state,
                  (IType == SurfaceClass::Wall || IType == SurfaceClass::Roof || IType == SurfaceClass::Floor) && (ISurf != window_iBaseSurf) &&
                  (ISurf != window_base_iExtBoundCond))) // Exclude window's base or base-adjacent surfaces
             {
-                PierceSurface(state, ISurf, R1, RN, d12, DayltgHitInteriorObstructionHP, hit); // Check if R2-R1 segment pierces surface
+                hit = PierceSurface(state, ISurf, R1, RN, d12, DayltgHitInteriorObstructionHP); // Check if R2-R1 segment pierces surface
                 if (hit) break;                                                                // Segment pierces surface: Don't check the rest
             }
         }
 
     } else { // Surface octree search
 
-        auto const *window_base_p(&window_base);
-        auto const &window_base_adjacent(window_base_iExtBoundCond > 0 ? state.dataSurface->Surface(window_base_iExtBoundCond) : window_base);
-        auto const *window_base_adjacent_p(&window_base_adjacent);
+        auto const *window_base_p = &window_base;
+        auto const &window_base_adjacent = window_base_iExtBoundCond > 0 ? state.dataSurface->Surface(window_base_iExtBoundCond) : window_base;
+        auto const *window_base_adjacent_p = &window_base_adjacent;
 
         // Lambda function for the octree to test for surface hit
         auto surfaceHit = [=, &R1, &hit](SurfaceData const &surface) -> bool {
-            DataSurfaces::SurfaceClass const sClass(surface.Class);
+            DataSurfaces::SurfaceClass const sClass = surface.Class;
             Vector3<Real64> HP;                                  // Hit point
             if ((surface.IsShadowing) ||                         // Shadowing surface
                 ((surface.SolarEnclIndex == window_Enclosure) && // Surface is in same zone as window
                  (sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && // Wall, ceiling/roof, or floor
                  (&surface != window_base_p) && (&surface != window_base_adjacent_p))) // Exclude window's base or base-adjacent surfaces
             {
-                PierceSurface(surface, R1, RN, d12, HP, hit); // Check if R2-R1 segment pierces surface
+                hit = PierceSurface(surface, R1, RN, d12, HP); // Check if R2-R1 segment pierces surface
                 return hit;
             } else {
                 return false;
@@ -5613,14 +5535,15 @@ void DayltgHitInteriorObstruction(EnergyPlusData &state,
         // Check octree surface candidates until a hit is found, if any
         state.dataHeatBalMgr->surfaceOctree.hasSurfaceSegmentIntersectsCube(R1, R2, surfaceHit);
     }
-}
 
-void DayltgHitBetWinObstruction(EnergyPlusData &state,
+    return hit;
+} // DayltgHitInteriorObstruction()
+
+bool DayltgHitBetWinObstruction(EnergyPlusData &state,
                                 int const IWin1,           // Surface number of origin window
                                 int const IWin2,           // Surface number of destination window
                                 Vector3<Real64> const &R1, // Origin of ray (on IWin1) (m)
-                                Vector3<Real64> const &R2, // Destination of ray (on IWin2) (m)
-                                bool &hit                  // True iff ray hits an obstruction
+                                Vector3<Real64> const &R2 // Destination of ray (on IWin2) (m)
 )
 {
 
@@ -5639,21 +5562,21 @@ void DayltgHitBetWinObstruction(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     SurfaceClass IType; // Surface type/class
 
-    hit = false;
+    bool hit = false;
     Vector3<Real64> RN = (R2 - R1).normalize(); // Unit vector
 
-    Real64 const d12(distance(R1, R2)); // Distance between R1 and R2 (m)
+    Real64 const d12 = distance(R1, R2); // Distance between R1 and R2 (m)
 
-    auto const &window1(state.dataSurface->Surface(IWin1));
-    int const window1_iBaseSurf(window1.BaseSurf);
-    auto const &window1_base(window1_iBaseSurf > 0 ? state.dataSurface->Surface(window1_iBaseSurf) : window1);
-    int const window1_base_iExtBoundCond(window1_base.ExtBoundCond);
+    auto const &window1 = state.dataSurface->Surface(IWin1);
+    int const window1_iBaseSurf = window1.BaseSurf;
+    auto const &window1_base = window1_iBaseSurf > 0 ? state.dataSurface->Surface(window1_iBaseSurf) : window1;
+    int const window1_base_iExtBoundCond = window1_base.ExtBoundCond;
 
-    auto const &window2(state.dataSurface->Surface(IWin2));
-    int const window2_Enclosure(window2.SolarEnclIndex);
-    int const window2_iBaseSurf(window2.BaseSurf);
-    auto const &window2_base(window2_iBaseSurf > 0 ? state.dataSurface->Surface(window2_iBaseSurf) : window2);
-    int const window2_base_iExtBoundCond(window2_base.ExtBoundCond);
+    auto const &window2 = state.dataSurface->Surface(IWin2);
+    int const window2_Enclosure = window2.SolarEnclIndex;
+    int const window2_iBaseSurf = window2.BaseSurf;
+    auto const &window2_base = window2_iBaseSurf > 0 ? state.dataSurface->Surface(window2_iBaseSurf) : window2;
+    int const window2_base_iExtBoundCond = window2_base.ExtBoundCond;
 
     // Preconditions
     //        assert( window1.Zone == window2_Zone ); //? This is violated in PurchAirWithDoubleFacadeDaylighting so then why the asymmetry
@@ -5663,7 +5586,7 @@ void DayltgHitBetWinObstruction(EnergyPlusData &state,
     if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
         for (int ISurf = 1; ISurf <= state.dataSurface->TotSurfaces; ++ISurf) {
-            auto const &surface(state.dataSurface->Surface(ISurf));
+            auto const &surface = state.dataSurface->Surface(ISurf);
             IType = surface.Class;
             if ((surface.IsShadowing) ||                          // Shadowing surface
                 ((surface.SolarEnclIndex == window2_Enclosure) && // Wall/ceiling/floor is in same zone as windows
@@ -5672,24 +5595,24 @@ void DayltgHitBetWinObstruction(EnergyPlusData &state,
                  (ISurf != window1_base_iExtBoundCond) && (ISurf != window2_base_iExtBoundCond))) // Exclude windows' base-adjacent surfaces
             {
                 Vector3<Real64> HP;
-                PierceSurface(state, ISurf, R1, RN, d12, HP, hit); // Check if R2-R1 segment pierces surface
+                hit = PierceSurface(state, ISurf, R1, RN, d12, HP); // Check if R2-R1 segment pierces surface
                 if (hit) break;                                    // Segment pierces surface: Don't check the rest
             }
         }
 
     } else { // Surface octree search
 
-        auto const *window1_base_p(&window1_base);
-        auto const &window1_base_adjacent(window1_base_iExtBoundCond > 0 ? state.dataSurface->Surface(window1_base_iExtBoundCond) : window1_base);
-        auto const *window1_base_adjacent_p(&window1_base_adjacent);
+        auto const *window1_base_p = &window1_base;
+        auto const &window1_base_adjacent = window1_base_iExtBoundCond > 0 ? state.dataSurface->Surface(window1_base_iExtBoundCond) : window1_base;
+        auto const *window1_base_adjacent_p = &window1_base_adjacent;
 
-        auto const *window2_base_p(&window2_base);
-        auto const &window2_base_adjacent(window2_base_iExtBoundCond > 0 ? state.dataSurface->Surface(window2_base_iExtBoundCond) : window2_base);
-        auto const *window2_base_adjacent_p(&window2_base_adjacent);
+        auto const *window2_base_p = &window2_base;
+        auto const &window2_base_adjacent = (window2_base_iExtBoundCond > 0) ? state.dataSurface->Surface(window2_base_iExtBoundCond) : window2_base;
+        auto const *window2_base_adjacent_p = &window2_base_adjacent;
 
         // Lambda function for the octree to test for surface hit
         auto surfaceHit = [=, &R1, &RN, &hit](SurfaceData const &surface) -> bool {
-            DataSurfaces::SurfaceClass const sClass(surface.Class);
+            DataSurfaces::SurfaceClass const sClass = surface.Class;
             Vector3<Real64> HP;
             if ((surface.IsShadowing) ||                          // Shadowing surface
                 ((surface.SolarEnclIndex == window2_Enclosure) && // Surface is in same zone as window
@@ -5697,8 +5620,7 @@ void DayltgHitBetWinObstruction(EnergyPlusData &state,
                  (&surface != window1_base_p) && (&surface != window2_base_p) &&                                    // Exclude windows' base surfaces
                  (&surface != window1_base_adjacent_p) && (&surface != window2_base_adjacent_p))) // Exclude windows' base-adjacent surfaces
             {
-                PierceSurface(surface, R1, RN, d12, HP,
-                              hit); // Check if R2-R1 segment pierces surface
+                hit = PierceSurface(surface, R1, RN, d12, HP); // Check if R2-R1 segment pierces surface
                 return hit;
             } else {
                 return false;
@@ -5708,7 +5630,9 @@ void DayltgHitBetWinObstruction(EnergyPlusData &state,
         // Check octree surface candidates until a hit is found, if any
         state.dataHeatBalMgr->surfaceOctree.hasSurfaceSegmentIntersectsCube(R1, R2, surfaceHit);
     }
-}
+
+    return hit;
+} // DayltingHitBetWinObstruction()
 
 void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefirstTime)
 {
@@ -5750,33 +5674,35 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
     // The following report variables are valid only for daylit zones/enclosures without interior windows
     if (state.dataEnvrn->SunIsUp) {
         for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
-            if ((state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints > 0) &&
-                (!state.dataViewFactor->EnclSolInfo(enclNum).HasInterZoneWindow)) {
-                auto &thisEnclDaylight = dl->enclDaylight(enclNum);
-                for (int extWinNum = 1; extWinNum <= thisEnclDaylight.NumOfDayltgExtWins; ++extWinNum) {
-                    int IWin = thisEnclDaylight.DayltgExtWinSurfNums(extWinNum);
-                    WinCover winCover = WinCover::Bare;
-                    if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel::BSDF &&
-                        (IS_SHADED(state.dataSurface->SurfWinShadingFlag(IWin)) || state.dataSurface->SurfWinSolarDiffusing(IWin))) {
-                        winCover = WinCover::Shaded;
-                    }
-                    int refPtCount = 0;
-                    for (int controlNum : dl->enclDaylight(enclNum).daylightControlIndexes) {
-                        auto &thisControl = dl->daylightControl(controlNum);
-                        if (thisControl.DaylightMethod == DaylightingMethod::SplitFlux) {
-                            for (int refPtNum = 1; refPtNum <= thisControl.TotalDaylRefPoints; ++refPtNum) {
-                                ++refPtCount; // Count reference points across each daylighting control in the same enclosure
-                                state.dataSurface->SurfaceWindow(IWin).IllumFromWinAtRefPtRep(refPtCount) =
-                                    thisControl.IllumFromWinAtRefPt(extWinNum, refPtNum)[(int)winCover];
-                                state.dataSurface->SurfaceWindow(IWin).LumWinFromRefPtRep(refPtCount) =
-                                    thisControl.SourceLumFromWinAtRefPt(extWinNum, refPtNum)[(int)winCover];
-                            }
-                        }
-                    }
+            if ((state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints == 0) ||
+                (state.dataViewFactor->EnclSolInfo(enclNum).HasInterZoneWindow))
+                continue;
+            
+            auto &thisEnclDaylight = dl->enclDaylight(enclNum);
+            for (int extWinNum = 1; extWinNum <= thisEnclDaylight.NumOfDayltgExtWins; ++extWinNum) {
+                int IWin = thisEnclDaylight.DayltgExtWinSurfNums(extWinNum);
+                WinCover winCover = WinCover::Bare;
+                if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel::BSDF &&
+                    (IS_SHADED(state.dataSurface->SurfWinShadingFlag(IWin)) || state.dataSurface->SurfWinSolarDiffusing(IWin))) {
+                    winCover = WinCover::Shaded;
                 }
-            }
-        }
-    }
+                int refPtCount = 0;
+                for (int controlNum : dl->enclDaylight(enclNum).daylightControlIndexes) {
+                    auto &thisControl = dl->daylightControl(controlNum);
+                    if (thisControl.DaylightMethod != DaylightingMethod::SplitFlux)
+                        continue;
+                    
+                    for (int refPtNum = 1; refPtNum <= thisControl.TotalDaylRefPoints; ++refPtNum) {
+                        ++refPtCount; // Count reference points across each daylighting control in the same enclosure
+                        state.dataSurface->SurfaceWindow(IWin).IllumFromWinAtRefPtRep(refPtCount) =
+                            thisControl.IllumFromWinAtRefPt(extWinNum, refPtNum)[(int)winCover];
+                        state.dataSurface->SurfaceWindow(IWin).LumWinFromRefPtRep(refPtCount) =
+                            thisControl.SourceLumFromWinAtRefPt(extWinNum, refPtNum)[(int)winCover];
+                    }
+                } // for (controlNum)
+            } // for (extWinNum)
+        } // for (enclNum)
+    } // if (SunIsUp)
 
     if (state.dataEnvrn->SunIsUp && (int)state.dataDaylightingDevicesData->TDDPipe.size() > 0) {
         if (initSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Daylighting Illumination for TDD pipes");
@@ -7330,11 +7256,11 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     Vector3<Real64> nearestHitPt; // Hit point of ray on nearest obstruction (m)
     Vector3<Real64> obsHitPt;     // Coordinates of hit point on an obstruction (m)
     Vector3<Real64> groundHitPt;  // Coordinates of point that ray from window center hits the ground (m)
-    std::array<Real64, Material::MaxSlatAngs+1> FLFWSU = {0.0};                     // Sun-related downgoing luminous flux, excluding entering beam
-    std::array<Real64, Material::MaxSlatAngs+1> FLFWSUdisk = {0.0};                 // Sun-related downgoing luminous flux, due to entering beam
-    std::array<Real64, Material::MaxSlatAngs+1> FLCWSU = {0.0};                     // Sun-related upgoing luminous flux
-    std::array<Dayltg::Illums, Material::MaxSlatAngs+1> FLCWSK = {Illums()};        // Sky-related upgoing luminous flux
-    std::array<Dayltg::Illums, Material::MaxSlatAngs+1> FLFWSK = {Illums()};        // Sky-related downgoing lumino
+    // std::array<Real64, Material::MaxSlatAngs+1> FLFWSU = {0.0};                     // Sun-related downgoing luminous flux, excluding entering beam
+    // std::array<Real64, Material::MaxSlatAngs+1> FLFWSUdisk = {0.0};                 // Sun-related downgoing luminous flux, due to entering beam
+    // std::array<Real64, Material::MaxSlatAngs+1> FLCWSU = {0.0};                     // Sun-related upgoing luminous flux
+    std::array<Dayltg::Illums, Material::MaxSlatAngs+1> FLCW = {Illums()};        // Sky-related upgoing luminous flux
+    std::array<Dayltg::Illums, Material::MaxSlatAngs+1> FLFW = {Illums()};        // Sky-related downgoing luminous flux
     std::array<Real64, (int)Material::MaxSlatAngs + 1> transMult;
     std::array<Real64, (int)Material::MaxSlatAngs + 1> transBmBmMult;
 
@@ -7388,8 +7314,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     Real64 ReflBlDiffDiffFront;  // Isolated blind vis diffuse-diffuse front reflectance
     Real64 ReflBlDiffDiffBack;   // Isolated blind vis diffuse-diffuse back reflectance
     Real64 ReflScDiffDiffBack;   // Isolated screen vis diffuse-diffuse back reflectance
-    Real64 ProfAng;              // Solar profile angle (radians)
-    Real64 SlatAng;              // Blind slat angle
     Real64 t1;                   // Beam-beam vis trans of bare glass layers 1 and 2
     Real64 t2;
     Real64 td2; // Diffuse-diffuse vis trans of bare glass layers 2 and 3
@@ -7409,9 +7333,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     Real64 LumAtHitPtFrSun; // Luminance at hit point on obstruction from solar reflection
     //  for unit beam normal illuminance (cd/m2)
     Real64 SunObstructionMult; // = 1 if sun hits a ground point; otherwise = 0
-    Real64 Alfa;               // Direction angles for ray heading towards the ground (radians)
-    Real64 Beta;
-    Real64 HorDis;        // Distance between ground hit point and proj'n of window center onto ground (m)
     bool hitObs;          // True iff obstruction is hit
     Real64 ObsVisRefl;    // Visible reflectance of obstruction
     Real64 SkyReflVisLum; // Reflected sky luminance at hit point divided by unobstructed sky
@@ -7460,6 +7381,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     // dl->WLUMSUdisk(IHR, _) = 0.0;
 
     int const IConst = state.dataSurface->SurfActiveConstruction(IWin);
+    auto const &construct = state.dataConstruction->Construct(IConst);
+            
     BlindOn = false;
     ShadeOn = false;
     ScreenOn = false;
@@ -7544,7 +7467,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
             if (ISunPos == 1) { // Intersection calculation has to be done only for first sun position
                 // Determine net transmittance of obstructions that the ray hits. ObTrans will be 1.0
                 // if no obstructions are hit.
-                DayltgHitObstruction(state, IHR, IWin, state.dataSurface->SurfaceWindow(IWin).WinCenter, U, ObTrans);
+                ObTrans = DayltgHitObstruction(state, IHR, IWin, state.dataSurface->SurfaceWindow(IWin).WinCenter, U);
                 dl->ObTransM[IPH][ITH] = ObTrans;
                 dl->SkyObstructionMult[IPH][ITH] = 1.0;
             }
@@ -7566,9 +7489,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     // (obstructed sky diffuse at ground point)/(unobstructed sky diffuse at ground point).
                     // This ratio is calculated for an isotropic sky.
                     // Ground point hit by the ray:
-                    Alfa = std::acos(-U.z);
-                    Beta = std::atan2(U.y, U.x);
-                    HorDis = (state.dataSurface->SurfaceWindow(IWin).WinCenter.z - state.dataSurface->GroundLevelZ) * std::tan(Alfa);
+                    Real64 Alfa = std::acos(-U.z);
+                    Real64 Beta = std::atan2(U.y, U.x);
+                    Real64 HorDis = (state.dataSurface->SurfaceWindow(IWin).WinCenter.z - state.dataSurface->GroundLevelZ) * std::tan(Alfa);
                     groundHitPt.z = state.dataSurface->GroundLevelZ;
                     groundHitPt.x = state.dataSurface->SurfaceWindow(IWin).WinCenter.x + HorDis * std::cos(Beta);
                     groundHitPt.y = state.dataSurface->SurfaceWindow(IWin).WinCenter.y + HorDis * std::sin(Beta);
@@ -7593,7 +7516,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     // Sun reaches ground point if vector from this point to the sun is unobstructed
                     hitObs = false;
                     for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
-                        PierceSurface(state, ObsSurfNum, groundHitPt, SUNCOS_IHR, obsHitPt, hitObs);
+                        hitObs = PierceSurface(state, ObsSurfNum, groundHitPt, SUNCOS_IHR, obsHitPt);
                         if (hitObs) break;
                     }
                     if (hitObs) SunObstructionMult = 0.0;
@@ -7609,7 +7532,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 if (NearestHitSurfNum > 0) {
 
                     // Beam solar reflected from nearest obstruction.
-                    DayltgSurfaceLumFromSun(state, IHR, U, NearestHitSurfNum, nearestHitPt, LumAtHitPtFrSun);
+                    LumAtHitPtFrSun = DayltgSurfaceLumFromSun(state, IHR, U, NearestHitSurfNum, nearestHitPt);
                     ZSUObsRefl = LumAtHitPtFrSun * COSB * DA;
                     ZSU += ZSUObsRefl;
 
@@ -7676,8 +7599,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
                 // Make all transmitted light diffuse for a TDD with a bare diffuser
                 auto &wlumsk = dl->winLum(IHR, 1);
-                auto &flfwsk = FLFWSK[1];
-                auto &flcwsk = FLCWSK[1];
+                auto &flfwsk = FLFW[1];
+                auto &flcwsk = FLCW[1];
 
                 auto &tddFluxInc = dl->TDDFluxInc(IHR, PipeNum);
                 auto &tddFluxTrans = dl->TDDFluxTrans(IHR, PipeNum);
@@ -7696,22 +7619,22 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 tddFluxTrans.sky[(int)SkyType::Clear] += ZSU * TVISBR;
 
                 dl->winLum(IHR, 1).sun += ZSU * TVISBR / Constant::Pi;
-                FLFWSU[1] += ZSU * TVISBR * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
-                FLCWSU[1] += ZSU * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
+                FLFW[1].sun += ZSU * TVISBR * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
+                FLCW[1].sun += ZSU * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
 
             } else { // Bare window
                 // Transmittance of bare window for this sky/ground element
-                TVISBR = General::POLYF(COSB, state.dataConstruction->Construct(IConst).TransVisBeamCoef) *
+                TVISBR = General::POLYF(COSB, construct.TransVisBeamCoef) *
                          state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                 if (InShelfSurf > 0) { // Inside daylighting shelf
                     // Daylighting shelf simplification:  All light is diffuse
                     // SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
-                    auto &flcwsk = FLCWSK[1];
+                    auto &flcwsk = FLCW[1];
                     for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
                         flcwsk.sky[iSky] += ZSK.sky[iSky] * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
                     }
-                    FLCWSU[1] += ZSU * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
+                    FLCW[1].sun += ZSU * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
 
                 } else { // Normal window
 
@@ -7723,7 +7646,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         for (int IntWinLoop = 1; IntWinLoop <= thisEnclDaylight.IntWinAdjEnclExtWin(IntWinAdjZoneExtWinNum).NumOfIntWindows;
                              ++IntWinLoop) {
                             IntWinNum = thisEnclDaylight.IntWinAdjEnclExtWin(IntWinAdjZoneExtWinNum).IntWinNum(IntWinLoop);
-                            PierceSurface(state, IntWinNum, state.dataSurface->SurfaceWindow(IntWinNum).WinCenter, SUNCOS_IHR, obsHitPt, hitObs);
+                            hitObs = PierceSurface(state, IntWinNum, state.dataSurface->SurfaceWindow(IntWinNum).WinCenter, SUNCOS_IHR, obsHitPt);
                             if (hitObs) { // disk passes thru
                                 // cosine of incidence angle of light from sky or ground element for
                                 COSBintWin = SPH * std::sin(state.dataSurface->SurfWinPhi(IntWinNum)) +
@@ -7740,8 +7663,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         }
                     }
 
-                    auto &flfwsk = FLFWSK[1];
-                    auto &flcwsk = FLCWSK[1];
+                    auto &flfwsk = FLFW[1];
+                    auto &flcwsk = FLCW[1];
                     for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
                         // IF (PH < 0.0d0) THEN
                         // Fixed by FCW, Nov. 2003:
@@ -7753,9 +7676,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     } // for (iSky)
 
                     if (PH > 0.0) {
-                        FLFWSU[1] += ZSU * TVISBR;
+                        FLFW[1].sun += ZSU * TVISBR;
                     } else {
-                        FLCWSU[1] += ZSU * TVISBR;
+                        FLCW[1].sun += ZSU * TVISBR;
                     }
 
                 } // End of check if window with daylighting shelf or normal window
@@ -7814,74 +7737,73 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 } else if (ScreenOn) { // Screen: get beam-beam, beam-diffuse and diffuse-diffuse vis trans/ref of screen and glazing system
                     DataHeatBalance::CalcScreenTransmittance(
                         state, IWin, (PH - state.dataSurface->SurfWinPhi(IWin)), (TH - state.dataSurface->SurfWinTheta(IWin)));
-                    ReflGlDiffDiffFront = state.dataConstruction->Construct(IConst).ReflectVisDiffFront;
+                    ReflGlDiffDiffFront = construct.ReflectVisDiffFront;
                     ReflScDiffDiffBack = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).DifReflectVis;
                     TransScBmDiffFront = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).BmDifTransVis;
                     transMult[1] = TransScBmDiffFront * state.dataSurface->SurfWinGlazedFrac(IWin) *
-                                   state.dataConstruction->Construct(IConst).TransDiffVis / (1 - ReflGlDiffDiffFront * ReflScDiffDiffBack) *
+                                   construct.TransDiffVis / (1 - ReflGlDiffDiffFront * ReflScDiffDiffBack) *
                                    state.dataSurface->SurfWinLightWellEff(IWin);
                     transBmBmMult[1] = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).BmBmTransVis;
 
                 } else if (BlindOn) { // Blind: get beam-diffuse and beam-beam vis trans of blind+glazing system
                     // PETER:  As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
                     //         for TDDs because it is based on TVISBR which is correctly calculated for TDDs above.
-
-                    ProfileAngle(state, IWin, U, state.dataMaterial->Blind(BlNum).SlatOrientation, ProfAng);
+                    auto const &blind = state.dataMaterial->Blind(BlNum);
+                    Real64 ProfAng = ProfileAngle(state, IWin, U, blind.SlatOrientation);
 
                     for (int JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
                         if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
 
                         TransBlBmDiffFront =
-                            WindowManager::InterpProfAng(ProfAng, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
+                            WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
 
                         if (ShType == WinShadingType::IntBlind) { // Interior blind
-                            ReflGlDiffDiffBack = state.dataConstruction->Construct(IConst).ReflectVisDiffBack;
+                            ReflGlDiffDiffBack = construct.ReflectVisDiffBack;
                             ReflBlBmDiffFront =
-                                WindowManager::InterpProfAng(ProfAng, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
-                            ReflBlDiffDiffFront = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffRefl(JB);
-                            TransBlDiffDiffFront = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffTrans(JB);
+                                WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
+                            ReflBlDiffDiffFront = blind.VisFrontDiffDiffRefl(JB);
+                            TransBlDiffDiffFront = blind.VisFrontDiffDiffTrans(JB);
                             transMult[JB] = TVISBR * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                                                (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
 
                         } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
-                            ReflGlDiffDiffFront = state.dataConstruction->Construct(IConst).ReflectVisDiffFront;
-                            ReflBlDiffDiffBack = state.dataMaterial->Blind(BlNum).VisBackDiffDiffRefl(JB);
+                            ReflGlDiffDiffFront = construct.ReflectVisDiffFront;
+                            ReflBlDiffDiffBack = blind.VisBackDiffDiffRefl(JB);
                             transMult[JB] = TransBlBmDiffFront * state.dataSurface->SurfWinGlazedFrac(IWin) *
-                                            state.dataConstruction->Construct(IConst).TransDiffVis /
+                                            construct.TransDiffVis /
                                             (1.0 - ReflGlDiffDiffFront * ReflBlDiffDiffBack) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                         } else { // Between-glass blind
-                            t1 = General::POLYF(COSB, state.dataConstruction->Construct(IConst).tBareVisCoef(1));
-                            td2 = state.dataConstruction->Construct(IConst).tBareVisDiff(2);
-                            rbd1 = state.dataConstruction->Construct(IConst).rbBareVisDiff(1);
-                            rfd2 = state.dataConstruction->Construct(IConst).rfBareVisDiff(2);
-                            tfshBd = WindowManager::InterpProfAng(ProfAng, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
-                            tfshd = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffTrans(JB);
-                            rfshB = WindowManager::InterpProfAng(ProfAng, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
-                            rbshd = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffRefl(JB);
-                            if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
+                            t1 = General::POLYF(COSB, construct.tBareVisCoef(1));
+                            td2 = construct.tBareVisDiff(2);
+                            rbd1 = construct.rbBareVisDiff(1);
+                            rfd2 = construct.rfBareVisDiff(2);
+                            tfshBd = WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
+                            tfshd = blind.VisFrontDiffDiffTrans(JB);
+                            rfshB = WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
+                            rbshd = blind.VisFrontDiffDiffRefl(JB);
+                            if (construct.TotGlassLayers == 2) { // 2 glass layers
                                 transMult[JB] =
                                     t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
                             } else { // 3 glass layers; blind between layers 2 and 3
-                                t2 = General::POLYF(COSB, state.dataConstruction->Construct(IConst).tBareVisCoef(2));
-                                td3 = state.dataConstruction->Construct(IConst).tBareVisDiff(3);
-                                rfd3 = state.dataConstruction->Construct(IConst).rfBareVisDiff(3);
-                                rbd2 = state.dataConstruction->Construct(IConst).rbBareVisDiff(2);
+                                t2 = General::POLYF(COSB, construct.tBareVisCoef(2));
+                                td3 = construct.tBareVisDiff(3);
+                                rfd3 = construct.rfBareVisDiff(3);
+                                rbd2 = construct.rbBareVisDiff(2);
                                 transMult[JB] = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) * td3 *
                                                 state.dataSurface->SurfWinLightWellEff(IWin);
                             }
                         }
 
-                        if (state.dataSurface->SurfWinMovableSlats(IWin)) {
-                            SlatAng = (JB - 1) * Constant::Pi / (Material::MaxSlatAngs - 1);
-                        } else {
-                            SlatAng = state.dataMaterial->Blind(BlNum).SlatAngle * Constant::DegToRadians;
-                        }
+                        Real64 SlatAng = (state.dataSurface->SurfWinMovableSlats(IWin)) ? 
+                                ((JB - 1) * Constant::Pi / (Material::MaxSlatAngs - 1)) :
+                                (blind.SlatAngle * Constant::DegToRadians);
+
                         transBmBmMult[JB] = TVISBR * WindowManager::BlindBeamBeamTrans(ProfAng,
                                                                                        SlatAng,
-                                                                                       state.dataMaterial->Blind(BlNum).SlatWidth,
-                                                                                       state.dataMaterial->Blind(BlNum).SlatSeparation,
-                                                                                       state.dataMaterial->Blind(BlNum).SlatThickness);
+                                                                                       blind.SlatWidth,
+                                                                                       blind.SlatSeparation,
+                                                                                       blind.SlatThickness);
                     } // End of loop over slat angles
 
                 } else { // Diffusing glass
@@ -7907,8 +7829,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
 
                     auto &wlumsk = dl->winLum(IHR, JB + 1);
-                    auto &flfwsk = FLFWSK[JB + 1];
-                    auto &flcwsk = FLCWSK[JB + 1];
+                    auto &flfwsk = FLFW[JB + 1];
+                    auto &flcwsk = FLCW[JB + 1];
 
                     for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
 
@@ -7926,13 +7848,13 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     }
 
                     dl->winLum(IHR, JB + 1).sun += ZSU * transMult[JB] / Constant::Pi;
-                    FLFWSU[JB + 1] += ZSU * transMult[JB] * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
-                    FLCWSU[JB + 1] += ZSU * transMult[JB] * state.dataSurface->SurfWinFractionUpgoing(IWin);
+                    FLFW[JB + 1].sun += ZSU * transMult[JB] * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
+                    FLCW[JB + 1].sun += ZSU * transMult[JB] * state.dataSurface->SurfWinFractionUpgoing(IWin);
                     if (BlindOn || ScreenOn) {
                         if (PH > 0.0) {
-                            FLFWSU[JB + 1] += ZSU * transBmBmMult[JB];
+                            FLFW[JB + 1].sun += ZSU * transBmBmMult[JB];
                         } else {
-                            FLCWSU[JB + 1] += ZSU * transBmBmMult[JB];
+                            FLCW[JB + 1].sun += ZSU * transBmBmMult[JB];
                         }
                     }
                 }
@@ -7945,10 +7867,10 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
         // Add exterior diffuse illuminance due to outside shelf
         // Since all of the illuminance is added to the zone as upgoing diffuse, it can be added as a lump sum here
 
-        TVISBR = state.dataConstruction->Construct(IConst).TransDiffVis; // Assume diffuse transmittance for shelf illuminance
+        TVISBR = construct.TransDiffVis; // Assume diffuse transmittance for shelf illuminance
 
         auto const &gilsk = dl->horIllum[IHR];
-        auto &flcwsk = FLCWSK[1];
+        auto &flcwsk = FLCW[1];
         for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
             // This is only an estimate because the anisotropic sky view of the shelf is not yet taken into account.
             // SurfAnisoSkyMult would be great to use but it is not available until the heat balance starts up.
@@ -7961,7 +7883,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
         ZSU = dl->horIllum[IHR].sun * state.dataHeatBal->SurfSunlitFracHR(IHR, OutShelfSurf) *
               state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectVis * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
-        FLCWSU[1] += ZSU * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
+        FLCW[1].sun += ZSU * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
     }
 
     // Sky-related portion of internally reflected illuminance.
@@ -7972,8 +7894,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
         if (!state.dataSurface->SurfWinMovableSlats(IWin) && JSH > 2) break;
 
         auto &eintsk = dl->reflIllum(IHR, JSH);
-        auto const &flfwsk = FLFWSK[JSH];
-        auto const &flcwsk = FLCWSK[JSH];
+        auto const &flfwsk = FLFW[JSH];
+        auto const &flcwsk = FLCW[JSH];
 
         for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
             // Full area of window is used in following since effect of dividers on reducing
@@ -8012,26 +7934,26 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 TVISBSun = TransTDD(state, PipeNum, COSBSun, RadType::VisibleBeam) * state.dataSurface->SurfWinGlazedFrac(IWin);
                 dl->TDDTransVisBeam(IHR, PipeNum) = TVISBSun;
 
-                FLFWSUdisk[1] = 0.0; // Diffuse light only
+                FLFW[1].sunDisk = 0.0; // Diffuse light only
 
                 dl->winLum(IHR, 1).sun += ZSU1 * TVISBSun / Constant::Pi;
-                FLFWSU[1] += ZSU1 * TVISBSun * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
-                FLCWSU[1] += ZSU1 * TVISBSun * state.dataSurface->SurfWinFractionUpgoing(IWin);
+                FLFW[1].sun += ZSU1 * TVISBSun * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
+                FLCW[1].sun += ZSU1 * TVISBSun * state.dataSurface->SurfWinFractionUpgoing(IWin);
 
             } else { // Bare window
-                TVISBSun = General::POLYF(COSBSun, state.dataConstruction->Construct(IConst).TransVisBeamCoef) *
+                TVISBSun = General::POLYF(COSBSun, construct.TransVisBeamCoef) *
                            state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                 // Daylighting shelf simplification:  No beam makes it past end of shelf, all light is diffuse
                 if (InShelfSurf > 0) {   // Inside daylighting shelf
-                    FLFWSUdisk[1] = 0.0; // Diffuse light only
+                    FLFW[1].sunDisk = 0.0; // Diffuse light only
 
                     // SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
                     // WLUMSU(1,IHR) = WLUMSU(1,IHR) + ZSU1 * TVISBSun / PI
                     // FLFWSU(1) = FLFWSU(1) + ZSU1 * TVISBSun * (1.0 - SurfaceWindow(IWin)%FractionUpgoing)
-                    FLCWSU[1] += ZSU1 * TVISBSun * state.dataSurface->SurfWinFractionUpgoing(IWin);
+                    FLCW[1].sun += ZSU1 * TVISBSun * state.dataSurface->SurfWinFractionUpgoing(IWin);
                 } else { // Normal window
-                    FLFWSUdisk[1] = ZSU1 * TVISBSun;
+                    FLFW[1].sunDisk = ZSU1 * TVISBSun;
                 }
             }
 
@@ -8040,9 +7962,11 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 std::fill(transBmBmMult.begin(), transBmBmMult.end(), 0.0);
                 std::fill(transMult.begin(), transMult.end(), 0.0);
 
+                auto const &blind = state.dataMaterial->Blind(BlNum);
                 // TH 7/7/2010 moved from inside the loop: DO JB = 1,MaxSlatAngs
+                Real64 ProfAng;
                 if (BlindOn)
-                    ProfileAngle(state, IWin, state.dataSurface->SurfSunCosHourly(IHR), state.dataMaterial->Blind(BlNum).SlatOrientation, ProfAng);
+                    ProfAng = ProfileAngle(state, IWin, state.dataSurface->SurfSunCosHourly(IHR), blind.SlatOrientation);
 
                 for (int JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
                     if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
@@ -8069,50 +7993,46 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         // for TDDs because it is based on TVISBSun which is correctly calculated for TDDs above.
 
                         TransBlBmDiffFront =
-                            WindowManager::InterpProfAng(ProfAng, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
+                            WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
 
                         if (ShType == WinShadingType::IntBlind) { // Interior blind
                             // TH CR 8121, 7/7/2010
                             // ReflBlBmDiffFront = WindowManager::InterpProfAng(ProfAng,Blind(BlNum)%VisFrontBeamDiffRefl)
                             ReflBlBmDiffFront =
-                                WindowManager::InterpProfAng(ProfAng, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
+                                WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
 
                             // TH added 7/12/2010 for CR 8121
-                            ReflBlDiffDiffFront = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffRefl(JB);
-                            TransBlDiffDiffFront = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffTrans(JB);
+                            ReflBlDiffDiffFront = blind.VisFrontDiffDiffRefl(JB);
+                            TransBlDiffDiffFront = blind.VisFrontDiffDiffTrans(JB);
 
                             transMult[JB] = TVISBSun * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                                                  (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
 
                         } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
                             transMult[JB] = TransBlBmDiffFront *
-                                            (state.dataConstruction->Construct(IConst).TransDiffVis /
-                                             (1.0 - ReflGlDiffDiffFront * state.dataMaterial->Blind(BlNum).VisBackDiffDiffRefl(JB))) *
+                                            (construct.TransDiffVis /
+                                             (1.0 - ReflGlDiffDiffFront * blind.VisBackDiffDiffRefl(JB))) *
                                             state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                         } else { // Between-glass blind
-                            t1 = General::POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef(1));
-                            tfshBd = WindowManager::InterpProfAng(ProfAng, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
-                            rfshB = WindowManager::InterpProfAng(ProfAng, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
-                            if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
+                            t1 = General::POLYF(COSBSun, construct.tBareVisCoef(1));
+                            tfshBd = WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
+                            rfshB = WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
+                            if (construct.TotGlassLayers == 2) { // 2 glass layers
                                 transMult[JB] =
                                     t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
                             } else { // 3 glass layers; blind between layers 2 and 3
-                                t2 = General::POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef(2));
+                                t2 = General::POLYF(COSBSun, construct.tBareVisCoef(2));
                                 transMult[JB] = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) * td3 *
                                                 state.dataSurface->SurfWinLightWellEff(IWin);
                             }
                         }
-                        if (state.dataSurface->SurfWinMovableSlats(IWin)) {
-                            SlatAng = (JB - 1) * Constant::Pi / (Material::MaxSlatAngs - 1);
-                        } else {
-                            SlatAng = state.dataMaterial->Blind(BlNum).SlatAngle * Constant::DegToRadians;
-                        }
-                        transBmBmMult[JB] = TVISBSun * WindowManager::BlindBeamBeamTrans(ProfAng,
-                                                                                         SlatAng,
-                                                                                         state.dataMaterial->Blind(BlNum).SlatWidth,
-                                                                                         state.dataMaterial->Blind(BlNum).SlatSeparation,
-                                                                                         state.dataMaterial->Blind(BlNum).SlatThickness);
+
+                        Real64 SlatAng = (state.dataSurface->SurfWinMovableSlats(IWin)) ? 
+                                ((JB - 1) * Constant::Pi / (Material::MaxSlatAngs - 1)) :
+                                (blind.SlatAngle * Constant::DegToRadians);
+
+                        transBmBmMult[JB] = TVISBSun * WindowManager::BlindBeamBeamTrans(ProfAng, SlatAng, blind.SlatWidth, blind.SlatSeparation, blind.SlatThickness);
                     } // ShadeOn/ScreenOn/BlindOn/Diffusing glass
 
                     if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
@@ -8128,9 +8048,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
                     dl->winLum(IHR, JB + 1).sun += ZSU1 * transMult[JB] / Constant::Pi;
                     dl->winLum(IHR, JB + 1).sunDisk = ZSU1 * transBmBmMult[JB] / Constant::Pi;
-                    FLFWSU[JB + 1] += ZSU1 * transMult[JB] * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
-                    FLFWSUdisk[JB + 1] = ZSU1 * transBmBmMult[JB];
-                    FLCWSU[JB + 1] += ZSU1 * transMult[JB] * state.dataSurface->SurfWinFractionUpgoing(IWin);
+                    FLFW[JB + 1].sun += ZSU1 * transMult[JB] * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
+                    FLFW[JB + 1].sunDisk = ZSU1 * transBmBmMult[JB];
+                    FLCW[JB + 1].sun += ZSU1 * transMult[JB] * state.dataSurface->SurfWinFractionUpgoing(IWin);
                 } // End of loop over slat angles
             }     // End of window with shade or blind
         }         // COSBSun > 0
@@ -8150,13 +8070,13 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
             // -- Bare window. We use diffuse-diffuse transmittance here rather than beam-beam to avoid
             //    complications due to specular reflection from multiple exterior surfaces
 
-            TVisSunRefl = state.dataConstruction->Construct(IConst).TransDiffVis * state.dataSurface->SurfWinGlazedFrac(IWin) *
+            TVisSunRefl = construct.TransDiffVis * state.dataSurface->SurfWinGlazedFrac(IWin) *
                           state.dataSurface->SurfWinLightWellEff(IWin);
             // In the following it is assumed that all reflected beam is going downward, as it would be in the
             // important case of reflection from a highly glazed facade of a neighboring building. However, in
             // rare cases (such as upward specular reflection from a flat horizontal skylight) it may
             // actually be going upward.
-            FLFWSUdisk[1] += ZSU1refl * TVisSunRefl;
+            FLFW[1].sunDisk += ZSU1refl * TVisSunRefl;
 
             // -- Window with shade, blind or diffusing glass
 
@@ -8176,31 +8096,32 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     } else if (ScreenOn) { // Exterior screen on
                         TransScDiffDiffFront = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).DifDifTransVis;
                         transMult[1] = TransScDiffDiffFront *
-                                       (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * ReflScDiffDiffBack)) *
+                                       (construct.TransDiffVis / (1.0 - ReflGlDiffDiffFront * ReflScDiffDiffBack)) *
                                        state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                     } else { // Blind on
-                        TransBlDiffDiffFront = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffTrans(JB);
+                        auto const &blind = state.dataMaterial->Blind(BlNum);
+                        TransBlDiffDiffFront = blind.VisFrontDiffDiffTrans(JB);
                         if (ShType == WinShadingType::IntBlind) { // Interior blind
-                            ReflBlDiffDiffFront = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffRefl(JB);
+                            ReflBlDiffDiffFront = blind.VisFrontDiffDiffRefl(JB);
                             transMult[JB] = TVisSunRefl * (TransBlDiffDiffFront + ReflBlDiffDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                                                       (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
 
                         } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
                             transMult[JB] = TransBlDiffDiffFront *
-                                            (state.dataConstruction->Construct(IConst).TransDiffVis /
-                                             (1.0 - ReflGlDiffDiffFront * state.dataMaterial->Blind(BlNum).VisBackDiffDiffRefl(JB))) *
+                                            (construct.TransDiffVis /
+                                             (1.0 - ReflGlDiffDiffFront * blind.VisBackDiffDiffRefl(JB))) *
                                             state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                         } else { // Between-glass blind
-                            t1 = state.dataConstruction->Construct(IConst).tBareVisDiff(1);
-                            tfshBd = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffTrans(JB);
-                            rfshB = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffRefl(JB);
-                            if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
+                            t1 = construct.tBareVisDiff(1);
+                            tfshBd = blind.VisFrontDiffDiffTrans(JB);
+                            rfshB = blind.VisFrontDiffDiffRefl(JB);
+                            if (construct.TotGlassLayers == 2) { // 2 glass layers
                                 transMult[JB] =
                                     t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
                             } else { // 3 glass layers; blind between layers 2 and 3
-                                t2 = state.dataConstruction->Construct(IConst).tBareVisDiff(2);
+                                t2 = construct.tBareVisDiff(2);
                                 transMult[JB] = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) * td3 *
                                                 state.dataSurface->SurfWinLightWellEff(IWin);
                             }
@@ -8208,8 +8129,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     }     // ShadeOn/BlindOn
 
                     dl->winLum(IHR, JB + 1).sun += ZSU1refl * transMult[JB] / Constant::Pi;
-                    FLFWSU[JB + 1] += ZSU1refl * transMult[JB] * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
-                    FLCWSU[JB + 1] += ZSU1refl * transMult[JB] * state.dataSurface->SurfWinFractionUpgoing(IWin);
+                    FLFW[JB + 1].sun += ZSU1refl * transMult[JB] * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
+                    FLCW[JB + 1].sun += ZSU1refl * transMult[JB] * state.dataSurface->SurfWinFractionUpgoing(IWin);
                 } // End of loop over slat angles
             }     // End of check if window has shade, blind or diffusing glass
         }         // End of check if ZSU1refl > 0.0
@@ -8225,11 +8146,11 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
         // CR 7869 added effect of intervening interior windows on transmittance and
         // added inside surface area of adjacent zone
         dl->reflIllum(IHR, JSH).sun =
-            (FLFWSU[JSH] * state.dataSurface->SurfWinRhoFloorWall(IWin) + FLCWSU[JSH] * state.dataSurface->SurfWinRhoCeilingWall(IWin)) *
+            (FLFW[JSH].sun * state.dataSurface->SurfWinRhoFloorWall(IWin) + FLCW[JSH].sun * state.dataSurface->SurfWinRhoCeilingWall(IWin)) *
             (state.dataSurface->Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
             (EnclInsideSurfArea * (1.0 - thisEnclDaylight.aveVisDiffReflect));
 
-        dl->reflIllum(IHR, JSH).sunDisk = FLFWSUdisk[JSH] * state.dataSurface->SurfWinRhoFloorWall(IWin) *
+        dl->reflIllum(IHR, JSH).sunDisk = FLFW[JSH].sunDisk * state.dataSurface->SurfWinRhoFloorWall(IWin) *
                                                              (state.dataSurface->Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
                                                              (EnclInsideSurfArea * (1.0 - thisEnclDaylight.aveVisDiffReflect));
     }
@@ -8241,9 +8162,7 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
                                    int const NBasis,
                                    int const IHR,
                                    int const iRefPoint,
-                                   Array1D<Illums> &ElementLuminanceSky,     // sky related luminance at window element (exterior side)
-                                   Array1D<Real64> &ElementLuminanceSun,     // sun related luminance at window element (exterior side),
-                                   Array1D<Real64> &ElementLuminanceSunDisk, // sun related luminance at window element (exterior side),
+                                   Array1D<Illums> &ElementLuminance,     // luminance at window element (exterior side)
                                    CalledFor const CalledFrom,
                                    int const MapNum)
 {
@@ -8267,35 +8186,33 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
         // DA = ComplexWind(IWin)%Geom(CurCplxFenState)%DAInc(iIncElem)
         Real64 Altitude = complexWinGeom.pInc(iIncElem).Altitude;
         Real64 Azimuth = complexWinGeom.pInc(iIncElem).Azimuth;
-        auto &elemLumSky = ElementLuminanceSky(iIncElem);
+        auto &elemLum = ElementLuminance(iIncElem);
         auto const &gilsk = dl->horIllum[IHR];
 
         if (Altitude > 0.0) {
             // Ray from sky element
             for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
-                elemLumSky.sky[iSky] = DayltgSkyLuminance(state, static_cast<SkyType>(iSky), Azimuth, Altitude) * LambdaInc;
+                elemLum.sky[iSky] = DayltgSkyLuminance(state, static_cast<SkyType>(iSky), Azimuth, Altitude) * LambdaInc;
             }
         } else if (Altitude < 0.0) {
             // Ray from ground element
             // BeamObstrMultiplier = ComplexWind(IWin)%DaylghtGeom(CurCplxFenState)%GndObstrMultiplier(WinEl, iIncElem)
             for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
-                elemLumSky.sky[iSky] = gilsk.sky[iSky] * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
+                elemLum.sky[iSky] = gilsk.sky[iSky] * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
             }
-            ElementLuminanceSun(iIncElem) =
-                dl->horIllum[IHR].sun * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
+            elemLum.sun = dl->horIllum[IHR].sun * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
         } else {
             // Ray from the element which is half sky and half ground
             for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
                 // in this case half of the pach is coming from the sky and half from the ground
-                elemLumSky.sky[iSky] = 0.5 * DayltgSkyLuminance(state, static_cast<SkyType>(iSky), Azimuth, Altitude) * LambdaInc +
+                elemLum.sky[iSky] = 0.5 * DayltgSkyLuminance(state, static_cast<SkyType>(iSky), Azimuth, Altitude) * LambdaInc +
                                        0.5 * gilsk.sky[iSky] * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
             }
-            ElementLuminanceSun(iIncElem) =
-                0.5 * dl->horIllum[IHR].sun * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
+            elemLum.sun = 0.5 * dl->horIllum[IHR].sun * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
         }
         // Sun beam calculations
         if ((SolBmIndex == iIncElem) && (state.dataHeatBal->SurfSunlitFracHR(IHR, IWin) > 0.0)) {
-            ElementLuminanceSunDisk(iIncElem) = 1.0;
+            elemLum.sunDisk = 1.0;
         }
     }
 
@@ -8308,12 +8225,12 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
             Real64 ObstrTrans = complexWinRefPoint.TransOutSurf(iReflElem, WinEl);
             int iReflElemIndex = complexWinRefPoint.RefSurfIndex(iReflElem, WinEl);
 
-            auto &elemLumSky = ElementLuminanceSky(iReflElemIndex);
+            auto &elemLum = ElementLuminance(iReflElemIndex);
             for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
-                elemLumSky.sky[iSky] *= ObstrTrans;
+                elemLum.sky[iSky] *= ObstrTrans;
             }
-            ElementLuminanceSun(iReflElemIndex) *= ObstrTrans;
-            ElementLuminanceSunDisk(iReflElemIndex) *= ObstrTrans;
+            elemLum.sun *= ObstrTrans;
+            elemLum.sunDisk *= ObstrTrans;
         }
 
         // add exterior ground element obstruction multipliers to calculated luminances. For sun reflection, calculate if
@@ -8326,9 +8243,9 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
             Real64 BeamObstrMultiplier = complexWinRefPoint.GndObstrMultiplier(iGndElem, WinEl);
             int iGndElemIndex = complexWinRefPoint.GndIndex(iGndElem, WinEl);
 
-            auto &elemLumSky = ElementLuminanceSky(iGndElemIndex);
+            auto &elemLum = ElementLuminance(iGndElemIndex);
             for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
-                elemLumSky.sky[iSky] *= BeamObstrMultiplier;
+                elemLum.sky[iSky] *= BeamObstrMultiplier;
             }
 
             // direct sun disk reflect off the ground
@@ -8337,15 +8254,14 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
                 // Sun reaches ground point if vector from this point to the sun is unobstructed
                 for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
                     groundHitPt = complexWinRefPoint.GndPt(iGndElem, WinEl);
-                    bool hitObs = false;
-                    PierceSurface(state, ObsSurfNum, groundHitPt, SUNCOS_IHR, obsHitPt, hitObs);
+                    bool hitObs = PierceSurface(state, ObsSurfNum, groundHitPt, SUNCOS_IHR, obsHitPt);
                     if (hitObs) {
                         SunObstrMultiplier = 0.0;
                         break;
                     }
                 }
             }
-            ElementLuminanceSun(iGndElemIndex) *= SunObstrMultiplier;
+            elemLum.sun *= SunObstrMultiplier;
         }
 
     } else { // if (CalledFrom != RefPoint)
@@ -8355,13 +8271,13 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
         for (int iReflElem = 1; iReflElem <= complexWinIllumMap.NReflSurf(WinEl); ++iReflElem) {
             Real64 ObstrTrans = complexWinIllumMap.TransOutSurf(iReflElem, WinEl);
             int iReflElemIndex = complexWinIllumMap.RefSurfIndex(iReflElem, WinEl);
-            auto &elemLumSky = ElementLuminanceSky(iReflElemIndex);
+            auto &elemLum = ElementLuminance(iReflElemIndex);
 
             for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
-                elemLumSky.sky[iSky] *= ObstrTrans;
+                elemLum.sky[iSky] *= ObstrTrans;
             }
-            ElementLuminanceSun(iReflElemIndex) *= ObstrTrans;
-            ElementLuminanceSunDisk(iReflElemIndex) *= ObstrTrans;
+            elemLum.sun *= ObstrTrans;
+            elemLum.sunDisk *= ObstrTrans;
         }
 
         // add exterior ground element obstruction multipliers to calculated luminances. For sun reflection, calculate if
@@ -8373,9 +8289,9 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
             Real64 BeamObstrMultiplier = complexWinIllumMap.GndObstrMultiplier(iGndElem, WinEl);
             int iGndElemIndex = complexWinIllumMap.GndIndex(iGndElem, WinEl);
 
-            auto &elemLumSky = ElementLuminanceSky(iGndElemIndex);
+            auto &elemLum = ElementLuminance(iGndElemIndex);
             for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
-                elemLumSky.sky[iSky] *= BeamObstrMultiplier;
+                elemLum.sky[iSky] *= BeamObstrMultiplier;
             }
 
             // direct sun disk reflect off the ground
@@ -8385,18 +8301,17 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
                 for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
                     groundHitPt = complexWinIllumMap.GndPt(iGndElem, WinEl);
 
-                    bool hitObs = false;
-                    PierceSurface(state, ObsSurfNum, groundHitPt, SUNCOS_IHR, obsHitPt, hitObs);
+                    bool hitObs = PierceSurface(state, ObsSurfNum, groundHitPt, SUNCOS_IHR, obsHitPt);
                     if (hitObs) {
                         SunObstrMultiplier = 0.0;
                         break;
                     }
                 }
             }
-            ElementLuminanceSun(iGndElemIndex) *= SunObstrMultiplier;
+            elemLum.sun *= SunObstrMultiplier;
         }
     } // if (CalledFrom == RefPoint)
-}
+} // ComplexFenestrationLuminances()
 
 void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
                                                   int const IWin,            // Window index
@@ -8423,31 +8338,27 @@ void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
 
     auto &dl = state.dataDayltg;
 
-    Array1D<Illums> FLSK;     // Sky related luminous flux
-    Array1D<Real64> FLSU;     // Sun related luminous flux, excluding entering beam
-    Array1D<Real64> FLSUdisk; // Sun related luminous flux, due to entering beam
+    Array1D<Illums> FL;     // Sky related luminous flux
+    // Array1D<Real64> FLSU;     // Sun related luminous flux, excluding entering beam
+    // Array1D<Real64> FLSUdisk; // Sun related luminous flux, due to entering beam
 
-    Array1D<Illums> FirstFluxSK;     // Sky related first reflected flux
-    Array1D<Real64> FirstFluxSU;     // Sun related first reflected flux, excluding entering beam
-    Array1D<Real64> FirstFluxSUdisk; // Sun related first reflected flux, due to entering beam
+    Array1D<Illums> FirstFlux;     // Sky related first reflected flux
+    //Array1D<Real64> FirstFluxSU;     // Sun related first reflected flux, excluding entering beam
+    //Array1D<Real64> FirstFluxSUdisk; // Sun related first reflected flux, due to entering beam
 
-    Array1D<Illums> ElementLuminanceSky;     // sky related luminance at window element (exterior side)
-    Array1D<Real64> ElementLuminanceSun;     // sun related luminance at window element (exterior side), exluding beam
-    Array1D<Real64> ElementLuminanceSunDisk; // sun related luminance at window element (exterior side), due to sun beam
-    Real64 FLSUTot;
-    Real64 FLSUdiskTot;
+    Array1D<Illums> ElementLuminance;     // sky related luminance at window element (exterior side)
+    //Array1D<Real64> ElementLuminanceSun;     // sun related luminance at window element (exterior side), exluding beam
+    //Array1D<Real64> ElementLuminanceSunDisk; // sun related luminance at window element (exterior side), due to sun beam
+    Illums FLTot;
+    // Real64 FLSUTot;
+    // Real64 FLSUdiskTot;
 
     // Total for first relflected fluxes
-    Illums FFSKTot = Illums();
-    Real64 FFSUTot;
-    Real64 FFSUdiskTot;
-
-    Real64 COSIncSun; // cosine of sun incidence angle (from basis elements)
-
-    int iConst; // Construction number
+    Illums FFTot = Illums();
+    // Real64 FFSUTot;
+    // Real64 FFSUdiskTot;
 
     int NIncBasis;
-    int NTrnBasis;
     int SolBmIndex; // index of current sun position
 
     Real64 LambdaInc; // current lambda value for incoming direction
@@ -8456,75 +8367,72 @@ void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
 
     int CurCplxFenState = state.dataSurface->SurfaceWindow(IWin).ComplexFen.CurrentState;
     auto &complexWinGeom = state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState);
-    iConst = state.dataSurface->SurfaceWindow(IWin).ComplexFen.State(CurCplxFenState).Konst;
-    NTrnBasis = complexWinGeom.Trn.NBasis;
+    int iConst = state.dataSurface->SurfaceWindow(IWin).ComplexFen.State(CurCplxFenState).Konst;
+    int NTrnBasis = complexWinGeom.Trn.NBasis;
 
-    if (!allocated(FLSK)) FLSK.allocate(NTrnBasis);
-    FLSK = Illums();
-    if (!allocated(FLSU)) FLSU.dimension(NTrnBasis, 0.0);
-    if (!allocated(FLSUdisk)) FLSUdisk.dimension(NTrnBasis, 0.0);
+    if (!allocated(FL)) FL.allocate(NTrnBasis);
+    FL = Illums();
+    // if (!allocated(FLSU)) FLSU.dimension(NTrnBasis, 0.0);
+    // if (!allocated(FLSUdisk)) FLSUdisk.dimension(NTrnBasis, 0.0);
 
-    if (!allocated(FirstFluxSK)) FirstFluxSK.allocate(NTrnBasis);
-    FirstFluxSK = Illums();
-    if (!allocated(FirstFluxSU)) FirstFluxSU.dimension(NTrnBasis, 0.0);
-    if (!allocated(FirstFluxSUdisk)) FirstFluxSUdisk.dimension(NTrnBasis, 0.0);
+    if (!allocated(FirstFlux)) FirstFlux.allocate(NTrnBasis);
+    FirstFlux = Illums();
+    // if (!allocated(FirstFluxSU)) FirstFluxSU.dimension(NTrnBasis, 0.0);
+    // if (!allocated(FirstFluxSUdisk)) FirstFluxSUdisk.dimension(NTrnBasis, 0.0);
 
     NIncBasis = complexWinGeom.Inc.NBasis;
-    if (!allocated(ElementLuminanceSky)) ElementLuminanceSky.allocate(NIncBasis);
-    ElementLuminanceSky = Illums();
-    if (!allocated(ElementLuminanceSun)) ElementLuminanceSun.dimension(NIncBasis, 0.0);
-    if (!allocated(ElementLuminanceSunDisk)) ElementLuminanceSunDisk.dimension(NIncBasis, 0.0);
+    if (!allocated(ElementLuminance)) ElementLuminance.allocate(NIncBasis);
+    ElementLuminance = Illums();
+    // if (!allocated(ElementLuminanceSun)) ElementLuminanceSun.dimension(NIncBasis, 0.0);
+    // if (!allocated(ElementLuminanceSunDisk)) ElementLuminanceSunDisk.dimension(NIncBasis, 0.0);
 
     // Integration over sky/ground/sun elements is done over window incoming basis element and flux is calculated for each
     // outgoing direction. This is used to calculate first reflected flux
 
-    ComplexFenestrationLuminances(
-        state, IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminanceSky, ElementLuminanceSun, ElementLuminanceSunDisk, CalledFrom, MapNum);
+    ComplexFenestrationLuminances(state, IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminance, CalledFrom, MapNum);
 
     // luminance from sun disk needs to include fraction of sunlit area
     SolBmIndex = complexWinGeom.SolBmIndex(IHR, state.dataGlobal->TimeStep);
-    if (SolBmIndex > 0) {
-        COSIncSun = complexWinGeom.CosInc(SolBmIndex);
-    } else {
-        COSIncSun = 0.0;
-    }
-    ElementLuminanceSunDisk *= state.dataHeatBal->SurfSunlitFracHR(IHR, IWin) * COSIncSun;
+    Real64 COSIncSun = (SolBmIndex > 0) ? complexWinGeom.CosInc(SolBmIndex) : 0.0;
+
+    for (int i = 1; i <= (int)ElementLuminance.size(); ++i) 
+        ElementLuminance(i).sunDisk *= state.dataHeatBal->SurfSunlitFracHR(IHR, IWin) * COSIncSun;
 
     //        FLSKTot = 0.0;
-    FLSUTot = 0.0;
-    FLSUdiskTot = 0.0;
-    FFSUTot = 0.0;
-    FFSUdiskTot = 0.0;
+    FLTot.sun = 0.0;
+    FLTot.sunDisk = 0.0;
+    FFTot.sun = 0.0;
+    FFTot.sunDisk = 0.0;
     // now calculate flux into each outgoing direction by integrating over all incoming directions
     for (int iBackElem = 1; iBackElem <= NTrnBasis; ++iBackElem) {
         for (int iIncElem = 1; iIncElem <= NIncBasis; ++iIncElem) {
             LambdaInc = complexWinGeom.Inc.Lamda(iIncElem);
             dirTrans = state.dataConstruction->Construct(iConst).BSDFInput.VisFrtTrans(iBackElem, iIncElem);
 
-            auto &flsk = FLSK(iBackElem);
-            auto const &elemLumSky = ElementLuminanceSky(iIncElem);
+            auto &fl = FL(iBackElem);
+            auto const &elemLum = ElementLuminance(iIncElem);
             for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
-                flsk.sky[iSky] += dirTrans * LambdaInc * elemLumSky.sky[iSky];
+                fl.sky[iSky] += dirTrans * LambdaInc * elemLum.sky[iSky];
             }
 
-            FLSU(iBackElem) += dirTrans * LambdaInc * ElementLuminanceSun(iIncElem);
-            FLSUdisk(iBackElem) += dirTrans * LambdaInc * ElementLuminanceSunDisk(iIncElem);
+            fl.sun += dirTrans * LambdaInc * elemLum.sun;
+            fl.sunDisk += dirTrans * LambdaInc * elemLum.sunDisk;
         }
 
-        auto &firstFluxSK = FirstFluxSK(iBackElem);
-        auto const &flsk = FLSK(iBackElem);
+        auto &firstFlux = FirstFlux(iBackElem);
+        auto const &fl = FL(iBackElem);
         for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
-            firstFluxSK.sky[iSky] = flsk.sky[iSky] * complexWinGeom.AveRhoVisOverlap(iBackElem);
-            FFSKTot.sky[iSky] += firstFluxSK.sky[iSky];
+            firstFlux.sky[iSky] = fl.sky[iSky] * complexWinGeom.AveRhoVisOverlap(iBackElem);
+            FFTot.sky[iSky] += firstFlux.sky[iSky];
             //                FLSKTot( iSky ) += FLSK( iSky, iBackElem );
         }
-        FirstFluxSU(iBackElem) = FLSU(iBackElem) * complexWinGeom.AveRhoVisOverlap(iBackElem);
-        FFSUTot += FirstFluxSU(iBackElem);
-        FLSUTot += FLSU(iBackElem);
+        firstFlux.sun = fl.sun * complexWinGeom.AveRhoVisOverlap(iBackElem);
+        FFTot.sun += firstFlux.sun;
+        FLTot.sun += fl.sun;
 
-        FirstFluxSUdisk(iBackElem) = FLSUdisk(iBackElem) * complexWinGeom.AveRhoVisOverlap(iBackElem);
-        FFSUdiskTot += FirstFluxSUdisk(iBackElem);
-        FLSUdiskTot += FLSUdisk(iBackElem);
+        firstFlux.sunDisk = fl.sunDisk * complexWinGeom.AveRhoVisOverlap(iBackElem);
+        FFTot.sunDisk += firstFlux.sunDisk;
+        FLTot.sunDisk += fl.sunDisk;
     }
 
     auto const &thisEnclDaylight = dl->enclDaylight(dl->daylightControl(daylightCtrlNum).enclIndex);
@@ -8532,27 +8440,26 @@ void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
 
     auto &eintsk = dl->reflIllum(IHR, 1);
     for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
-        eintsk.sky[iSky] = FFSKTot.sky[iSky] * (state.dataSurface->Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
+        eintsk.sky[iSky] = FFTot.sky[iSky] * (state.dataSurface->Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
                            (EnclInsideSurfArea * (1.0 - thisEnclDaylight.aveVisDiffReflect));
     } // for (iSky)
 
-    dl->reflIllum(IHR, 1).sun = FFSUTot * (state.dataSurface->Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
+    dl->reflIllum(IHR, 1).sun = FFTot.sun * (state.dataSurface->Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
                                                    (EnclInsideSurfArea * (1.0 - thisEnclDaylight.aveVisDiffReflect));
-    dl->reflIllum(IHR, 1).sunDisk = FFSUdiskTot *
-                                                       (state.dataSurface->Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
+    dl->reflIllum(IHR, 1).sunDisk = FFTot.sunDisk * (state.dataSurface->Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
                                                        (EnclInsideSurfArea * (1.0 - thisEnclDaylight.aveVisDiffReflect));
 
-    if (allocated(FLSK)) FLSK.deallocate();
-    if (allocated(FLSU)) FLSU.deallocate();
-    if (allocated(FLSUdisk)) FLSUdisk.deallocate();
+    if (allocated(FL)) FL.deallocate();
+    // if (allocated(FLSU)) FLSU.deallocate();
+    // if (allocated(FLSUdisk)) FLSUdisk.deallocate();
 
-    if (allocated(FirstFluxSK)) FirstFluxSK.deallocate();
-    if (allocated(FirstFluxSU)) FirstFluxSU.deallocate();
-    if (allocated(FirstFluxSUdisk)) FirstFluxSUdisk.deallocate();
+    if (allocated(FirstFlux)) FirstFlux.deallocate();
+    // if (allocated(FirstFluxSU)) FirstFluxSU.deallocate();
+    // if (allocated(FirstFluxSUdisk)) FirstFluxSUdisk.deallocate();
 
-    if (allocated(ElementLuminanceSky)) ElementLuminanceSky.deallocate();
-    if (allocated(ElementLuminanceSun)) ElementLuminanceSun.deallocate();
-    if (allocated(ElementLuminanceSunDisk)) ElementLuminanceSunDisk.deallocate();
+    if (allocated(ElementLuminance)) ElementLuminance.deallocate();
+    // if (allocated(ElementLuminanceSun)) ElementLuminanceSun.deallocate();
+    // if (allocated(ElementLuminanceSunDisk)) ElementLuminanceSunDisk.deallocate();
 }
 
 void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
@@ -8571,10 +8478,10 @@ void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
     auto &dl = state.dataDayltg;
         
     // Luminances from different sources to the window
-    Array1D<Illums> ElementLuminanceSky; // sky related luminance at window element (exterior side)
-    Array1D<Real64> ElementLuminanceSun; // sun related luminance at window element (exterior side),
+    Array1D<Illums> ElementLuminance; // sky related luminance at window element (exterior side)
+    // Array1D<Real64> ElementLuminanceSun; // sun related luminance at window element (exterior side),
     // exluding beam
-    Array1D<Real64> ElementLuminanceSunDisk; // sun related luminance at window element (exterior side),
+    // Array1D<Real64> ElementLuminanceSunDisk; // sun related luminance at window element (exterior side),
     // due to sun beam
 
     int RefPointIndex;                                       // reference point patch number
@@ -8589,13 +8496,12 @@ void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
     int iConst = state.dataSurface->SurfaceWindow(IWin).ComplexFen.State(CurCplxFenState).Konst;
     int NIncBasis = complexWin.Geom(CurCplxFenState).Inc.NBasis;
 
-    if (!allocated(ElementLuminanceSky)) ElementLuminanceSky.allocate(NIncBasis);
-    ElementLuminanceSky = Illums();
-    if (!allocated(ElementLuminanceSun)) ElementLuminanceSun.dimension(NIncBasis, 0.0);
-    if (!allocated(ElementLuminanceSunDisk)) ElementLuminanceSunDisk.dimension(NIncBasis, 0.0);
+    if (!allocated(ElementLuminance)) ElementLuminance.allocate(NIncBasis);
+    ElementLuminance = Illums();
+    // if (!allocated(ElementLuminanceSun)) ElementLuminanceSun.dimension(NIncBasis, 0.0);
+    // if (!allocated(ElementLuminanceSunDisk)) ElementLuminanceSunDisk.dimension(NIncBasis, 0.0);
 
-    ComplexFenestrationLuminances(
-        state, IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminanceSky, ElementLuminanceSun, ElementLuminanceSunDisk, CalledFrom, MapNum);
+    ComplexFenestrationLuminances(state, IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminance, CalledFrom, MapNum);
 
     // find number of outgoing basis towards current reference point
     if (CalledFrom == CalledFor::RefPoint) {
@@ -8616,12 +8522,12 @@ void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
         // LambdaInc = ComplexWind(IWin)%Geom(CurCplxFenState)%Inc%Lamda(iIncElem)
         dirTrans = state.dataConstruction->Construct(iConst).BSDFInput.VisFrtTrans(RefPointIndex, iIncElem);
 
-        auto const &elemLumSky = ElementLuminanceSky(iIncElem);
+        auto const &elemLum = ElementLuminance(iIncElem);
         for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
-            WinLum.sky[iSky] += dirTrans * elemLumSky.sky[iSky];
+            WinLum.sky[iSky] += dirTrans * elemLum.sky[iSky];
         }
 
-        WinLum.sun += dirTrans * ElementLuminanceSun(iIncElem);
+        WinLum.sun += dirTrans * elemLum.sun;
 
         // For sun disk need to go throug outgoing directions and see which directions actually contain reference point
     }
@@ -8667,95 +8573,64 @@ void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &dl = state.dataDayltg;
         
-    int CurCplxFenState;
-    int iConst;
-    int SolBmIndex;
-    int NTrnBasis;
-    Real64 WindowSolidAngleDaylightPoint(0.0);
-    Real64 XR;
-    Real64 YR;
-    Real64 PosFac;
-    Real64 dirTrans;
-    Real64 LambdaTrn;
-    Real64 WinLumSunDisk; // window luminance from sun disk
-    Real64 ELumSunDisk;   // window illuminance from sun disk
-    Real64 TransBeam;     // transmittance of the beam for given direction
-    Real64 RayZ;          // z component of unit vector for outgoing direction
-    bool refPointIntersect;
+    assert(CalledFrom != CalledFor::MapPoint || MapNum > 0);
 
-    CurCplxFenState = state.dataSurface->SurfaceWindow(iWin).ComplexFen.CurrentState;
-    iConst = state.dataSurface->SurfaceWindow(iWin).ComplexFen.State(CurCplxFenState).Konst;
-    SolBmIndex = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).SolBmIndex(iHour, state.dataGlobal->TimeStep);
+    auto const &window = state.dataSurface->SurfaceWindow(iWin);
+    int CurCplxFenState = window.ComplexFen.CurrentState;
+    int iConst = window.ComplexFen.State(CurCplxFenState).Konst;
 
-    switch (CalledFrom) {
-    case CalledFor::RefPoint: {
-        WindowSolidAngleDaylightPoint = state.dataSurface->SurfaceWindow(iWin).SolidAngAtRefPtWtd(iRefPoint);
-    } break;
-    case CalledFor::MapPoint: {
-        WindowSolidAngleDaylightPoint = 0.0;
-    } break;
-    default: {
-        assert(false); // Bad CalledFrom argument
-    } break;
-    }
+    auto const &complexWindow = state.dataBSDFWindow->ComplexWind(iWin);
+    auto const &complexWindowGeom = complexWindow.Geom(CurCplxFenState);
+    auto const &complexWindowDayltgGeom = complexWindow.DaylghtGeom(CurCplxFenState);
+    int SolBmIndex = complexWindowGeom.SolBmIndex(iHour, state.dataGlobal->TimeStep);
 
+    Real64 WindowSolidAngleDaylightPoint = (CalledFrom == CalledFor::RefPoint) ? window.SolidAngAtRefPtWtd(iRefPoint) : 0.0;
     if (WindowSolidAngleDaylightPoint < 1e-6) return;
 
-    WinLumSunDisk = 0.0;
-    ELumSunDisk = 0.0;
-    NTrnBasis = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).Trn.NBasis;
+    Illums WinLum; 
+    Illums ElemLum;
+    
+    int NTrnBasis = complexWindowGeom.Trn.NBasis;
     for (int iTrnElem = 1; iTrnElem <= NTrnBasis; ++iTrnElem) {
         // if ray from any part of the window can reach reference point
-        if (CalledFrom == CalledFor::RefPoint) {
-            refPointIntersect =
-                state.dataBSDFWindow->ComplexWind(iWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).RefPointIntersection(iTrnElem);
-        } else if (CalledFrom == CalledFor::MapPoint) {
-            assert(MapNum > 0);
-            refPointIntersect =
-                state.dataBSDFWindow->ComplexWind(iWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).RefPointIntersection(iTrnElem);
+        int refPointIntersect = (CalledFrom == CalledFor::RefPoint) ?
+                complexWindowDayltgGeom.RefPoint(iRefPoint).RefPointIntersection(iTrnElem) :
+                complexWindowDayltgGeom.IlluminanceMap(iRefPoint, MapNum).RefPointIntersection(iTrnElem);
+
+        if (refPointIntersect == 0)
+            continue;
+        
+        Real64 PosFac = (CalledFrom == CalledFor::RefPoint) ?
+                complexWindowDayltgGeom.RefPoint(iRefPoint).RefPtIntPosFac(iTrnElem) :
+                complexWindowDayltgGeom.IlluminanceMap(iRefPoint, MapNum).RefPtIntPosFac(iTrnElem);
+
+        Real64 RayZ = -complexWindowGeom.sTrn(iTrnElem).z;
+        
+        // Need to recalculate position factor for dominant direction in case of specular bsdf.  Otherwise this will produce
+        // very inaccurate results because of position factor of the sun and bsdf pach can vary by lot
+        if (iTrnElem == SolBmIndex) {
+            Real64 XR = std::tan(std::abs(Constant::PiOvr2 - AZVIEW - dl->sunAngles.theta) + 0.001);
+            Real64 YR = std::tan(dl->sunAngles.phi + 0.001);
+            PosFac = DayltgGlarePositionFactor(XR, YR);
+            RayZ = dl->sunAngles.sinPhi;
         }
-        if (refPointIntersect) {
-            if (CalledFrom == CalledFor::RefPoint) {
-                PosFac = state.dataBSDFWindow->ComplexWind(iWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).RefPtIntPosFac(iTrnElem);
-            } else {
-                PosFac =
-                    state.dataBSDFWindow->ComplexWind(iWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).RefPtIntPosFac(iTrnElem);
-            }
-            RayZ = -state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem).z;
 
-            // Need to recalculate position factor for dominant direction in case of specular bsdf.  Otherwise this will produce
-            // very inaccurate results because of position factor of the sun and bsdf pach can vary by lot
-            if (iTrnElem == SolBmIndex) {
-                XR = std::tan(std::abs(Constant::PiOvr2 - AZVIEW - dl->sunAngles.theta) + 0.001);
-                YR = std::tan(dl->sunAngles.phi + 0.001);
-                PosFac = DayltgGlarePositionFactor(XR, YR);
-                RayZ = dl->sunAngles.sinPhi;
-            }
+        if (PosFac == 0.0)
+            continue;
+        
+        Real64 dirTrans = (SolBmIndex > 0) ? state.dataConstruction->Construct(iConst).BSDFInput.VisFrtTrans(iTrnElem, SolBmIndex) : 0.0;
+        Real64 LambdaTrn = complexWindowGeom.Trn.Lamda(iTrnElem);
+        Vector3<Real64> V = -complexWindowGeom.sTrn(iTrnElem);
+        Vector3<Real64> RWin = state.dataSurface->Surface(iWin).Centroid;
+        Real64 TransBeam = DayltgHitObstruction(state, iHour, iWin, RWin, V);
+        
+        WinLum.sunDisk += (14700.0 * std::sqrt(0.000068 * PosFac) * double(NumEl) / std::pow(WindowSolidAngleDaylightPoint, 0.8)) * dirTrans * LambdaTrn * TransBeam;
+        
+        ElemLum.sunDisk += RayZ * dirTrans * LambdaTrn * TransBeam;
+    } // for (iTrnElem)
 
-            if (PosFac != 0.0) {
-                if (SolBmIndex > 0) {
-                    dirTrans = state.dataConstruction->Construct(iConst).BSDFInput.VisFrtTrans(iTrnElem, SolBmIndex);
-                } else {
-                    dirTrans = 0.0;
-                }
-                LambdaTrn = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).Trn.Lamda(iTrnElem);
-
-                Vector3<Real64> V = -state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).sTrn(iTrnElem);
-                // Window center
-                Vector3<Real64> RWin = state.dataSurface->Surface(iWin).Centroid;
-
-                DayltgHitObstruction(state, iHour, iWin, RWin, V, TransBeam);
-
-                WinLumSunDisk += (14700.0 * std::sqrt(0.000068 * PosFac) * double(NumEl) / std::pow(WindowSolidAngleDaylightPoint, 0.8)) * dirTrans *
-                                 LambdaTrn * TransBeam;
-
-                ELumSunDisk += RayZ * dirTrans * LambdaTrn * TransBeam;
-            }
-        }
-    }
-
-    dl->avgWinLum(iHour, 1).sunDisk = WinLumSunDisk;
-    dl->dirIllum(iHour, 1).sunDisk = ELumSunDisk;
+    dl->avgWinLum(iHour, 1).sunDisk = WinLum.sunDisk;
+    dl->dirIllum(iHour, 1).sunDisk = ElemLum.sunDisk;
 }
 
 Real64 DayltgSkyLuminance(EnergyPlusData const &state,
@@ -8838,11 +8713,10 @@ Real64 DayltgSkyLuminance(EnergyPlusData const &state,
     }
 }
 
-void ProfileAngle(EnergyPlusData &state,
+Real64 ProfileAngle(EnergyPlusData &state,
                   int const SurfNum,                                      // Surface number
                   Vector3<Real64> const &CosDirSun,                       // Solar direction cosines
-                  DataWindowEquivalentLayer::Orientation const HorOrVert, // If HORIZONTAL, calculates ProfileAngHor
-                  Real64 &ProfileAng                                      // Solar profile angle (radians).
+                  DataWindowEquivalentLayer::Orientation const HorOrVert  // If HORIZONTAL, calculates ProfileAngHor
 )
 {
 
@@ -8865,29 +8739,24 @@ void ProfileAngle(EnergyPlusData &state,
     //  which the width of the window is measured).
     // If VERTICAL, calculates ProfileAngVert
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 ElevSun; // Sun elevation; angle between sun and horizontal (radians)
-    Real64 ElevWin; // Window elevation: angle between window outward normal and horizontal (radians)
-    Real64 AzimWin; // Window azimuth (radians)
-    Real64 AzimSun; // Sun azimuth (radians)
-    Real64 ThWin;   // Azimuth angle of WinNorm
-
+    auto const &surf = state.dataSurface->Surface(SurfNum);
     if (HorOrVert == DataWindowEquivalentLayer::Orientation::Horizontal) { // Profile angle for horizontal structures
-        ElevWin = Constant::PiOvr2 - state.dataSurface->Surface(SurfNum).Tilt * Constant::DegToRadians;
-        AzimWin = (90.0 - state.dataSurface->Surface(SurfNum).Azimuth) * Constant::DegToRadians;
-        ElevSun = std::asin(CosDirSun.z);
-        AzimSun = std::atan2(CosDirSun.y, CosDirSun.x);
-        ProfileAng = std::atan(std::sin(ElevSun) / std::abs(std::cos(ElevSun) * std::cos(AzimWin - AzimSun))) - ElevWin;
+        Real64 ElevWin = Constant::PiOvr2 - surf.Tilt * Constant::DegToRadians; // Window elevation: angle between outward normal and horizontal (radians)
+        Real64 AzimWin = (90.0 - surf.Azimuth) * Constant::DegToRadians; // Window azimuth (radians)
+        Real64 ElevSun = std::asin(CosDirSun.z); // Sun elevation; angle between sun and horizontal (radians)
+        Real64 AzimSun = std::atan2(CosDirSun.y, CosDirSun.x); // Sun azimuth (radians)
+        return std::atan(std::sin(ElevSun) / std::abs(std::cos(ElevSun) * std::cos(AzimWin - AzimSun))) - ElevWin;
     } else { // Profile angle for vertical structures
-        ElevWin = Constant::PiOvr2 - state.dataSurface->Surface(SurfNum).Tilt * Constant::DegToRadians;
-        AzimWin = state.dataSurface->Surface(SurfNum).Azimuth * Constant::DegToRadians; // 7952
-        AzimSun = std::atan2(CosDirSun.x, CosDirSun.y);                                 // 7952
+        Real64 ElevWin = Constant::PiOvr2 - surf.Tilt * Constant::DegToRadians;
+        Real64 AzimWin = surf.Azimuth * Constant::DegToRadians; // 7952
+        Real64 AzimSun = std::atan2(CosDirSun.x, CosDirSun.y);                                 // 7952
+
+        Real64 ProfileAng;
         if (std::abs(ElevWin) < 0.1) {                                                  // Near-vertical window
             ProfileAng = AzimWin - AzimSun;                                             // CR7952 allow sign changes.
         } else {
-
-            Vector3<Real64> WinNorm = state.dataSurface->Surface(SurfNum).OutNormVec; // Window outward normal unit vector
-            ThWin = AzimWin - Constant::PiOvr2;
+            Vector3<Real64> WinNorm = surf.OutNormVec; // Window outward normal unit vector
+            Real64 ThWin = AzimWin - Constant::PiOvr2;
             Real64 const sin_ElevWin = std::sin(ElevWin);
             // Cross product of WinNorm and vector along window baseline
             Vector3<Real64> WinNormCrossBase = {-sin_ElevWin * std::cos(ThWin), sin_ElevWin * std::sin(ThWin), std::cos(ElevWin)};
@@ -8900,6 +8769,7 @@ void ProfileAngle(EnergyPlusData &state,
         }
         // Constrain to 0 to pi
         if (ProfileAng > Constant::Pi) ProfileAng = 2.0 * Constant::Pi - ProfileAng;
+        return ProfileAng;
     }
 }
 
@@ -8934,25 +8804,26 @@ void DayltgClosestObstruction(EnergyPlusData &state,
 
         for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
             // Determine if this ray hits the surface and, if so, get the distance from the receiving point to the hit
-            PierceSurface(state, ObsSurfNum, RecPt, RayVec, HitPt, hit);
-            if (hit) { // Ray pierces surface
-                // If obstruction is a window and its base surface is the nearest obstruction hit so far set nearestHitSurface to this window
-                // Note that in this case NearestHitDistance_sq has already been calculated, so does not have to be recalculated
-                if ((state.dataSurface->Surface(ObsSurfNum).Class == SurfaceClass::Window) &&
-                    (state.dataSurface->Surface(ObsSurfNum).BaseSurf == NearestHitSurfNum)) {
+            hit = PierceSurface(state, ObsSurfNum, RecPt, RayVec, HitPt);
+            if (!hit) // Ray pierces surface
+                continue;
+            
+            // If obstruction is a window and its base surface is the nearest obstruction hit so far set nearestHitSurface to this window
+            // Note that in this case NearestHitDistance_sq has already been calculated, so does not have to be recalculated
+            if ((state.dataSurface->Surface(ObsSurfNum).Class == SurfaceClass::Window) &&
+                (state.dataSurface->Surface(ObsSurfNum).BaseSurf == NearestHitSurfNum)) {
+                NearestHitSurfNum = ObsSurfNum;
+            } else {
+                // Distance squared from receiving point to hit point
+                Real64 const HitDistance_sq(distance_squared(HitPt, RecPt));
+                // Reset NearestHitSurfNum and NearestHitDistance_sq if this hit point is closer than previous closest
+                if (HitDistance_sq < NearestHitDistance_sq) {
+                    NearestHitDistance_sq = HitDistance_sq;
                     NearestHitSurfNum = ObsSurfNum;
-                } else {
-                    // Distance squared from receiving point to hit point
-                    Real64 const HitDistance_sq(distance_squared(HitPt, RecPt));
-                    // Reset NearestHitSurfNum and NearestHitDistance_sq if this hit point is closer than previous closest
-                    if (HitDistance_sq < NearestHitDistance_sq) {
-                        NearestHitDistance_sq = HitDistance_sq;
-                        NearestHitSurfNum = ObsSurfNum;
-                        NearestHitPt = HitPt;
-                    }
+                    NearestHitPt = HitPt;
                 }
             } // End of check if obstruction was hit
-        }     // End of loop over possible obstructions for this ray
+        } // for (ObsSurfNum)
 
     } else { // Surface octree search
 
@@ -8963,22 +8834,23 @@ void DayltgClosestObstruction(EnergyPlusData &state,
             if (surface.IsShadowPossibleObstruction) {
                 Vector3<Real64> HitPt;
                 // Determine if this ray hits the surface and, if so, get the distance from the receiving point to the hit
-                PierceSurface(surface, RecPt, RayVec, HitPt, hit); // Check if ray pierces surface
-                if (hit) {                                         // Ray pierces surface
-                    // If obstruction is a window and its base surface is the nearest obstruction hit so far set nearestHitSurface to this window
-                    // Note that in this case NearestHitDistance_sq has already been calculated, so does not have to be recalculated
-                    if ((surface.Class == SurfaceClass::Window) && (surface.BaseSurf > 0) &&
-                        (&state.dataSurface->Surface(surface.BaseSurf) == nearestHitSurface)) {
+                hit = PierceSurface(surface, RecPt, RayVec, HitPt); // Check if ray pierces surface
+                if (!hit)
+                   return;
+
+                // If obstruction is a window and its base surface is the nearest obstruction hit so far set nearestHitSurface to this window
+                // Note that in this case NearestHitDistance_sq has already been calculated, so does not have to be recalculated
+                if ((surface.Class == SurfaceClass::Window) && (surface.BaseSurf > 0) &&
+                    (&state.dataSurface->Surface(surface.BaseSurf) == nearestHitSurface)) {
+                    nearestHitSurface = &surface;
+                } else {
+                    // Distance squared from receiving point to hit point
+                    Real64 const HitDistance_sq(distance_squared(HitPt, RecPt));
+                    // Reset nearestHitSurface and NearestHitDistance_sq if this hit point is closer than previous closest
+                    if (HitDistance_sq < NearestHitDistance_sq) {
+                        NearestHitDistance_sq = HitDistance_sq;
                         nearestHitSurface = &surface;
-                    } else {
-                        // Distance squared from receiving point to hit point
-                        Real64 const HitDistance_sq(distance_squared(HitPt, RecPt));
-                        // Reset nearestHitSurface and NearestHitDistance_sq if this hit point is closer than previous closest
-                        if (HitDistance_sq < NearestHitDistance_sq) {
-                            NearestHitDistance_sq = HitDistance_sq;
-                            nearestHitSurface = &surface;
-                            NearestHitPt = HitPt;
-                        }
+                        NearestHitPt = HitPt;
                     }
                 } // End of check if obstruction was hit
             }
@@ -8997,14 +8869,13 @@ void DayltgClosestObstruction(EnergyPlusData &state,
             assert(NearestHitSurfNum != 0);
         }
     }
-}
+} // DayltgClosestObstruction()
 
-void DayltgSurfaceLumFromSun(EnergyPlusData &state,
+Real64 DayltgSurfaceLumFromSun(EnergyPlusData &state,
                              int const IHR,                    // Hour number
                              Vector3<Real64> const &Ray,       // Ray from window to reflecting surface (m)
                              int const ReflSurfNum,            // Number of surface for which luminance is being calculated
-                             Vector3<Real64> const &ReflHitPt, // Point on ReflSurfNum for luminance calculation (m)
-                             Real64 &LumAtReflHitPtFrSun       // Luminance at ReflHitPt from beam solar reflection for unit
+                             Vector3<Real64> const &ReflHitPt // Point on ReflSurfNum for luminance calculation (m)
 )
 {
 
@@ -9023,49 +8894,51 @@ void DayltgSurfaceLumFromSun(EnergyPlusData &state,
     Vector3<Real64> SurfaceLumFromSunReflNorm; // Unit normal to reflecting surface (m)
     Vector3<Real64> SurfaceLumFromSunObsHitPt; // Hit point on obstruction (m)
     bool hitObs;                               // True iff obstruction is hit
-    Real64 CosIncAngAtHitPt;                   // Cosine of angle of incidence of sun at HitPt
     Real64 DiffVisRefl;                        // Diffuse visible reflectance of ReflSurfNum
 
-    LumAtReflHitPtFrSun = 0.0;
     // Skip daylighting shelves since reflection from these is separately calculated
-    if (state.dataSurface->SurfDaylightingShelfInd(ReflSurfNum) > 0) return;
+    if (state.dataSurface->SurfDaylightingShelfInd(ReflSurfNum) > 0) return 0.0;
+
+    auto const &reflSurf = state.dataSurface->Surface(ReflSurfNum);
+
     // Normal to reflecting surface in hemisphere containing window element
-    SurfaceLumFromSunReflNorm = state.dataSurface->Surface(ReflSurfNum).OutNormVec;
-    if (state.dataSurface->Surface(ReflSurfNum).IsShadowing) {
+    SurfaceLumFromSunReflNorm = reflSurf.OutNormVec;
+    if (reflSurf.IsShadowing) {
         if (dot(SurfaceLumFromSunReflNorm, Ray) > 0.0) {
             SurfaceLumFromSunReflNorm *= -1.0;
         }
     }
     // Cosine of angle of incidence of sun at HitPt if sun were to reach HitPt
-    Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SurfSunCosHourly(IHR));
-    CosIncAngAtHitPt = dot(SurfaceLumFromSunReflNorm, SUNCOS_IHR);
+    Vector3<Real64> const SUNCOS_IHR = state.dataSurface->SurfSunCosHourly(IHR);
+    Real64 CosIncAngAtHitPt = dot(SurfaceLumFromSunReflNorm, SUNCOS_IHR);
     // Require that the sun be in front of this surface relative to window element
-    if (CosIncAngAtHitPt <= 0.0) return; // Sun is in back of reflecting surface
+    if (CosIncAngAtHitPt <= 0.0) return 0.0; // Sun is in back of reflecting surface
     // Sun reaches ReflHitPt if vector from ReflHitPt to sun is unobstructed
     hitObs = false;
     for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
         // Exclude as a possible obstructor ReflSurfNum and its base surface (if it has one)
-        if (ObsSurfNum == ReflSurfNum || ObsSurfNum == state.dataSurface->Surface(ReflSurfNum).BaseSurf) continue;
-        PierceSurface(state, ObsSurfNum, ReflHitPt, SUNCOS_IHR, SurfaceLumFromSunObsHitPt, hitObs);
+        if (ObsSurfNum == ReflSurfNum || ObsSurfNum == reflSurf.BaseSurf) continue;
+        hitObs = PierceSurface(state, ObsSurfNum, ReflHitPt, SUNCOS_IHR, SurfaceLumFromSunObsHitPt);
         if (hitObs) break;
     }
-    if (hitObs) return; // Obstruction was hit, blocking s auto surfaceHit = [&state, &GroundHitPtun
+    
+    if (hitObs) return 0.0; // Obstruction was hit, blocking s auto surfaceHit = [&state, &GroundHitPtun
     // Obstruction was not hit; sun reaches ReflHitPt.
     // Calculate luminance at ReflHitPt due to beam solar reflection (for unit beam normal illuminance)
-    if (state.dataSurface->Surface(ReflSurfNum).IsShadowing) {
+    if (reflSurf.IsShadowing) {
         DiffVisRefl = state.dataSurface->SurfShadowDiffuseVisRefl(ReflSurfNum);
         // Note that if the shadowing surface has a non-zero glazing fraction (e.g., neighboring bldg) that the above is
         // (1 - glazing fraction) * (vis refl of opaque part of shadowing surface); specular reflection is
         // excluded in this value of DiffVisRefl.
     } else { // Exterior building surface
-        if (!state.dataConstruction->Construct(state.dataSurface->Surface(ReflSurfNum).Construction).TypeIsWindow) {
-            DiffVisRefl = 1.0 - state.dataConstruction->Construct(state.dataSurface->Surface(ReflSurfNum).Construction).OutsideAbsorpSolar;
+        if (!state.dataConstruction->Construct(reflSurf.Construction).TypeIsWindow) {
+            DiffVisRefl = 1.0 - state.dataConstruction->Construct(reflSurf.Construction).OutsideAbsorpSolar;
         } else {
             // Window; assume bare so no beam-to-diffuse reflection
             DiffVisRefl = 0.0;
         }
     }
-    LumAtReflHitPtFrSun = CosIncAngAtHitPt * DiffVisRefl / Constant::Pi;
+    return CosIncAngAtHitPt * DiffVisRefl / Constant::Pi;
 }
 
 void DayltgInteriorMapIllum(EnergyPlusData &state)
