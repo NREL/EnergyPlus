@@ -3905,7 +3905,6 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
     } else {
         for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
             auto const &enclSol = state.dataViewFactor->EnclSolInfo(enclNum);
-            auto const &enclDayltg = dl->enclDaylight(enclNum);
             for (int const enclSurfNum : enclSol.SurfacePtr) {
                 auto const &surf = state.dataSurface->Surface(enclSurfNum);
                 auto &surfWindow = state.dataSurface->SurfaceWindow(enclSurfNum);
@@ -3913,7 +3912,11 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                 if (surf.Class != SurfaceClass::Window || !surf.ExtSolar)
                     continue;
                 
-                if (enclSol.TotalEnclosureDaylRefPoints == 0 || enclSol.HasInterZoneWindow || !enclDayltg.hasSplitFluxDaylighting)
+                if (enclSol.TotalEnclosureDaylRefPoints == 0 || enclSol.HasInterZoneWindow)
+                    continue;
+                
+                auto const &enclDayltg = dl->enclDaylight(enclNum);
+                if (!enclDayltg.hasSplitFluxDaylighting)
                     continue;
                 
                 int refPtCount = 0;
@@ -7894,11 +7897,12 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 std::fill(transBmBmMult.begin(), transBmBmMult.end(), 0.0);
                 std::fill(transMult.begin(), transMult.end(), 0.0);
 
-                auto const &blind = state.dataMaterial->Blind(BlNum);
                 // TH 7/7/2010 moved from inside the loop: DO JB = 1,MaxSlatAngs
                 Real64 ProfAng;
-                if (BlindOn)
+                if (BlindOn) {
+                    auto const &blind = state.dataMaterial->Blind(BlNum);
                     ProfAng = ProfileAngle(state, IWin, state.dataSurface->SurfSunCosHourly(IHR), blind.SlatOrientation);
+                }
 
                 for (int JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
                     if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
@@ -7923,19 +7927,18 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
                         // As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
                         // for TDDs because it is based on TVISBSun which is correctly calculated for TDDs above.
+                        auto const &blind = state.dataMaterial->Blind(BlNum);
 
-                        TransBlBmDiffFront =
-                            WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
+                        Real64 TransBlBmDiffFront = WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
 
                         if (ShType == WinShadingType::IntBlind) { // Interior blind
                             // TH CR 8121, 7/7/2010
                             // ReflBlBmDiffFront = WindowManager::InterpProfAng(ProfAng,Blind(BlNum)%VisFrontBeamDiffRefl)
-                            ReflBlBmDiffFront =
-                                WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
+                            Real64 ReflBlBmDiffFront = WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
 
                             // TH added 7/12/2010 for CR 8121
-                            ReflBlDiffDiffFront = blind.VisFrontDiffDiffRefl(JB);
-                            TransBlDiffDiffFront = blind.VisFrontDiffDiffTrans(JB);
+                            Real64 ReflBlDiffDiffFront = blind.VisFrontDiffDiffRefl(JB);
+                            Real64 TransBlDiffDiffFront = blind.VisFrontDiffDiffTrans(JB);
 
                             transMult[JB] = TVISBSun * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                                                  (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
@@ -7947,9 +7950,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                             state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                         } else { // Between-glass blind
-                            t1 = General::POLYF(COSBSun, construct.tBareVisCoef(1));
-                            tfshBd = WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
-                            rfshB = WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
+                            Real64 t1 = General::POLYF(COSBSun, construct.tBareVisCoef(1));
+                            Real64 tfshBd = WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
+                            Real64 rfshB = WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
                             if (construct.TotGlassLayers == 2) { // 2 glass layers
                                 transMult[JB] =
                                     t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
@@ -7973,9 +7976,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
                     // Daylighting shelf simplification:  No beam makes it past end of shelf, all light is diffuse
                     if (InShelfSurf > 0) { // Inside daylighting shelf
-                        std::fill(
-                            transBmBmMult.begin(), transBmBmMult.end(), 0.0); // No beam, diffuse only
-                                                                              // SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
+                        std::fill(transBmBmMult.begin(), transBmBmMult.end(), 0.0); // No beam, diffuse only
+                        // SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
                     }
 
                     dl->winLum(IHR, JB + 1).sun += ZSU1 * transMult[JB] / Constant::Pi;
@@ -7983,10 +7985,10 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     FLFW[JB + 1].sun += ZSU1 * transMult[JB] * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
                     FLFW[JB + 1].sunDisk = ZSU1 * transBmBmMult[JB];
                     FLCW[JB + 1].sun += ZSU1 * transMult[JB] * state.dataSurface->SurfWinFractionUpgoing(IWin);
-                } // End of loop over slat angles
-            }     // End of window with shade or blind
-        }         // COSBSun > 0
-    }             // SurfSunlitFracHR > 0
+                } // for (JB)
+            } // if (BlindOn || ShadeOn)
+        } // if (COSBSun > 0)
+    } // if (SurfSunlitFracHR > 0)
 
     // Beam reaching window after specular reflection from exterior obstruction
 
