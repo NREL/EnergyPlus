@@ -93,7 +93,7 @@ namespace Dayltg {
         Real64 cosPhi = 0.0;
         Real64 theta = 0.0; // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
     };
-        
+
     void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum); // Enclosure number
 
     void CalcDayltgCoefficients(EnergyPlusData &state);

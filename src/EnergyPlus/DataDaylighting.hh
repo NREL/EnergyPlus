@@ -85,6 +85,14 @@ namespace Dayltg {
         Real64 sunDisk = 0.0;    
     };
 
+    enum class Lum {
+        Invalid = -1,
+        Illum,
+        Back,
+        Source,
+        Num
+    };
+        
     enum class ExtWinType
     {
         Invalid = -1,
@@ -194,11 +202,14 @@ namespace Dayltg {
         Array1D<Real64> BacLum;             // =0.0 ! Background luminance at each reference point (cd/m2)
         Array2D<Real64> SolidAngAtRefPt;    // (Number of Zones, Total Daylighting Reference Points)
         Array2D<Real64> SolidAngAtRefPtWtd; // (Number of Zones, Total Daylighting Reference Points)
-        Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>> IllumFromWinAtRefPt; // (Number of Zones, 2, Total Daylighting Reference Points)
-        Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>>
-            BackLumFromWinAtRefPt; // (Number of Zones, 2, Total Daylighting Reference Points)
-        Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>>
-            SourceLumFromWinAtRefPt; // (Number of Zones, 2, Total Daylighting Reference Points)
+        Array2D<std::array<std::array<Real64, (int)DataSurfaces::WinCover::Num>, (int)Lum::Num>> DaylFromWinAtRefPt; // (Number of Zones, 2, Total Daylighting Reference Points)
+
+
+            // Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>> IllumFromWinAtRefPt; // (Number of Zones, 2, Total Daylighting Reference Points)
+            // Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>>
+            //BackLumFromWinAtRefPt; // (Number of Zones, 2, Total Daylighting Reference Points)
+            // Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>>
+            // SourceLumFromWinAtRefPt; // (Number of Zones, 2, Total Daylighting Reference Points)
         Array1D<Real64> TimeExceedingGlareIndexSPAtRefPt;
         // Allocatable daylight factor arrays
         // Arguments (dimensions) for Dayl---Sky are:
@@ -208,9 +219,7 @@ namespace Dayltg {
         //  3: Reference point number (1 to Total Daylighting Reference Points)
         //  4: Sky type (1 to 4; 1 = clear, 2 = clear turbid, 3 = intermediate, 4 = overcast
         //  5: Daylit window number (1 to NumOfDayltgExtWins)
-        Array4D<Dayltg::Illums> DaylIllumFac;
-        Array4D<Dayltg::Illums> DaylSourceFac;
-        Array4D<Dayltg::Illums> DaylBackFac;
+        Array4D<std::array<Dayltg::Illums, (int)Lum::Num>> DaylFac;
             
         // Time exceeding daylight illuminance setpoint at reference points (hours)
         Array1D<Real64> TimeExceedingDaylightIlluminanceSPAtRefPt;
