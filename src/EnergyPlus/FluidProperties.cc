@@ -7046,7 +7046,7 @@ namespace FluidProperties {
         std::uint64_t const hash(T_tag & t_sh_cache_mask);
         auto &cTsh(state.dataFluidProps->cached_t_sh[hash]);
 
-        if (cTsh.iT != T_tag) {
+        if (true || cTsh.iT != T_tag) {
             cTsh.iT = T_tag;
             cTsh.sh = GetSpecificHeatGlycol_raw(state, Glycol, Temperature, GlycolIndex, CalledFrom);
         }
