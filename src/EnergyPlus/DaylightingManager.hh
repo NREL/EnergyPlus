@@ -326,11 +326,10 @@ namespace Dayltg {
 
     int findWinShadingStatus(int const IWin);
 
-    void DayltgGlare(EnergyPlusData &state,
-                     int IL,                   // Reference point index: 1=first ref pt, 2=second ref pt
-                     Real64 BLUM,              // Window background (surround) luminance (cd/m2)
-                     Real64 &GLINDX,           // Glare index
-                     int const daylightCtrlNum // Current daylighting control number
+    Real64 DayltgGlare(EnergyPlusData &state,
+                       int IL,                   // Reference point index: 1=first ref pt, 2=second ref pt
+                       Real64 BLUM,              // Window background (surround) luminance (cd/m2)
+                       int const daylightCtrlNum // Current daylighting control number
     );
 
     void DayltgGlareWithIntWins(EnergyPlusData &state,
@@ -338,8 +337,7 @@ namespace Dayltg {
     );
 
     void DayltgExtHorizIllum(EnergyPlusData &state,
-                             Illums &HISK, // Horizontal illuminance from sky for different sky types
-                             Real64 &HISU  // Horizontal illuminance from sun for unit beam normal
+                             Illums &HI // Horizontal illuminance from sky for different sky types
     );
 
     // Product of solar transmittances of exterior obstructions

@@ -253,13 +253,19 @@ namespace DElightManagerF {
                     ShowWarningError(state, format("Maximum of 100 Reference Points exceeded for daylighting zone using DElight ={}", znDayl.Name));
                     ShowWarningError(state, "  Only first 100 Reference Points included in DElight analysis");
                 }
-                znDayl.refPts.allocate(znDayl.TotalDaylRefPoints);
-                std::fill(znDayl.refPts.begin(), znDayl.refPts.end(), Dayltg::DaylRefPt());
+
+                // Should already be allocated
+                assert((int)znDayl.refPts.size() == znDayl.TotalDaylRefPoints);
+                for (auto &refPt : znDayl.refPts) {
+                    refPt.absCoords = {0.0, 0.0, 0.0};
+                    refPt.lums[(int)Lum::Illum] = 0.0;
+                    refPt.glareIndex = 0.0;
+                }                    
 
                 // RJH 2008-03-07: Allocate and Init DaylIllumAtRefPt array for this DElight zone
                 //znDayl.DaylIllumAtRefPt.allocate(znDayl.TotalDaylRefPoints);
                 //znDayl.DaylIllumAtRefPt = 0.0;
-                //e following not used in DElight but allocated for convenience
+                // The following not used in DElight but allocated for convenience
                 //znDayl.GlareIndexAtRefPt.allocate(znDayl.TotalDaylRefPoints);
                 //znDayl.GlareIndexAtRefPt = 0.0;
 

@@ -776,17 +776,18 @@ void DXFOut(EnergyPlusData &state,
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         const DataSurfaceColors::ColorNo curcolorno = DataSurfaceColors::ColorNo::DaylSensor1;
 
-        for (int mapnum = 1; mapnum <= (int)state.dataDayltg->IllumMap.size(); ++mapnum) {
-            if (state.dataDayltg->IllumMapCalc(mapnum).zoneIndex != zones) continue;
-            for (int refpt = 1; refpt <= state.dataDayltg->IllumMapCalc(mapnum).TotalMapRefPoints; ++refpt) {
-                print(dxffile, Format_710, format("{}:MapRefPt:{}", state.dataHeatBal->Zone(zones).Name, refpt));
+        int numRefPt = 0;
+        for (auto const &illumMapCalc : state.dataDayltg->IllumMapCalc) {
+            if (illumMapCalc.zoneIndex != zones) continue;
+            for (auto const &refPt : illumMapCalc.refPts) { 
+                print(dxffile, Format_710, format("{}:MapRefPt:{}", state.dataHeatBal->Zone(zones).Name, ++numRefPt));
                 print(dxffile,
                       Format_709,
                       normalizeName(state.dataHeatBal->Zone(zones).Name),
                       DXFcolorno[static_cast<int>(curcolorno)],
-                      state.dataDayltg->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).x,
-                      state.dataDayltg->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).y,
-                      state.dataDayltg->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).z,
+                      refPt.absCoords.x,
+                      refPt.absCoords.y,
+                      refPt.absCoords.z,
                       0.05);
             }
         }

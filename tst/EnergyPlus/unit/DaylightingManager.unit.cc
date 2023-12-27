@@ -3699,7 +3699,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgIlluminanceMap)
     auto &dl = state->dataDayltg;
     
     SimulationManager::ManageSimulation(*state);
-    EXPECT_EQ(100, dl->IllumMapCalc(1).DaylIllumAtMapPt.size());
+    EXPECT_EQ(100, dl->IllumMapCalc(1).refPts.size());
 
     // re-set the hour of the day to mid-day
     state->dataGlobal->TimeStep = 1;
@@ -3710,15 +3710,15 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgIlluminanceMap)
     state->dataWeather->Envrn = 1;
     Weather::ManageWeather(*state);
     HeatBalanceManager::ManageHeatBalance(*state);
-    EXPECT_NEAR(16051, dl->IllumMapCalc(1).DaylIllumAtMapPt(5), 1);
-    EXPECT_NEAR(203, dl->IllumMapCalc(1).DaylIllumAtMapPt(10), 1);
-    EXPECT_NEAR(1294, dl->IllumMapCalc(1).DaylIllumAtMapPt(15), 1);
-    EXPECT_NEAR(412, dl->IllumMapCalc(1).DaylIllumAtMapPt(20), 1);
-    EXPECT_NEAR(257, dl->IllumMapCalc(1).DaylIllumAtMapPt(51), 1);
-    EXPECT_NEAR(316, dl->IllumMapCalc(1).DaylIllumAtMapPt(55), 1);
-    EXPECT_NEAR(255, dl->IllumMapCalc(1).DaylIllumAtMapPt(60), 1);
-    EXPECT_NEAR(209, dl->IllumMapCalc(1).DaylIllumAtMapPt(91), 1);
-    EXPECT_NEAR(209, dl->IllumMapCalc(1).DaylIllumAtMapPt(100), 1);
+    EXPECT_NEAR(16051, dl->IllumMapCalc(1).refPts(5).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(203, dl->IllumMapCalc(1).refPts(10).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(1294, dl->IllumMapCalc(1).refPts(15).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(412, dl->IllumMapCalc(1).refPts(20).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(257, dl->IllumMapCalc(1).refPts(51).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(316, dl->IllumMapCalc(1).refPts(55).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(255, dl->IllumMapCalc(1).refPts(60).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(209, dl->IllumMapCalc(1).refPts(91).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(209, dl->IllumMapCalc(1).refPts(100).lums[(int)Lum::Illum], 1);
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_SteppedControl_LowDaylightConditions)
