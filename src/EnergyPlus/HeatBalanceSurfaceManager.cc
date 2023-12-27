@@ -3886,12 +3886,12 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                             Real64 EffBlEmiss; // Blind emissivity (thermal absorptance) as part of glazing system
                             if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                                 EffBlEmiss = General::Interp(
-                                    state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                                    state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(
-                                        std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                    state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[state.dataSurface->SurfWinSlatsAngIndex(SurfNum)],
+                                    state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[
+                                        std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)],
                                     state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                             } else {
-                                EffBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
+                                EffBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[1];
                             }
                             state.dataSurface->SurfWinIntLWAbsByShade(SurfNum) = state.dataViewFactor->EnclRadInfo(radEnclosureNum).radQThermalRad *
                                                                                  EffBlEmiss *
@@ -4118,8 +4118,8 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 DataSurfaces::WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
                 if (DataSurfaces::ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
-                    Real64 BlindEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
-                    Real64 GlassEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1);
+                    Real64 BlindEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[1];
+                    Real64 GlassEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[1];
                     state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum) = BlindEmiss + GlassEmiss;
                 } else {
                     int ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
@@ -4139,12 +4139,12 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
                     int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(SurfNum);
                     Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
                     BlindEmiss = General::Interp(
-                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(SurfWinSlatsAngIndex),
-                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[SurfWinSlatsAngIndex],
+                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)],
                         SurfWinSlatsAngInterpFac);
                     GlassEmiss = General::Interp(
-                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(SurfWinSlatsAngIndex),
-                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[SurfWinSlatsAngIndex],
+                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)],
                         SurfWinSlatsAngInterpFac);
                     state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum) = BlindEmiss + GlassEmiss;
                 }
@@ -4188,7 +4188,7 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
                         // Shade or blind IR transmittance
                         Real64 TauShIR = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatNumSh))->TransThermal;
                         // Effective emissivity of shade or blind
-                        Real64 EffShDevEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
+                        Real64 EffShDevEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[1];
                         if (ShadeFlag == DataSurfaces::WinShadingType::IntBlind) {
                             TauShIR = state.dataMaterial->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).IRBackTrans(1);
                             if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
@@ -4199,9 +4199,9 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
                                     state.dataMaterial->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum))
                                         .IRBackTrans(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                     SurfWinSlatsAngInterpFac);
-                                EffShDevEmiss = General::Interp(state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(SurfWinSlatsAngIndex),
-                                                                state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(
-                                                                    std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
+                                EffShDevEmiss = General::Interp(state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[SurfWinSlatsAngIndex],
+                                                                state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[
+                                                                    std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)],
                                                                 SurfWinSlatsAngInterpFac);
                             }
                         }
@@ -6350,12 +6350,12 @@ void ReportVisualResilience(EnergyPlusData &state)
             if (thisDaylightControl.PowerReductionFactor > 0) {
                 for (int refPt = 1; refPt <= thisDaylightControl.TotalDaylRefPoints; ++refPt) {
                     state.dataDayltg->ZoneDaylight(thisDaylightControl.zoneIndex).zoneAvgIllumSum +=
-                        thisDaylightControl.IllumSetPoint(refPt);
+                        thisDaylightControl.refPts(refPt).illumSetPoint;
                 }
             } else {
                 for (int refPt = 1; refPt <= thisDaylightControl.TotalDaylRefPoints; ++refPt) {
                     state.dataDayltg->ZoneDaylight(thisDaylightControl.zoneIndex).zoneAvgIllumSum +=
-                        thisDaylightControl.DaylIllumAtRefPt(refPt);
+                        thisDaylightControl.refPts(refPt).lums[(int)DataSurfaces::Lum::Illum];
                 }
             }
         }

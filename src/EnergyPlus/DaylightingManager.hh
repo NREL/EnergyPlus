@@ -334,7 +334,6 @@ namespace Dayltg {
     );
 
     void DayltgGlareWithIntWins(EnergyPlusData &state,
-                                Array1D<Real64> &GLINDX,  // Glare index
                                 int const daylightCtrlNum // Current daylighting control number
     );
 
@@ -552,11 +551,6 @@ struct DaylightingData : BaseGlobalStruct
     std::array<Real64, 2 * DataSurfaces::AzimAngStepsForSolReflCalc + 1> cos_Theta = {0.0}; // cos( Theta ) table
     std::array<Real64, 2 * DataSurfaces::AzimAngStepsForSolReflCalc + 1> sin_Theta = {0.0}; // sin( Theta ) table
 
-    // Dayltg::Illums WinLumSK;                                                           // Sky related window luminance
-    // Dayltg::Illums EDirSky;                                                            // Sky related direct illuminance
-
-    // Array1D<Real64> BACLUM;
-    // Array1D<Real64> DayltgInteriorMapIllumGLRNDX;
     std::array<Real64, Dayltg::NPH + 1> PH;     // Altitude of sky element (radians)
 
         // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
@@ -618,36 +612,12 @@ void clear_state() override
         this->sin_Phi = {0.0}; 
         this->cos_Theta = {0.0}; 
         this->sin_Theta = {0.0}; 
-
-        // this->IConstShaded = 0;
-        // this->VTDark = 0.0;
-        // this->VTMULT = 1.0;
-
-        // this->BACLUM.clear();
-        // this->DayltgInteriorMapIllumGLRNDX.clear();
-        // this->daylight_illum.clear();
-        // this->SetPnt.clear();
-        // this->GLRNDX.clear();
-        // this->GLRNEW.clear();
-        // this->tmpIllumFromWinAtRefPt.clear();
-        // this->tmpBackLumFromWinAtRefPt.clear();
-        // this->tmpSourceLumFromWinAtRefPt.clear();
         this->FirstTimeMaps.clear();
         this->EnvrnPrint.clear();
         this->SavedMnDy.clear();
         this->XValue.clear();
         this->YValue.clear();
         this->IllumValue.clear();
-        // this->DILLSW.clear();
-        // this->DILLUN.clear();
-        // this->previously_shaded.clear();
-        // this->WDAYIL.clear();
-        // this->WBACLU.clear();
-        // this->RDAYIL.clear();
-        // this->RBACLU.clear();
-        // this->TVIS1.clear();
-        // this->TVIS2.clear();
-        // this->ASETIL.clear();
     }
 };
 

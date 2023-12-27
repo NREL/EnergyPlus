@@ -65,6 +65,8 @@ namespace EnergyPlus {
 
 namespace Dayltg {
 
+    using DataSurfaces::Lum;
+        
     // Two kinds of reference points: used directly in daylighting, used to show illuminance map of zone
     constexpr int MaxMapRefPoints(2500); // Maximum number of Illuminance Map Ref Points
 
@@ -85,14 +87,6 @@ namespace Dayltg {
         Real64 sunDisk = 0.0;    
     };
 
-    enum class Lum {
-        Invalid = -1,
-        Illum,
-        Back,
-        Source,
-        Num
-    };
-        
     enum class ExtWinType
     {
         Invalid = -1,
@@ -165,6 +159,20 @@ namespace Dayltg {
         EPVector<int> daylightControlIndexes; // Indexes to daylighting:controls object operating in this enclosure
     };
 
+    struct DaylRefPt
+    {
+        int num = 0;
+        Vector3<Real64> absCoords = {0.0, 0.0, 0.0};
+        bool inBounds = true;
+        Real64 fracZoneDaylit = 0.0;
+        Real64 illumSetPoint = 0.0;
+        Real64 powerReductionFactor = 0.0;
+        Real64 timeExceedingGlareIndexSetPoint = 0.0;
+        Real64 timeExceedingDaylightIlluminanceSetPoint = 0.0;
+        std::array<Real64, (int)Lum::Num> lums = {0.0, 0.0, 0.0};
+        Real64 glareIndex = 0.0;
+    };
+        
     struct DaylightingControl
     {
         std::string Name;     // Name of the daylighting:controls object
@@ -176,14 +184,16 @@ namespace Dayltg {
         int AvailSchedNum = 0;                                              // pointer to availability schedule if present
         int TotalExtWindows = 0;
         int TotalDaylRefPoints = 0;                 // Number of daylighting reference points for this control
-        Array1D_int DaylRefPtNum;                   // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
-        Array1D<Vector3<Real64>> DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points
+
+        Array1D<DaylRefPt> refPts;
+        // Array1D_int DaylRefPtNum;                   // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
+        // Array1D<Vector3<Real64>> DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points
         // in absolute coordinate system (m)
         // Points 1 and 2 are the control reference points
-        Array1D_bool DaylRefPtInBounds;                         // True when coordinates are in bounds of zone coordinates
-        Array1D<Real64> FracZoneDaylit;                         // =0.0  ! Fraction of zone controlled by each reference point
+        // Array1D_bool DaylRefPtInBounds;                         // True when coordinates are in bounds of zone coordinates
+        // Array1D<Real64> FracZoneDaylit;                         // =0.0  ! Fraction of zone controlled by each reference point
         Real64 sumFracLights = 0.0;                             // Sum of lighting control fractions for this daylighting control
-        Array1D<Real64> IllumSetPoint;                          // =0.0  ! Illuminance setpoint at each reference point (lux)
+        //Array1D<Real64> IllumSetPoint;                          // =0.0  ! Illuminance setpoint at each reference point (lux)
         LtgCtrlType LightControlType = LtgCtrlType::Continuous; // Lighting control type (same for all reference points)
         // (1=continuous, 2=stepped, 3=continuous/off)
         int glareRefPtNumber = 0;                  // from field: Glare Calculation Daylighting Reference Point Name
@@ -195,11 +205,11 @@ namespace Dayltg {
         Real64 LightControlProbability = 0.0;      // For manual control of stepped systems, probability that lighting will
         Real64 PowerReductionFactor = 1.0;         // Electric power reduction factor for this control due to daylighting
         Real64 DElightGriddingResolution = 0.0;    // Field: Delight Gridding Resolution
-        Array1D<Real64> RefPtPowerReductionFactor; // =1.0  ! Electric power reduction factor at reference points
+        // Array1D<Real64> RefPtPowerReductionFactor; // =1.0  ! Electric power reduction factor at reference points
         // due to daylighting
-        Array1D<Real64> DaylIllumAtRefPt;   // =0.0 ! Daylight illuminance at reference points (lux)
-        Array1D<Real64> GlareIndexAtRefPt;  // =0.0 ! Glare index at reference points
-        Array1D<Real64> BacLum;             // =0.0 ! Background luminance at each reference point (cd/m2)
+        // Array1D<Real64> DaylIllumAtRefPt;   // =0.0 ! Daylight illuminance at reference points (lux)
+        // Array1D<Real64> GlareIndexAtRefPt;  // =0.0 ! Glare index at reference points
+        // Array1D<Real64> BacLum;             // =0.0 ! Background luminance at each reference point (cd/m2)
         Array2D<Real64> SolidAngAtRefPt;    // (Number of Zones, Total Daylighting Reference Points)
         Array2D<Real64> SolidAngAtRefPtWtd; // (Number of Zones, Total Daylighting Reference Points)
         Array2D<std::array<std::array<Real64, (int)DataSurfaces::WinCover::Num>, (int)Lum::Num>> DaylFromWinAtRefPt; // (Number of Zones, 2, Total Daylighting Reference Points)
@@ -210,7 +220,7 @@ namespace Dayltg {
             //BackLumFromWinAtRefPt; // (Number of Zones, 2, Total Daylighting Reference Points)
             // Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>>
             // SourceLumFromWinAtRefPt; // (Number of Zones, 2, Total Daylighting Reference Points)
-        Array1D<Real64> TimeExceedingGlareIndexSPAtRefPt;
+            // Array1D<Real64> TimeExceedingGlareIndexSPAtRefPt;
         // Allocatable daylight factor arrays
         // Arguments (dimensions) for Dayl---Sky are:
         //  1: Sun position index / HourOfDay (1 to 24)
@@ -222,7 +232,7 @@ namespace Dayltg {
         Array4D<std::array<Dayltg::Illums, (int)Lum::Num>> DaylFac;
             
         // Time exceeding daylight illuminance setpoint at reference points (hours)
-        Array1D<Real64> TimeExceedingDaylightIlluminanceSPAtRefPt;
+        // Array1D<Real64> TimeExceedingDaylightIlluminanceSPAtRefPt;
         std::vector<std::vector<int>> ShadeDeployOrderExtWins; // describes how the fenestration surfaces should deploy the shades.
         // It is a list of lists. Each sublist is a group of fenestration surfaces that should be deployed together. Many times the
         // sublists a just a single index to a fenestration surface if they are deployed one at a time.

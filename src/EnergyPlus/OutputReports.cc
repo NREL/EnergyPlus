@@ -429,19 +429,19 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
                 refPtType = "DayRefPt";
             }
 
-            for (int refpt = 1; refpt <= thisDaylightControl.TotalDaylRefPoints; ++refpt) {
+            for (auto const &refPt : thisDaylightControl.refPts) {
                 print<FormatSyntax::FMT>(of,
                                          "999\n{}:{}:{}\n",
                                          thisDaylightControl.ZoneName,
                                          refPtType,
-                                         state.dataDayltg->DaylRefPt(thisDaylightControl.DaylRefPtNum(refpt)).Name);
+                                         state.dataDayltg->DaylRefPt(refPt.num).Name);
                 print<check_syntax(Format_709)>(of,
                                                 Format_709,
                                                 normalizeName(thisDaylightControl.ZoneName),
                                                 state.dataSurfColor->DXFcolorno[static_cast<int>(curcolorno)],
-                                                thisDaylightControl.DaylRefPtAbsCoord(refpt).x,
-                                                thisDaylightControl.DaylRefPtAbsCoord(refpt).y,
-                                                thisDaylightControl.DaylRefPtAbsCoord(refpt).z,
+                                                refPt.absCoords.x,
+                                                refPt.absCoords.y,
+                                                refPt.absCoords.z,
                                                 0.2);
                 curcolorno = DataSurfaceColors::ColorNo::DaylSensor2; // ref pts 2 and later are this color
             }

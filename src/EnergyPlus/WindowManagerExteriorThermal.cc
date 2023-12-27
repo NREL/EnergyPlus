@@ -115,7 +115,7 @@ namespace WindowManager {
         }
 
         for (int k = 1; k <= 2 * totSolidLayers; ++k) {
-            Guess.push_back(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(k));
+            Guess.push_back(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace[k]);
         }
 
         try {
@@ -144,16 +144,16 @@ namespace WindowManager {
                 Real64 EffGlEmiss;
                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                     EffShBlEmiss =
-                        General::Interp(window.EffShBlindEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                                        window.EffShBlindEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                        General::Interp(window.EffShBlindEmiss[state.dataSurface->SurfWinSlatsAngIndex(SurfNum)],
+                                        window.EffShBlindEmiss[std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)],
                                         state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                     EffGlEmiss =
-                        General::Interp(window.EffGlassEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                                        window.EffGlassEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                        General::Interp(window.EffGlassEmiss[state.dataSurface->SurfWinSlatsAngIndex(SurfNum)],
+                                        window.EffGlassEmiss[std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)],
                                         state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                 } else {
-                    EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
-                    EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1);
+                    EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[1];
+                    EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[1];
                 }
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
                     (EffShBlEmiss * SurfInsideTemp +
@@ -204,10 +204,10 @@ namespace WindowManager {
             // Effective shade and glass emissivities that are used later for energy calculations.
             // This needs to be checked as well. (Simon)
             Real64 EffShBlEmiss = EpsShIR1 * (1.0 + RhoGlIR2 * TauShIR / (1.0 - RhoGlIR2 * RhoShIR2));
-            state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss = EffShBlEmiss;
+            std::fill(window.EffShBlindEmiss.begin(), window.EffShBlindEmiss.end(), EffShBlEmiss);
 
             Real64 EffGlEmiss = glassEmiss * TauShIR / (1.0 - RhoGlIR2 * RhoShIR2);
-            state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss = EffGlEmiss;
+            std::fill(window.EffGlassEmiss.begin(), window.EffGlassEmiss.end(), EffGlEmiss);
 
             Real64 glassTemperature = aGlassLayer->getSurface(FenestrationCommon::Side::Back)->getTemperature();
             state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
@@ -232,8 +232,7 @@ namespace WindowManager {
 
             state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
                 aLayers[totLayers - 1]->getTemperature(FenestrationCommon::Side::Back) - state.dataWindowManager->TKelvin;
-            state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss =
-                aLayers[totLayers - 1]->getSurface(FenestrationCommon::Side::Back)->getEmissivity();
+            std::fill(window.EffGlassEmiss.begin(), window.EffGlassEmiss.end(), aLayers[totLayers - 1]->getSurface(FenestrationCommon::Side::Back)->getEmissivity());
 
             state.dataSurface->SurfWinHeatGain(SurfNum) =
                 state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
@@ -247,8 +246,8 @@ namespace WindowManager {
         state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum);
 
         for (int k = 1; k <= surface.getTotLayers(state); ++k) {
-            state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas[2 * k - 2];
-            state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k) = state.dataWindowManager->thetas[2 * k - 1];
+            window.ThetaFace[2 * k - 1] = state.dataWindowManager->thetas[2 * k - 2];
+            window.ThetaFace[2 * k] = state.dataWindowManager->thetas[2 * k - 1];
 
             // temperatures for reporting
             state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = state.dataWindowManager->thetas[2 * k - 2] - Constant::Kelvin;

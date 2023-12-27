@@ -543,7 +543,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                               thisDayltgCtrl.Name,
                               state.dataViewFactor->EnclSolInfo(thisDayltgCtrl.enclIndex).Name,
                               state.dataSurface->Surface(windowSurfNum).Name,
-                              dl->DaylRefPt(thisDayltgCtrl.DaylRefPtNum(refPtNum)).Name,
+                              dl->DaylRefPt(thisDayltgCtrl.refPts(refPtNum).num).Name,
                               DaylFac);
                     } // for (refPtNum)
                 }     // for (iSky)
@@ -650,7 +650,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                             print(state.files.dfs,
                                   "{},{},{:.5R},{:.5R},{:.5R},{:.5R}\n",
                                   IHR,
-                                  dl->DaylRefPt(thisDayltgCtrl.DaylRefPtNum(refPtNum)).Name,
+                                  dl->DaylRefPt(thisDayltgCtrl.refPts(refPtNum).num).Name,
                                   illums.sky[(int)SkyType::Clear],
                                   illums.sky[(int)SkyType::ClearTurbid],
                                   illums.sky[(int)SkyType::Intermediate],
@@ -810,11 +810,15 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
     // View vector components in absolute coord sys
     VIEWVC = {std::sin(AZVIEW), std::cos(AZVIEW), 0.0};
 
-    thisDayltgCtrl.DaylIllumAtRefPt = 0.0;  // Daylight illuminance at reference points (lux)
-    thisDayltgCtrl.GlareIndexAtRefPt = 0.0; // Glare index at reference points
+    for (int iRefPt = 1; iRefPt <= thisDayltgCtrl.TotalDaylRefPoints; ++iRefPt) {
+        auto &refPt = thisDayltgCtrl.refPts(iRefPt);
+        refPt.lums[(int)Lum::Illum] = 0.0;  // Daylight illuminance at reference points (lux)
+        refPt.glareIndex = 0.0; // Glare index at reference points
+    }
+
     thisDayltgCtrl.SolidAngAtRefPt = 0.0;
     thisDayltgCtrl.SolidAngAtRefPtWtd = 0.0;
-
+    
     for (int iExtWin = 1; iExtWin <= thisDayltgCtrl.TotalExtWindows; ++iExtWin) {
         for (int iRefPt = 1; iRefPt <= thisDayltgCtrl.TotalDaylRefPoints; ++iRefPt) {
             thisDayltgCtrl.DaylFromWinAtRefPt(iExtWin, iRefPt)[(int)Lum::Illum] = {0.0, 0.0};
@@ -845,8 +849,9 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
     BRef = 0;
 
     for (int IL = 1; IL <= thisDayltgCtrl.TotalDaylRefPoints; ++IL) {
+        auto &refPt = thisDayltgCtrl.refPts(IL);
         // Reference point in absolute coordinate system
-        Vector3<Real64> RREF = thisDayltgCtrl.DaylRefPtAbsCoord(IL); // ( x, y, z )
+        Vector3<Real64> RREF = refPt.absCoords;
 
         //           -------------
         // ---------- WINDOW LOOP ----------
@@ -3768,12 +3773,12 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                 surfWin.SolidAngAtRefPt = 0.0;
                 surfWin.SolidAngAtRefPtWtd.allocate(numEnclRefPoints);
                 surfWin.SolidAngAtRefPtWtd = 0.0;
-                surfWin.IllumFromWinAtRefPt.allocate(numEnclRefPoints);
-                surfWin.IllumFromWinAtRefPt = {0.0, 0.0};
-                surfWin.BackLumFromWinAtRefPt.allocate(numEnclRefPoints);
-                surfWin.BackLumFromWinAtRefPt = {0.0, 0.0};
-                surfWin.SourceLumFromWinAtRefPt.allocate(numEnclRefPoints);
-                surfWin.SourceLumFromWinAtRefPt = {0.0, 0.0};
+                surfWin.DaylFromWinAtRefPt.allocate(numEnclRefPoints);
+                for (int i = 1; i <= numEnclRefPoints; ++i) {
+                    auto &dayl = surfWin.DaylFromWinAtRefPt(i);
+                    dayl[(int)Lum::Illum] = dayl[(int)Lum::Back] = dayl[(int)Lum::Source] = {0.0, 0.0};
+                }
+                                
                 surfWin.IllumFromWinAtRefPtRep.allocate(numEnclRefPoints);
                 surfWin.IllumFromWinAtRefPtRep = 0.0;
                 surfWin.LumWinFromRefPtRep.allocate(numEnclRefPoints);
@@ -3791,12 +3796,11 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                         surfWin.SolidAngAtRefPt = 0.0;
                         surfWin.SolidAngAtRefPtWtd.allocate(numAdjEnclRefPoints);
                         surfWin.SolidAngAtRefPtWtd = 0.0;
-                        surfWin.IllumFromWinAtRefPt.allocate(numAdjEnclRefPoints);
-                        surfWin.IllumFromWinAtRefPt = {0.0, 0.0};
-                        surfWin.BackLumFromWinAtRefPt.allocate(numAdjEnclRefPoints);
-                        surfWin.BackLumFromWinAtRefPt = {0.0, 0.0};
-                        surfWin.SourceLumFromWinAtRefPt.allocate(numAdjEnclRefPoints);
-                        surfWin.SourceLumFromWinAtRefPt = {0.0, 0.0};
+                        surfWin.DaylFromWinAtRefPt.allocate(numEnclRefPoints);
+                        for (int i = 1; i <= numEnclRefPoints; ++i) {
+                            auto &dayl = surfWin.DaylFromWinAtRefPt(i);
+                            dayl[(int)Lum::Illum] = dayl[(int)Lum::Back] = dayl[(int)Lum::Source] = {0.0, 0.0};
+                        }
                         surfWin.IllumFromWinAtRefPtRep.allocate(numAdjEnclRefPoints);
                         surfWin.IllumFromWinAtRefPtRep = 0.0;
                         surfWin.LumWinFromRefPtRep.allocate(numAdjEnclRefPoints);
@@ -3924,7 +3928,7 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                      auto const &control = dl->daylightControl(controlNum);
                      for (int refPtNum = 1; refPtNum <= control.TotalDaylRefPoints; ++refPtNum) {
                          ++refPtCount; // Count reference points across each daylighting control in the same enclosure
-                         std::string varKey = format("{} to {}", surf.Name, state.dataDayltg->DaylRefPt(control.DaylRefPtNum(refPtNum)).Name);
+                         std::string varKey = format("{} to {}", surf.Name, state.dataDayltg->DaylRefPt(control.refPts(refPtNum).num).Name);
                          SetupOutputVariable(state,
                                              "Daylighting Window Reference Point Illuminance",
                                              OutputProcessor::Unit::lux,
@@ -4646,38 +4650,38 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
                                      ipsc->cAlphaFieldNames(NumAlpha)));
             ErrorsFound = true;
         }
-        daylightControl.DaylRefPtNum.allocate(curTotalDaylRefPts);
-        daylightControl.FracZoneDaylit.allocate(curTotalDaylRefPts);
-        daylightControl.IllumSetPoint.allocate(curTotalDaylRefPts);
-        daylightControl.DaylIllumAtRefPt.allocate(curTotalDaylRefPts);
-        daylightControl.GlareIndexAtRefPt.allocate(curTotalDaylRefPts);
-        daylightControl.DaylRefPtAbsCoord.allocate(curTotalDaylRefPts);
-        daylightControl.DaylRefPtInBounds.allocate(curTotalDaylRefPts);
-        daylightControl.RefPtPowerReductionFactor.allocate(curTotalDaylRefPts);
-        daylightControl.BacLum.allocate(curTotalDaylRefPts);
-        daylightControl.TimeExceedingGlareIndexSPAtRefPt.allocate(curTotalDaylRefPts);
-        daylightControl.TimeExceedingDaylightIlluminanceSPAtRefPt.allocate(curTotalDaylRefPts);
+        daylightControl.refPts.allocate(curTotalDaylRefPts);
+        // daylightControl.FracZoneDaylit.allocate(curTotalDaylRefPts);
+        // daylightControl.IllumSetPoint.allocate(curTotalDaylRefPts);
+        // daylightControl.DaylIllumAtRefPt.allocate(curTotalDaylRefPts);
+        // daylightControl.GlareIndexAtRefPt.allocate(curTotalDaylRefPts);
+        // daylightControl.DaylRefPtAbsCoord.allocate(curTotalDaylRefPts);
+        // daylightControl.DaylRefPtInBounds.allocate(curTotalDaylRefPts);
+        // daylightControl.RefPtPowerReductionFactor.allocate(curTotalDaylRefPts);
+        // daylightControl.BacLum.allocate(curTotalDaylRefPts);
+        // daylightControl.TimeExceedingGlareIndexSPAtRefPt.allocate(curTotalDaylRefPts);
+        // daylightControl.TimeExceedingDaylightIlluminanceSPAtRefPt.allocate(curTotalDaylRefPts);
 
         for (int refPt = 1; refPt <= curTotalDaylRefPts; ++refPt) {
-            daylightControl.DaylRefPtNum(refPt) = 0;
-            daylightControl.FracZoneDaylit(refPt) = 0.0;
-            daylightControl.IllumSetPoint(refPt) = 0.0;
-            daylightControl.DaylIllumAtRefPt(refPt) = 0.0;
-            daylightControl.GlareIndexAtRefPt(refPt) = 0.0;
-            daylightControl.DaylRefPtInBounds(refPt) = true;
-            daylightControl.RefPtPowerReductionFactor(refPt) = 1.0;
-            daylightControl.BacLum(refPt) = 0.0;
-            daylightControl.TimeExceedingGlareIndexSPAtRefPt(refPt) = 0.0;
-            daylightControl.TimeExceedingDaylightIlluminanceSPAtRefPt(refPt) = 0.0;
-            daylightControl.DaylRefPtAbsCoord(refPt) = {0.0, 0.0, 0.0};
+            daylightControl.refPts(refPt) = DaylRefPt();
+            // daylightControl.FracZoneDaylit(refPt) = 0.0;
+            // daylightControl.IllumSetPoint(refPt) = 0.0;
+            // daylightControl.DaylIllumAtRefPt(refPt) = 0.0;
+            // daylightControl.GlareIndexAtRefPt(refPt) = 0.0;
+            //daylightControl.DaylRefPtInBounds(refPt) = true;
+            //daylightControl.RefPtPowerReductionFactor(refPt) = 1.0;
+            //daylightControl.BacLum(refPt) = 0.0;
+            //daylightControl.TimeExceedingGlareIndexSPAtRefPt(refPt) = 0.0;
+            //daylightControl.TimeExceedingDaylightIlluminanceSPAtRefPt(refPt) = 0.0;
+            //daylightControl.DaylRefPtAbsCoord(refPt) = {0.0, 0.0, 0.0};
         }
 
         int countRefPts = 0;
         for (int refPtNum = 1; refPtNum <= curTotalDaylRefPts; ++refPtNum) {
-            daylightControl.DaylRefPtNum(refPtNum) = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(6 + refPtNum),
-                                                                          dl->DaylRefPt,
-                                                                          &RefPointData::Name); // Field: Daylighting Reference Point Name
-            if (daylightControl.DaylRefPtNum(refPtNum) == 0) {
+            daylightControl.refPts(refPtNum).num = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(6 + refPtNum),
+                                                                        dl->DaylRefPt,
+                                                                        &RefPointData::Name); // Field: Daylighting Reference Point Name
+            if (daylightControl.refPts(refPtNum).num == 0) {
                 ShowSevereError(state,
                                 format("{}: invalid {}=\"{}\" for object named: {}",
                                        ipsc->cCurrentModuleObject,
@@ -4689,35 +4693,35 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             } else {
                 ++countRefPts;
             }
-            daylightControl.FracZoneDaylit(refPtNum) = ipsc->rNumericArgs(6 + refPtNum * 2); // Field: Fraction Controlled by Reference Point
-            daylightControl.IllumSetPoint(refPtNum) = ipsc->rNumericArgs(7 + refPtNum * 2);  // Field: Illuminance Setpoint at Reference Point
+            daylightControl.refPts(refPtNum).fracZoneDaylit = ipsc->rNumericArgs(6 + refPtNum * 2); // Field: Fraction Controlled by Reference Point
+            daylightControl.refPts(refPtNum).illumSetPoint = ipsc->rNumericArgs(7 + refPtNum * 2);  // Field: Illuminance Setpoint at Reference Point
 
             if (daylightControl.DaylightMethod == DaylightingMethod::SplitFlux) {
                 SetupOutputVariable(state,
                                     format("Daylighting Reference Point {} Illuminance", refPtNum),
                                     OutputProcessor::Unit::lux,
-                                    daylightControl.DaylIllumAtRefPt(refPtNum),
+                                    daylightControl.refPts(refPtNum).lums[(int)Lum::Illum],
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     daylightControl.Name);
                 SetupOutputVariable(state,
                                     format("Daylighting Reference Point {} Daylight Illuminance Setpoint Exceeded Time", refPtNum),
                                     OutputProcessor::Unit::hr,
-                                    daylightControl.TimeExceedingDaylightIlluminanceSPAtRefPt(refPtNum),
+                                    daylightControl.refPts(refPtNum).timeExceedingDaylightIlluminanceSetPoint,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Summed,
                                     daylightControl.Name);
                 SetupOutputVariable(state,
                                     format("Daylighting Reference Point {} Glare Index", refPtNum),
                                     OutputProcessor::Unit::None,
-                                    daylightControl.GlareIndexAtRefPt(refPtNum),
+                                    daylightControl.refPts(refPtNum).glareIndex,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     daylightControl.Name);
                 SetupOutputVariable(state,
                                     format("Daylighting Reference Point {} Glare Index Setpoint Exceeded Time", refPtNum),
                                     OutputProcessor::Unit::hr,
-                                    daylightControl.TimeExceedingGlareIndexSPAtRefPt(refPtNum),
+                                    daylightControl.refPts(refPtNum).timeExceedingGlareIndexSetPoint,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Summed,
                                     daylightControl.Name);
@@ -4730,7 +4734,10 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             ErrorsFound = true;
         }
 
-        Real64 sumFracs = sum(daylightControl.FracZoneDaylit);
+        Real64 sumFracs = 0.0;
+        for (auto const &refPt : daylightControl.refPts)
+            sumFracs += refPt.fracZoneDaylit;
+        
         daylightControl.sumFracLights = sumFracs;
         if ((1.0 - sumFracs) > FractionTolerance) {
             ShowWarningError(state, "GetDaylightingControls: Fraction of zone or space controlled by the Daylighting reference points is < 1.0.");
@@ -4738,14 +4745,14 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
                               format("..discovered in {}=\"{}\", only {:.3R} of the zone or space is controlled.",
                                      ipsc->cCurrentModuleObject,
                                      daylightControl.Name,
-                                     sum(daylightControl.FracZoneDaylit)));
+                                     sumFracs));
         } else if ((sumFracs - 1.0) > FractionTolerance) {
             ShowSevereError(state, "GetDaylightingControls: Fraction of zone or space controlled by the Daylighting reference points is > 1.0.");
             ShowContinueError(state,
                               format("..discovered in {}=\"{}\", trying to control {:.3R} of the zone or space.",
                                      ipsc->cCurrentModuleObject,
                                      daylightControl.Name,
-                                     sum(daylightControl.FracZoneDaylit)));
+                                     sumFracs));
             ErrorsFound = true;
         }
 
@@ -4816,24 +4823,25 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
         InternalHeatGains::CheckLightsReplaceableMinMaxForZone(state, daylCntrl.zoneIndex);
 
         for (int refPtNum = 1; refPtNum <= daylCntrl.TotalDaylRefPoints; ++refPtNum) {
-            auto &curRefPt(dl->DaylRefPt(daylCntrl.DaylRefPtNum(refPtNum))); // get the active daylighting:referencepoint
+            auto &refPt = daylCntrl.refPts(refPtNum);
+            auto &curRefPt = dl->DaylRefPt(refPt.num); // get the active daylighting:referencepoint
             curRefPt.indexToFracAndIllum = refPtNum; // back reference to the index to the ZoneDaylight structure arrays related to reference points
             if (state.dataSurface->DaylRefWorldCoordSystem) {
                 // transform only by appendix G rotation
-                daylCntrl.DaylRefPtAbsCoord(refPtNum).x = curRefPt.x * CosBldgRotAppGonly - curRefPt.y * SinBldgRotAppGonly;
-                daylCntrl.DaylRefPtAbsCoord(refPtNum).y = curRefPt.x * SinBldgRotAppGonly + curRefPt.y * CosBldgRotAppGonly;
-                daylCntrl.DaylRefPtAbsCoord(refPtNum).z = curRefPt.z;
+                refPt.absCoords.x = curRefPt.x * CosBldgRotAppGonly - curRefPt.y * SinBldgRotAppGonly;
+                refPt.absCoords.y = curRefPt.x * SinBldgRotAppGonly + curRefPt.y * CosBldgRotAppGonly;
+                refPt.absCoords.z = curRefPt.z;
             } else {
                 // Transform reference point coordinates into building coordinate system
                 Xb = curRefPt.x * CosZoneRelNorth - curRefPt.y * SinZoneRelNorth + zone.OriginX;
                 Yb = curRefPt.x * SinZoneRelNorth + curRefPt.y * CosZoneRelNorth + zone.OriginY;
                 // Transform into World Coordinate System
-                daylCntrl.DaylRefPtAbsCoord(refPtNum).x = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
-                daylCntrl.DaylRefPtAbsCoord(refPtNum).y = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
-                daylCntrl.DaylRefPtAbsCoord(refPtNum).z = curRefPt.z + zone.OriginZ;
+                refPt.absCoords.x = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
+                refPt.absCoords.y = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
+                refPt.absCoords.z = curRefPt.z + zone.OriginZ;
                 if (doTransform) {
-                    Xo = daylCntrl.DaylRefPtAbsCoord(refPtNum).x; // world coordinates.... shifted by relative north angle...
-                    Yo = daylCntrl.DaylRefPtAbsCoord(refPtNum).y;
+                    Xo = refPt.absCoords.x; // world coordinates.... shifted by relative north angle...
+                    Yo = refPt.absCoords.y;
                     // next derotate the building
                     XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
                     YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
@@ -4841,91 +4849,73 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
                     Xtrans = XnoRot * std::sqrt(NewAspectRatio / OldAspectRatio);
                     Ytrans = YnoRot * std::sqrt(OldAspectRatio / NewAspectRatio);
                     // rerotate
-                    daylCntrl.DaylRefPtAbsCoord(refPtNum).x = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
-                    daylCntrl.DaylRefPtAbsCoord(refPtNum).y = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
+                    refPt.absCoords.x = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
+                    refPt.absCoords.y = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
                 }
             }
             refName = curRefPt.Name;
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtZone, refName, daylCntrl.ZoneName);
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlName, refName, daylCntrl.Name);
+
+            auto &orp = state.dataOutRptPredefined;
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtZone, refName, daylCntrl.ZoneName);
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtCtrlName, refName, daylCntrl.Name);
             if (daylCntrl.DaylightMethod == DaylightingMethod::SplitFlux) {
-                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtKind, refName, "SplitFlux");
+                OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtKind, refName, "SplitFlux");
             } else {
-                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtKind, refName, "DElight");
+                OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtKind, refName, "DElight");
             }
             // ( 1=continuous, 2=stepped, 3=continuous/off )
             if (daylCntrl.LightControlType == LtgCtrlType::Continuous) {
-                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous");
+                OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtCtrlType, refName, "Continuous");
             } else if (daylCntrl.LightControlType == LtgCtrlType::Stepped) {
-                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Stepped");
+                OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtCtrlType, refName, "Stepped");
             } else if (daylCntrl.LightControlType == LtgCtrlType::ContinuousOff) {
-                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous/Off");
+                OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtCtrlType, refName, "Continuous/Off");
             }
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtFrac, refName, daylCntrl.FracZoneDaylit(refPtNum));
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtWInst, refName, rLightLevel);
-            OutputReportPredefined::PreDefTableEntry(
-                state, state.dataOutRptPredefined->pdchDyLtWCtrl, refName, rLightLevel * daylCntrl.FracZoneDaylit(refPtNum));
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtFrac, refName, refPt.fracZoneDaylit);
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtWInst, refName, rLightLevel);
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtWCtrl, refName, rLightLevel * refPt.fracZoneDaylit);
 
-            if (daylCntrl.DaylRefPtAbsCoord(refPtNum).x < zone.MinimumX || daylCntrl.DaylRefPtAbsCoord(refPtNum).x > zone.MaximumX) {
-                daylCntrl.DaylRefPtInBounds(refPtNum) = false;
+            if (refPt.absCoords.x < zone.MinimumX || refPt.absCoords.x > zone.MaximumX) {
+                refPt.inBounds = false;
                 ShowWarningError(state,
                                  format("GeometryTransformForDaylighting: Reference point X Value outside Zone Min/Max X, Zone={}", zone.Name));
                 ShowContinueError(state,
                                   format("...X Reference Point= {:.2R}, Zone Minimum X= {:.2R}, Zone Maximum X= {:.2R}",
-                                         daylCntrl.DaylRefPtAbsCoord(refPtNum).x,
+                                         refPt.absCoords.x,
                                          zone.MinimumX,
                                          zone.MaximumX));
-                if (daylCntrl.DaylRefPtAbsCoord(refPtNum).x < zone.MinimumX) {
-                    ShowContinueError(
-                        state,
-                        format("...X Reference Distance Outside MinimumX= {:.4R} m.", zone.MinimumX - daylCntrl.DaylRefPtAbsCoord(refPtNum).x));
-                } else {
-                    ShowContinueError(
-                        state,
-                        format("...X Reference Distance Outside MaximumX= {:.4R} m.", daylCntrl.DaylRefPtAbsCoord(refPtNum).x - zone.MaximumX));
-                }
+                ShowContinueError(state,
+                                  format("...X Reference Distance Outside MinimumX= {:.4R} m.",
+                                         (refPt.absCoords.x < zone.MinimumX) ? (zone.MinimumX - refPt.absCoords.x) : (refPt.absCoords.x - zone.MaximumX)));
             }
-            if (daylCntrl.DaylRefPtAbsCoord(refPtNum).y < zone.MinimumY || daylCntrl.DaylRefPtAbsCoord(refPtNum).y > zone.MaximumY) {
-                daylCntrl.DaylRefPtInBounds(refPtNum) = false;
-                ShowWarningError(state,
-                                 format("GeometryTransformForDaylighting: Reference point Y Value outside Zone Min/Max Y, Zone={}", zone.Name));
+            if (refPt.absCoords.y < zone.MinimumY || refPt.absCoords.y > zone.MaximumY) {
+                refPt.inBounds = false;
+                ShowWarningError(state, format("GeometryTransformForDaylighting: Reference point Y Value outside Zone Min/Max Y, Zone={}", zone.Name));
                 ShowContinueError(state,
                                   format("...Y Reference Point= {:.2R}, Zone Minimum Y= {:.2R}, Zone Maximum Y= {:.2R}",
-                                         daylCntrl.DaylRefPtAbsCoord(refPtNum).x,
+                                         refPt.absCoords.x,
                                          zone.MinimumY,
                                          zone.MaximumY));
-                if (daylCntrl.DaylRefPtAbsCoord(refPtNum).y < zone.MinimumY) {
-                    ShowContinueError(
-                        state,
-                        format("...Y Reference Distance Outside MinimumY= {:.4R} m.", zone.MinimumY - daylCntrl.DaylRefPtAbsCoord(refPtNum).y));
-                } else {
-                    ShowContinueError(
-                        state,
-                        format("...Y Reference Distance Outside MaximumY= {:.4R} m.", daylCntrl.DaylRefPtAbsCoord(refPtNum).y - zone.MaximumY));
-                }
+                ShowContinueError(state,
+                                  format("...Y Reference Distance Outside MinimumY= {:.4R} m.",
+                                         (refPt.absCoords.y < zone.MinimumY) ? (zone.MinimumY - refPt.absCoords.y) : (refPt.absCoords.y - zone.MaximumY)));
             }
-            if (daylCntrl.DaylRefPtAbsCoord(refPtNum).z < zone.MinimumZ || daylCntrl.DaylRefPtAbsCoord(refPtNum).z > zone.MaximumZ) {
-                daylCntrl.DaylRefPtInBounds(refPtNum) = false;
+            if (refPt.absCoords.z < zone.MinimumZ || refPt.absCoords.z > zone.MaximumZ) {
+                refPt.inBounds = false;
                 ShowWarningError(state,
                                  format("GeometryTransformForDaylighting: Reference point Z Value outside Zone Min/Max Z, Zone={}", zone.Name));
                 ShowContinueError(state,
                                   format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}",
-                                         daylCntrl.DaylRefPtAbsCoord(refPtNum).z,
+                                         refPt.absCoords.z,
                                          zone.MinimumZ,
                                          zone.MaximumZ));
-                if (daylCntrl.DaylRefPtAbsCoord(refPtNum).z < zone.MinimumZ) {
-                    ShowContinueError(
-                        state,
-                        format("...Z Reference Distance Outside MinimumZ= {:.4R} m.", zone.MinimumZ - daylCntrl.DaylRefPtAbsCoord(refPtNum).z));
-                } else {
-                    ShowContinueError(
-                        state,
-                        format("...Z Reference Distance Outside MaximumZ= {:.4R} m.", daylCntrl.DaylRefPtAbsCoord(refPtNum).z - zone.MaximumZ));
-                }
+                ShowContinueError(state,
+                                  format("...Z Reference Distance Outside MinimumZ= {:.4R} m.",
+                                         (refPt.absCoords.z < zone.MinimumZ) ? (zone.MinimumZ - refPt.absCoords.z) : (refPt.absCoords.z - zone.MaximumZ)));
             }
         } // for (refPtNum) reference point
-    }     // for (controlNum) daylighting control
-}
+    } // for (controlNum) daylighting control
+} // GeometryTransformForDaylighting()
 
 void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
 {
@@ -5235,7 +5225,6 @@ void DayltgGlare(EnergyPlusData &state,
 }
 
 void DayltgGlareWithIntWins(EnergyPlusData &state,
-                            Array1D<Real64> &GLINDX,  // Glare index
                             int const daylightCtrlNum // Current daylighting control number
 )
 {
@@ -5255,7 +5244,7 @@ void DayltgGlareWithIntWins(EnergyPlusData &state,
     // REFERENCES:
     // Based on subroutine DayltgGlare.
 
-    Real64 GTOT = 0.0; // Glare constant(?)
+    Real64 GTOT = 0.0; // Glare constant(?) // TODO: does this need to be reset for every refPt?
 
     // Calculate background luminance including effect of inter-reflected illuminance from light
     // entering zone through its interior windows
@@ -5264,9 +5253,10 @@ void DayltgGlareWithIntWins(EnergyPlusData &state,
     auto &thisEnclDaylight = dl->enclDaylight(thisDayltgCtrl.enclIndex);
     int RefPoints = thisDayltgCtrl.TotalDaylRefPoints; // Number of daylighting reference points in zone
     for (int IL = 1; IL <= RefPoints; ++IL) {
-        Real64 BackgroundLum =
-            thisDayltgCtrl.BacLum(IL) + thisEnclDaylight.InterReflIllFrIntWins * thisEnclDaylight.aveVisDiffReflect / Constant::Pi;
-        BackgroundLum = max(thisDayltgCtrl.IllumSetPoint(IL) * thisEnclDaylight.aveVisDiffReflect / Constant::Pi, BackgroundLum);
+        auto &refPt = thisDayltgCtrl.refPts(IL);
+            
+        Real64 BackgroundLum = refPt.lums[(int)Lum::Back] + thisEnclDaylight.InterReflIllFrIntWins * thisEnclDaylight.aveVisDiffReflect / Constant::Pi;
+        BackgroundLum = max(refPt.illumSetPoint * thisEnclDaylight.aveVisDiffReflect / Constant::Pi, BackgroundLum);
 
         // Loop over exterior windows associated with zone
         for (int loop = 1; loop <= thisEnclDaylight.NumOfDayltgExtWins; ++loop) {
@@ -5282,11 +5272,9 @@ void DayltgGlareWithIntWins(EnergyPlusData &state,
         }
 
         // Glare index
-        GLINDX(IL) = 10.0 * std::log10(GTOT + 0.000001);
-        // Set glare index to zero for GTOT < 1
-        GLINDX(IL) = max(0.0, GLINDX(IL));
-    }
-}
+        refPt.glareIndex = max(0.0, 10.0 * std::log10(GTOT + 0.000001));
+    } // for (IL)
+} // DaylGlareWithIntWins()
 
 void DayltgExtHorizIllum(EnergyPlusData &state,
                          Illums &HISK, // Horizontal illuminance from sky for different sky types
@@ -5657,13 +5645,13 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
         thisDayltgCtrl.PowerReductionFactor = 1.0;
         if (state.dataEnvrn->PreviousSolRadPositive) {
             // Reset to zero only if there was solar in the previous timestep, otherwise these are already zero
-            thisDayltgCtrl.DaylIllumAtRefPt = 0.0;
-            thisDayltgCtrl.GlareIndexAtRefPt = 0.0;
-            dl->enclDaylight(thisDayltgCtrl.enclIndex).InterReflIllFrIntWins =
-                0.0; // inter-reflected illuminance from interior windows
+            dl->enclDaylight(thisDayltgCtrl.enclIndex).InterReflIllFrIntWins = 0.0; // inter-reflected illuminance from interior windows
             for (int refPtNum = 1; refPtNum <= thisDayltgCtrl.TotalDaylRefPoints; ++refPtNum) {
-                thisDayltgCtrl.TimeExceedingGlareIndexSPAtRefPt(refPtNum) = 0.0;
-                thisDayltgCtrl.TimeExceedingDaylightIlluminanceSPAtRefPt(refPtNum) = 0.0;
+                auto &refPt = thisDayltgCtrl.refPts(refPtNum);
+                refPt.lums[(int)Lum::Illum] = 0.0;
+                refPt.glareIndex = 0.0;
+                refPt.timeExceedingGlareIndexSetPoint = 0.0;
+                refPt.timeExceedingDaylightIlluminanceSetPoint = 0.0;
             }
         }
 
@@ -5814,7 +5802,7 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
                     ++iDElightRefPt;
                     // Assure refpt index does not exceed number of refpts in this zone
                     if (iDElightRefPt <= thisDayltgCtrl.TotalDaylRefPoints) {
-                        thisDayltgCtrl.DaylIllumAtRefPt(iDElightRefPt) = dRefPtIllum;
+                        thisDayltgCtrl.refPts(iDElightRefPt).lums[(int)Lum::Illum] = dRefPtIllum;
                     }
                 }
 
@@ -5855,14 +5843,13 @@ void manageDaylighting(EnergyPlusData &state)
 
     if (state.dataEnvrn->SunIsUp && (state.dataEnvrn->BeamSolarRad + state.dataEnvrn->GndSolarRad + state.dataEnvrn->DifSolarRad > 0.0)) {
         for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
-            if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints > 0) {
-                if (state.dataViewFactor->EnclSolInfo(enclNum).HasInterZoneWindow) {
-                    DayltgInterReflIllFrIntWins(state, enclNum);
-                    for (int daylightCtrlNum : dl->enclDaylight(enclNum).daylightControlIndexes) {
-                        auto &thisDayltgCtrl = dl->daylightControl(daylightCtrlNum);
-                        DayltgGlareWithIntWins(state, thisDayltgCtrl.GlareIndexAtRefPt, daylightCtrlNum);
-                    }
-                }
+            auto &enclSol = state.dataViewFactor->EnclSolInfo(enclNum);
+            if (enclSol.TotalEnclosureDaylRefPoints == 0 || !enclSol.HasInterZoneWindow)
+                continue;
+            
+            DayltgInterReflIllFrIntWins(state, enclNum);
+            for (int daylightCtrlNum : dl->enclDaylight(enclNum).daylightControlIndexes) {
+                DayltgGlareWithIntWins(state, daylightCtrlNum);
             }
         }
         DayltgElecLightingControl(state);
@@ -5872,7 +5859,7 @@ void manageDaylighting(EnergyPlusData &state)
         }
         dl->mapResultsToReport = false;
     }
-}
+} // manageDaylighting()
 
 void DayltgInteriorIllum(EnergyPlusData &state,
                          int const daylightCtrlNum) // Daylighting:Controls number
@@ -5959,6 +5946,11 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
     NREFPT = thisDayltgCtrl.TotalDaylRefPoints;
 
+    if (dl->DayltgInteriorIllum_firstTime) {
+        dl->DaylIllum.allocate(dl->maxNumRefPtInAnyDaylCtrl);
+        dl->DayltgInteriorIllum_firstTime = false;
+    }
+
     // size these for the maximum of the shade deployment order
     DILLSW.allocate(dl->maxShadeDeployOrderExtWins);
     DILLUN.allocate(dl->maxShadeDeployOrderExtWins);
@@ -5990,9 +5982,10 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
     // Initialize reference point illuminance and window background luminance
     for (int IL = 1; IL <= NREFPT; ++IL) {
-        SetPnt(IL) = thisDayltgCtrl.IllumSetPoint(IL);
+        auto &refPt = thisDayltgCtrl.refPts(IL);
+        SetPnt(IL) = refPt.illumSetPoint;
         dl->DaylIllum(IL) = 0.0;
-        thisDayltgCtrl.BacLum(IL) = 0.0;
+        refPt.lums[(int)Lum::Back] = 0.0;
     }
 
     if (state.dataEnvrn->SkyClearness > 3.0) { // Sky is average of clear and clear turbid
@@ -6264,7 +6257,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
         for (int IL = 1; IL <= NREFPT; ++IL) {
             auto const &daylFromWinAtRefPt = thisDayltgCtrl.DaylFromWinAtRefPt(loop, IL); 
             dl->DaylIllum(IL) += daylFromWinAtRefPt[(int)Lum::Illum][IS - 1];
-            thisDayltgCtrl.BacLum(IL) += daylFromWinAtRefPt[(int)Lum::Back][IS - 1];
+            thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] += daylFromWinAtRefPt[(int)Lum::Back][IS - 1];
         }
     } // End of second window loop over exterior windows associated with this zone
 
@@ -6396,7 +6389,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                         
                         VTRAT = state.dataSurface->SurfWinVisTransSelected(IWin) / (thisTVIS1 + 0.000001);
                         dl->DaylIllum(IL) += (VTRAT - 1.0) * daylFromWinAtRefPt[(int)Lum::Illum][IS - 1];
-                        thisDayltgCtrl.BacLum(IL) += (VTRAT - 1.0) * daylFromWinAtRefPt[(int)Lum::Back][IS - 1];
+                        thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] += (VTRAT - 1.0) * daylFromWinAtRefPt[(int)Lum::Back][IS - 1];
                         
                         // Adjust illum, background illum and source luminance for this window in intermediate switched state
                         //  for later use in the DayltgGlare calc because SurfaceWindow(IWin)%ShadingFlag = WinShadingType::SwitchableGlazing = 2
@@ -6451,7 +6444,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                 for (int IL = 1; IL <= NREFPT; ++IL) {
                     dl->DaylIllum(IL) += daylFromWinAtRefPt[(int)Lum::Illum][(int)WinCover::Shaded] -
                             daylFromWinAtRefPt[(int)Lum::Illum][(int)WinCover::Bare];
-                    thisDayltgCtrl.BacLum(IL) += daylFromWinAtRefPt[(int)Lum::Back][(int)WinCover::Shaded] -
+                    thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] += daylFromWinAtRefPt[(int)Lum::Back][(int)WinCover::Shaded] -
                             daylFromWinAtRefPt[(int)Lum::Back][(int)WinCover::Bare];
                 }
             } else {
@@ -6464,7 +6457,8 @@ void DayltgInteriorIllum(EnergyPlusData &state,
     // Calculate glare index at each reference point assuming the daylight illuminance setpoint is
     //  met at both reference points, either by daylight or electric lights
     for (int IL = 1; IL <= NREFPT; ++IL) {
-        BACL = max(SetPnt(IL) * dl->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi, thisDayltgCtrl.BacLum(IL));
+        auto &refPt = thisDayltgCtrl.refPts(IL);
+        BACL = max(SetPnt(IL) * dl->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi, refPt.lums[(int)Lum::Back]);
         // DayltgGlare uses ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,1,loop) for unshaded windows, and
         //  ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) for shaded windows
         DayltgGlare(state, IL, BACL, GLRNDX(IL), daylightCtrlNum);
@@ -6541,14 +6535,14 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                             RDAYIL(IL, igroup) =
                                 dl->DaylIllum(IL) - WDAYIL(IL, igroup)[(int)WinCover::Bare] + WDAYIL(IL, igroup)[(int)WinCover::Shaded];
                             RBACLU(IL, igroup) =
-                                thisDayltgCtrl.BacLum(IL) - WBACLU(IL, igroup)[(int)WinCover::Bare] +
+                                    thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] - WBACLU(IL, igroup)[(int)WinCover::Bare] +
                                 WBACLU(IL, igroup)[(int)WinCover::Shaded];
                         } else {
                             // switchable glazings already in partially switched state when calc the RDAYIL(IL) & RBACLU(IL)
                                 auto &tmpDayl = tmpDaylFromWinAtRefPt(loop, IL);
                             RDAYIL(IL, igroup) =
                                 dl->DaylIllum(IL) - WDAYIL(IL, igroup)[(int)WinCover::Shaded] + tmpDayl[(int)Lum::Illum][(int)WinCover::Shaded];
-                            RBACLU(IL, igroup) = thisDayltgCtrl.BacLum(IL) - WBACLU(IL, igroup)[(int)WinCover::Shaded] + tmpDayl[(int)Lum::Back][(int)WinCover::Shaded];
+                            RBACLU(IL, igroup) = thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] - WBACLU(IL, igroup)[(int)WinCover::Shaded] + tmpDayl[(int)Lum::Back][(int)WinCover::Shaded];
                         }
                     } // for (IL)
 
@@ -6683,7 +6677,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                     // Reset background luminance, glare index, and daylight illuminance at each ref pt.
                     // For switchable glazings, this is fully switched, dark state
                     for (int IL = 1; IL <= NREFPT; ++IL) {
-                        thisDayltgCtrl.BacLum(IL) = RBACLU(IL, igroup);
+                        thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] = RBACLU(IL, igroup);
                         GLRNDX(IL) = GLRNEW(IL);
                         dl->DaylIllum(IL) = RDAYIL(IL, igroup);
                     }
@@ -6745,7 +6739,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                                         dl->DaylIllum(IL) +
                                         (WDAYIL(IL, igroup)[(int)WinCover::Bare] - WDAYIL(IL, igroup)[(int)WinCover::Shaded]) * (1.0 - tmpSWFactor);
                                     RBACLU(IL, igroup) =
-                                        thisDayltgCtrl.BacLum(IL) +
+                                        thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] +
                                         (WBACLU(IL, igroup)[(int)WinCover::Bare] - WBACLU(IL, igroup)[(int)WinCover::Shaded]) * (1.0 - tmpSWFactor);
                                     BACL = max(SetPnt(IL) * dl->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi, RBACLU(IL, igroup));
                                         // needs to update SourceLumFromWinAtRefPt(IL,2,loop) before re-calc DayltgGlare
@@ -6788,7 +6782,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                                 for (int IL = 1; IL <= NREFPT; ++IL) {
                                     RDAYIL(IL, igroup) = dl->DaylIllum(IL) +
                                         (WDAYIL(IL, igroup)[(int)WinCover::Bare] - WDAYIL(IL, igroup)[(int)WinCover::Shaded]) * (1.0 - tmpSWFactor);
-                                    RBACLU(IL, igroup) = thisDayltgCtrl.BacLum(IL) +
+                                    RBACLU(IL, igroup) = thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] +
                                         (WBACLU(IL, igroup)[(int)WinCover::Bare] - WBACLU(IL, igroup)[(int)WinCover::Shaded]) * (1.0 - tmpSWFactor);
                                     BACL = max(SetPnt(IL) * dl->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi, RBACLU(IL, igroup));
 
@@ -6801,7 +6795,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
                             // Update final results
                             for (int IL = 1; IL <= NREFPT; ++IL) {
-                                thisDayltgCtrl.BacLum(IL) = RBACLU(IL, igroup);
+                                thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] = RBACLU(IL, igroup);
                                 GLRNDX(IL) = GLRNEW(IL);
                                 dl->DaylIllum(IL) = RDAYIL(IL, igroup);
                                 
@@ -6847,22 +6841,14 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
     // Variables for reporting
     for (int IL = 1; IL <= NREFPT; ++IL) {
-        thisDayltgCtrl.DaylIllumAtRefPt(IL) = dl->DaylIllum(IL);
-        thisDayltgCtrl.GlareIndexAtRefPt(IL) = GLRNDX(IL);
+        auto &refPt = thisDayltgCtrl.refPts(IL);
+        refPt.lums[(int)Lum::Illum] = dl->DaylIllum(IL);
+        refPt.glareIndex = GLRNDX(IL);
 
         // added TH 12/2/2008
-        if (GLRNDX(IL) > thisDayltgCtrl.MaxGlareallowed) {
-            thisDayltgCtrl.TimeExceedingGlareIndexSPAtRefPt(IL) = state.dataGlobal->TimeStepZone; // fraction of hours
-        } else {
-            thisDayltgCtrl.TimeExceedingGlareIndexSPAtRefPt(IL) = 0.0;
-        }
-
+        refPt.timeExceedingGlareIndexSetPoint = (GLRNDX(IL) > thisDayltgCtrl.MaxGlareallowed) ? state.dataGlobal->TimeStepZone : 0.0;
         // added TH 7/6/2009
-        if (dl->DaylIllum(IL) > thisDayltgCtrl.IllumSetPoint(IL)) {
-            thisDayltgCtrl.TimeExceedingDaylightIlluminanceSPAtRefPt(IL) = state.dataGlobal->TimeStepZone; // fraction of hours
-        } else {
-            thisDayltgCtrl.TimeExceedingDaylightIlluminanceSPAtRefPt(IL) = 0.0;
-        }
+        refPt.timeExceedingDaylightIlluminanceSetPoint = (dl->DaylIllum(IL) > refPt.illumSetPoint) ? state.dataGlobal->TimeStepZone : 0.0;
     }
 } // DayltgInteriorIllum()
 
@@ -6978,15 +6964,14 @@ void DayltgElecLightingControl(EnergyPlusData &state)
 
             // Loop over reference points
             for (int IL = 1; IL <= thisDayltgCtrl.TotalDaylRefPoints; ++IL) {
-
+                auto &refPt = thisDayltgCtrl.refPts(IL);
                 // Total fraction of zone that is daylit
-                ZFTOT += thisDayltgCtrl.FracZoneDaylit(IL);
+                ZFTOT += refPt.fracZoneDaylit;
 
-                dl->DaylIllum(IL) = thisDayltgCtrl.DaylIllumAtRefPt(IL);
+                dl->DaylIllum(IL) = refPt.lums[(int)Lum::Illum];
                 Real64 FL = 0.0;
-                if (dl->DaylIllum(IL) < thisDayltgCtrl.IllumSetPoint(IL)) {
-                    FL =
-                        (thisDayltgCtrl.IllumSetPoint(IL) - dl->DaylIllum(IL)) / thisDayltgCtrl.IllumSetPoint(IL);
+                if (dl->DaylIllum(IL) < refPt.illumSetPoint) {
+                    FL = (refPt.illumSetPoint - dl->DaylIllum(IL)) / refPt.illumSetPoint;
                 }
 
                 // BRANCH ON LIGHTING SYSTEM TYPE
@@ -7015,7 +7000,7 @@ void DayltgElecLightingControl(EnergyPlusData &state)
                     // #9060: Use a tolerance, otherwise at very low (< 1e-12) daylighting conditions, you can get a multiplier > 1.0
                     if (dl->DaylIllum(IL) < 0.1) {
                         FP = 1.0;
-                    } else if (dl->DaylIllum(IL) < thisDayltgCtrl.IllumSetPoint(IL)) {
+                    } else if (dl->DaylIllum(IL) < refPt.illumSetPoint) {
                         FP = double(int(thisDayltgCtrl.LightControlSteps * FL) + 1) / double(thisDayltgCtrl.LightControlSteps);
                     }
 
@@ -7034,10 +7019,10 @@ void DayltgElecLightingControl(EnergyPlusData &state)
                     }     // Light Control Probability < 1
                 }         // Lighting System Type
 
-                thisDayltgCtrl.RefPtPowerReductionFactor(IL) = FP;
+                refPt.powerReductionFactor = FP;
 
                 // Accumulate net ltg power reduction factor for entire zone
-                TotReduction += thisDayltgCtrl.RefPtPowerReductionFactor(IL) * thisDayltgCtrl.FracZoneDaylit(IL);
+                TotReduction += refPt.powerReductionFactor * refPt.fracZoneDaylit;
 
             } // End of loop over reference points, IL
 
@@ -9211,17 +9196,15 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
     illumMap.pointsHeader = "";
     int rCount = 0;
     for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)dl->daylightControl.size(); ++daylightCtrlNum) {
-        if (dl->daylightControl(daylightCtrlNum).zoneIndex == illumMap.zoneIndex) {
-            auto &thisDayltgCtrl = dl->daylightControl(daylightCtrlNum);
+        if (dl->daylightControl(daylightCtrlNum).zoneIndex != illumMap.zoneIndex)
+            continue;
+        
+        auto &thisDayltgCtrl = dl->daylightControl(daylightCtrlNum);
 
-            for (int R = 1; R <= thisDayltgCtrl.TotalDaylRefPoints; ++R) {
-                ++rCount;
-                illumMap.pointsHeader += format(" RefPt{}=({:.2R}:{:.2R}:{:.2R}),",
-                                                rCount,
-                                                thisDayltgCtrl.DaylRefPtAbsCoord(R).x,
-                                                thisDayltgCtrl.DaylRefPtAbsCoord(R).y,
-                                                thisDayltgCtrl.DaylRefPtAbsCoord(R).z);
-            }
+        for (int R = 1; R <= thisDayltgCtrl.TotalDaylRefPoints; ++R) {
+             ++rCount;
+             auto const &refPt = thisDayltgCtrl.refPts(R);
+             illumMap.pointsHeader += format(" RefPt{}=({:.2R}:{:.2R}:{:.2R}),", rCount, refPt.absCoords.x, refPt.absCoords.y, refPt.absCoords.z);
         }
     }
 
@@ -9660,14 +9643,10 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
                                 surfWinAdj.SolidAngAtRefPt = 0.0;
                                 surfWinAdj.SolidAngAtRefPtWtd.allocate(thisEnclNumRefPoints);
                                 surfWinAdj.SolidAngAtRefPtWtd = 0.0;
-                                surfWinAdj.IllumFromWinAtRefPt.allocate(thisEnclNumRefPoints);
-                                surfWinAdj.BackLumFromWinAtRefPt.allocate(thisEnclNumRefPoints);
-                                surfWinAdj.SourceLumFromWinAtRefPt.allocate(thisEnclNumRefPoints);
-
-                                for (int iRefPt = 1; iRefPt < (int)surfWinAdj.IllumFromWinAtRefPt.size(); ++iRefPt) {
-                                    surfWinAdj.IllumFromWinAtRefPt(iRefPt) = {0.0, 0.0};
-                                    surfWinAdj.BackLumFromWinAtRefPt(iRefPt) = {0.0, 0.0};
-                                    surfWinAdj.SourceLumFromWinAtRefPt(iRefPt) = {0.0, 0.0};
+                                surfWinAdj.DaylFromWinAtRefPt.allocate(thisEnclNumRefPoints);
+                                for (int iRefPt = 1; iRefPt < thisEnclNumRefPoints; ++iRefPt) {
+                                    auto &dayl = surfWinAdj.DaylFromWinAtRefPt(iRefPt);
+                                    dayl[(int)Lum::Illum] = dayl[(int)Lum::Back] = dayl[(int)Lum::Source] = {0.0, 0.0};
                                 }
                                 state.dataSurface->SurfWinSurfDayLightInit(SurfNumAdj) = true;
                             }
@@ -9953,7 +9932,7 @@ void CalcMinIntWinSolidAngs(EnergyPlusData &state)
                 auto &thisDayltgCtrl = dl->daylightControl(controlNum);
                 for (int IL = 1; IL <= thisDayltgCtrl.TotalDaylRefPoints; ++IL) {
                     // Reference point in absolute coordinate system
-                    Vector3<Real64> RREF = thisDayltgCtrl.DaylRefPtAbsCoord(IL);
+                    Vector3<Real64> RREF = thisDayltgCtrl.refPts(IL).absCoords;
                     bool is_Triangle = (surf.Sides == 3);
                     bool is_Rectangle = (surf.Sides == 4);
 

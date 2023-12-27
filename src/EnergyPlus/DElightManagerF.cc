@@ -253,15 +253,15 @@ namespace DElightManagerF {
                     ShowWarningError(state, format("Maximum of 100 Reference Points exceeded for daylighting zone using DElight ={}", znDayl.Name));
                     ShowWarningError(state, "  Only first 100 Reference Points included in DElight analysis");
                 }
-                znDayl.DaylRefPtAbsCoord.allocate(znDayl.TotalDaylRefPoints);
-                std::fill(znDayl.DaylRefPtAbsCoord.begin(), znDayl.DaylRefPtAbsCoord.end(), Vector3<Real64>(0.0));
+                znDayl.refPts.allocate(znDayl.TotalDaylRefPoints);
+                std::fill(znDayl.refPts.begin(), znDayl.refPts.end(), Dayltg::DaylRefPt());
 
                 // RJH 2008-03-07: Allocate and Init DaylIllumAtRefPt array for this DElight zone
-                znDayl.DaylIllumAtRefPt.allocate(znDayl.TotalDaylRefPoints);
-                znDayl.DaylIllumAtRefPt = 0.0;
-                // following not used in DElight but allocated for convenience
-                znDayl.GlareIndexAtRefPt.allocate(znDayl.TotalDaylRefPoints);
-                znDayl.GlareIndexAtRefPt = 0.0;
+                //znDayl.DaylIllumAtRefPt.allocate(znDayl.TotalDaylRefPoints);
+                //znDayl.DaylIllumAtRefPt = 0.0;
+                //e following not used in DElight but allocated for convenience
+                //znDayl.GlareIndexAtRefPt.allocate(znDayl.TotalDaylRefPoints);
+                //znDayl.GlareIndexAtRefPt = 0.0;
 
                 // Increment counter of Thermal Zones with valid hosted DElight object
                 ++iNumDElightZones;
@@ -596,7 +596,7 @@ namespace DElightManagerF {
                                         RefPt_WCS_Coord(2) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
                                     }
                                 }
-                                znDayl.DaylRefPtAbsCoord(refPt.indexToFracAndIllum) = {RefPt_WCS_Coord(1), RefPt_WCS_Coord(2), RefPt_WCS_Coord(3)};
+                                znDayl.refPts(refPt.indexToFracAndIllum).absCoords = {RefPt_WCS_Coord(1), RefPt_WCS_Coord(2), RefPt_WCS_Coord(3)};
 
                                 // Validate that Reference Point coordinates are within the host Zone
                                 if (RefPt_WCS_Coord(1) < thisZone.MinimumX || RefPt_WCS_Coord(1) > thisZone.MaximumX) {
@@ -642,14 +642,14 @@ namespace DElightManagerF {
                                           RefPt_WCS_Coord(1) * M2FT,
                                           RefPt_WCS_Coord(2) * M2FT,
                                           RefPt_WCS_Coord(3) * M2FT,
-                                          znDayl.FracZoneDaylit(refPt.indexToFracAndIllum),
-                                          znDayl.IllumSetPoint(refPt.indexToFracAndIllum) * LUX2FC,
+                                          znDayl.refPts(refPt.indexToFracAndIllum).fracZoneDaylit,
+                                          znDayl.refPts(refPt.indexToFracAndIllum).illumSetPoint * LUX2FC,
                                           znDayl.LightControlType);
                                     // RJH 2008-03-07: Set up DaylIllumAtRefPt for output for this DElight zone RefPt
                                     SetupOutputVariable(state,
                                                         "Daylighting Reference Point Illuminance",
                                                         OutputProcessor::Unit::lux,
-                                                        znDayl.DaylIllumAtRefPt(refPt.indexToFracAndIllum),
+                                                        znDayl.refPts(refPt.indexToFracAndIllum).lums[(int)Lum::Illum],
                                                         OutputProcessor::SOVTimeStepType::Zone,
                                                         OutputProcessor::SOVStoreType::Average,
                                                         refPt.Name);

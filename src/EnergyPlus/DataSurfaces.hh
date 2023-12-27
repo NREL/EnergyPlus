@@ -338,6 +338,15 @@ namespace DataSurfaces {
         "KivaFoundation - TwoDimensionalFiniteDifference",
         "Air Boundary - No Heat Transfer"};
 
+    // Daylighting illuminance components
+    enum class Lum {
+        Invalid = -1,
+        Illum,
+        Back,
+        Source,
+        Num
+    };
+        
     // IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control
     // original expression: SHADE_FLAG == ShadeOff || SHADE_FLAG == ShadeOff
     constexpr bool NOT_SHADED(WinShadingType const ShadingFlag)
@@ -860,20 +869,22 @@ namespace DataSurfaces {
         // Members
         Array1D<Real64> SolidAngAtRefPt;    // Solid angle subtended by window from daylit ref points 1 and 2
         Array1D<Real64> SolidAngAtRefPtWtd; // Solid angle subtended by window from ref pts weighted by glare pos factor
-        EPVector<std::array<Real64, (int)WinCover::Num>>
-            IllumFromWinAtRefPt; // Illuminance from window at ref pts for window with and w/o shade (lux)
-        EPVector<std::array<Real64, (int)WinCover::Num>>
-            BackLumFromWinAtRefPt; // Window background luminance from window wrt ref pts (cd/m2) with and w/o shade (cd/m2)
-        EPVector<std::array<Real64, (int)WinCover::Num>> SourceLumFromWinAtRefPt; // Window luminance at ref pts for window with and w/o shade (cd/m2)
+        EPVector<std::array<std::array<Real64, (int)WinCover::Num>, (int)Lum::Num>>
+            DaylFromWinAtRefPt; // Illuminance from window at ref pts for window with and w/o shade (lux)
+            // EPVector<std::array<Real64, (int)WinCover::Num>>
+            // BackLumFromWinAtRefPt; // Window background luminance from window wrt ref pts (cd/m2) with and w/o shade (cd/m2)
+            // EPVector<std::array<Real64, (int)WinCover::Num>> SourceLumFromWinAtRefPt; // Window luminance at ref pts for window with and w/o shade (cd/m2)
         Vector3<Real64> WinCenter = {0.0, 0.0, 0.0};                              // X,Y,Z coordinates of window center point in building coord system
-        Array1D<Real64> ThetaFace;                                                // Face temperatures of window layers (K)
+        // What is 10 here?
+        std::array<Real64, 10+1> ThetaFace = {296.15};                                                // Face temperatures of window layers (K)
 
-        Array1D<Real64> OutProjSLFracMult; // Multiplier on sunlit fraction due to shadowing of glass by frame
+        // What is 24 here?
+        std::array<Real64, 24+1> OutProjSLFracMult = {1.0}; // Multiplier on sunlit fraction due to shadowing of glass by frame
         // and divider outside projections
-        Array1D<Real64> InOutProjSLFracMult; // Multiplier on sunlit fraction due to shadowing of glass by frame
+        std::array<Real64, 24+1> InOutProjSLFracMult = {1.0}; // Multiplier on sunlit fraction due to shadowing of glass by frame
         // and divider inside and outside projections
-        Array1D<Real64> EffShBlindEmiss; // Effective emissivity of interior blind or shade
-        Array1D<Real64> EffGlassEmiss;   // Effective emissivity of glass adjacent to interior blind or shade
+        std::array<Real64, Material::MaxSlatAngs+1> EffShBlindEmiss = {0.0}; // Effective emissivity of interior blind or shade
+        std::array<Real64, Material::MaxSlatAngs+1> EffGlassEmiss = {0.0};   // Effective emissivity of glass adjacent to interior blind or shade
 
         Array1D<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point N [lux]
         Array1D<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point N [cd/m2]
@@ -887,13 +898,6 @@ namespace DataSurfaces {
         // for floor/wall/ceiling (m2)
 
         BSDFWindowDescript ComplexFen; // Data for complex fenestration, see DataBSDFWindow.cc for declaration
-
-        // Default Constructor
-        SurfaceWindowCalc()
-            : ThetaFace(10, 296.15), OutProjSLFracMult(24, 1.0), InOutProjSLFracMult(24, 1.0), EffShBlindEmiss(Material::MaxSlatAngs, 0.0),
-              EffGlassEmiss(Material::MaxSlatAngs, 0.0)
-        {
-        }
     };
 
     enum class NfrcProductOptions : int
