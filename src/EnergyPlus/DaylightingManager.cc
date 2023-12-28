@@ -4038,38 +4038,17 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
     // Glazer - June 2016 (moved from GetDaylightingControls)
     auto &dl = state.dataDayltg;
     
-    int AddMapPoints;
-    int RefPt;
-    Real64 CosBldgRelNorth;         // Cosine of Building rotation
-    Real64 SinBldgRelNorth;         // Sine of Building rotation
-    Real64 CosZoneRelNorth;         // Cosine of Zone rotation
-    Real64 SinZoneRelNorth;         // Sine of Zone rotation
-    Real64 CosBldgRotAppGonly(0.0); // Cosine of the building rotation for appendix G only ( relative north )
-    Real64 SinBldgRotAppGonly(0.0); // Sine of the building rotation for appendix G only ( relative north )
-    Real64 Xb;                      // temp var for transformation calc
-    Real64 Yb;                      // temp var for transformation calc
-    Real64 Xo;
-    Real64 XnoRot;
-    Real64 Xtrans;
-    Real64 Yo;
-    Real64 YnoRot;
-    Real64 Ytrans;
-    bool doTransform;
-    Real64 OldAspectRatio;
-    Real64 NewAspectRatio;
     Array1D_bool ZoneMsgDone;
 
-    auto &Zone(state.dataHeatBal->Zone);
-
-    CosBldgRelNorth = std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * Constant::DegToRadians);
-    SinBldgRelNorth = std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * Constant::DegToRadians);
+    Real64 CosBldgRelNorth = std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * Constant::DegToRadians);
+    Real64 SinBldgRelNorth = std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * Constant::DegToRadians);
     // these are only for Building Rotation for Appendix G when using world coordinate system
-    CosBldgRotAppGonly = std::cos(-state.dataHeatBal->BuildingRotationAppendixG * Constant::DegToRadians);
-    SinBldgRotAppGonly = std::sin(-state.dataHeatBal->BuildingRotationAppendixG * Constant::DegToRadians);
+    Real64 CosBldgRotAppGonly = std::cos(-state.dataHeatBal->BuildingRotationAppendixG * Constant::DegToRadians);
+    Real64 SinBldgRotAppGonly = std::sin(-state.dataHeatBal->BuildingRotationAppendixG * Constant::DegToRadians);
 
-    doTransform = false;
-    OldAspectRatio = 1.0;
-    NewAspectRatio = 1.0;
+    bool doTransform = false;
+    Real64 OldAspectRatio = 1.0;
+    Real64 NewAspectRatio = 1.0;
 
     CheckForGeometricTransform(state, doTransform, OldAspectRatio, NewAspectRatio);
 
@@ -4100,7 +4079,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
 
             auto &illumMap = dl->IllumMap(MapNum);
             illumMap.Name = ipsc->cAlphaArgs(1);
-            illumMap.zoneIndex = Util::FindItemInList(ipsc->cAlphaArgs(2), Zone);
+            illumMap.zoneIndex = Util::FindItemInList(ipsc->cAlphaArgs(2), state.dataHeatBal->Zone);
 
             if (illumMap.zoneIndex == 0) {
                 ShowSevereError(state,
@@ -4229,26 +4208,24 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
         
         auto &zone = state.dataHeatBal->Zone(illumMap.zoneIndex);
         // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
-        CosZoneRelNorth = std::cos(-zone.RelNorth * Constant::DegToRadians);
-        SinZoneRelNorth = std::sin(-zone.RelNorth * Constant::DegToRadians);
+        Real64 CosZoneRelNorth = std::cos(-zone.RelNorth * Constant::DegToRadians);
+        Real64 SinZoneRelNorth = std::sin(-zone.RelNorth * Constant::DegToRadians);
 
         if (illumMap.Xnum * illumMap.Ynum == 0)
             continue;
         
         // Add additional daylighting reference points for map
-        AddMapPoints = illumMap.Xnum * illumMap.Ynum;
-        illumMapCalc.TotalMapRefPoints = AddMapPoints;
-        illumMapCalc.refPts.allocate(AddMapPoints);
-        for (int i = 1; i <= AddMapPoints; ++i)
-            illumMapCalc.refPts(i) = DaylMapPt();
+        illumMapCalc.TotalMapRefPoints = illumMap.Xnum * illumMap.Ynum;
+        illumMapCalc.refPts.allocate(illumMapCalc.TotalMapRefPoints);
+        for (auto &refPt : illumMapCalc.refPts) { refPt = DaylMapPt(); }
             
-        if (AddMapPoints > MaxMapRefPoints) {
+        if (illumMapCalc.TotalMapRefPoints > MaxMapRefPoints) {
             ShowSevereError(state, "GetDaylighting Parameters: Total Map Reference points entered is greater than maximum allowed.");
             ShowContinueError(state, format("Occurs in Zone={}", zone.Name));
             ShowContinueError(state,
                               format("Maximum reference points allowed={}, entered amount ( when error first occurred )={}",
                                      MaxMapRefPoints,
-                                     AddMapPoints));
+                                     illumMapCalc.TotalMapRefPoints));
             ErrorsFound = true;
             break;
         }
@@ -4274,32 +4251,32 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
                 auto &refPt = illumMapCalc.refPts(iRefPt);
 
                 if (!state.dataSurface->DaylRefWorldCoordSystem) {
-                    Xb = refPt.absCoords.x * CosZoneRelNorth - refPt.absCoords.y * SinZoneRelNorth + zone.OriginX;
-                    Yb = refPt.absCoords.x * SinZoneRelNorth + refPt.absCoords.y * CosZoneRelNorth + zone.OriginY;
+                    Real64 Xb = refPt.absCoords.x * CosZoneRelNorth - refPt.absCoords.y * SinZoneRelNorth + zone.OriginX;
+                    Real64 Yb = refPt.absCoords.x * SinZoneRelNorth + refPt.absCoords.y * CosZoneRelNorth + zone.OriginY;
                     refPt.absCoords.x = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
                     refPt.absCoords.y = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
                     refPt.absCoords.z += zone.OriginZ;
                     if (doTransform) {
-                        Xo = refPt.absCoords.x; // world coordinates.... shifted by relative north angle...
-                        Yo = refPt.absCoords.y;
+                        Real64 Xo = refPt.absCoords.x; // world coordinates.... shifted by relative north angle...
+                        Real64 Yo = refPt.absCoords.y;
                         // next derotate the building
-                        XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
-                        YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
+                        Real64 XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
+                        Real64 YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
                         // translate
-                        Xtrans = XnoRot * std::sqrt(NewAspectRatio / OldAspectRatio);
-                        Ytrans = YnoRot * std::sqrt(OldAspectRatio / NewAspectRatio);
+                        Real64 Xtrans = XnoRot * std::sqrt(NewAspectRatio / OldAspectRatio);
+                        Real64 Ytrans = YnoRot * std::sqrt(OldAspectRatio / NewAspectRatio);
                         // rerotate
                         refPt.absCoords.x = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
                         
                         refPt.absCoords.y = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
                     }
                 } else {
-                    Xb = refPt.absCoords.x;
-                    Yb = refPt.absCoords.y;
+                    Real64 Xb = refPt.absCoords.x;
+                    Real64 Yb = refPt.absCoords.y;
                     refPt.absCoords.x = Xb * CosBldgRotAppGonly - Yb * SinBldgRotAppGonly;
                     refPt.absCoords.y = Xb * SinBldgRotAppGonly + Yb * CosBldgRotAppGonly;
                 }
-                if (RefPt == 1) {
+                if (iRefPt == 1) {
                     illumMap.Xmin = refPt.absCoords.x;
                     illumMap.Ymin = refPt.absCoords.y;
                     illumMap.Xmax = refPt.absCoords.x;
@@ -4320,7 +4297,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
                 }
                 
                 // Test extremes of Map Points against Zone Min/Max
-                if (RefPt != 1 && RefPt != illumMapCalc.TotalMapRefPoints)
+                if (iRefPt != 1 && iRefPt != illumMapCalc.TotalMapRefPoints)
                     continue;
                 
                 if (refPt.inBounds)
@@ -4329,7 +4306,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
                 if (refPt.absCoords.x < zone.MinimumX || refPt.absCoords.x > zone.MaximumX) {
                     ShowWarningError(state,
                                      format("GetInputIlluminanceMap: Reference Map point #[{}], X Value outside Zone Min/Max X, Zone={}",
-                                            RefPt,
+                                            iRefPt,
                                             zone.Name));
                     ShowContinueError(state,
                                       format("...X Reference Point= {:.2R}, Zone Minimum X= {:.2R}, Zone Maximum X= {:.2R}",
@@ -4343,7 +4320,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
                 if (refPt.absCoords.y < zone.MinimumY || refPt.absCoords.y > zone.MaximumY) {
                     ShowWarningError(state,
                                      format("GetInputIlluminanceMap: Reference Map point #[{}], Y Value outside Zone Min/Max Y, Zone={}",
-                                            RefPt,
+                                            iRefPt,
                                             zone.Name));
                     ShowContinueError(state,
                                       format("...Y Reference Point= {:.2R}, Zone Minimum Y= {:.2R}, Zone Maximum Y= {:.2R}",
@@ -4357,7 +4334,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
                 if (refPt.absCoords.z < zone.MinimumZ || refPt.absCoords.z > zone.MaximumZ) {
                     ShowWarningError(state,
                                      format("GetInputIlluminanceMap: Reference Map point #[{}], Z Value outside Zone Min/Max Z, Zone={}",
-                                            RefPt,
+                                            iRefPt,
                                             zone.Name));
                     ShowContinueError(state,
                                       format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}",
@@ -4378,8 +4355,8 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
         if (illumMap.zoneIndex == 0) continue;
         int enclNum = illumMap.enclIndex;
         if (!dl->enclDaylight(enclNum).hasSplitFluxDaylighting && !ZoneMsgDone(illumMap.zoneIndex)) {
-            ShowSevereError(state,
-                            format("Zone Name in Output:IlluminanceMap is not used for Daylighting:Controls={}", Zone(illumMap.zoneIndex).Name));
+            ShowSevereError(state, format("Zone Name in Output:IlluminanceMap is not used for Daylighting:Controls={}",
+                                          state.dataHeatBal->Zone(illumMap.zoneIndex).Name));
             ErrorsFound = true;
         }
     }
@@ -4395,7 +4372,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
         print(state.files.eio,
               "Daylighting:Illuminance Maps:Detail,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{},{:.2R}\n",
               illumMap.Name,
-              Zone(illumMap.zoneIndex).Name,
+              state.dataHeatBal->Zone(illumMap.zoneIndex).Name,
               illumMap.Xmin,
               illumMap.Xmax,
               illumMap.Xinc,
@@ -4722,46 +4699,26 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
     // For splitflux daylighting, transform the geometry
     auto &dl = state.dataDayltg;
     
-    std::string refName;
-    Real64 CosBldgRelNorth;         // Cosine of Building rotation
-    Real64 SinBldgRelNorth;         // Sine of Building rotation
-    Real64 CosZoneRelNorth;         // Cosine of Zone rotation
-    Real64 SinZoneRelNorth;         // Sine of Zone rotation
-    Real64 CosBldgRotAppGonly(0.0); // Cosine of the building rotation for appendix G only ( relative north )
-    Real64 SinBldgRotAppGonly(0.0); // Sine of the building rotation for appendix G only ( relative north )
-    Real64 Xb;                      // temp var for transformation calc
-    Real64 Yb;                      // temp var for transformation calc
-    Real64 Xo;
-    Real64 XnoRot;
-    Real64 Xtrans;
-    Real64 Yo;
-    Real64 YnoRot;
-    Real64 Ytrans;
-    bool doTransform;
-    Real64 OldAspectRatio;
-    Real64 NewAspectRatio;
-    Real64 rLightLevel;
-
     // Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
-    CosBldgRelNorth = std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * Constant::DegToRadians);
-    SinBldgRelNorth = std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * Constant::DegToRadians);
+    Real64 CosBldgRelNorth = std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * Constant::DegToRadians);
+    Real64 SinBldgRelNorth = std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * Constant::DegToRadians);
     // these are only for Building Rotation for Appendix G when using world coordinate system
-    CosBldgRotAppGonly = std::cos(-state.dataHeatBal->BuildingRotationAppendixG * Constant::DegToRadians);
-    SinBldgRotAppGonly = std::sin(-state.dataHeatBal->BuildingRotationAppendixG * Constant::DegToRadians);
+    Real64 CosBldgRotAppGonly = std::cos(-state.dataHeatBal->BuildingRotationAppendixG * Constant::DegToRadians);
+    Real64 SinBldgRotAppGonly = std::sin(-state.dataHeatBal->BuildingRotationAppendixG * Constant::DegToRadians);
 
-    doTransform = false;
-    OldAspectRatio = 1.0;
-    NewAspectRatio = 1.0;
+    bool doTransform = false;
+    Real64 OldAspectRatio = 1.0;
+    Real64 NewAspectRatio = 1.0;
 
     CheckForGeometricTransform(state, doTransform, OldAspectRatio, NewAspectRatio);
     for (auto &daylCntrl : dl->daylightControl) {
         auto &zone = state.dataHeatBal->Zone(daylCntrl.zoneIndex);
 
         // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
-        CosZoneRelNorth = std::cos(-zone.RelNorth * Constant::DegToRadians);
-        SinZoneRelNorth = std::sin(-zone.RelNorth * Constant::DegToRadians);
+        Real64 CosZoneRelNorth = std::cos(-zone.RelNorth * Constant::DegToRadians);
+        Real64 SinZoneRelNorth = std::sin(-zone.RelNorth * Constant::DegToRadians);
 
-        rLightLevel = InternalHeatGains::GetDesignLightingLevelForZone(state, daylCntrl.zoneIndex);
+        Real64 rLightLevel = InternalHeatGains::GetDesignLightingLevelForZone(state, daylCntrl.zoneIndex);
         InternalHeatGains::CheckLightsReplaceableMinMaxForZone(state, daylCntrl.zoneIndex);
 
         for (int refPtNum = 1; refPtNum <= daylCntrl.TotalDaylRefPoints; ++refPtNum) {
@@ -4775,47 +4732,46 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
                 refPt.absCoords.z = curRefPt.z;
             } else {
                 // Transform reference point coordinates into building coordinate system
-                Xb = curRefPt.x * CosZoneRelNorth - curRefPt.y * SinZoneRelNorth + zone.OriginX;
-                Yb = curRefPt.x * SinZoneRelNorth + curRefPt.y * CosZoneRelNorth + zone.OriginY;
+                Real64 Xb = curRefPt.x * CosZoneRelNorth - curRefPt.y * SinZoneRelNorth + zone.OriginX;
+                Real64 Yb = curRefPt.x * SinZoneRelNorth + curRefPt.y * CosZoneRelNorth + zone.OriginY;
                 // Transform into World Coordinate System
                 refPt.absCoords.x = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
                 refPt.absCoords.y = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
                 refPt.absCoords.z = curRefPt.z + zone.OriginZ;
                 if (doTransform) {
-                    Xo = refPt.absCoords.x; // world coordinates.... shifted by relative north angle...
-                    Yo = refPt.absCoords.y;
+                    Real64 Xo = refPt.absCoords.x; // world coordinates.... shifted by relative north angle...
+                    Real64 Yo = refPt.absCoords.y;
                     // next derotate the building
-                    XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
-                    YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
+                    Real64 XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
+                    Real64 YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
                     // translate
-                    Xtrans = XnoRot * std::sqrt(NewAspectRatio / OldAspectRatio);
-                    Ytrans = YnoRot * std::sqrt(OldAspectRatio / NewAspectRatio);
+                    Real64 Xtrans = XnoRot * std::sqrt(NewAspectRatio / OldAspectRatio);
+                    Real64 Ytrans = YnoRot * std::sqrt(OldAspectRatio / NewAspectRatio);
                     // rerotate
                     refPt.absCoords.x = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
                     refPt.absCoords.y = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
                 }
             }
-            refName = curRefPt.Name;
 
             auto &orp = state.dataOutRptPredefined;
-            OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtZone, refName, daylCntrl.ZoneName);
-            OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtCtrlName, refName, daylCntrl.Name);
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtZone, curRefPt.Name, daylCntrl.ZoneName);
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtCtrlName, curRefPt.Name, daylCntrl.Name);
             if (daylCntrl.DaylightMethod == DaylightingMethod::SplitFlux) {
-                OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtKind, refName, "SplitFlux");
+                OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtKind, curRefPt.Name, "SplitFlux");
             } else {
-                OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtKind, refName, "DElight");
+                OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtKind, curRefPt.Name, "DElight");
             }
             // ( 1=continuous, 2=stepped, 3=continuous/off )
             if (daylCntrl.LightControlType == LtgCtrlType::Continuous) {
-                OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtCtrlType, refName, "Continuous");
+                OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtCtrlType, curRefPt.Name, "Continuous");
             } else if (daylCntrl.LightControlType == LtgCtrlType::Stepped) {
-                OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtCtrlType, refName, "Stepped");
+                OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtCtrlType, curRefPt.Name, "Stepped");
             } else if (daylCntrl.LightControlType == LtgCtrlType::ContinuousOff) {
-                OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtCtrlType, refName, "Continuous/Off");
+                OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtCtrlType, curRefPt.Name, "Continuous/Off");
             }
-            OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtFrac, refName, refPt.fracZoneDaylit);
-            OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtWInst, refName, rLightLevel);
-            OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtWCtrl, refName, rLightLevel * refPt.fracZoneDaylit);
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtFrac, curRefPt.Name, refPt.fracZoneDaylit);
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtWInst, curRefPt.Name, rLightLevel);
+            OutputReportPredefined::PreDefTableEntry(state, orp->pdchDyLtWCtrl, curRefPt.Name, rLightLevel * refPt.fracZoneDaylit);
 
             if (refPt.absCoords.x < zone.MinimumX || refPt.absCoords.x > zone.MaximumX) {
                 refPt.inBounds = false;
@@ -5840,17 +5796,29 @@ void DayltgInteriorIllum(EnergyPlusData &state,
     bool breakOuterLoop(false);
     bool continueOuterLoop(false);
 
-    Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>> WDAYIL; // Illuminance from window at reference point (second index)
+    struct ShadeGroupLums {
+        Array1D<std::array<std::array<Real64, (int)DataSurfaces::WinCover::Num>, (int)Lum::Num>> WDAYIL; // Illuminance from window at ref-point
+        Array1D<std::array<Real64, (int)Lum::Num>> RDAYIL; // Illuminance from window at ref-point after closing shade 
+        Real64 switchedWinLum;
+        Real64 unswitchedWinLum;
+        Real64 switchedTvis;
+        Real64 unswitchedTvis;
+        Real64 lumRatio;
+    };
+
+    Array1D<ShadeGroupLums> shadeGroupsLums;
+    
+    // Array2D<std::array<std::array<Real64, (int)DataSurfaces::WinCover::Num>, (int)Lum::Num>> WDAYIL; // Illuminance from window at reference point (second index)
     //   the number of shade deployment groups (third index)
-    Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>> WBACLU; // Background illuminance from window at reference point (second index)
+    //Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>> WBACLU; // Background illuminance from window at reference point (second index)
     //   the number of shade deployment groups (third index)
-    Array2D<Real64> RDAYIL; // Illuminance from window at reference point after closing shade
-    Array2D<Real64> RBACLU; // Background illuminance from window at reference point after closing shade
-    Array1D<Real64> DILLSW;         // Illuminance a ref point from a group of windows that can be switched together,
-    Array1D<Real64> DILLUN;         //  and from those that aren't (lux)
-    Array1D<Real64> TVIS1;  // Visible transmittance at normal incidence of unswitched glazing
-    Array1D<Real64> TVIS2;  // Visible transmittance at normal incidence of fully-switched glazing
-    Array1D<Real64> ASETIL; // Illuminance ratio (lux)
+    // Array2D<std::array<Real64, (int)Lum::Num>> RDAYIL; // Illuminance from window at reference point after closing shade
+    // Array2D<Real64> RBACLU; // Background illuminance from window at reference point after closing shade
+    //Array1D<Real64> DILLSW;         // Illuminance a ref point from a group of windows that can be switched together,
+    // Array1D<Real64> DILLUN;         //  and from those that aren't (lux)
+    // Array1D<Real64> TVIS1;  // Visible transmittance at normal incidence of unswitched glazing
+    // Array1D<Real64> TVIS2;  // Visible transmittance at normal incidence of fully-switched glazing
+    // Array1D<Real64> ASETIL; // Illuminance ratio (lux)
 
     if (thisDayltgCtrl.DaylightMethod != DaylightingMethod::SplitFlux) return;
 
@@ -5862,16 +5830,11 @@ void DayltgInteriorIllum(EnergyPlusData &state,
     }
 
     // size these for the maximum of the shade deployment order
-    DILLSW.allocate(dl->maxShadeDeployOrderExtWins);
-    DILLUN.allocate(dl->maxShadeDeployOrderExtWins);
-    WDAYIL.allocate(dl->maxControlRefPoints, dl->maxShadeDeployOrderExtWins);
-    WBACLU.allocate(dl->maxControlRefPoints, dl->maxShadeDeployOrderExtWins);
-    RDAYIL.allocate(dl->maxControlRefPoints, dl->maxShadeDeployOrderExtWins);
-    RBACLU.allocate(dl->maxControlRefPoints, dl->maxShadeDeployOrderExtWins);
-
-    TVIS1.allocate(dl->maxShadeDeployOrderExtWins);
-    TVIS2.allocate(dl->maxShadeDeployOrderExtWins);
-    ASETIL.allocate(dl->maxShadeDeployOrderExtWins);
+    shadeGroupsLums.allocate(dl->maxShadeDeployOrderExtWins);
+    for (auto &shadeGroupLums : shadeGroupsLums) {
+        shadeGroupLums.WDAYIL.allocate(dl->maxControlRefPoints);
+        shadeGroupLums.RDAYIL.allocate(dl->maxControlRefPoints);
+    }
 
     // Three arrays to save original clear and dark (fully switched) states'
     //  zone/window daylighting properties.
@@ -6191,10 +6154,12 @@ void DayltgInteriorIllum(EnergyPlusData &state,
         // windows that can be switched (DILLSW) with a group and those that can't (DILLUN).
         // Windows that can be switched are initially in the unswitched state. For subsequent
         // groups the windows in previous groups are fully switched.
-        DILLSW = 0.0;
-        DILLUN = 0.0;
+        for (auto &shadeGroupLum : shadeGroupsLums) {
+            shadeGroupLum.switchedWinLum = shadeGroupLum.unswitchedWinLum = 0.0;
+        }
 
         for (std::size_t igroup = 1; igroup <= thisDayltgCtrl.ShadeDeployOrderExtWins.size(); igroup++) {
+            auto &shadeGroupLums = shadeGroupsLums(igroup);
             std::vector<int> const &listOfExtWin = thisDayltgCtrl.ShadeDeployOrderExtWins[igroup - 1];
             for (const int IWin : listOfExtWin) {
                 ++count;
@@ -6213,17 +6178,17 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                 if (state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::GlassConditionallyLightened &&
                     state.dataSurface->WindowShadingControl(ICtrl).shadingControlType == WindowShadingControlType::MeetDaylIlumSetp &&
                     !previously_shaded(loop)) {
-                    DILLSW(igroup) += daylFromWinAtRefPt[IS - 1];
+                    shadeGroupLums.switchedWinLum += daylFromWinAtRefPt[IS - 1];
                     previously_shaded(loop) = true;
                 } else { 
-                    DILLUN(igroup) += !previously_shaded(loop) ? daylFromWinAtRefPt[IS - 1] : daylFromWinAtRefPt[(int)WinCover::Shaded]; 
+                    shadeGroupLums.unswitchedWinLum += !previously_shaded(loop) ? daylFromWinAtRefPt[IS - 1] : daylFromWinAtRefPt[(int)WinCover::Shaded]; 
                 } 
             } // for (IWin)
         } // for (igroup)
 
         // Transmittance multiplier
-        for (std::size_t igroup = 1; igroup <= thisDayltgCtrl.ShadeDeployOrderExtWins.size(); igroup++) {
-            ASETIL(igroup) = (SetPnt(1) - DILLUN(igroup)) / (DILLSW(igroup) + 0.00001);
+        for (auto &shadeGroupLums : shadeGroupsLums) {
+            shadeGroupLums.lumRatio = (SetPnt(1) - shadeGroupLums.unswitchedWinLum) / (shadeGroupLums.switchedWinLum + 0.00001);
         }
 
         // ASETIL < 1 means there's enough light, so check for switching
@@ -6234,18 +6199,15 @@ void DayltgInteriorIllum(EnergyPlusData &state,
         breakOuterLoop = false;
         continueOuterLoop = false;
         for (std::size_t igroup = 1; igroup <= thisDayltgCtrl.ShadeDeployOrderExtWins.size(); igroup++) {
-
+            auto &shadeGroupLums = shadeGroupsLums(igroup);
             std::vector<int> const &listOfExtWin = thisDayltgCtrl.ShadeDeployOrderExtWins[igroup - 1];
-            auto &thisTVIS1 = TVIS1(igroup);
-            auto &thisTVIS2 = TVIS2(igroup);
-            auto const &thisASETIL = ASETIL(igroup);
 
             for (const int IWin : listOfExtWin) {
                 ++count;
                 // need to map back to the original order of the "loop" to not change all the other data structures
                 int loop = thisDayltgCtrl.MapShdOrdToLoopNum(count);
                 if (loop > 0 && 
-                    thisASETIL < 1.0) {
+                    shadeGroupLums.lumRatio < 1.0) {
 
                     int ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
                     if (!state.dataSurface->Surface(IWin).HasShadeControl) {
@@ -6260,12 +6222,12 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                     
                     int const IConst = state.dataSurface->SurfActiveConstruction(IWin);
                     // Vis trans at normal incidence of unswitched glass
-                    thisTVIS1 = General::POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) *
+                    shadeGroupLums.unswitchedTvis = General::POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) *
                             state.dataSurface->SurfWinGlazedFrac(IWin);
 
                         // Vis trans at normal incidence of fully switched glass
                     int const IConstShaded = state.dataSurface->Surface(IWin).activeShadedConstruction;
-                    thisTVIS2 = General::POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) *
+                    shadeGroupLums.switchedTvis = General::POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) *
                             state.dataSurface->SurfWinGlazedFrac(IWin);
                     
                     // Reset shading flag to indicate that window is shaded by being partially or fully switched
@@ -6273,16 +6235,17 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
                     // ASETIL < 0 means illuminance from non-daylight-switchable windows exceeds setpoint,
                     // so completely switch all daylight-switchable windows to minimize solar gain
-                    if (thisASETIL <= 0.0) {
+                    if (shadeGroupLums.lumRatio <= 0.0) {
                         state.dataSurface->SurfWinSwitchingFactor(IWin) = 1.0;
-                        state.dataSurface->SurfWinVisTransSelected(IWin) = thisTVIS2;
+                        state.dataSurface->SurfWinVisTransSelected(IWin) = shadeGroupLums.switchedTvis;
                     } else {
                         // Case where 0 < ASETIL < 1: darken glass in all
                         // daylight-switchable windows to just meet illuminance setpoint
                         // From this equation: SETPNT(1) = DILLUN + DILLSW/TVIS1 * VisTransSelected
-                        state.dataSurface->SurfWinVisTransSelected(IWin) = max(thisTVIS2, thisASETIL * thisTVIS1) + 0.000001;
+                        state.dataSurface->SurfWinVisTransSelected(IWin) =
+                                max(shadeGroupLums.switchedTvis, shadeGroupLums.lumRatio * shadeGroupLums.unswitchedTvis) + 0.000001;
                         state.dataSurface->SurfWinSwitchingFactor(IWin) =
-                                (thisTVIS1 - state.dataSurface->SurfWinVisTransSelected(IWin)) / (thisTVIS1 - thisTVIS2 + 0.000001);
+                                (shadeGroupLums.unswitchedTvis - state.dataSurface->SurfWinVisTransSelected(IWin)) / (shadeGroupLums.unswitchedTvis - shadeGroupLums.switchedTvis + 0.000001);
                         // bound switching factor between 0 and 1
                         state.dataSurface->SurfWinSwitchingFactor(IWin) = min(1.0, state.dataSurface->SurfWinSwitchingFactor(IWin));
                         state.dataSurface->SurfWinSwitchingFactor(IWin) = max(0.0, state.dataSurface->SurfWinSwitchingFactor(IWin));
@@ -6297,14 +6260,14 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                         auto &daylFromWinAtRefPt = thisDayltgCtrl.DaylFromWinAtRefPt(loop, IL);
                         auto const &tmpDayl = tmpDaylFromWinAtRefPt(loop, IL);
                         
-                        VTRAT = state.dataSurface->SurfWinVisTransSelected(IWin) / (thisTVIS1 + 0.000001);
+                        VTRAT = state.dataSurface->SurfWinVisTransSelected(IWin) / (shadeGroupLums.unswitchedTvis + 0.000001);
                         dl->DaylIllum(IL) += (VTRAT - 1.0) * daylFromWinAtRefPt[(int)Lum::Illum][IS - 1];
                         thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] += (VTRAT - 1.0) * daylFromWinAtRefPt[(int)Lum::Back][IS - 1];
                         
                         // Adjust illum, background illum and source luminance for this window in intermediate switched state
                         //  for later use in the DayltgGlare calc because SurfaceWindow(IWin)%ShadingFlag = WinShadingType::SwitchableGlazing = 2
                         IS = 2;
-                        VTRAT = state.dataSurface->SurfWinVisTransSelected(IWin) / (thisTVIS2 + 0.000001);
+                        VTRAT = state.dataSurface->SurfWinVisTransSelected(IWin) / (shadeGroupLums.switchedTvis + 0.000001);
                         daylFromWinAtRefPt[(int)Lum::Illum][IS - 1] = VTRAT * tmpDayl[(int)Lum::Illum][IS - 1];
                         daylFromWinAtRefPt[(int)Lum::Back][IS - 1] = VTRAT * tmpDayl[(int)Lum::Back][IS - 1];
                         daylFromWinAtRefPt[(int)Lum::Source][IS - 1] = VTRAT * tmpDayl[(int)Lum::Source][IS - 1];
@@ -6394,10 +6357,8 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
         continueOuterLoop = false;
         for (std::size_t igroup = 1; igroup <= thisDayltgCtrl.ShadeDeployOrderExtWins.size(); igroup++) {
-
+            auto &shadeGroupLums = shadeGroupsLums(igroup);
             std::vector<int> const &listOfExtWin = thisDayltgCtrl.ShadeDeployOrderExtWins[igroup - 1];
-            auto &thisTVIS1 = TVIS1(igroup);
-            auto &thisTVIS2 = TVIS2(igroup);
 
             int countBeforeListOfExtWinLoop = count;
             bool atLeastOneGlareControlIsActive = false;
@@ -6431,28 +6392,31 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                     for (int IL = 1; IL <= NREFPT; ++IL) {
                         auto const &daylFromWinAtRefPt =  thisDayltgCtrl.DaylFromWinAtRefPt(loop, IL);   
                         for (int iWinCover = 0; iWinCover < (int)WinCover::Num; ++iWinCover) {
-                            WDAYIL(IL, igroup)[iWinCover] = daylFromWinAtRefPt[(int)Lum::Illum][iWinCover];
-                            WBACLU(IL, igroup)[iWinCover] = daylFromWinAtRefPt[(int)Lum::Back][iWinCover];
+                            shadeGroupLums.WDAYIL(IL)[(int)Lum::Illum][iWinCover] = daylFromWinAtRefPt[(int)Lum::Illum][iWinCover];
+                            shadeGroupLums.WDAYIL(IL)[(int)Lum::Back][iWinCover] = daylFromWinAtRefPt[(int)Lum::Back][iWinCover];
                         }
                     }
 
                     // Recalculate illuminance and glare with shading on this window.
                     //  For switchable glazings, this is the fully switched (dark) state
                     for (int IL = 1; IL <= NREFPT; ++IL) {
+                        auto &rdayil = shadeGroupLums.RDAYIL(IL);
+                        auto const &wdayil = shadeGroupLums.WDAYIL(IL);
+                        auto const &refPt = thisDayltgCtrl.refPts(IL);
+                            
                         if (state.dataSurface->SurfWinShadingFlag(IWin) != WinShadingType::SwitchableGlazing) {
                             // for non switchable glazings or switchable glazings not switched yet (still in clear state)
                             //  SurfaceWindow(IWin)%ShadingFlag = WinShadingFlag::GlassConditionallyLightened
-                            RDAYIL(IL, igroup) =
-                                dl->DaylIllum(IL) - WDAYIL(IL, igroup)[(int)WinCover::Bare] + WDAYIL(IL, igroup)[(int)WinCover::Shaded];
-                            RBACLU(IL, igroup) =
-                                    thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] - WBACLU(IL, igroup)[(int)WinCover::Bare] +
-                                WBACLU(IL, igroup)[(int)WinCover::Shaded];
+                            rdayil[(int)Lum::Illum] =
+                                dl->DaylIllum(IL) - wdayil[(int)Lum::Illum][(int)WinCover::Bare] + wdayil[(int)Lum::Illum][(int)WinCover::Shaded];
+                            rdayil[(int)Lum::Back] =
+                                refPt.lums[(int)Lum::Back] - wdayil[(int)Lum::Back][(int)WinCover::Bare] + wdayil[(int)Lum::Back][(int)WinCover::Shaded];
                         } else {
                             // switchable glazings already in partially switched state when calc the RDAYIL(IL) & RBACLU(IL)
                             auto &tmpDayl = tmpDaylFromWinAtRefPt(loop, IL);
-                            RDAYIL(IL, igroup) =
-                                dl->DaylIllum(IL) - WDAYIL(IL, igroup)[(int)WinCover::Shaded] + tmpDayl[(int)Lum::Illum][(int)WinCover::Shaded];
-                            RBACLU(IL, igroup) = thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] - WBACLU(IL, igroup)[(int)WinCover::Shaded] + tmpDayl[(int)Lum::Back][(int)WinCover::Shaded];
+                            rdayil[(int)Lum::Illum] =
+                                dl->DaylIllum(IL) - wdayil[(int)Lum::Illum][(int)WinCover::Shaded] + tmpDayl[(int)Lum::Illum][(int)WinCover::Shaded];
+                            rdayil[(int)Lum::Back] = refPt.lums[(int)Lum::Back] - wdayil[(int)Lum::Back][(int)WinCover::Shaded] + tmpDayl[(int)Lum::Back][(int)WinCover::Shaded];
                         }
                     } // for (IL)
 
@@ -6485,12 +6449,12 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                         
                         int const IConst = state.dataSurface->SurfActiveConstruction(IWin);
                         // Vis trans at normal incidence of unswitched glass
-                        thisTVIS1 = General::POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) *
+                        shadeGroupLums.unswitchedTvis = General::POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) *
                                 state.dataSurface->SurfWinGlazedFrac(IWin);
                         
                         // Vis trans at normal incidence of fully switched glass
                         int const IConstShaded = state.dataSurface->Surface(IWin).activeShadedConstruction;
-                        thisTVIS2 = General::POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) *
+                        shadeGroupLums.switchedTvis = General::POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) *
                                 state.dataSurface->SurfWinGlazedFrac(IWin);
                     } // if (switchableGlazing)
                 } // if (GlareControlIsActive)
@@ -6501,7 +6465,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
                 // Re-calc daylight and glare at shaded state. For switchable glazings, it is the fully dark state.
                 for (int IL = 1; IL <= NREFPT; ++IL) {
-                    BACL = max(SetPnt(IL) * dl->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi, RBACLU(IL, igroup));
+                    BACL = max(SetPnt(IL) * dl->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi, shadeGroupLums.RDAYIL(IL)[(int)Lum::Back]);
                     // DayltgGlare uses ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) for shaded state
                     GLRNEW(IL) = DayltgGlare(state, IL, BACL, daylightCtrlNum);
                 }
@@ -6566,7 +6530,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                         //  for switchable glazings, reset properties to clear state or partial switched state?
                         if (state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::SwitchableGlazing) {
                             state.dataSurface->SurfWinSwitchingFactor(IWin) = 0.0;
-                            state.dataSurface->SurfWinVisTransSelected(IWin) = thisTVIS1;
+                            state.dataSurface->SurfWinVisTransSelected(IWin) = shadeGroupLums.unswitchedTvis;
                             
                             // RESET properties for fully dark state
                             for (int IL = 1; IL <= NREFPT; ++IL) {
@@ -6586,9 +6550,9 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                     // Reset background luminance, glare index, and daylight illuminance at each ref pt.
                     // For switchable glazings, this is fully switched, dark state
                     for (int IL = 1; IL <= NREFPT; ++IL) {
-                        thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] = RBACLU(IL, igroup);
+                        thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] = shadeGroupLums.RDAYIL(IL)[(int)Lum::Back];
                         GLRNDX(IL) = GLRNEW(IL);
-                        dl->DaylIllum(IL) = RDAYIL(IL, igroup);
+                        dl->DaylIllum(IL) = shadeGroupLums.RDAYIL(IL)[(int)Lum::Illum];
                     }
 
                     // TH comments (5/22/2009): seems for EC windows, if the calculated glare exceeds the max setpoint,
@@ -6604,14 +6568,15 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                         // switching  factor
                         ////Unused Set but never used
                         state.dataSurface->SurfWinSwitchingFactor(IWin) = 1.0;
-                        state.dataSurface->SurfWinVisTransSelected(IWin) = thisTVIS2;
+                        state.dataSurface->SurfWinVisTransSelected(IWin) = shadeGroupLums.switchedTvis;
                         
                         // restore fully dark values
                         for (int IL = 1; IL <= NREFPT; ++IL) {
                              auto &daylFromWinAtRefPt = thisDayltgCtrl.DaylFromWinAtRefPt(loop, IL);
                              auto const &tmpDayl = tmpDaylFromWinAtRefPt(loop, IL);
-                             WDAYIL(IL, igroup)[(int)WinCover::Shaded] = tmpDayl[(int)Lum::Illum][(int)WinCover::Shaded];
-                             WBACLU(IL, igroup)[(int)WinCover::Shaded] = tmpDayl[(int)Lum::Back][(int)WinCover::Shaded];
+                             auto &wdayil = shadeGroupLums.WDAYIL(IL);
+                             wdayil[(int)Lum::Illum][(int)WinCover::Shaded] = tmpDayl[(int)Lum::Illum][(int)WinCover::Shaded];
+                             wdayil[(int)Lum::Back][(int)WinCover::Shaded] = tmpDayl[(int)Lum::Back][(int)WinCover::Shaded];
                              daylFromWinAtRefPt[(int)Lum::Illum][(int)WinCover::Shaded] = tmpDayl[(int)Lum::Illum][(int)WinCover::Shaded];
                              daylFromWinAtRefPt[(int)Lum::Back][(int)WinCover::Shaded] = tmpDayl[(int)Lum::Back][(int)WinCover::Shaded];
                              daylFromWinAtRefPt[(int)Lum::Source][(int)WinCover::Shaded] = tmpDayl[(int)Lum::Source][(int)WinCover::Shaded];
@@ -6644,15 +6609,16 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                             while (tmpSWFactor > 0) {
                                 // calc new glare at new switching state
                                 for (int IL = 1; IL <= NREFPT; ++IL) {
-                                    RDAYIL(IL, igroup) =
-                                        dl->DaylIllum(IL) +
-                                        (WDAYIL(IL, igroup)[(int)WinCover::Bare] - WDAYIL(IL, igroup)[(int)WinCover::Shaded]) * (1.0 - tmpSWFactor);
-                                    RBACLU(IL, igroup) =
-                                        thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] +
-                                        (WBACLU(IL, igroup)[(int)WinCover::Bare] - WBACLU(IL, igroup)[(int)WinCover::Shaded]) * (1.0 - tmpSWFactor);
-                                    BACL = max(SetPnt(IL) * dl->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi, RBACLU(IL, igroup));
+                                    auto &rdayil = shadeGroupLums.RDAYIL(IL);
+                                    auto const &wdayil = shadeGroupLums.WDAYIL(IL);
+                                    auto const &refPt = thisDayltgCtrl.refPts(IL);
+                                    rdayil[(int)Lum::Illum] = dl->DaylIllum(IL) +
+                                        (wdayil[(int)Lum::Illum][(int)WinCover::Bare] - wdayil[(int)Lum::Illum][(int)WinCover::Shaded]) * (1.0 - tmpSWFactor);
+                                    rdayil[(int)Lum::Back] = refPt.lums[(int)Lum::Back] +
+                                        (wdayil[(int)Lum::Back][(int)WinCover::Bare] - wdayil[(int)Lum::Back][(int)WinCover::Shaded]) * (1.0 - tmpSWFactor);
+                                        BACL = max(SetPnt(IL) * dl->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi, rdayil[(int)Lum::Back]);
                                         // needs to update SourceLumFromWinAtRefPt(IL,2,loop) before re-calc DayltgGlare
-                                    tmpMult = (thisTVIS1 - (thisTVIS1 - thisTVIS2) * tmpSWFactor) / thisTVIS2;
+                                    tmpMult = (shadeGroupLums.unswitchedTvis - (shadeGroupLums.unswitchedTvis - shadeGroupLums.switchedTvis) * tmpSWFactor) / shadeGroupLums.switchedTvis;
                                     thisDayltgCtrl.DaylFromWinAtRefPt(loop, IL)[(int)Lum::Source][(int)WinCover::Shaded] = ((IL == 1) ? tmpSWSL1 : tmpSWSL2) * tmpMult;
                                     // Calc new glare
                                     GLRNEW(IL) = DayltgGlare(state, IL, BACL, daylightCtrlNum);
@@ -6689,14 +6655,16 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                             if (!GlareOK) {
                                 // Glare too high, use previous state and re-calc
                                 for (int IL = 1; IL <= NREFPT; ++IL) {
-                                    RDAYIL(IL, igroup) = dl->DaylIllum(IL) +
-                                        (WDAYIL(IL, igroup)[(int)WinCover::Bare] - WDAYIL(IL, igroup)[(int)WinCover::Shaded]) * (1.0 - tmpSWFactor);
-                                    RBACLU(IL, igroup) = thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] +
-                                        (WBACLU(IL, igroup)[(int)WinCover::Bare] - WBACLU(IL, igroup)[(int)WinCover::Shaded]) * (1.0 - tmpSWFactor);
-                                    BACL = max(SetPnt(IL) * dl->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi, RBACLU(IL, igroup));
+                                    auto &rdayil = shadeGroupLums.RDAYIL(IL);
+                                    auto const &wdayil = shadeGroupLums.WDAYIL(IL);
+                                    rdayil[(int)Lum::Illum] = dl->DaylIllum(IL) +
+                                        (wdayil[(int)Lum::Illum][(int)WinCover::Bare] - wdayil[(int)Lum::Illum][(int)WinCover::Shaded]) * (1.0 - tmpSWFactor);
+                                    rdayil[(int)Lum::Back] = thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] +
+                                        (wdayil[(int)Lum::Back][(int)WinCover::Bare] - wdayil[(int)Lum::Back][(int)WinCover::Shaded]) * (1.0 - tmpSWFactor);
+                                    BACL = max(SetPnt(IL) * dl->enclDaylight(enclNum).aveVisDiffReflect / Constant::Pi, rdayil[(int)Lum::Back]);
 
                                     // needs to update SourceLumFromWinAtRefPt(IL,2,IWin) before re-calc DayltgGlare
-                                    tmpMult = (thisTVIS1 - (thisTVIS1 - thisTVIS2) * tmpSWFactor) / thisTVIS2;
+                                    tmpMult = (shadeGroupLums.unswitchedTvis - (shadeGroupLums.unswitchedTvis - shadeGroupLums.switchedTvis) * tmpSWFactor) / shadeGroupLums.switchedTvis;
                                     thisDayltgCtrl.DaylFromWinAtRefPt(loop, 1)[(int)Lum::Source][(int)WinCover::Shaded] = ((IL == 1) ? tmpSWSL1 : tmpSWSL2) * tmpMult;
                                     GLRNEW(IL) = DayltgGlare(state, IL, BACL, daylightCtrlNum);
                                 }
@@ -6704,11 +6672,13 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
                             // Update final results
                             for (int IL = 1; IL <= NREFPT; ++IL) {
-                                thisDayltgCtrl.refPts(IL).lums[(int)Lum::Back] = RBACLU(IL, igroup);
+                                auto &refPt = thisDayltgCtrl.refPts(IL);
+                                auto const &rdayil = shadeGroupLums.RDAYIL(IL);
+                                refPt.lums[(int)Lum::Back] = rdayil[(int)Lum::Back];
                                 GLRNDX(IL) = GLRNEW(IL);
-                                dl->DaylIllum(IL) = RDAYIL(IL, igroup);
+                                dl->DaylIllum(IL) = rdayil[(int)Lum::Illum];
                                 
-                                tmpMult = (thisTVIS1 - (thisTVIS1 - thisTVIS2) * tmpSWFactor) / thisTVIS2;
+                                tmpMult = (shadeGroupLums.unswitchedTvis - (shadeGroupLums.unswitchedTvis - shadeGroupLums.switchedTvis) * tmpSWFactor) / shadeGroupLums.switchedTvis;
                                 // update report variables
                                 auto &daylFromWinAtRefPt = thisDayltgCtrl.DaylFromWinAtRefPt(loop, IL);
                                 auto const &tmpDayl = tmpDaylFromWinAtRefPt(loop, IL);
@@ -6716,7 +6686,7 @@ void DayltgInteriorIllum(EnergyPlusData &state,
                                 daylFromWinAtRefPt[(int)Lum::Back][(int)WinCover::Shaded] = tmpDayl[(int)Lum::Back][(int)WinCover::Shaded] * tmpMult;
                             }
                             state.dataSurface->SurfWinSwitchingFactor(IWin) = tmpSWFactor;
-                            state.dataSurface->SurfWinVisTransSelected(IWin) = thisTVIS1 - (thisTVIS1 - thisTVIS2) * tmpSWFactor;
+                            state.dataSurface->SurfWinVisTransSelected(IWin) = shadeGroupLums.unswitchedTvis - (shadeGroupLums.unswitchedTvis - shadeGroupLums.switchedTvis) * tmpSWFactor;
                             
                         } else {
                             // For un-switchable glazing or switchable glazing but not MeetDaylightIlluminaceSetpoint control,
@@ -7019,7 +6989,7 @@ Real64 DayltgGlarePositionFactor(Real64 X, // Lateral and vertical distance of l
     Real64 FA = PF[IY - 1][IX - 1] + 2.0 * (X - X1) * (PF[IY - 1][IX] - PF[IY - 1][IX - 1]);
     Real64 FB = PF[IY][IX - 1] + 2.0 * (X - X1) * (PF[IY][IX] - PF[IY][IX - 1]);
     return FA + 2.0 * (Y - Y1) * (FB - FA);
-}
+} // DayltgGlarePositionFactor()
 
 void DayltgInterReflectedIllum(EnergyPlusData &state,
                                int const ISunPos, // Sun position counter; used to avoid calculating various
@@ -7136,7 +7106,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     int OutShelfSurf;            // Outside daylighting shelf surface number
     Real64 TransBlBmDiffFront;   // Isolated blind vis beam-diffuse front transmittance
     Real64 TransScBmDiffFront;   // Isolated screen vis beam-diffuse front transmittance
-    Real64 TransScDiffDiffFront; // Isolated screen vis diffuse-diffuse front transmittance
     Real64 ReflGlDiffDiffBack;   // Bare glazing system vis diffuse back reflectance
     Real64 ReflGlDiffDiffFront;  // Bare glazing system vis diffuse front reflectance
     Real64 ReflBlBmDiffFront;    // Isolated blind vis beam-diffuse front reflectance
@@ -7144,16 +7113,13 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     Real64 ReflBlDiffDiffFront;  // Isolated blind vis diffuse-diffuse front reflectance
     Real64 ReflBlDiffDiffBack;   // Isolated blind vis diffuse-diffuse back reflectance
     Real64 ReflScDiffDiffBack;   // Isolated screen vis diffuse-diffuse back reflectance
-    Real64 t1;                   // Beam-beam vis trans of bare glass layers 1 and 2
-    Real64 t2;
+
     Real64 td2; // Diffuse-diffuse vis trans of bare glass layers 2 and 3
     Real64 td3;
     Real64 rbd1; // Beam-diffuse back vis reflectance of bare glass layers 1 and 2
     Real64 rbd2;
     Real64 rfd2; // Beam-diffuse front vis reflectance of bare glass layers 2 and 3
     Real64 rfd3;
-    Real64 tfshBd;     // Beam-diffuse front vis trans of bare blind
-    Real64 rfshB;      // Beam-diffuse front vis reflectance of bare blind
     Real64 tfshd;      // Diffuse-diffuse front vis trans of bare blind
     Real64 rbshd;      // Diffuse-diffuse back vis reflectance of bare blind
     Real64 ZSUObsRefl; // Illuminance on window from beam solar reflected by an
@@ -7194,8 +7160,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     } else {
         extWinType = ExtWinType::AdjZone;
         // If window is exterior window in adjacent zone, then use areas of both enclosures
-        EnclInsideSurfArea =
-            dl->enclDaylight(enclNum).totInsSurfArea + dl->enclDaylight(enclNumThisWin).totInsSurfArea;
+        EnclInsideSurfArea = dl->enclDaylight(enclNum).totInsSurfArea + dl->enclDaylight(enclNumThisWin).totInsSurfArea;
         // find index in IntWinAdjZoneExtWin
         for (int AdjExtWinLoop = 1; AdjExtWinLoop <= thisEnclDaylight.NumOfIntWinAdjEnclExtWins; ++AdjExtWinLoop) {
             if (IWin == thisEnclDaylight.IntWinAdjEnclExtWin(AdjExtWinLoop).SurfNum) { // found it
@@ -7604,19 +7569,19 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                             (1.0 - ReflGlDiffDiffFront * ReflBlDiffDiffBack) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                         } else { // Between-glass blind
-                            t1 = General::POLYF(COSB, construct.tBareVisCoef(1));
+                            Real64 t1 = General::POLYF(COSB, construct.tBareVisCoef(1));
                             td2 = construct.tBareVisDiff(2);
                             rbd1 = construct.rbBareVisDiff(1);
                             rfd2 = construct.rfBareVisDiff(2);
-                            tfshBd = WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
+                            Real64 tfshBd = WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
                             tfshd = blind.VisFrontDiffDiffTrans(JB);
-                            rfshB = WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
+                            Real64 rfshB = WindowManager::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
                             rbshd = blind.VisFrontDiffDiffRefl(JB);
                             if (construct.TotGlassLayers == 2) { // 2 glass layers
                                 transMult[JB] =
                                     t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
                             } else { // 3 glass layers; blind between layers 2 and 3
-                                t2 = General::POLYF(COSB, construct.tBareVisCoef(2));
+                                Real64 t2 = General::POLYF(COSB, construct.tBareVisCoef(2));
                                 td3 = construct.tBareVisDiff(3);
                                 rfd3 = construct.rfBareVisDiff(3);
                                 rbd2 = construct.rbBareVisDiff(2);
@@ -7852,7 +7817,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                 transMult[JB] =
                                     t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
                             } else { // 3 glass layers; blind between layers 2 and 3
-                                t2 = General::POLYF(COSBSun, construct.tBareVisCoef(2));
+                                Real64 t2 = General::POLYF(COSBSun, construct.tBareVisCoef(2));
                                 transMult[JB] = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) * td3 *
                                                 state.dataSurface->SurfWinLightWellEff(IWin);
                             }
@@ -7891,72 +7856,73 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     // specular reflection from exterior surfaces
 
     if (state.dataSurface->CalcSolRefl && state.dataSurface->SurfWinOriginalClass(IWin) != SurfaceClass::TDD_Dome) {
+    
         ZSU1refl = state.dataSurface->SurfReflFacBmToBmSolObs(IHR, IWin);
 
         if (ZSU1refl > 0.0) {
             // Contribution to window luminance and downgoing flux
-
+                
             // -- Bare window. We use diffuse-diffuse transmittance here rather than beam-beam to avoid
             //    complications due to specular reflection from multiple exterior surfaces
-
+                
             TVisSunRefl = construct.TransDiffVis * state.dataSurface->SurfWinGlazedFrac(IWin) *
-                          state.dataSurface->SurfWinLightWellEff(IWin);
+                    state.dataSurface->SurfWinLightWellEff(IWin);
             // In the following it is assumed that all reflected beam is going downward, as it would be in the
             // important case of reflection from a highly glazed facade of a neighboring building. However, in
             // rare cases (such as upward specular reflection from a flat horizontal skylight) it may
             // actually be going upward.
             FLFW[1].sunDisk += ZSU1refl * TVisSunRefl;
-
+            
             // -- Window with shade, blind or diffusing glass
-
+            
             if (ShadeOn || BlindOn || ScreenOn || state.dataSurface->SurfWinSolarDiffusing(IWin)) {
                 std::fill(transBmBmMult.begin(), transBmBmMult.end(), 0.0);
                 std::fill(transMult.begin(), transMult.end(), 0.0);
-
+                
                 for (int JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
                     if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
-
+                        
                     if (ShadeOn || state.dataSurface->SurfWinSolarDiffusing(IWin)) { // Shade on or diffusing glass
                         int IConstShaded = state.dataSurface->SurfWinActiveShadedConstruction(IWin);
                         if (state.dataSurface->SurfWinSolarDiffusing(IWin)) IConstShaded = state.dataSurface->Surface(IWin).Construction;
                         transMult[1] = state.dataConstruction->Construct(IConstShaded).TransDiffVis * state.dataSurface->SurfWinGlazedFrac(IWin) *
-                                       state.dataSurface->SurfWinLightWellEff(IWin);
-
+                                state.dataSurface->SurfWinLightWellEff(IWin);
+                        
                     } else if (ScreenOn) { // Exterior screen on
-                        TransScDiffDiffFront = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).DifDifTransVis;
+                        Real64 TransScDiffDiffFront = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).DifDifTransVis;
                         transMult[1] = TransScDiffDiffFront *
-                                       (construct.TransDiffVis / (1.0 - ReflGlDiffDiffFront * ReflScDiffDiffBack)) *
-                                       state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
-
+                                (construct.TransDiffVis / (1.0 - ReflGlDiffDiffFront * ReflScDiffDiffBack)) *
+                                state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
+                        
                     } else { // Blind on
                         auto const &blind = state.dataMaterial->Blind(BlNum);
-                        TransBlDiffDiffFront = blind.VisFrontDiffDiffTrans(JB);
+                        Real64 TransBlDiffDiffFront = blind.VisFrontDiffDiffTrans(JB);
                         if (ShType == WinShadingType::IntBlind) { // Interior blind
                             ReflBlDiffDiffFront = blind.VisFrontDiffDiffRefl(JB);
                             transMult[JB] = TVisSunRefl * (TransBlDiffDiffFront + ReflBlDiffDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
-                                                                                      (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
-
+                                                           (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
+                            
                         } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
                             transMult[JB] = TransBlDiffDiffFront *
-                                            (construct.TransDiffVis /
-                                             (1.0 - ReflGlDiffDiffFront * blind.VisBackDiffDiffRefl(JB))) *
-                                            state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
-
+                                    (construct.TransDiffVis /
+                                     (1.0 - ReflGlDiffDiffFront * blind.VisBackDiffDiffRefl(JB))) *
+                                    state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
+                            
                         } else { // Between-glass blind
-                            t1 = construct.tBareVisDiff(1);
-                            tfshBd = blind.VisFrontDiffDiffTrans(JB);
-                            rfshB = blind.VisFrontDiffDiffRefl(JB);
+                            Real64 t1 = construct.tBareVisDiff(1);
+                            Real64 tfshBd = blind.VisFrontDiffDiffTrans(JB);
+                            Real64 rfshB = blind.VisFrontDiffDiffRefl(JB);
                             if (construct.TotGlassLayers == 2) { // 2 glass layers
                                 transMult[JB] =
-                                    t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
+                                        t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
                             } else { // 3 glass layers; blind between layers 2 and 3
-                                t2 = construct.tBareVisDiff(2);
+                                Real64 t2 = construct.tBareVisDiff(2);
                                 transMult[JB] = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) * td3 *
-                                                state.dataSurface->SurfWinLightWellEff(IWin);
+                                        state.dataSurface->SurfWinLightWellEff(IWin);
                             }
                         } // End of check of interior/exterior/between-glass blind
                     }     // ShadeOn/BlindOn
-
+                    
                     dl->winLum(IHR, JB + 1).sun += ZSU1refl * transMult[JB] / Constant::Pi;
                     FLFW[JB + 1].sun += ZSU1refl * transMult[JB] * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
                     FLCW[JB + 1].sun += ZSU1refl * transMult[JB] * state.dataSurface->SurfWinFractionUpgoing(IWin);
@@ -7964,7 +7930,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
             }     // End of check if window has shade, blind or diffusing glass
         }         // End of check if ZSU1refl > 0.0
     }             // End of check if solar reflections are in effect
-
+    
     // Sun-related portion of internally reflected illuminance
 
     for (int JSH = 1; JSH <= Material::MaxSlatAngs + 1; ++JSH) {
