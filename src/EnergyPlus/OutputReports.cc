@@ -776,10 +776,10 @@ void DXFOut(EnergyPlusData &state,
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         const DataSurfaceColors::ColorNo curcolorno = DataSurfaceColors::ColorNo::DaylSensor1;
 
-        for (auto const &illumMapCalc : state.dataDayltg->IllumMapCalc) {
-            if (illumMapCalc.zoneIndex != zones) continue;
+        for (auto const &illumMap : state.dataDayltg->illumMaps) {
+            if (illumMap.zoneIndex != zones) continue;
             int numRefPt = 0;
-            for (auto const &refPt : illumMapCalc.refPts) { 
+            for (auto const &refPt : illumMap.refPts) { 
                 print(dxffile, Format_710, format("{}:MapRefPt:{}", state.dataHeatBal->Zone(zones).Name, ++numRefPt));
                 print(dxffile,
                       Format_709,

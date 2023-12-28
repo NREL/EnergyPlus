@@ -149,7 +149,7 @@ namespace DElightManagerF {
         Real64 SinZoneRelNorth; // Sine of Zone rotation
         Real64 Xb;              // temp var for transformation calc
         Real64 Yb;              // temp var for transformation calc
-        Array1D<Real64> RefPt_WCS_Coord(3);
+        Vector3<Real64> RefPt_WCS_Coord;
         Array1D_int iWndoConstIndexes(100);
         bool lWndoConstFound;      // Flag for non-unique window const index
         std::string cNameWOBlanks; // Name without blanks
@@ -576,20 +576,18 @@ namespace DElightManagerF {
                             if (znDayl.TotalDaylRefPoints <= 100) {
 
                                 if (state.dataSurface->DaylRefWorldCoordSystem) {
-                                    RefPt_WCS_Coord(1) = refPt.x;
-                                    RefPt_WCS_Coord(2) = refPt.y;
-                                    RefPt_WCS_Coord(3) = refPt.z;
+                                    RefPt_WCS_Coord = refPt.coords;
                                 } else {
                                     // Transform reference point coordinates into building coordinate system
-                                    Xb = refPt.x * CosZoneRelNorth - refPt.y * SinZoneRelNorth + thisZone.OriginX;
-                                    Yb = refPt.x * SinZoneRelNorth + refPt.y * CosZoneRelNorth + thisZone.OriginY;
+                                    Xb = refPt.coords.x * CosZoneRelNorth - refPt.coords.y * SinZoneRelNorth + thisZone.OriginX;
+                                    Yb = refPt.coords.x * SinZoneRelNorth + refPt.coords.y * CosZoneRelNorth + thisZone.OriginY;
                                     // Transform into World Coordinate System
-                                    RefPt_WCS_Coord(1) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
-                                    RefPt_WCS_Coord(2) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
-                                    RefPt_WCS_Coord(3) = refPt.z + thisZone.OriginZ;
+                                    RefPt_WCS_Coord.x = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
+                                    RefPt_WCS_Coord.y = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
+                                    RefPt_WCS_Coord.z = refPt.coords.z + thisZone.OriginZ;
                                     if (ldoTransform) {          // Geometry transform
-                                        Xo = RefPt_WCS_Coord(1); // world coordinates.... shifted by relative north angle...
-                                        Yo = RefPt_WCS_Coord(2);
+                                        Xo = RefPt_WCS_Coord.x; // world coordinates.... shifted by relative north angle...
+                                        Yo = RefPt_WCS_Coord.y;
                                         // next derotate the building
                                         XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
                                         YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
@@ -597,42 +595,42 @@ namespace DElightManagerF {
                                         Xtrans = XnoRot * std::sqrt(rnewAspectRatio / roldAspectRatio);
                                         Ytrans = YnoRot * std::sqrt(roldAspectRatio / rnewAspectRatio);
                                         // rerotate
-                                        RefPt_WCS_Coord(1) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
+                                        RefPt_WCS_Coord.x = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
 
-                                        RefPt_WCS_Coord(2) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
+                                        RefPt_WCS_Coord.y = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
                                     }
                                 }
-                                znDayl.refPts(refPt.indexToFracAndIllum).absCoords = {RefPt_WCS_Coord(1), RefPt_WCS_Coord(2), RefPt_WCS_Coord(3)};
+                                znDayl.refPts(refPt.indexToFracAndIllum).absCoords = RefPt_WCS_Coord;
 
                                 // Validate that Reference Point coordinates are within the host Zone
-                                if (RefPt_WCS_Coord(1) < thisZone.MinimumX || RefPt_WCS_Coord(1) > thisZone.MaximumX) {
+                                if (RefPt_WCS_Coord.x < thisZone.MinimumX || RefPt_WCS_Coord.x > thisZone.MaximumX) {
                                     ShowWarningError(
                                         state, format("DElightInputGenerator:Reference point X Value outside Zone Min/Max X, Zone={}", zn.Name));
                                     ShowSevereError(state,
                                                     format("...X Reference Point= {:.2R}, Zone Minimum X= {:.2R}, Zone Maximum X= {:.2R}",
                                                            thisZone.MinimumX,
-                                                           RefPt_WCS_Coord(1),
+                                                           RefPt_WCS_Coord.x,
                                                            thisZone.MaximumX));
                                     ErrorsFound = true;
                                 }
-                                if (RefPt_WCS_Coord(2) < thisZone.MinimumY || RefPt_WCS_Coord(2) > thisZone.MaximumY) {
+                                if (RefPt_WCS_Coord.y < thisZone.MinimumY || RefPt_WCS_Coord.y > thisZone.MaximumY) {
                                     ShowWarningError(
                                         state, format("DElightInputGenerator:Reference point Y Value outside Zone Min/Max Y, Zone={}", zn.Name));
                                     ShowSevereError(state,
                                                     format("...Y Reference Point= {:.2R}, Zone Minimum Y= {:.2R}, Zone Maximum Y= {:.2R}",
                                                            thisZone.MinimumY,
-                                                           RefPt_WCS_Coord(2),
+                                                           RefPt_WCS_Coord.y,
                                                            thisZone.MaximumY));
                                     ErrorsFound = true;
                                 }
-                                if (RefPt_WCS_Coord(3) < state.dataHeatBal->Zone(izone).MinimumZ || RefPt_WCS_Coord(3) > thisZone.MaximumZ) {
+                                if (RefPt_WCS_Coord.z < state.dataHeatBal->Zone(izone).MinimumZ || RefPt_WCS_Coord.z > thisZone.MaximumZ) {
                                     ShowWarningError(
                                         state,
                                         format("DElightInputGenerator:Reference point Z Value outside Zone Min/Max Z, Zone={}", thisZone.Name));
                                     ShowSevereError(state,
                                                     format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}",
                                                            thisZone.MinimumZ,
-                                                           RefPt_WCS_Coord(3),
+                                                           RefPt_WCS_Coord.z,
                                                            thisZone.MaximumZ));
                                     ErrorsFound = true;
                                 }
@@ -645,9 +643,9 @@ namespace DElightManagerF {
                                     print(delightInFile,
                                           Format_913,
                                           cNameWOBlanks,
-                                          RefPt_WCS_Coord(1) * M2FT,
-                                          RefPt_WCS_Coord(2) * M2FT,
-                                          RefPt_WCS_Coord(3) * M2FT,
+                                          RefPt_WCS_Coord.x * M2FT,
+                                          RefPt_WCS_Coord.y * M2FT,
+                                          RefPt_WCS_Coord.z * M2FT,
                                           znDayl.refPts(refPt.indexToFracAndIllum).fracZoneDaylit,
                                           znDayl.refPts(refPt.indexToFracAndIllum).illumSetPoint * LUX2FC,
                                           znDayl.LightControlType);
@@ -663,9 +661,9 @@ namespace DElightManagerF {
                                     print(delightInFile,
                                           Format_913,
                                           cNameWOBlanks,
-                                          RefPt_WCS_Coord(1) * M2FT,
-                                          RefPt_WCS_Coord(2) * M2FT,
-                                          RefPt_WCS_Coord(3) * M2FT,
+                                          RefPt_WCS_Coord.x * M2FT,
+                                          RefPt_WCS_Coord.y * M2FT,
+                                          RefPt_WCS_Coord.z * M2FT,
                                           0.0,
                                           0.0 * LUX2FC,
                                           znDayl.LightControlType); // should never happen but just in case send zero fraction and illuminance

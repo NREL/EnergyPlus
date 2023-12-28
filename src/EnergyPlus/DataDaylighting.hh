@@ -159,6 +159,12 @@ namespace Dayltg {
         EPVector<int> daylightControlIndexes; // Indexes to daylighting:controls object operating in this enclosure
     };
 
+    struct DaylRefPtExtWin {
+        Real64 solidAng = 0.0;
+        Real64 solidAngWtd = 0.0;
+        std::array<std::array<Real64, (int)DataSurfaces::WinCover::Num>, (int)Lum::Num> lums;
+    };
+        
     struct DaylRefPt
     {
         int num = 0;
@@ -171,6 +177,8 @@ namespace Dayltg {
         Real64 timeExceedingDaylightIlluminanceSetPoint = 0.0;
         std::array<Real64, (int)Lum::Num> lums = {0.0, 0.0, 0.0};
         Real64 glareIndex = 0.0;
+
+        Array1D<DaylRefPtExtWin> extWins;
     };
         
     struct DaylightingControl
@@ -197,10 +205,6 @@ namespace Dayltg {
         Real64 LightControlProbability = 0.0;      // For manual control of stepped systems, probability that lighting will
         Real64 PowerReductionFactor = 1.0;         // Electric power reduction factor for this control due to daylighting
         Real64 DElightGriddingResolution = 0.0;    // Field: Delight Gridding Resolution
-        Array2D<Real64> SolidAngAtRefPt;    // (Number of Zones, Total Daylighting Reference Points)
-        Array2D<Real64> SolidAngAtRefPtWtd; // (Number of Zones, Total Daylighting Reference Points)
-        Array2D<std::array<std::array<Real64, (int)DataSurfaces::WinCover::Num>, (int)Lum::Num>> DaylFromWinAtRefPt; // (Number of Zones, 2, Total Daylighting Reference Points)
-
 
         // Allocatable daylight factor arrays
         // Arguments (dimensions) for Dayl---Sky are:
@@ -227,11 +231,21 @@ namespace Dayltg {
         int totRefPts = 0.0;          // For VisualResilienceSummary total number of rereference points
     };
 
-    struct IllumMapData
+    struct DaylMapPt
+    {
+        Vector3<Real64> absCoords = {0.0, 0.0, 0.0};
+        bool inBounds = true;
+        std::array<Real64, (int)Lum::Num> lums = {0.0, 0.0, 0.0};
+        std::array<Real64, (int)Lum::Num> lumsHr = {0.0, 0.0, 0.0};
+
+        Array1D<std::array<Real64, (int)DataSurfaces::WinCover::Num>> winLums;
+    };
+        
+    struct IllumMap
     {
         // Members
         std::string Name;                    // Map name
-        int zoneIndex;                       // Index to zone being mapped
+        int zoneIndex = 0;                   // Index to zone being mapped
         int enclIndex = 0;                   // Index to enclosure for this map
         Real64 Z = 0.0;                      // Elevation or height
         Real64 Xmin = 0.0;                   // Minimum X value
@@ -246,44 +260,23 @@ namespace Dayltg {
         bool HeaderXLineLengthNeeded = true; // X header will likely be the longest line in the file
         int HeaderXLineLength = 0;           // actual length of this X header line
         std::string pointsHeader;            // part of the header that lists the reference points in the same zone
-    };
 
-    struct DaylMapPt
-    {
-        Vector3<Real64> absCoords = {0.0, 0.0, 0.0};
-        bool inBounds = true;
-        std::array<Real64, (int)Lum::Num> lums = {0.0, 0.0, 0.0};
-        std::array<Real64, (int)Lum::Num> lumsHr = {0.0, 0.0, 0.0};
-    };
-        
-    struct MapCalcData
-    {
-        // Members
         int TotalMapRefPoints = 0;                 // Number of illuminance map reference points in this zone (up to 100)
-        int zoneIndex = 0;                         // Pointer to zone being mapped
-        int enclIndex = 0;                         // Index to enclosure for this map
-
         Array1D<DaylMapPt> refPts;    
-        // in absolute coordinate system (m)
-        // Points 1 and 2 are the control reference points
-        Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>> IllumFromWinAtMapPt; // (Number of Zones, Total Map Reference Points)
         // Arguments (dimensions) for Dayl---Sky are:
         //  1: Sun position index / HourOfDay (1 to 24)
         //  2: Daylit window number (1 to NumOfDayltgExtWins)
         //  3: Reference point number (1 to Total Map Reference Points)
         //  4: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
         //      2 = first slat position, 3 = second position, ..., MaxSlatAngs+1 = last position)
-        //  5: Sky type (1 to 4; 1 = clear, 2 = clear turbid, 3 = intermediate, 4 = overcast
-        Array4D<Dayltg::Illums> DaylIllumFac;
+        Array4D<Dayltg::Illums> daylFac;
     };
 
     struct RefPointData
     {
         std::string Name; // Map name
         int ZoneNum = 0;  // Pointer to zone being referenced
-        Real64 x = 0.0;   // x coordinate
-        Real64 y = 0.0;   // y coordinate
-        Real64 z = 0.0;   // z coordinate
+        Vector3<Real64> coords = {0.0, 0.0, 0.0};   // x coordinate
         int indexToFracAndIllum = 0;
     };
 

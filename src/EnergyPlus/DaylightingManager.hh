@@ -491,8 +491,7 @@ struct DaylightingData : BaseGlobalStruct
     Array1D<Dayltg::EnclDaylightCalc> enclDaylight;
     Array1D<Dayltg::ZoneDaylightCalc> ZoneDaylight;
     Array1D<Dayltg::DaylightingControl> daylightControl;
-    Array1D<Dayltg::IllumMapData> IllumMap;
-    Array1D<Dayltg::MapCalcData> IllumMapCalc;
+    Array1D<Dayltg::IllumMap> illumMaps;
     Array1D<Dayltg::RefPointData> DaylRefPt;
     Array1D<Dayltg::DElightComplexFeneData> DElightComplexFene;
     Array1D<Real64> spacePowerReductionFactor; // Average electric power reduction factor for space due to daylighting

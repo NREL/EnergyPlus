@@ -353,21 +353,21 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDayliteRefPt_Test)
 
     EXPECT_EQ("WEST ZONE_DAYLREFPT1", dl->DaylRefPt(1).Name);
     EXPECT_EQ(1, dl->DaylRefPt(1).ZoneNum);
-    EXPECT_EQ(3.048, dl->DaylRefPt(1).x);
-    EXPECT_EQ(2.048, dl->DaylRefPt(1).y);
-    EXPECT_EQ(0.7, dl->DaylRefPt(1).z);
+    EXPECT_EQ(3.048, dl->DaylRefPt(1).coords.x);
+    EXPECT_EQ(2.048, dl->DaylRefPt(1).coords.y);
+    EXPECT_EQ(0.7, dl->DaylRefPt(1).coords.z);
 
     EXPECT_EQ("WEST ZONE_DAYLREFPT2", dl->DaylRefPt(2).Name);
     EXPECT_EQ(1, dl->DaylRefPt(2).ZoneNum);
-    EXPECT_EQ(3.048, dl->DaylRefPt(2).x);
-    EXPECT_EQ(3.048, dl->DaylRefPt(2).y);
-    EXPECT_EQ(0.8, dl->DaylRefPt(2).z);
+    EXPECT_EQ(3.048, dl->DaylRefPt(2).coords.x);
+    EXPECT_EQ(3.048, dl->DaylRefPt(2).coords.y);
+    EXPECT_EQ(0.8, dl->DaylRefPt(2).coords.z);
 
     EXPECT_EQ("WEST ZONE_DAYLREFPT3", dl->DaylRefPt(3).Name);
     EXPECT_EQ(1, dl->DaylRefPt(3).ZoneNum);
-    EXPECT_EQ(3.048, dl->DaylRefPt(3).x);
-    EXPECT_EQ(4.048, dl->DaylRefPt(3).y);
-    EXPECT_EQ(0.9, dl->DaylRefPt(3).z);
+    EXPECT_EQ(3.048, dl->DaylRefPt(3).coords.x);
+    EXPECT_EQ(4.048, dl->DaylRefPt(3).coords.y);
+    EXPECT_EQ(0.9, dl->DaylRefPt(3).coords.z);
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_GetInputOutputIlluminanceMap_Test)
@@ -418,17 +418,17 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputOutputIlluminanceMap_Test)
     GetInputIlluminanceMap(*state, foundErrors);
     // compare_err_stream(""); // expecting errors because zone is not really defined
 
-    EXPECT_EQ(1, (int)dl->IllumMap.size());
+    EXPECT_EQ(1, (int)dl->illumMaps.size());
 
-    EXPECT_EQ("MAP1", dl->IllumMap(1).Name);
-    EXPECT_EQ(1, dl->IllumMap(1).zoneIndex);
-    EXPECT_EQ(0, dl->IllumMap(1).Z);
-    EXPECT_EQ(0.1, dl->IllumMap(1).Xmin);
-    EXPECT_EQ(6.0, dl->IllumMap(1).Xmax);
-    EXPECT_EQ(10, dl->IllumMap(1).Xnum);
-    EXPECT_EQ(0.2, dl->IllumMap(1).Ymin);
-    EXPECT_EQ(5.0, dl->IllumMap(1).Ymax);
-    EXPECT_EQ(11, dl->IllumMap(1).Ynum);
+    EXPECT_EQ("MAP1", dl->illumMaps(1).Name);
+    EXPECT_EQ(1, dl->illumMaps(1).zoneIndex);
+    EXPECT_EQ(0, dl->illumMaps(1).Z);
+    EXPECT_EQ(0.1, dl->illumMaps(1).Xmin);
+    EXPECT_EQ(6.0, dl->illumMaps(1).Xmax);
+    EXPECT_EQ(10, dl->illumMaps(1).Xnum);
+    EXPECT_EQ(0.2, dl->illumMaps(1).Ymin);
+    EXPECT_EQ(5.0, dl->illumMaps(1).Ymax);
+    EXPECT_EQ(11, dl->illumMaps(1).Ynum);
 
     // OutputControl:IlluminanceMap:Style
     EXPECT_EQ(',', dl->MapColSep);
@@ -3384,7 +3384,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
-TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
+TEST_F(EnergyPlusFixture, DaylightingManager_ReportillumMaps)
 {
     auto &dl = state->dataDayltg;
         
@@ -3400,8 +3400,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
     thisDaylightControl.TotalDaylRefPoints = 3;
     thisDaylightControl.refPts.allocate(thisDaylightControl.TotalDaylRefPoints);
     dl->SavedMnDy.allocate(1);
-    dl->IllumMap.allocate(state->dataGlobal->NumOfZones);
-    dl->IllumMap(MapNum).zoneIndex = 1;
+    dl->illumMaps.allocate(state->dataGlobal->NumOfZones);
+    dl->illumMaps(MapNum).zoneIndex = 1;
     thisDaylightControl.zoneIndex = 1;
     dl->MapColSep = DataStringGlobals::CharSemicolon;
     state->dataEnvrn->CurMnDyHr = "JAN012001";
@@ -3410,16 +3410,16 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
     thisDaylightControl.refPts(1).absCoords = {1.23, 2.34, 3.45};
     thisDaylightControl.refPts(2).absCoords = {4.56, 5.67, 6.78};
     thisDaylightControl.refPts(3).absCoords = {7.89, 8.90, 9.01};
-    dl->IllumMap(MapNum).Name = "ThisOne";
-    dl->IllumMap(MapNum).Z = 23.23;
+    dl->illumMaps(MapNum).Name = "ThisOne";
+    dl->illumMaps(MapNum).Z = 23.23;
 
     std::string expectedResultName = "ThisOne at 23.23m";
     std::string expectedResultPtsHeader = " RefPt1=(1.23:2.34:3.45), RefPt2=(4.56:5.67:6.78), RefPt3=(7.89:8.90:9.01)";
 
     Dayltg::ReportIllumMap(*state, MapNum);
 
-    EXPECT_EQ(expectedResultName, dl->IllumMap(1).Name);
-    EXPECT_EQ(expectedResultPtsHeader, dl->IllumMap(MapNum).pointsHeader);
+    EXPECT_EQ(expectedResultName, dl->illumMaps(1).Name);
+    EXPECT_EQ(expectedResultPtsHeader, dl->illumMaps(MapNum).pointsHeader);
 }
 TEST_F(EnergyPlusFixture, DaylightingManager_DayltgIlluminanceMap)
 {
@@ -3699,7 +3699,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgIlluminanceMap)
     auto &dl = state->dataDayltg;
     
     SimulationManager::ManageSimulation(*state);
-    EXPECT_EQ(100, dl->IllumMapCalc(1).refPts.size());
+    EXPECT_EQ(100, dl->illumMaps(1).refPts.size());
 
     // re-set the hour of the day to mid-day
     state->dataGlobal->TimeStep = 1;
@@ -3710,15 +3710,15 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgIlluminanceMap)
     state->dataWeather->Envrn = 1;
     Weather::ManageWeather(*state);
     HeatBalanceManager::ManageHeatBalance(*state);
-    EXPECT_NEAR(16051, dl->IllumMapCalc(1).refPts(5).lums[(int)Lum::Illum], 1);
-    EXPECT_NEAR(203, dl->IllumMapCalc(1).refPts(10).lums[(int)Lum::Illum], 1);
-    EXPECT_NEAR(1294, dl->IllumMapCalc(1).refPts(15).lums[(int)Lum::Illum], 1);
-    EXPECT_NEAR(412, dl->IllumMapCalc(1).refPts(20).lums[(int)Lum::Illum], 1);
-    EXPECT_NEAR(257, dl->IllumMapCalc(1).refPts(51).lums[(int)Lum::Illum], 1);
-    EXPECT_NEAR(316, dl->IllumMapCalc(1).refPts(55).lums[(int)Lum::Illum], 1);
-    EXPECT_NEAR(255, dl->IllumMapCalc(1).refPts(60).lums[(int)Lum::Illum], 1);
-    EXPECT_NEAR(209, dl->IllumMapCalc(1).refPts(91).lums[(int)Lum::Illum], 1);
-    EXPECT_NEAR(209, dl->IllumMapCalc(1).refPts(100).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(16051, dl->illumMaps(1).refPts(5).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(203, dl->illumMaps(1).refPts(10).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(1294, dl->illumMaps(1).refPts(15).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(412, dl->illumMaps(1).refPts(20).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(257, dl->illumMaps(1).refPts(51).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(316, dl->illumMaps(1).refPts(55).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(255, dl->illumMaps(1).refPts(60).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(209, dl->illumMaps(1).refPts(91).lums[(int)Lum::Illum], 1);
+    EXPECT_NEAR(209, dl->illumMaps(1).refPts(100).lums[(int)Lum::Illum], 1);
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_SteppedControl_LowDaylightConditions)
