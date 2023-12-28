@@ -1123,12 +1123,11 @@ void GatherForPredefinedReport(EnergyPlusData &state)
             ++numExtSurfaces(currSurfaceClass);
         }
         if (surface.Class == DataSurfaces::SurfaceClass::Window) {
-            if (state.dataSurface->SurfWinOriginalClass(iSurf) == DataSurfaces::SurfaceClass::GlassDoor ||
-                state.dataSurface->SurfWinOriginalClass(iSurf) == DataSurfaces::SurfaceClass::TDD_Diffuser) {
-                int currOriginalSurfaceClass = int(state.dataSurface->SurfWinOriginalClass(iSurf));
-                ++numSurfaces(currOriginalSurfaceClass);
+            if (surface.OriginalClass == DataSurfaces::SurfaceClass::GlassDoor ||
+                surface.OriginalClass == DataSurfaces::SurfaceClass::TDD_Diffuser) {
+                ++numSurfaces((int)surface.OriginalClass);
                 if (isExterior) {
-                    ++numExtSurfaces(currOriginalSurfaceClass);
+                    ++numExtSurfaces((int)surface.OriginalClass);
                 }
             }
         }
@@ -3039,7 +3038,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
                 int const firstSurfWin = thisSpace.WindowSurfaceFirst;
                 int const lastSurfWin = thisSpace.WindowSurfaceLast;
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    if (Surface(SurfNum).ExtSolar || state.dataSurface->SurfWinOriginalClass(SurfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) {
+                    auto &surf = state.dataSurface->Surface(SurfNum);
+                    if (surf.ExtSolar || surf.OriginalClass == DataSurfaces::SurfaceClass::TDD_Diffuser) {
                         // Exclude special shading surfaces which required SurfOpaqQRadSWOut calculations above
                         int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
                         auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
@@ -3275,7 +3275,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                         } else if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
                             int SurfNum2 = SurfNum;
-                            if (state.dataSurface->SurfWinOriginalClass(SurfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) {
+                            if (state.dataSurface->Surface(SurfNum).OriginalClass == DataSurfaces::SurfaceClass::TDD_Diffuser) {
                                 SurfNum2 = state.dataDaylightingDevicesData->TDDPipe(state.dataSurface->SurfWinTDDPipeNum(SurfNum)).Dome;
                             }
 
@@ -6559,7 +6559,7 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
                 }
                 state.dataSurface->SurfWinHeatTransferRepEnergy(surfNum) =
                     state.dataSurface->SurfWinHeatGain(surfNum) * state.dataGlobal->TimeStepZoneSec;
-                if (state.dataSurface->SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
+                if (state.dataSurface->Surface(surfNum).OriginalClass == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                     int pipeNum = state.dataSurface->SurfWinTDDPipeNum(surfNum);
                     state.dataDaylightingDevicesData->TDDPipe(pipeNum).HeatGain = state.dataSurface->SurfWinHeatGainRep(surfNum);
                     state.dataDaylightingDevicesData->TDDPipe(pipeNum).HeatLoss = state.dataSurface->SurfWinHeatLossRep(surfNum);
@@ -8098,7 +8098,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
             Real64 &TH11 = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
             int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum); // Not const, because storm window may change this
             auto const &construct = state.dataConstruction->Construct(ConstrNum);
-            if (state.dataSurface->SurfWinOriginalClass(SurfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
+            if (surface.OriginalClass == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                 // Lookup up the TDD:DOME object
                 int const pipeNum = state.dataSurface->SurfWinTDDPipeNum(SurfNum);
                 int const domeNum = state.dataDaylightingDevicesData->TDDPipe(pipeNum).Dome;
@@ -8242,8 +8242,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
             Real64 &TH12 = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
             TH12 = state.dataHeatBalSurf->SurfTempIn(SurfNum);
             state.dataHeatBalSurf->SurfTempOut(SurfNum) = TH11; // For reporting
-            if (state.dataSurface->SurfWinOriginalClass(SurfNum) == DataSurfaces::SurfaceClass::TDD_Dome) continue;
-            if (state.dataSurface->SurfWinOriginalClass(SurfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
+            if (state.dataSurface->Surface(SurfNum).OriginalClass == DataSurfaces::SurfaceClass::TDD_Dome) continue;
+            if (state.dataSurface->Surface(SurfNum).OriginalClass == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                 // Tubular daylighting devices are treated as one big object with an effective R value.
                 // The outside face temperature of the TDD:DOME and the inside face temperature of the
                 // TDD:DIFFUSER are calculated with the outside and inside heat balances respectively.
@@ -8785,7 +8785,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                 int const firstWindowSurf = thisSpace.WindowSurfaceFirst;
                 int const lastWindowSurf = thisSpace.WindowSurfaceLast;
                 for (int surfNum = firstWindowSurf; surfNum <= lastWindowSurf; ++surfNum) {
-                    auto &surface = Surface(surfNum);
+                    auto &surface = state.dataSurface->Surface(surfNum);
                     if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
                         int repSurfNum = surface.RepresentativeCalcSurfNum;
                         if (surfNum != repSurfNum) continue;
@@ -8793,7 +8793,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                     Real64 &TH11(state.dataHeatBalSurf->SurfOutsideTempHist(1)(surfNum));
                     int const ConstrNum = state.dataSurface->SurfActiveConstruction(surfNum);
                     auto const &construct = state.dataConstruction->Construct(ConstrNum);
-                    if (state.dataSurface->SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
+                    if (surface.OriginalClass == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                         // Lookup up the TDD:DOME object
                         int const pipeNum = state.dataSurface->SurfWinTDDPipeNum(surfNum);
                         int const domeNum = state.dataDaylightingDevicesData->TDDPipe(pipeNum).Dome;
@@ -8945,7 +8945,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                     Real64 &TH12 = state.dataHeatBalSurf->SurfInsideTempHist(1)(surfNum);
                     TH12 = state.dataHeatBalSurf->SurfTempIn(surfNum);
                     state.dataHeatBalSurf->SurfTempOut(surfNum) = TH11;                                                 // For reporting
-                    if (state.dataSurface->SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
+                    if (state.dataSurface->Surface(surfNum).OriginalClass == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                         // Tubular daylighting devices are treated as one big object with an effective R value.
                         // The outside face temperature of the TDD:DOME and the inside face temperature of the
                         // TDD:DIFFUSER are calculated with the outside and inside heat balances respectively.

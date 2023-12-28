@@ -212,9 +212,9 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
                       state.dataSurface->SurfWinDividerArea(ISurf) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(ISurf)) *
                           (1.0 - state.dataSurface->SurfWinDividerSolAbsorp(ISurf));
 
-            FWC fwc = FWC::Ceiling;                                                                                               // Ceiling
+            FWC fwc = FWC::Ceiling; // Ceiling
             if (surf.Tilt > 10.0 && surf.Tilt < 170.0) fwc = FWC::Wall; // Wall
-            if (surf.Tilt >= 170.0) fwc = FWC::Floor;                                                // Floor
+            if (surf.Tilt >= 170.0) fwc = FWC::Floor;  // Floor
             AR[(int)fwc] += AREA + state.dataSurface->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(ISurf)) +
                             state.dataSurface->SurfWinDividerArea(ISurf) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(ISurf));
             ARH[(int)fwc] += AREA * state.dataConstruction->Construct(surf.Construction).ReflectVisDiffBack +
@@ -677,7 +677,7 @@ void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state)
         for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
             for (int loopwin = 1; loopwin <= dl->enclDaylight(enclNum).NumOfDayltgExtWins; ++loopwin) {
                 int IWin = dl->enclDaylight(enclNum).DayltgExtWinSurfNums(loopwin);
-                if (state.dataSurface->SurfWinOriginalClass(IWin) != SurfaceClass::TDD_Diffuser) continue;
+                if (state.dataSurface->Surface(IWin).OriginalClass != SurfaceClass::TDD_Diffuser) continue;
                 // Look up the TDD:DOME object
                 int PipeNum = state.dataSurface->SurfWinTDDPipeNum(IWin);
                 if (PipeNum == 0) {
@@ -1689,7 +1689,7 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
     }
 
     // Recalculation of values for TDD:DOME
-    if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
+    if (state.dataSurface->Surface(IWin).OriginalClass == SurfaceClass::TDD_Diffuser) {
 
         // Look up the TDD:DOME object
         int PipeNum = state.dataSurface->SurfWinTDDPipeNum(IWin);
@@ -1812,8 +1812,8 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
     if (CalledFrom == CalledFor::RefPoint) {
         // Initialize solid angle subtended by window wrt ref pt
         // and solid angle weighted by glare position factor
-        state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPt(iRefPoint) = 0.0;
-        state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint) = 0.0;
+        state.dataSurface->SurfaceWindow(IWin).refPts(iRefPoint).solidAng = 0.0;
+        state.dataSurface->SurfaceWindow(IWin).refPts(iRefPoint).solidAngWtd = 0.0;
     }
     // Area of window element
     if (is_Rectangle) {
@@ -1957,7 +1957,7 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
 
         Vector3<Real64> HitPtIntWin = {0.0, 0.0, 0.0};
 
-        if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
+        if (state.dataSurface->Surface(IWin).OriginalClass == SurfaceClass::TDD_Diffuser) {
             // Look up the TDD:DOME object
             int PipeNum = state.dataSurface->SurfWinTDDPipeNum(IWin);
             // Unshaded visible transmittance of TDD for a single ray from sky/ground element
@@ -2041,10 +2041,10 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
             if (!hitIntObs) {
                 if (extWinType == ExtWinType::InZone || (extWinType == ExtWinType::AdjZone && hitIntWin)) {
                     // Increment solid angle subtended by portion of window above ref pt
-                    state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPt(iRefPoint) += DOMEGA;
+                    state.dataSurface->SurfaceWindow(IWin).refPts(iRefPoint).solidAng += DOMEGA;
                     dl->daylightControl(daylightCtrlNum).SolidAngAtRefPt(loopwin, iRefPoint) += DOMEGA;
                     // Increment position-factor-modified solid angle
-                    state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint) += DOMEGA * POSFAC;
+                    state.dataSurface->SurfaceWindow(IWin).refPts(iRefPoint).solidAngWtd += DOMEGA * POSFAC;
                     dl->daylightControl(daylightCtrlNum).SolidAngAtRefPtWtd(loopwin, iRefPoint) += DOMEGA * POSFAC;
                 }
             }
@@ -3018,7 +3018,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     if (ObTrans > 1.e-6) {
         // Ray did not hit an obstruction or the transmittance product of hit obstructions is non-zero.
         // Contribution of sky or ground luminance in cd/m2
-        if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
+        if (state.dataSurface->Surface(IWin).OriginalClass == SurfaceClass::TDD_Diffuser) {
             // Make all transmitted light diffuse for a TDD with a bare diffuser
             assert(equal_dimensions(dl->avgWinLum, dl->winLum));
             assert(equal_dimensions(dl->avgWinLum, dl->dirIllum));
@@ -3218,7 +3218,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                     // Sun reaches reference point;  increment illuminance.
                     // Direct normal illuminance is normalized to 1.0
 
-                    if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
+                    if (state.dataSurface->Surface(IWin).OriginalClass == SurfaceClass::TDD_Diffuser) {
                         // No beam is transmitted.  Takes care of TDD with a bare diffuser and all types of blinds.
                         TVISS = 0.0;
                     } else {
@@ -3274,7 +3274,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                         Real64 YR = std::tan(dl->sunAngles.phi + 0.001);
                         Real64 POSFAC = DayltgGlarePositionFactor(XR, YR); // Position factor for a window element / ref point / view vector combination
 
-                        WindowSolidAngleDaylightPoint = state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint);
+                        WindowSolidAngleDaylightPoint = state.dataSurface->SurfaceWindow(IWin).refPts(iRefPoint).solidAngWtd;
 
                         if (POSFAC != 0.0 && WindowSolidAngleDaylightPoint > 0.000001) {
                             // Increment window luminance.  Luminance of solar disk (cd/m2)
@@ -3455,9 +3455,9 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             Real64 XR = std::tan(std::abs(Constant::PiOvr2 - AZVIEW - THSUNrefl) + 0.001);
                             Real64 YR = std::tan(PHSUNrefl + 0.001);
                             Real64 POSFAC = DayltgGlarePositionFactor(XR, YR);
-                            if (POSFAC != 0.0 && state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint) > 0.000001) {
+                            if (POSFAC != 0.0 && state.dataSurface->SurfaceWindow(IWin).refPts(iRefPoint).solidAngWtd > 0.000001) {
                                 XAVWL = 14700.0 * std::sqrt(0.000068 * POSFAC) * double(NWX * NWY) /
-                                        std::pow(state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint), 0.8);
+                                        std::pow(state.dataSurface->SurfaceWindow(IWin).refPts(iRefPoint).solidAngWtd, 0.8);
                                 dl->avgWinLum(iHour, 1).sunDisk += XAVWL * TVisRefl * SpecReflectance; // Bare window
                                 if (ANY_BLIND(ShType)) {
                                     for (int JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
@@ -3763,20 +3763,11 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
         auto &surfWin = state.dataSurface->SurfaceWindow(SurfNum);
         if (numEnclRefPoints > 0) {
             if (!state.dataSurface->SurfWinSurfDayLightInit(SurfNum)) {
-                surfWin.SolidAngAtRefPt.allocate(numEnclRefPoints);
-                surfWin.SolidAngAtRefPt = 0.0;
-                surfWin.SolidAngAtRefPtWtd.allocate(numEnclRefPoints);
-                surfWin.SolidAngAtRefPtWtd = 0.0;
-                surfWin.DaylFromWinAtRefPt.allocate(numEnclRefPoints);
-                for (int i = 1; i <= numEnclRefPoints; ++i) {
-                    auto &dayl = surfWin.DaylFromWinAtRefPt(i);
-                    dayl[(int)Lum::Illum] = dayl[(int)Lum::Back] = dayl[(int)Lum::Source] = {0.0, 0.0};
+                surfWin.refPts.allocate(numEnclRefPoints);
+                for (auto &refPt : surfWin.refPts) {
+                    new (&refPt) SurfaceWindowRefPt();
                 }
                                 
-                surfWin.IllumFromWinAtRefPtRep.allocate(numEnclRefPoints);
-                surfWin.IllumFromWinAtRefPtRep = 0.0;
-                surfWin.LumWinFromRefPtRep.allocate(numEnclRefPoints);
-                surfWin.LumWinFromRefPtRep = 0.0;
                 state.dataSurface->SurfWinSurfDayLightInit(SurfNum) = true;
             }
         } else {
@@ -3786,19 +3777,10 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                 int const numAdjEnclRefPoints = state.dataViewFactor->EnclSolInfo(adjSurfEnclNum).TotalEnclosureDaylRefPoints;
                 if (numAdjEnclRefPoints > 0) {
                     if (!state.dataSurface->SurfWinSurfDayLightInit(SurfNum)) {
-                        surfWin.SolidAngAtRefPt.allocate(numAdjEnclRefPoints);
-                        surfWin.SolidAngAtRefPt = 0.0;
-                        surfWin.SolidAngAtRefPtWtd.allocate(numAdjEnclRefPoints);
-                        surfWin.SolidAngAtRefPtWtd = 0.0;
-                        surfWin.DaylFromWinAtRefPt.allocate(numEnclRefPoints);
-                        for (int i = 1; i <= numEnclRefPoints; ++i) {
-                            auto &dayl = surfWin.DaylFromWinAtRefPt(i);
-                            dayl[(int)Lum::Illum] = dayl[(int)Lum::Back] = dayl[(int)Lum::Source] = {0.0, 0.0};
+                        surfWin.refPts.allocate(numAdjEnclRefPoints);
+                        for (auto &refPt : surfWin.refPts) { 
+                            new (&refPt) SurfaceWindowRefPt();
                         }
-                        surfWin.IllumFromWinAtRefPtRep.allocate(numAdjEnclRefPoints);
-                        surfWin.IllumFromWinAtRefPtRep = 0.0;
-                        surfWin.LumWinFromRefPtRep.allocate(numAdjEnclRefPoints);
-                        surfWin.LumWinFromRefPtRep = 0.0;
                         state.dataSurface->SurfWinSurfDayLightInit(SurfNum) = true;
                     }
                 }
@@ -3882,19 +3864,21 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
             auto const &enclSol = state.dataViewFactor->EnclSolInfo(enclOfSurf);
             if (enclSol.TotalEnclosureDaylRefPoints == 0 || enclSol.HasInterZoneWindow || !dl->enclDaylight(enclOfSurf).hasSplitFluxDaylighting)
                 continue;
-            
+
+            auto &surfWin = state.dataSurface->SurfaceWindow(SurfLoop);
             for (int refPtNum = 1; refPtNum <= enclSol.TotalEnclosureDaylRefPoints; ++refPtNum) {
+                auto &refPt = surfWin.refPts(refPtNum);
                 SetupOutputVariable(state,
                                     format("Daylighting Window Reference Point {} Illuminance", refPtNum),
                                     OutputProcessor::Unit::lux,
-                                    state.dataSurface->SurfaceWindow(SurfLoop).IllumFromWinAtRefPtRep(refPtNum),
+                                    refPt.illumFromWinRep,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     surf.Name);
                 SetupOutputVariable(state,
                                     format("Daylighting Window Reference Point {} View Luminance", refPtNum),
                                     OutputProcessor::Unit::cd_m2,
-                                    state.dataSurface->SurfaceWindow(SurfLoop).LumWinFromRefPtRep(refPtNum),
+                                    refPt.lumWinRep,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     surf.Name);
@@ -3922,18 +3906,19 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                      auto const &control = dl->daylightControl(controlNum);
                      for (int refPtNum = 1; refPtNum <= control.TotalDaylRefPoints; ++refPtNum) {
                          ++refPtCount; // Count reference points across each daylighting control in the same enclosure
+                         auto &refPt = surfWindow.refPts(refPtCount);
                          std::string varKey = format("{} to {}", surf.Name, state.dataDayltg->DaylRefPt(control.refPts(refPtNum).num).Name);
                          SetupOutputVariable(state,
                                              "Daylighting Window Reference Point Illuminance",
                                              OutputProcessor::Unit::lux,
-                                             surfWindow.IllumFromWinAtRefPtRep(refPtCount),
+                                             refPt.illumFromWinRep,
                                              OutputProcessor::SOVTimeStepType::Zone,
                                              OutputProcessor::SOVStoreType::Average,
                                              varKey);
                          SetupOutputVariable(state,
                                              "Daylighting Window Reference Point View Luminance",
                                              OutputProcessor::Unit::cd_m2,
-                                             surfWindow.LumWinFromRefPtRep(refPtCount),
+                                             refPt.lumWinRep,
                                              OutputProcessor::SOVTimeStepType::Zone,
                                              OutputProcessor::SOVStoreType::Average,
                                              varKey);
@@ -5498,8 +5483,9 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
     auto &dl = state.dataDayltg;
 
     for (int SurfNum : state.dataSurface->AllExtSolWindowSurfaceList) {
-        state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
-        state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
+        for (auto &refPt : state.dataSurface->SurfaceWindow(SurfNum).refPts) {
+            refPt.illumFromWinRep = refPt.lumWinRep = 0.0;
+        }
     }
 
     // Reset space power reduction factors
@@ -5550,10 +5536,9 @@ void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefir
                     
                     for (int refPtNum = 1; refPtNum <= thisControl.TotalDaylRefPoints; ++refPtNum) {
                         ++refPtCount; // Count reference points across each daylighting control in the same enclosure
-                        state.dataSurface->SurfaceWindow(IWin).IllumFromWinAtRefPtRep(refPtCount) =
-                                thisControl.DaylFromWinAtRefPt(extWinNum, refPtNum)[(int)Lum::Illum][(int)winCover];
-                        state.dataSurface->SurfaceWindow(IWin).LumWinFromRefPtRep(refPtCount) =
-                                thisControl.DaylFromWinAtRefPt(extWinNum, refPtNum)[(int)Lum::Source][(int)winCover];
+                        auto &refPt = state.dataSurface->SurfaceWindow(IWin).refPts(refPtCount);
+                        refPt.illumFromWinRep = thisControl.DaylFromWinAtRefPt(extWinNum, refPtNum)[(int)Lum::Illum][(int)winCover];
+                        refPt.lumWinRep = thisControl.DaylFromWinAtRefPt(extWinNum, refPtNum)[(int)Lum::Source][(int)winCover];
                     }
                 } // for (controlNum)
             } // for (extWinNum)
@@ -7182,7 +7167,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     ShadeOn = false;
     ScreenOn = false;
 
-    if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
+    if (state.dataSurface->Surface(IWin).OriginalClass == SurfaceClass::TDD_Dome) {
         PipeNum = state.dataSurface->SurfWinTDDPipeNum(IWin);
     }
 
@@ -7388,7 +7373,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
             // FLCW--(I,J) = part of incoming flux (in lumens) that goes up to ceiling and upper part of walls.
             // FLFW--(I,J) = part that goes down to floor and lower part of walls
 
-            if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
+            if (state.dataSurface->Surface(IWin).OriginalClass == SurfaceClass::TDD_Dome) {
                 // Unshaded visible transmittance of TDD for a single ray from sky/ground element
                 TVISBR = TransTDD(state, PipeNum, COSB, RadType::VisibleBeam) * state.dataSurface->SurfWinGlazedFrac(IWin);
 
@@ -7520,7 +7505,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 std::fill(transMult.begin(), transMult.end(), 0.0);
 
                 if (ShadeOn) { // Shade
-                    if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
+                    if (state.dataSurface->Surface(IWin).OriginalClass == SurfaceClass::TDD_Dome) {
                         // Shaded visible transmittance of TDD for a single ray from sky/ground element
                         transMult[1] = TransTDD(state, PipeNum, COSB, RadType::VisibleBeam) * state.dataSurface->SurfWinGlazedFrac(IWin);
                     } else { // Shade only, no TDD
@@ -7606,7 +7591,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                    state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
                 } // End of check if shade, blind or diffusing glass
 
-                if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
+                if (state.dataSurface->Surface(IWin).OriginalClass == SurfaceClass::TDD_Dome) {
                     // No beam is transmitted.  This takes care of all types of screens and blinds.
                     std::fill(transBmBmMult.begin(), transBmBmMult.end(), 0.0);
                 }
@@ -7724,7 +7709,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
             // -- Bare window
 
-            if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
+            if (state.dataSurface->Surface(IWin).OriginalClass == SurfaceClass::TDD_Dome) {
                 // Unshaded visible transmittance of TDD for collimated beam from the sun
                 TVISBSun = TransTDD(state, PipeNum, COSBSun, RadType::VisibleBeam) * state.dataSurface->SurfWinGlazedFrac(IWin);
                 dl->TDDTransVisBeam(IHR, PipeNum) = TVISBSun;
@@ -7768,7 +7753,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
 
                     if (ShadeOn || ScreenOn || state.dataSurface->SurfWinSolarDiffusing(IWin)) { // Shade or screen on or diffusing glass
-                        if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
+                        if (state.dataSurface->Surface(IWin).OriginalClass == SurfaceClass::TDD_Dome) {
                             // Shaded visible transmittance of TDD for collimated beam from the sun
                             transMult[1] = TransTDD(state, PipeNum, COSBSun, RadType::VisibleBeam) * state.dataSurface->SurfWinGlazedFrac(IWin);
                         } else {
@@ -7830,7 +7815,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         transBmBmMult[JB] = TVISBSun * WindowManager::BlindBeamBeamTrans(ProfAng, SlatAng, blind.SlatWidth, blind.SlatSeparation, blind.SlatThickness);
                     } // ShadeOn/ScreenOn/BlindOn/Diffusing glass
 
-                    if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
+                    if (state.dataSurface->Surface(IWin).OriginalClass == SurfaceClass::TDD_Dome) {
                         std::fill(transBmBmMult.begin(), transBmBmMult.end(), 0.0); // No beam, diffuse only
                     }
 
@@ -7855,7 +7840,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     // In the following, Beam normal illuminance times ZSU1refl = illuminance on window due to
     // specular reflection from exterior surfaces
 
-    if (state.dataSurface->CalcSolRefl && state.dataSurface->SurfWinOriginalClass(IWin) != SurfaceClass::TDD_Dome) {
+    if (state.dataSurface->CalcSolRefl && state.dataSurface->Surface(IWin).OriginalClass != SurfaceClass::TDD_Dome) {
     
         ZSU1refl = state.dataSurface->SurfReflFacBmToBmSolObs(IHR, IWin);
 
@@ -8379,7 +8364,7 @@ void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
     auto const &complexWindowDayltgGeom = complexWindow.DaylghtGeom(CurCplxFenState);
     int SolBmIndex = complexWindowGeom.SolBmIndex(iHour, state.dataGlobal->TimeStep);
 
-    Real64 WindowSolidAngleDaylightPoint = (CalledFrom == CalledFor::RefPoint) ? window.SolidAngAtRefPtWtd(iRefPoint) : 0.0;
+    Real64 WindowSolidAngleDaylightPoint = (CalledFrom == CalledFor::RefPoint) ? window.refPts(iRefPoint).solidAngWtd : 0.0;
     if (WindowSolidAngleDaylightPoint < 1e-6) return;
 
     Illums WinLum; 
@@ -9274,9 +9259,8 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
 
         // Count exterior windows in this solar enclosure
         for (int const surfNum : state.dataViewFactor->EnclSolInfo(enclNum).SurfacePtr) {
-            if ((state.dataSurface->Surface(surfNum).Class == SurfaceClass::Window &&
-                 state.dataSurface->Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
-                state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
+                auto const &surf = state.dataSurface->Surface(surfNum);
+            if ((surf.Class == SurfaceClass::Window && surf.ExtBoundCond == ExternalEnvironment) || surf.OriginalClass == SurfaceClass::TDD_Diffuser) {
                 ++thisEnclDaylight.TotalExtWindows;
             }
         }
@@ -9430,9 +9414,8 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
 
         // Get exterior windows in this solar enclosure
         for (int const surfNum : state.dataViewFactor->EnclSolInfo(enclNum).SurfacePtr) {
-            auto &surf = state.dataSurface->Surface(surfNum);
-            if ((surf.Class == SurfaceClass::Window && surf.ExtBoundCond == ExternalEnvironment) ||
-                state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
+            auto const &surf = state.dataSurface->Surface(surfNum);
+            if ((surf.Class == SurfaceClass::Window && surf.ExtBoundCond == ExternalEnvironment) || surf.OriginalClass == SurfaceClass::TDD_Diffuser) {
                 ++enclExtWin(enclNum);
             }
         }
@@ -9446,8 +9429,7 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
             // it would not be an "AdjIntWinEncl"
             for (int SurfNumAdj : state.dataViewFactor->EnclSolInfo(adjEnclNum).SurfacePtr) {
                 auto const &surfAdj = state.dataSurface->Surface(SurfNumAdj);
-                if ((surfAdj.Class == SurfaceClass::Window && surfAdj.ExtBoundCond == ExternalEnvironment) ||
-                    state.dataSurface->SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser) {
+                if ((surfAdj.Class == SurfaceClass::Window && surfAdj.ExtBoundCond == ExternalEnvironment) || surfAdj.OriginalClass == SurfaceClass::TDD_Diffuser) {
                     ++enclExtWin(enclNum);
                 }
             }
@@ -9490,9 +9472,8 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
             int enclExtWinCtr = 0;
 
             for (int const surfNum : state.dataViewFactor->EnclSolInfo(enclNum).SurfacePtr) {
-                if ((state.dataSurface->Surface(surfNum).Class == SurfaceClass::Window &&
-                     state.dataSurface->Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
-                    state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
+                auto const &surf = state.dataSurface->Surface(surfNum);
+                if ((surf.Class == SurfaceClass::Window && surf.ExtBoundCond == ExternalEnvironment) || surf.OriginalClass == SurfaceClass::TDD_Diffuser) {
                     ++enclExtWinCtr;
                     thisEnclDaylight.DayltgExtWinSurfNums(enclExtWinCtr) = surfNum;
                 }
@@ -9504,24 +9485,19 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
                     // Get exterior windows in EnclNumAdj -- there must be at least one, otherwise
                     // it would not be an "AdjIntWinEncl"
                     for (int SurfNumAdj : state.dataViewFactor->EnclSolInfo(adjEnclNum).SurfacePtr) {
-                        if ((state.dataSurface->Surface(SurfNumAdj).Class == SurfaceClass::Window &&
-                             state.dataSurface->Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
-                            state.dataSurface->SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser) {
+                        auto &surfAdj = state.dataSurface->Surface(SurfNumAdj);
+                        if ((surfAdj.Class == SurfaceClass::Window && surfAdj.ExtBoundCond == ExternalEnvironment) ||
+                            surfAdj.OriginalClass == SurfaceClass::TDD_Diffuser) {
                             ++enclExtWinCtr;
                             thisEnclDaylight.DayltgExtWinSurfNums(enclExtWinCtr) = SurfNumAdj;
 
+                            auto &surfWinAdj = state.dataSurface->SurfaceWindow(SurfNumAdj);
                             // If no daylighting in the adjacent enclosure, set up variables anyway:
                             if (state.dataViewFactor->EnclSolInfo(adjEnclNum).TotalEnclosureDaylRefPoints == 0 &&
                                 !state.dataSurface->SurfWinSurfDayLightInit(SurfNumAdj)) {
-                                auto &surfWinAdj = state.dataSurface->SurfaceWindow(SurfNumAdj);
-                                surfWinAdj.SolidAngAtRefPt.allocate(thisEnclNumRefPoints);
-                                surfWinAdj.SolidAngAtRefPt = 0.0;
-                                surfWinAdj.SolidAngAtRefPtWtd.allocate(thisEnclNumRefPoints);
-                                surfWinAdj.SolidAngAtRefPtWtd = 0.0;
-                                surfWinAdj.DaylFromWinAtRefPt.allocate(thisEnclNumRefPoints);
-                                for (int iRefPt = 1; iRefPt < thisEnclNumRefPoints; ++iRefPt) {
-                                    auto &dayl = surfWinAdj.DaylFromWinAtRefPt(iRefPt);
-                                    dayl[(int)Lum::Illum] = dayl[(int)Lum::Back] = dayl[(int)Lum::Source] = {0.0, 0.0};
+                                surfWinAdj.refPts.allocate(thisEnclNumRefPoints);
+                                for (auto &refPt : surfWinAdj.refPts) {
+                                    new (&refPt) SurfaceWindowRefPt();
                                 }
                                 state.dataSurface->SurfWinSurfDayLightInit(SurfNumAdj) = true;
                             }

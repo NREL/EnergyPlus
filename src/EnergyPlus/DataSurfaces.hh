@@ -688,6 +688,7 @@ namespace DataSurfaces {
         std::vector<int> ConstituentSurfaceNums; // A vector of surface numbers which reference this surface for representative calculations
         int ConstructionStoredInputValue;        // holds the original value for Construction per surface input
         SurfaceClass Class;
+        SurfaceClass OriginalClass;
 
         // Geometry related parameters
         SurfaceShape Shape;       // Surface shape (Triangle=1,Quadrilateral=2,Rectangle=3,
@@ -716,13 +717,13 @@ namespace DataSurfaces {
         // Vertices
         Array1D<Vector> NewVertex;
         Vertices Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
-        Vector Centroid; // computed centroid (also known as center of mass or surface balance point)
-        Vector lcsx;
-        Vector lcsy;
-        Vector lcsz;
-        Vector NewellAreaVector;
-        Vector NewellSurfaceNormalVector; // same as OutNormVec in vector notation
-        Array1D<Real64> OutNormVec;       // Direction cosines (outward normal vector) for surface
+        Vector3<Real64> Centroid; // computed centroid (also known as center of mass or surface balance point)
+        Vector3<Real64> lcsx;
+        Vector3<Real64> lcsy;
+        Vector3<Real64> lcsz;
+        Vector3<Real64> NewellAreaVector;
+        Vector3<Real64> NewellSurfaceNormalVector; // same as OutNormVec in vector notation
+        Vector3<Real64> OutNormVec;       // Direction cosines (outward normal vector) for surface
         Real64 SinAzim;                   // Sine of surface azimuth angle
         Real64 CosAzim;                   // Cosine of surface azimuth angle
         Real64 SinTilt;                   // Sine of surface tilt angle
@@ -818,7 +819,7 @@ namespace DataSurfaces {
             : Construction(0), RepresentativeCalcSurfNum(-1), ConstructionStoredInputValue(0), Class(SurfaceClass::None), Shape(SurfaceShape::None),
               Sides(0), Area(0.0), GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0), Azimuth(0.0), Height(0.0), Reveal(0.0), Tilt(0.0),
               Width(0.0), shapeCat(ShapeCat::Invalid), plane(0.0, 0.0, 0.0, 0.0), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
-              lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0),
+              lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(0.0,0.0,0.0), SinAzim(0.0),
               CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0),
               HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
               HeatTransferAlgorithm(HeatTransferModel::Invalid), BaseSurf(0), NumSubSurfaces(0), Zone(0), spaceNum(0), ExtBoundCond(0),
@@ -864,16 +865,19 @@ namespace DataSurfaces {
         Surface2D computed_surface2d() const;
     };
 
+    struct SurfaceWindowRefPt {
+        Real64 solidAng = 0.0; // Solid angle subtended by window from daylit ref points 1 and 2
+        Real64 solidAngWtd = 0.0; // Solid angle subtended by window from ref pts weighted by glare pos factor
+        std::array<std::array<Real64, (int)WinCover::Num>, (int)Lum::Num> lums = {{0.0, 0.0}};
+        Real64 illumFromWinRep = 0.0; // Illuminance from window at reference point N [lux]
+        Real64 lumWinRep = 0.0; // Window luminance as viewed from reference point N [cd/m2]
+    };
+        
     struct SurfaceWindowCalc // Calculated window-related values
     {
         // Members
-        Array1D<Real64> SolidAngAtRefPt;    // Solid angle subtended by window from daylit ref points 1 and 2
-        Array1D<Real64> SolidAngAtRefPtWtd; // Solid angle subtended by window from ref pts weighted by glare pos factor
-        EPVector<std::array<std::array<Real64, (int)WinCover::Num>, (int)Lum::Num>>
-            DaylFromWinAtRefPt; // Illuminance from window at ref pts for window with and w/o shade (lux)
-            // EPVector<std::array<Real64, (int)WinCover::Num>>
-            // BackLumFromWinAtRefPt; // Window background luminance from window wrt ref pts (cd/m2) with and w/o shade (cd/m2)
-            // EPVector<std::array<Real64, (int)WinCover::Num>> SourceLumFromWinAtRefPt; // Window luminance at ref pts for window with and w/o shade (cd/m2)
+        Array1D<SurfaceWindowRefPt> refPts;
+
         Vector3<Real64> WinCenter = {0.0, 0.0, 0.0};                              // X,Y,Z coordinates of window center point in building coord system
         // What is 10 here?
         std::array<Real64, 10+1> ThetaFace = {296.15};                                                // Face temperatures of window layers (K)
@@ -886,8 +890,6 @@ namespace DataSurfaces {
         std::array<Real64, Material::MaxSlatAngs+1> EffShBlindEmiss = {0.0}; // Effective emissivity of interior blind or shade
         std::array<Real64, Material::MaxSlatAngs+1> EffGlassEmiss = {0.0};   // Effective emissivity of glass adjacent to interior blind or shade
 
-        Array1D<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point N [lux]
-        Array1D<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point N [cd/m2]
         // for shadowing of ground by building and obstructions [W/m2]
         std::array<Real64, (int)FWC::Num> EnclAreaMinusThisSurf = {
             0.0, 0.0, 0.0}; // Enclosure inside surface area minus this surface and its subsurfaces
@@ -1699,7 +1701,6 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinCenterGlArea;                        // Center of glass area (m2); area of glass where 1-D conduction dominates
     Array1D<Real64> SurfWinEdgeGlCorrFac; // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal bridging
                                           // effects near frame and divider
-    EPVector<DataSurfaces::SurfaceClass> SurfWinOriginalClass; // 0 or if entered originally as:
     Array1D<Real64> SurfWinShadeAbsFacFace1; // Fraction of short-wave radiation incident that is absorbed by face 1 when total absorbed radiation is
                                              // apportioned to the two faces
     Array1D<Real64> SurfWinShadeAbsFacFace2; // Fraction of short-wave radiation incident that is absorbed by face 2 when total absorbed radiation is

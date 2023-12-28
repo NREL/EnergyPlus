@@ -626,13 +626,13 @@ void DXFOut(EnergyPlusData &state,
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Floor) colorindex = DataSurfaceColors::ColorNo::Floor;
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Door) colorindex = DataSurfaceColors::ColorNo::Door;
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::Window)
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::Window)
                     colorindex = DataSurfaceColors::ColorNo::Window;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::GlassDoor)
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::GlassDoor)
                     colorindex = DataSurfaceColors::ColorNo::GlassDoor;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::TDD_Dome)
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::TDD_Dome)
                     colorindex = DataSurfaceColors::ColorNo::TDDDome;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::TDD_Diffuser)
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::TDD_Diffuser)
                     colorindex = DataSurfaceColors::ColorNo::TDDDiffuser;
             }
             if (state.dataSurface->SurfIsPV(surf)) colorindex = DataSurfaceColors::ColorNo::PV;
@@ -887,13 +887,13 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Floor) colorindex = DataSurfaceColors::ColorNo::Floor;
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Door) colorindex = DataSurfaceColors::ColorNo::Door;
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::Window)
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::Window)
                     colorindex = DataSurfaceColors::ColorNo::Window;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::GlassDoor)
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::GlassDoor)
                     colorindex = DataSurfaceColors::ColorNo::GlassDoor;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::TDD_Dome)
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::TDD_Dome)
                     colorindex = DataSurfaceColors::ColorNo::TDDDome;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::TDD_Diffuser)
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::TDD_Diffuser)
                     colorindex = DataSurfaceColors::ColorNo::TDDDiffuser;
             }
             if (state.dataSurface->SurfIsPV(surf)) colorindex = DataSurfaceColors::ColorNo::PV;
