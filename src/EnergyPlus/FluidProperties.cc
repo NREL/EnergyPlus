@@ -7044,9 +7044,9 @@ namespace FluidProperties {
         DISABLE_WARNING_POP
 
         std::uint64_t uTtag = uT >> precision_shift;
-        std::uint64_t uRound = (uT >> (precision_shift - 2) & 3);
+        std::uint64_t uRound = (uT >> (precision_shift - 1) & 1);
 
-        if (uRound == 3) ++uTtag; // Round up if next two bits are 1s
+        if (uRound == 1) ++uTtag; // Round up if next bits is 1
 
         std::uint64_t hash = uTtag & t_sh_cache_mask;
         auto &cTsh = state.dataFluidProps->cached_t_sh[hash];
