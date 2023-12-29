@@ -287,7 +287,7 @@ namespace AirflowNetwork {
 
         if (AirflowNetworkFanActivated && distribution_simulated) {
             if (ValidateDistributionSystemFlag) {
-                validate_distribution();
+                finalize_distribution();
                 validate_fan_flowrate();
                 ValidateDistributionSystemFlag = false;
                 if (simulation_control.autosize_ducts) {
@@ -3923,7 +3923,7 @@ namespace AirflowNetwork {
                 DisSysNodeData(i).node_name = Alphas(2); // Name of associated EnergyPlus node
                 DisSysNodeData(i).EPlusType = Alphas(3); // Name of associated EnergyPlus type
                 DisSysNodeData(i).Height = Numbers(1);   // Nodal height
-                DisSysNodeData(i).EPlusNodeNum = 0;      // EPlus node number
+                DisSysNodeData(i).node_number = 0;      // EPlus node number
                 // verify EnergyPlus object type
                 if (Util::SameString(Alphas(3), "AirLoopHVAC:ZoneMixer") || Util::SameString(Alphas(3), "AirLoopHVAC:ZoneSplitter") ||
                     Util::SameString(Alphas(3), "AirLoopHVAC:OutdoorAirSystem") || Util::SameString(Alphas(3), "OAMixerOutdoorAirStreamNode") ||
@@ -4261,7 +4261,7 @@ namespace AirflowNetwork {
                 AirflowNetworkNodeData(i).NodeTypeNum = 0;
                 AirflowNetworkNodeData(i).EPlusZoneNum = 0;
                 AirflowNetworkNodeData(i).NodeHeight = DisSysNodeData(i - NumOfNodesMultiZone).Height;
-                AirflowNetworkNodeData(i).EPlusNodeNum = DisSysNodeData(i - NumOfNodesMultiZone).EPlusNodeNum;
+                AirflowNetworkNodeData(i).EPlusNodeNum = DisSysNodeData(i - NumOfNodesMultiZone).node_number;
                 // Get mixer information
                 if (Util::SameString(DisSysNodeData(i - NumOfNodesMultiZone).EPlusType, "AirLoopHVAC:ZoneMixer")) {
                     AirflowNetworkNodeData(i).EPlusTypeNum = NodeType::MIX;
@@ -9992,17 +9992,19 @@ namespace AirflowNetwork {
                         OpenFactorMult = 1.0;
                     } else if (DelEnthal >= UpperValInOutEnthalDiff) {
                         OpenFactorMult = LimValVentOpenFacMult;
-                    } else {
-                        OpenFactorMult =
-                            LimValVentOpenFacMult + ((UpperValInOutEnthalDiff - DelEnthal) / (UpperValInOutEnthalDiff - LowerValInOutEnthalDiff)) *
-                                                        (1 - LimValVentOpenFacMult);
+                    }
+ else {
+     OpenFactorMult =
+         LimValVentOpenFacMult + ((UpperValInOutEnthalDiff - DelEnthal) / (UpperValInOutEnthalDiff - LowerValInOutEnthalDiff)) *
+         (1 - LimValVentOpenFacMult);
                     }
                     OpenFactor *= OpenFactorMult;
                     m_state.dataSurface->SurfWinVentingOpenFactorMultRep(SurfNum) = OpenFactorMult;
                 }
-            } else {
-                OpenFactor = 0.0;
-                m_state.dataSurface->SurfWinVentingOpenFactorMultRep(SurfNum) = -1.0;
+            }
+ else {
+     OpenFactor = 0.0;
+     m_state.dataSurface->SurfWinVentingOpenFactorMultRep(SurfNum) = -1.0;
             }
         }
 
@@ -10022,13 +10024,16 @@ namespace AirflowNetwork {
                         m_state.dataThermalComforts->ThermalComfortData(PeopleInd).TComfASH55) {
                         OpenFactor = MultizoneSurfaceData(i).Factor;
                         m_state.dataSurface->SurfWinVentingOpenFactorMultRep(SurfNum) = 1.0;
-                    } else {
+                    }
+                    else {
                         OpenFactor = 0.0;
                     }
-                } else {
+                }
+                else {
                     OpenFactor = 0.0;
                 }
-            } else {
+            }
+            else {
                 OpenFactor = 0.0;
             }
         }
@@ -10041,13 +10046,16 @@ namespace AirflowNetwork {
                         m_state.dataThermalComforts->ThermalComfortData(PeopleInd).TComfCEN15251) {
                         OpenFactor = MultizoneSurfaceData(i).Factor;
                         m_state.dataSurface->SurfWinVentingOpenFactorMultRep(SurfNum) = 1.0;
-                    } else {
+                    }
+                    else {
                         OpenFactor = 0.0;
                     }
-                } else {
+                }
+                else {
                     OpenFactor = 0.0;
                 }
-            } else {
+            }
+            else {
                 OpenFactor = 0.0;
             }
         }
@@ -10078,7 +10086,26 @@ namespace AirflowNetwork {
         }
     }
 
-    void Solver::validate_distribution()
+    bool Solver::validate_network()
+    {
+        bool result = true;
+        // Technically, the nodes could be verified at input time with a bunch of string comparisons on the names,
+        // but this will likely be faster and should get the same result
+        std::vector<int> nodes_already_in_use;
+        for (auto& node : DisSysNodeData) {
+            if (node.node_number)
+            if (std::find(nodes_already_in_use.begin(), nodes_already_in_use.end(), node.node_number) == nodes_already_in_use.end()) {
+                // Node number already in use
+                ShowWarningError(m_state, format("validate_network: Node \"{}\" (node number {}) is used more than once as an AirflowNetwork distribution node, verify that this matches the modeling intent", node.node_name, node.node_number));
+                result = false;
+            } else {
+                nodes_already_in_use.push_back(node.node_number);
+            }
+        }
+        return result;
+    }
+
+    void Solver::finalize_distribution()
     {
 
         // SUBROUTINE INFORMATION:
@@ -10088,9 +10115,14 @@ namespace AirflowNetwork {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine validates the inputs of distribution system, since node data from a primary airloop
-        // are not available in the first call during reading input data of airflownetwork objects.
-        // Note: this routine shouldn't be called more than once
+        // This subroutine finalizes the inputs of distribution system, since node data from a primary airloop
+        // are not available in the first call during reading input data of AirflowNetwork objects.
+        // Note: this routine shouldn't be called more than once, which is enforced with the distribution_is_final
+        // flag. Some of the validation may be moved to the validate_network function.
+
+        if (distribution_is_final) {
+            return;
+        }
 
         // Using/Aliasing
         using BranchNodeConnections::GetNodeConnectionType;
@@ -10148,7 +10180,7 @@ namespace AirflowNetwork {
                                           "The entered name is " + DisSysNodeData(i).node_name + " in an AirflowNetwork:Distribution:Node object.");
                         ErrorsFound = true;
                     }
-                    DisSysNodeData(i).EPlusNodeNum = j;
+                    DisSysNodeData(i).node_number = j;
                     AirflowNetworkNodeData(NumOfNodesMultiZone + i).EPlusNodeNum = j;
                     AirflowNetworkNodeData(NumOfNodesMultiZone + i).AirLoopNum = DisSysNodeData(i).AirLoopNum;
                     NodeFound(j) = true;
@@ -10168,7 +10200,7 @@ namespace AirflowNetwork {
                     ErrorsFound = true;
                 }
             }
-            if (DisSysNodeData(i).EPlusNodeNum == 0) {
+            if (DisSysNodeData(i).node_number == 0) {
                 ShowSevereError(m_state,
                                 format(RoutineName) +
                                     "Primary Air Loop Node is not found in AIRFLOWNETWORK:DISTRIBUTION:NODE = " + DisSysNodeData(i).Name);
@@ -11007,6 +11039,9 @@ namespace AirflowNetwork {
             }
             if (NumOfFans > 1) break;
         }
+
+        distribution_is_final = true;
+
         if (NumOfFans > 1) {
             ShowSevereError(m_state,
                             format(RoutineName) + "An AirLoop branch, " + m_state.dataAirSystemsData->PrimaryAirSystems(1).Branch(BranchNum).Name +

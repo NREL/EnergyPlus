@@ -847,11 +847,11 @@ namespace AirflowNetwork {
         std::string node_name; // EnergyPlus node name
         std::string EPlusType; // EnergyPlus node type
         Real64 Height;         // Nodal height
-        int EPlusNodeNum;      // EPlus node number
+        int node_number;      // EPlus node number
         int AirLoopNum;        // AirLoop number
 
         // Default Constructor
-        DisSysNodeProp() : Height(0.0), EPlusNodeNum(0), AirLoopNum(0)
+        DisSysNodeProp() : Height(0.0), node_number(0), AirLoopNum(0)
         {
         }
     };
@@ -1285,10 +1285,10 @@ namespace AirflowNetwork {
     {
         // Members
         std::string Name;      // Provide a unique node name
-        //std::string node_type_string;  // Provide node type "External", "Thermal Zone" or "Other"
-        //std::string node_name; // EnergyPlus node name
+        // std::string node_type_string; // Provide node type "External", "Thermal Zone" or "Other"
+        // std::string node_name;        // EnergyPlus node name
         Real64 NodeHeight;     // Node height [m]
-        int NodeNum;           // Node number
+        // int node_number;       // Node number
         int NodeTypeNum;       // Node type with integer number,  0: Calculated, 1: Given pressure;
         // std::string zone_name; // EnergyPlus node name
         int EPlusZoneNum;          // E+ zone number
@@ -1302,7 +1302,7 @@ namespace AirflowNetwork {
 
         // Default Constructor
         AirflowNetworkNodeProp()
-            : NodeHeight(0.0), NodeNum(0), NodeTypeNum(0), EPlusZoneNum(0), EPlusNodeNum(0), ExtNodeNum(0), OutAirNodeNum(0),
+            : NodeHeight(0.0), /*node_number(0),*/ NodeTypeNum(0), EPlusZoneNum(0), EPlusNodeNum(0), ExtNodeNum(0), OutAirNodeNum(0),
               EPlusTypeNum(NodeType::Unknown), RAFNNodeNum(0), NumOfLinks(0), AirLoopNum(0)
         {
         }

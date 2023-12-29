@@ -307,7 +307,8 @@ namespace AirflowNetwork {
                              Real64 &OpenFactor                             // Window or door opening factor (used to calculate airflow)
         );
         void assign_fan_airloop();
-        void validate_distribution();
+        bool validate_network();
+        void finalize_distribution();
         void validate_fan_flowrate(); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
         void validate_exhaust_fan_input();
         void hybrid_ventilation_control();
@@ -371,6 +372,7 @@ namespace AirflowNetwork {
         Array1D<Real64> LoopOnOffFanRunTimeFraction;
         Array1D<bool> LoopOnOffFlag;
 
+        bool distribution_is_final = false;
         bool ValidateExhaustFanInputOneTimeFlag = true;
         bool initializeOneTimeFlag = true;
         bool initializeMyEnvrnFlag = true;
@@ -595,6 +597,7 @@ namespace AirflowNetwork {
             LoopOnOffFanRunTimeFraction.deallocate();
             LoopOnOffFlag.deallocate();
             UniqueAirflowNetworkSurfaceName.clear();
+            distribution_is_final = false;
             ValidateExhaustFanInputOneTimeFlag = true;
             initializeOneTimeFlag = true;
             initializeMyEnvrnFlag = true;
