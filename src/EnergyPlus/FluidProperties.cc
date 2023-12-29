@@ -7032,25 +7032,33 @@ namespace FluidProperties {
                                  std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
-        std::uint64_t constexpr Grid_Shift = 64 - 12 - t_sh_precision_bits;
+        std::uint64_t constexpr precision_shift = 64 - 12 - t_sh_precision_bits;
 
-        double const t(Temperature + 1000 * GlycolIndex);
+        double const t = Temperature + 1000 * GlycolIndex;
 
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING
         DISABLE_WARNING_UNINITIALIZED
         // cppcheck-suppress invalidPointerCast
-        std::uint64_t const T_tag(*reinterpret_cast<std::uint64_t const *>(&t) >> Grid_Shift);
+        std::uint64_t const uT = *reinterpret_cast<std::uint64_t const *>(&t);
         DISABLE_WARNING_POP
 
-        std::uint64_t const hash(T_tag & t_sh_cache_mask);
-        auto &cTsh(state.dataFluidProps->cached_t_sh[hash]);
+        std::uint64_t uTtag = uT >> precision_shift;
+        std::uint64_t uRound = (uT >> (precision_shift - 2) & 3);
 
-        if (true || cTsh.iT != T_tag) {
-            cTsh.iT = T_tag;
+        if (uRound == 3) ++uTtag; // Round up if next two bits are 1s
+
+        std::uint64_t hash = uTtag & t_sh_cache_mask;
+        auto &cTsh = state.dataFluidProps->cached_t_sh[hash];
+
+        if (cTsh.iT != uTtag) {
+            cTsh.iT = uTtag;
             cTsh.sh = GetSpecificHeatGlycol_raw(state, Glycol, Temperature, GlycolIndex, CalledFrom);
-        }
+        } 
 
+        Real64 sh = GetSpecificHeatGlycol_raw(state, Glycol, Temperature, GlycolIndex, CalledFrom);
+        assert (abs(sh - cTsh.sh) < 0.001);
+        
         return cTsh.sh; // saturation pressure {Pascals}
     }
 
