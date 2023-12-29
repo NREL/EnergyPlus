@@ -75,16 +75,16 @@ namespace AirflowNetwork {
 
     enum OpenStatus // TODO: make enum class
     {
-        FreeOperation = 0,     // Free operation
-        MinCheckForceOpen = 1, // Force open when opening elapsed time is less than minimum opening time
-        MinCheckForceClose = 2 // Force open when closing elapsed time is less than minimum closing time
+        FreeOperation = 0, // Free operation
+        MinCheckForceOpen, // Force open when opening elapsed time is less than minimum opening time
+        MinCheckForceClose // Force open when closing elapsed time is less than minimum closing time
     };
 
     enum ProbabilityCheck // TODO: make enum class
     {
-        NoAction = 0,    // No action from probability check
-        ForceChange = 1, // Force open or close from probability check
-        KeepStatus = 2   // Keep status at the previous time step from probability check
+        NoAction = 0, // No action from probability check
+        ForceChange,  // Force open or close from probability check
+        KeepStatus    // Keep status at the previous time step from probability check
     };
 
     enum class EquivRec
@@ -96,53 +96,17 @@ namespace AirflowNetwork {
 
     enum class DuctLineType
     {
-        Invalid = -1,
+        Unknown = 0,
         SupplyTrunk,  // Supply trunk
         SupplyBranch, // SupplyBrnach
         ReturnTrunk,  // Return trunk
         ReturnBranch, // ReturnBrnach
     };
 
-    // Using/Aliasing
-
-    // Data
-    // module should be available to other modules and routines.  Thus,
-    // all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-    enum class iComponentTypeNum : int
+    enum class ComponentType : int
     {
-        Invalid = 0,
-        DOP = 1,  // Detailed large opening component
-        SOP = 2,  // Simple opening component
-        SCR = 3,  // Surface crack component
-        SEL = 4,  // Surface effective leakage ratio component
-        PLR = 5,  // Distribution system crack component
-        DWC = 6,  // Distribution system duct component
-        CVF = 7,  // Distribution system constant volume fan component
-        FAN = 8,  // Distribution system detailed fan component
-        MRR = 9,  // Distribution system multiple curve fit power law resistant flow component
-        DMP = 10, // Distribution system damper component
-        ELR = 11, // Distribution system effective leakage ratio component
-        CPD = 12, // Distribution system constant pressure drop component
-        COI = 13, // Distribution system coil component
-        TMU = 14, // Distribution system terminal unit component
-        EXF = 15, // Zone exhaust fan
-        HEX = 16, // Distribution system heat exchanger
-        HOP = 17, // Horizontal opening component
-        RVD = 18, // Reheat VAV terminal damper
-        OAF = 19, // Distribution system OA
-        REL = 20, // Distribution system relief air
-        SMF = 21, // Specified mass flow component
-        SVF = 22, // Specified volume flow component
-        Num
-    };
-
-    enum class ComponentType
-    {
-        // TODO: enum check
-        Invalid = -1,
-        DOP = 1, // Detailed large opening component
+        Unknown = -1,
+        DOP = 0, // Detailed large opening component
         SOP,     // Simple opening component
         SCR,     // Surface crack component
         SEL,     // Surface effective leakage ratio component
@@ -163,8 +127,7 @@ namespace AirflowNetwork {
         OAF,     // Distribution system OA
         REL,     // Distribution system relief air
         SMF,     // Specified mass flow component
-        SVF,     // Specified volume flow component
-        Num
+        SVF      // Specified volume flow component
     };
 
     // EPlus component Type
@@ -182,24 +145,23 @@ namespace AirflowNetwork {
     };
 
     // EPlus node type
-    enum class iEPlusNodeType : int
+    enum class NodeType : int
     {
-        Invalid = 0,
-        ZIN = 1,  // Zone inlet node
-        ZOU = 2,  // Zone outlet node
-        SPL = 3,  // Splitter node
-        MIX = 4,  // Mixer node
-        OAN = 5,  // Outside air system node
-        EXT = 6,  // OA system inlet node
-        FIN = 7,  // Fan Inlet node
-        FOU = 8,  // Fan Outlet Node
-        COU = 9,  // Coil Outlet Node
-        HXO = 10, // Heat exchanger Outlet Node
-        DIN = 11, // Damper Inlet node
-        DOU = 12, // Damper Outlet Node
-        SPI = 13, // Splitter inlet Node
-        SPO = 14, // Splitter Outlet Node
-        Num
+        Unknown = 0,
+        ZIN,  // Zone inlet node
+        ZOU,  // Zone outlet node
+        SPL,  // Splitter node
+        MIX,  // Mixer node
+        OAN,  // Outside air system node
+        EXT,  // OA system inlet node
+        FIN,  // Fan Inlet node
+        FOU,  // Fan Outlet Node
+        COU,  // Coil Outlet Node
+        HXO, // Heat exchanger Outlet Node
+        DIN, // Damper Inlet node
+        DOU, // Damper Outlet Node
+        SPI, // Splitter inlet Node
+        SPO  // Splitter Outlet Node
     };
 
     enum class iWPCCntr : int
@@ -879,11 +841,11 @@ namespace AirflowNetwork {
         }
     };
 
-    struct DisSysNodeProp // CP Value
+    struct DisSysNodeProp
     {
         // Members
         std::string Name;      // Name of node
-        std::string EPlusName; // EnergyPlus node name
+        std::string node_name; // EnergyPlus node name
         std::string EPlusType; // EnergyPlus node type
         Real64 Height;         // Nodal height
         int EPlusNodeNum;      // EPlus node number
@@ -1324,18 +1286,17 @@ namespace AirflowNetwork {
     {
         // Members
         std::string Name;      // Provide a unique node name
-        std::string NodeType;  // Provide node type "External", "Thermal Zone" or "Other"
-        std::string EPlusNode; // EnergyPlus node name
+        //std::string node_type_string;  // Provide node type "External", "Thermal Zone" or "Other"
+        //std::string node_name; // EnergyPlus node name
         Real64 NodeHeight;     // Node height [m]
         int NodeNum;           // Node number
-        int NodeTypeNum;       // Node type with integer number
-        // 0: Calculated, 1: Given pressure;
-        std::string EPlusZoneName; // EnergyPlus node name
+        int NodeTypeNum;       // Node type with integer number,  0: Calculated, 1: Given pressure;
+        // std::string zone_name; // EnergyPlus node name
         int EPlusZoneNum;          // E+ zone number
         int EPlusNodeNum;
         int ExtNodeNum;
         int OutAirNodeNum;
-        iEPlusNodeType EPlusTypeNum;
+        NodeType EPlusTypeNum;
         int RAFNNodeNum; // RoomAir model node number
         int NumOfLinks;  // Number of links for RoomAir model
         int AirLoopNum;  // AirLoop number
@@ -1343,7 +1304,7 @@ namespace AirflowNetwork {
         // Default Constructor
         AirflowNetworkNodeProp()
             : NodeHeight(0.0), NodeNum(0), NodeTypeNum(0), EPlusZoneNum(0), EPlusNodeNum(0), ExtNodeNum(0), OutAirNodeNum(0),
-              EPlusTypeNum(iEPlusNodeType::Invalid), RAFNNodeNum(0), NumOfLinks(0), AirLoopNum(0)
+              EPlusTypeNum(NodeType::Unknown), RAFNNodeNum(0), NumOfLinks(0), AirLoopNum(0)
         {
         }
     };
@@ -1352,7 +1313,7 @@ namespace AirflowNetwork {
     {
         // Members
         std::string Name;                 // Provide a unique element name
-        iComponentTypeNum CompTypeNum;    // Provide numeric equivalent for AirflowNetworkCompType
+        ComponentType CompTypeNum;        // Provide numeric equivalent for AirflowNetworkCompType
         int TypeNum;                      // Component number under same component type
         int CompNum;                      // General component number
         std::string EPlusName;            // Provide a unique element name
@@ -1361,7 +1322,7 @@ namespace AirflowNetwork {
         iEPlusComponentType EPlusTypeNum; // Provide EPlus component type
 
         // Default Constructor
-        AirflowNetworkCompProp() : CompTypeNum(iComponentTypeNum::Invalid), TypeNum(0), CompNum(0), EPlusTypeNum(iEPlusComponentType::Invalid)
+        AirflowNetworkCompProp() : CompTypeNum(ComponentType::Unknown), TypeNum(0), CompNum(0), EPlusTypeNum(iEPlusComponentType::Invalid)
         {
         }
     };
@@ -1381,7 +1342,7 @@ namespace AirflowNetwork {
         // Default Constructor
         AirflowNetworkLinkageProp()
             : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(iEPlusComponentType::Invalid), VAVTermDamper(false),
-              LinkageViewFactorObjectNum(0), AirLoopNum(0), ductLineType(DuctLineType::Invalid)
+              LinkageViewFactorObjectNum(0), AirLoopNum(0), ductLineType(DuctLineType::Unknown)
         {
         }
     };

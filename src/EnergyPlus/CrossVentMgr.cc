@@ -423,9 +423,9 @@ namespace RoomAir {
             auto &jetRecFlows = state.dataRoomAir->CrossVentJetRecFlows(Ctd, ZoneNum);
             auto const &surfParams = state.dataRoomAir->SurfParametersCrossDispVent(Ctd);
             int cCompNum = state.afn->AirflowNetworkLinkageData(Ctd).CompNum;
-            if (state.afn->AirflowNetworkCompData(cCompNum).CompTypeNum == AirflowNetwork::iComponentTypeNum::DOP) {
+            if (state.afn->AirflowNetworkCompData(cCompNum).CompTypeNum == AirflowNetwork::ComponentType::DOP) {
                 jetRecFlows.Area = surfParams.Width * surfParams.Height * state.afn->MultizoneSurfaceData(Ctd).OpenFactor;
-            } else if (state.afn->AirflowNetworkCompData(cCompNum).CompTypeNum == AirflowNetwork::iComponentTypeNum::SCR) {
+            } else if (state.afn->AirflowNetworkCompData(cCompNum).CompTypeNum == AirflowNetwork::ComponentType::SCR) {
                 jetRecFlows.Area = surfParams.Width * surfParams.Height;
             } else {
                 ShowSevereError(

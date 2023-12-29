@@ -6041,7 +6041,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneInfiSenLossW, 95.89575, 0.001);
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneInfiLatLossW, 0.969147, 0.001);
 
-    state->afn->AirflowNetworkCompData(state->afn->AirflowNetworkLinkageData(2).CompNum).CompTypeNum = AirflowNetwork::iComponentTypeNum::DOP;
+    state->afn->AirflowNetworkCompData(state->afn->AirflowNetworkLinkageData(2).CompNum).CompTypeNum = AirflowNetwork::ComponentType::DOP;
     state->afn->report();
 
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneVentSenLossW, 95.89575, 0.001);
@@ -6059,7 +6059,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).VentilAirChangeRate, 0.2438, 0.001);
     EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).VentilMass, 0.85114, 0.001);
     // Infiltration
-    state->afn->AirflowNetworkCompData(state->afn->AirflowNetworkLinkageData(2).CompNum).CompTypeNum = AirflowNetwork::iComponentTypeNum::SCR;
+    state->afn->AirflowNetworkCompData(state->afn->AirflowNetworkLinkageData(2).CompNum).CompTypeNum = AirflowNetwork::ComponentType::SCR;
     state->afn->update();
     state->afn->report();
     EXPECT_NEAR(state->afn->exchangeData(1).SumMCp, 2.38012, 0.001);
@@ -16256,8 +16256,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
     state->afn->AirflowNetworkNodeData(19).EPlusNodeNum = 2;
     state->afn->AirflowNetworkNodeData(20).EPlusNodeNum = 11;
     state->afn->AirflowNetworkNodeData(21).EPlusNodeNum = 3;
-    state->afn->AirflowNetworkNodeData(11).EPlusTypeNum = AirflowNetwork::iEPlusNodeType::ZIN;
-    state->afn->AirflowNetworkNodeData(12).EPlusTypeNum = AirflowNetwork::iEPlusNodeType::ZOU;
+    state->afn->AirflowNetworkNodeData(11).EPlusTypeNum = AirflowNetwork::NodeType::ZIN;
+    state->afn->AirflowNetworkNodeData(12).EPlusTypeNum = AirflowNetwork::NodeType::ZOU;
     state->dataEnvrn->StdRhoAir = 1.2;
     state->afn->DisSysCompCVFData(1).FlowRate = 1.23;
     state->afn->SizeDucts();
