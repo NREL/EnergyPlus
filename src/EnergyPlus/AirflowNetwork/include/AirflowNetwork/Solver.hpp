@@ -199,11 +199,11 @@ namespace AirflowNetwork {
             ControlType::NoMultizoneOrDistribution; // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION, MULTIZONE WITHOUT DISTRIBUTION, MULTIZONE
                                                     // WITH DISTRIBUTION ONLY DURING FAN OPERATION, and NO MULTIZONE OR DISTRIBUTION
         std::string WPCCntr = "SURFACEAVERAGECALCULATION"; // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
-        iWPCCntr iWPCCnt = iWPCCntr::SurfAvg;              // Integer equivalent for WPCCntr field
-        std::string BldgType = "LowRise";                  // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
-        std::string HeightOption = "OpeningHeight";        // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
-        int maximum_iterations = 500;                      // Maximum number of iteration, default 500
-        int InitFlag = 1;                                  // Initialization flag
+        WindPressureCalculationType iWPCCnt = WindPressureCalculationType::SurfAvg; // Integer equivalent for WPCCntr field
+        std::string BldgType = "LowRise";           // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
+        std::string HeightOption = "OpeningHeight"; // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
+        int maximum_iterations = 500;               // Maximum number of iteration, default 500
+        int InitFlag = 1;                           // Initialization flag
         Solver solver = Solver::SkylineLU;
         Real64 relative_convergence_tolerance = 0.0001; // Relative airflow convergence
         Real64 absolute_convergence_tolerance = 1e-06;  // Absolute airflow convergence
