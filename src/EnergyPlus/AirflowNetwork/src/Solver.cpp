@@ -5348,7 +5348,7 @@ namespace AirflowNetwork {
                         MultizoneSurfaceData(i).OpenElapsedTime = 0.0;
                         MultizoneSurfaceData(i).OpeningStatus = AirflowNetwork::OpenStatus::FreeOperation;
                         MultizoneSurfaceData(i).OpeningProbStatus = AirflowNetwork::ProbabilityCheck::NoAction;
-                        MultizoneSurfaceData(i).ClosingProbStatus = 0;
+                        MultizoneSurfaceData(i).ClosingProbStatus = AirflowNetwork::ProbabilityCheck::NoAction;
                     }
                 }
             }

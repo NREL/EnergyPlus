@@ -80,7 +80,7 @@ namespace AirflowNetwork {
         MinCheckForceClose // Force open when closing elapsed time is less than minimum closing time
     };
 
-    enum ProbabilityCheck // TODO: make enum class
+    enum ProbabilityCheck // Needs to be used as an output variable
     {
         NoAction = 0, // No action from probability check
         ForceChange,  // Force open or close from probability check
