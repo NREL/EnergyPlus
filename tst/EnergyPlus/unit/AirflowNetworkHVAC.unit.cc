@@ -6041,7 +6041,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneInfiSenLossW, 95.89575, 0.001);
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneInfiLatLossW, 0.969147, 0.001);
 
-    state->afn->AirflowNetworkCompData(state->afn->AirflowNetworkLinkageData(2).CompNum).CompTypeNum = AirflowNetwork::iComponentTypeNum::DOP;
+    state->afn->AirflowNetworkCompData(state->afn->AirflowNetworkLinkageData(2).CompNum).CompTypeNum = AirflowNetwork::Type::DOP;
     state->afn->report();
 
     EXPECT_NEAR(state->afn->AirflowNetworkReportData(1).MultiZoneVentSenLossW, 95.89575, 0.001);
@@ -6059,7 +6059,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).VentilAirChangeRate, 0.2438, 0.001);
     EXPECT_NEAR(state->afn->AirflowNetworkZnRpt(1).VentilMass, 0.85114, 0.001);
     // Infiltration
-    state->afn->AirflowNetworkCompData(state->afn->AirflowNetworkLinkageData(2).CompNum).CompTypeNum = AirflowNetwork::iComponentTypeNum::SCR;
+    state->afn->AirflowNetworkCompData(state->afn->AirflowNetworkLinkageData(2).CompNum).CompTypeNum = AirflowNetwork::Type::SCR;
     state->afn->update();
     state->afn->report();
     EXPECT_NEAR(state->afn->exchangeData(1).SumMCp, 2.38012, 0.001);
@@ -6081,7 +6081,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckNumOfFansInAirLoopTest)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "CVF";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).Name = "VAV";
 
-    ASSERT_THROW(state->afn->validate_distribution(), std::runtime_error);
+    ASSERT_THROW(state->afn->finalize_distribution(), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: An AirLoop branch, , has two or more fans: CVF,VAV",
@@ -6156,7 +6156,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
-    ASSERT_THROW(state->afn->validate_distribution(), std::runtime_error);
+    ASSERT_THROW(state->afn->finalize_distribution(), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node "
@@ -6251,7 +6251,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     state->afn->SplitterNodeNumbers(2) = 0;
 
     // MixedAir::NumOAMixers.allocate(1);
-    state->afn->validate_distribution();
+    state->afn->finalize_distribution();
 
     EXPECT_TRUE(compare_err_stream("", true));
 }
@@ -10503,7 +10503,7 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeAirLoopNum(1) = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1) = 1;
     state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 1;
-    state->afn->DisSysNodeData(9).EPlusNodeNum = 50;
+    state->afn->DisSysNodeData(9).node_number = 50;
     // AirflowNetwork::AirflowNetworkExchangeData.allocate(5);
     state->afn->manage_balance(true);
     EXPECT_EQ(state->afn->DisSysCompCVFData(1).AirLoopNum, 1);
@@ -10797,7 +10797,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportZoneERV)
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
 
     // Check validation and expected errors
-    ASSERT_THROW(state->afn->validate_distribution(), std::runtime_error);
+    ASSERT_THROW(state->afn->finalize_distribution(), std::runtime_error);
     std::string const error_string = delimited_string({
         "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node "
         "object.",
@@ -10978,7 +10978,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportZoneERV)
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
 
     // Check validation and expected warning
-    state->afn->validate_distribution();
+    state->afn->finalize_distribution();
 
     EXPECT_TRUE(compare_err_stream(
         "   ** Warning ** AirflowNetwork::Solver::validate_distribution: A ZoneHVAC:EnergyRecoveryVentilator is simulated along with an "
@@ -11146,7 +11146,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportUnbalancedZoneERV)
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
 
     // Check validation and expected errors
-    ASSERT_THROW(state->afn->validate_distribution(), std::runtime_error);
+    ASSERT_THROW(state->afn->finalize_distribution(), std::runtime_error);
     std::string const error_string = delimited_string({
         "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node "
         "object.",
@@ -11289,7 +11289,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportHPWH)
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
 
     // Check validation and expected errors
-    ASSERT_THROW(state->afn->validate_distribution(), std::runtime_error);
+    ASSERT_THROW(state->afn->finalize_distribution(), std::runtime_error);
     std::string const error_string = delimited_string({
         "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node "
         "object.",
@@ -11427,7 +11427,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWH)
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
 
     // Check validation and expected warning
-    state->afn->validate_distribution();
+    state->afn->finalize_distribution();
     EXPECT_TRUE(compare_err_stream(
         "   ** Warning ** AirflowNetwork::Solver::validate_distribution: Heat pump water heater is simulated along with an AirflowNetwork "
         "but is not included in the AirflowNetwork.\n",
@@ -11555,7 +11555,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWHZoneAndOA)
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
 
     // Check validation and expected errors
-    ASSERT_THROW(state->afn->validate_distribution(), std::runtime_error);
+    ASSERT_THROW(state->afn->finalize_distribution(), std::runtime_error);
     std::string const error_string = delimited_string({
         "   ** Severe  ** AirflowNetwork::Solver::validate_distribution: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node "
         "object.",
@@ -16256,8 +16256,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
     state->afn->AirflowNetworkNodeData(19).EPlusNodeNum = 2;
     state->afn->AirflowNetworkNodeData(20).EPlusNodeNum = 11;
     state->afn->AirflowNetworkNodeData(21).EPlusNodeNum = 3;
-    state->afn->AirflowNetworkNodeData(11).EPlusTypeNum = AirflowNetwork::iEPlusNodeType::ZIN;
-    state->afn->AirflowNetworkNodeData(12).EPlusTypeNum = AirflowNetwork::iEPlusNodeType::ZOU;
+    state->afn->AirflowNetworkNodeData(11).EPlusTypeNum = AirflowNetwork::NodeType::ZIN;
+    state->afn->AirflowNetworkNodeData(12).EPlusTypeNum = AirflowNetwork::NodeType::ZOU;
     state->dataEnvrn->StdRhoAir = 1.2;
     state->afn->DisSysCompCVFData(1).FlowRate = 1.23;
     state->afn->SizeDucts();

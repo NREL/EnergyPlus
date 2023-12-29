@@ -199,11 +199,11 @@ namespace AirflowNetwork {
             ControlType::NoMultizoneOrDistribution; // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION, MULTIZONE WITHOUT DISTRIBUTION, MULTIZONE
                                                     // WITH DISTRIBUTION ONLY DURING FAN OPERATION, and NO MULTIZONE OR DISTRIBUTION
         std::string WPCCntr = "SURFACEAVERAGECALCULATION"; // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
-        iWPCCntr iWPCCnt = iWPCCntr::SurfAvg;              // Integer equivalent for WPCCntr field
-        std::string BldgType = "LowRise";                  // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
-        std::string HeightOption = "OpeningHeight";        // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
-        int maximum_iterations = 500;                      // Maximum number of iteration, default 500
-        int InitFlag = 1;                                  // Initialization flag
+        WindPressureCalculationType iWPCCnt = WindPressureCalculationType::SurfAvg; // Integer equivalent for WPCCntr field
+        std::string BldgType = "LowRise";           // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
+        std::string HeightOption = "OpeningHeight"; // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
+        int maximum_iterations = 500;               // Maximum number of iteration, default 500
+        int InitFlag = 1;                           // Initialization flag
         Solver solver = Solver::SkylineLU;
         Real64 relative_convergence_tolerance = 0.0001; // Relative airflow convergence
         Real64 absolute_convergence_tolerance = 1e-06;  // Absolute airflow convergence
@@ -307,7 +307,8 @@ namespace AirflowNetwork {
                              Real64 &OpenFactor                             // Window or door opening factor (used to calculate airflow)
         );
         void assign_fan_airloop();
-        void validate_distribution();
+        bool validate_network();
+        void finalize_distribution();
         void validate_fan_flowrate(); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
         void validate_exhaust_fan_input();
         void hybrid_ventilation_control();
@@ -371,6 +372,7 @@ namespace AirflowNetwork {
         Array1D<Real64> LoopOnOffFanRunTimeFraction;
         Array1D<bool> LoopOnOffFlag;
 
+        bool distribution_is_final = false;
         bool ValidateExhaustFanInputOneTimeFlag = true;
         bool initializeOneTimeFlag = true;
         bool initializeMyEnvrnFlag = true;
@@ -595,6 +597,7 @@ namespace AirflowNetwork {
             LoopOnOffFanRunTimeFraction.deallocate();
             LoopOnOffFlag.deallocate();
             UniqueAirflowNetworkSurfaceName.clear();
+            distribution_is_final = false;
             ValidateExhaustFanInputOneTimeFlag = true;
             initializeOneTimeFlag = true;
             initializeMyEnvrnFlag = true;
