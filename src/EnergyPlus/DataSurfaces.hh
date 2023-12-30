@@ -896,7 +896,7 @@ namespace DataSurfaces {
 
         Real64 glazedFrac = 1.0;       // (Glazed area)/(Glazed area + divider area)
         Real64 centerGlassArea = 0.0;  // Center of glass area (m2); area of glass where 1-D conduction dominates
-        Real64 edgeGlassCorrFac = 0.0; // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal bridging
+        Real64 edgeGlassCorrFac = 1.0; // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal bridging
                                  // effects near frame and divider
             
         int screenNum = 0;           // Screen number for a window with a screen (do not confuse with material number)
