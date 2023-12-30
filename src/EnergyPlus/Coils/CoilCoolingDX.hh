@@ -88,7 +88,6 @@ struct CoilCoolingDX
     void oneTimeInit(EnergyPlusData &state);
     void simulate(EnergyPlusData &state,
                   int useAlternateMode,
-                  Real64 PLR,
                   int speedNum,
                   Real64 speedRatio,
                   int const fanOpMode,

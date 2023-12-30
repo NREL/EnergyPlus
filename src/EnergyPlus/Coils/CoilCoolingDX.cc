@@ -684,7 +684,6 @@ void CoilCoolingDX::size(EnergyPlusData &state)
 
 void CoilCoolingDX::simulate(EnergyPlusData &state,
                              int useAlternateMode,
-                             Real64 PLR,
                              int speedNum,
                              Real64 speedRatio,
                              int const fanOpMode,
@@ -722,7 +721,6 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                                 evapInletNode,
                                 evapOutletNode,
                                 useAlternateMode,
-                                PLR,
                                 speedNum,
                                 speedRatio,
                                 fanOpMode,
@@ -805,7 +803,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     this->wasteHeatEnergyRate = this->performance->wasteHeatRate;
     this->wasteHeatEnergy = this->performance->wasteHeatRate * reportingConstant;
 
-    this->partLoadRatioReport = PLR;
+    this->partLoadRatioReport = speedNum == 1 ? 1.0 : speedRatio;
     this->speedNumReport = speedNum;
     this->speedRatioReport = speedRatio;
 
@@ -914,7 +912,6 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                                         dummyEvapInlet,
                                         dummyEvapOutlet,
                                         false,
-                                        dummyPLR,
                                         dummySpeedNum,
                                         dummySpeedRatio,
                                         dummyFanOpMode,
