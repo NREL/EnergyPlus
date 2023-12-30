@@ -1039,7 +1039,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
             ShowFatalError(state, "Syntax error, optional arguments Theta and Phi must be present when optional ScreenNumber is used.");
         }
     } else {
-        ScNum = state.dataSurface->SurfWinScreenNumber(SurfaceNum);
+        ScNum = state.dataSurface->SurfaceWindow(SurfaceNum).screenNum;
     }
 
     if (present(Theta)) {
@@ -1053,7 +1053,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         }
         NormalAzimuth = SunAzimuthToScreenNormal;
     } else {
-        SunAzimuth = std::atan2(state.dataEnvrn->SOLCOS(1), state.dataEnvrn->SOLCOS(2));
+        SunAzimuth = std::atan2(state.dataEnvrn->SOLCOS.x, state.dataEnvrn->SOLCOS.y);
         if (SunAzimuth < 0.0) SunAzimuth += 2.0 * Constant::Pi;
         SurfaceAzimuth = state.dataSurface->Surface(SurfaceNum).Azimuth * Constant::DegToRadians;
         NormalAzimuth = SunAzimuth - SurfaceAzimuth;

@@ -1471,7 +1471,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
         for (int iWin = 1; iWin <= numExtWins; ++iWin) {
             for (int iRefPt = 1; iRefPt <= numRefPts; ++iRefPt) {
                 for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) {
-                    auto &daylFac = thisDaylgtCtrl.DaylFac(iHr, iWin, iRefPt, iSlatAng);
+                    auto &daylFac = thisDaylgtCtrl.daylFac[iHr](iWin, iRefPt, iSlatAng);
                     daylFac[(int)Lum::Illum].sky = {0.2, 0.2, 0.2, 0.2};
                     daylFac[(int)Lum::Illum].sun = 0.02;
                     daylFac[(int)Lum::Illum].sunDisk = 0.01;
@@ -1504,7 +1504,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
         for (int iWin = 1; iWin <= numExtWins; ++iWin) {
             for (int iRefPt = 1; iRefPt <= numRefPts; ++iRefPt) {
                 for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) {
-                    auto &daylFac = thisDaylgtCtrl.DaylFac(iHr, iWin, iRefPt, iSlatAng);
+                    auto &daylFac = thisDaylgtCtrl.daylFac[iHr](iWin, iRefPt, iSlatAng);
                     daylFac[(int)Lum::Illum] = Illums();
                     daylFac[(int)Lum::Source] = Illums();
                     daylFac[(int)Lum::Back] = Illums();
@@ -1796,7 +1796,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
         for (int iWin = 1; iWin <= numExtWins; ++iWin) {
             for (int iRefPt = 1; iRefPt <= numRefPts; ++iRefPt) {
                 for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) {
-                    auto &daylFac = thisDaylgtCtrl.DaylFac(iHr, iWin, iRefPt, iSlatAng);
+                    auto &daylFac = thisDaylgtCtrl.daylFac[iHr](iWin, iRefPt, iSlatAng);
                     daylFac[(int)Lum::Illum] = Illums();
                     daylFac[(int)Lum::Source] = Illums();
                     daylFac[(int)Lum::Back] = Illums();
@@ -1818,11 +1818,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     // Set un-shaded surface illuminance factor to 1.0 for RefPt1, 0.1 for RefPt2
     // Set shaded surface illuminance factor to 0.5 for RefPt1, 0.05 for RefPt2
     int RefPt = 1;
-    thisDaylgtCtrl.DaylFac(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Unshaded)[(int)Lum::Illum].sky[iSky] = 1.0;
-    thisDaylgtCtrl.DaylFac(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Shaded)[(int)Lum::Illum].sky[iSky] = 0.5;
+    thisDaylgtCtrl.daylFac[state->dataGlobal->HourOfDay](DayltgExtWin, RefPt, Unshaded)[(int)Lum::Illum].sky[iSky] = 1.0;
+    thisDaylgtCtrl.daylFac[state->dataGlobal->HourOfDay](DayltgExtWin, RefPt, Shaded)[(int)Lum::Illum].sky[iSky] = 0.5;
     RefPt = 2;
-    thisDaylgtCtrl.DaylFac(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Unshaded)[(int)Lum::Illum].sky[iSky] = 0.1;
-    thisDaylgtCtrl.DaylFac(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Shaded)[(int)Lum::Illum].sky[iSky] = 0.05;
+    thisDaylgtCtrl.daylFac[state->dataGlobal->HourOfDay](DayltgExtWin, RefPt, Unshaded)[(int)Lum::Illum].sky[iSky] = 0.1;
+    thisDaylgtCtrl.daylFac[state->dataGlobal->HourOfDay](DayltgExtWin, RefPt, Shaded)[(int)Lum::Illum].sky[iSky] = 0.05;
 
     // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
     state->dataSurface->SurfWinWindowModelType(IWin) = WindowModel::Detailed;

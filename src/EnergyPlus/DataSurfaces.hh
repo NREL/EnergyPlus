@@ -214,6 +214,9 @@ namespace DataSurfaces {
         Num
     };
 
+    constexpr int iWinCover_Bare = (int)WinCover::Bare;
+    constexpr int iWinCover_Shaded = (int)WinCover::Shaded;
+        
     enum class WinShadingType
     {
         Invalid = -1,
@@ -346,6 +349,11 @@ namespace DataSurfaces {
         Source,
         Num
     };
+
+    // Trying out this new pattern to make code look less gnarly
+    constexpr int iLum_Illum = (int)Lum::Illum;
+    constexpr int iLum_Back = (int)Lum::Back;
+    constexpr int iLum_Source = (int)Lum::Source;
         
     // IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control
     // original expression: SHADE_FLAG == ShadeOff || SHADE_FLAG == ShadeOff
@@ -879,29 +887,49 @@ namespace DataSurfaces {
         Array1D<SurfaceWindowRefPt> refPts;
 
         Vector3<Real64> WinCenter = {0.0, 0.0, 0.0};                              // X,Y,Z coordinates of window center point in building coord system
+
+        Real64 theta = 0.0;                                    // Azimuth of window normal (rad)
+        Real64 phi = 0.0;                                      // Altitude of window normal (rad)
+        Real64 rhoCeilingWall = 0.0;   // Average interior reflectance seen by light moving up across horizontal plane thru center of window
+        Real64 rhoFloorWall = 0.0;     // Same as above, but for light moving down
+        Real64 fractionUpgoing = 0.0;  // Fraction light entering window that goes upward
+
+        Real64 glazedFrac = 1.0;       // (Glazed area)/(Glazed area + divider area)
+        Real64 centerGlassArea = 0.0;  // Center of glass area (m2); area of glass where 1-D conduction dominates
+        Real64 edgeGlassCorrFac = 0.0; // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal bridging
+                                 // effects near frame and divider
+            
+        int screenNum = 0;           // Screen number for a window with a screen (do not confuse with material number)
+        Real64 lightWellEff = 1.0;     // Light well efficiency (multiplier on exterior window vis trans due to light well losses)
+            
         // What is 10 here?
         std::array<Real64, 10+1> ThetaFace = {296.15};                                                // Face temperatures of window layers (K)
 
-        // What is 24 here?
-        std::array<Real64, 24+1> OutProjSLFracMult = {1.0}; // Multiplier on sunlit fraction due to shadowing of glass by frame
-        // and divider outside projections
-        std::array<Real64, 24+1> InOutProjSLFracMult = {1.0}; // Multiplier on sunlit fraction due to shadowing of glass by frame
-        // and divider inside and outside projections
+        // Multiplier on sunlit fraction due to shadowing of glass by
+        // frame and divider outside projections
+        std::array<Real64, (int)Constant::HoursInDay+1> OutProjSLFracMult = {1.0};
+        // Multiplier on sunlit fraction due to shadowing of glass by
+        // frame and divider inside and outside projections
+        std::array<Real64, (int)Constant::HoursInDay+1> InOutProjSLFracMult = {1.0}; 
         std::array<Real64, Material::MaxSlatAngs+1> EffShBlindEmiss = {0.0}; // Effective emissivity of interior blind or shade
         std::array<Real64, Material::MaxSlatAngs+1> EffGlassEmiss = {0.0};   // Effective emissivity of glass adjacent to interior blind or shade
 
         // for shadowing of ground by building and obstructions [W/m2]
-        std::array<Real64, (int)FWC::Num> EnclAreaMinusThisSurf = {
-            0.0, 0.0, 0.0}; // Enclosure inside surface area minus this surface and its subsurfaces
-        // for floor/wall/ceiling (m2)
-        std::array<Real64, (int)FWC::Num> EnclAreaReflProdMinusThisSurf = {
-            0.0, 0.0, 0.0}; // Enclosure product of inside surface area times vis reflectance
-        // minus this surface and its subsurfaces,
-        // for floor/wall/ceiling (m2)
+        // Enclosure inside surface area minus this surface and its
+        // subsurfaces for floor/wall/ceiling (m2)
+        std::array<Real64, (int)FWC::Num> EnclAreaMinusThisSurf = {0.0, 0.0, 0.0}; 
+        // Enclosure product of inside surface area times vis
+        // reflectance minus this surface and its subsurfaces, for
+        // floor/wall/ceiling (m2)
+        std::array<Real64, (int)FWC::Num> EnclAreaReflProdMinusThisSurf = {0.0, 0.0, 0.0}; 
 
         BSDFWindowDescript ComplexFen; // Data for complex fenestration, see DataBSDFWindow.cc for declaration
     };
 
+    struct SurfaceWindowFrameDiv
+    {
+    };
+        
     enum class NfrcProductOptions : int
     {
         Invalid = -1,
@@ -1663,11 +1691,6 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> SurfWinDaylFacPoint;                                // Pointer to daylight factors for the window
     Array1D<Real64> SurfWinVisTransSelected;                         // Window vis trans at normal incidence selected for use in dayltg calculation
     Array1D<Real64> SurfWinSwitchingFactor;                          // Window switching factor (0.0 = unswitched; 1.0 = fully switched)
-    Array1D<Real64> SurfWinTheta;                                    // Azimuth of window normal (rad)
-    Array1D<Real64> SurfWinPhi;                                      // Altitude of window normal (rad)
-    Array1D<Real64> SurfWinRhoCeilingWall;   // Average interior reflectance seen by light moving up across horizontal plane thru center of window
-    Array1D<Real64> SurfWinRhoFloorWall;     // Same as above, but for light moving down
-    Array1D<Real64> SurfWinFractionUpgoing;  // Fraction light entering window that goes upward
     Array1D<Real64> SurfWinVisTransRatio;    // For windows with switchable glazing,
                                              // ratio of normal transmittance in switched state to that in unswitched state
     Array1D<Real64> SurfWinFrameArea;        // Frame projected area (m2)
@@ -1697,10 +1720,6 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinDividerTempSurfOut;                  // Divider outside surface temperature (C)
     Array1D<Real64> SurfWinProjCorrDivOut;                      // Correction factor to absorbed radiation due to divider outside projection
     Array1D<Real64> SurfWinProjCorrDivIn;                       // Correction factor to absorbed radiation due to divider inside projection
-    Array1D<Real64> SurfWinGlazedFrac;                          // (Glazed area)/(Glazed area + divider area)
-    Array1D<Real64> SurfWinCenterGlArea;                        // Center of glass area (m2); area of glass where 1-D conduction dominates
-    Array1D<Real64> SurfWinEdgeGlCorrFac; // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal bridging
-                                          // effects near frame and divider
     Array1D<Real64> SurfWinShadeAbsFacFace1; // Fraction of short-wave radiation incident that is absorbed by face 1 when total absorbed radiation is
                                              // apportioned to the two faces
     Array1D<Real64> SurfWinShadeAbsFacFace2; // Fraction of short-wave radiation incident that is absorbed by face 2 when total absorbed radiation is
@@ -1732,7 +1751,6 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinInsideSillSolAbs;         // Solar absorptance of inside sill
     Array1D<Real64> SurfWinInsideRevealSolAbs;       // Solar absorptance of inside reveal
     Array1D<Real64> SurfWinOutsideRevealSolAbs;      // Solar absorptance of outside reveal
-    Array1D<int> SurfWinScreenNumber;                // Screen number for a window with a screen (do not confuse with material number)
     Array1D<DataSurfaces::WindowAirFlowSource> SurfWinAirflowSource;           // Source of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
     Array1D<DataSurfaces::WindowAirFlowDestination> SurfWinAirflowDestination; // Destination of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
     Array1D<int> SurfWinAirflowReturnNodePtr;                                  // Return node pointer for destination = ReturnAir
@@ -1750,7 +1768,6 @@ struct SurfacesData : BaseGlobalStruct
                                            // true, accounts for shadowing of ground by building and obstructions [W/m2]
     Array1D<Real64> SurfWinBmGndSolarInc;  // Incident diffuse solar from ground-reflected beam radiation; used for Complex Fen; if CalcSolRefl is
                                            // true, accounts for shadowing of ground by building and obstructions [W/m2]
-    Array1D<Real64> SurfWinLightWellEff;   // Light well efficiency (multiplier on exterior window vis trans due to light well losses)
     Array1D<bool> SurfWinSolarDiffusing;   // True if exterior window with a construction that contains a diffusing glass layer
     Array1D<Real64> SurfWinFrameHeatGain;
     Array1D<Real64> SurfWinFrameHeatLoss;

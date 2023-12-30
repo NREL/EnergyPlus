@@ -3047,10 +3047,7 @@ namespace WindowComplexManager {
             theta = 273.15;
         }
 
-        if (SurfNum != 0)
-            edgeGlCorrFac = state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum);
-        else
-            edgeGlCorrFac = 1;
+        edgeGlCorrFac = (SurfNum != 0) ?state.dataSurface->SurfaceWindow(SurfNum).edgeGlassCorrFac : 1;
 
         //  call TARCOG
         int constexpr Debug_mode = 0;
