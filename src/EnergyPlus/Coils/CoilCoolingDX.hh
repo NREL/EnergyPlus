@@ -51,7 +51,7 @@
 #include <string>
 #include <vector>
 
-#include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
+#include <EnergyPlus/Coils/CoilCoolingDXPerformanceBase.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -78,6 +78,8 @@ struct CoilCoolingDXInputSpecification
 struct CoilCoolingDX
 {
     CoilCoolingDX() = default;
+    static std::shared_ptr<CoilCoolingDXPerformanceBase> makePerformanceSubclass(EnergyPlus::EnergyPlusData &state,
+                                                                                 const std::string &performance_object_name);
     static int factory(EnergyPlusData &state, std::string const &coilName);
     static void getInput(EnergyPlusData &state);
     static void clear_state();
@@ -97,7 +99,7 @@ struct CoilCoolingDX
                       int &evapOutletNodeIndex,
                       int &condInletNodeIndex,
                       int &normalModeNumSpeeds,
-                      CoilCoolingDXCurveFitPerformance::CapControlMethod &capacityControlMethod,
+                      CoilCoolingDXPerformanceBase::CapControlMethod &capacityControlMethod,
                       Real64 &minOutdoorDryBulb);
     void getDataAfterSizing(Real64 &normalModeRatedEvapAirFlowRate,
                             Real64 &normalModeRatedCapacity,
@@ -118,7 +120,7 @@ struct CoilCoolingDX
     int availScheduleIndex = 0;
     int condInletNodeIndex = 0;
     int condOutletNodeIndex = 0;
-    CoilCoolingDXCurveFitPerformance performance;
+    std::shared_ptr<CoilCoolingDXPerformanceBase> performance; // TODO: unique_ptr and explicit copy ctor
     int condensateTankIndex = 0;
     int condensateTankSupplyARRID = 0;
     Real64 condensateVolumeFlow = 0.0;
@@ -135,8 +137,8 @@ struct CoilCoolingDX
     std::string supplyFanName = "";
     bool SubcoolReheatFlag = false; // Subcool reheat coil control
 
-    CoilCoolingDXCurveFitSpeed &normModeNomSpeed();
-    CoilCoolingDXCurveFitSpeed &altModeNomSpeed();
+    // CoilCoolingDXCurveFitSpeed &normModeNomSpeed();
+    // CoilCoolingDXCurveFitSpeed &altModeNomSpeed();
 
     // report variables
     Real64 totalCoolingEnergyRate = 0.0;
@@ -173,6 +175,10 @@ struct CoilCoolingDX
 
     void setToHundredPercentDOAS();
     bool isHundredPercentDOAS = false;
+
+private:
+    static bool
+    findPerformanceSubclass(EnergyPlus::EnergyPlusData &state, const std::string_view object_to_find, const std::string &idd_performance_name);
 };
 
 struct CoilCoolingDXData : BaseGlobalStruct

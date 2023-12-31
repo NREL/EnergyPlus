@@ -74,7 +74,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXInput)
     int coilIndex = CoilCoolingDX::factory(*state, "coolingCoil");
     auto const &thisCoil(state->dataCoilCooingDX->coilCoolingDXs[coilIndex]);
     EXPECT_EQ("COOLINGCOIL", thisCoil.name);
-    EXPECT_EQ("PERFORMANCEOBJECTNAME", thisCoil.performance.name);
+    EXPECT_EQ("PERFORMANCEOBJECTNAME", thisCoil.performance->name);
 }
 
 TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance)
@@ -163,13 +163,13 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance)
     thisCoil.size(*state);
 
     // for speed > 1 we use the mshp rated high speed flow...
-    state->dataHVACGlobal->MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = thisCoil.performance->RatedAirMassFlowRateMaxSpeed();
 
     // we'll use this later
     auto &evapOutletNode = state->dataLoopNodes->Node(thisCoil.evapOutletNodeIndex);
 
     // set some values to run at rated conditions and call to run normal mode speed 1
-    evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate = thisCoil.performance->RatedAirMassFlowRateMinSpeed();
     int useAlternateMode = DataHVACGlobals::coilNormalMode;
     Real64 PLR = 1.0;
     int speedNum = 1;
@@ -183,7 +183,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance)
     EXPECT_NEAR(0.0114, evapOutletNode.HumRat, 0.001);
 
     // alter values and run at rated conditions normal mode speed 2
-    evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate = thisCoil.performance->RatedAirMassFlowRateMaxSpeed();
     speedNum = 2;
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     //    std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
@@ -299,7 +299,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation)
     thisCoil.size(*state);
 
     // for speed > 1 we use the mshp rated high speed flow...
-    state->dataHVACGlobal->MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = thisCoil.performance->RatedAirMassFlowRateMaxSpeed();
 
     // we'll use this later
     auto &evapOutletNode = state->dataLoopNodes->Node(thisCoil.evapOutletNodeIndex);
@@ -307,7 +307,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation)
     bool setExpectations = true;
 
     // set some values to run at rated conditions and call to run normal mode speed 1
-    evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate = thisCoil.performance->RatedAirMassFlowRateMinSpeed();
     int useAlternateMode = DataHVACGlobals::coilNormalMode;
     Real64 PLR = 1.0;
     int speedNum = 1;
@@ -323,7 +323,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation)
         EXPECT_NEAR(0.007748, evapOutletNode.HumRat, 0.0001);
     }
     // alter values and run at rated conditions normal mode speed 2
-    evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate = thisCoil.performance->RatedAirMassFlowRateMaxSpeed();
     speedNum = 2;
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     if (!setExpectations) {
@@ -684,7 +684,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     thisCoil.size(*state);
 
     // for speed > 1 we use the mshp rated high speed flow...
-    state->dataHVACGlobal->MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = thisCoil.performance->RatedAirMassFlowRateMaxSpeed();
 
     // we'll use this later
     auto &evapOutletNode = state->dataLoopNodes->Node(thisCoil.evapOutletNodeIndex);
@@ -694,7 +694,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     evapInletNode.HumRat = 0.0055;
     evapInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(evapInletNode.Temp, evapInletNode.HumRat);
     // set some values to run at rated conditions and call to run normal mode speed 1
-    evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate = thisCoil.performance->RatedAirMassFlowRateMinSpeed();
     int useAlternateMode = DataHVACGlobals::coilNormalMode;
     Real64 PLR = 1.0;
     int speedNum = 1;
@@ -709,7 +709,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     EXPECT_NEAR(MultiSpeedOutletHumRat1, evapOutletNode.HumRat, 0.001);
     EXPECT_NEAR(MultiSpeedElecPower1, thisCoil.elecCoolingPower, 0.001);
     // Test 2 - dry coil - run the coil at high speed
-    evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate = thisCoil.performance->RatedAirMassFlowRateMaxSpeed();
     speedNum = 2;
     speedRatio = 1.0;
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
@@ -723,8 +723,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     // Test 3 - dry coil - run the coil at 0.75 speed ratio
     speedNum = 2;
     speedRatio = 0.75;
-    evapInletNode.MassFlowRate = speedRatio * thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate +
-                                 (1.0 - speedRatio) * thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate =
+        speedRatio * thisCoil.performance->RatedAirMassFlowRateMaxSpeed() + (1.0 - speedRatio) * thisCoil.performance->RatedAirMassFlowRateMinSpeed();
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate3, thisCoil.totalCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedSensCoolingRate3, thisCoil.sensCoolingEnergyRate, 0.1);
@@ -737,7 +737,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     evapInletNode.Temp = 24.0;
     evapInletNode.HumRat = 0.0100;
     evapInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(evapInletNode.Temp, evapInletNode.HumRat);
-    evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate = thisCoil.performance->RatedAirMassFlowRateMinSpeed();
     useAlternateMode = DataHVACGlobals::coilNormalMode;
     PLR = 1.0;
     speedNum = 1;
@@ -753,7 +753,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     EXPECT_NEAR(MultiSpeedElecPower4, thisCoil.elecCoolingPower, 0.001);
 
     // Test 5 - wet coil - run the coil at high speed
-    evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate = thisCoil.performance->RatedAirMassFlowRateMaxSpeed();
     speedNum = 2;
     speedRatio = 1.0;
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
@@ -767,8 +767,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     // Test 6 - wet coil - run the coil at 0.75 speed ratio
     speedNum = 2;
     speedRatio = 0.75;
-    evapInletNode.MassFlowRate = speedRatio * thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate +
-                                 (1.0 - speedRatio) * thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate =
+        speedRatio * thisCoil.performance->RatedAirMassFlowRateMaxSpeed() + (1.0 - speedRatio) * thisCoil.performance->RatedAirMassFlowRateMinSpeed();
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate6, thisCoil.totalCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedSensCoolingRate6, thisCoil.sensCoolingEnergyRate, 0.1);
@@ -1101,7 +1101,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     thisCoil.size(*state);
 
     // for speed > 1 we use the mshp rated high speed flow...
-    state->dataHVACGlobal->MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+    state->dataHVACGlobal->MSHPMassFlowRateHigh = thisCoil.performance->RatedAirMassFlowRateMaxSpeed();
 
     // we'll use this later
     auto &evapOutletNode = state->dataLoopNodes->Node(thisCoil.evapOutletNodeIndex);
@@ -1111,7 +1111,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     evapInletNode.HumRat = 0.0055;
     evapInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(evapInletNode.Temp, evapInletNode.HumRat);
     // set some values to run at rated conditions and call to run normal mode speed 1
-    evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate = thisCoil.performance->RatedAirMassFlowRateMinSpeed();
     int useAlternateMode = DataHVACGlobals::coilNormalMode;
     Real64 PLR = 1.0;
     int speedNum = 1;
@@ -1127,7 +1127,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     EXPECT_NEAR(MultiSpeedElecPower1, thisCoil.elecCoolingPower, 0.001);
 
     // Test 2 - dry coil - run the coil at high speed
-    evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate = thisCoil.performance->RatedAirMassFlowRateMaxSpeed();
     speedNum = 2;
     speedRatio = 1.0;
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
@@ -1141,8 +1141,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     // Test 3 - dry coil - run the coil at 0.75 speed ratio
     speedNum = 2;
     speedRatio = 0.75;
-    evapInletNode.MassFlowRate = speedRatio * thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate +
-                                 (1.0 - speedRatio) * thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate =
+        speedRatio * thisCoil.performance->RatedAirMassFlowRateMaxSpeed() + (1.0 - speedRatio) * thisCoil.performance->RatedAirMassFlowRateMinSpeed();
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate3, thisCoil.totalCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedSensCoolingRate3, thisCoil.sensCoolingEnergyRate, 0.1);
@@ -1155,7 +1155,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     evapInletNode.Temp = 24.0;
     evapInletNode.HumRat = 0.0100;
     evapInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(evapInletNode.Temp, evapInletNode.HumRat);
-    evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate = thisCoil.performance->RatedAirMassFlowRateMinSpeed();
     useAlternateMode = DataHVACGlobals::coilNormalMode;
     PLR = 1.0;
     speedNum = 1;
@@ -1171,7 +1171,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     EXPECT_NEAR(MultiSpeedElecPower4, thisCoil.elecCoolingPower, 0.001);
 
     // Test 5 - wet coil - run the coil at high speed
-    evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate = thisCoil.performance->RatedAirMassFlowRateMaxSpeed();
     speedNum = 2;
     speedRatio = 1.0;
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
@@ -1185,8 +1185,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     // Test 6 - wet coil - run the coil at 0.75 speed ratio
     speedNum = 2;
     speedRatio = 0.75;
-    evapInletNode.MassFlowRate = speedRatio * thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate +
-                                 (1.0 - speedRatio) * thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
+    evapInletNode.MassFlowRate =
+        speedRatio * thisCoil.performance->RatedAirMassFlowRateMaxSpeed() + (1.0 - speedRatio) * thisCoil.performance->RatedAirMassFlowRateMinSpeed();
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate6, thisCoil.totalCoolingEnergyRate, 0.1);
     EXPECT_NEAR(MultiSpeedSensCoolingRate6, thisCoil.sensCoolingEnergyRate, 0.1);
@@ -1844,10 +1844,10 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
     this_dx_clg_coil.size(*state);
 
     // check the normal operating mode names
-    EXPECT_EQ(this_dx_clg_coil.performance.normalMode.speeds[0].name, "DX COOLING COIL SPEED 1 PERFORMANCE");
-    EXPECT_EQ(this_dx_clg_coil.performance.normalMode.speeds[1].name, "DX COOLING COIL SPEED 2 PERFORMANCE");
-    EXPECT_EQ(this_dx_clg_coil.performance.normalMode.speeds[2].name, "DX COOLING COIL SPEED 3 PERFORMANCE");
-    EXPECT_EQ(this_dx_clg_coil.performance.normalMode.speeds[3].name, "DX COOLING COIL SPEED 4 PERFORMANCE");
+    EXPECT_EQ(this_dx_clg_coil.performance->NameAtSpeed(0), "DX COOLING COIL SPEED 1 PERFORMANCE");
+    EXPECT_EQ(this_dx_clg_coil.performance->NameAtSpeed(1), "DX COOLING COIL SPEED 2 PERFORMANCE");
+    EXPECT_EQ(this_dx_clg_coil.performance->NameAtSpeed(2), "DX COOLING COIL SPEED 3 PERFORMANCE");
+    EXPECT_EQ(this_dx_clg_coil.performance->NameAtSpeed(3), "DX COOLING COIL SPEED 4 PERFORMANCE");
 
     struct TestQuery
     {
@@ -1889,7 +1889,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
 
     // test 2: speed 2 cooling coil dx
     compType = "Coil:Cooling:DX:CurveFit:Speed";
-    compName = this_dx_clg_coil.performance.normalMode.speeds[1].name;
+    compName = this_dx_clg_coil.performance->NameAtSpeed(1);
     // expected results
     std::vector<TestQuery> speed2_testQueries(
         {TestQuery("Design Size Rated Air Flow Rate", "m3/s", 0.4000), TestQuery("Design Size Gross Cooling Capacity", "W", 6520.2056)});
@@ -1915,7 +1915,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
 
     // test 3: speed 3 cooling coil dx
     compType = "Coil:Cooling:DX:CurveFit:Speed";
-    compName = this_dx_clg_coil.performance.normalMode.speeds[2].name;
+    compName = this_dx_clg_coil.performance->NameAtSpeed(2);
     // expected results
     std::vector<TestQuery> speed3_testQueries(
         {TestQuery("Design Size Rated Air Flow Rate", "m3/s", 0.6000), TestQuery("Design Size Gross Cooling Capacity", "W", 9780.3084)});
