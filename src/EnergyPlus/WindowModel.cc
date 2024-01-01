@@ -52,13 +52,13 @@
 
 namespace EnergyPlus {
 
-template <> EnumParser<WindowManager::WindowsModel>::EnumParser()
+template <> EnumParser<Window::WindowsModel>::EnumParser() // LOL
 {
-    m_Map["BUILTINWINDOWSMODEL"] = WindowManager::WindowsModel::BuiltIn;
-    m_Map["EXTERNALWINDOWSMODEL"] = WindowManager::WindowsModel::External;
+    m_Map["BUILTINWINDOWSMODEL"] = Window::WindowsModel::BuiltIn;
+    m_Map["EXTERNALWINDOWSMODEL"] = Window::WindowsModel::External;
 }
 
-namespace WindowManager {
+namespace Window {
 
     /////////////////////////////////////////////////////////////////////////////////////////
     //  CWindowModel
@@ -144,6 +144,6 @@ namespace WindowManager {
         return (m_Model == WindowsOpticalModel::Simplified);
     }
 
-} // namespace WindowManager
+} // namespace Window
 
 } // namespace EnergyPlus

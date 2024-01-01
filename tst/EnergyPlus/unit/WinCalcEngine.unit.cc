@@ -97,11 +97,11 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEClear)
 
     Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
-    WindowManager::initWindowModel(*state);
-    WindowManager::InitWindowOpticalCalculations(*state);
+    Window::initWindowModel(*state);
+    Window::InitWindowOpticalCalculations(*state);
     HeatBalanceManager::InitHeatBalance(*state);
 
-    auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance(*state);
+    auto aWinConstSimp = Window::CWindowConstructionsSimplified::instance(*state);
     auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
 
     constexpr Real64 minLambda{0.3};
@@ -193,11 +193,11 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEVenetian)
 
     Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
-    WindowManager::initWindowModel(*state);
-    WindowManager::InitWindowOpticalCalculations(*state);
+    Window::initWindowModel(*state);
+    Window::InitWindowOpticalCalculations(*state);
     HeatBalanceManager::InitHeatBalance(*state);
 
-    auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance(*state);
+    auto aWinConstSimp = Window::CWindowConstructionsSimplified::instance(*state);
     auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
 
     constexpr Real64 minLambda{0.3};
@@ -272,11 +272,11 @@ TEST_F(EnergyPlusFixture, DISABLED_WCEShade)
 
     Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
-    WindowManager::initWindowModel(*state);
-    WindowManager::InitWindowOpticalCalculations(*state);
+    Window::initWindowModel(*state);
+    Window::InitWindowOpticalCalculations(*state);
     HeatBalanceManager::InitHeatBalance(*state);
 
-    auto aWinConstSimp = WindowManager::CWindowConstructionsSimplified::instance(*state);
+    auto aWinConstSimp = Window::CWindowConstructionsSimplified::instance(*state);
     auto solarLayer = aWinConstSimp.getEquivalentLayer(*state, FenestrationCommon::WavelengthRange::Solar, 1);
 
     constexpr Real64 minLambda{0.3};

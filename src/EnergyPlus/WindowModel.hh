@@ -77,7 +77,7 @@ public:
     }
 };
 
-namespace WindowManager {
+namespace Window {
 
     enum class WindowsModel
     {
@@ -125,7 +125,7 @@ namespace WindowManager {
     private:
         WindowsOpticalModel m_Model;
     };
-} // namespace WindowManager
+} // namespace Window
 
 } // namespace EnergyPlus
 

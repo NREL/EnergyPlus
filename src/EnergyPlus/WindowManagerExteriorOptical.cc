@@ -71,7 +71,7 @@ using namespace SingleLayerOptics;
 using namespace DataEnvironment;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-namespace WindowManager {
+namespace Window {
 
     std::shared_ptr<CBSDFLayer> getBSDFLayer(EnergyPlusData &state, const Material::MaterialChild &t_Material, const WavelengthRange t_Range)
     {
@@ -667,5 +667,5 @@ namespace WindowManager {
         m_MaterialFactory = std::make_shared<CWCEDiffuseShadeMaterialsFactory>(m_Material, m_Range);
     }
 
-} // namespace WindowManager
+} // namespace Window
 } // namespace EnergyPlus

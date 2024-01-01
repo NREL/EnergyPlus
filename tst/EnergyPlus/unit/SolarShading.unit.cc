@@ -3965,7 +3965,7 @@ TEST_F(EnergyPlusFixture, ShadowCalculation_CSV)
     state->dataConstruction->Construct(1).TypeIsWindow = false;
     state->dataSurface->SurfWinSolarDiffusing.allocate(state->dataSurface->TotSurfaces);
     SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
-    WindowManager::initWindowModel(*state);
+    Window::initWindowModel(*state);
 
     state->dataSolarShading->GetInputFlag = false;
     state->dataSolarShading->ShadowingCalcFrequency = 20; // Default IDD

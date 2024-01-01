@@ -69,7 +69,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace WindowManager {
+namespace Window {
 
     class CWCEIntegrator;
 
@@ -310,7 +310,7 @@ namespace WindowManager {
         void createMaterialFactory() override;
     };
 
-} // namespace WindowManager
+} // namespace Window
 
 } // namespace EnergyPlus
 

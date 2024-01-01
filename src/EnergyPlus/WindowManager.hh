@@ -68,7 +68,14 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace WindowManager {
+namespace Window {
+
+    int constexpr nume = 107;                    // Number of wavelength values in solar spectrum
+    int constexpr numt3 = 81;                    // Number of wavelength values in the photopic response
+
+    int constexpr maxGlassLayers = 5;
+    int constexpr maxIncidentAngles = 20;
+    int constexpr maxSpectralDataElements = 800; // Maximum number in Spectral Data arrays.
 
     class CWindowModel;
     class CWindowOpticalModel;
@@ -423,15 +430,11 @@ namespace WindowManager {
 
     void initWindowModel(EnergyPlusData &state);
 
-} // namespace WindowManager
+} // namespace Window
 
 struct WindowManagerData : BaseGlobalStruct
 {
 
-    static Real64 constexpr sigma = 5.6697e-8;          // Stefan-Boltzmann constant
-    static Real64 constexpr TKelvin = Constant::Kelvin; // conversion from Kelvin to Celsius
-    static int constexpr nume = 107;                    // Number of wavelength values in solar spectrum
-    static int constexpr numt3 = 81;                    // Number of wavelength values in the photopic response
 
     //                                      Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
     std::array<Real64, 8> const AirProps = {1.29, -0.4e-2, 2.41e-2, 7.6e-5, 1.73e-5, 1.0e-7, 0.72, 1.8e-3};
@@ -442,45 +445,49 @@ struct WindowManagerData : BaseGlobalStruct
     // derived from Optics5 data file ISO-9845GlobalNorm.std, 10-14-99)
 
     // Solar spectrum wavelength values (microns)
-    std::array<Real64, nume> wle = {0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800,
-                                    0.3900, 0.4000, 0.4100, 0.4200, 0.4300, 0.4400, 0.4500, 0.4600, 0.4700, 0.4800, 0.4900, 0.5000, 0.5100, 0.5200,
-                                    0.5300, 0.5400, 0.5500, 0.5700, 0.5900, 0.6100, 0.6300, 0.6500, 0.6700, 0.6900, 0.7100, 0.7180, 0.7244, 0.7400,
-                                    0.7525, 0.7575, 0.7625, 0.7675, 0.7800, 0.8000, 0.8160, 0.8237, 0.8315, 0.8400, 0.8600, 0.8800, 0.9050, 0.9150,
-                                    0.9250, 0.9300, 0.9370, 0.9480, 0.9650, 0.9800, 0.9935, 1.0400, 1.0700, 1.1000, 1.1200, 1.1300, 1.1370, 1.1610,
-                                    1.1800, 1.2000, 1.2350, 1.2900, 1.3200, 1.3500, 1.3950, 1.4425, 1.4625, 1.4770, 1.4970, 1.5200, 1.5390, 1.5580,
-                                    1.5780, 1.5920, 1.6100, 1.6300, 1.6460, 1.6780, 1.7400, 1.8000, 1.8600, 1.9200, 1.9600, 1.9850, 2.0050, 2.0350,
-                                    2.0650, 2.1000, 2.1480, 2.1980, 2.2700, 2.3600, 2.4500, 2.4940, 2.5370};
+    std::array<Real64, Window::nume> wle = {
+        0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800,
+        0.3900, 0.4000, 0.4100, 0.4200, 0.4300, 0.4400, 0.4500, 0.4600, 0.4700, 0.4800, 0.4900, 0.5000, 0.5100, 0.5200,
+        0.5300, 0.5400, 0.5500, 0.5700, 0.5900, 0.6100, 0.6300, 0.6500, 0.6700, 0.6900, 0.7100, 0.7180, 0.7244, 0.7400,
+        0.7525, 0.7575, 0.7625, 0.7675, 0.7800, 0.8000, 0.8160, 0.8237, 0.8315, 0.8400, 0.8600, 0.8800, 0.9050, 0.9150,
+        0.9250, 0.9300, 0.9370, 0.9480, 0.9650, 0.9800, 0.9935, 1.0400, 1.0700, 1.1000, 1.1200, 1.1300, 1.1370, 1.1610,
+        1.1800, 1.2000, 1.2350, 1.2900, 1.3200, 1.3500, 1.3950, 1.4425, 1.4625, 1.4770, 1.4970, 1.5200, 1.5390, 1.5580,
+        1.5780, 1.5920, 1.6100, 1.6300, 1.6460, 1.6780, 1.7400, 1.8000, 1.8600, 1.9200, 1.9600, 1.9850, 2.0050, 2.0350,
+        2.0650, 2.1000, 2.1480, 2.1980, 2.2700, 2.3600, 2.4500, 2.4940, 2.5370};
 
     // Solar spectrum values corresponding to wle
-    std::array<Real64, nume> e = {0.0,    9.5,    42.3,   107.8,  181.0,  246.0,  395.3,  390.1,  435.3,  438.9,  483.7,  520.3,  666.2,  712.5,
-                                  720.7,  1013.1, 1158.2, 1184.0, 1071.9, 1302.0, 1526.0, 1599.6, 1581.0, 1628.3, 1539.2, 1548.7, 1586.5, 1484.9,
-                                  1572.4, 1550.7, 1561.5, 1501.5, 1395.5, 1485.3, 1434.1, 1419.9, 1392.3, 1130.0, 1316.7, 1010.3, 1043.2, 1211.2,
-                                  1193.9, 1175.5, 643.1,  1030.7, 1131.1, 1081.6, 849.2,  785.0,  916.4,  959.9,  978.9,  933.2,  748.5,  667.5,
-                                  690.3,  403.6,  258.3,  313.6,  526.8,  646.4,  746.8,  690.5,  637.5,  412.6,  108.9,  189.1,  132.2,  339.0,
-                                  460.0,  423.6,  480.5,  413.1,  250.2,  32.5,   1.6,    55.7,   105.1,  105.5,  182.1,  262.2,  274.2,  275.0,
-                                  244.6,  247.4,  228.7,  244.5,  234.8,  220.5,  171.5,  30.7,   2.0,    1.2,    21.2,   91.1,   26.8,   99.5,
-                                  60.4,   89.1,   82.2,   71.5,   70.2,   62.0,   21.2,   18.5,   3.2};
-
+    std::array<Real64, Window::nume> e = {
+        0.0,    9.5,    42.3,   107.8,  181.0,  246.0,  395.3,  390.1,  435.3,  438.9,  483.7,  520.3,  666.2,  712.5,
+        720.7,  1013.1, 1158.2, 1184.0, 1071.9, 1302.0, 1526.0, 1599.6, 1581.0, 1628.3, 1539.2, 1548.7, 1586.5, 1484.9,
+        1572.4, 1550.7, 1561.5, 1501.5, 1395.5, 1485.3, 1434.1, 1419.9, 1392.3, 1130.0, 1316.7, 1010.3, 1043.2, 1211.2,
+        1193.9, 1175.5, 643.1,  1030.7, 1131.1, 1081.6, 849.2,  785.0,  916.4,  959.9,  978.9,  933.2,  748.5,  667.5,
+        690.3,  403.6,  258.3,  313.6,  526.8,  646.4,  746.8,  690.5,  637.5,  412.6,  108.9,  189.1,  132.2,  339.0,
+        460.0,  423.6,  480.5,  413.1,  250.2,  32.5,   1.6,    55.7,   105.1,  105.5,  182.1,  262.2,  274.2,  275.0,
+        244.6,  247.4,  228.7,  244.5,  234.8,  220.5,  171.5,  30.7,   2.0,    1.2,    21.2,   91.1,   26.8,   99.5,
+        60.4,   89.1,   82.2,   71.5,   70.2,   62.0,   21.2,   18.5,   3.2};
+        
     // Phototopic response function and corresponding wavelengths (microns)
     // (CIE 1931 observer; ISO/CIE 10527, CIE Standard Calorimetric Observers;
     // derived from Optics5 data file "CIE 1931 Color Match from E308.txt", which is
     // the same as WINDOW4 file Cie31t.dat)
     // Wavelength values for photopic response
-    std::array<Real64, numt3> wlt3 = {0.380, 0.385, 0.390, 0.395, 0.400, 0.405, 0.410, 0.415, 0.420, 0.425, 0.430, 0.435, 0.440, 0.445,
-                                      0.450, 0.455, 0.460, 0.465, 0.470, 0.475, 0.480, 0.485, 0.490, 0.495, 0.500, 0.505, 0.510, 0.515,
-                                      0.520, 0.525, 0.530, 0.535, 0.540, 0.545, 0.550, 0.555, 0.560, 0.565, 0.570, 0.575, 0.580, 0.585,
-                                      0.590, 0.595, 0.600, 0.605, 0.610, 0.615, 0.620, 0.625, 0.630, 0.635, 0.640, 0.645, 0.650, 0.655,
-                                      0.660, 0.665, 0.670, 0.675, 0.680, 0.685, 0.690, 0.695, 0.700, 0.705, 0.710, 0.715, 0.720, 0.725,
-                                      0.730, 0.735, 0.740, 0.745, 0.750, 0.755, 0.760, 0.765, 0.770, 0.775, 0.780};
-
+    std::array<Real64, Window::numt3> wlt3 = {
+        0.380, 0.385, 0.390, 0.395, 0.400, 0.405, 0.410, 0.415, 0.420, 0.425, 0.430, 0.435, 0.440, 0.445,
+        0.450, 0.455, 0.460, 0.465, 0.470, 0.475, 0.480, 0.485, 0.490, 0.495, 0.500, 0.505, 0.510, 0.515,
+        0.520, 0.525, 0.530, 0.535, 0.540, 0.545, 0.550, 0.555, 0.560, 0.565, 0.570, 0.575, 0.580, 0.585,
+        0.590, 0.595, 0.600, 0.605, 0.610, 0.615, 0.620, 0.625, 0.630, 0.635, 0.640, 0.645, 0.650, 0.655,
+        0.660, 0.665, 0.670, 0.675, 0.680, 0.685, 0.690, 0.695, 0.700, 0.705, 0.710, 0.715, 0.720, 0.725,
+        0.730, 0.735, 0.740, 0.745, 0.750, 0.755, 0.760, 0.765, 0.770, 0.775, 0.780};
+        
     // Photopic response corresponding to wavelengths in wlt3
-    std::array<Real64, numt3> y30 = {0.0000, 0.0001, 0.0001, 0.0002, 0.0004, 0.0006, 0.0012, 0.0022, 0.0040, 0.0073, 0.0116, 0.0168, 0.0230, 0.0298,
-                                     0.0380, 0.0480, 0.0600, 0.0739, 0.0910, 0.1126, 0.1390, 0.1693, 0.2080, 0.2586, 0.3230, 0.4073, 0.5030, 0.6082,
-                                     0.7100, 0.7932, 0.8620, 0.9149, 0.9540, 0.9803, 0.9950, 1.0000, 0.9950, 0.9786, 0.9520, 0.9154, 0.8700, 0.8163,
-                                     0.7570, 0.6949, 0.6310, 0.5668, 0.5030, 0.4412, 0.3810, 0.3210, 0.2650, 0.2170, 0.1750, 0.1382, 0.1070, 0.0816,
-                                     0.0610, 0.0446, 0.0320, 0.0232, 0.0170, 0.0119, 0.0082, 0.0158, 0.0041, 0.0029, 0.0021, 0.0015, 0.0010, 0.0007,
-                                     0.0005, 0.0004, 0.0002, 0.0002, 0.0001, 0.0001, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000};
-
+    std::array<Real64, Window::numt3> y30 = {
+        0.0000, 0.0001, 0.0001, 0.0002, 0.0004, 0.0006, 0.0012, 0.0022, 0.0040, 0.0073, 0.0116, 0.0168, 0.0230, 0.0298,
+        0.0380, 0.0480, 0.0600, 0.0739, 0.0910, 0.1126, 0.1390, 0.1693, 0.2080, 0.2586, 0.3230, 0.4073, 0.5030, 0.6082,
+        0.7100, 0.7932, 0.8620, 0.9149, 0.9540, 0.9803, 0.9950, 1.0000, 0.9950, 0.9786, 0.9520, 0.9154, 0.8700, 0.8163,
+        0.7570, 0.6949, 0.6310, 0.5668, 0.5030, 0.4412, 0.3810, 0.3210, 0.2650, 0.2170, 0.1750, 0.1382, 0.1070, 0.0816,
+        0.0610, 0.0446, 0.0320, 0.0232, 0.0170, 0.0119, 0.0082, 0.0158, 0.0041, 0.0029, 0.0021, 0.0015, 0.0010, 0.0007,
+        0.0005, 0.0004, 0.0002, 0.0002, 0.0001, 0.0001, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000};
+        
     int ngllayer = 0;                                                 // Number of glass layers
     int nglface = 0;                                                  // Number of glass faces
     int nglfacep = 0;                                                 // Number of glass faces, + 2 if shade layer present
@@ -499,10 +506,10 @@ struct WindowManagerData : BaseGlobalStruct
     std::array<std::array<std::array<Real64, 5>, 5>, 3> gcp = {0.0};  // Gas specific-heat coefficients for each gap
     std::array<std::array<Real64, 5>, 5> gwght = {0.0};               // Gas molecular weights for each gap
     std::array<std::array<Real64, 5>, 5> gfract = {0.0};              // Gas fractions for each gap
-    std::array<int, 5> gnmix = {0};                                   // Number of gases in gap
-    std::array<Real64, 5> gap = {0.0};                                // Gap width (m)
-    std::array<Real64, 5> thick = {0.0};                              // Glass layer thickness (m)
-    std::array<Real64, 5> scon = {0.0};                               // Glass layer conductance--conductivity/thickness (W/m2-K)
+    std::array<int, 5> gnmix = {0};                                  // Number of gases in gap
+    std::array<Real64, Window::maxGlassLayers> gap = {0.0};                                // Gap width (m)
+    std::array<Real64, Window::maxGlassLayers> thick = {0.0};                              // Glass layer thickness (m)
+    std::array<Real64, Window::maxGlassLayers> scon = {0.0};                               // Glass layer conductance--conductivity/thickness (W/m2-K)
 
     std::array<Real64, 10> tir = {0.0};             // Front and back IR transmittance for each glass layer
     std::array<Real64, 10> emis = {0.0};            // Front and back IR emissivity for each glass layer
@@ -513,7 +520,7 @@ struct WindowManagerData : BaseGlobalStruct
     std::array<Real64, 10> thetasPrev = {0.0};      // Previous-iteration glass surface temperatures (K)
     std::array<Real64, 10> fvec = {0.0};            // Glass face heat balance function
 
-    std::array<Real64, 5> hrgap = {0.0}; // Radiative gap conductance
+    std::array<Real64, Window::maxGlassLayers> hrgap = {0.0}; // Radiative gap conductance
 
     Real64 A23P = 0.0; // Intermediate variables in glass face
     Real64 A32P = 0.0;
@@ -525,36 +532,32 @@ struct WindowManagerData : BaseGlobalStruct
     Real64 A45 = 0.0;
     Real64 A67 = 0.0;
 
-    static int constexpr MaxNumOfIncidentAngles = 20;
-    static int constexpr MaxSpectralDataElements = 800; // Maximum number in Spectral Data arrays.
     // TEMP MOVED FROM DataHeatBalance.hh -BLB
 
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> wlt = {0.0}; // Spectral data wavelengths for each glass layer in a glazing system
+    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> wlt = {0.0}; // Spectral data wavelengths for each glass layer in a glazing system
 
     // Following data, Spectral data for each layer for each wavelength in wlt
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> t = {0.0};        // normal transmittance
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rff = {0.0};      // normal front reflectance
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rbb = {0.0};      // normal back reflectance
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> tPhi = {0.0};     // transmittance at angle of incidence
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rfPhi = {0.0};    // front reflectance at angle of incidence
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rbPhi = {0.0};    // back reflectance at angle of incidence
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> tadjPhi = {0.0};  // transmittance at angle of incidence
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rfadjPhi = {0.0}; // front reflectance at angle of incidence
-    std::array<std::array<Real64, MaxSpectralDataElements>, 5> rbadjPhi = {0.0}; // back reflectance at angle of incidence
+    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> t = {0.0};        // normal transmittance
+    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> rff = {0.0};      // normal front reflectance
+    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> rbb = {0.0};      // normal back reflectance
+    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> tPhi = {0.0};     // transmittance at angle of incidence
+    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> rfPhi = {0.0};    // front reflectance at angle of incidence
+    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> rbPhi = {0.0};    // back reflectance at angle of incidence
+    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> tadjPhi = {0.0};  // transmittance at angle of incidence
+    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> rfadjPhi = {0.0}; // front reflectance at angle of incidence
+    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> rbadjPhi = {0.0}; // back reflectance at angle of incidence
 
-    std::array<int, 5> numpt = {0};                    // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
-    std::array<Real64, nume> stPhi = {0.0};            // Glazing system transmittance at angle of incidence for each wavelength in wle
-    std::array<Real64, nume> srfPhi = {0.0};           // Glazing system front reflectance at angle of incidence for each wavelength in wle
-    std::array<Real64, nume> srbPhi = {0.0};           // Glazing system back reflectance at angle of incidence for each wavelenth in wle
+    std::array<int, Window::maxGlassLayers> numpt = {0};                    // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
+    std::array<Real64, Window::nume> stPhi = {0.0};            // Glazing system transmittance at angle of incidence for each wavelength in wle
+    std::array<Real64, Window::nume> srfPhi = {0.0};           // Glazing system front reflectance at angle of incidence for each wavelength in wle
+    std::array<Real64, Window::nume> srbPhi = {0.0};           // Glazing system back reflectance at angle of incidence for each wavelenth in wle
     Array2D<Real64> saPhi;                             // For each layer, glazing system absorptance at angle of incidence
                                                        // for each wavelenth in wle
-    std::array<std::array<Real64, 5>, 5> top = {0.0};  // Transmittance matrix for subr. op
-    std::array<std::array<Real64, 5>, 5> rfop = {0.0}; // Front reflectance matrix for subr. op
-    std::array<std::array<Real64, 5>, 5> rbop = {0.0}; // Back transmittance matrix for subr. op
+    std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxGlassLayers> top = {0.0};  // Transmittance matrix for subr. op
+    std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxGlassLayers> rfop = {0.0}; // Front reflectance matrix for subr. op
+    std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxGlassLayers> rbop = {0.0}; // Back transmittance matrix for subr. op
 
     // These need to stay as Array1D for a little longer because changing them spreads into many source files
-    Array1D<Real64> DepVarCurveFit; // Values of dependent variable corresponding to IndepVarCurveFit values
-    Array1D<Real64> CoeffsCurveFit; // Polynomial coefficients from curve fit
     Array1D<Real64> tsolPhi;        // Glazing system solar transmittance for each angle of incidence
     Array1D<Real64> rfsolPhi;       // Glazing system solar front reflectance for each angle of incidence
     Array1D<Real64> rbsolPhi;       // Glazing system solar back reflectance for each angle of incidence
@@ -566,8 +569,8 @@ struct WindowManagerData : BaseGlobalStruct
     Array1D<Real64> rbvisPhi;       // Glazing system visible back reflectance for each angle of incidence
     Array1D<Real64> CosPhiIndepVar; // Cos of incidence angles at 10-deg increments for curve fits
 
-    std::unique_ptr<WindowManager::CWindowModel> inExtWindowModel;       // Information about windows model (interior or exterior)
-    std::unique_ptr<WindowManager::CWindowOpticalModel> winOpticalModel; // Information about windows optical model (Simplified or BSDF)
+    std::unique_ptr<Window::CWindowModel> inExtWindowModel;       // Information about windows model (interior or exterior)
+    std::unique_ptr<Window::CWindowOpticalModel> winOpticalModel; // Information about windows optical model (Simplified or BSDF)
 
     bool RunMeOnceFlag = false;
     bool lSimpleGlazingSystem = false; // true if using simple glazing system block model
@@ -586,36 +589,7 @@ struct WindowManagerData : BaseGlobalStruct
     Real64 tmpReflectVisBeamFront = 0.0;
     Real64 tmpReflectVisBeamBack = 0.0;
 
-    Array1D<Real64> deltaTemp = Array1D<Real64>(100, 0.0);
-    Array1D_int iMinDT = Array1D_int(1, 0);
-    Array1D_int IDConst = Array1D_int(100, 0);
-
-    Array1D<Real64> hgap = Array1D<Real64>(5);       // Gap gas conductance (W/m2-K)
-    Array1D<Real64> hr = Array1D<Real64>(10);        // Radiative conductance (W/m2-K)
-    Array1D_int indx = Array1D_int(10);              // Vector of row permutations in LU decomposition
-    Array2D<Real64> Aface = Array2D<Real64>(10, 10); // Coefficient in equation Aface*thetas = Bface
-    Array1D<Real64> Bface = Array1D<Real64>(10);     // Coefficient in equation Aface*thetas = Bface
-    Array1D<Real64> TGapNewBG = Array1D<Real64>(2);  // For between-glass shade/blind, average gas temp in gaps on either
-    //  side of shade/blind (K)
-    Array1D<Real64> hcvBG = Array1D<Real64>(2); // For between-glass shade/blind, convection coefficient from gap glass or
-    //  shade/blind to gap gas on either side of shade/blind (W/m2-K)
-    Array1D<Real64> AbsRadShadeFace = Array1D<Real64>(2); // Solar radiation, short-wave radiation from lights, and long-wave
-    Array1D<Real64> RhoIR = Array1D<Real64>(10);          // Face IR reflectance
-
-    std::array<Real64, 10> vv = {0.0};     // Stores the implicit scaling of each row
-    std::array<Real64, 10> kprime = {0.0}; // Monotonic thermal conductivity
-    std::array<Real64, 10> kdblprm = {
-        0.0}; // Conductivity term accounting for additional energy moved by the diffusional transport of internal energy in polyatomic gases.
-    std::array<Real64, 10> mukpdwn = {0.0}; // Denominator term
-    std::array<Real64, 10> kpdown = {0.0};  // Denominator terms
-    std::array<Real64, 10> kdpdown = {0.0};
-    std::array<Real64, 10> frct = {0.0};  // Fraction of each gas in a mixture
-    std::array<Real64, 10> fvis = {0.0};  // Viscosity of each gas in a mixture (g/m-s)
-    std::array<Real64, 10> fcon = {0.0};  // Conductance of each gas in a mixture (W/m2-K)
-    std::array<Real64, 10> fdens = {0.0}; // Density of each gas in a mixture (kg/m3)
-    std::array<Real64, 10> fcp = {0.0};   // Specific heat of each gas in a mixture (J/m3-K)
-
-    std::array<int, 5> LayerNum = {0}; // Glass layer number
+    std::array<int, Window::maxGlassLayers> LayerNum = {0}; // Glass layer number
 
     void clear_state() override
     {
@@ -662,23 +636,21 @@ struct WindowManagerData : BaseGlobalStruct
         this->stPhi = {0.0};
         this->srfPhi = {0.0};
         this->srbPhi = {0.0};
-        this->saPhi = Array2D<Real64>(5, nume, 0.0);
+        this->saPhi = Array2D<Real64>(5, Window::nume, 0.0);
         this->top = {0.0};
         this->rfop = {0.0};
         this->rbop = {0.0};
-        this->DepVarCurveFit = Array1D<Real64>(10, 0.0);
-        this->CoeffsCurveFit = Array1D<Real64>(6, 0.0);
-        this->tsolPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-        this->rfsolPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-        this->rbsolPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-        this->solabsPhi = Array2D<Real64>(5, MaxNumOfIncidentAngles, 0.0);
-        this->solabsBackPhi = Array2D<Real64>(5, MaxNumOfIncidentAngles, 0.0);
-        this->solabsShadePhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-        this->tvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-        this->rfvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-        this->rbvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-        this->CosPhiIndepVar = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-        WindowManager::CWindowConstructionsSimplified::clearState();
+        this->tsolPhi = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
+        this->rfsolPhi = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
+        this->rbsolPhi = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
+        this->solabsPhi = Array2D<Real64>(5, Window::maxIncidentAngles, 0.0);
+        this->solabsBackPhi = Array2D<Real64>(5, Window::maxIncidentAngles, 0.0);
+        this->solabsShadePhi = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
+        this->tvisPhi = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
+        this->rfvisPhi = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
+        this->rbvisPhi = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
+        this->CosPhiIndepVar = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
+        Window::CWindowConstructionsSimplified::clearState();
         this->RunMeOnceFlag = false;
         this->lSimpleGlazingSystem = false; // true if using simple glazing system block model
         this->BGFlag = false;               // True if between-glass shade or blind
@@ -700,31 +672,27 @@ struct WindowManagerData : BaseGlobalStruct
     // Default Constructor
     WindowManagerData()
     {
-        saPhi.allocate(5, nume);                         // For each layer, glazing system absorptance at angle of incidence
+        saPhi.allocate(Window::maxGlassLayers, Window::nume);                         // For each layer, glazing system absorptance at angle of incidence
         saPhi = 0.0;                                     // for each wavelenth in wle
-        DepVarCurveFit.allocate(MaxNumOfIncidentAngles); // Values of dependent variable corresponding to IndepVarCurveFit values
-        DepVarCurveFit = 0.0;
-        CoeffsCurveFit.allocate(6); // Polynomial coefficients from curve fit
-        CoeffsCurveFit = 0.0;
-        tsolPhi.allocate(MaxNumOfIncidentAngles); // Glazing system solar transmittance for each angle of incidence
+        tsolPhi.allocate(Window::maxIncidentAngles); // Glazing system solar transmittance for each angle of incidence
         tsolPhi = 0.0;
-        rfsolPhi.allocate(MaxNumOfIncidentAngles); // Glazing system solar front reflectance for each angle of incidence
+        rfsolPhi.allocate(Window::maxIncidentAngles); // Glazing system solar front reflectance for each angle of incidence
         rfsolPhi = 0.0;
-        rbsolPhi.allocate(MaxNumOfIncidentAngles); // Glazing system solar back reflectance for each angle of incidence
+        rbsolPhi.allocate(Window::maxIncidentAngles); // Glazing system solar back reflectance for each angle of incidence
         rbsolPhi = 0.0;
-        solabsPhi.allocate(5, MaxNumOfIncidentAngles); // Glazing system solar absorptance for each angle of incidence
+        solabsPhi.allocate(5, Window::maxIncidentAngles); // Glazing system solar absorptance for each angle of incidence
         solabsPhi = 0.0;
-        solabsBackPhi.allocate(5, MaxNumOfIncidentAngles); // Glazing system back solar absorptance for each angle of incidence
+        solabsBackPhi.allocate(5, Window::maxIncidentAngles); // Glazing system back solar absorptance for each angle of incidence
         solabsBackPhi = 0.0;
-        solabsShadePhi.allocate(MaxNumOfIncidentAngles); // Glazing system interior shade solar absorptance for each angle of incidence
+        solabsShadePhi.allocate(Window::maxIncidentAngles); // Glazing system interior shade solar absorptance for each angle of incidence
         solabsShadePhi = 0.0;
-        tvisPhi.allocate(MaxNumOfIncidentAngles); // Glazing system visible transmittance for each angle of incidence
+        tvisPhi.allocate(Window::maxIncidentAngles); // Glazing system visible transmittance for each angle of incidence
         tvisPhi = 0.0;
-        rfvisPhi.allocate(MaxNumOfIncidentAngles); // Glazing system visible front reflectance for each angle of incidence
+        rfvisPhi.allocate(Window::maxIncidentAngles); // Glazing system visible front reflectance for each angle of incidence
         rfvisPhi = 0.0;
-        rbvisPhi.allocate(MaxNumOfIncidentAngles); // Glazing system visible back reflectance for each angle of incidence
+        rbvisPhi.allocate(Window::maxIncidentAngles); // Glazing system visible back reflectance for each angle of incidence
         rbvisPhi = 0.0;
-        CosPhiIndepVar.allocate(MaxNumOfIncidentAngles); // Cos of incidence angles at 10-deg increments for curve fits
+        CosPhiIndepVar.allocate(Window::maxIncidentAngles); // Cos of incidence angles at 10-deg increments for curve fits
         CosPhiIndepVar = 0.0;
         SimpleGlazingSHGC = 0.0;
         SimpleGlazingU = 0.0;
