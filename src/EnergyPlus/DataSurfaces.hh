@@ -177,6 +177,10 @@ namespace DataSurfaces {
         Num
     };
 
+    int constexpr iFWC_Floor = (int)FWC::Floor;
+    int constexpr iFWC_Wall = (int)FWC::Wall;
+    int constexpr iFWC_Ceiling = (int)FWC::Ceiling;
+        
     enum class SurfaceFilter
     {
         Invalid = -1,
