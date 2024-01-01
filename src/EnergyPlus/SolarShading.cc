@@ -12407,7 +12407,6 @@ void CalcInteriorWinTransDifSolInitialDistribution(EnergyPlusData &state,
 
             int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(HeatTransSurfNum);
             auto const &construction = state.dataConstruction->Construct(ConstrNum);
-            auto const &constructionSh = state.dataConstruction->Construct(ConstrNumSh);
 
             TotGlassLayers = construction.TotGlassLayers;
             ShadeFlag = state.dataSurface->SurfWinShadingFlag(HeatTransSurfNum);
@@ -12492,6 +12491,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(EnergyPlusData &state,
 
             } else if (ShadeFlag == WinShadingType::SwitchableGlazing) { // Switchable glazing
                 // Init accumulator for transmittance calc below
+                auto const &constructionSh = state.dataConstruction->Construct(ConstrNumSh);
                 DifSolarAbsW = 0.0;
 
                 for (IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
@@ -12548,7 +12548,8 @@ void CalcInteriorWinTransDifSolInitialDistribution(EnergyPlusData &state,
                 Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(HeatTransSurfNum);
 
                 // First calc diffuse solar absorbed by each glass layer in this window with shade/blind in place
-                for (IGlass = 1; IGlass <= constructionSh.TotGlassLayers; ++IGlass) {
+                    auto const &constructionSh = state.dataConstruction->Construct(ConstrNumSh);
+                    for (IGlass = 1; IGlass <= constructionSh.TotGlassLayers; ++IGlass) {
                     if (ANY_SHADE_SCREEN(ShadeFlag)) {
                         // Calc diffuse solar absorbed in each window glass layer and shade
                         WinDifSolLayAbsW = SolarTrans_ViewFactor * constructionSh.AbsDiffBack(IGlass);
