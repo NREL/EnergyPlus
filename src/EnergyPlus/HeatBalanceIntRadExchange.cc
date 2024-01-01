@@ -280,7 +280,7 @@ namespace HeatBalanceIntRadExchange {
                     SurfaceEmiss[ZoneSurfNum] = WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss(state, constrNum);
                 } else if (construct.WindowTypeBSDF && state.dataSurface->SurfWinShadingFlag(SurfNum) == DataSurfaces::WinShadingType::IntShade) {
                     SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
-                    SurfaceEmiss[ZoneSurfNum] = surfWindow.EffShBlindEmiss[0] + surfWindow.EffGlassEmiss[0];
+                    SurfaceEmiss[ZoneSurfNum] = surfWindow.EffShBlindEmiss[1] + surfWindow.EffGlassEmiss[1];
                 } else if (construct.WindowTypeBSDF) {
                     SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
@@ -289,7 +289,7 @@ namespace HeatBalanceIntRadExchange {
                         // If the window is bare this TS and it is the first time through we use the previous TS glass
                         // temperature whether or not the window was shaded in the previous TS. If the window was shaded
                         // the previous time step this temperature is a better starting value than the shade temperature.
-                        SurfaceTempRad[ZoneSurfNum] = surfWindow.ThetaFace[2 * construct.TotGlassLayers] - Constant::Kelvin;
+                        SurfaceTempRad[ZoneSurfNum] = surfWindow.thetaFace[2 * construct.TotGlassLayers] - Constant::Kelvin;
                         SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
                         // For windows with an interior shade or blind an effective inside surface temp
                         // and emiss is used here that is a weighted combination of shade/blind and glass temp and emiss.

@@ -2187,7 +2187,7 @@ namespace WindowManager {
                 state.dataConstruction->Construct(ConstrNum).TotSolidLayers; // Simon: This is necessary to keep for frame calculations
             // Simon: need to transfer surface temperatures because of frames calculation
             for (i = 1; i <= 2 * state.dataConstruction->Construct(ConstrNum).TotSolidLayers; ++i) {
-                state.dataWindowManager->thetas[i - 1] = window.ThetaFace[i];
+                state.dataWindowManager->thetas[i - 1] = window.thetaFace[i];
             }
             state.dataWindowManager->hcout = HextConvCoeff;
             state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
@@ -2615,7 +2615,7 @@ namespace WindowManager {
             // Save temperatures for use next time step
 
             for (k = 1; k <= state.dataWindowManager->nglfacep; ++k) {
-                window.ThetaFace[k] = state.dataWindowManager->thetas[k - 1];
+                window.thetaFace[k] = state.dataWindowManager->thetas[k - 1];
             }
 
             // Added TH 12/23/2008 for thermochromic windows to save the current TC layer temperature
@@ -5052,7 +5052,7 @@ namespace WindowManager {
         } else {
             // Use previous time step values
             for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
-                state.dataWindowManager->thetas[i - 1] = state.dataSurface->SurfaceWindow(SurfNum).ThetaFace[i];
+                state.dataWindowManager->thetas[i - 1] = state.dataSurface->SurfaceWindow(SurfNum).thetaFace[i];
             }
         }
 
@@ -5072,9 +5072,9 @@ namespace WindowManager {
             if (StormWinFlagPrevDay == 0 && StormWinFlagThisDay == 1) nglfacePrevDay = state.dataWindowManager->nglface - 2;
             if (StormWinFlagPrevDay == 1 && StormWinFlagThisDay == 0) nglfacePrevDay = state.dataWindowManager->nglface + 2;
             state.dataWindowManager->thetas[state.dataWindowManager->nglface] =
-                state.dataSurface->SurfaceWindow(SurfNum).ThetaFace[nglfacePrevDay + 1];
+                state.dataSurface->SurfaceWindow(SurfNum).thetaFace[nglfacePrevDay + 1];
             state.dataWindowManager->thetas[state.dataWindowManager->nglface + 1] =
-                state.dataSurface->SurfaceWindow(SurfNum).ThetaFace[nglfacePrevDay + 2];
+                state.dataSurface->SurfaceWindow(SurfNum).thetaFace[nglfacePrevDay + 2];
         } else {
             // No shade or blind previous time step; guess starting values of shade/blind
             // taking into account short- and long-wave radiation (from solar, lights and zone equipment)
@@ -6196,7 +6196,7 @@ namespace WindowManager {
                 // Add long-wave from outside window surface absorbed by frame outside projection
                 state.dataSurface->SurfWinFrameQRadOutAbs(SurfNum) +=
                     0.5 * state.dataSurface->SurfWinProjCorrFrOut(SurfNum) * state.dataSurface->FrameDivider(FrDivNum).FrameEmis * EmisGlassOut *
-                    state.dataWindowManager->sigma * pow_4(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace[1]);
+                    state.dataWindowManager->sigma * pow_4(state.dataSurface->SurfaceWindow(SurfNum).thetaFace[1]);
             }
             if (state.dataSurface->FrameDivider(FrDivNum).FrameProjectionIn > 0.0) {
                 HInRad *= (1.0 + ProjCorrFrIn);
@@ -6204,7 +6204,7 @@ namespace WindowManager {
                 // Add long-wave from inside window surface absorbed by frame inside projection
                 state.dataSurface->SurfWinFrameQRadInAbs(SurfNum) +=
                     0.5 * state.dataSurface->SurfWinProjCorrFrIn(SurfNum) * state.dataSurface->FrameDivider(FrDivNum).FrameEmis * EmisGlassIn *
-                    state.dataWindowManager->sigma * pow_4(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace[2 * TotGlassLayers]);
+                    state.dataWindowManager->sigma * pow_4(state.dataSurface->SurfaceWindow(SurfNum).thetaFace[2 * TotGlassLayers]);
             }
             Afac = (HOutRad * TOutRadFr + HOutConvFr * tout + state.dataSurface->SurfWinFrameQRadOutAbs(SurfNum)) / (HOutRad + FrameCon + HOutConvFr);
             Bfac = FrameCon / (HOutRad + FrameCon + HOutConvFr);
@@ -6266,7 +6266,7 @@ namespace WindowManager {
                 // Add long-wave from outside window surface absorbed by divider outside projection
                 state.dataSurface->SurfWinDividerQRadOutAbs(SurfNum) +=
                     state.dataSurface->SurfWinProjCorrDivOut(SurfNum) * state.dataSurface->FrameDivider(FrDivNum).DividerEmis * EmisGlassOut *
-                    state.dataWindowManager->sigma * pow_4(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace[1]);
+                    state.dataWindowManager->sigma * pow_4(state.dataSurface->SurfaceWindow(SurfNum).thetaFace[1]);
             }
 
             HInConvDiv = HInConv;
@@ -6279,7 +6279,7 @@ namespace WindowManager {
                 // Add long-wave from inside window surface absorbed by divider inside projection
                 state.dataSurface->SurfWinDividerQRadInAbs(SurfNum) +=
                     state.dataSurface->SurfWinProjCorrDivIn(SurfNum) * state.dataSurface->FrameDivider(FrDivNum).DividerEmis * EmisGlassIn *
-                    state.dataWindowManager->sigma * pow_4(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace[2 * TotGlassLayers]);
+                        state.dataWindowManager->sigma * pow_4(state.dataSurface->SurfaceWindow(SurfNum).thetaFace[2 * TotGlassLayers]);
             }
             Afac =
                 (HOutRad * TOutRadDiv + HOutConvDiv * tout + state.dataSurface->SurfWinDividerQRadOutAbs(SurfNum)) / (HOutRad + DivCon + HOutConvDiv);

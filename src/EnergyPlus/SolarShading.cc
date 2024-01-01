@@ -9563,9 +9563,9 @@ void WindowShadingManager(EnergyPlusData &state)
                         Real64 RhoGlassIR = 1 - EpsGlassIR;
 
                         Real64 EffShBlEmiss = EpsShadeIR * (1.0 + RhoGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR));
-                        surface_window.EffShBlindEmiss[0] = EffShBlEmiss;
+                        surface_window.EffShBlindEmiss[1] = EffShBlEmiss;
                         Real64 EffGlEmiss = EpsGlassIR * TauShadeIR / (1.0 - RhoGlassIR * RhoShadeIR);
-                        surface_window.EffGlassEmiss[0] = EffGlEmiss;
+                        surface_window.EffGlassEmiss[1] = EffGlEmiss;
                     }
                 }
 

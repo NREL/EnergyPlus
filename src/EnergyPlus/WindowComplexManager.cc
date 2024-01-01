@@ -3006,7 +3006,7 @@ namespace WindowComplexManager {
 
             // Instead of doing temperature guess get solution from previous iteration.  That should be much better than guess
             for (k = 1; k <= 2 * nlayer; ++k) {
-                theta(k) = state.dataSurface->SurfaceWindow(SurfNum).ThetaFace[k];
+                theta(k) = state.dataSurface->SurfaceWindow(SurfNum).thetaFace[k];
             }
         }
 
@@ -3375,8 +3375,8 @@ namespace WindowComplexManager {
 
                 // // Get properties of inside shading layer
 
-                Real64 EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[0];
-                Real64 EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[0];
+                Real64 EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[1];
+                Real64 EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[1];
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
                     (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (theta(2 * ngllayer) - Constant::Kelvin)) / (EffShBlEmiss + EffGlEmiss);
 
@@ -3385,8 +3385,8 @@ namespace WindowComplexManager {
             }
 
             for (k = 1; k <= nlayer; ++k) {
-                state.dataSurface->SurfaceWindow(SurfNum).ThetaFace[2 * k - 1] = theta(2 * k - 1);
-                state.dataSurface->SurfaceWindow(SurfNum).ThetaFace[2 * k] = theta(2 * k);
+                state.dataSurface->SurfaceWindow(SurfNum).thetaFace[2 * k - 1] = theta(2 * k - 1);
+                state.dataSurface->SurfaceWindow(SurfNum).thetaFace[2 * k] = theta(2 * k);
                 
                 // temperatures for reporting
                 state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = theta(2 * k - 1) - Constant::Kelvin;

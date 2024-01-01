@@ -903,7 +903,7 @@ namespace DataSurfaces {
         Real64 lightWellEff = 1.0;     // Light well efficiency (multiplier on exterior window vis trans due to light well losses)
             
         // What is 10 here?
-        std::array<Real64, 10+1> ThetaFace = {296.15};                                                // Face temperatures of window layers (K)
+        std::array<Real64, 10+1> thetaFace = {296.15};                                                // Face temperatures of window layers (K)
 
         // Multiplier on sunlit fraction due to shadowing of glass by
         // frame and divider outside projections

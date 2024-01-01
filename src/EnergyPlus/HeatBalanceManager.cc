@@ -2782,7 +2782,7 @@ namespace HeatBalanceManager {
             state.dataHeatBalMgr->CountWarmupDayPoints = 0;
 
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
-                std::fill(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace.begin(), state.dataSurface->SurfaceWindow(SurfNum).ThetaFace.end(), 296.15);
+                std::fill(state.dataSurface->SurfaceWindow(SurfNum).thetaFace.begin(), state.dataSurface->SurfaceWindow(SurfNum).thetaFace.end(), 296.15);
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) = 23.0;
             }
         }

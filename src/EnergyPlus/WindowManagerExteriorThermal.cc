@@ -115,7 +115,7 @@ namespace WindowManager {
         }
 
         for (int k = 1; k <= 2 * totSolidLayers; ++k) {
-            Guess.push_back(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace[k]);
+            Guess.push_back(state.dataSurface->SurfaceWindow(SurfNum).thetaFace[k]);
         }
 
         try {
@@ -246,8 +246,8 @@ namespace WindowManager {
         state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum);
 
         for (int k = 1; k <= surface.getTotLayers(state); ++k) {
-            window.ThetaFace[2 * k - 1] = state.dataWindowManager->thetas[2 * k - 2];
-            window.ThetaFace[2 * k] = state.dataWindowManager->thetas[2 * k - 1];
+            window.thetaFace[2 * k - 1] = state.dataWindowManager->thetas[2 * k - 2];
+            window.thetaFace[2 * k] = state.dataWindowManager->thetas[2 * k - 1];
 
             // temperatures for reporting
             state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = state.dataWindowManager->thetas[2 * k - 2] - Constant::Kelvin;
