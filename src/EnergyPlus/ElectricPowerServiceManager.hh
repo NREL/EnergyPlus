@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -753,7 +753,7 @@ public: // Creation
           electProdRate_(0.0), electricityPurch_(0.0), electPurchRate_(0.0), electSurplusRate_(0.0), electricitySurplus_(0.0),
           electricityNetRate_(0.0), electricityNet_(0.0), totalBldgElecDemand_(0.0), totalHVACElecDemand_(0.0), totalElectricDemand_(0.0),
           elecProducedPVRate_(0.0), elecProducedWTRate_(0.0), elecProducedStorageRate_(0.0), elecProducedPowerConversionRate_(0.0),
-          elecProducedCoGenRate_(0.0)
+          elecProducedCoGenRate_(0.0), pvTotalCapacity_(0.0), windTotalCapacity_(0.0)
     {
     }
 

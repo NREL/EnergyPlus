@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -79,7 +79,7 @@ namespace ZoneTempPredictorCorrector {
         std::string HeatTempSetptSchedName;
         int HeatTempSchedIndex = 0;
         std::string CoolTempSetptSchedName;
-        int CoolTempSchedIndex;
+        int CoolTempSchedIndex = 0;
     };
 
     struct ZoneComfortFangerControl
@@ -90,7 +90,7 @@ namespace ZoneTempPredictorCorrector {
         std::string HeatPMVSetptSchedName; // Name of PMV heating set point schedule
         int HeatPMVSchedIndex = 0;         // Index to PMV heating set point schedule
         std::string CoolPMVSetptSchedName; // Name of PMV cooling set point schedule
-        int CoolPMVSchedIndex;             // INdex to PMV cooling set point schedule
+        int CoolPMVSchedIndex = 0;         // INdex to PMV cooling set point schedule
     };
 
     struct AdaptiveComfortDailySetPointSchedule
@@ -120,6 +120,7 @@ namespace ZoneTempPredictorCorrector {
 
         // Zone or space air drybulb temperature conditions
         Real64 MAT = DataHeatBalance::ZoneInitialTemp;      // Mean Air Temperature at end of zone time step [C]
+        Real64 MRT = DataHeatBalance::ZoneInitialTemp;      // Mean Radiant Temperature [C]
         Real64 ZTAV = DataHeatBalance::ZoneInitialTemp;     // Air Temperature Averaged over the zone time step (during HVAC Time Steps)
         Real64 ZT = DataHeatBalance::ZoneInitialTemp;       // Air Temperature Averaged over the system time step
         Real64 ZTAVComf = DataHeatBalance::ZoneInitialTemp; // Air Temperature Averaged used in thermal comfort models (currently Fanger model only) -

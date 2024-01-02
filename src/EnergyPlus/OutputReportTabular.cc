@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2804,8 +2804,8 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
     // na
 
     // Using/Aliasing
-    using PollutionModule::GetEnvironmentalImpactFactorInfo;
-    using PollutionModule::GetFuelFactorInfo;
+    using Pollution::GetEnvironmentalImpactFactorInfo;
+    using Pollution::GetFuelFactorInfo;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -18442,7 +18442,7 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(91).hint = "COOL";
     ort->UnitConv(92).hint = "ELEC";
     ort->UnitConv(93).hint = "GAS";
-    ort->UnitConv(93).hint = "ADDITIONAL";
+    ort->UnitConv(94).hint = "ADDITIONAL";
 
     ort->UnitConv(19).several = true;
     ort->UnitConv(20).several = true;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -4910,24 +4911,30 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
 
     for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
-        calcMeanAirTemps(state, thisZoneHB.ZTAV, thisZoneHB.airHumRatAvg, state.dataHeatBal->ZnAirRpt(ZoneLoop), ZoneLoop);
+        calcMeanAirTemps(state, thisZoneHB.ZTAV, thisZoneHB.airHumRatAvg, thisZoneHB.MRT, state.dataHeatBal->ZnAirRpt(ZoneLoop), ZoneLoop);
         if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
             for (int spaceNum : state.dataHeatBal->Zone(ZoneLoop).spaceIndexes) {
                 auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
-                calcMeanAirTemps(state, thisSpaceHB.ZTAV, thisSpaceHB.airHumRatAvg, state.dataHeatBal->spaceAirRpt(spaceNum), ZoneLoop);
+                calcMeanAirTemps(
+                    state, thisSpaceHB.ZTAV, thisSpaceHB.airHumRatAvg, thisSpaceHB.MRT, state.dataHeatBal->spaceAirRpt(spaceNum), ZoneLoop);
             }
         }
     }
 }
 
-void calcMeanAirTemps(EnergyPlusData &state, Real64 ZTAV, Real64 airHumRatAvg, DataHeatBalance::AirReportVars &thisAirRpt, int zoneNum)
+void calcMeanAirTemps(EnergyPlusData &state,
+                      Real64 const ZTAV,
+                      Real64 const airHumRatAvg,
+                      Real64 const MRT,
+                      DataHeatBalance::AirReportVars &thisAirRpt,
+                      int const zoneNum)
 {
     // The mean air temperature is actually ZTAV which is the average
     // temperature of the air temperatures at the system time step for the
     // entire zone time step.
     thisAirRpt.MeanAirTemp = ZTAV;
     thisAirRpt.MeanAirHumRat = airHumRatAvg;
-    thisAirRpt.OperativeTemp = 0.5 * (ZTAV + state.dataHeatBal->ZoneMRT(zoneNum));
+    thisAirRpt.OperativeTemp = 0.5 * (ZTAV + MRT);
     thisAirRpt.MeanAirDewPointTemp = Psychrometrics::PsyTdpFnWPb(state, thisAirRpt.MeanAirHumRat, state.dataEnvrn->OutBaroPress);
 
     // if operative temperature control is being used, then radiative fraction/weighting
@@ -4945,8 +4952,8 @@ void calcMeanAirTemps(EnergyPlusData &state, Real64 ZTAV, Real64 airHumRatAvg, D
                 } else {
                     thisMRTFraction = state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).FixedRadiativeFraction;
                 }
-                thisAirRpt.OperativeTemp = 0.5 * (ZTAV + state.dataHeatBal->ZoneMRT(zoneNum));
-                thisAirRpt.ThermOperativeTemp = (1.0 - thisMRTFraction) * ZTAV + thisMRTFraction * state.dataHeatBal->ZoneMRT(zoneNum);
+                thisAirRpt.OperativeTemp = 0.5 * (ZTAV + MRT);
+                thisAirRpt.ThermOperativeTemp = (1.0 - thisMRTFraction) * ZTAV + thisMRTFraction * MRT;
             }
         }
     }

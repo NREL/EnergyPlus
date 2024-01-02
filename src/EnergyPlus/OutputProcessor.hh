@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -265,17 +265,17 @@ namespace OutputProcessor {
 
     struct RealVariables
     {
-        Real64 *Which;       // The POINTER to the actual variable holding the value
-        Real64 Value;        // Current Value of the variable (to resolution of Zone Time Step)
-        Real64 TSValue;      // Value of this variable at the Zone Time Step
-        Real64 EITSValue;    // Value of this variable at the Zone Time Step for external interface
-        Real64 StoreValue;   // At end of Zone Time Step, value is placed here for later reporting
-        Real64 NumStored;    // Number of hours stored
-        StoreType storeType; // Variable Type (Summed/Non-Static or Average/Static)
-        bool Stored;         // True when value is stored
-        bool Report;         // User has requested reporting of this variable in the IDF
-        bool tsStored;       // if stored for this zone timestep
-        bool thisTSStored;   // if stored for this zone timestep
+        Real64 *Which = nullptr; // The POINTER to the actual variable holding the value
+        Real64 Value;            // Current Value of the variable (to resolution of Zone Time Step)
+        Real64 TSValue;          // Value of this variable at the Zone Time Step
+        Real64 EITSValue;        // Value of this variable at the Zone Time Step for external interface
+        Real64 StoreValue;       // At end of Zone Time Step, value is placed here for later reporting
+        Real64 NumStored;        // Number of hours stored
+        StoreType storeType;     // Variable Type (Summed/Non-Static or Average/Static)
+        bool Stored;             // True when value is stored
+        bool Report;             // User has requested reporting of this variable in the IDF
+        bool tsStored;           // if stored for this zone timestep
+        bool thisTSStored;       // if stored for this zone timestep
         int thisTSCount;
         ReportingFrequency frequency; // How often to report this variable
         Real64 MaxValue;              // Maximum reporting (only for Averaged variables, and those greater than Time Step)
@@ -301,17 +301,17 @@ namespace OutputProcessor {
     struct IntegerVariables
     {
         // Members
-        int *Which;          // The POINTER to the actual variable holding the value
-        Real64 Value;        // Current Value of the variable (to resolution of Zone Time Step)
-        Real64 TSValue;      // Value of this variable at the Zone Time Step
-        Real64 EITSValue;    // Value of this variable at the Zone Time Step for external interface
-        Real64 StoreValue;   // At end of Zone Time Step, value is placed here for later reporting
-        Real64 NumStored;    // Number of hours stored
-        StoreType storeType; // Variable Type (Summed/Non-Static or Average/Static)
-        bool Stored;         // True when value is stored
-        bool Report;         // User has requested reporting of this variable in the IDF
-        bool tsStored;       // if stored for this zone timestep
-        bool thisTSStored;   // if stored for this zone timestep
+        int *Which = nullptr; // The POINTER to the actual variable holding the value
+        Real64 Value;         // Current Value of the variable (to resolution of Zone Time Step)
+        Real64 TSValue;       // Value of this variable at the Zone Time Step
+        Real64 EITSValue;     // Value of this variable at the Zone Time Step for external interface
+        Real64 StoreValue;    // At end of Zone Time Step, value is placed here for later reporting
+        Real64 NumStored;     // Number of hours stored
+        StoreType storeType;  // Variable Type (Summed/Non-Static or Average/Static)
+        bool Stored;          // True when value is stored
+        bool Report;          // User has requested reporting of this variable in the IDF
+        bool tsStored;        // if stored for this zone timestep
+        bool thisTSStored;    // if stored for this zone timestep
         int thisTSCount;
         ReportingFrequency frequency; // How often to report this variable
         int MaxValue;                 // Maximum reporting (only for Averaged variables, and those greater than Time Step)
@@ -1178,7 +1178,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                                             bool CumulativeIndicator                                // true if this is a Cumulative meter reporting
 );
 
-int GetMeterIndex(EnergyPlusData &state, std::string const &MeterName);
+int GetMeterIndex(EnergyPlusData &state, std::string_view const MeterName);
 
 std::string GetMeterResourceType(EnergyPlusData &state, int MeterNumber); // Which Meter Number (from GetMeterIndex)
 

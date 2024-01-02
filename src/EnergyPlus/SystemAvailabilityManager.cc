@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -4737,7 +4737,7 @@ namespace SystemAvailabilityManager {
             } break;
             case HybridVentMode_OperT80: {
                 if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
-                    hybridVentMgr.OperativeTemp = 0.5 * (thisZoneHB.MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
+                    hybridVentMgr.OperativeTemp = 0.5 * (thisZoneHB.MAT + thisZoneHB.MRT);
                     minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 14.3;
                     maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 21.3;
                     hybridVentMgr.minAdaTem = minAdaTem;
@@ -4754,7 +4754,7 @@ namespace SystemAvailabilityManager {
             } break;
             case HybridVentMode_OperT90: {
                 if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
-                    hybridVentMgr.OperativeTemp = 0.5 * (thisZoneHB.MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
+                    hybridVentMgr.OperativeTemp = 0.5 * (thisZoneHB.MAT + thisZoneHB.MRT);
                     minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 15.3;
                     maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 20.3;
                     hybridVentMgr.minAdaTem = minAdaTem;
