@@ -73,7 +73,10 @@ namespace IndoorGreen {
         int SchedPtr = 0;
         int SchedLEDPtr = 0;
         int LightRefPtr = 0; //daylight reference point number;
+        int SchedLEDDaylightTargetPtr = 0; //LED-Daylight PPFD setpoint schedule pointer
         Real64 LeafArea = 0.0;
+        Real64 LEDNominalPPFD = 0.0; // nominal PPFD for LED grow light (PPFD)
+        Real64 LEDNominalEleP = 0.0; // nominal power for total LED grow light (W)
         Real64 ZPreTemp = 0.0;
         Real64 ZPreHum = 0.0;
         Real64 ZCO2 = 400;
@@ -82,6 +85,9 @@ namespace IndoorGreen {
         Real64 LatentRate = 0.0;   //w
         Real64 ETRate = 0.0;     // kg/(m2s)
         Real64 LambdaET = 0.0;     //J/(kg m2)
+        Real64 LEDActualPPFD = 0.0; // LED operational PPFD 
+        Real64 LEDActualEleP = 0.0; // LED operational power (W)
+        Real64 LEDActualEleCon = 0.0; //LED operational electricity consumption (J)
         int SurfPtr = 0;
         int ZoneListPtr = 0;
         int ZonePtr = 0;                    // point to the zone where the indoor greenery system is located

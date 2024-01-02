@@ -4138,6 +4138,8 @@ namespace OutputProcessor {
             return "cd/m2";
         case OutputProcessor::Unit::kmol_s:
             return "kmol/s";
+        case OutputProcessor::Unit::mol_m2s:
+            return "umol/m2-s";
         case OutputProcessor::Unit::K_m:
             return "K/m";
         case OutputProcessor::Unit::min:
@@ -4224,6 +4226,8 @@ namespace OutputProcessor {
             return OutputProcessor::Unit::V;
         } else if (unitUpper == "KMOL/S") {
             return OutputProcessor::Unit::kmol_s;
+        } else if (unitUpper == "MOL/M2-S") {
+            return OutputProcessor::Unit::mol_m2s;
         } else if (unitUpper == "REV/MIN") {
             return OutputProcessor::Unit::rev_min;
         } else if (unitUpper == "W/M2-K") {

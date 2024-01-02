@@ -303,8 +303,7 @@ namespace IndoorGreen {
                 ErrorsFound = true;
             }
 
-            if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightingMethod == 1 ||
-                state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightingMethod == 3) {
+            if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightingMethod == 1) {
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedLEDPtr =
                     ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
                 if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedLEDPtr == 0) {
@@ -343,7 +342,7 @@ namespace IndoorGreen {
                                             format("{}=\"{}\", {}, maximum is < 0.0",
                                                    RoutineName,
                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                   state.dataIPShortCut->cAlphaFieldNames(3)));
+                                                   state.dataIPShortCut->cAlphaFieldNames(6)));
                             ShowContinueError(
                                 state,
                                 format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(6), SchMin));
@@ -362,13 +361,64 @@ namespace IndoorGreen {
                     ShowSevereError(state,
                                     format("{}: invalid {}=\"{}\" for object named: {}",
                                            state.dataIPShortCut->cCurrentModuleObject,
-                                           state.dataIPShortCut->cAlphaFieldNames(6),
-                                           state.dataIPShortCut->cAlphaArgs(6),
+                                           state.dataIPShortCut->cAlphaFieldNames(7),
+                                           state.dataIPShortCut->cAlphaArgs(7),
                                            state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                     continue;
                 }
             }
+            if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightingMethod == 3) {
+                state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedLEDDaylightTargetPtr =
+                    ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(8));
+                if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedLEDDaylightTargetPtr == 0) {
+                    if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                        ShowSevereError(state,
+                                        format("{} =\"{}\", {} is required.",
+                                               RoutineName,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(8)));
+                    } else {
+                        ShowSevereError(state,
+                                        format("{} =\"{}\", invalid {} entered={}",
+                                               RoutineName,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(8),
+                                               state.dataIPShortCut->cAlphaArgs(8)));
+                    }
+                    ErrorsFound = true;
+                } else { // check min/max on schedule
+                    SchMin =
+                        ScheduleManager::GetScheduleMinValue(state, state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedLEDDaylightTargetPtr);
+                    SchMax =
+                        ScheduleManager::GetScheduleMaxValue(state, state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedLEDDaylightTargetPtr);
+                    if (SchMin < 0.0 || SchMax < 0.0) {
+                        if (SchMin < 0.0) {
+                            ShowSevereError(state,
+                                            format("{}=\"{}\", {}, minimum is < 0.0",
+                                                   RoutineName,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(8)));
+                            ShowContinueError(
+                                state,
+                                format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(8), SchMin));
+                            ErrorsFound = true;
+                        }
+                        if (SchMax < 0.0) {
+                            ShowSevereError(state,
+                                            format("{}=\"{}\", {}, maximum is < 0.0",
+                                                   RoutineName,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(8)));
+                            ShowContinueError(
+                                state,
+                                format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(8), SchMin));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+            }
+
 
             state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LeafArea = state.dataIPShortCut->rNumericArgs(1);
             if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LeafArea <= 0) {
@@ -378,6 +428,26 @@ namespace IndoorGreen {
                                        state.dataIPShortCut->cAlphaArgs(1),
                                        state.dataIPShortCut->cNumericFieldNames(1),
                                        state.dataIPShortCut->rNumericArgs(1)));
+                ErrorsFound = true;
+            }
+            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDNominalPPFD = state.dataIPShortCut->rNumericArgs(2);
+            if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDNominalPPFD <0) {
+                ShowSevereError(state,
+                                format("{}=\"{}\", invalid {} entered={}",
+                                       RoutineName,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(2),
+                                       state.dataIPShortCut->rNumericArgs(2)));
+                ErrorsFound = true;
+            }
+            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDNominalEleP = state.dataIPShortCut->rNumericArgs(3);
+            if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDNominalEleP< 0) {
+                ShowSevereError(state,
+                                format("{}=\"{}\", invalid {} entered={}",
+                                       RoutineName,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(3),
+                                       state.dataIPShortCut->rNumericArgs(3)));
                 ErrorsFound = true;
             }
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -428,6 +498,27 @@ namespace IndoorGreen {
                                     "Inside surface heat loss per m2 from evapotranspiration for indoor greenery system",
                                     OutputProcessor::Unit::W_m2, 
                                     state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LambdaET,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).IndoorGreenName);
+                SetupOutputVariable(state,
+                                    "LED Operational PPFD",
+                                    OutputProcessor::Unit::mol_m2s, 
+                                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualPPFD,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).IndoorGreenName);
+                SetupOutputVariable(state,
+                                    "LED Operational Power",
+                                    OutputProcessor::Unit::W,  
+                                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualEleP,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).IndoorGreenName);
+               SetupOutputVariable(state,
+                                    "LED Electricity Consumption",
+                                    OutputProcessor::Unit::J,
+                                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualEleCon,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataIndoorGreen->indoorgreens(IndoorGreenNum).IndoorGreenName);
@@ -491,6 +582,8 @@ namespace IndoorGreen {
             Real64 HCons;           // enthalpy (J/kg)
             Real64 HMid;           // enthalpy 3rd point (J/kg)
             Real64 ZoneAirVol;     // zone air volume (m3)
+                                  
+            Timestep = state.dataHVACGlobal->TimeStepSysSec; // unit s
             // Method for ET calculation: Penman-Monteith=1, Stanghellini=2, Data-driven=3
             for (IndoorGreenNum = 1; IndoorGreenNum <= state.dataIndoorGreen->NumIndoorGreen; ++IndoorGreenNum) {
                 ZonePreTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr).ZT;
@@ -499,11 +592,21 @@ namespace IndoorGreen {
                 //ZonePPFD
                 if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightingMethod == 1) {
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZPPFD =
-                    ScheduleManager::GetCurrentScheduleValue(state, state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedLEDPtr); //PPFD
+                    ScheduleManager::GetCurrentScheduleValue(state, state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedLEDPtr) *
+                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDNominalPPFD; // PPFD
+                state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualPPFD =
+                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDNominalPPFD;
+                state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualEleP =
+                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDNominalEleP;
+                state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualEleCon =
+                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDNominalEleP*Timestep;
                 }
                 else if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightingMethod == 2) {  
                  
                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZPPFD = 0;
+                   state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualPPFD =0;
+                   state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualEleP =0;
+                   state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualEleCon =0;
 
                    if (!state.dataDaylightingManager->CalcDayltghCoefficients_firstTime && state.dataEnvrn->SunIsUp) {
                         state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZPPFD=
@@ -522,12 +625,31 @@ namespace IndoorGreen {
                    }
                 }
                 else if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightingMethod == 3) {
-                Real64 a = ScheduleManager::GetCurrentScheduleValue(state, state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedLEDPtr);
+                Real64 a = ScheduleManager::GetCurrentScheduleValue(state, state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedLEDDaylightTargetPtr);
                 Real64 b = 0;
                 if (!state.dataDaylightingManager->CalcDayltghCoefficients_firstTime && state.dataEnvrn->SunIsUp) {
                        b= state.dataDaylightingManager->DaylIllum(state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LightRefPtr)/77; // PPFD
                    }
-                        state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZPPFD = a + b;                    
+                state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualPPFD = a - b; 
+                if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualPPFD >=
+                    state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDNominalPPFD) {
+                       state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZPPFD =
+                           state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDNominalPPFD + b;// LED Nominal + Daylight
+                       state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualEleP =
+                           state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDNominalEleP;
+                       state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualEleCon =
+                           state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDNominalEleP * Timestep;    
+                }
+                else
+                {
+                       state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZPPFD = a;//Targeted PPFD
+                       state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualEleP =
+                           state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDNominalEleP *
+                           state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualPPFD /
+                           state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDNominalPPFD;
+                       state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDActualEleCon =
+                           state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LEDNominalEleP * Timestep;   
+                }                   
                 }  
                 ZonePPFD = state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZPPFD;
 
@@ -553,8 +675,7 @@ namespace IndoorGreen {
                    }
                 } 
 
-                //adding ET effects 
-                Timestep = state.dataHVACGlobal->TimeStepSysSec; // unit s
+
                 //debug 
                 //state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETRate = 0.0;
                 ETTotal = state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETRate * Timestep *
