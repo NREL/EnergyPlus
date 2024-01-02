@@ -450,19 +450,21 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
             std::string endUseCat = Util::makeUPPER(cAlphaArgs(10));
             if (endUseCat == "FREECOOLING")
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::SOVEndUseCat::FreeCooling;
-            else if (endUseCat == "HEATREJECTION")                   
+            else if (endUseCat == "HEATREJECTION")
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::SOVEndUseCat::HeatRejection;
-            else if (endUseCat == "HEATRECOVERYFORCOOLING")                   
+            else if (endUseCat == "HEATRECOVERYFORCOOLING")
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::SOVEndUseCat::HeatRecoveryForCooling;
-            else if (endUseCat == "HEATRECOVERYFORCOOLING")                   
+            else if (endUseCat == "HEATRECOVERYFORCOOLING")
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::SOVEndUseCat::HeatRecoveryForHeating;
-            else if (endUseCat == "LOOPTOLOOP")                   
+            else if (endUseCat == "LOOPTOLOOP")
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::SOVEndUseCat::LoopToLoop;
             else {
-                ShowWarningError(state, format("{} = {}, {} is an invalid value for {}", cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(10), cAlphaFieldNames(10)));
+                ShowWarningError(
+                    state,
+                    format("{} = {}, {} is an invalid value for {}", cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(10), cAlphaFieldNames(10)));
                 ErrorsFound = true;
             }
-                
+
             if (!lAlphaFieldBlanks(11)) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).OtherCompSupplySideLoop.inletNodeNum =
                     NodeInputManager::GetOnlySingleNode(state,

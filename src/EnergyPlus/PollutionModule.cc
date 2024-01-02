@@ -175,13 +175,13 @@ void SetupPollutionCalculations(EnergyPlusData &state)
         OutputProcessor::ReportFreq freq = OutputProcessor::ReportFreq::Simulation;
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(1) &&
-            (freq = static_cast<OutputProcessor::ReportFreq>
-             (getEnumValue(OutputProcessor::reportFreqNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(1)))))
-            == OutputProcessor::ReportFreq::Invalid) {
+            (freq = static_cast<OutputProcessor::ReportFreq>(
+                 getEnumValue(OutputProcessor::reportFreqNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(1))))) ==
+                OutputProcessor::ReportFreq::Invalid) {
             ShowSevereError(state, format("Invalid reporting frequency {}", state.dataIPShortCut->cAlphaArgs(1)));
             continue;
         }
-                                                                                                        
+
         InitPollutionMeterReporting(state, freq);
     }
 }
@@ -461,7 +461,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
             OutputProcessor::SOVEndUseCat::Invalid,
             OutputProcessor::SOVEndUseCat::Invalid // used for OtherEquipment object
         };
-                
+
         // Need to check whether this fuel is used?
         SetupOutputVariable(state,
                             format("Environmental Impact {} Source Energy", Constant::eFuelNames[(int)fuel]),
@@ -552,7 +552,6 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                         OutputProcessor::SOVEndUseCat::CarbonEquivalentEmissions,
                         {},
                         OutputProcessor::SOVGroup::Invalid);
-
 
     // Connect pollution meters to energy meters
     for (int iMeter = 0; iMeter < (int)PollFacilityMeter::Num; ++iMeter) {

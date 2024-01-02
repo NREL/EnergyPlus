@@ -126,7 +126,7 @@ namespace ExteriorEnergyUse {
         Real64 SchMin; // Min value of schedule for item
 
         auto &ipsc = state.dataIPShortCut;
-        
+
         state.dataExteriorEnergyUse->NumExteriorLights = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Exterior:Lights");
         state.dataExteriorEnergyUse->ExteriorLights.allocate(state.dataExteriorEnergyUse->NumExteriorLights);
 
@@ -188,8 +188,7 @@ namespace ExteriorEnergyUse {
                                                ipsc->cAlphaFieldNames(2),
                                                ipsc->cAlphaFieldNames(1),
                                                ipsc->cAlphaArgs(1)));
-                        ShowContinueError(state,
-                                          format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", ipsc->cAlphaArgs(2), SchMin));
+                        ShowContinueError(state, format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", ipsc->cAlphaArgs(2), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
@@ -200,8 +199,7 @@ namespace ExteriorEnergyUse {
                                                ipsc->cAlphaFieldNames(2),
                                                ipsc->cAlphaFieldNames(1),
                                                ipsc->cAlphaArgs(1)));
-                        ShowContinueError(state,
-                                          format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", ipsc->cAlphaArgs(2), SchMax));
+                        ShowContinueError(state, format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", ipsc->cAlphaArgs(2), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -305,7 +303,7 @@ namespace ExteriorEnergyUse {
                                                      ErrorsFound);
 
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
-            
+
             ++state.dataExteriorEnergyUse->NumExteriorEqs;
 
             auto &exteriorEquip = state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs);
@@ -320,30 +318,30 @@ namespace ExteriorEnergyUse {
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 ShowSevereEmptyField(state, eoh, ipsc->cAlphaFieldNames(2));
                 ErrorsFound = true;
-                
-            } else if ((exteriorEquip.FuelType = static_cast<Constant::eFuel>
-                        (getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(2))))) == Constant::eFuel::Invalid) {
+
+            } else if ((exteriorEquip.FuelType = static_cast<Constant::eFuel>(
+                            getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(2))))) == Constant::eFuel::Invalid) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 ErrorsFound = true;
 
             } else if (exteriorEquip.FuelType != Constant::eFuel::Water) {
-                 SetupOutputVariable(state,
-                                     "Exterior Equipment Fuel Rate",
-                                     Constant::Units::W,
-                                     exteriorEquip.Power,
-                                     OutputProcessor::SOVTimeStepType::Zone,
-                                     OutputProcessor::SOVStoreType::Average,
-                                     exteriorEquip.Name);
-                 SetupOutputVariable(state,
-                                     format("Exterior Equipment {} Energy", Constant::eFuelNames[(int)exteriorEquip.FuelType]),
-                                     Constant::Units::J,
-                                     exteriorEquip.CurrentUse,
-                                     OutputProcessor::SOVTimeStepType::Zone,
-                                     OutputProcessor::SOVStoreType::Summed,
-                                     exteriorEquip.Name,
-                                     Constant::eFuel2eResource[(int)exteriorEquip.FuelType],
-                                     OutputProcessor::SOVEndUseCat::ExteriorEquipment,
-                                     EndUseSubcategoryName);
+                SetupOutputVariable(state,
+                                    "Exterior Equipment Fuel Rate",
+                                    Constant::Units::W,
+                                    exteriorEquip.Power,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    exteriorEquip.Name);
+                SetupOutputVariable(state,
+                                    format("Exterior Equipment {} Energy", Constant::eFuelNames[(int)exteriorEquip.FuelType]),
+                                    Constant::Units::J,
+                                    exteriorEquip.CurrentUse,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    exteriorEquip.Name,
+                                    Constant::eFuel2eResource[(int)exteriorEquip.FuelType],
+                                    OutputProcessor::SOVEndUseCat::ExteriorEquipment,
+                                    EndUseSubcategoryName);
             } else {
                 SetupOutputVariable(state,
                                     "Exterior Equipment Water Volume Flow Rate",
@@ -364,8 +362,7 @@ namespace ExteriorEnergyUse {
                                     EndUseSubcategoryName);
             }
 
-            exteriorEquip.SchedPtr =
-                GetScheduleIndex(state, ipsc->cAlphaArgs(3));
+            exteriorEquip.SchedPtr = GetScheduleIndex(state, ipsc->cAlphaArgs(3));
             if (exteriorEquip.SchedPtr == 0) {
                 if (ipsc->lAlphaFieldBlanks(3)) {
                     ShowSevereError(state,
@@ -387,10 +384,8 @@ namespace ExteriorEnergyUse {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin =
-                    GetScheduleMinValue(state, exteriorEquip.SchedPtr);
-                SchMax =
-                    GetScheduleMaxValue(state, exteriorEquip.SchedPtr);
+                SchMin = GetScheduleMinValue(state, exteriorEquip.SchedPtr);
+                SchMax = GetScheduleMaxValue(state, exteriorEquip.SchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state,
@@ -400,8 +395,7 @@ namespace ExteriorEnergyUse {
                                                ipsc->cAlphaFieldNames(3),
                                                ipsc->cAlphaFieldNames(1),
                                                ipsc->cAlphaArgs(1)));
-                        ShowContinueError(state,
-                                          format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", ipsc->cAlphaArgs(3), SchMin));
+                        ShowContinueError(state, format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", ipsc->cAlphaArgs(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
@@ -412,14 +406,12 @@ namespace ExteriorEnergyUse {
                                                ipsc->cAlphaFieldNames(3),
                                                ipsc->cAlphaFieldNames(1),
                                                ipsc->cAlphaArgs(1)));
-                        ShowContinueError(state,
-                                          format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", ipsc->cAlphaArgs(3), SchMax));
+                        ShowContinueError(state, format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", ipsc->cAlphaArgs(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
             }
-            exteriorEquip.DesignLevel =
-                ipsc->rNumericArgs(1);
+            exteriorEquip.DesignLevel = ipsc->rNumericArgs(1);
         }
 
         // =================================  Get Exterior Water Equipment
@@ -472,10 +464,8 @@ namespace ExteriorEnergyUse {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin =
-                    GetScheduleMinValue(state, exteriorEquip.SchedPtr);
-                SchMax =
-                    GetScheduleMaxValue(state, exteriorEquip.SchedPtr);
+                SchMin = GetScheduleMinValue(state, exteriorEquip.SchedPtr);
+                SchMax = GetScheduleMaxValue(state, exteriorEquip.SchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state,
@@ -485,8 +475,7 @@ namespace ExteriorEnergyUse {
                                                ipsc->cAlphaFieldNames(3),
                                                ipsc->cAlphaFieldNames(1),
                                                ipsc->cAlphaArgs(1)));
-                        ShowContinueError(state,
-                                          format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", ipsc->cAlphaArgs(3), SchMin));
+                        ShowContinueError(state, format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", ipsc->cAlphaArgs(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
@@ -497,8 +486,7 @@ namespace ExteriorEnergyUse {
                                                ipsc->cAlphaFieldNames(3),
                                                ipsc->cAlphaFieldNames(1),
                                                ipsc->cAlphaArgs(1)));
-                        ShowContinueError(state,
-                                          format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", ipsc->cAlphaArgs(3), SchMax));
+                        ShowContinueError(state, format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", ipsc->cAlphaArgs(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -510,8 +498,7 @@ namespace ExteriorEnergyUse {
                 EndUseSubcategoryName = "General";
             }
 
-            exteriorEquip.DesignLevel =
-                ipsc->rNumericArgs(1);
+            exteriorEquip.DesignLevel = ipsc->rNumericArgs(1);
 
             SetupOutputVariable(state,
                                 "Exterior Equipment Water Volume Flow Rate",

@@ -623,7 +623,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput_EnsureFuelTypesAllRecog
         const std::string enum_string = Util::makeUPPER(enum_value.get<std::string>());
 
         const auto resource = static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, enum_string));
-        // WHY IS COMPARE ENUMS THIS WAY? 
+        // WHY IS COMPARE ENUMS THIS WAY?
         EXPECT_FALSE(compare_enums(Constant::eResource::Invalid, resource, false)) << "Failed for " << enum_string;
 
         idf_objects += fmt::format(R"idf(

@@ -332,10 +332,7 @@ namespace ResultsFramework {
                          InputOutputFile &outputFile,
                          bool outputControl,
                          bool rewriteTimestamp);
-        void parseTSOutputs(EnergyPlusData &state,
-                            json const &data,
-                            std::vector<std::string> const &outputVariables,
-                            ReportFreq reportingFrequency);
+        void parseTSOutputs(EnergyPlusData &state, json const &data, std::vector<std::string> const &outputVariables, ReportFreq reportingFrequency);
 
     private:
         friend class EnergyPlus::EnergyPlusFixture;
@@ -372,36 +369,28 @@ namespace ResultsFramework {
         bool MsgPackEnabled() const;
 
         void initializeTSDataFrame(const ReportFreq reportFrequency,
-                                   const std::vector<OutputProcessor::OutVar*> &Variables,
+                                   const std::vector<OutputProcessor::OutVar *> &Variables,
                                    const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::Zone);
-            
-        void initializeMeters(const std::vector<OutputProcessor::Meter*> &EnergyMeters, const ReportFreq reportFrequency);
 
-        std::array<DataFrame, (int)TimeStepType::Num> detailedTSData = {
-            DataFrame("Dummy"),
-            DataFrame("Detailed-Zone"), 
-            DataFrame("Detailed-HVAC")
-        };
+        void initializeMeters(const std::vector<OutputProcessor::Meter *> &EnergyMeters, const ReportFreq reportFrequency);
 
-        std::array<DataFrame, (int)ReportFreq::Num> freqTSData = {
-            DataFrame("Each Call"),
-            DataFrame("TimeStep"),
-            DataFrame("Hourly"),
-            DataFrame("Daily"),
-            DataFrame("Monthly"),
-            DataFrame("RunPeriod"),
-            DataFrame("Yearly")
-        };
+        std::array<DataFrame, (int)TimeStepType::Num> detailedTSData = {DataFrame("Dummy"), DataFrame("Detailed-Zone"), DataFrame("Detailed-HVAC")};
 
-        std::array<MeterDataFrame, (int)ReportFreq::Num> Meters = {
-            MeterDataFrame("Each Call"),
-            MeterDataFrame("TimeStep"),
-            MeterDataFrame("Hourly"),
-            MeterDataFrame("Daily"),
-            MeterDataFrame("Monthly"),
-            MeterDataFrame("RunPeriod"),
-            MeterDataFrame("Yearly")
-        };
+        std::array<DataFrame, (int)ReportFreq::Num> freqTSData = {DataFrame("Each Call"),
+                                                                  DataFrame("TimeStep"),
+                                                                  DataFrame("Hourly"),
+                                                                  DataFrame("Daily"),
+                                                                  DataFrame("Monthly"),
+                                                                  DataFrame("RunPeriod"),
+                                                                  DataFrame("Yearly")};
+
+        std::array<MeterDataFrame, (int)ReportFreq::Num> Meters = {MeterDataFrame("Each Call"),
+                                                                   MeterDataFrame("TimeStep"),
+                                                                   MeterDataFrame("Hourly"),
+                                                                   MeterDataFrame("Daily"),
+                                                                   MeterDataFrame("Monthly"),
+                                                                   MeterDataFrame("RunPeriod"),
+                                                                   MeterDataFrame("Yearly")};
 
         void setISO8601(const bool value)
         {
@@ -461,16 +450,17 @@ namespace ResultsFramework {
         friend class EnergyPlus::ResultsFrameworkFixture;
 
     protected:
-
-        inline bool hasDetailedTSData(TimeStepType timeStepType) const {
+        inline bool hasDetailedTSData(TimeStepType timeStepType) const
+        {
             return detailedTSData[(int)timeStepType].dataFrameEnabled();
         }
 
-        inline bool hasFreqTSData(ReportFreq freq) const {
+        inline bool hasFreqTSData(ReportFreq freq) const
+        {
             return freqTSData[(int)freq].dataFrameEnabled();
         }
 
-#ifdef GET_OUT            
+#ifdef GET_OUT
         inline bool hasRIDetailedZoneTSData() const
         {
             return detailedTSData[(int)TimeStepType::Zone].iDataFrameEnabled() || detailedTSData[(int)TimeStepType::Zone].rDataFrameEnabled();
@@ -542,16 +532,16 @@ namespace ResultsFramework {
             return Meters[(int)ReportFreq::Year].dataFrameEnabled();
         };
 
-#endif // 
+#endif //
         inline bool hasMeters(ReportFreq freq) const
         {
             return Meters[(int)freq].dataFrameEnabled();
         }
-            
+
         inline bool hasMeterData() const
         {
-            return hasMeters(ReportFreq::TimeStep) || hasMeters(ReportFreq::Hour) || hasMeters(ReportFreq::Day) ||
-                    hasMeters(ReportFreq::Month) || hasMeters(ReportFreq::Simulation) || hasMeters(ReportFreq::Year);
+            return hasMeters(ReportFreq::TimeStep) || hasMeters(ReportFreq::Hour) || hasMeters(ReportFreq::Day) || hasMeters(ReportFreq::Month) ||
+                   hasMeters(ReportFreq::Simulation) || hasMeters(ReportFreq::Year);
         };
 
         inline bool hasTSData(ReportFreq freq, TimeStepType timeStepType = TimeStepType::Invalid) const

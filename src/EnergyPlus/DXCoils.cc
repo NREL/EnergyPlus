@@ -5757,7 +5757,7 @@ void GetDXCoils(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisDXCoil.Name,
-                                Constant::eResource::EnergyTransfer, 
+                                Constant::eResource::EnergyTransfer,
                                 OutputProcessor::SOVEndUseCat::CoolingCoils,
                                 {},
                                 OutputProcessor::SOVGroup::HVAC);
@@ -6219,7 +6219,7 @@ void GetDXCoils(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisDXCoil.Name,
-                                Constant::eResource::EnergyTransfer, 
+                                Constant::eResource::EnergyTransfer,
                                 OutputProcessor::SOVEndUseCat::HeatingCoils,
                                 {},
                                 OutputProcessor::SOVGroup::HVAC);

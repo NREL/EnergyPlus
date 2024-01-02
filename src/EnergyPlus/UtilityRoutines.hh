@@ -227,23 +227,32 @@ struct ErrorObjectHeader
     std::string_view objectName;
 };
 
-
 void ShowSevereDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh);
-void ShowSevereEmptyField(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName,
-                          std::string_view depFieldName = {}, std::string_view depFieldValue = {});
+void ShowSevereEmptyField(EnergyPlusData &state,
+                          ErrorObjectHeader const &eoh,
+                          std::string_view fieldName,
+                          std::string_view depFieldName = {},
+                          std::string_view depFieldValue = {});
 void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
 void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
 void ShowSevereInvalidBool(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
 
 void ShowSevereCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg);
 void ShowWarningDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh);
-void ShowWarningEmptyField(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view defaultValue,
-                           std::string_view depFieldName = {}, std::string_view depFieldValue = {});
-void ShowWarningItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
-void ShowWarningInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
-void ShowWarningInvalidBool(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
+void ShowWarningEmptyField(EnergyPlusData &state,
+                           ErrorObjectHeader const &eoh,
+                           std::string_view fieldName,
+                           std::string_view defaultValue,
+                           std::string_view depFieldName = {},
+                           std::string_view depFieldValue = {});
+void ShowWarningItemNotFound(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
+void ShowWarningInvalidKey(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
+void ShowWarningInvalidBool(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
 void ShowWarningCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg);
-        
+
 namespace Util {
 
     static constexpr std::array<std::string_view, 12> MonthNamesCC{

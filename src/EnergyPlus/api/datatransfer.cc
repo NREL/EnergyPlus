@@ -306,20 +306,21 @@ Real64 getVariableValue(EnergyPlusState state, const int handle)
         if (thisOutputVar->varType == EnergyPlus::OutputProcessor::VariableType::Real) {
             return *(dynamic_cast<EnergyPlus::OutputProcessor::OutVarReal const *>(thisOutputVar))->Which;
         } else if (thisOutputVar->varType == EnergyPlus::OutputProcessor::VariableType::Integer) {
-            return (Real64)*(dynamic_cast<EnergyPlus::OutputProcessor::OutVarInt const *>(thisOutputVar))->Which;
+            return (Real64) * (dynamic_cast<EnergyPlus::OutputProcessor::OutVarInt const *>(thisOutputVar))->Which;
         } else {
             if (thisState->dataGlobal->errorCallback) {
-               std::cout << "ERROR: Variable at handle has type other than Real or Integer, returning zero but caller should take note and likely abort."
-                         << std::endl;
-        } else {
-            // must be running from python plugin, need to fatal out once the plugin is done
-            // throw an error, set the fatal flag, and then return zero
-            EnergyPlus::ShowSevereError(*thisState, fmt::format("Data Exchange API: Error in getVariableValue; received handle: {}", handle));
-            EnergyPlus::ShowContinueError(
-                *thisState, "The getVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
-        }
-        thisState->dataPluginManager->apiErrorFlag = true;
-        return 0;
+                std::cout
+                    << "ERROR: Variable at handle has type other than Real or Integer, returning zero but caller should take note and likely abort."
+                    << std::endl;
+            } else {
+                // must be running from python plugin, need to fatal out once the plugin is done
+                // throw an error, set the fatal flag, and then return zero
+                EnergyPlus::ShowSevereError(*thisState, fmt::format("Data Exchange API: Error in getVariableValue; received handle: {}", handle));
+                EnergyPlus::ShowContinueError(
+                    *thisState, "The getVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
+            }
+            thisState->dataPluginManager->apiErrorFlag = true;
+            return 0;
         }
     } else {
         if (thisState->dataGlobal->errorCallback) {

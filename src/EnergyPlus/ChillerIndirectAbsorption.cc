@@ -695,7 +695,7 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            Constant::eResource::EnergyTransfer, 
+                            Constant::eResource::EnergyTransfer,
                             OutputProcessor::SOVEndUseCat::Cooling,
                             {},
                             OutputProcessor::SOVGroup::Plant);
@@ -716,7 +716,7 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                Constant::eResource::PlantLoopHeatingDemand, 
+                                Constant::eResource::PlantLoopHeatingDemand,
                                 OutputProcessor::SOVEndUseCat::Chillers,
                                 {},
                                 OutputProcessor::SOVGroup::Plant);

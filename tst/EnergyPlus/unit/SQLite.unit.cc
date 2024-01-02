@@ -126,12 +126,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord)
     // There needs to be a simulation record otherwise the foreign key constraint will fail
     sql->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
     sql->createSQLiteEnvironmentPeriodRecord(1, "CHICAGO ANN HTG 99.6% CONDNS DB", Constant::KindOfSim::DesignDay);
-    sql->createSQLiteEnvironmentPeriodRecord(
-        2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", Constant::KindOfSim::DesignDay, 1);
-    sql->createSQLiteEnvironmentPeriodRecord(
-        3, "CHICAGO ANN HTG 99.6% CONDNS DB", Constant::KindOfSim::RunPeriodDesign);
-    sql->createSQLiteEnvironmentPeriodRecord(
-        4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", Constant::KindOfSim::RunPeriodWeather, 1);
+    sql->createSQLiteEnvironmentPeriodRecord(2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", Constant::KindOfSim::DesignDay, 1);
+    sql->createSQLiteEnvironmentPeriodRecord(3, "CHICAGO ANN HTG 99.6% CONDNS DB", Constant::KindOfSim::RunPeriodDesign);
+    sql->createSQLiteEnvironmentPeriodRecord(4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", Constant::KindOfSim::RunPeriodWeather, 1);
     auto result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
     sql->sqliteCommit();
 
@@ -147,11 +144,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord)
 
     sql->sqliteBegin();
     // This should fail to insert due to foreign key constraint
-    sql->createSQLiteEnvironmentPeriodRecord(
-        5, "CHICAGO ANN HTG 99.6% CONDNS DB", Constant::KindOfSim::DesignDay, 100);
+    sql->createSQLiteEnvironmentPeriodRecord(5, "CHICAGO ANN HTG 99.6% CONDNS DB", Constant::KindOfSim::DesignDay, 100);
     // This should fail to insert due to duplicate primary key
-    sql->createSQLiteEnvironmentPeriodRecord(
-        4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", Constant::KindOfSim::DesignDay, 1);
+    sql->createSQLiteEnvironmentPeriodRecord(4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", Constant::KindOfSim::DesignDay, 1);
     result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
     sql->sqliteCommit();
 
@@ -164,8 +159,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_errorRecords)
     sql->sqliteBegin();
     // There needs to be a simulation record otherwise the foreign key constraint will fail
     sql->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
-    sql->createSQLiteErrorRecord(
-        1, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1);
+    sql->createSQLiteErrorRecord(1, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1);
     auto result = queryResult("SELECT * FROM Errors;", "Errors");
     sql->sqliteCommit();
 
@@ -185,8 +179,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_errorRecords)
     EXPECT_EQ(testResult1, result[0]);
 
     sql->sqliteBegin();
-    sql->createSQLiteErrorRecord(
-        1, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1);
+    sql->createSQLiteErrorRecord(1, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1);
     sql->createSQLiteErrorRecord(1, 0, "This should be changed.", 1);
     sql->updateSQLiteErrorRecord("Changed error message.");
     result = queryResult("SELECT * FROM Errors;", "Errors");
@@ -203,8 +196,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_errorRecords)
 
     sql->sqliteBegin();
     // This should fail to insert due to foreign key constraint
-    sql->createSQLiteErrorRecord(
-        100, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1);
+    sql->createSQLiteErrorRecord(100, 0, "CheckUsedConstructions: There are 2 nominally unused constructions in input.", 1);
     result = queryResult("SELECT * FROM Errors;", "Errors");
     sql->sqliteCommit();
 
@@ -242,7 +234,6 @@ TEST_F(SQLiteFixture, SQLiteProcedures_informationalErrorRecords)
     compare_err_stream(errMsg);
 }
 
-
 TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord)
 {
     auto &sql = state->dataSQLiteProcedures->sqlite;
@@ -254,7 +245,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord)
     sql->createSQLiteReportDictionaryRecord(
         3, StoreType::Summed, "Facility:Electricity", "", "Facility:Electricity", TimeStepType::Zone, "J", ReportFreq::Month, true);
     sql->createSQLiteReportDictionaryRecord(4, StoreType::Averaged, "HVAC", "", "AHU-1", TimeStepType::System, "", ReportFreq::Hour, false);
-    sql->createSQLiteReportDictionaryRecord(5, StoreType::Averaged, "HVAC", "", "AHU-1", TimeStepType::System, "", ReportFreq::Hour, false, "test schedule");
+    sql->createSQLiteReportDictionaryRecord(
+        5, StoreType::Averaged, "HVAC", "", "AHU-1", TimeStepType::System, "", ReportFreq::Hour, false, "test schedule");
     auto result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
     sql->sqliteCommit();
 
@@ -272,14 +264,13 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord)
 
     // Do we still need to do these tests now that ReportFreq, StoreType, and TimeStep type are enums?
     sql->sqliteBegin();
-    sql->createSQLiteReportDictionaryRecord(6, StoreType::Invalid, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature",
-                                            TimeStepType::Zone, "C", ReportFreq::Hour, false);
-    sql->createSQLiteReportDictionaryRecord(7, StoreType::Summed, "Facility:Electricity", "", "Facility:Electricity",
-                                            TimeStepType::Invalid, "J", ReportFreq::Hour, true);
-    sql->createSQLiteReportDictionaryRecord(8, StoreType::Summed, "Facility:Electricity", "", "Facility:Electricity",
-                                            TimeStepType::Zone, "J", ReportFreq::Invalid, true);
-    sql->createSQLiteReportDictionaryRecord(9, StoreType::Averaged, "HVAC", "", "AHU-1",
-                                            TimeStepType::System, "", ReportFreq::Invalid, false);
+    sql->createSQLiteReportDictionaryRecord(
+        6, StoreType::Invalid, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", TimeStepType::Zone, "C", ReportFreq::Hour, false);
+    sql->createSQLiteReportDictionaryRecord(
+        7, StoreType::Summed, "Facility:Electricity", "", "Facility:Electricity", TimeStepType::Invalid, "J", ReportFreq::Hour, true);
+    sql->createSQLiteReportDictionaryRecord(
+        8, StoreType::Summed, "Facility:Electricity", "", "Facility:Electricity", TimeStepType::Zone, "J", ReportFreq::Invalid, true);
+    sql->createSQLiteReportDictionaryRecord(9, StoreType::Averaged, "HVAC", "", "AHU-1", TimeStepType::System, "", ReportFreq::Invalid, false);
     result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
     sql->sqliteCommit();
 
@@ -293,7 +284,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord)
     EXPECT_EQ(testResult6, result[6]);
     EXPECT_EQ(testResult7, result[7]);
     EXPECT_EQ(testResult8, result[8]);
-    
+
     sql->sqliteBegin();
     // This should fail to insert due to duplicate primary key
     sql->createSQLiteReportDictionaryRecord(
@@ -425,7 +416,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDataRecord)
         1, StoreType::Averaged, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", TimeStepType::Zone, "C", ReportFreq::Hour, false);
     sql->createSQLiteReportDataRecord(1, 999.9);
     sql->createSQLiteReportDataRecord(1, 999.9, ReportFreq::Day, 0, 1310459, 100, 7031530, 15);
-    sql->createSQLiteReportDataRecord(1, 999.9, ReportFreq::TimeStep , 0, 1310459, 100, 7031530, 15);
+    sql->createSQLiteReportDataRecord(1, 999.9, ReportFreq::TimeStep, 0, 1310459, 100, 7031530, 15);
     sql->createSQLiteReportDataRecord(1, 999.9, ReportFreq::Day, 100, 1310459, 999, 7031530, -1);
     auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
     auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
@@ -493,8 +484,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_addSQLiteSystemSizingRecord)
 {
     auto &sql = state->dataSQLiteProcedures->sqlite;
     sql->sqliteBegin();
-    sql->addSQLiteSystemSizingRecord(
-        "VAV_1", "Cooling", "Sensible", 23.3, 6.3, 6.03, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00");
+    sql->addSQLiteSystemSizingRecord("VAV_1", "Cooling", "Sensible", 23.3, 6.3, 6.03, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00");
     auto result = queryResult("SELECT * FROM SystemSizes;", "SystemSizes");
     sql->sqliteCommit();
 
@@ -510,8 +500,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_addSQLiteComponentSizingRecord)
     sql->sqliteBegin();
     sql->addSQLiteComponentSizingRecord(
         "AirTerminal:SingleDuct:VAV:Reheat", "CORE_BOTTOM VAV BOX COMPONENT", "Design Size Maximum Air Flow Rate [m3/s]", 3.23);
-    sql->addSQLiteComponentSizingRecord(
-        "Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity", 38689.18);
+    sql->addSQLiteComponentSizingRecord("Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity", 38689.18);
     auto result = queryResult("SELECT * FROM ComponentSizes;", "ComponentSizes");
     sql->sqliteCommit();
 
@@ -554,7 +543,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_privateMethods)
     EXPECT_EQ("Unknown!!!", reportingFreqName(6));
     EXPECT_EQ("Unknown!!!", reportingFreqName(-2));
 #endif // GET_OUT
-    
+
     EXPECT_EQ(1, logicalToInteger(true));
     EXPECT_EQ(0, logicalToInteger(false));
 
@@ -587,8 +576,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_DaylightMaping)
     sql->sqliteBegin();
     sql->addZoneData(1, *zone);
     sql->createZoneExtendedOutput();
-    sql->createSQLiteDaylightMapTitle(
-        1, "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", 1, " RefPt1=(2.50:2.00:0.80), RefPt2=(2.50:18.00:0.80)", 0.8);
+    sql->createSQLiteDaylightMapTitle(1, "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", 1, " RefPt1=(2.50:2.00:0.80), RefPt2=(2.50:18.00:0.80)", 0.8);
     sql->createSQLiteDaylightMap(1, 2005, 7, 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue);
 
     auto zones = queryResult("SELECT * FROM Zones;", "Zones");
@@ -1100,8 +1088,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteTabularDataRecords)
     sql->sqliteBegin();
     // tabular data references simulation record... always checks for first simulation record only.
     sql->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
-    sql->createSQLiteTabularDataRecords(
-        body, rowLabels, columnLabels, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
+    sql->createSQLiteTabularDataRecords(body, rowLabels, columnLabels, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
     sql->createSQLiteTabularDataRecords(
         body2, rowLabels2, columnLabels2, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory");
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");

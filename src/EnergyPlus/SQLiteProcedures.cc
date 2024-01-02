@@ -70,12 +70,12 @@ namespace EnergyPlus {
 
 constexpr std::array<int, (int)OutputProcessor::ReportFreq::Num> reportFreqInts = {
     -1, // EachCall
-    0, // TimeStep
-    1, // Hour
-    2, // Day
-    3, // Month
-    4, // Simulation
-    5 // Year
+    0,  // TimeStep
+    1,  // Hour
+    2,  // Day
+    3,  // Month
+    4,  // Simulation
+    5   // Year
 };
 
 const int SQLite::ReportNameId = 1;
@@ -1352,8 +1352,6 @@ void SQLite::initializeIndexes()
     }
 }
 
-
-
 void SQLite::adjustReportingHourAndMinutes(int &hour, int &minutes)
 {
     switch (minutes) {
@@ -1405,12 +1403,17 @@ void SQLite::createSQLiteReportDictionaryRecord(int const reportVariableReportID
     if (m_writeOutputToSQLite) {
         sqliteBindInteger(m_reportDictionaryInsertStmt, 1, reportVariableReportID);
         sqliteBindLogical(m_reportDictionaryInsertStmt, 2, isMeter);
-        sqliteBindText(m_reportDictionaryInsertStmt, 3, (storeType == OutputProcessor::StoreType::Invalid) ? "Unknown!!!" : storeTypeStrings[(int)storeType]);
+        sqliteBindText(
+            m_reportDictionaryInsertStmt, 3, (storeType == OutputProcessor::StoreType::Invalid) ? "Unknown!!!" : storeTypeStrings[(int)storeType]);
         sqliteBindText(m_reportDictionaryInsertStmt, 4, indexGroup);
-        sqliteBindText(m_reportDictionaryInsertStmt, 5, (timeStepType == OutputProcessor::TimeStepType::Invalid) ? "Unknown!!!" : timeStepTypeStrings[(int)timeStepType]);
+        sqliteBindText(m_reportDictionaryInsertStmt,
+                       5,
+                       (timeStepType == OutputProcessor::TimeStepType::Invalid) ? "Unknown!!!" : timeStepTypeStrings[(int)timeStepType]);
         sqliteBindText(m_reportDictionaryInsertStmt, 6, keyedValueString);
         sqliteBindText(m_reportDictionaryInsertStmt, 7, variableName);
-        sqliteBindText(m_reportDictionaryInsertStmt, 8, (reportFreq == OutputProcessor::ReportFreq::Invalid) ? "Unknown!!!" : reportFreqStrings[(int)reportFreq]);
+        sqliteBindText(m_reportDictionaryInsertStmt,
+                       8,
+                       (reportFreq == OutputProcessor::ReportFreq::Invalid) ? "Unknown!!!" : reportFreqStrings[(int)reportFreq]);
 
         if (!scheduleName.empty()) {
             sqliteBindText(m_reportDictionaryInsertStmt, 9, scheduleName);
@@ -1427,7 +1430,7 @@ void SQLite::createSQLiteReportDictionaryRecord(int const reportVariableReportID
 
 void SQLite::createSQLiteReportDataRecord(int const recordIndex,
                                           Real64 const value,
-                                          OutputProcessor::ReportFreq const reportFreq, 
+                                          OutputProcessor::ReportFreq const reportFreq,
                                           Real64 const minValue,
                                           int const minValueDate,
                                           Real64 const maxValue,
@@ -1438,14 +1441,14 @@ void SQLite::createSQLiteReportDataRecord(int const recordIndex,
     if (!m_writeOutputToSQLite) {
         return;
     }
-        
+
     ++m_dataIndex;
 
     sqliteBindInteger(m_reportDataInsertStmt, 1, m_dataIndex);
     sqliteBindForeignKey(m_reportDataInsertStmt, 2, m_sqlDBTimeIndex);
     sqliteBindForeignKey(m_reportDataInsertStmt, 3, recordIndex);
     sqliteBindDouble(m_reportDataInsertStmt, 4, value);
-    
+
     sqliteStepCommand(m_reportDataInsertStmt);
     sqliteResetCommand(m_reportDataInsertStmt);
 
@@ -1458,15 +1461,15 @@ void SQLite::createSQLiteReportDataRecord(int const recordIndex,
         int maxDay;
         int maxHour;
         int maxMinute;
-        
+
         General::DecodeMonDayHrMin(minValueDate, minMonth, minDay, minHour, minMinute);
         General::DecodeMonDayHrMin(maxValueDate, maxMonth, maxDay, maxHour, maxMinute);
-        
+
         adjustReportingHourAndMinutes(minHour, minMinute);
         adjustReportingHourAndMinutes(maxHour, maxMinute);
-        
+
         ++m_extendedDataIndex;
-        
+
         if (minutesPerTimeStep != -1) { // This is for data created by a 'Report Meter' statement
             switch (reportFreq) {
             case OutputProcessor::ReportFreq::Hour:
@@ -1476,27 +1479,27 @@ void SQLite::createSQLiteReportDataRecord(int const recordIndex,
             case OutputProcessor::ReportFreq::Year: {
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, m_extendedDataIndex);
                 sqliteBindForeignKey(m_reportExtendedDataInsertStmt, 2, m_dataIndex);
-                
+
                 sqliteBindDouble(m_reportExtendedDataInsertStmt, 3, maxValue);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 4, maxMonth);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 5, maxDay);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 6, maxHour);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 7, maxMinute - minutesPerTimeStep + 1);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 8, maxMinute);
-                
+
                 sqliteBindDouble(m_reportExtendedDataInsertStmt, 9, minValue);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 10, minMonth);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 11, minDay);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 12, minHour);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 13, minMinute - minutesPerTimeStep + 1);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 14, minMinute);
-                
+
                 sqliteStepCommand(m_reportExtendedDataInsertStmt);
                 sqliteResetCommand(m_reportExtendedDataInsertStmt);
             } break;
-                
-            case OutputProcessor::ReportFreq::TimeStep: 
-            case OutputProcessor::ReportFreq::EachCall: { 
+
+            case OutputProcessor::ReportFreq::TimeStep:
+            case OutputProcessor::ReportFreq::EachCall: {
                 --m_extendedDataIndex; // Reset the data index to account for the error
             } break;
 
@@ -1505,7 +1508,7 @@ void SQLite::createSQLiteReportDataRecord(int const recordIndex,
                 std::stringstream ss;
                 ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << (int)reportFreq;
                 sqliteWriteMessage(ss.str());
-            } break; 
+            } break;
             } // switch (reportFreq)
 
         } else { // This is for data created by a 'Report Variable' statement
@@ -1516,21 +1519,21 @@ void SQLite::createSQLiteReportDataRecord(int const recordIndex,
             case OutputProcessor::ReportFreq::Year: {
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, m_extendedDataIndex);
                 sqliteBindForeignKey(m_reportExtendedDataInsertStmt, 2, m_dataIndex);
-                
+
                 sqliteBindDouble(m_reportExtendedDataInsertStmt, 3, maxValue);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 4, maxMonth);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 5, maxDay);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 6, maxHour);
                 sqliteBindNULL(m_reportExtendedDataInsertStmt, 7);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 8, maxMinute);
-                
+
                 sqliteBindDouble(m_reportExtendedDataInsertStmt, 9, minValue);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 10, minMonth);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 11, minDay);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 12, minHour);
                 sqliteBindNULL(m_reportExtendedDataInsertStmt, 13);
                 sqliteBindInteger(m_reportExtendedDataInsertStmt, 14, minMinute);
-                
+
                 sqliteStepCommand(m_reportExtendedDataInsertStmt);
                 sqliteResetCommand(m_reportExtendedDataInsertStmt);
             } break;
@@ -1538,17 +1541,17 @@ void SQLite::createSQLiteReportDataRecord(int const recordIndex,
             case OutputProcessor::ReportFreq::TimeStep:
             case OutputProcessor::ReportFreq::EachCall:
             case OutputProcessor::ReportFreq::Hour: {
-                    --m_extendedDataIndex; // Reset the data index to account for the error
+                --m_extendedDataIndex; // Reset the data index to account for the error
             } break;
             default: {
                 --m_extendedDataIndex; // Reset the data index to account for the error
                 std::stringstream ss;
                 ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << (int)reportFreq;
                 sqliteWriteMessage(ss.str());
-            } break; 
+            } break;
             } // switch (reportFreq)
-        } // if (minutesPerTimeStep != -1)
-    } // if (minDataValue != 0)
+        }     // if (minutesPerTimeStep != -1)
+    }         // if (minDataValue != 0)
 } // SQLite::createSQLiteReportDataRecord()
 
 void SQLite::createSQLiteTimeIndexRecord(OutputProcessor::ReportFreq const reportFreq,

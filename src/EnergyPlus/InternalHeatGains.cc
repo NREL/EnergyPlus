@@ -2822,7 +2822,8 @@ namespace InternalHeatGains {
                                                othEqModuleObject,
                                                thisOthEqInput.Name,
                                                IHGNumericFieldNames(DesignLevelFieldNumber)));
-                        ShowContinueError(state, format("... when a fuel type of {} is specified.", Constant::eFuelNames[(int)thisZoneOthEq.OtherEquipFuelType]));
+                        ShowContinueError(
+                            state, format("... when a fuel type of {} is specified.", Constant::eFuelNames[(int)thisZoneOthEq.OtherEquipFuelType]));
                         ErrorsFound = true;
                     }
 
@@ -6140,8 +6141,7 @@ namespace InternalHeatGains {
 
             addZoneOutputs(zoneOtherEq.ZonePtr) = true;
             addSpaceOutputs(zoneOtherEq.spaceIndex) = true;
-            if (zoneOtherEq.OtherEquipFuelType != Constant::eFuel::Invalid &&
-                zoneOtherEq.OtherEquipFuelType != Constant::eFuel::None) {
+            if (zoneOtherEq.OtherEquipFuelType != Constant::eFuel::Invalid && zoneOtherEq.OtherEquipFuelType != Constant::eFuel::None) {
                 SetupOutputVariable(state,
                                     format("Other Equipment {} Rate", Constant::eFuelNames[(int)zoneOtherEq.OtherEquipFuelType]),
                                     Constant::Units::W,
@@ -6248,9 +6248,9 @@ namespace InternalHeatGains {
                     if (fuelType == Constant::eFuel::Invalid || fuelType == Constant::eFuel::None) continue;
 
                     std::string_view fuelName = Constant::eFuelNames[(int)state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums[i]];
-                    
+
                     SetupOutputVariable(state,
-                                        format("Zone Other Equipment {} Rate", fuelName), 
+                                        format("Zone Other Equipment {} Rate", fuelName),
                                         Constant::Units::W,
                                         state.dataHeatBal->ZoneRpt(zoneNum).OtherPower[(int)fuelType],
                                         OutputProcessor::SOVTimeStepType::Zone,
@@ -6264,7 +6264,7 @@ namespace InternalHeatGains {
                                         OutputProcessor::SOVStoreType::Summed,
                                         state.dataHeatBal->Zone(zoneNum).Name);
                 }
-                    
+
                 SetupOutputVariable(state,
                                     "Zone Other Equipment Radiant Heating Energy",
                                     Constant::Units::J,

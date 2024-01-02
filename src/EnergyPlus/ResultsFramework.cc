@@ -160,7 +160,9 @@ namespace ResultsFramework {
                        const OutputProcessor::TimeStepType timeStepType,
                        const int ReportID,
                        const Constant::Units units)
-        : m_varName(VarName), m_reportFreq(reportFrequency), m_timeStepType(timeStepType), m_rptID(ReportID), m_units(units) {}
+        : m_varName(VarName), m_reportFreq(reportFrequency), m_timeStepType(timeStepType), m_rptID(ReportID), m_units(units)
+    {
+    }
 
     Variable::Variable(const std::string &VarName,
                        const OutputProcessor::ReportFreq reportFrequency,
@@ -168,7 +170,10 @@ namespace ResultsFramework {
                        const int ReportID,
                        const Constant::Units units,
                        const std::string &customUnits)
-        : m_varName(VarName), m_reportFreq(reportFrequency), m_timeStepType(timeStepType), m_rptID(ReportID), m_units(units), m_customUnits(customUnits) {}
+        : m_varName(VarName), m_reportFreq(reportFrequency), m_timeStepType(timeStepType), m_rptID(ReportID), m_units(units),
+          m_customUnits(customUnits)
+    {
+    }
 
     std::string Variable::variableName() const
     {
@@ -182,14 +187,13 @@ namespace ResultsFramework {
 
     std::string Variable::sReportFrequency() const
     {
-        static constexpr std::array<std::string_view, (int)ReportFreq::Num> reportFreqStrings =
-            {"Detailed", "TimeStep", "Hourly", "Daily", "Monthly", "RunPeriod", "Yearly"};
+        static constexpr std::array<std::string_view, (int)ReportFreq::Num> reportFreqStrings = {
+            "Detailed", "TimeStep", "Hourly", "Daily", "Monthly", "RunPeriod", "Yearly"};
 
-        static constexpr std::array<std::string_view, (int)TimeStepType::Num> timeStepTypeStrings =
-            {"Detailed - Zone", "Detailed - HVAC"};
-                    
-        return (m_reportFreq == ReportFreq::EachCall) ?
-                std::string(timeStepTypeStrings[(int)m_timeStepType]) : std::string(reportFreqStrings[(int)m_reportFreq]);
+        static constexpr std::array<std::string_view, (int)TimeStepType::Num> timeStepTypeStrings = {"Detailed - Zone", "Detailed - HVAC"};
+
+        return (m_reportFreq == ReportFreq::EachCall) ? std::string(timeStepTypeStrings[(int)m_timeStepType])
+                                                      : std::string(reportFreqStrings[(int)m_reportFreq]);
     }
 
     OutputProcessor::ReportFreq Variable::iReportFrequency() const
@@ -261,9 +265,9 @@ namespace ResultsFramework {
     {
         json root;
         if (m_customUnits.empty()) {
-             root = {{"Name", m_varName}, {"Units", Constant::unitNames[(int)m_units]}, {"Frequency", sReportFrequency()}};
+            root = {{"Name", m_varName}, {"Units", Constant::unitNames[(int)m_units]}, {"Frequency", sReportFrequency()}};
         } else {
-             root = {{"Name", m_varName}, {"Units", m_customUnits}, {"Frequency", sReportFrequency()}};
+            root = {{"Name", m_varName}, {"Units", m_customUnits}, {"Frequency", sReportFrequency()}};
         }
         return root;
     }
@@ -424,7 +428,7 @@ namespace ResultsFramework {
 
         for (auto const &varMap : variableMap) {
             if (varMap.second.customUnits().empty()) {
-                    cols.push_back({{"Variable", varMap.second.variableName()}, {"Units", Constant::unitNames[(int)varMap.second.units()]}});
+                cols.push_back({{"Variable", varMap.second.variableName()}, {"Units", Constant::unitNames[(int)varMap.second.units()]}});
             } else {
                 cols.push_back({{"Variable", varMap.second.variableName()}, {"Units", varMap.second.customUnits()}});
             }
@@ -467,7 +471,7 @@ namespace ResultsFramework {
 
         for (auto const &varMap : meterMap) {
             if (!(meterOnlyCheck && varMap.second.meterOnly())) {
-                    cols.push_back({{"Variable", varMap.second.variableName()}, {"Units", Constant::unitNames[(int)varMap.second.units()]}});
+                cols.push_back({{"Variable", varMap.second.variableName()}, {"Units", Constant::unitNames[(int)varMap.second.units()]}});
             }
         }
 
@@ -932,7 +936,7 @@ namespace ResultsFramework {
                                                  const OutputProcessor::TimeStepType timeStepType)
     {
         for (auto *var : Variables) {
-            
+
             if (var->Report && var->freq == reportFrequency) {
                 Variable rfvar;
                 if (var->units == Constant::Units::customEMS) {
@@ -940,7 +944,7 @@ namespace ResultsFramework {
                 } else {
                     rfvar = Variable(var->keyColonName, reportFrequency, var->timeStepType, var->ReportID, var->units);
                 }
-                
+
                 switch (reportFrequency) {
                 case OutputProcessor::ReportFreq::EachCall: { // each time UpdatedataandReport is called
                     if (timeStepType == var->timeStepType) {
@@ -948,12 +952,12 @@ namespace ResultsFramework {
                         detailedTSData[(int)timeStepType].addVariable(rfvar);
                     }
                 } break;
-                case OutputProcessor::ReportFreq::Hour:  // at 'EndHourFlag'
-                case OutputProcessor::ReportFreq::TimeStep:  // at 'EndTimeStepFlag'
-                case OutputProcessor::ReportFreq::Day:  // at 'EndDayFlag'
-                case OutputProcessor::ReportFreq::Month:  // at 'EndMonthFlag'
-                case OutputProcessor::ReportFreq::Simulation:  // once per environment 'EndEnvrnFlag'
-                case OutputProcessor::ReportFreq::Year: { // at end of year
+                case OutputProcessor::ReportFreq::Hour:       // at 'EndHourFlag'
+                case OutputProcessor::ReportFreq::TimeStep:   // at 'EndTimeStepFlag'
+                case OutputProcessor::ReportFreq::Day:        // at 'EndDayFlag'
+                case OutputProcessor::ReportFreq::Month:      // at 'EndMonthFlag'
+                case OutputProcessor::ReportFreq::Simulation: // once per environment 'EndEnvrnFlag'
+                case OutputProcessor::ReportFreq::Year: {     // at end of year
                     freqTSData[(int)reportFrequency].setDataFrameEnabled(true);
                     freqTSData[(int)reportFrequency].addVariable(rfvar);
                 } break;
@@ -968,12 +972,12 @@ namespace ResultsFramework {
         case OutputProcessor::ReportFreq::EachCall: {
             detailedTSData[(int)timeStepType].setVariablesScanned(true);
         } break;
-        case OutputProcessor::ReportFreq::TimeStep: // at 'EndTimeStepFlag'
-        case OutputProcessor::ReportFreq::Hour:  // at 'EndHourFlag'
-        case OutputProcessor::ReportFreq::Day:  // at 'EndDayFlag'
-        case OutputProcessor::ReportFreq::Month:  // at end of month
-        case OutputProcessor::ReportFreq::Simulation:  // once per environment 'EndEnvrnFlag'
-        case OutputProcessor::ReportFreq::Year: { // at end of year
+        case OutputProcessor::ReportFreq::TimeStep:   // at 'EndTimeStepFlag'
+        case OutputProcessor::ReportFreq::Hour:       // at 'EndHourFlag'
+        case OutputProcessor::ReportFreq::Day:        // at 'EndDayFlag'
+        case OutputProcessor::ReportFreq::Month:      // at end of month
+        case OutputProcessor::ReportFreq::Simulation: // once per environment 'EndEnvrnFlag'
+        case OutputProcessor::ReportFreq::Year: {     // at end of year
             detailedTSData[(int)timeStepType].setVariablesScanned(true);
         } break;
         default: {
@@ -982,19 +986,18 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsFramework::initializeMeters(const std::vector<OutputProcessor::Meter *> &meters,
-                                            const OutputProcessor::ReportFreq freq)
+    void ResultsFramework::initializeMeters(const std::vector<OutputProcessor::Meter *> &meters, const OutputProcessor::ReportFreq freq)
     {
         switch (freq) {
         case OutputProcessor::ReportFreq::EachCall: {
             // nothing to do; meters are not reported at this frequency
         } break;
-        case OutputProcessor::ReportFreq::TimeStep: // at 'TimeStep'
-        case OutputProcessor::ReportFreq::Hour: // at 'Hourly'
-        case OutputProcessor::ReportFreq::Day: // at 'Daily'
-        case OutputProcessor::ReportFreq::Month: // at 'Monthly'
+        case OutputProcessor::ReportFreq::TimeStep:   // at 'TimeStep'
+        case OutputProcessor::ReportFreq::Hour:       // at 'Hourly'
+        case OutputProcessor::ReportFreq::Day:        // at 'Daily'
+        case OutputProcessor::ReportFreq::Month:      // at 'Monthly'
         case OutputProcessor::ReportFreq::Simulation: // at 'RunPeriod'/'SM'
-        case OutputProcessor::ReportFreq::Year: { // at 'Yearly'
+        case OutputProcessor::ReportFreq::Year: {     // at 'Yearly'
             for (auto const *meter : meters) {
                 auto const &period = meter->periods[(int)freq];
                 if (period.Rpt || period.RptFO) {
@@ -1018,12 +1021,12 @@ namespace ResultsFramework {
         case OutputProcessor::ReportFreq::EachCall:
             // case should not happen in Meters
             break;
-        case OutputProcessor::ReportFreq::TimeStep: // at TimeStepFlag
-        case OutputProcessor::ReportFreq::Hour: // at Hourly
-        case OutputProcessor::ReportFreq::Day: // at Daily
-        case OutputProcessor::ReportFreq::Month: // at Monthly
+        case OutputProcessor::ReportFreq::TimeStep:   // at TimeStepFlag
+        case OutputProcessor::ReportFreq::Hour:       // at Hourly
+        case OutputProcessor::ReportFreq::Day:        // at Daily
+        case OutputProcessor::ReportFreq::Month:      // at Monthly
         case OutputProcessor::ReportFreq::Simulation: // at RunPeriod/SM
-        case OutputProcessor::ReportFreq::Year: { // at Yearly
+        case OutputProcessor::ReportFreq::Year: {     // at Yearly
             Meters[(int)freq].setVariablesScanned(true);
         } break;
         default:
@@ -1049,19 +1052,20 @@ namespace ResultsFramework {
     void ResultsFramework::writeCSVOutput(EnergyPlusData &state)
     {
         using OutputProcessor::ReportFreq;
-            
+
         if (!hasOutputData()) {
             return;
         }
         CSVWriter csv(outputVariables.size());
         CSVWriter mtr_csv(outputVariables.size());
 
-        for (ReportFreq freq : {ReportFreq::Year, ReportFreq::Simulation, ReportFreq::Month, ReportFreq::Day, ReportFreq::Hour, ReportFreq::TimeStep}) {
+        for (ReportFreq freq :
+             {ReportFreq::Year, ReportFreq::Simulation, ReportFreq::Month, ReportFreq::Day, ReportFreq::Hour, ReportFreq::TimeStep}) {
             // Output yearly time series data
             if (hasTSData(freq)) {
                 csv.parseTSOutputs(state, freqTSData[(int)freq].getJSON(), outputVariables, freq);
             }
-            
+
             if (hasMeters(freq)) {
                 csv.parseTSOutputs(state, Meters[(int)freq].getJSON(true), outputVariables, freq);
                 mtr_csv.parseTSOutputs(state, Meters[(int)freq].getJSON(), outputVariables, freq);
@@ -1091,13 +1095,14 @@ namespace ResultsFramework {
         }
 
         // Output timestep time series data
-        for (ReportFreq freq : {ReportFreq::TimeStep, ReportFreq::Hour, ReportFreq::Day, ReportFreq::Month, ReportFreq::Simulation, ReportFreq::Year}) {
+        for (ReportFreq freq :
+             {ReportFreq::TimeStep, ReportFreq::Hour, ReportFreq::Day, ReportFreq::Month, ReportFreq::Simulation, ReportFreq::Year}) {
             if (hasFreqTSData(freq)) {
-               freqTSData[(int)freq].writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
+                freqTSData[(int)freq].writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
             }
         }
     }
-       
+
     void ResultsFramework::writeReport(JsonOutputFilePaths &jsonOutputFilePaths)
     {
         json root, outputVars, meterVars, meterData;
@@ -1115,7 +1120,8 @@ namespace ResultsFramework {
 
         // Same issue here
         static std::array<std::string, (int)ReportFreq::Num> const freqStrings = {"Timestep", "Hourly", "Daily", "Monthly", "RunPeriod", "Yearly"};
-        for (ReportFreq freq : {ReportFreq::Year, ReportFreq::Simulation, ReportFreq::Month, ReportFreq::Day, ReportFreq::Hour, ReportFreq::TimeStep}) {
+        for (ReportFreq freq :
+             {ReportFreq::Year, ReportFreq::Simulation, ReportFreq::Month, ReportFreq::Day, ReportFreq::Hour, ReportFreq::TimeStep}) {
             if (hasFreqTSData(freq)) {
                 outputVars[freqStrings[(int)freq]] = freqTSData[(int)freq].getVariablesJSON();
             }
@@ -1127,7 +1133,8 @@ namespace ResultsFramework {
         // meter variables
 
         // -- meter values
-        for (ReportFreq freq : {ReportFreq::Year, ReportFreq::Simulation, ReportFreq::Month, ReportFreq::Day, ReportFreq::Hour, ReportFreq::TimeStep}) {
+        for (ReportFreq freq :
+             {ReportFreq::Year, ReportFreq::Simulation, ReportFreq::Month, ReportFreq::Day, ReportFreq::Hour, ReportFreq::TimeStep}) {
             if (hasMeters(freq)) {
                 meterVars[freqStrings[(int)freq]] = Meters[(int)freq].getVariablesJSON();
                 meterData[freqStrings[(int)freq]] = Meters[(int)freq].getJSON();
@@ -1161,8 +1168,7 @@ namespace ResultsFramework {
         outputVariables.emplace_back(fmt::format("{0}:{1} [{2}]({3})", keyedValue, variableName, units, reportFreqNames[(int)freq]));
     }
 
-    void
-    ResultsFramework::addReportMeter(std::string const &meter, std::string_view units, OutputProcessor::ReportFreq const freq)
+    void ResultsFramework::addReportMeter(std::string const &meter, std::string_view units, OutputProcessor::ReportFreq const freq)
     {
         outputVariables.emplace_back(fmt::format("{0} [{1}]({2})", meter, units, reportFreqNames[(int)freq]));
     }

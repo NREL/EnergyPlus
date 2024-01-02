@@ -342,7 +342,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
 {
     using namespace OutputProcessor;
-        
+
     std::string const idf_objects = delimited_string({
         "Output:Table:Annual,",
         "Test Report, !- Name",
@@ -382,7 +382,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
                         "Lite1",
                         Constant::eResource::Electricity,
                         OutputProcessor::SOVEndUseCat::InteriorLights, // Was "Facility"
-                        "General"); // create an electric meter
+                        "General");                                    // create an electric meter
 
     Meter *meter1 = new Meter("Electricity:Facility");
     meter1->units = Constant::Units::None;
@@ -419,7 +419,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
 {
     using namespace OutputProcessor;
-        
+
     std::string const idf_objects = delimited_string({
         "Output:Table:Annual,",
         "Test Report, !- Name",
@@ -445,7 +445,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
                         "Lite1",
                         Constant::eResource::Electricity,
                         OutputProcessor::SOVEndUseCat::InteriorLights, // Was "Facility"
-                        "General"); // create an electric meter
+                        "General");                                    // create an electric meter
 
     Meter *meter1 = new Meter("ELECTRICITY:FACILITY");
     meter1->units = Constant::Units::None;
@@ -453,7 +453,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
     state->dataOutputProcessor->meterMap.insert_or_assign("ELECTRICITY:FACILITY", state->dataOutputProcessor->meters.size() - 1);
     Meter *meter2 = new Meter("ELECTRICITY:LIGHTING");
     meter2->units = Constant::Units::None;
-    state->dataOutputProcessor->meters.push_back(meter2); 
+    state->dataOutputProcessor->meters.push_back(meter2);
     state->dataOutputProcessor->meterMap.insert_or_assign("ELECTRICITY:LIGHTING", state->dataOutputProcessor->meters.size() - 1);
 
     state->dataGlobal->DoWeathSim = true;
@@ -471,7 +471,7 @@ TEST_F(SQLiteFixture, OutputReportTabularAnnual_CurlyBraces)
 {
     // Test for #8921
     using namespace OutputProcessor;
-        
+
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     std::string const idf_objects = delimited_string({

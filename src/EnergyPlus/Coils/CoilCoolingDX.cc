@@ -495,7 +495,7 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
-                            Constant::eResource::Electricity, 
+                            Constant::eResource::Electricity,
                             OutputProcessor::SOVEndUseCat::Condensate,
                             {},
                             OutputProcessor::SOVGroup::HVAC);

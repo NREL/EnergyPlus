@@ -586,12 +586,11 @@ namespace CondenserLoopTowers {
                     ErrorsFound = true;
                 }
             } else { // Tower performance input method is not specified as a valid "choice"
-                ShowSevereError(
-                    state,
-                    format("{} \"{}{}",
-                           cCurrentModuleObject,
-                           tower.Name,
-                           ". Tower Performance Input Method must be \"UFactorTimesAreaAndDesignWaterFlowRate\" or \"NominalCapacity\""));
+                ShowSevereError(state,
+                                format("{} \"{}{}",
+                                       cCurrentModuleObject,
+                                       tower.Name,
+                                       ". Tower Performance Input Method must be \"UFactorTimesAreaAndDesignWaterFlowRate\" or \"NominalCapacity\""));
                 ShowContinueError(state, format("Tower Performanace Input Method currently specified as: {}", AlphArray(4)));
                 ErrorsFound = true;
             }

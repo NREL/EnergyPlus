@@ -409,7 +409,7 @@ void SizingLoggerFramework::UpdateSizingLogValuesSystemStep(EnergyPlusData &stat
         tmpSysStepStamp.CurMinuteEnd = MinutesPerHour;
     }
     tmpSysStepStamp.CurMinuteStart =
-            tmpSysStepStamp.CurMinuteEnd - (*state.dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep) * MinutesPerHour;
+        tmpSysStepStamp.CurMinuteEnd - (*state.dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep) * MinutesPerHour;
     tmpSysStepStamp.TimeStepDuration = *state.dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep;
 
     for (auto &l : logObjs) {

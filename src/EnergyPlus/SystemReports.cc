@@ -2352,7 +2352,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         thisComp.MeteredVar.allocate(NumVariables);
 
                         thisComp.NumMeteredVars = NumVariables;
-                        GetMeteredVariables(state, NameOfComp, meteredVars); 
+                        GetMeteredVariables(state, NameOfComp, meteredVars);
                         ModeFlagOn = true;
                         for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
                             {
@@ -2500,7 +2500,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     meteredVars.allocate(NumVariables);
                     thisEquipData.MeteredVar.allocate(NumVariables);
 
-                    GetMeteredVariables(state, NameOfComp, meteredVars); 
+                    GetMeteredVariables(state, NameOfComp, meteredVars);
 
                     ModeFlagOn = true;
                     for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
@@ -2615,7 +2615,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                 } // for (SubCompNum)
             }
         } // for (CompNum)
-    } // for (CtrlZoneNum)
+    }     // for (CtrlZoneNum)
 
     for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
@@ -2630,21 +2630,21 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                 if (NumVariables > 0) {
                     meteredVars.allocate(NumVariables);
                     thisSubEquipData.MeteredVar.allocate(NumVariables);
-                    
+
                     GetMeteredVariables(state, NameOfSubComp, meteredVars);
-                    
+
                     ModeFlagOn = true;
                     for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
                         thisSubEquipData.MeteredVar(VarNum) = meteredVars(VarNum);
                         auto &thisVar = thisSubEquipData.MeteredVar(VarNum);
                         if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                    thisSubEquipData.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
+                                thisSubEquipData.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
                             }
                             ModeFlagOn = false;
                         } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                    thisSubEquipData.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
+                                thisSubEquipData.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
                             }
                             ModeFlagOn = false;
                         } else if (ModeFlagOn) {
@@ -2664,7 +2664,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     if (NumVariables > 0) {
                         meteredVars.allocate(NumVariables);
                         thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar.allocate(NumVariables);
-                        
+
                         GetMeteredVariables(state, NameOfSubSubComp, meteredVars);
                         ModeFlagOn = true;
                         for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
@@ -2672,25 +2672,27 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             auto &thisVar = thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum);
                             if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                    thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
+                                    thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum1).heatOrCool =
+                                        Constant::HeatOrCool::HeatingOnly;
                                 }
                                 ModeFlagOn = false;
                             } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                    thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
+                                    thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum1).heatOrCool =
+                                        Constant::HeatOrCool::CoolingOnly;
                                 }
                                 ModeFlagOn = false;
                             } else if (ModeFlagOn) {
                                 thisVar.heatOrCool = Constant::HeatOrCool::NoHeatNoCool;
                             }
                         }
-                        
+
                         meteredVars.deallocate();
                     } // if (NumVariables > 0)
-                } // for (SubSubCompNum)
-            } // for (SubCompNum)
-        } // for (CompNum)
-    } // for (CtrlZoneNum)
+                }     // for (SubSubCompNum)
+            }         // for (SubCompNum)
+        }             // for (CompNum)
+    }                 // for (CtrlZoneNum)
 
     //***Plant Loops
 
@@ -2861,7 +2863,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     if (NumVariables > 0) {
                         meteredVars.allocate(NumVariables);
                         thisComp.MeteredVar.allocate(NumVariables);
-                        
+
                         thisComp.NumMeteredVars = NumVariables;
                         GetMeteredVariables(state, NameOfComp, meteredVars);
                         ModeFlagOn = true;
@@ -2887,7 +2889,6 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         meteredVars.deallocate();
                     } // if (NumVariables > 0)
 
-                    
                     for (SubCompNum = 1; SubCompNum <= thisComp.NumSubComps; ++SubCompNum) {
                         // Get complete list of components for complex branches
                         std::string &TypeOfSubComp = thisComp.SubComp(SubCompNum).TypeOf;
@@ -2920,13 +2921,13 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
 
                             meteredVars.deallocate();
                         } // if (NumVariables > 0)
-                        
+
                         thisComp.SubComp(SubCompNum).NumMeteredVars = NumVariables;
                     } // for (SubCompNum)
-                } // for (CompNum)
-            } // for (BranchNum)
-        } // for (LoopSide)
-    } // for (PlantLoopNum)
+                }     // for (CompNum)
+            }         // for (BranchNum)
+        }             // for (LoopSide)
+    }                 // for (PlantLoopNum)
 } // CreateEnergyReportStructure()
 
 // End Initialization Section of the Module
@@ -3091,10 +3092,10 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
                             CalcSystemEnergyUse(state, CompLoadFlag, AirLoopNum, pasBranchSubSubComp.TypeOf, EnergyType, CompLoad, CompEnergyUse);
                         }
                     } // for (SubSubCompNum)
-                } // for (SubCompNum)
-            } // for (CompNum)
-        } // for (BranchNum)
-    } // for (AirLoopNum)
+                }     // for (SubCompNum)
+            }         // for (CompNum)
+        }             // for (BranchNum)
+    }                 // for (AirLoopNum)
 
     for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
         auto const &zecCtrlZone = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);

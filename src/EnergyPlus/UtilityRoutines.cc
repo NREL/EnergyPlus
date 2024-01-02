@@ -1652,8 +1652,9 @@ void ShowSevereDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh
 {
     ShowSevereError(state, format("{}: {} = {}, duplicate name.", eoh.routineName, eoh.objectType, eoh.objectName));
 }
-        
-void ShowSevereEmptyField(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view depFieldName, std::string_view depFieldVal)
+
+void ShowSevereEmptyField(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view depFieldName, std::string_view depFieldVal)
 {
     ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
     ShowContinueError(state,

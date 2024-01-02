@@ -788,7 +788,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        Constant::eResource::Electricity, 
+                        Constant::eResource::Electricity,
                         OutputProcessor::SOVEndUseCat::Cooling,
                         this->EndUseSubcategory,
                         OutputProcessor::SOVGroup::Plant);
@@ -948,7 +948,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                Constant::eResource::EnergyTransfer, 
+                                Constant::eResource::EnergyTransfer,
                                 OutputProcessor::SOVEndUseCat::HeatRecovery,
                                 {},
                                 OutputProcessor::SOVGroup::Plant);
@@ -1011,7 +1011,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                Constant::eResource::Electricity, 
+                                Constant::eResource::Electricity,
                                 OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
                                 OutputProcessor::SOVGroup::Plant);
@@ -1024,7 +1024,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                Constant::eResource::Water, 
+                                Constant::eResource::Water,
                                 OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
                                 OutputProcessor::SOVGroup::HVAC);
@@ -1036,7 +1036,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                Constant::eResource::MainsWater, 
+                                Constant::eResource::MainsWater,
                                 OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
                                 OutputProcessor::SOVGroup::HVAC);
@@ -1057,7 +1057,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
-                                    Constant::eResource::Electricity, 
+                                    Constant::eResource::Electricity,
                                     OutputProcessor::SOVEndUseCat::Chillers,
                                     {},
                                     OutputProcessor::SOVGroup::Plant);

@@ -261,7 +261,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
     meter->resource = Constant::eResource::Water;
     state->dataOutputProcessor->meters.push_back(meter);
     state->dataOutputProcessor->meterMap.insert_or_assign("WATER:FACILITY", state->dataOutputProcessor->meters.size() - 1);
-    
+
     UpdateUtilityBills(*state);
 
     // tariff

@@ -546,7 +546,7 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
-                        Constant::eResource::EnergyTransfer, 
+                        Constant::eResource::EnergyTransfer,
                         OutputProcessor::SOVEndUseCat::Chillers,
                         {},
                         OutputProcessor::SOVGroup::Plant);
@@ -565,7 +565,7 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
-                        Constant::eResource::EnergyTransfer, 
+                        Constant::eResource::EnergyTransfer,
                         OutputProcessor::SOVEndUseCat::Boilers,
                         {},
                         OutputProcessor::SOVGroup::Plant);
@@ -627,7 +627,7 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
-                        Constant::eResource::Electricity, 
+                        Constant::eResource::Electricity,
                         OutputProcessor::SOVEndUseCat::Cooling,
                         {},
                         OutputProcessor::SOVGroup::Plant);

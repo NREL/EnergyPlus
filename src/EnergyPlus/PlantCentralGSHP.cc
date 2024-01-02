@@ -871,7 +871,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        Constant::eResource::EnergyTransfer, 
+                        Constant::eResource::EnergyTransfer,
                         OutputProcessor::SOVEndUseCat::HeatRejection,
                         {},
                         OutputProcessor::SOVGroup::Plant);

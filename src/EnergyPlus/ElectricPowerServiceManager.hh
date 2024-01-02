@@ -747,13 +747,13 @@ public: // Creation
     // Default Constructor
     ElectricPowerServiceManager()
         : newEnvironmentInternalGainsFlag(true), numElecStorageDevices(0), getInputFlag_(true), newEnvironmentFlag_(true), numLoadCenters_(0),
-          numTransformers_(0), setupMeterIndexFlag_(true), elecFacilityMeterIndex_(-1), elecProducedCoGenMeterIndex_(-1), elecProducedPVMeterIndex_(-1),
-          elecProducedWTMeterIndex_(-1), elecProducedStorageMeterIndex_(-1), elecProducedPowerConversionMeterIndex_(-1), name_("Whole Building"),
-          facilityPowerInTransformerPresent_(false), numPowerOutTransformers_(0), wholeBldgRemainingLoad_(0.0), electricityProd_(0.0),
-          electProdRate_(0.0), electricityPurch_(0.0), electPurchRate_(0.0), electSurplusRate_(0.0), electricitySurplus_(0.0),
-          electricityNetRate_(0.0), electricityNet_(0.0), totalBldgElecDemand_(0.0), totalHVACElecDemand_(0.0), totalElectricDemand_(0.0),
-          elecProducedPVRate_(0.0), elecProducedWTRate_(0.0), elecProducedStorageRate_(0.0), elecProducedPowerConversionRate_(0.0),
-          elecProducedCoGenRate_(0.0), pvTotalCapacity_(0.0), windTotalCapacity_(0.0)
+          numTransformers_(0), setupMeterIndexFlag_(true), elecFacilityMeterIndex_(-1), elecProducedCoGenMeterIndex_(-1),
+          elecProducedPVMeterIndex_(-1), elecProducedWTMeterIndex_(-1), elecProducedStorageMeterIndex_(-1),
+          elecProducedPowerConversionMeterIndex_(-1), name_("Whole Building"), facilityPowerInTransformerPresent_(false), numPowerOutTransformers_(0),
+          wholeBldgRemainingLoad_(0.0), electricityProd_(0.0), electProdRate_(0.0), electricityPurch_(0.0), electPurchRate_(0.0),
+          electSurplusRate_(0.0), electricitySurplus_(0.0), electricityNetRate_(0.0), electricityNet_(0.0), totalBldgElecDemand_(0.0),
+          totalHVACElecDemand_(0.0), totalElectricDemand_(0.0), elecProducedPVRate_(0.0), elecProducedWTRate_(0.0), elecProducedStorageRate_(0.0),
+          elecProducedPowerConversionRate_(0.0), elecProducedCoGenRate_(0.0), pvTotalCapacity_(0.0), windTotalCapacity_(0.0)
     {
     }
 

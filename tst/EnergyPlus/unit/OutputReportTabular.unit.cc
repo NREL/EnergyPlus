@@ -3661,7 +3661,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 {
     // Glazer - Sep 2017
     auto &op = state->dataOutputProcessor;
-        
+
     state->dataOutRptTab->displayDemandEndUse = true;
     state->dataOutRptTab->displayLEEDSummary = true;
     state->dataGlobal->TimeStepZoneSec = 900.0;
@@ -3673,12 +3673,12 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     Meter *meterSubEndUse = new Meter("SubEndUse");
 
     op->meters.push_back(meterTotal);
-    int totalMeterNum = (int)op->meters.size()-1;
+    int totalMeterNum = (int)op->meters.size() - 1;
     state->dataOutputProcessor->meters.push_back(meterEndUse);
-    int endUseMeterNum = (int)op->meters.size()-1;
+    int endUseMeterNum = (int)op->meters.size() - 1;
     state->dataOutputProcessor->meters.push_back(meterSubEndUse);
-    int subEndUseMeterNum = (int)op->meters.size()-1;
-    
+    int subEndUseMeterNum = (int)op->meters.size() - 1;
+
     int endUseNum = 1;
     int subEndUseNum = 1;
 
@@ -3702,12 +3702,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // first "timestep"
 
-    op->meters[totalMeterNum]->CurTSValue =
-        123.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the total meter
-    op->meters[endUseMeterNum]->CurTSValue =
-        47.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the end use meter
-    op->meters[subEndUseMeterNum]->CurTSValue =
-        28.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
+    op->meters[totalMeterNum]->CurTSValue = 123.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
+    op->meters[endUseMeterNum]->CurTSValue = 47.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
+    op->meters[subEndUseMeterNum]->CurTSValue = 28.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
 
@@ -10066,7 +10063,7 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
     Meter *meter = new Meter("Electricity:Facility");
     meter->units = Constant::Units::J;
     state->dataOutputProcessor->meters.push_back(meter);
-    state->dataOutputProcessor->meterMap.insert_or_assign("ELECTRICITY:FACILITY", (int)state->dataOutputProcessor->meters.size()-1);
+    state->dataOutputProcessor->meterMap.insert_or_assign("ELECTRICITY:FACILITY", (int)state->dataOutputProcessor->meters.size() - 1);
     // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
     state->dataGlobal->DoWeathSim = true; // flag to trick tabular reports to scan meters
     state->dataGlobal->TimeStepZone = 0.25;

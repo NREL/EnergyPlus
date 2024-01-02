@@ -234,7 +234,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
 
     Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportFreq::TimeStep, indexType, reportId, Constant::Units::C);
     auto &dataTS = rf->freqTSData[(int)ReportFreq::TimeStep];
-    
+
     dataTS.addVariable(var0);
     dataTS.newRow(2, 25, 1, 45, 2017);  // month,day,hour,minute
     dataTS.newRow(2, 25, 1, 60, 2017);  // month,day,hour,minute
@@ -521,10 +521,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_CSV_Timestamp_Beginning)
     dataTS.pushVariableValue(reportId, 3.0);
     dataTS.pushVariableValue(reportId, 4.0);
 
-    auto outputs = getCSVOutputs(*state,
-                                 dataTS.getJSON(),
-                                 *state->dataResultsFramework->resultsFramework,
-                                 OutputProcessor::ReportFreq::TimeStep);
+    auto outputs = getCSVOutputs(*state, dataTS.getJSON(), *state->dataResultsFramework->resultsFramework, OutputProcessor::ReportFreq::TimeStep);
 
     std::map<std::string, std::vector<std::string>> expected_output = {
         {"02/25 00:00:00", {"1.0"}}, {"02/25 00:45:00", {"2.0"}}, {"02/25 01:00:00", {"3.0"}}, {"02/25 23:45:00", {"4.0"}}};
@@ -553,10 +550,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_CSV_Timestamp)
     dataTS.pushVariableValue(reportId, 3.0);
     dataTS.pushVariableValue(reportId, 4.0);
 
-    auto outputs = getCSVOutputs(*state,
-                                 dataTS.getJSON(),
-                                 *state->dataResultsFramework->resultsFramework,
-                                 OutputProcessor::ReportFreq::TimeStep);
+    auto outputs = getCSVOutputs(*state, dataTS.getJSON(), *state->dataResultsFramework->resultsFramework, OutputProcessor::ReportFreq::TimeStep);
 
     std::map<std::string, std::vector<std::string>> expected_output = {
         {"02/25 00:45:00", {"1.0"}}, {"02/25 01:00:00", {"2.0"}}, {"02/25 23:45:00", {"3.0"}}, {"02/25 24:00:00", {"4.0"}}};
@@ -586,10 +580,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_CSV_Timestamp_8601_End)
     dataTS.pushVariableValue(reportId, 3.0);
     dataTS.pushVariableValue(reportId, 4.0);
 
-    auto outputs = getCSVOutputs(*state,
-                                 dataTS.getJSON(),
-                                 *rf,
-                                 OutputProcessor::ReportFreq::TimeStep);
+    auto outputs = getCSVOutputs(*state, dataTS.getJSON(), *rf, OutputProcessor::ReportFreq::TimeStep);
 
     std::map<std::string, std::vector<std::string>> expected_output = {
         {"2017-02-25T00:45:00", {"1.0"}}, {"2017-02-25T01:00:00", {"2.0"}}, {"2017-02-25T23:45:00", {"3.0"}}, {"2017-02-25T24:00:00", {"4.0"}}};
@@ -620,10 +611,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_CSV_Timestamp_8601_Beginning)
     dataTS.pushVariableValue(reportId, 3.0);
     dataTS.pushVariableValue(reportId, 4.0);
 
-    auto outputs = getCSVOutputs(*state,
-                                 dataTS.getJSON(),
-                                 *rf,
-                                 OutputProcessor::ReportFreq::TimeStep);
+    auto outputs = getCSVOutputs(*state, dataTS.getJSON(), *rf, OutputProcessor::ReportFreq::TimeStep);
 
     std::map<std::string, std::vector<std::string>> expected_output = {
         {"2017-02-25T00:00:00", {"1.0"}}, {"2017-02-25T00:45:00", {"2.0"}}, {"2017-02-25T01:00:00", {"3.0"}}, {"2017-02-25T23:45:00", {"4.0"}}};

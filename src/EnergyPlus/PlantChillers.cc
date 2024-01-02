@@ -650,7 +650,7 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            Constant::eResource::EnergyTransfer, 
+                            Constant::eResource::EnergyTransfer,
                             OutputProcessor::SOVEndUseCat::Chillers,
                             {},
                             OutputProcessor::SOVGroup::Plant);
@@ -689,7 +689,7 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            Constant::eResource::EnergyTransfer, 
+                            Constant::eResource::EnergyTransfer,
                             OutputProcessor::SOVEndUseCat::HeatRejection,
                             {},
                             OutputProcessor::SOVGroup::Plant);
@@ -764,7 +764,7 @@ namespace PlantChillers {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                Constant::eResource::EnergyTransfer, 
+                                Constant::eResource::EnergyTransfer,
                                 OutputProcessor::SOVEndUseCat::HeatRecovery,
                                 {},
                                 OutputProcessor::SOVGroup::Plant);
@@ -2673,7 +2673,7 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            Constant::eResource::EnergyTransfer, 
+                            Constant::eResource::EnergyTransfer,
                             OutputProcessor::SOVEndUseCat::Chillers,
                             {},
                             OutputProcessor::SOVGroup::Plant);
@@ -2712,7 +2712,7 @@ namespace PlantChillers {
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            Constant::eResource::EnergyTransfer, 
+                            Constant::eResource::EnergyTransfer,
                             OutputProcessor::SOVEndUseCat::HeatRejection,
                             {},
                             OutputProcessor::SOVGroup::Plant);

@@ -642,7 +642,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             if (TypeVar == OutputProcessor::VariableType::Invalid) {
                 continue;
             }
-            
+
             ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).NamesOfKeys.allocate(KeyCount);
             ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).IndexesForKeyVar.allocate(KeyCount);
 
@@ -1050,7 +1050,7 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
 
     Array1D_int objVarIDs;
     Array1D_string objNames;
-    
+
     auto &ort = state.dataOutRptTab;
 
     if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
@@ -1809,13 +1809,17 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
                 ort->meterNumEndUseBEPS(iResource, jEndUse) = meterNumber;
 
                 for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                    meterName = format("{}:{}:{}", op->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub), ort->endUseNames(jEndUse),
+                    meterName = format("{}:{}:{}",
+                                       op->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
+                                       ort->endUseNames(jEndUse),
                                        ort->resourceTypeNames(iResource));
                     meterNumber = GetMeterIndex(state, Util::makeUPPER(meterName));
                     ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource) = meterNumber;
                 }
                 for (int kEndUseSpType = 1; kEndUseSpType <= op->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
-                    meterName = format("{}:{}:SpaceType:{}", ort->endUseNames(jEndUse), ort->resourceTypeNames(iResource),
+                    meterName = format("{}:{}:SpaceType:{}",
+                                       ort->endUseNames(jEndUse),
+                                       ort->resourceTypeNames(iResource),
                                        op->EndUseCategory(jEndUse).spaceTypeName(kEndUseSpType));
                     meterNumber = GetMeterIndex(state, Util::makeUPPER(meterName));
                     ort->meterNumEndUseSpTypeBEPS(kEndUseSpType, jEndUse, iResource) = meterNumber;
@@ -3346,12 +3350,15 @@ void WriteTableOfContents(EnergyPlusData &state)
                             int const curTable = ort->OutputTableBinned(iInput).resIndex + (jTable - 1);
                             std::string curName;
                             if (ort->unitsStyle == UnitsStyle::InchPound) {
-                                std::string origName = format("{} [{}]", ort->OutputTableBinned(iInput).varOrMeter,
+                                std::string origName = format("{} [{}]",
+                                                              ort->OutputTableBinned(iInput).varOrMeter,
                                                               Constant::unitNames[(int)ort->OutputTableBinned(iInput).units]);
                                 [[maybe_unused]] int indexUnitConv = -1;
                                 LookupSItoIP(state, origName, indexUnitConv, curName);
                             } else {
-                                curName = format("{}[{}]", ort->OutputTableBinned(iInput).varOrMeter, Constant::unitNames[(int)ort->OutputTableBinned(iInput).units]);
+                                curName = format("{}[{}]",
+                                                 ort->OutputTableBinned(iInput).varOrMeter,
+                                                 Constant::unitNames[(int)ort->OutputTableBinned(iInput).units]);
                             }
                             if (ort->OutputTableBinned(iInput).scheduleIndex == 0) {
                                 tbl_stream << "<a href=\"#" << MakeAnchorName(curName, ort->BinObjVarID(curTable).namesOfObj) << "\">"
@@ -4194,8 +4201,7 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
                         if (curMeterNumber > -1) {
                             curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
                             ort->gatherDemandEndUse(iResource, jEndUse) = curDemandValue;
-                            for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories;
-                                 ++kEndUseSub) {
+                            for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                                 curMeterNumber = ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
                                 if (curMeterNumber > -1) {
                                     curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
@@ -7059,7 +7065,8 @@ void WriteMonthlyTables(EnergyPlusData &state)
                     }
                     // do the unit conversions
                     if (unitsStyle_cur == UnitsStyle::InchPound) {
-                        varNameWithUnits = format("{} [{}]", ort->MonthlyColumns(curCol).varName, Constant::unitNames[(int)ort->MonthlyColumns(curCol).units]);
+                        varNameWithUnits =
+                            format("{} [{}]", ort->MonthlyColumns(curCol).varName, Constant::unitNames[(int)ort->MonthlyColumns(curCol).units]);
                         LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
                         GetUnitConversion(state, indexUnitConv, curConversionFactor, state.dataOutRptTab->curConversionOffset, curUnits);
                     } else if (Util::SameString(Constant::unitNames[(int)ort->MonthlyColumns(curCol).units], "J")) {
@@ -7407,8 +7414,8 @@ void WriteTimeBinTables(EnergyPlusData &state)
 
         for (int iInObj = 1; iInObj <= ort->OutputTableBinnedCount; ++iInObj) {
             int const firstReport = ort->OutputTableBinned(iInObj).resIndex;
-            curNameWithSIUnits = format("{} [{}]", ort->OutputTableBinned(iInObj).varOrMeter,
-                                        Constant::unitNames[(int)ort->OutputTableBinned(iInObj).units]);
+            curNameWithSIUnits =
+                format("{} [{}]", ort->OutputTableBinned(iInObj).varOrMeter, Constant::unitNames[(int)ort->OutputTableBinned(iInObj).units]);
             Real64 curIntervalStart;
             Real64 curIntervalSize;
             int indexUnitConv = -1;
@@ -10459,8 +10466,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     PreDefTableEntry(state,
                                      resource_entry_map(iResource),
-                                     op->EndUseCategory(jEndUse).DisplayName + " -- " +
-                                         op->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
+                                     op->EndUseCategory(jEndUse).DisplayName + " -- " + op->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
                                      collapsedIndEndUseSub(kEndUseSub, jEndUse, iResource));
                     ++i;
                 }

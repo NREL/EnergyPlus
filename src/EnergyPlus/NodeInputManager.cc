@@ -1034,8 +1034,7 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
             nodeFluidNames.push_back(FluidProperties::GetGlycolNameByIndex(state, state.dataLoopNodes->Node(iNode).FluidIndex));
 
             for (auto const *reqVar : state.dataOutputProcessor->reqVars) {
-                if (Util::SameString(reqVar->key, state.dataLoopNodes->NodeID(iNode)) ||
-                    reqVar->key.empty()) {
+                if (Util::SameString(reqVar->key, state.dataLoopNodes->NodeID(iNode)) || reqVar->key.empty()) {
                     if (Util::SameString(reqVar->name, "System Node Wetbulb Temperature")) {
                         state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) = true;
                         NodeWetBulbSchedPtr(iNode) = reqVar->SchedPtr;

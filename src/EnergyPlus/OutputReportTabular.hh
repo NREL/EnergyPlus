@@ -265,7 +265,7 @@ namespace OutputReportTabular {
         OutputProcessor::VariableType typeOfVar = OutputProcessor::VariableType::NotFound;
         OutputProcessor::StoreType avgSum = OutputProcessor::StoreType::Averaged;     // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType stepType = OutputProcessor::TimeStepType::Zone; // Variable time step is Zone=1 or HVAC=2
-        Constant::Units units = Constant::Units::Invalid;                 // the units enumeration
+        Constant::Units units = Constant::Units::Invalid;                             // the units enumeration
         std::string ScheduleName;                                                     // the name of the schedule
         int scheduleIndex = 0;                                                        // index to the schedule specified - if no schedule use zero
     };
@@ -336,11 +336,11 @@ namespace OutputReportTabular {
     struct MonthlyFieldSetInputType
     {
         // Members
-        std::string variMeter;          // the name of the variable or meter
-        std::string colHead;            // the column header to use instead of the variable name (only for predefined)
-        AggType aggregate;              // the type of aggregation for the variable (see aggType parameters)
-        Constant::Units varUnits; // Units enumeration
-        std::string variMeterUpper;     // the name of the variable or meter uppercased
+        std::string variMeter;      // the name of the variable or meter
+        std::string colHead;        // the column header to use instead of the variable name (only for predefined)
+        AggType aggregate;          // the type of aggregation for the variable (see aggType parameters)
+        Constant::Units varUnits;   // Units enumeration
+        std::string variMeterUpper; // the name of the variable or meter uppercased
         OutputProcessor::VariableType typeOfVar;
         int keyCount;                              // noel
         OutputProcessor::StoreType varAvgSum;      // Variable  is Averaged=1 or Summed=2
@@ -378,7 +378,7 @@ namespace OutputReportTabular {
         OutputProcessor::VariableType typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
         OutputProcessor::StoreType avgSum;       // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType stepType;  // Variable time step is Zone=1 or HVAC=2
-        Constant::Units units;             // the units string, may be blank
+        Constant::Units units;                   // the units string, may be blank
         AggType aggType;                         // index to the type of aggregation (see list of parameters)
         Array1D<Real64> reslt;                   // monthly results
         Array1D<Real64> duration;                // the time during which results are summed for use in averages
@@ -1029,7 +1029,6 @@ struct OutputReportTabularData : BaseGlobalStruct
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
     // arrays that hold the meter numbers that are initialized at get input
-
 
     Array1D_int meterNumTotalsBEPS = Array1D_int(OutputReportTabular::numResourceTypes, -1);
     Array1D_int meterNumTotalsSource = Array1D_int(OutputReportTabular::numSourceTypes, -1);

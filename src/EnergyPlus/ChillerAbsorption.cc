@@ -625,7 +625,7 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                Constant::eResource::PlantLoopHeatingDemand, 
+                                Constant::eResource::PlantLoopHeatingDemand,
                                 OutputProcessor::SOVEndUseCat::Chillers,
                                 {},
                                 OutputProcessor::SOVGroup::Plant);
@@ -644,7 +644,7 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                Constant::eResource::DistrictHeatingSteam, 
+                                Constant::eResource::DistrictHeatingSteam,
                                 OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
                                 OutputProcessor::SOVGroup::Plant);

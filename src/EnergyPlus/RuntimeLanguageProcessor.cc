@@ -2709,7 +2709,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     int RuntimeReportVarNum;
     bool Found;
     OutputProcessor::SOVTimeStepType sovTimeStepType; // temporary
-    OutputProcessor::SOVStoreType sovStoreType; // temporary
+    OutputProcessor::SOVStoreType sovStoreType;       // temporary
     std::string EndUseSubCatString;
 
     int TrendNum;
@@ -3476,7 +3476,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     }
                 }
                 curUnit = static_cast<Constant::Units>(getEnumValue(Constant::unitNamesUC, Util::makeUPPER(UnitsB)));
-                
+
                 state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Name = cAlphaArgs(1);
 
                 if (!lAlphaFieldBlanks(4)) {
@@ -3534,8 +3534,8 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 }
 
                 // Resource Type
-                Constant::eResource resource = static_cast<Constant::eResource>
-                    (getEnumValue(Constant::eResourceNamesUC, Util::makeUPPER(cAlphaArgs(5))));
+                Constant::eResource resource =
+                    static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, Util::makeUPPER(cAlphaArgs(5))));
 
                 if (resource == Constant::eResource::Invalid) {
                     ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -3545,7 +3545,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
                 // Group Type
                 OutputProcessor::SOVGroup sovGroup;
-                
+
                 if (cAlphaArgs(6) == "BUILDING") {
                     sovGroup = OutputProcessor::SOVGroup::Building;
                 } else if (cAlphaArgs(6) == "HVAC") {
@@ -3561,7 +3561,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 }
 
                 // End Use Type
-                OutputProcessor::SOVEndUseCat sovEndUseCat; 
+                OutputProcessor::SOVEndUseCat sovEndUseCat;
 
                 if (cAlphaArgs(7) == "HEATING") {
                     sovEndUseCat = OutputProcessor::SOVEndUseCat::Heating;
@@ -3613,10 +3613,8 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
                 // Additional End Use Types Only Used for EnergyTransfer
                 if ((resource != Constant::eResource::EnergyTransfer) &&
-                    (sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils ||
-                     sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils ||
-                     sovEndUseCat == OutputProcessor::SOVEndUseCat::Chillers ||
-                     sovEndUseCat == OutputProcessor::SOVEndUseCat::Boilers ||
+                    (sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils || sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils ||
+                     sovEndUseCat == OutputProcessor::SOVEndUseCat::Chillers || sovEndUseCat == OutputProcessor::SOVEndUseCat::Boilers ||
                      sovEndUseCat == OutputProcessor::SOVEndUseCat::Baseboard ||
                      sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatRecoveryForCooling ||
                      sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatRecoveryForHeating)) {
@@ -3637,7 +3635,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         sovTimeStepType,
                                         sovStoreType,
                                         "EMS",
-                                        resource, 
+                                        resource,
                                         sovEndUseCat,
                                         EndUseSubCatString,
                                         sovGroup);
@@ -3649,7 +3647,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         sovTimeStepType,
                                         sovStoreType,
                                         "EMS",
-                                        resource, 
+                                        resource,
                                         sovEndUseCat,
                                         {},
                                         sovGroup);

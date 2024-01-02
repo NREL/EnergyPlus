@@ -125,7 +125,8 @@ void ElectricPowerServiceManager::manageElectricPowerService(
     if (!state.dataGlobal->BeginEnvrnFlag) newEnvironmentFlag_ = true;
 
     // retrieve data from meters for demand and production
-    totalBldgElecDemand_ = GetInstantMeterValue(state, elecFacilityMeterIndex_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec;
+    totalBldgElecDemand_ =
+        GetInstantMeterValue(state, elecFacilityMeterIndex_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec;
     totalHVACElecDemand_ =
         GetInstantMeterValue(state, elecFacilityMeterIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
     totalElectricDemand_ = totalBldgElecDemand_ + totalHVACElecDemand_;
@@ -476,7 +477,8 @@ void ElectricPowerServiceManager::updateWholeBuildingRecords(EnergyPlusData &sta
 {
 
     // main panel balancing.
-    totalBldgElecDemand_ = GetInstantMeterValue(state, elecFacilityMeterIndex_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec;
+    totalBldgElecDemand_ =
+        GetInstantMeterValue(state, elecFacilityMeterIndex_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec;
     totalHVACElecDemand_ =
         GetInstantMeterValue(state, elecFacilityMeterIndex_, OutputProcessor::TimeStepType::System) / (state.dataHVACGlobal->TimeStepSysSec);
     totalElectricDemand_ = totalBldgElecDemand_ + totalHVACElecDemand_;
@@ -5193,10 +5195,8 @@ void ElectricTransformer::setupMeterIndices(EnergyPlusData &state)
             // Electricity such as ElectricityPurchased and ElectricityProduced.
             // It is not proper to have this check in GetInput routine because the meter index may have not been defined
             auto *meter = state.dataOutputProcessor->meters[wiredMeterPtrs_[meterNum]];
-            if (meter->resource != Constant::eResource::Electricity &&
-                meter->resource != Constant::eResource::ElectricityPurchased &&
-                meter->resource != Constant::eResource::ElectricitySurplusSold &&
-                meter->resource != Constant::eResource::ElectricityProduced &&
+            if (meter->resource != Constant::eResource::Electricity && meter->resource != Constant::eResource::ElectricityPurchased &&
+                meter->resource != Constant::eResource::ElectricitySurplusSold && meter->resource != Constant::eResource::ElectricityProduced &&
                 meter->resource != Constant::eResource::ElectricityNet) {
                 ShowFatalError(state, format("Non-electricity meter used for {}", name_));
             }

@@ -471,7 +471,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view routineName = "GetInputZoneHybridUnitaryAirConditioners";
-    
+
     cCurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
     state.dataHybridUnitaryAC->NumZoneHybridEvap = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumFields, NumAlphas, NumNumbers);
@@ -504,7 +504,6 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                                                      cAlphaFields,
                                                                      cNumericFields);
 
-            
             IsNotOK = false;
             IsBlank = false;
             Util::VerifyName(state,
@@ -518,7 +517,6 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             ErrorObjectHeader eoh{routineName, cCurrentModuleObject, Alphas(1)};
             auto &hybridUnitaryAC = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop);
 
-            
             // A1, \field Name
             hybridUnitaryAC.Name = Alphas(1);
             // A2, \field Availability Schedule Name
@@ -581,46 +579,42 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             // A10, \field Outdoor Air Node Name
             // A11, \field Supply Air Node Name
             // A12, \field Relief Node Name
-            hybridUnitaryAC.InletNode =
-                GetOnlySingleNode(state,
-                                  Alphas(9),
-                                  ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
-                                  Alphas(1),
-                                  DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::ConnectionType::Inlet,
-                                  NodeInputManager::CompFluidStream::Primary,
-                                  ObjectIsNotParent);
-            hybridUnitaryAC.SecondaryInletNode =
-                GetOnlySingleNode(state,
-                                  Alphas(10),
-                                  ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
-                                  Alphas(1),
-                                  DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::ConnectionType::OutsideAir,
-                                  NodeInputManager::CompFluidStream::Primary,
-                                  ObjectIsNotParent);
-            hybridUnitaryAC.OutletNode =
-                GetOnlySingleNode(state,
-                                  Alphas(11),
-                                  ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
-                                  Alphas(1),
-                                  DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::ConnectionType::Outlet,
-                                  NodeInputManager::CompFluidStream::Primary,
-                                  ObjectIsNotParent);
-            hybridUnitaryAC.SecondaryOutletNode =
-                GetOnlySingleNode(state,
-                                  Alphas(12),
-                                  ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
-                                  Alphas(1),
-                                  DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::ConnectionType::ReliefAir,
-                                  NodeInputManager::CompFluidStream::Primary,
-                                  ObjectIsNotParent);
+            hybridUnitaryAC.InletNode = GetOnlySingleNode(state,
+                                                          Alphas(9),
+                                                          ErrorsFound,
+                                                          DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
+                                                          Alphas(1),
+                                                          DataLoopNode::NodeFluidType::Air,
+                                                          DataLoopNode::ConnectionType::Inlet,
+                                                          NodeInputManager::CompFluidStream::Primary,
+                                                          ObjectIsNotParent);
+            hybridUnitaryAC.SecondaryInletNode = GetOnlySingleNode(state,
+                                                                   Alphas(10),
+                                                                   ErrorsFound,
+                                                                   DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
+                                                                   Alphas(1),
+                                                                   DataLoopNode::NodeFluidType::Air,
+                                                                   DataLoopNode::ConnectionType::OutsideAir,
+                                                                   NodeInputManager::CompFluidStream::Primary,
+                                                                   ObjectIsNotParent);
+            hybridUnitaryAC.OutletNode = GetOnlySingleNode(state,
+                                                           Alphas(11),
+                                                           ErrorsFound,
+                                                           DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
+                                                           Alphas(1),
+                                                           DataLoopNode::NodeFluidType::Air,
+                                                           DataLoopNode::ConnectionType::Outlet,
+                                                           NodeInputManager::CompFluidStream::Primary,
+                                                           ObjectIsNotParent);
+            hybridUnitaryAC.SecondaryOutletNode = GetOnlySingleNode(state,
+                                                                    Alphas(12),
+                                                                    ErrorsFound,
+                                                                    DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
+                                                                    Alphas(1),
+                                                                    DataLoopNode::NodeFluidType::Air,
+                                                                    DataLoopNode::ConnectionType::ReliefAir,
+                                                                    NodeInputManager::CompFluidStream::Primary,
+                                                                    ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, Alphas(1), Alphas(9), Alphas(11), "Hybrid Evap Air Zone Nodes");
             TestCompSet(state, cCurrentModuleObject, Alphas(1), Alphas(10), Alphas(12), "Hybrid Evap Air Zone Secondary Nodes");
 
@@ -639,8 +633,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                 } else if (Util::SameString(Alphas(13), "No")) {
                     hybridUnitaryAC.FanHeatGain = true;
                 } else {
-                    ShowSevereError(
-                        state, format("{} = {}", cCurrentModuleObject, hybridUnitaryAC.Name));
+                    ShowSevereError(state, format("{} = {}", cCurrentModuleObject, hybridUnitaryAC.Name));
                     ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(13), Alphas(13)));
                     ErrorsFound = true;
                 }
@@ -658,11 +651,9 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             if (state.dataEnvrn->StdRhoAir > 1) {
                 // SystemMaximumSupplyAirFlowRate*ScalingFactor*AirDensity;
                 hybridUnitaryAC.ScaledSystemMaximumSupplyAirMassFlowRate =
-                    hybridUnitaryAC.ScaledSystemMaximumSupplyAirVolumeFlowRate *
-                    state.dataEnvrn->StdRhoAir;
+                    hybridUnitaryAC.ScaledSystemMaximumSupplyAirVolumeFlowRate * state.dataEnvrn->StdRhoAir;
             } else {
-                hybridUnitaryAC.ScaledSystemMaximumSupplyAirMassFlowRate =
-                    hybridUnitaryAC.ScaledSystemMaximumSupplyAirVolumeFlowRate * 1.225;
+                hybridUnitaryAC.ScaledSystemMaximumSupplyAirMassFlowRate = hybridUnitaryAC.ScaledSystemMaximumSupplyAirVolumeFlowRate * 1.225;
             }
 
             // N5, \field Minimum Time Between Mode Change
@@ -671,32 +662,30 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                 // The original code never checks if this field is empty, but adding this check leads to a unit test failure.
                 // ShowSevereEmptyField(state, eoh, cAlphaFields(15));
                 // ErrorsFound = true;
-            } else if ((hybridUnitaryAC.firstFuel = static_cast<Constant::eFuel>
-                        (getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(Alphas(15))))) == Constant::eFuel::Invalid) {
+            } else if ((hybridUnitaryAC.firstFuel = static_cast<Constant::eFuel>(
+                            getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(Alphas(15))))) == Constant::eFuel::Invalid) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(15), Alphas(15));
                 ErrorsFound = true;
             }
 
             // A16, \field Second fuel type
-            if (!lAlphaBlanks(16) &&
-                Alphas(16) != "NONE" &&
-                (hybridUnitaryAC.secondFuel = static_cast<Constant::eFuel>
-                        (getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(Alphas(16))))) == Constant::eFuel::Invalid) {
+            if (!lAlphaBlanks(16) && Alphas(16) != "NONE" &&
+                (hybridUnitaryAC.secondFuel = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(Alphas(16))))) ==
+                    Constant::eFuel::Invalid) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(16), Alphas(16));
                 ErrorsFound = true;
             }
-            
+
             // A17, \field Third fuel type
-            if (!lAlphaBlanks(17) &&
-                Alphas(17) != "NONE" &&
-                (hybridUnitaryAC.thirdFuel = static_cast<Constant::eFuel>
-                        (getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(Alphas(17))))) == Constant::eFuel::Invalid) {
+            if (!lAlphaBlanks(17) && Alphas(17) != "NONE" &&
+                (hybridUnitaryAC.thirdFuel = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, Util::makeUPPER(Alphas(17))))) ==
+                    Constant::eFuel::Invalid) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(17), Alphas(17));
                 ErrorsFound = true;
             }
 
             // A18, \field Objective Function Minimizes
-            
+
             // A19, \ OA requirement pointer
             if (!lAlphaBlanks(19)) {
                 hybridUnitaryAC.OARequirementsPtr = Util::FindItemInList(Alphas(19), state.dataSize->OARequirements);
@@ -721,8 +710,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             }
 
             for (int modeIter = 0; modeIter <= Numberofoperatingmodes - 1; ++modeIter) {
-                ErrorsFound = hybridUnitaryAC.ParseMode(
-                    state, Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
+                ErrorsFound = hybridUnitaryAC.ParseMode(state, Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
                 if (ErrorsFound) {
                     ShowFatalError(state, format("{}: Errors found parsing modes", routineName));
                     ShowContinueError(state, "... Preceding condition causes termination.");
@@ -730,12 +718,11 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                 }
             }
             // add the ZoneHVAC:HybridUnitaryHVAC Scaled Maximum Supply Air Volume Flow Rate to the Component Sizing Report Summary
-            BaseSizer::reportSizerOutput(
-                state,
-                cCurrentModuleObject,
-                hybridUnitaryAC.Name,
-                "Scaled Maximum Supply Air Volume Flow Rate [m3/s]",
-                hybridUnitaryAC.ScaledSystemMaximumSupplyAirVolumeFlowRate);
+            BaseSizer::reportSizerOutput(state,
+                                         cCurrentModuleObject,
+                                         hybridUnitaryAC.Name,
+                                         "Scaled Maximum Supply Air Volume Flow Rate [m3/s]",
+                                         hybridUnitaryAC.ScaledSystemMaximumSupplyAirVolumeFlowRate);
         }
     }
 

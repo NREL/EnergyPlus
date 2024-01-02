@@ -146,8 +146,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
     OutputProcessor::StoreType AvgSumVar;
     OutputProcessor::TimeStepType StepTypeVar;
     Constant::Units UnitsVar = Constant::Units::None; // Units sting, may be blank
-    Array1D_string NamesOfKeys;                                  // Specific key name
-    Array1D_int IndexesForKeyVar;                                // Array index
+    Array1D_string NamesOfKeys;                       // Specific key name
+    Array1D_int IndexesForKeyVar;                     // Array index
 
     auto &tariff(state.dataEconTariff->tariff);
 
@@ -256,9 +256,9 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
                 tariff(iInObj).kindGasMtr = kindMeterGas;
             } break;
             default: {
-            // Do or assert something here?
+                // Do or assert something here?
             } break;
-            } // switch 
+            } // switch
         }
 
         // Assign the right conversion factors based on the resource type

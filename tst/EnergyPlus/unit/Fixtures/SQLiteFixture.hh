@@ -105,7 +105,7 @@ protected:
         ss->str(std::string());
     }
 
-#ifdef GET_OUT        
+#ifdef GET_OUT
     std::string storageType(const int storageTypeIndex)
     {
         return state->dataSQLiteProcedures->sqlite->storageType(storageTypeIndex);

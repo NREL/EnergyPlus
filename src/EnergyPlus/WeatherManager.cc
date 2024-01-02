@@ -4432,7 +4432,7 @@ namespace Weather {
             ",1,Calendar Year of Simulation[] ! When Annual "};
 
         auto &op = state.dataOutputProcessor;
-        
+
         state.dataWeather->EnvironmentReportNbr = ++op->ReportNumberCounter;
         if (state.dataWeather->EnvironmentReportNbr != 1) { //  problem
             ShowFatalError(state, "ReportOutputFileHeaders: Assigned report number for Environment title is not 1.  Contact Support.");
@@ -4448,9 +4448,9 @@ namespace Weather {
         print(state.files.mtr, "{}{}\n", op->freqStampReportNums[(int)ReportFreq::TimeStep], freqStrings[(int)ReportFreq::TimeStep]);
 
         for (ReportFreq freq : {ReportFreq::Day, ReportFreq::Month, ReportFreq::Simulation, ReportFreq::Year}) {
-             op->freqStampReportNums[(int)freq] = ++op->ReportNumberCounter;
-             print(state.files.eso, "{}{}{}\n", op->freqStampReportNums[(int)freq], freqStrings[(int)freq], "Report Variables Requested");
-             print(state.files.mtr, "{}{}{}\n", op->freqStampReportNums[(int)freq], freqStrings[(int)freq], "Meters Requested");
+            op->freqStampReportNums[(int)freq] = ++op->ReportNumberCounter;
+            print(state.files.eso, "{}{}{}\n", op->freqStampReportNums[(int)freq], freqStrings[(int)freq], "Report Variables Requested");
+            print(state.files.mtr, "{}{}{}\n", op->freqStampReportNums[(int)freq], freqStrings[(int)freq], "Meters Requested");
         }
     }
 

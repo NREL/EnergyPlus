@@ -273,7 +273,8 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                     resource = Constant::eResource::SolarWater;
                 } else if (resourceType == "SOLARAIRHEATING") {
                     resource = Constant::eResource::SolarAir;
-                } else if ((resource = static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, resourceType))) == Constant::eResource::Invalid) {
+                } else if ((resource = static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, resourceType))) ==
+                           Constant::eResource::Invalid) {
                     ShowSevereError(state, format("Invalid input for PythonPlugin:OutputVariable, unexpected Resource Type = {}", resourceType));
                     ShowFatalError(state, "Python plugin output variable input problem causes program termination");
                 }
@@ -287,7 +288,8 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                     EnergyPlus::ShowFatalError(state, "Input error on PythonPlugin:OutputVariable causes program termination");
                 }
                 std::string const groupType = EnergyPlus::Util::makeUPPER(fields.at("group_type").get<std::string>());
-                OutputProcessor::SOVGroup sovGroup = static_cast<OutputProcessor::SOVGroup>(getEnumValue(OutputProcessor::sovGroupNamesUC, groupType));
+                OutputProcessor::SOVGroup sovGroup =
+                    static_cast<OutputProcessor::SOVGroup>(getEnumValue(OutputProcessor::sovGroupNamesUC, groupType));
                 if (sovGroup == OutputProcessor::SOVGroup::Invalid) {
                     ShowSevereError(state, format("Invalid input for PythonPlugin:OutputVariable, unexpected Group Type = {}", groupType));
                     ShowFatalError(state, "Python plugin output variable input problem causes program termination");
@@ -314,7 +316,8 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                 if ((resource != Constant::eResource::EnergyTransfer) &&
                     (sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils || sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils ||
                      sovEndUseCat == OutputProcessor::SOVEndUseCat::Chillers || sovEndUseCat == OutputProcessor::SOVEndUseCat::Boilers ||
-                     sovEndUseCat == OutputProcessor::SOVEndUseCat::Baseboard || sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatRecoveryForCooling ||
+                     sovEndUseCat == OutputProcessor::SOVEndUseCat::Baseboard ||
+                     sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatRecoveryForCooling ||
                      sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatRecoveryForHeating)) {
                     ShowWarningError(state, format("Inconsistent resource type input for PythonPlugin:OutputVariable = {}", thisObjectName));
                     ShowContinueError(state, format("For end use subcategory = {}, resource type must be EnergyTransfer", endUse));
@@ -354,7 +357,7 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                 }
             }
         } // for (instance)
-    } // if (OutputVarInstances > 0)
+    }     // if (OutputVarInstances > 0)
 #endif
 } // setupOutputVariables()
 

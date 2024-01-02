@@ -201,7 +201,9 @@ namespace Material {
         Real64 SpecHeat = 0.0;  // Layer specific heat (J/kgK)
         Real64 Thickness = 0.0; // Layer thickness (m)
 
-        virtual ~MaterialBase() {}
+        virtual ~MaterialBase()
+        {
+        }
     };
 
     struct MaterialChild : public MaterialBase
@@ -385,7 +387,7 @@ namespace Material {
         // material
         int GlassSpecAngBRefleDataPtr = 0; // Data set index of back reflectance as a function of spectral and angle associated with a window glass
         // material
-        virtual ~MaterialChild() {};
+        virtual ~MaterialChild(){};
     };
 
     struct WindowBlindProperties

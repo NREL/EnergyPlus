@@ -3157,7 +3157,7 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     std::string TypeOfComp = "HeatPump:PlantLoop:EIR:Cooling";
     std::string NameOfComp = thisCoolingPLHP->name;
     int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
-    Array1D<OutputProcessor::MeteredVar> meteredVars(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D<OutputProcessor::MeteredVar> meteredVars(NumVariables); // Variable Types (1=integer, 2=real, 3=meter)
 
     NumFound = GetMeteredVariables(*state, NameOfComp, meteredVars);
 
@@ -3247,8 +3247,8 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     std::string NameOfComp = thisHeatingPLHP->name;
     int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
 
-    Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
-    Array1D<OutputProcessor::MeteredVar> meteredVars(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D_int VarIndexes(NumVariables);                           // Variable Numbers
+    Array1D<OutputProcessor::MeteredVar> meteredVars(NumVariables); // Variable Types (1=integer, 2=real, 3=meter)
 
     NumFound = GetMeteredVariables(*state, NameOfComp, meteredVars);
 

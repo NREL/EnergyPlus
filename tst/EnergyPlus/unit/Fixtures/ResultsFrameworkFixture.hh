@@ -85,10 +85,8 @@ protected:
         return ResultsFramework::CSVWriter::convertToMonth(datetime);
     }
 
-    std::map<std::string, std::vector<std::string>> getCSVOutputs(EnergyPlusData &state,
-                                                                  json const &data,
-                                                                  OutputProcessor::ReportFreq freq,
-                                                                  std::vector<std::string> const &outputVariables)
+    std::map<std::string, std::vector<std::string>>
+    getCSVOutputs(EnergyPlusData &state, json const &data, OutputProcessor::ReportFreq freq, std::vector<std::string> const &outputVariables)
     {
         ResultsFramework::CSVWriter csv(outputVariables.size());
         csv.parseTSOutputs(state, data, outputVariables, freq);

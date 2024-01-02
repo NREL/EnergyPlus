@@ -458,7 +458,7 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            Constant::eFuel2eResource[(int)this->FuelType], 
+                            Constant::eFuel2eResource[(int)this->FuelType],
                             OutputProcessor::SOVEndUseCat::Heating,
                             "Boiler Parasitic",
                             OutputProcessor::SOVGroup::Plant);
