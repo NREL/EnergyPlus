@@ -688,7 +688,6 @@ namespace OutputProcessor {
 
         std::vector<int> onCustomMeterVarNums;
         Array1D_int VarsOnSourceMeter;
-        bool errFlag;
         bool BigErrorsFound;
 
         BigErrorsFound = false;
@@ -900,6 +899,7 @@ namespace OutputProcessor {
             meter->type = MeterType::Custom;
             meter->resource = resource;
             meter->units = units;
+            bool errFlag = false;
             meter->RT_forIPUnits = GetResourceIPUnits(state, meter->resource, meter->units, errFlag);
             if (errFlag) {
                 ShowContinueError(state, format("..on {}=\"{}\".", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
@@ -1215,6 +1215,7 @@ namespace OutputProcessor {
             meter->type = MeterType::CustomDec;
             meter->resource = resource;
             meter->units = units;
+            bool errFlag = false;
             meter->RT_forIPUnits = GetResourceIPUnits(state, meter->resource, meter->units, errFlag);
             if (errFlag) {
                 ShowContinueError(state, format("..on {}=\"{}\".", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
@@ -1390,7 +1391,7 @@ namespace OutputProcessor {
             }
 
             if (meter->resource != Constant::eResource::Invalid) {
-                bool errFlag;
+                bool errFlag = false;
                 meter->RT_forIPUnits = GetResourceIPUnits(state, meter->resource, units, errFlag);
                 if (errFlag) {
                     ShowContinueError(state, format("..on Meter=\"{}\".", Name));
@@ -1533,7 +1534,8 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         RT_IPUnits IPUnits;
 
-        ErrorsFound = false;
+        // Commented this out to avoid accidentally clearing an error condition by calling this function
+        // ErrorsFound = false;
 
         switch (resource) {
         case Constant::eResource::Electricity:
