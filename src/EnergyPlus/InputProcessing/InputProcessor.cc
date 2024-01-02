@@ -863,7 +863,7 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
         }
     } else {
         if (field_type == "a") {
-            if (!(within_max_fields && findDefault(Alphas(alpha_index), schema_field_obj))) {
+            if (!(findDefault(Alphas(alpha_index), schema_field_obj))) {
                 Alphas(alpha_index) = "";
             }
             if (is_AlphaBlank) AlphaBlank()(alpha_index) = true;
