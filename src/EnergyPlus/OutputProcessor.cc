@@ -798,7 +798,7 @@ namespace OutputProcessor {
                         itemsAssigned = true;
                     } else if (units != srcMeter->units) {
                         ShowWarningCustomMessage(
-                            state, eoh, format("{}=\"{}\", differing units in {}=\"{}\".", ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                            state, eoh, format("Meter:Custom=\"{}\", differing units in {}=\"{}\".", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
                         ShowContinueError(state,
                                           format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
                                                  Constant::unitNames[(int)units],
@@ -817,7 +817,7 @@ namespace OutputProcessor {
                         ShowWarningCustomMessage(
                             state,
                             eoh,
-                            format("{}=\"{}\", variable not summed variable {}=\"{}\".", ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                            format("Meter:Custom=\"{}\", variable not summed variable {}=\"{}\".", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
                         ShowContinueError(state,
                                           format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
                                                  Constant::unitNames[(int)units],
@@ -1114,7 +1114,7 @@ namespace OutputProcessor {
                         itemsAssigned = true;
                     } else if (units != srcMeter->units) {
                         ShowWarningCustomMessage(
-                            state, eoh, format("{}=\"{}\", differing units in {}=\"{}\".", ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                            state, eoh, format("Meter:Custom=\"{}\", differing units in {}=\"{}\".", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
                         ShowContinueError(state,
                                           format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
                                                  Constant::unitNames[(int)units],
@@ -1133,7 +1133,7 @@ namespace OutputProcessor {
                         ShowWarningCustomMessage(
                             state,
                             eoh,
-                            format("{}=\"{}\", variable not summed variable {}=\"{}\".", ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                            format("Meter:Custom=\"{}\", variable not summed variable {}=\"{}\".", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
                         ShowContinueError(state,
                                           format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
                                                  Constant::unitNames[(int)units],
