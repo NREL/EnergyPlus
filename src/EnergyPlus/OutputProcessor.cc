@@ -48,9 +48,6 @@
 // C++ Headers
 #include <algorithm>
 #include <cassert>
-#include <cmath>
-#include <cstdio>
-#include <cstring>
 #include <memory>
 #include <string>
 #include <unordered_set>
@@ -81,7 +78,6 @@
 
 #include <fmt/ostream.h>
 #include <milo/dtoa.h>
-#include <milo/itoa.h>
 
 namespace EnergyPlus {
 
@@ -768,7 +764,7 @@ namespace OutputProcessor {
                 // A custom meter cannot reference another custom meter
                 if (std::find(customMeterNames.begin(), customMeterNames.end(), meterOrVarNameUC) != customMeterNames.end()) {
                     ShowWarningError(state,
-                                     format("Meter:Custom=\"{}\", contains a reference to another Meter:Custom in field: {}=\"{}\".",
+                                     format(R"(Meter:Custom="{}", contains a reference to another Meter:Custom in field: {}="{}".)",
                                             ipsc->cAlphaArgs(1),
                                             ipsc->cAlphaFieldNames(fldIndex + 1),
                                             ipsc->cAlphaArgs(fldIndex + 1)));
@@ -779,7 +775,7 @@ namespace OutputProcessor {
                 // A custom meter cannot reference another customDec meter
                 if (std::find(customDecMeterNames.begin(), customDecMeterNames.end(), meterOrVarNameUC) != customDecMeterNames.end()) {
                     ShowWarningError(state,
-                                     format("Meter:Custom=\"{}\", contains a reference to another Meter:CustomDecrement in field: {}=\"{}\".",
+                                     format(R"(Meter:Custom="{}", contains a reference to another Meter:CustomDecrement in field: {}="{}".)",
                                             ipsc->cAlphaArgs(1),
                                             ipsc->cAlphaFieldNames(fldIndex + 1),
                                             ipsc->cAlphaArgs(fldIndex + 1)));
@@ -798,7 +794,7 @@ namespace OutputProcessor {
                         itemsAssigned = true;
                     } else if (units != srcMeter->units) {
                         ShowWarningCustomMessage(
-                            state, eoh, format("Meter:Custom=\"{}\", differing units in {}=\"{}\".", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                            state, eoh, format(R"(Meter:Custom="{}", differing units in {}="{}".)", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
                         ShowContinueError(state,
                                           format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
                                                  Constant::unitNames[(int)units],
@@ -817,7 +813,7 @@ namespace OutputProcessor {
                         ShowWarningCustomMessage(
                             state,
                             eoh,
-                            format("Meter:Custom=\"{}\", variable not summed variable {}=\"{}\".", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                            format(R"(Meter:Custom="{}", variable not summed variable {}="{}".)", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
                         ShowContinueError(state,
                                           format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
                                                  Constant::unitNames[(int)units],
@@ -844,7 +840,7 @@ namespace OutputProcessor {
                     bool KeyIsStar = (ipsc->cAlphaArgs(fldIndex) == "*" || ipsc->lAlphaFieldBlanks(fldIndex));
                     // Have already checked for mismatching units between meter and source variable and assigned units
                     if (KeyIsStar) {
-                        if (srcDDVar->keyOutVarNums.size() == 0) {
+                        if (srcDDVar->keyOutVarNums.empty()) {
                             ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC);
                             foundBadSrc = true;
                             break;
@@ -871,7 +867,7 @@ namespace OutputProcessor {
                 } else {
                     // Cannot use ShowWarningItemNotFound because this string appears in a unit test
                     ShowWarningError(state,
-                                     format("Meter:Custom=\"{}\", invalid {}=\"{}\".",
+                                     format(R"(Meter:Custom="{}", invalid {}="{}".)",
                                             ipsc->cAlphaArgs(1),
                                             ipsc->cAlphaFieldNames(fldIndex + 1),
                                             ipsc->cAlphaArgs(fldIndex + 1)));
@@ -883,7 +879,7 @@ namespace OutputProcessor {
             } // for (fldIndex)
 
             // Somehow, this meter is not linked to any variables either directly or via another meter
-            if (itemsAssigned == false) {
+            if (!itemsAssigned) {
                 ShowWarningError(state, format("Meter:Custom=\"{}\", no items assigned ", ipsc->cAlphaArgs(1)));
                 ShowContinueError(
                     state, "...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom.");
@@ -1051,7 +1047,7 @@ namespace OutputProcessor {
             // DecMeter cannot be a Meter:Custom
             if (std::find(customDecMeterNames.begin(), customDecMeterNames.end(), decMeterNameUC) != customDecMeterNames.end()) {
                 ShowWarningError(state,
-                                 format("Meter:CustomDec=\"{}\", contains a reference to another Meter:CustomDecrement in field: {}=\"{}\".",
+                                 format(R"(Meter:CustomDec="{}", contains a reference to another Meter:CustomDecrement in field: {}="{}".)",
                                         ipsc->cAlphaArgs(1),
                                         ipsc->cAlphaFieldNames(3),
                                         ipsc->cAlphaArgs(3)));
@@ -1095,7 +1091,7 @@ namespace OutputProcessor {
                 // A custom meter cannot reference another custom meter
                 if (std::find(customDecMeterNames.begin(), customDecMeterNames.end(), meterOrVarNameUC) != customDecMeterNames.end()) {
                     ShowWarningError(state,
-                                     format("Meter:Custom=\"{}\", contains a reference to another Meter:CustomDecrement in field: {}=\"{}\".",
+                                     format(R"(Meter:Custom="{}", contains a reference to another Meter:CustomDecrement in field: {}="{}".)",
                                             ipsc->cAlphaArgs(1),
                                             ipsc->cAlphaFieldNames(fldIndex + 1),
                                             ipsc->cAlphaArgs(fldIndex + 1)));
@@ -1114,7 +1110,7 @@ namespace OutputProcessor {
                         itemsAssigned = true;
                     } else if (units != srcMeter->units) {
                         ShowWarningCustomMessage(
-                            state, eoh, format("Meter:Custom=\"{}\", differing units in {}=\"{}\".", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                            state, eoh, format(R"(Meter:Custom="{}", differing units in {}="{}".)", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
                         ShowContinueError(state,
                                           format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
                                                  Constant::unitNames[(int)units],
@@ -1133,7 +1129,7 @@ namespace OutputProcessor {
                         ShowWarningCustomMessage(
                             state,
                             eoh,
-                            format("Meter:Custom=\"{}\", variable not summed variable {}=\"{}\".", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                            format(R"(Meter:Custom="{}", variable not summed variable {}="{}".)", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
                         ShowContinueError(state,
                                           format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
                                                  Constant::unitNames[(int)units],
@@ -1160,7 +1156,7 @@ namespace OutputProcessor {
                     bool KeyIsStar = (ipsc->cAlphaArgs(fldIndex) == "*" || ipsc->lAlphaFieldBlanks(fldIndex));
                     // Have already checked for mismatching units between meter and source variable and assigned units
                     if (KeyIsStar) {
-                        if (srcDDVar->keyOutVarNums.size() == 0) {
+                        if (srcDDVar->keyOutVarNums.empty()) {
                             ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC);
                             foundBadSrc = true;
                             break;
@@ -1187,7 +1183,7 @@ namespace OutputProcessor {
                 } else {
                     // Cannot use ShowWarningItemNotFound because this string appears in a unit test
                     ShowWarningError(state,
-                                     format("Meter:Custom=\"{}\", invalid {}=\"{}\".",
+                                     format(R"(Meter:Custom="{}", invalid {}="{}".)",
                                             ipsc->cAlphaArgs(1),
                                             ipsc->cAlphaFieldNames(fldIndex + 1),
                                             ipsc->cAlphaArgs(fldIndex + 1)));
@@ -1199,7 +1195,7 @@ namespace OutputProcessor {
             } // for (fldIndex)
 
             // Somehow, this meter is not linked to any variables either directly or via another meter
-            if (itemsAssigned == false) {
+            if (!itemsAssigned) {
                 ShowWarningError(state, format("Meter:Custom=\"{}\", no items assigned ", ipsc->cAlphaArgs(1)));
                 ShowContinueError(
                     state, "...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another Meter:Custom.");
@@ -2199,7 +2195,7 @@ namespace OutputProcessor {
 
         for (auto const *var : op->outVars) {
 
-            if (var->meterNums.size() == 0) continue;
+            if (var->meterNums.empty()) continue;
 
             print(state.files.mtd,
                   "\n Meters for {},{} [{}]{}\n",
@@ -2301,7 +2297,7 @@ namespace OutputProcessor {
         switch (reportingInterval) {
         case ReportFreq::EachCall:
         case ReportFreq::TimeStep: {
-            assert(Month != -1 && DayOfMonth != -1 && Hour != -1 && StartMinute != -1 && EndMinute != -1 && DST != -1 && DayType != "");
+            assert(Month != -1 && DayOfMonth != -1 && Hour != -1 && StartMinute != -1 && EndMinute != -1 && DST != -1 && !DayType.empty());
             print<FormatSyntax::FMT>(outputFile,
                                      "{},{},{:2d},{:2d},{:2d},{:2d},{:5.2f},{:5.2f},{}\n",
                                      reportStr,
@@ -2333,7 +2329,7 @@ namespace OutputProcessor {
         } break;
 
         case ReportFreq::Hour: {
-            assert(Month != -1 && DayOfMonth != -1 && Hour != -1 && DST != -1 && DayType != "");
+            assert(Month != -1 && DayOfMonth != -1 && Hour != -1 && DST != -1 && !DayType.empty());
             print<FormatSyntax::FMT>(outputFile,
                                      "{},{},{:2d},{:2d},{:2d},{:2d},{:5.2f},{:5.2f},{}\n",
                                      reportStr,
@@ -2363,7 +2359,7 @@ namespace OutputProcessor {
             }
         } break;
         case ReportFreq::Day: {
-            assert(Month != -1 && DayOfMonth != -1 && DST != -1 && DayType != "");
+            assert(Month != -1 && DayOfMonth != -1 && DST != -1 && !DayType.empty());
             print<FormatSyntax::FMT>(outputFile, "{},{},{:2d},{:2d},{:2d},{}\n", reportStr, DayOfSimChr, Month, DayOfMonth, DST, DayType);
             if (writeToSQL && sql) {
                 sql->createSQLiteTimeIndexRecord(reportingInterval,
@@ -3178,7 +3174,7 @@ void SetupOutputVariable(EnergyPlusData &state,
 
     // Determine whether to Report or not
     CheckReportVariable(state, name, key, reqVarNums);
-    if (reqVarNums.size() == 0) {
+    if (reqVarNums.empty()) {
         reqVarNums.push_back(-1);
     }
 
@@ -3311,7 +3307,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     // Determine whether to Report or not
     std::vector<int> reqVarNums;
     CheckReportVariable(state, name, key, reqVarNums);
-    if (reqVarNums.size() == 0) {
+    if (reqVarNums.empty()) {
         reqVarNums.push_back(-1);
     }
 
@@ -3324,7 +3320,7 @@ void SetupOutputVariable(EnergyPlusData &state,
 
     ++op->NumOfIVariable_Setup;
 
-    op->NumTotalIVariable += (reqVarNums.size() > 0) ? reqVarNums.size() : 1;
+    op->NumTotalIVariable += (!reqVarNums.empty()) ? reqVarNums.size() : 1;
     bool ThisOneOnTheList = DataOutputs::FindItemInVariableList(state, key, name);
     if (!ThisOneOnTheList) return;
 
@@ -4342,7 +4338,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
         if (MeterFileOnlyIndicator && period.Rpt) {
             ShowWarningError(
                 state,
-                format("Output:Meter:MeterFileOnly requested for \"{}\" ({}), already on \"Output:Meter\". Will report to both {} and {}",
+                format(R"(Output:Meter:MeterFileOnly requested for "{}" ({}), already on "Output:Meter". Will report to both {} and {})",
                        meter->Name,
                        reportFreqNames[(freq == ReportFreq::EachCall) ? (int)ReportFreq::TimeStep : (int)freq],
                        state.files.eso.filePath.filename().string(),
@@ -4607,7 +4603,7 @@ int GetNumMeteredVariables(EnergyPlusData &state,
         //    IF (ComponentName /= RVariableTypes(Loop)%VarNameUC(1:Pos-1)) CYCLE
         if (var->varType != OutputProcessor::VariableType::Real) continue;
         if (ComponentName != var->keyUC) continue;
-        if (var->meterNums.size() > 0) {
+        if (!var->meterNums.empty()) {
             ++NumVariables;
         }
     }
@@ -4646,7 +4642,7 @@ int GetMeteredVariables(EnergyPlusData &state,
         auto *var = op->outVars[iVar];
         if (var->varType != VariableType::Real) continue;
         if (ComponentName != var->keyUC) continue;
-        if (var->meterNums.size() == 0) continue;
+        if (var->meterNums.empty()) continue;
 
         auto &meteredVar = meteredVars(++NumVariables);
 
