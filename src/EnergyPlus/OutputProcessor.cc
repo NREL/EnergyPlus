@@ -793,8 +793,12 @@ namespace OutputProcessor {
                         units = srcMeter->units;
                         itemsAssigned = true;
                     } else if (units != srcMeter->units) {
-                        ShowWarningCustomMessage(
-                            state, eoh, format(R"(Meter:Custom="{}", differing units in {}="{}".)", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                        ShowWarningCustomMessage(state,
+                                                 eoh,
+                                                 format(R"(Meter:Custom="{}", differing units in {}="{}".)",
+                                                        ipsc->cAlphaArgs(1),
+                                                        ipsc->cAlphaFieldNames(fldIndex + 1),
+                                                        meterOrVarNameUC));
                         ShowContinueError(state,
                                           format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
                                                  Constant::unitNames[(int)units],
@@ -810,10 +814,12 @@ namespace OutputProcessor {
 
                     // Has to be a summed variable
                     if (srcDDVar->storeType != StoreType::Summed) {
-                        ShowWarningCustomMessage(
-                            state,
-                            eoh,
-                            format(R"(Meter:Custom="{}", variable not summed variable {}="{}".)", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                        ShowWarningCustomMessage(state,
+                                                 eoh,
+                                                 format(R"(Meter:Custom="{}", variable not summed variable {}="{}".)",
+                                                        ipsc->cAlphaArgs(1),
+                                                        ipsc->cAlphaFieldNames(fldIndex + 1),
+                                                        meterOrVarNameUC));
                         ShowContinueError(state,
                                           format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
                                                  Constant::unitNames[(int)units],
@@ -1109,8 +1115,12 @@ namespace OutputProcessor {
                         units = srcMeter->units;
                         itemsAssigned = true;
                     } else if (units != srcMeter->units) {
-                        ShowWarningCustomMessage(
-                            state, eoh, format(R"(Meter:Custom="{}", differing units in {}="{}".)", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                        ShowWarningCustomMessage(state,
+                                                 eoh,
+                                                 format(R"(Meter:Custom="{}", differing units in {}="{}".)",
+                                                        ipsc->cAlphaArgs(1),
+                                                        ipsc->cAlphaFieldNames(fldIndex + 1),
+                                                        meterOrVarNameUC));
                         ShowContinueError(state,
                                           format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
                                                  Constant::unitNames[(int)units],
@@ -1126,10 +1136,12 @@ namespace OutputProcessor {
 
                     // Has to be a summed variable
                     if (srcDDVar->storeType != StoreType::Summed) {
-                        ShowWarningCustomMessage(
-                            state,
-                            eoh,
-                            format(R"(Meter:Custom="{}", variable not summed variable {}="{}".)", ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(fldIndex + 1), meterOrVarNameUC));
+                        ShowWarningCustomMessage(state,
+                                                 eoh,
+                                                 format(R"(Meter:Custom="{}", variable not summed variable {}="{}".)",
+                                                        ipsc->cAlphaArgs(1),
+                                                        ipsc->cAlphaFieldNames(fldIndex + 1),
+                                                        meterOrVarNameUC));
                         ShowContinueError(state,
                                           format("...will not be shown with the Meter results; units for meter={}, units for this variable={}.",
                                                  Constant::unitNames[(int)units],
@@ -4336,13 +4348,12 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
     auto &period = meter->periods[(freq == ReportFreq::EachCall) ? (int)ReportFreq::TimeStep : (int)freq];
     if (!CumulativeIndicator) {
         if (MeterFileOnlyIndicator && period.Rpt) {
-            ShowWarningError(
-                state,
-                format(R"(Output:Meter:MeterFileOnly requested for "{}" ({}), already on "Output:Meter". Will report to both {} and {})",
-                       meter->Name,
-                       reportFreqNames[(freq == ReportFreq::EachCall) ? (int)ReportFreq::TimeStep : (int)freq],
-                       state.files.eso.filePath.filename().string(),
-                       state.files.mtr.filePath.filename().string()));
+            ShowWarningError(state,
+                             format(R"(Output:Meter:MeterFileOnly requested for "{}" ({}), already on "Output:Meter". Will report to both {} and {})",
+                                    meter->Name,
+                                    reportFreqNames[(freq == ReportFreq::EachCall) ? (int)ReportFreq::TimeStep : (int)freq],
+                                    state.files.eso.filePath.filename().string(),
+                                    state.files.mtr.filePath.filename().string()));
         }
         if (!period.Rpt) {
             period.Rpt = true;
