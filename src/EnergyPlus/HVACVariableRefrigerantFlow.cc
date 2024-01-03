@@ -12497,8 +12497,17 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         auto &thisTUList = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum);
         for (int TUNum = 1; TUNum <= thisTUList.NumTUInList; ++TUNum) {
             auto &fan = state.dataFans->Fan(state.dataHVACVarRefFlow->VRFTU(TUNum).FanIndex);
-            fan.FanPower *= state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondCyclingRatio;
-            fan.FanEnergy = fan.FanPower * state.dataHVACGlobal->TimeStepSysSec;
+            int heatingCoilNum = state.dataHVACVarRefFlow->VRFTU(TUNum).HeatCoilIndex;
+            int coolingCoilNum = state.dataHVACVarRefFlow->VRFTU(TUNum).CoolCoilIndex;
+            auto &heatingCoil = state.dataDXCoils->DXCoil(heatingCoilNum);
+            auto &coolingCoil = state.dataDXCoils->DXCoil(coolingCoilNum);
+            // only deal with cooling for now. heating RTF might have some issue
+            if (heatingCoil.HeatingCoilRuntimeFraction == 0.0) { // in cooling mode
+                // here coolingCoil.CoolingCoilRuntimeFraction equals state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondCyclingRatio
+                // this is not the case for heating
+                fan.FanPower *= coolingCoil.CoolingCoilRuntimeFraction;
+                fan.FanEnergy = fan.FanPower * state.dataHVACGlobal->TimeStepSysSec;
+            }
         }
     }
 
