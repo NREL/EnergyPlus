@@ -870,10 +870,9 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
             DataLoopNode::NodeData dummyEvapOutlet;
             DataLoopNode::NodeData dummyCondInlet;
             DataLoopNode::NodeData dummyCondOutlet;
-            Real64 dummyPLR = 1.0;
             int dummySpeedNum = 1;
             Real64 dummySpeedRatio = 1.0;
-            int dummyFanOpMode = 1.0;
+            int dummyFanOpMode = 1;
             bool dummySingleMode = false;
 
             Real64 constexpr RatedInletAirTemp(26.6667);   // 26.6667C or 80F
