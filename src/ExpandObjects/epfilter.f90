@@ -11608,6 +11608,7 @@ DO iSys = 1, numCompactSysVAV
     IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     htRecLat75 = StringToReal(FldVal(base + vsHeatRecLatEffOff)) + 0.05
     htRecLat100 = StringToReal(FldVal(base + vsHeatRecSenEffOff))
+    htRecLat100 = StringToReal(FldVal(base + vsHeatRecLatEffOff))
     IF (htRecLat75 .GT. 1.) htRecLat75 = 1.
     IF (htRecLat100 .GT. 1.) htRecLat100 = 1.
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
@@ -24253,6 +24254,7 @@ IF (.NOT. isBaseboardNone) THEN
     ! MJW ???? - Not sure
     CALL AddToObjStr('Economizer Lockout','No')
     CALL AddSenEffectCurve(base + cvsAirHandlerNameOff, 0.75, 0.7)
+    CALL AddSenEffectCurve(base + fczNameOff, 0.75, 0.7)
     CALL CreateNewObj('Coil:Cooling:Water')
     CALL AddToObjFld('Name', base + fczNameOff,' Cooling Coil')
     CALL AddToObjFld('Availability Schedule Name', base + fczCoolAvailSchedNameOff,'')
