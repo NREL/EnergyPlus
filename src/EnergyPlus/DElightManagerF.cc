@@ -647,7 +647,7 @@ namespace DElightManagerF {
                                     // RJH 2008-03-07: Set up DaylIllumAtRefPt for output for this DElight zone RefPt
                                     SetupOutputVariable(state,
                                                         "Daylighting Reference Point Illuminance",
-                                                        OutputProcessor::Unit::lux,
+                                                        Constant::Units::lux,
                                                         znDayl.DaylIllumAtRefPt(refPt.indexToFracAndIllum),
                                                         OutputProcessor::SOVTimeStepType::Zone,
                                                         OutputProcessor::SOVStoreType::Average,

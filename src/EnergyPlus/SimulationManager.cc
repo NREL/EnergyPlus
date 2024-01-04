@@ -1679,16 +1679,16 @@ namespace SimulationManager {
         print(state.files.audit, variable_fmt, "NumOfIVariable(Total)", state.dataOutputProcessor->NumTotalIVariable);
         print(state.files.audit, variable_fmt, "NumOfIVariable(Actual)", state.dataOutputProcessor->NumOfIVariable);
         print(state.files.audit, variable_fmt, "NumOfIVariable(Summed)", state.dataOutputProcessor->NumOfIVariable_Sum);
-        print(state.files.audit, variable_fmt, "MaxRVariable", state.dataOutputProcessor->MaxRVariable);
-        print(state.files.audit, variable_fmt, "MaxIVariable", state.dataOutputProcessor->MaxIVariable);
-        print(state.files.audit, variable_fmt, "NumEnergyMeters", state.dataOutputProcessor->NumEnergyMeters);
-        print(state.files.audit, variable_fmt, "NumVarMeterArrays", state.dataOutputProcessor->NumVarMeterArrays);
+        // print(state.files.audit, variable_fmt, "MaxRVariable", state.dataOutputProcessor->MaxRVariable);
+        // print(state.files.audit, variable_fmt, "MaxIVariable", state.dataOutputProcessor->MaxIVariable);
+        print(state.files.audit, variable_fmt, "NumEnergyMeters", state.dataOutputProcessor->meters.size());
+        // print(state.files.audit, variable_fmt, "NumVarMeterArrays", state.dataOutputProcessor->NumVarMeterArrays);
         print(state.files.audit, variable_fmt, "maxUniqueKeyCount", state.dataOutRptTab->maxUniqueKeyCount);
         print(state.files.audit, variable_fmt, "maxNumberOfFigures", state.dataSolarShading->maxNumberOfFigures);
         print(state.files.audit, variable_fmt, "MAXHCArrayBounds", state.dataSolarShading->MAXHCArrayBounds);
         print(state.files.audit, variable_fmt, "MaxVerticesPerSurface", state.dataSurface->MaxVerticesPerSurface);
-        print(state.files.audit, variable_fmt, "NumReportList", state.dataOutputProcessor->NumReportList);
-        print(state.files.audit, variable_fmt, "InstMeterCacheSize", state.dataOutputProcessor->InstMeterCacheSize);
+        // print(state.files.audit, variable_fmt, "NumReportList", state.dataOutputProcessor->NumReportList);
+        // print(state.files.audit, variable_fmt, "InstMeterCacheSize", state.dataOutputProcessor->InstMeterCacheSize);
         if (state.dataSysVars->SutherlandHodgman) {
             if (state.dataSysVars->SlaterBarsky) {
                 print(state.files.audit, " {}\n", "ClippingAlgorithm=SlaterBarskyandSutherlandHodgman");

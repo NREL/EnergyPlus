@@ -448,14 +448,14 @@ namespace HybridModel {
                         state.dataHybridModel->HybridModelZone(ZonePtr).InfiltrationCalc_C) {
                         SetupOutputVariable(state,
                                             "Zone Infiltration Hybrid Model Air Change Rate",
-                                            OutputProcessor::Unit::ach,
+                                            Constant::Units::ach,
                                             state.dataHeatBal->Zone(ZonePtr).InfilOAAirChangeRateHM,
                                             OutputProcessor::SOVTimeStepType::Zone,
                                             OutputProcessor::SOVStoreType::Average,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                         SetupOutputVariable(state,
                                             "Zone Infiltration Hybrid Model Mass Flow Rate",
-                                            OutputProcessor::Unit::kg_s,
+                                            Constant::Units::kg_s,
                                             state.dataHeatBal->Zone(ZonePtr).MCPIHM,
                                             OutputProcessor::SOVTimeStepType::Zone,
                                             OutputProcessor::SOVStoreType::Average,
@@ -466,7 +466,7 @@ namespace HybridModel {
                         state.dataHybridModel->HybridModelZone(ZonePtr).PeopleCountCalc_C) {
                         SetupOutputVariable(state,
                                             "Zone Hybrid Model People Count",
-                                            OutputProcessor::Unit::None,
+                                            Constant::Units::None,
                                             state.dataHeatBal->Zone(ZonePtr).NumOccHM,
                                             OutputProcessor::SOVTimeStepType::Zone,
                                             OutputProcessor::SOVStoreType::Average,

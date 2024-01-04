@@ -759,8 +759,8 @@ namespace SetPointManager {
         // Default Constructor
         DefineIdealCondEntSetPointManager()
             : MinimumLiftTD(0.0), MaxCondEntTemp(0.0), NumCtrlNodes(0), SetPt(0.0), ChillerIndexPlantSide(0), BranchIndexPlantSide(0),
-              LoopIndexPlantSide(0), ChllrVarType(OutputProcessor::VariableType::NotFound), ChllrVarIndex(0),
-              ChlPumpVarType(OutputProcessor::VariableType::NotFound), ChlPumpVarIndex(0), CndPumpVarType(OutputProcessor::VariableType::NotFound),
+              LoopIndexPlantSide(0), ChllrVarType(OutputProcessor::VariableType::Invalid), ChllrVarIndex(0),
+              ChlPumpVarType(OutputProcessor::VariableType::Invalid), ChlPumpVarIndex(0), CndPumpVarType(OutputProcessor::VariableType::Invalid),
               CndPumpVarIndex(0), Type(DataPlant::PlantEquipmentType::Invalid), CondLoopNum(0), numTowers(0), CondPumpNum(0), CondPumpBranchNum(0),
               ChilledPumpNum(0), ChilledPumpBranchNum(0), SetupIdealCondEntSetPtVars(true)
         {

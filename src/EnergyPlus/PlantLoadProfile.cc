@@ -515,7 +515,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
             // Setup report variables
             SetupOutputVariable(state,
                                 "Plant Load Profile Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).MassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -523,7 +523,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 "Plant Load Profile Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Power,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -531,42 +531,39 @@ void GetPlantProfileInput(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 "Plant Load Profile Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::SOVEndUseCat::Heating,
                                 {},
-                                "ENERGYTRANSFER",
-                                "Heating",
-                                {},
-                                "Plant"); // is EndUseKey right?
+                                OutputProcessor::SOVGroup::Plant); // is EndUseKey right?
 
             SetupOutputVariable(state,
                                 "Plant Load Profile Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).HeatingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
+                                Constant::eResource::PlantLoopHeatingDemand,
+                                OutputProcessor::SOVEndUseCat::Heating,
                                 {},
-                                "PLANTLOOPHEATINGDEMAND",
-                                "Heating",
-                                {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             SetupOutputVariable(state,
                                 "Plant Load Profile Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).CoolingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
+                                Constant::eResource::PlantLoopCoolingDemand,
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "PLANTLOOPCOOLINGDEMAND",
-                                "Cooling",
-                                {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator(state,
@@ -588,7 +585,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
             if (state.dataPlantLoadProfile->PlantProfile(ProfileNum).FluidType == PlantLoopFluidType::Steam) {
                 SetupOutputVariable(state,
                                     "Plant Load Profile Steam Outlet Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     state.dataPlantLoadProfile->PlantProfile(ProfileNum).OutletTemp,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,

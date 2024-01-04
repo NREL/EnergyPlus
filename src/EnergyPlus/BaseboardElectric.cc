@@ -346,20 +346,19 @@ namespace BaseboardElectric {
             auto &thisBaseboard = baseboard->baseboards(BaseboardNum);
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisBaseboard.Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipName,
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::SOVEndUseCat::Baseboard,
                                 {},
-                                eResourceSOV::EnergyTransfer,
-                                EndUseCatSOV::Baseboard,
-                                {},
-                                GroupSOV::HVAC); // "System");
+                                OutputProcessor::SOVGroup::HVAC); // "System");
 
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisBaseboard.Power,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -367,20 +366,19 @@ namespace BaseboardElectric {
 
             SetupOutputVariable(state,
                                 "Baseboard Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisBaseboard.ElecUseLoad,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipName,
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Heating,
                                 {},
-                                eResourceSOV::Electricity,
-                                EndUseCatSOV::Heating,
-                                {},
-                                GroupSOV::HVAC); // "System");
+                                OutputProcessor::SOVGroup::HVAC); // "System");
 
             SetupOutputVariable(state,
                                 "Baseboard Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisBaseboard.ElecUseRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
