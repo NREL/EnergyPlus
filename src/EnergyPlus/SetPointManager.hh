@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -759,8 +759,8 @@ namespace SetPointManager {
         // Default Constructor
         DefineIdealCondEntSetPointManager()
             : MinimumLiftTD(0.0), MaxCondEntTemp(0.0), NumCtrlNodes(0), SetPt(0.0), ChillerIndexPlantSide(0), BranchIndexPlantSide(0),
-              LoopIndexPlantSide(0), ChllrVarType(OutputProcessor::VariableType::NotFound), ChllrVarIndex(0),
-              ChlPumpVarType(OutputProcessor::VariableType::NotFound), ChlPumpVarIndex(0), CndPumpVarType(OutputProcessor::VariableType::NotFound),
+              LoopIndexPlantSide(0), ChllrVarType(OutputProcessor::VariableType::Invalid), ChllrVarIndex(0),
+              ChlPumpVarType(OutputProcessor::VariableType::Invalid), ChlPumpVarIndex(0), CndPumpVarType(OutputProcessor::VariableType::Invalid),
               CndPumpVarIndex(0), Type(DataPlant::PlantEquipmentType::Invalid), CondLoopNum(0), numTowers(0), CondPumpNum(0), CondPumpBranchNum(0),
               ChilledPumpNum(0), ChilledPumpBranchNum(0), SetupIdealCondEntSetPtVars(true)
         {
