@@ -565,8 +565,6 @@ set(SRC
     SolarReflectionManager.hh
     SolarShading.cc
     SolarShading.hh
-    SortAndStringUtilities.cc
-    SortAndStringUtilities.hh
     SplitterComponent.cc
     SplitterComponent.hh
     StandardRatings.cc

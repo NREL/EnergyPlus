@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -438,7 +438,7 @@ namespace ElectricBaseboardRadiator {
             // CurrentModuleObject='ZoneHVAC:Baseboard:RadiantConvective:Electric'
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 elecBaseboard.TotPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -446,14 +446,14 @@ namespace ElectricBaseboardRadiator {
 
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 elecBaseboard.ConvPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 elecBaseboard.EquipName);
             SetupOutputVariable(state,
                                 "Baseboard Radiant Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 elecBaseboard.RadPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -461,46 +461,44 @@ namespace ElectricBaseboardRadiator {
 
             SetupOutputVariable(state,
                                 "Baseboard Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 elecBaseboard.ElecUseLoad,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 elecBaseboard.EquipName,
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Heating,
                                 {},
-                                "Electricity",
-                                "HEATING",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Baseboard Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 elecBaseboard.ElecUseRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 elecBaseboard.EquipName);
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 elecBaseboard.TotEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 elecBaseboard.EquipName,
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::SOVEndUseCat::Baseboard,
                                 {},
-                                "ENERGYTRANSFER",
-                                "BASEBOARD",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
 
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 elecBaseboard.ConvEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 elecBaseboard.EquipName);
             SetupOutputVariable(state,
                                 "Baseboard Radiant Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 elecBaseboard.RadEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
