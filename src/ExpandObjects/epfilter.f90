@@ -2116,7 +2116,7 @@ END FUNCTION DoesGroundHeatTransferExist
 
 !----------------------------------------------------------------------------------
 
-SUBROUTINE AddEffectCurveHelper(fieldIdx, Eff75, Eff100)
+SUBROUTINE AddEffectCurveHelper(fieldIdx, Eff75, Eff100, prefix)
     ! SUBROUTINE INFORMATION:
     !    AUTHOR         Yujie Xu
     !    DATE WRITTEN   December 2023
@@ -2140,6 +2140,7 @@ SUBROUTINE AddEffectCurveHelper(fieldIdx, Eff75, Eff100)
     INTEGER,INTENT(IN)                       :: fieldIdx
     REAL,INTENT(IN)                          :: Eff75
     REAL,INTENT(IN)                          :: Eff100
+    CHARACTER(len=*),INTENT(IN)              :: prefix ! "Sen" (Sensible) or "Lat" (Latent)
 
     ! SUBROUTINE PARAMETER DEFINITIONS:
     !    na
@@ -2153,7 +2154,7 @@ SUBROUTINE AddEffectCurveHelper(fieldIdx, Eff75, Eff100)
     ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     !    na
     CALL CreateNewObj('Table:Lookup')
-    CALL AddToObjFld('Name', fieldIdx,' SenEffectivenessTable')
+    CALL AddToObjFld('Name', fieldIdx,' '//prefix//'EffectivenessTable')
     CALL AddToObjFld('Independent Variable List Name', fieldIdx,' effIndVarList')
     CALL AddToObjStr('Normalization Method', 'DivisorOnly')
     CALL AddToObjStr('Normalization Divisor', RealToStr(Eff100))
@@ -2263,7 +2264,7 @@ SUBROUTINE AddSenEffectCurve(fieldIdx, htRecSens75, htRecSens100)
     CALL AddToObjStr('Latent Effectiveness of Cooling Air Flow Curve Name', '',.TRUE.)
     ! create curve objects for the heat exchanger start
     CALL AddEffectCurveIndVar(fieldIdx)
-    CALL AddEffectCurveHelper(fieldIdx, htRecSens75, htRecSens100)
+    CALL AddEffectCurveHelper(fieldIdx, htRecSens75, htRecSens100, 'Sen')
     ! create curve objects for the heat exchanger end
 END SUBROUTINE
 
@@ -2312,8 +2313,8 @@ SUBROUTINE AddSenLatEffectCurve(fieldIdx, htRecSens75, htRecSens100, htRecLat75,
     CALL AddToObjFld('Latent Effectiveness of Cooling Air Flow Curve Name', fieldIdx,' LatEffectivenessTable',.TRUE.)
     ! create curve objects for the heat exchanger start
     CALL AddEffectCurveIndVar(fieldIdx)
-    CALL AddEffectCurveHelper(fieldIdx, htRecSens75, htRecSens100)
-    CALL AddEffectCurveHelper(fieldIdx, htRecLat75, htRecLat100)
+    CALL AddEffectCurveHelper(fieldIdx, htRecSens75, htRecSens100, 'Sen')
+    CALL AddEffectCurveHelper(fieldIdx, htRecLat75, htRecLat100, 'Lat')
     ! create curve objects for the heat exchanger end
 END SUBROUTINE
 
