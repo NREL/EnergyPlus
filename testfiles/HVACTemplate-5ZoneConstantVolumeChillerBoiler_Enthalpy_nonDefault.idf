@@ -1970,9 +1970,9 @@
     ,                        !- Return Plenum Name
     CycleOnAny,              !- Night Cycle Control
     ,                        !- Night Cycle Control Zone Name
-    Sensible,                    !- Heat Recovery Type
-    ,                     !- Sensible Heat Recovery Effectiveness
-    ,                    !- Latent Heat Recovery Effectiveness
+    Enthalpy,                    !- Heat Recovery Type
+    0.4,                     !- Sensible Heat Recovery Effectiveness
+    0.3,                    !- Latent Heat Recovery Effectiveness
     Plate,                   !- Heat Recovery Heat Exchanger Type
     None,                    !- Heat Recovery Frost Control Type
     None,                    !- Dehumidification Control Type

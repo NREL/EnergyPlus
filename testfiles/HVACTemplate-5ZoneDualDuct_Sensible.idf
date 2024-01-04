@@ -1988,8 +1988,8 @@
     CycleOnAny,              !- Night Cycle Control
     ,                        !- Night Cycle Control Zone Name
     Sensible,                    !- Heat Recovery Type
-    0.7,                     !- Sensible Heat Recovery Effectiveness
-    0.65,                    !- Latent Heat Recovery Effectiveness
+    ,                     !- Sensible Heat Recovery Effectiveness
+    ,                    !- Latent Heat Recovery Effectiveness
     Plate,                   !- Heat Recovery Heat Exchanger Type
     None,                    !- Heat Recovery Frost Control Type
     None,                    !- Dehumidification Control Type

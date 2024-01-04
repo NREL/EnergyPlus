@@ -1989,8 +1989,8 @@
     0.8,                     !- Gas Heating Coil Efficiency
     ,                        !- Gas Heating Coil Parasitic Electric Load {W}
     Enthalpy,                !- Heat Recovery Type
-    0.7,                     !- Heat Recovery Sensible Effectiveness
-    0.65,                    !- Heat Recovery Latent Effectiveness
+    ,                     !- Heat Recovery Sensible Effectiveness
+    ,                    !- Heat Recovery Latent Effectiveness
     Plate,                   !- Heat Recovery Heat Exchanger Type
     MinimumExhaustTemperature,  !- Heat Recovery Frost Control Type
     None,                    !- Dehumidification Control Type

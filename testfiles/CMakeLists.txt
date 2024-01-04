@@ -852,6 +852,24 @@ if (BUILD_FORTRAN)
             2)
     add_simulation_test(
             IDF_FILE
+            HVACTemplate-5ZoneConstantVolumeChillerBoiler_Sensible_nonDefault.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZoneConstantVolumeChillerBoiler_Enthalpy_nonDefault.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
             HVACTemplate-5ZoneDualDuct.idf
             EPW_FILE
             USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
@@ -871,6 +889,24 @@ if (BUILD_FORTRAN)
     add_simulation_test(
             IDF_FILE
             HVACTemplate-5ZoneDualDuct_Enthalpy.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZoneDualDuct_Sensible_nonDefault.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZoneDualDuct_Enthalpy_nonDefault.idf
             EPW_FILE
             USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
             ENERGYPLUS_FLAGS
@@ -906,7 +942,52 @@ if (BUILD_FORTRAN)
             2)
     add_simulation_test(
             IDF_FILE
+            HVACTemplate-5ZoneFanCoil-DOAS_Sensible_nonDefault.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZoneFanCoil-DOAS_HXAssistCW_Sensible.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZoneFanCoil-DOAS_HXAssistDX_Sensible.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZoneFanCoil-DOAS_Enthalpy_nonDefault.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
             HVACTemplate-5ZoneFanCoil.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZoneFanCoil_HXAssistCW_Sensible.idf
             EPW_FILE
             USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
             ENERGYPLUS_FLAGS
@@ -934,6 +1015,24 @@ if (BUILD_FORTRAN)
     add_simulation_test(
             IDF_FILE
             HVACTemplate-5ZoneFurnaceDX_Enthalpy.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZoneFurnaceDX_Sensible_nonDefault.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZoneFurnaceDX_Enthalpy_nonDefault.idf
             EPW_FILE
             USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
             ENERGYPLUS_FLAGS
@@ -996,6 +1095,24 @@ if (BUILD_FORTRAN)
             2)
     add_simulation_test(
             IDF_FILE
+            HVACTemplate-5ZonePackagedVAV_Sensible_nonDefault.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZonePackagedVAV_Enthalpy_nonDefault.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
             HVACTemplate-5ZonePurchAir.idf
             EPW_FILE
             USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
@@ -1032,6 +1149,24 @@ if (BUILD_FORTRAN)
             2)
     add_simulation_test(
             IDF_FILE
+            HVACTemplate-5ZoneUnitaryHeatPump_Sensible_nonDefault.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZoneUnitaryHeatPump_Enthalpy_nonDefault.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
             HVACTemplate-5ZoneUnitarySystem.idf
             EPW_FILE
             USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
@@ -1059,6 +1194,42 @@ if (BUILD_FORTRAN)
             2)
     add_simulation_test(
             IDF_FILE
+            HVACTemplate-5ZoneUnitarySystem_Sensible_nonDefault.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZoneUnitarySystem_HXAssistCW_Sensible.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZoneUnitarySystem_HXAssistDX_Sensible.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZoneUnitarySystem_Enthalpy_nonDefault.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
             HVACTemplate-5ZoneVAVFanPowered.idf
             EPW_FILE
             USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
@@ -1078,6 +1249,24 @@ if (BUILD_FORTRAN)
     add_simulation_test(
             IDF_FILE
             HVACTemplate-5ZoneVAVFanPowered_Enthalpy.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZoneVAVFanPowered_Sensible_nonDefault.idf
+            EPW_FILE
+            USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+            ENERGYPLUS_FLAGS
+            -x
+            COST
+            2)
+    add_simulation_test(
+            IDF_FILE
+            HVACTemplate-5ZoneVAVFanPowered_Enthalpy_nonDefault.idf
             EPW_FILE
             USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
             ENERGYPLUS_FLAGS

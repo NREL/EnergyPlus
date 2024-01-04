@@ -2,12 +2,11 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! HVACTemplate-5ZoneConstantVolumeChillerBoiler.idf
+! HVACTemplate-5ZoneFanCoil.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum
 !                          illustrates the use of HVACTemplate objects to define zone thermostats and
-!                          constant volume air handlers with chilled water and hot water loops.
-!
-! Highlights:              HVACTemplate thermostats, constant volume systems, chiller, condenser and boiler loops
+!                          fan coil units with chilled water and hot water loops.
+! Highlights:              HVACTemplate thermostats, fan coils, chiller, condenser and boiler loops
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
@@ -77,15 +76,13 @@
 ! Natural Ventilation:            None
 ! Compact Schedules:              Yes
 !
-! HVAC:                           Constant volume systems with outside air, hot water heating coils,
-!                                 and chilled water cooling coils. Spaces 1-4 are served by AHU 1 and
-!                                 have hot water reheat coils. Space 5 is served by AHU 2 which is
-!                                 controlled by the Space 5 thermostat with no reheat coil.
-!                                 Central Plant is single hot water boiler, electric compression
-!                                 chiller with water cooled condenser. All equipment is autosized.
+! HVAC:                           Four pipe an coil system with outside air, hot water heating coils,
+!                                 and chilled water cooling coils. Central Plant is single hot water
+!                                 boiler, electric compression chiller with water cooled condenser.
+!                                 All equipment is autosized.
 !
-! Zonal Equipment:                No
-! Central Air Handling Equipment: Yes
+! Zonal Equipment:                Yes
+! Central Air Handling Equipment: None
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
@@ -95,10 +92,10 @@
 ! Chillers:                       Yes
 !
 ! Results:
-! Standard Reports:               AllSummary
+! Standard Reports:               None
 ! Timestep or Hourly Variables:   Hourly
 ! Time bins Report:               None
-! HTML Report:                    Yes
+! HTML Report:                    None
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
@@ -161,8 +158,20 @@
     10,                      !- Upper Limit Value
     CONTINUOUS;              !- Numeric Type
 
+!  RunPeriod,
+!    1,                       !- Begin Month
+!    1,                      !- Begin Day Of Month
+!    12,                       !- End Month
+!    31,                      !- End Day Of Month
+!    Tuesday,                 !- Day Of Week For Start Day
+!    Yes,                     !- Use WeatherFile Holidays/Special Days
+!    Yes,                     !- Use WeatherFile DaylightSavingPeriod
+!    No,                      !- Apply Weekend Holiday Rule
+!    Yes,                     !- Use WeatherFile Rain Indicators
+!    Yes;                     !- Use WeatherFile Snow Indicators
+
   RunPeriod,
-    Run Period 1,            !- Name
+    Run Period 2,            !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
     ,                        !- Begin Year
@@ -177,7 +186,7 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    Run Period 2,            !- Name
+    Run Period 3,            !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -1780,289 +1789,185 @@
     Clg-SetP-Sch,            !- Cooling Setpoint Schedule Name
     ;                        !- Constant Cooling Setpoint {C}
 
-  HVACTemplate:Zone:ConstantVolume,
+  HVACTemplate:Zone:FanCoil,
     SPACE1-1,                !- Zone Name
-    AHU 1 Spaces 1-4,        !- Template Constant Volume System Name
     All Zones,               !- Template Thermostat Name
     autosize,                !- Supply Air Maximum Flow Rate {m3/s}
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
-    Flow/Person,             !- Outdoor Air Method
+    flow/person,             !- Outdoor Air Method
     0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    ,                        !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
-    ,                        !- Design Specification Outdoor Air Object name
-    ,                        !- Design Specification Zone Air Distribution Object Name
-    HotWater,                !- Reheat Coil Type
-    ,                        !- Reheat Coil Availability Schedule Name
-    ,                        !- Maximum Reheat Air Temperature {C}
-    ,                        !- Supply Plenum Name
-    ,                        !- Return Plenum Name
-    None,                    !- Baseboard Heating Type
-    ,                        !- Baseboard Heating Availability Schedule Name
-    ,                        !- Baseboard Heating Capacity {W}
-    SystemSupplyAirTemperature,  !- Zone Cooling Design Supply Air Temperature Input Method
-    12.8,                    !- Zone Cooling Design Supply Air Temperature {C}
-    11.11,                   !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+    0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    FanAvailSched,           !- System Availability Schedule Name
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    HeatExchangerAssistedChilledWater,            !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    12.5,                    !- Cooling Coil Design Setpoint {C}
+    HotWater,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    50,                      !- Heating Coil Design Setpoint {C}
+    ,                        !- Dedicated Outdoor Air System Name
+    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
+    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
-    50,                      !- Zone Heating Design Supply Air Temperature {C}
-    30;                      !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Capacity Control Method
+    ,                        !- Low Speed Supply Air Flow Ratio
+    ,                        !- Medium Speed Supply Air Flow Ratio
+    ,                        !- Outdoor Air Schedule Name
+    ,                        !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    ;                        !- Baseboard Heating Capacity {W}
 
-  HVACTemplate:Zone:ConstantVolume,
+  HVACTemplate:Zone:FanCoil,
     SPACE2-1,                !- Zone Name
-    AHU 1 Spaces 1-4,        !- Template Constant Volume System Name
     All Zones,               !- Template Thermostat Name
     autosize,                !- Supply Air Maximum Flow Rate {m3/s}
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
-    Flow/Person,             !- Outdoor Air Method
+    flow/person,             !- Outdoor Air Method
     0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    ,                        !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
-    ,                        !- Design Specification Outdoor Air Object name
-    ,                        !- Design Specification Zone Air Distribution Object Name
-    HotWater,                !- Reheat Coil Type
-    ,                        !- Reheat Coil Availability Schedule Name
-    ,                        !- Maximum Reheat Air Temperature {C}
-    ,                        !- Supply Plenum Name
-    ,                        !- Return Plenum Name
-    None,                    !- Baseboard Heating Type
-    ,                        !- Baseboard Heating Availability Schedule Name
-    ,                        !- Baseboard Heating Capacity {W}
-    SystemSupplyAirTemperature,  !- Zone Cooling Design Supply Air Temperature Input Method
-    12.8,                    !- Zone Cooling Design Supply Air Temperature {C}
-    11.11,                   !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+    0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    FanAvailSched,           !- System Availability Schedule Name
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    ChilledWater,            !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    12.5,                    !- Cooling Coil Design Setpoint {C}
+    HotWater,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    50,                      !- Heating Coil Design Setpoint {C}
+    ,                        !- Dedicated Outdoor Air System Name
+    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
+    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
-    50,                      !- Zone Heating Design Supply Air Temperature {C}
-    30;                      !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Capacity Control Method
+    ,                        !- Low Speed Supply Air Flow Ratio
+    ,                        !- Medium Speed Supply Air Flow Ratio
+    ,                        !- Outdoor Air Schedule Name
+    ,                        !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    ;                        !- Baseboard Heating Capacity {W}
 
-  HVACTemplate:Zone:ConstantVolume,
+  HVACTemplate:Zone:FanCoil,
     SPACE3-1,                !- Zone Name
-    AHU 1 Spaces 1-4,        !- Template Constant Volume System Name
     All Zones,               !- Template Thermostat Name
     autosize,                !- Supply Air Maximum Flow Rate {m3/s}
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
-    Flow/Person,             !- Outdoor Air Method
+    flow/person,             !- Outdoor Air Method
     0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    ,                        !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
-    ,                        !- Design Specification Outdoor Air Object name
-    ,                        !- Design Specification Zone Air Distribution Object Name
-    HotWater,                !- Reheat Coil Type
-    ,                        !- Reheat Coil Availability Schedule Name
-    ,                        !- Maximum Reheat Air Temperature {C}
-    ,                        !- Supply Plenum Name
-    ,                        !- Return Plenum Name
-    None,                    !- Baseboard Heating Type
-    ,                        !- Baseboard Heating Availability Schedule Name
-    ,                        !- Baseboard Heating Capacity {W}
-    SystemSupplyAirTemperature,  !- Zone Cooling Design Supply Air Temperature Input Method
-    12.8,                    !- Zone Cooling Design Supply Air Temperature {C}
-    11.11,                   !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+    0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    FanAvailSched,           !- System Availability Schedule Name
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    ChilledWater,            !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    12.5,                    !- Cooling Coil Design Setpoint {C}
+    HotWater,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    50,                      !- Heating Coil Design Setpoint {C}
+    ,                        !- Dedicated Outdoor Air System Name
+    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
+    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
-    50,                      !- Zone Heating Design Supply Air Temperature {C}
-    30;                      !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Capacity Control Method
+    ,                        !- Low Speed Supply Air Flow Ratio
+    ,                        !- Medium Speed Supply Air Flow Ratio
+    ,                        !- Outdoor Air Schedule Name
+    ,                        !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    ;                        !- Baseboard Heating Capacity {W}
 
-  HVACTemplate:Zone:ConstantVolume,
+  HVACTemplate:Zone:FanCoil,
     SPACE4-1,                !- Zone Name
-    AHU 1 Spaces 1-4,        !- Template Constant Volume System Name
     All Zones,               !- Template Thermostat Name
     autosize,                !- Supply Air Maximum Flow Rate {m3/s}
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
-    Flow/Person,             !- Outdoor Air Method
+    flow/person,             !- Outdoor Air Method
     0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    ,                        !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
-    ,                        !- Design Specification Outdoor Air Object name
-    ,                        !- Design Specification Zone Air Distribution Object Name
-    HotWater,                !- Reheat Coil Type
-    ,                        !- Reheat Coil Availability Schedule Name
-    ,                        !- Maximum Reheat Air Temperature {C}
-    ,                        !- Supply Plenum Name
-    ,                        !- Return Plenum Name
-    None,                    !- Baseboard Heating Type
-    ,                        !- Baseboard Heating Availability Schedule Name
-    ,                        !- Baseboard Heating Capacity {W}
-    SystemSupplyAirTemperature,  !- Zone Cooling Design Supply Air Temperature Input Method
-    12.8,                    !- Zone Cooling Design Supply Air Temperature {C}
-    11.11,                   !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+    0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    FanAvailSched,           !- System Availability Schedule Name
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    ChilledWater,            !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    12.5,                    !- Cooling Coil Design Setpoint {C}
+    HotWater,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    50,                      !- Heating Coil Design Setpoint {C}
+    ,                        !- Dedicated Outdoor Air System Name
+    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
+    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
-    50,                      !- Zone Heating Design Supply Air Temperature {C}
-    30;                      !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Capacity Control Method
+    ,                        !- Low Speed Supply Air Flow Ratio
+    ,                        !- Medium Speed Supply Air Flow Ratio
+    ,                        !- Outdoor Air Schedule Name
+    ,                        !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    ;                        !- Baseboard Heating Capacity {W}
 
-  HVACTemplate:Zone:ConstantVolume,
+  HVACTemplate:Zone:FanCoil,
     SPACE5-1,                !- Zone Name
-    AHU 2 Space 5,           !- Template Constant Volume System Name
     All Zones,               !- Template Thermostat Name
     autosize,                !- Supply Air Maximum Flow Rate {m3/s}
     ,                        !- Zone Heating Sizing Factor
     ,                        !- Zone Cooling Sizing Factor
-    Flow/Person,             !- Outdoor Air Method
+    flow/person,             !- Outdoor Air Method
     0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-    ,                        !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-    ,                        !- Outdoor Air Flow Rate per Zone {m3/s}
-    ,                        !- Design Specification Outdoor Air Object name
-    ,                        !- Design Specification Zone Air Distribution Object Name
-    None,                    !- Reheat Coil Type
-    ,                        !- Reheat Coil Availability Schedule Name
-    ,                        !- Maximum Reheat Air Temperature {C}
-    ,                        !- Supply Plenum Name
-    ,                        !- Return Plenum Name
-    None,                    !- Baseboard Heating Type
-    ,                        !- Baseboard Heating Availability Schedule Name
-    ,                        !- Baseboard Heating Capacity {W}
-    SystemSupplyAirTemperature,  !- Zone Cooling Design Supply Air Temperature Input Method
-    12.8,                    !- Zone Cooling Design Supply Air Temperature {C}
-    11.11,                   !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+    0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
+    0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
+    FanAvailSched,           !- System Availability Schedule Name
+    0.7,                     !- Supply Fan Total Efficiency
+    75,                      !- Supply Fan Delta Pressure {Pa}
+    0.9,                     !- Supply Fan Motor Efficiency
+    1,                       !- Supply Fan Motor in Air Stream Fraction
+    ChilledWater,            !- Cooling Coil Type
+    ,                        !- Cooling Coil Availability Schedule Name
+    12.5,                    !- Cooling Coil Design Setpoint {C}
+    HotWater,                !- Heating Coil Type
+    ,                        !- Heating Coil Availability Schedule Name
+    50,                      !- Heating Coil Design Setpoint {C}
+    ,                        !- Dedicated Outdoor Air System Name
+    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
+    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
-    50,                      !- Zone Heating Design Supply Air Temperature {C}
-    30;                      !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-
-  HVACTemplate:System:ConstantVolume,
-    AHU 1 Spaces 1-4,        !- Name
-    FanAvailSched,           !- System Availability Schedule Name
-    autosize,                !- Supply Fan Maximum Flow Rate {m3/s}
-    0.7,                     !- Supply Fan Total Efficiency
-    600,                     !- Supply Fan Delta Pressure {Pa}
-    0.9,                     !- Supply Fan Motor Efficiency
-    1,                       !- Supply Fan Motor in Air Stream Fraction
-    DrawThrough,             !- Supply Fan Placement
-    ChilledWater,            !- Cooling Coil Type
-    ,                        !- Cooling Coil Availability Schedule Name
-    Warmest,                 !- Cooling Coil Setpoint Control Type
-    ,                        !- Cooling Coil Control Zone name
-    12.8,                    !- Cooling Coil Design Setpoint Temperature {C}
-    ,                        !- Cooling Coil Setpoint Schedule Name
-    15.6,                    !- Cooling Coil Setpoint at Outdoor Dry-Bulb Low {C}
-    15.6,                    !- Cooling Coil Reset Outdoor Dry-Bulb Low {C}
-    12.8,                    !- Cooling Coil Setpoint at Outdoor Dry-Bulb High {C}
-    23.3,                    !- Cooling Coil Reset Outdoor Dry-Bulb High {C}
-    HotWater,                !- Heating Coil Type
-    ,                        !- Heating Coil Availability Schedule Name
-    OutdoorAirTemperatureReset,  !- Heating Coil Setpoint Control Type
-    ,                        !- Heating Coil Control Zone name
-    15,                      !- Heating Coil Design Setpoint {C}
-    ,                        !- Heating Coil Setpoint Schedule Name
-    15,                      !- Heating Coil Setpoint at Outdoor Dry-Bulb Low {C}
-    7.8,                     !- Heating Coil Reset Outdoor Dry-Bulb Low {C}
-    12.2,                    !- Heating Coil Setpoint at Outdoor Dry-Bulb High {C}
-    12.2,                    !- Heating Coil Reset Outdoor Dry-Bulb High {C}
-    autosize,                !- Heating Coil Capacity {W}
-    0.8,                     !- Gas Heating Coil Efficiency
-    ,                        !- Gas Heating Coil Parasitic Electric Load {W}
-    None,                    !- Preheat Coil Type
-    ,                        !- Preheat Coil Availability Schedule Name
-    7.2,                     !- Preheat Coil Design Setpoint {C}
-    ,                        !- Preheat Coil Setpoint Schedule Name
-    0.8,                     !- Gas Preheat Coil Efficiency
-    ,                        !- Gas Preheat Coil Parasitic Electric Load {W}
-    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-    ,                        !- Minimum Outdoor Air Schedule Name
-    FixedDryBulb,            !- Economizer Type
-    19,                      !- Economizer Upper Temperature Limit {C}
-    4,                       !- Economizer Lower Temperature Limit {C}
-    ,                        !- Economizer Upper Enthalpy Limit {J/kg}
-    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
-    ,                        !- Supply Plenum Name
-    ,                        !- Return Plenum Name
-    CycleOnAny,              !- Night Cycle Control
-    ,                        !- Night Cycle Control Zone Name
-    Sensible,                    !- Heat Recovery Type
-    ,                     !- Sensible Heat Recovery Effectiveness
-    ,                    !- Latent Heat Recovery Effectiveness
-    Plate,                   !- Heat Recovery Heat Exchanger Type
-    None,                    !- Heat Recovery Frost Control Type
-    None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
-    60,                      !- Dehumidification Relative Humidity Setpoint {percent}
-    ,                        !- Dehumidification Relative Humidity Setpoint Schedule Name
-    None,                    !- Humidifier Type
-    ,                        !- Humidifier Availability Schedule Name
-    0.000001,                !- Humidifier Rated Capacity {m3/s}
-    autosize,                !- Humidifier Rated Electric Power {W}
-    ,                        !- Humidifier Control Zone Name
-    30,                      !- Humidifier Relative Humidity Setpoint {percent}
-    ,                        !- Humidifier Relative Humidity Setpoint Schedule Name
-    Yes,                     !- Return Fan
-    0.7,                     !- Return Fan Total Efficiency
-    300,                     !- Return Fan Delta Pressure {Pa}
-    0.9,                     !- Return Fan Motor Efficiency
-    1;                       !- Return Fan Motor in Air Stream Fraction
-
-  HVACTemplate:System:ConstantVolume,
-    AHU 2 Space 5,           !- Name
-    FanAvailSched,           !- System Availability Schedule Name
-    autosize,                !- Supply Fan Maximum Flow Rate {m3/s}
-    0.7,                     !- Supply Fan Total Efficiency
-    600,                     !- Supply Fan Delta Pressure {Pa}
-    0.9,                     !- Supply Fan Motor Efficiency
-    1,                       !- Supply Fan Motor in Air Stream Fraction
-    DrawThrough,             !- Supply Fan Placement
-    ChilledWater,            !- Cooling Coil Type
-    ,                        !- Cooling Coil Availability Schedule Name
-    ControlZone,             !- Cooling Coil Setpoint Control Type
-    SPACE5-1,                !- Cooling Coil Control Zone name
-    12.8,                    !- Cooling Coil Design Setpoint Temperature {C}
-    ,                        !- Cooling Coil Setpoint Schedule Name
-    15.6,                    !- Cooling Coil Setpoint at Outdoor Dry-Bulb Low {C}
-    15.6,                    !- Cooling Coil Reset Outdoor Dry-Bulb Low {C}
-    12.8,                    !- Cooling Coil Setpoint at Outdoor Dry-Bulb High {C}
-    23.3,                    !- Cooling Coil Reset Outdoor Dry-Bulb High {C}
-    HotWater,                !- Heating Coil Type
-    ,                        !- Heating Coil Availability Schedule Name
-    ControlZone,             !- Heating Coil Setpoint Control Type
-    SPACE5-1,                !- Heating Coil Control Zone name
-    50.0,                    !- Heating Coil Design Setpoint {C}
-    ,                        !- Heating Coil Setpoint Schedule Name
-    50.0,                    !- Heating Coil Setpoint at Outdoor Dry-Bulb Low {C}
-    7.8,                     !- Heating Coil Reset Outdoor Dry-Bulb Low {C}
-    12.2,                    !- Heating Coil Setpoint at Outdoor Dry-Bulb High {C}
-    12.2,                    !- Heating Coil Reset Outdoor Dry-Bulb High {C}
-    autosize,                !- Heating Coil Capacity {W}
-    0.8,                     !- Gas Heating Coil Efficiency
-    ,                        !- Gas Heating Coil Parasitic Electric Load {W}
-    None,                    !- Preheat Coil Type
-    ,                        !- Preheat Coil Availability Schedule Name
-    7.2,                     !- Preheat Coil Design Setpoint {C}
-    ,                        !- Preheat Coil Setpoint Schedule Name
-    0.8,                     !- Gas Preheat Coil Efficiency
-    ,                        !- Gas Preheat Coil Parasitic Electric Load {W}
-    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-    ,                        !- Minimum Outdoor Air Schedule Name
-    FixedDryBulb,            !- Economizer Type
-    19,                      !- Economizer Upper Temperature Limit {C}
-    4,                       !- Economizer Lower Temperature Limit {C}
-    ,                        !- Economizer Upper Enthalpy Limit {J/kg}
-    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
-    ,                        !- Supply Plenum Name
-    ,                        !- Return Plenum Name
-    CycleOnAny,              !- Night Cycle Control
-    ,                        !- Night Cycle Control Zone Name
-    None,                    !- Heat Recovery Type
-    0.7,                     !- Sensible Heat Recovery Effectiveness
-    0.65,                    !- Latent Heat Recovery Effectiveness
-    Plate,                   !- Heat Recovery Heat Exchanger Type
-    None,                    !- Heat Recovery Frost Control Type
-    None,                    !- Dehumidification Control Type
-    ,                        !- Dehumidification Control Zone Name
-    60,                      !- Dehumidification Relative Humidity Setpoint {percent}
-    ,                        !- Dehumidification Relative Humidity Setpoint Schedule Name
-    None,                    !- Humidifier Type
-    ,                        !- Humidifier Availability Schedule Name
-    0.000001,                !- Humidifier Rated Capacity {m3/s}
-    autosize,                !- Humidifier Rated Electric Power {W}
-    ,                        !- Humidifier Control Zone Name
-    30,                      !- Humidifier Relative Humidity Setpoint {percent}
-    ,                        !- Humidifier Relative Humidity Setpoint Schedule Name
-    No,                      !- Return Fan
-    0.7,                     !- Return Fan Total Efficiency
-    300,                     !- Return Fan Delta Pressure {Pa}
-    0.9,                     !- Return Fan Motor Efficiency
-    1;                       !- Return Fan Motor in Air Stream Fraction
+    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Capacity Control Method
+    ,                        !- Low Speed Supply Air Flow Ratio
+    ,                        !- Medium Speed Supply Air Flow Ratio
+    ,                        !- Outdoor Air Schedule Name
+    ,                        !- Baseboard Heating Type
+    ,                        !- Baseboard Heating Availability Schedule Name
+    ;                        !- Baseboard Heating Capacity {W}
 
   HVACTemplate:Plant:ChilledWaterLoop,
     Chilled Water Loop,      !- Name
@@ -2150,6 +2055,8 @@
 
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
 
+  Output:Variable,*,Zone Mean Air Temperature,hourly;
+
   Output:Variable,*,Zone Mean Radiant Temperature,hourly;
 
   Output:Variable,*,Zone Operative Temperature,hourly;
@@ -2188,31 +2095,7 @@
 
   Output:Variable,*,Cooling Tower Fan Electricity Rate,hourly;
 
-  Output:Variable,AHU 1 Spaces 1-4 Mixed Air Outlet,System Node Temperature,hourly;
-
-  Output:Variable,AHU 1 Spaces 1-4 Supply Fan Outlet,System Node Temperature,hourly;
-
-  Output:Variable,AHU 1 Spaces 1-4 Cooling Coil Outlet,System Node Temperature,hourly;
-
-  Output:Variable,AHU 1 Spaces 1-4 Cooling Coil Outlet,System Node Setpoint Temperature,hourly;
-
-  Output:Variable,AHU 1 Spaces 1-4 Heating Coil Outlet,System Node Temperature,hourly;
-
-  Output:Variable,AHU 1 Spaces 1-4 Heating Coil Outlet,System Node Setpoint Temperature,hourly;
-
-  Output:Variable,AHU 2 Space 5 Supply Fan Outlet,System Node Temperature,hourly;
-
-  Output:Variable,AHU 2 Space 5 Supply Fan Outlet,System Node Temperature,hourly;
-
-  Output:Variable,AHU 2 Space 5 Cooling Coil Outlet,System Node Temperature,hourly;
-
-  Output:Variable,AHU 2 Space 5 Cooling Coil Outlet,System Node Setpoint Temperature,hourly;
-
-  Output:Variable,AHU 2 Space 5 Heating Coil Outlet,System Node Temperature,hourly;
-
-  Output:Variable,AHU 2 Space 5 Heating Coil Outlet,System Node Setpoint Temperature,hourly;
-
-  Output:VariableDictionary,IDF;
+  Output:VariableDictionary,Regular;
 
   Output:Surfaces:Drawing,dxf;
 

@@ -2018,8 +2018,8 @@
     CycleOnAnyZoneFansOnly,  !- Night Cycle Control
     ,                        !- Night Cycle Control Zone Name
     Sensible,                    !- Heat Recovery Type
-    0.70,                    !- Sensible Heat Recovery Effectiveness
-    0.65,                    !- Latent Heat Recovery Effectiveness
+    ,                    !- Sensible Heat Recovery Effectiveness
+    ,                    !- Latent Heat Recovery Effectiveness
     None,                    !- Cooling Coil Setpoint Reset Type
     None,                    !- Heating Coil Setpoint Reset Type
     None,                    !- Dehumidification Control Type
