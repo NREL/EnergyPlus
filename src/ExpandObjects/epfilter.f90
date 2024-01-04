@@ -15660,7 +15660,7 @@ DO iSys = 1, numCompactSysUnitHP
     CALL AddToObjStr('Frost Control Type','MinimumExhaustTemperature')
     CALL AddToObjStr('Threshold Temperature','1.7')
     CALL AddToObjStr('Initial Defrost Time Fraction','')
-    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','',.TRUE.)
+    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','')
     CALL AddToObjStr('Economizer Lockout','')
     CALL AddSenLatEffectCurve(base + uhpsAirHandlerNameOff, htRecSens75, htRecSens100, htRecLat75, htRecLat100)
   END IF
@@ -20469,7 +20469,7 @@ DO iSys = 1, numCompactSysConstVol
     CALL AddToObjStr('Initial Defrost Time Fraction','0.083')
     CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.012')
     CALL AddToObjStr('Economizer Lockout','Yes')
-    CALL AddSenEffectCurve(base + cvsFrostControlOff, htRecSens75, htRecSens100)
+    CALL AddSenEffectCurve(base + cvsAirHandlerNameOff, htRecSens75, htRecSens100)
   ELSEIF (heatRecovery .EQ. htrecEnth) THEN
     htRecSens75 = StringToReal(FldVal(base + cvsHeatRecSenEffOff)) + 0.05
     htRecSens100 = StringToReal(FldVal(base + cvsHeatRecSenEffOff))
@@ -32964,7 +32964,7 @@ DO iSys = 1, numCompactDedOutAir
     CALL AddToObjStr('Initial Defrost Time Fraction','0.083')
     CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.012')
     CALL AddToObjStr('Economizer Lockout','Yes')
-    CALL AddSenEffectCurve(base + doasFrostControlOff, htRecSens75, htRecSens100)
+    CALL AddSenEffectCurve(base + doasNameOff, htRecSens75, htRecSens100)
   ELSEIF (heatRecovery .EQ. htrecEnth) THEN
     htRecSens75 = StringToReal(FldVal(base + doasHeatRecSenEffOff)) + 0.05
     htRecSens100 = StringToReal(FldVal(base + doasHeatRecSenEffOff))
