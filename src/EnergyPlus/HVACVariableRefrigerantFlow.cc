@@ -11653,6 +11653,9 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         C_cap_operation = this->VRFOU_CapModFactor(
             state, h_comp_in, h_IU_evap_in, max(min(Psuction, RefPHigh), RefPLow), Tsuction + SH_Comp, Tsuction + 8, CapMinTc - 5);
 
+        // using compressor speed min-speed capacity calculation
+        CompEvaporatingCAPSpdMin = this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(1), this->CondensingTemp, Tsuction);
+
         if (Q_c_TU_PL * C_cap_operation < CompEvaporatingCAPSpdMin) {
             // Required cooling load is less than the min cooling capacity, on-off strategy
 
