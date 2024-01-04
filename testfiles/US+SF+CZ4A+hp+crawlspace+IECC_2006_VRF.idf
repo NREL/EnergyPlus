@@ -30,10 +30,10 @@
 !    dhw_type =
 !    TEMPLATE_PATH = template/v9.5
 
-  Version,22.2;
-
+  Version,24.1;
 
 ! added VRF system
+
   Schedule:Compact,
     VRFCondAvailSched,       !- Name
     Fraction,                !- Schedule Type Limits Name
@@ -51,22 +51,22 @@
     VRF Heat Pump TU List,   !- Zone Terminal Unit List Name
     R410A,                   !- Refrigerant Type
     10023,                   !- Rated Evaporative Capacity {W}
-    0.2931,                   !- Rated Compressor Power Per Unit of Rated Evaporative Capacity {dimensionless}
+    0.2931,                  !- Rated Compressor Power Per Unit of Rated Evaporative Capacity {dimensionless}
     -5,                      !- Minimum Outdoor Air Temperature in Cooling Mode {C}
     43,                      !- Maximum Outdoor Air Temperature in Cooling Mode {C}
     -20,                     !- Minimum Outdoor Air Temperature in Heating Mode {C}
     18,                      !- Maximum Outdoor Air Temperature in Heating Mode {C}
-    7.6,                       !- Reference Outdoor Unit Superheating {deltaC}
-    7.7,                       !- Reference Outdoor Unit Subcooling {deltaC}
+    7.6,                     !- Reference Outdoor Unit Superheating {deltaC}
+    7.7,                     !- Reference Outdoor Unit Subcooling {deltaC}
     VariableTemp,            !- Refrigerant Temperature Control Algorithm for Indoor Unit
-    10,                       !- Reference Evaporating Temperature for Indoor Unit {C}
-    38.9,                      !- Reference Condensing Temperature for Indoor Unit {C}
+    10,                      !- Reference Evaporating Temperature for Indoor Unit {C}
+    38.9,                    !- Reference Condensing Temperature for Indoor Unit {C}
     6,                       !- Variable Evaporating Temperature Minimum for Indoor Unit {C}
     13,                      !- Variable Evaporating Temperature Maximum for Indoor Unit {C}
     35,                      !- Variable Condensing Temperature Minimum for Indoor Unit {C}
     42,                      !- Variable Condensing Temperature Maximum for Indoor Unit {C}
     0.01197,                 !- Outdoor Unit Fan Power Per Unit of Rated Evaporative Capacity {dimensionless}
-    0.000169511,                 !- Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity {m3/s-W}
+    0.000169511,             !- Outdoor Unit Fan Flow Rate Per Unit of Rated Evaporative Capacity {m3/s-W}
     OUEvapTempCurve,         !- Outdoor Unit Evaporating Temperature Function of Superheating Curve Name
     OUCondTempCurve,         !- Outdoor Unit Condensing Temperature Function of Subcooling Curve Name
     0.0508,                  !- Diameter of Main Pipe Connecting Outdoor Unit to the First Branch Joint {m}
@@ -86,39 +86,36 @@
     ,                        !- Resistive Defrost Heater Capacity {W}
     ,                        !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
     4500000,                 !- Compressor maximum delta Pressure {Pa}
-    9,                       !- Number of Compressor Loading Index Entries
-    900,                    !- Compressor Speed at Loading Index 1 {rev/min}
-    MinSpdCooling,             !- Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
-    MinSpdPower,               !- Loading Index 1 Compressor Power Multiplier Function of Temperature Curve Name
-    1320,                    !- Compressor Speed at Loading Index 2 {rev/min}
-    Spd1Cooling,             !- Loading Index 2 Evaporative Capacity Multiplier Function of Temperature Curve Name
-    Spd1Power,               !- Loading Index 2 Compressor Power Multiplier Function of Temperature Curve Name
-    1920,                    !- Compressor Speed at Loading Index 3 {rev/min}
-    Spd2Cooling,             !- Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
-    Spd2Power,               !- Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
+    8,                       !- Number of Compressor Loading Index Entries
+    1319,                    !- Compressor Speed at Loading Index 1 {rev/min}
+    Spd1Cooling,             !- Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    Spd1Power,               !- Loading Index 1 Compressor Power Multiplier Function of Temperature Curve Name
+    1920,                    !- Compressor Speed at Loading Index 2 {rev/min}
+    Spd2Cooling,             !- Loading Index 2 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    Spd2Power,               !- Loading Index 2 Compressor Power Multiplier Function of Temperature Curve Name
     2580,                    !- Compressor Speed at Loading Index 3 {rev/min}
     Spd3Cooling,             !- Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
     Spd3Power,               !- Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
-    3480,                    !- Compressor Speed at Loading Index 3 {rev/min}
-    Spd4Cooling,             !- Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
-    Spd4Power,               !- Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
-    4380,                    !- Compressor Speed at Loading Index 3 {rev/min}
-    Spd5Cooling,             !- Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
-    Spd5Power,               !- Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
-    4800,                    !- Compressor Speed at Loading Index 3 {rev/min}
-    Spd6Cooling,             !- Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
-    Spd6Power,               !- Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
-    5730,                    !- Compressor Speed at Loading Index 3 {rev/min}
-    Spd7Cooling,             !- Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
-    Spd7Power,               !- Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
-    6900,                    !- Compressor Speed at Loading Index 3 {rev/min}
-    Spd8Cooling,             !- Loading Index 3 Evaporative Capacity Multiplier Function of Temperature Curve Name
-    Spd8Power;               !- Loading Index 3 Compressor Power Multiplier Function of Temperature Curve Name
+    3480,                    !- Compressor Speed at Loading Index 4 {rev/min}
+    Spd4Cooling,             !- Loading Index 4 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    Spd4Power,               !- Loading Index 4 Compressor Power Multiplier Function of Temperature Curve Name
+    4380,                    !- Compressor Speed at Loading Index 5 {rev/min}
+    Spd5Cooling,             !- Loading Index 5 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    Spd5Power,               !- Loading Index 5 Compressor Power Multiplier Function of Temperature Curve Name
+    4800,                    !- Compressor Speed at Loading Index 6 {rev/min}
+    Spd6Cooling,             !- Loading Index 6 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    Spd6Power,               !- Loading Index 6 Compressor Power Multiplier Function of Temperature Curve Name
+    5730,                    !- Compressor Speed at Loading Index 7 {rev/min}
+    Spd7Cooling,             !- Loading Index 7 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    Spd7Power,               !- Loading Index 7 list
+    6900,                    !- Compressor Speed at Loading Index 8 {rev/min}
+    Spd8Cooling,             !- Loading Index 8 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    Spd8Power;               !- Loading Index 8 Compressor Power Multiplier Function of Temperature Curve Name
 
   Curve:Quadratic,
     OUEvapTempCurve,         !- Name
-    -5.0464,                       !- Coefficient1 Constant
-    1.1194,                 !- Coefficient2 x
+    -5.0464,                 !- Coefficient1 Constant
+    1.1194,                  !- Coefficient2 x
     -0.0017,                 !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     50,                      !- Maximum Value of x
@@ -129,9 +126,9 @@
 
   Curve:Quadratic,
     OUCondTempCurve,         !- Name
-    -0.0269,                       !- Coefficient1 Constant
-    1.0814,                   !- Coefficient2 x
-    -0.0012,                   !- Coefficient3 x**2
+    -0.0269,                 !- Coefficient1 Constant
+    1.0814,                  !- Coefficient2 x
+    -0.0012,                 !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     30,                      !- Maximum Value of x
     ,                        !- Minimum Curve Output
@@ -139,335 +136,329 @@
     Temperature,             !- Input Unit Type for X
     Temperature;             !- Output Unit Type
 
+  Curve:Biquadratic,
+    MinSpdCooling,           !- Name
+    0.1407,                  !- Coefficient1 Constant
+    -0.0006872,              !- Coefficient2 x
+    -0.00001269,             !- Coefficient3 x**2
+    0.005913,                !- Coefficient4 y
+    0.00007356,              !- Coefficient5 y**2
+    -0.00004693,             !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
+  Curve:Biquadratic,
+    Spd1Cooling,             !- Name
+    0.2186,                  !- Coefficient1 Constant
+    -0.001577,               !- Coefficient2 x
+    -0.000008294,            !- Coefficient3 x**2
+    0.008626,                !- Coefficient4 y
+    0.000105,                !- Coefficient5 y**2
+    -0.00006976,             !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-Curve:Biquadratic,
-MinSpdCooling,!-Name
-0.1407,!-Coefficient1Constant
--0.0006872,!-Coefficient2x
--0.00001269,!-Coefficient3x**2
-0.005913,!-Coefficient4y
-0.00007356,!-Coefficient5y**2
--0.00004693,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
+  Curve:Biquadratic,
+    Spd2Cooling,             !- Name
+    0.3201,                  !- Coefficient1 Constant
+    -0.002263,               !- Coefficient2 x
+    -0.00001064,             !- Coefficient3 x**2
+    0.0125,                  !- Coefficient4 y
+    0.0001496,               !- Coefficient5 y**2
+    -0.000103,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
+  Curve:Biquadratic,
+    Spd3Cooling,             !- Name
+    0.4913,                  !- Coefficient1 Constant
+    -0.006415,               !- Coefficient2 x
+    0.00003422,              !- Coefficient3 x**2
+    0.01676,                 !- Coefficient4 y
+    0.0001999,               !- Coefficient5 y**2
+    -0.0001361,              !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-Curve:Biquadratic,
-Spd1Cooling,!-Name
-0.2186,!-Coefficient1Constant
--0.001577,!-Coefficient2x
--0.000008294,!-Coefficient3x**2
-0.008626,!-Coefficient4y
-0.000105,!-Coefficient5y**2
--0.00006976,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
+  Curve:Biquadratic,
+    Spd4Cooling,             !- Name
+    0.5808,                  !- Coefficient1 Constant
+    -0.003717,               !- Coefficient2 x
+    -0.00001957,             !- Coefficient3 x**2
+    0.02248,                 !- Coefficient4 y
+    0.0002053,               !- Coefficient5 y**2
+    -0.0001921,              !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
+  Curve:Biquadratic,
+    Spd5Cooling,             !- Name
+    0.7591,                  !- Coefficient1 Constant
+    -0.005862,               !- Coefficient2 x
+    -0.000007698,            !- Coefficient3 x**2
+    0.02731,                 !- Coefficient4 y
+    0.0003537,               !- Coefficient5 y**2
+    -0.0002037,              !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-Curve:Biquadratic,
-Spd2Cooling,!-Name
-0.3201,!-Coefficient1Constant
--0.002263,!-Coefficient2x
--0.00001064,!-Coefficient3x**2
-0.0125,!-Coefficient4y
-0.0001496,!-Coefficient5y**2
--0.000103,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
+  Curve:Biquadratic,
+    Spd6Cooling,             !- Name
+    0.8061,                  !- Coefficient1 Constant
+    -0.005029,               !- Coefficient2 x
+    -0.00002445,             !- Coefficient3 x**2
+    0.03092,                 !- Coefficient4 y
+    0.0003777,               !- Coefficient5 y**2
+    -0.0002377,              !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
+  Curve:Biquadratic,
+    Spd7Cooling,             !- Name
+    0.8781,                  !- Coefficient1 Constant
+    -0.00156,                !- Coefficient2 x
+    -0.00008131,             !- Coefficient3 x**2
+    0.04012,                 !- Coefficient4 y
+    0.0003905,               !- Coefficient5 y**2
+    -0.0003383,              !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-Curve:Biquadratic,
-Spd3Cooling,!-Name
-0.4913,!-Coefficient1Constant
--0.006415,!-Coefficient2x
-0.00003422,!-Coefficient3x**2
-0.01676,!-Coefficient4y
-0.0001999,!-Coefficient5y**2
--0.0001361,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
+  Curve:Biquadratic,
+    Spd8Cooling,             !- Name
+    0.9687,                  !- Coefficient1 Constant
+    0.002803,                !- Coefficient2 x
+    -0.0001528,              !- Coefficient3 x**2
+    0.0517,                  !- Coefficient4 y
+    0.0004067,               !- Coefficient5 y**2
+    -0.0004648,              !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
+  Curve:Biquadratic,
+    MinSpdPower,             !- Name
+    -0.0004381,              !- Coefficient1 Constant
+    0.001459,                !- Coefficient2 x
+    -0.000002076,            !- Coefficient3 x**2
+    -0.001412,               !- Coefficient4 y
+    -0.00002865,             !- Coefficient5 y**2
+    0.00003538,              !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-Curve:Biquadratic,
-Spd4Cooling,!-Name
-0.5808,!-Coefficient1Constant
--0.003717,!-Coefficient2x
--0.00001957,!-Coefficient3x**2
-0.02248,!-Coefficient4y
-0.0002053,!-Coefficient5y**2
--0.0001921,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
+  Curve:Biquadratic,
+    Spd1Power,               !- Name
+    0.003529,                !- Coefficient1 Constant
+    0.001969,                !- Coefficient2 x
+    -0.000001219,            !- Coefficient3 x**2
+    -0.002001,               !- Coefficient4 y
+    -0.00003987,             !- Coefficient5 y**2
+    0.00005041,              !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
+  Curve:Biquadratic,
+    Spd2Power,               !- Name
+    0.007864,                !- Coefficient1 Constant
+    0.002813,                !- Coefficient2 x
+    -0.000002908,            !- Coefficient3 x**2
+    -0.002862,               !- Coefficient4 y
+    -0.00005547,             !- Coefficient5 y**2
+    0.00007219,              !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-Curve:Biquadratic,
-Spd5Cooling,!-Name
-0.7591,!-Coefficient1Constant
--0.005862,!-Coefficient2x
--0.000007698,!-Coefficient3x**2
-0.02731,!-Coefficient4y
-0.0003537,!-Coefficient5y**2
--0.0002037,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
+  Curve:Biquadratic,
+    Spd3Power,               !- Name
+    0.05318,                 !- Coefficient1 Constant
+    0.004007,                !- Coefficient2 x
+    0.00001729,              !- Coefficient3 x**2
+    -0.005707,               !- Coefficient4 y
+    -0.0001153,              !- Coefficient5 y**2
+    0.0001452,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
+  Curve:Biquadratic,
+    Spd4Power,               !- Name
+    0.01397,                 !- Coefficient1 Constant
+    0.009363,                !- Coefficient2 x
+    -0.0000341,              !- Coefficient3 x**2
+    -0.00757,                !- Coefficient4 y
+    -0.0001547,              !- Coefficient5 y**2
+    0.0001957,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-Curve:Biquadratic,
-Spd6Cooling,!-Name
-0.8061,!-Coefficient1Constant
--0.005029,!-Coefficient2x
--0.00002445,!-Coefficient3x**2
-0.03092,!-Coefficient4y
-0.0003777,!-Coefficient5y**2
--0.0002377,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
+  Curve:Biquadratic,
+    Spd5Power,               !- Name
+    0.1167,                  !- Coefficient1 Constant
+    0.007259,                !- Coefficient2 x
+    0.00001968,              !- Coefficient3 x**2
+    -0.008029,               !- Coefficient4 y
+    -0.0001646,              !- Coefficient5 y**2
+    0.0002185,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
+  Curve:Biquadratic,
+    Spd6Power,               !- Name
+    0.2574,                  !- Coefficient1 Constant
+    0.004687,                !- Coefficient2 x
+    0.00008909,              !- Coefficient3 x**2
+    -0.009131,               !- Coefficient4 y
+    -0.0001989,              !- Coefficient5 y**2
+    0.000259,                !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-Curve:Biquadratic,
-Spd7Cooling,!-Name
-0.8781,!-Coefficient1Constant
--0.00156,!-Coefficient2x
--0.00008131,!-Coefficient3x**2
-0.04012,!-Coefficient4y
-0.0003905,!-Coefficient5y**2
--0.0003383,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
+  Curve:Biquadratic,
+    Spd7Power,               !- Name
+    0.5701,                  !- Coefficient1 Constant
+    -0.00674,                !- Coefficient2 x
+    0.0002654,               !- Coefficient3 x**2
+    -0.00734,                !- Coefficient4 y
+    -0.000198,               !- Coefficient5 y**2
+    0.0002378,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
-
-Curve:Biquadratic,
-Spd8Cooling,!-Name
-0.9687,!-Coefficient1Constant
-0.002803,!-Coefficient2x
--0.0001528,!-Coefficient3x**2
-0.0517,!-Coefficient4y
-0.0004067,!-Coefficient5y**2
--0.0004648,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
-
-
-
-
-
-Curve:Biquadratic,
-MinSpdPower,!-Name
--0.0004381,!-Coefficient1Constant
-0.001459,!-Coefficient2x
--0.000002076,!-Coefficient3x**2
--0.001412,!-Coefficient4y
--0.00002865,!-Coefficient5y**2
-0.00003538,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
-Curve:Biquadratic,
-Spd1Power,!-Name
-0.003529,!-Coefficient1Constant
-0.001969,!-Coefficient2x
--0.000001219,!-Coefficient3x**2
--0.002001,!-Coefficient4y
--0.00003987,!-Coefficient5y**2
-0.00005041,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
-Curve:Biquadratic,
-Spd2Power,!-Name
-0.007864,!-Coefficient1Constant
-0.002813,!-Coefficient2x
--0.000002908,!-Coefficient3x**2
--0.002862,!-Coefficient4y
--0.00005547,!-Coefficient5y**2
-0.00007219,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
-Curve:Biquadratic,
-Spd3Power,!-Name
-0.05318,!-Coefficient1Constant
-0.004007,!-Coefficient2x
-0.00001729,!-Coefficient3x**2
--0.005707,!-Coefficient4y
--0.0001153,!-Coefficient5y**2
-0.0001452,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
-Curve:Biquadratic,
-Spd4Power,!-Name
-0.01397,!-Coefficient1Constant
-0.009363,!-Coefficient2x
--0.0000341,!-Coefficient3x**2
--0.00757,!-Coefficient4y
--0.0001547,!-Coefficient5y**2
-0.0001957,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
-Curve:Biquadratic,
-Spd5Power,!-Name
-0.1167,!-Coefficient1Constant
-0.007259,!-Coefficient2x
-0.00001968,!-Coefficient3x**2
--0.008029,!-Coefficient4y
--0.0001646,!-Coefficient5y**2
-0.0002185,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
-Curve:Biquadratic,
-Spd6Power,!-Name
-0.2574,!-Coefficient1Constant
-0.004687,!-Coefficient2x
-0.00008909,!-Coefficient3x**2
--0.009131,!-Coefficient4y
--0.0001989,!-Coefficient5y**2
-0.000259,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
-Curve:Biquadratic,
-Spd7Power,!-Name
-0.5701,!-Coefficient1Constant
--0.00674,!-Coefficient2x
-0.0002654,!-Coefficient3x**2
--0.00734,!-Coefficient4y
--0.000198,!-Coefficient5y**2
-0.0002378,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
-Curve:Biquadratic,
-Spd8Power,!-Name
-0.9635,!-Coefficient1Constant
--0.02112,!-Coefficient2x
-0.0004872,!-Coefficient3x**2
--0.005087,!-Coefficient4y
--0.0001969,!-Coefficient5y**2
-0.0002112,!-Coefficient6x*y
-15,!-MinimumValueofx
-65,!-MaximumValueofx
--30,!-MinimumValueofy
-15,!-MaximumValueofy
-,!-MinimumCurveOutput
-,!-MaximumCurveOutput
-Temperature,!-InputUnitTypeforX
-Temperature,!-InputUnitTypeforY
-Dimensionless;!-OutputUnitType
+  Curve:Biquadratic,
+    Spd8Power,               !- Name
+    0.9635,                  !- Coefficient1 Constant
+    -0.02112,                !- Coefficient2 x
+    0.0004872,               !- Coefficient3 x**2
+    -0.005087,               !- Coefficient4 y
+    -0.0001969,              !- Coefficient5 y**2
+    0.0002112,               !- Coefficient6 x*y
+    15,                      !- Minimum Value of x
+    65,                      !- Maximum Value of x
+    -30,                     !- Minimum Value of y
+    15,                      !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONETERMINALUNITLIST ===========
 
@@ -482,14 +473,14 @@ Dimensionless;!-OutputUnitType
     VRFAvailSched,           !- Terminal Unit Availability Schedule
     TU1 Inlet Node,          !- Terminal Unit Air Inlet Node Name
     TU1 Outlet Node,         !- Terminal Unit Air Outlet Node Name
-    0.595,                !- Cooling Supply Air Flow Rate {m3/s}
-    0,                !- No Cooling Supply Air Flow Rate {m3/s}
-    0.595,                !- Heating Supply Air Flow Rate {m3/s}
-    0,                !- No Heating Supply Air Flow Rate {m3/s}
+    0.595,                   !- Cooling Supply Air Flow Rate {m3/s}
+    0,                       !- No Cooling Supply Air Flow Rate {m3/s}
+    0.595,                   !- Heating Supply Air Flow Rate {m3/s}
+    0,                       !- No Heating Supply Air Flow Rate {m3/s}
     autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
     autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
-    0,                !- No Load Outdoor Air Flow Rate {m3/s}
-    VRFFanModeSchedule,          !- Supply Air Fan Operating Mode Schedule Name
+    0,                       !- No Load Outdoor Air Flow Rate {m3/s}
+    VRFFanModeSchedule,      !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
     Fan:VariableVolume,      !- Supply Air Fan Object Type
     TU1 VRF Supply Fan,      !- Supply Air Fan Object Name
@@ -506,8 +497,7 @@ Dimensionless;!-OutputUnitType
     ,                        !- Design Specification ZoneHVAC Sizing Object Name
     Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
     TU1 Supp Heating Coil,   !- Supplemental Heating Coil Name
-    50;                !- Maximum Supply Air Temperature from Supplemental Heater {C}
-
+    50;                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:ELECTRIC ===========
 
@@ -519,10 +509,10 @@ Dimensionless;!-OutputUnitType
     TU1 VRF Fan Outlet Node, !- Air Inlet Node Name
     TU1 Outlet Node;         !- Air Outlet Node Name
 
-
 ! 0 means cycling fan/coil operation
- Schedule:Compact,
-    VRFFanModeSchedule,          !- Name
+
+  Schedule:Compact,
+    VRFFanModeSchedule,      !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
@@ -538,26 +528,26 @@ Dimensionless;!-OutputUnitType
     TU1 Inlet Node;          !- Return Air Stream Node Name
 
   OutdoorAir:NodeList,
-    Outside Air Inlet Node 1;  !- Node or NodeList Name 1
+    Outside Air Inlet Node 1;!- Node or NodeList Name 1
 
- Fan:VariableVolume,
+  Fan:VariableVolume,
     TU1 VRF Supply Fan,      !- Name
     VRFAvailSched,           !- Availability Schedule Name
     0.5,                     !- Fan Total Efficiency
     400,                     !- Pressure Rise {Pa}
-    0.595,                !- Maximum Flow Rate {m3/s}
-    FixedFlowRate,                !- Fan Power Minimum Flow Rate Input Method
+    0.595,                   !- Maximum Flow Rate {m3/s}
+    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method
     0,                       !- Fan Power Minimum Flow Fraction
-    0.415,                       !- Fan Power Minimum Air Flow Rate {m3/s}
+    0.415,                   !- Fan Power Minimum Air Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1,                       !- Motor In Airstream Fraction
-    0.09,                   !- Fan Power Coefficient 1
+    0.09,                    !- Fan Power Coefficient 1
     0,                       !- Fan Power Coefficient 2
     0,                       !- Fan Power Coefficient 3
-    0.91,                   !- Fan Power Coefficient 4
+    0.91,                    !- Fan Power Coefficient 4
     0,                       !- Fan Power Coefficient 5
     TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name
-    TU1 VRF Fan Outlet Node,         !- Air Outlet Node Name
+    TU1 VRF Fan Outlet Node, !- Air Outlet Node Name
     General;                 !- End-Use Subcategory
 
 !- ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL ===========
@@ -567,18 +557,17 @@ Dimensionless;!-OutputUnitType
     VRFAvailSched,           !- Availability Schedule Name
     TU1 VRF DX CCoil Inlet Node,  !- Coil Air Inlet Node
     TU1 VRF DX CCoil Outlet Node,  !- Coil Air Outlet Node
-    10023,                !- Rated Total Cooling Capacity {W}
+    10023,                   !- Rated Total Cooling Capacity {W}
     autosize,                !- Rated Sensible Heat Ratio
-    8.7,                       !- Indoor Unit Reference Superheating {deltaC}
+    8.7,                     !- Indoor Unit Reference Superheating {deltaC}
     IUEvapTempCurve,         !- Indoor Unit Evaporating Temperature Function of Superheating Curve Name
     ;                        !- Name of Water Storage Tank for Condensate Collection
 
-
- Curve:Quadratic,
+  Curve:Quadratic,
     IUEvapTempCurve,         !- Name
-    3.3627,                       !- Coefficient1 Constant
-    -0.1535,                   !- Coefficient2 x
-    0.0359,                       !- Coefficient3 x**2
+    3.3627,                  !- Coefficient1 Constant
+    -0.1535,                 !- Coefficient2 x
+    0.0359,                  !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     25,                      !- Maximum Value of x
     ,                        !- Minimum Curve Output
@@ -593,15 +582,14 @@ Dimensionless;!-OutputUnitType
     VRFAvailSched,           !- Availability Schedule
     TU1 VRF DX CCoil Outlet Node,  !- Coil Air Inlet Node
     TU1 VRF DX HCoil Outlet Node,  !- Coil Air Outlet Node
-    10023,                !- Rated Total Heating Capacity {W}
-    11.5,                       !- Indoor Unit Reference Subcooling {deltaC}
+    10023,                   !- Rated Total Heating Capacity {W}
+    11.5,                    !- Indoor Unit Reference Subcooling {deltaC}
     IUCondTempCurve;         !- Indoor Unit Condensing Temperature Function of Subcooling Curve Name
-
 
   Curve:Quadratic,
     IUCondTempCurve,         !- Name
-    1.2124,                   !- Coefficient1 Constant
-    0.1306,                   !- Coefficient2 x
+    1.2124,                  !- Coefficient1 Constant
+    0.1306,                  !- Coefficient2 x
     0.0169,                  !- Coefficient3 x**2
     0,                       !- Minimum Value of x
     25,                      !- Maximum Value of x
@@ -630,15 +618,15 @@ Dimensionless;!-OutputUnitType
     Until: 24:00,1.0;        !- Field 21
 
   ZoneHVAC:EquipmentConnections,
-    living_unit1,                !- Zone Name
-    living_unit1 Eq,             !- Zone Conditioning Equipment List Name
-    living_unit1 In Nodes,       !- Zone Air Inlet Node or NodeList Name
-    living_unit1 Out Nodes,      !- Zone Air Exhaust Node or NodeList Name
-    living_unit1 Node,           !- Zone Air Node Name
-    living_unit1 Out Node;       !- Zone Return Air Node or NodeList Name
+    living_unit1,            !- Zone Name
+    living_unit1 Eq,         !- Zone Conditioning Equipment List Name
+    living_unit1 In Nodes,   !- Zone Air Inlet Node or NodeList Name
+    living_unit1 Out Nodes,  !- Zone Air Exhaust Node or NodeList Name
+    living_unit1 Node,       !- Zone Air Node Name
+    living_unit1 Out Node;   !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
-    living_unit1 Eq,             !- Name
+    living_unit1 Eq,         !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type
     TU1,                     !- Zone Equipment 1 Name
@@ -648,13 +636,12 @@ Dimensionless;!-OutputUnitType
     ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   NodeList,
-    living_unit1 In Nodes,       !- Name
+    living_unit1 In Nodes,   !- Name
     TU1 Outlet Node;         !- Node 1 Name
 
   NodeList,
-    living_unit1 Out Nodes,      !- Name
+    living_unit1 Out Nodes,  !- Name
     TU1 Inlet Node;          !- Node 1 Name
-
 
 !-   ===========  ALL OBJECTS IN CLASS: FLUIDPROPERTIES:NAME ===========
 
@@ -1923,31 +1910,6 @@ Dimensionless;!-OutputUnitType
     0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,0.0000E+00,
     0.0000E+00,3.1758E+02;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !-   ===========  ALL OBJECTS IN CLASS: GLOBALGEOMETRYRULES ===========
 
   GlobalGeometryRules,
@@ -2550,7 +2512,7 @@ Dimensionless;!-OutputUnitType
     Yes,                     !- Do Zone Sizing Calculation
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    No,                     !- Run Simulation for Sizing Periods
+    No,                      !- Run Simulation for Sizing Periods
     Yes,                     !- Run Simulation for Weather File Run Periods
     ,                        !- Do HVAC Sizing Simulation for Sizing Periods
     ;                        !- Maximum Number of HVAC Sizing Simulation Passes
@@ -6018,7 +5980,6 @@ Dimensionless;!-OutputUnitType
     ,                        !- Zone Humidification Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.005;                   !- Zone Humidification Design Supply Air Humidity Ratio Difference {kgWater/kgDryAir}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONECONTROL:THERMOSTAT ===========
 
   ZoneControl:Thermostat,
@@ -6223,9 +6184,6 @@ Dimensionless;!-OutputUnitType
 !    Zone Exhaust Fan_unit1,        !- Name
 !    0.01,                    !- Air Mass Flow Coefficient When the Zone Exhaust Fan is Off at Reference Conditions {kg/s}
 !    0.667;                   !- Air Mass Flow Exponent When the Zone Exhaust Fan is Off {dimensionless}
-
-
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:OUTDOORAIRUNIT ===========
 
   ZoneVentilation:DesignFlowRate,
@@ -6265,9 +6223,7 @@ Dimensionless;!-OutputUnitType
     ,                        !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0283168464628752;      !- Outdoor Air Flow per Zone {m3/s}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
-
 ! Fan:ZoneExhaust,
 !    Zone Exhaust Fan_unit1,        !- Name
 !    always_avail,            !- Availability Schedule Name
@@ -6279,8 +6235,6 @@ Dimensionless;!-OutputUnitType
 !    Ventilation,                 !- End-Use Subcategory
 !    ,                        !- Flow Fraction Schedule Name
 !    Decoupled;               !- System Availability Manager Coupling Mode
-
-
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:NODE ===========
 
   OutdoorAir:Node,
@@ -6301,8 +6255,6 @@ Dimensionless;!-OutputUnitType
 !   3,                       !- Zone Equipment 2 Heating or No-Load Sequence
 !   ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
 !   ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
-
-
    !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:ENERGYRECOVERYVENTILATOR ===========
 
   ZoneHVAC:EnergyRecoveryVentilator,
@@ -6316,7 +6268,7 @@ Dimensionless;!-OutputUnitType
 
   Fan:OnOff,
     OASupplyFan_unit1,       !- Name
-    always_off,            !- Availability Schedule Name
+    always_off,              !- Availability Schedule Name
     0.6,                     !- Fan Total Efficiency
     454.045717061016,        !- Pressure Rise {Pa}
     0.0283168464628752,      !- Maximum Flow Rate {m3/s}
@@ -6330,7 +6282,7 @@ Dimensionless;!-OutputUnitType
 
   Fan:OnOff,
     OAExhaustFan_unit1,      !- Name
-    always_off,            !- Availability Schedule Name
+    always_off,              !- Availability Schedule Name
     0.6,                     !- Fan Total Efficiency
     454.045717061016,        !- Pressure Rise {Pa}
     0.0283168464628752,      !- Maximum Flow Rate {m3/s}
@@ -6341,7 +6293,6 @@ Dimensionless;!-OutputUnitType
     ,                        !- Fan Power Ratio Function of Speed Ratio Curve Name
     ,                        !- Fan Efficiency Ratio Function of Speed Ratio Curve Name
     Ventilation;             !- End-Use Subcategory
-
 
    !-   ===========  ALL OBJECTS IN CLASS: HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT ===========
 
@@ -6369,7 +6320,6 @@ Dimensionless;!-OutputUnitType
     0.083,                   !- Initial Defrost Time Fraction {dimensionless}
     2.15999989700318E-02,    !- Rate of Defrost Time Fraction Increase {1/K}
     No;                      !- Economizer Lockout
-
 
 !- DHW pipe network...
 
@@ -6399,7 +6349,7 @@ Dimensionless;!-OutputUnitType
     activity_sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
  !-   ===========  ALL OBJECTS IN CLASS: LIGHTS ===========
 
@@ -6868,7 +6818,7 @@ Dimensionless;!-OutputUnitType
 
   OutputControl:Table:Style,
     CommaAndHTML,            !- Column Separator
-    JtoKWH;               !- Unit Conversion
+    JtoKWH;                  !- Unit Conversion
 
   Output:Table:Monthly,
     FanSplit,                !- Name
@@ -7286,97 +7236,175 @@ Dimensionless;!-OutputUnitType
 !
 ! =====================================================
 
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
+  Output:Variable,*,Site Outdoor Air Relative Humidity,hourly;
 
+  Output:Variable,*,Zone Air Temperature,hourly;
 
+  Output:Variable,*,Zone Air Relative Humidity,hourly;
 
-Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly; !- Zone Average [C]
-Output:Variable,*,Site Outdoor Air Relative Humidity,hourly; !- Zone Average [%]
-Output:Variable,*,Zone Air Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Zone Air Relative Humidity,hourly; !- HVAC Average [%]
-Output:Variable,*,Fan Electricity Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Zone VRF Air Terminal Cooling Electricity Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Zone VRF Air Terminal Total Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Zone VRF Air Terminal Heating Electricity Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Zone VRF Air Terminal Total Heating Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,VRF Heat Pump Total Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,VRF Heat Pump Total Heating Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,VRF Heat Pump Cooling Electricity Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,VRF Heat Pump Heating Electricity Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,VRF Heat Pump Cooling COP,hourly; !- HVAC Average []
-Output:Variable,*,VRF Heat Pump Heating COP,hourly; !- HVAC Average []
-Output:Variable,*,VRF Heat Pump COP,hourly; !- HVAC Average []
-Output:Variable,*,VRF Heat Pump Compressor Electricity Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,VRF Heat Pump Outdoor Unit Fan Power,hourly; !- HVAC Average [W]
-Output:Variable,*,VRF Heat Pump Compressor Rotating Speed,hourly; !- HVAC Average [rev/min]
-Output:Variable,*,VRF Heat Pump Indoor Unit Evaporating Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,VRF Heat Pump Outdoor Unit Condensing Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,VRF Heat Pump Indoor Unit Condensing Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,VRF Heat Pump Outdoor Unit Evaporating Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,VRF Heat Pump Cooling Capacity at Max Compressor Speed,hourly; !- HVAC Average [W]
-Output:Variable,*,VRF Heat Pump Heating Capacity at Max Compressor Speed,hourly; !- HVAC Average [W]
-Output:Variable,*,VRF Heat Pump Outdoor Unit Evaporator Heat Extract Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,VRF Heat Pump Outdoor Unit Condenser Heat Release Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,VRF Heat Pump Defrost Electricity Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,VRF Heat Pump Defrost Electricity Energy,hourly; !- HVAC Sum [J]
-Output:Variable,*,VRF Heat Pump Part Load Ratio,hourly; !- HVAC Average []
-Output:Variable,*,VRF Heat Pump Runtime Fraction,hourly; !- HVAC Average []
-Output:Variable,*,VRF Heat Pump Cycling Ratio,hourly; !- HVAC Average []
-Output:Variable,*,VRF Heat Pump Operating Mode,hourly; !- HVAC Average []
-Output:Variable,*,VRF Heat Pump Condenser Inlet Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,VRF Heat Pump Crankcase Heater Electricity Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,VRF Heat Pump Terminal Unit Cooling Load Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,VRF Heat Pump Terminal Unit Heating Load Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,VRF Heat Pump Indoor Unit Piping Correction for Cooling,hourly; !- HVAC Average []
-Output:Variable,*,VRF Heat Pump Indoor Unit Piping Correction for Heating,hourly; !- HVAC Average []
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
-Output:Variable,TU1 Inlet Node,System Node Temperature,hourly; !- HVAC Average [C]
-Output:Variable,TU1 Inlet Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
-Output:Variable,TU1 Inlet Node,System Node Standard Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-Output:Variable,TU1 Inlet Node,System Node Current Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-Output:Variable,TU1 Outlet Node,System Node Temperature,hourly; !- HVAC Average [C]
-Output:Variable,TU1 Outlet Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
-Output:Variable,TU1 Outlet Node,System Node Standard Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-Output:Variable,TU1 Outlet Node,System Node Current Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-Output:Variable,Outside Air Inlet Node 1,System Node Temperature,hourly; !- HVAC Average [C]
-Output:Variable,Outside Air Inlet Node 1,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
-Output:Variable,Outside Air Inlet Node 1,System Node Standard Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-Output:Variable,Outside Air Inlet Node 1,System Node Current Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-Output:Variable,TU1 VRF DX CCoil Inlet Node,System Node Temperature,hourly; !- HVAC Average [C]
-Output:Variable,TU1 VRF DX CCoil Inlet Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
-Output:Variable,TU1 VRF DX CCoil Inlet Node,System Node Standard Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-Output:Variable,TU1 VRF DX CCoil Inlet Node,System Node Current Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-Output:Variable,TU1 VRF DX CCoil Outlet Node,System Node Temperature,hourly; !- HVAC Average [C]
-Output:Variable,TU1 VRF DX CCoil Outlet Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
-Output:Variable,TU1 VRF DX CCoil Outlet Node,System Node Standard Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-Output:Variable,TU1 VRF DX CCoil Outlet Node,System Node Current Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-Output:Variable,TU1 VRF DX HCoil Outlet Node,System Node Temperature,hourly; !- HVAC Average [C]
-Output:Variable,TU1 VRF DX HCoil Outlet Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
-Output:Variable,TU1 VRF DX HCoil Outlet Node,System Node Standard Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-Output:Variable,TU1 VRF DX HCoil Outlet Node,System Node Current Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
+  Output:Variable,*,Zone VRF Air Terminal Cooling Electricity Rate,hourly;
 
-Output:Variable,*,Zone Predicted Sensible Load to Setpoint Heat Transfer Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Zone Predicted Moisture Load Moisture Transfer Rate,hourly; !- HVAC Average [kgWater/s]
-Output:Variable,*,Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate,hourly; !- HVAC Average [kgWater/s]
-Output:Variable,*,Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate,hourly; !- HVAC Average [kgWater/s]
-Output:Variable,*,Zone System Predicted Moisture Load Moisture Transfer Rate,hourly; !- HVAC Average [kgWater/s]
-Output:Variable,*,Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate,hourly; !- HVAC Average [kgWater/s]
-Output:Variable,*,Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate,hourly; !- HVAC Average [kgWater/s]
+  Output:Variable,*,Zone VRF Air Terminal Total Cooling Rate,hourly;
 
+  Output:Variable,*,Zone VRF Air Terminal Heating Electricity Rate,hourly;
 
-Output:Variable,*,Cooling Coil Total Cooling Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Runtime Fraction,hourly; !- HVAC Average []
-Output:Variable,*,Cooling Coil VRF Evaporating Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Cooling Coil VRF Super Heating Degrees,hourly; !- HVAC Average [C]
-Output:Variable,*,Heating Coil Heating Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Heating Coil Runtime Fraction,hourly; !- HVAC Average []
-Output:Variable,*,Heating Coil VRF Condensing Temperature,hourly; !- HVAC Average [C]
-Output:Variable,*,Heating Coil VRF Subcooling Degrees,hourly; !- HVAC Average [C]
-Output:Variable,*,Heating Coil Electricity Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,Zone VRF Air Terminal Total Heating Rate,hourly;
 
-Output:Diagnostics,DisplayAdvancedReportVariables,DisplayZoneAirHeatBalanceOffBalance;
+  Output:Variable,*,VRF Heat Pump Total Cooling Rate,hourly;
+
+  Output:Variable,*,VRF Heat Pump Total Heating Rate,hourly;
+
+  Output:Variable,*,VRF Heat Pump Cooling Electricity Rate,hourly;
+
+  Output:Variable,*,VRF Heat Pump Heating Electricity Rate,hourly;
+
+  Output:Variable,*,VRF Heat Pump Cooling COP,hourly;
+
+  Output:Variable,*,VRF Heat Pump Heating COP,hourly;
+
+  Output:Variable,*,VRF Heat Pump COP,hourly;
+
+  Output:Variable,*,VRF Heat Pump Compressor Electricity Rate,hourly;
+
+  Output:Variable,*,VRF Heat Pump Outdoor Unit Fan Power,hourly;
+
+  Output:Variable,*,VRF Heat Pump Compressor Rotating Speed,hourly;
+
+  Output:Variable,*,VRF Heat Pump Indoor Unit Evaporating Temperature,hourly;
+
+  Output:Variable,*,VRF Heat Pump Outdoor Unit Condensing Temperature,hourly;
+
+  Output:Variable,*,VRF Heat Pump Indoor Unit Condensing Temperature,hourly;
+
+  Output:Variable,*,VRF Heat Pump Outdoor Unit Evaporating Temperature,hourly;
+
+  Output:Variable,*,VRF Heat Pump Cooling Capacity at Max Compressor Speed,hourly;
+
+  Output:Variable,*,VRF Heat Pump Heating Capacity at Max Compressor Speed,hourly;
+
+  Output:Variable,*,VRF Heat Pump Outdoor Unit Evaporator Heat Extract Rate,hourly;
+
+  Output:Variable,*,VRF Heat Pump Outdoor Unit Condenser Heat Release Rate,hourly;
+
+  Output:Variable,*,VRF Heat Pump Defrost Electricity Rate,hourly;
+
+  Output:Variable,*,VRF Heat Pump Defrost Electricity Energy,hourly;
+
+  Output:Variable,*,VRF Heat Pump Part Load Ratio,hourly;
+
+  Output:Variable,*,VRF Heat Pump Runtime Fraction,hourly;
+
+  Output:Variable,*,VRF Heat Pump Cycling Ratio,hourly;
+
+  Output:Variable,*,VRF Heat Pump Operating Mode,hourly;
+
+  Output:Variable,*,VRF Heat Pump Condenser Inlet Temperature,hourly;
+
+  Output:Variable,*,VRF Heat Pump Crankcase Heater Electricity Rate,hourly;
+
+  Output:Variable,*,VRF Heat Pump Terminal Unit Cooling Load Rate,hourly;
+
+  Output:Variable,*,VRF Heat Pump Terminal Unit Heating Load Rate,hourly;
+
+  Output:Variable,*,VRF Heat Pump Indoor Unit Piping Correction for Cooling,hourly;
+
+  Output:Variable,*,VRF Heat Pump Indoor Unit Piping Correction for Heating,hourly;
+
+  Output:Variable,TU1 Inlet Node,System Node Temperature,hourly;
+
+  Output:Variable,TU1 Inlet Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,TU1 Inlet Node,System Node Standard Density Volume Flow Rate,hourly;
+
+  Output:Variable,TU1 Inlet Node,System Node Current Density Volume Flow Rate,hourly;
+
+  Output:Variable,TU1 Outlet Node,System Node Temperature,hourly;
+
+  Output:Variable,TU1 Outlet Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,TU1 Outlet Node,System Node Standard Density Volume Flow Rate,hourly;
+
+  Output:Variable,TU1 Outlet Node,System Node Current Density Volume Flow Rate,hourly;
+
+  Output:Variable,Outside Air Inlet Node 1,System Node Temperature,hourly;
+
+  Output:Variable,Outside Air Inlet Node 1,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,Outside Air Inlet Node 1,System Node Standard Density Volume Flow Rate,hourly;
+
+  Output:Variable,Outside Air Inlet Node 1,System Node Current Density Volume Flow Rate,hourly;
+
+  Output:Variable,TU1 VRF DX CCoil Inlet Node,System Node Temperature,hourly;
+
+  Output:Variable,TU1 VRF DX CCoil Inlet Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,TU1 VRF DX CCoil Inlet Node,System Node Standard Density Volume Flow Rate,hourly;
+
+  Output:Variable,TU1 VRF DX CCoil Inlet Node,System Node Current Density Volume Flow Rate,hourly;
+
+  Output:Variable,TU1 VRF DX CCoil Outlet Node,System Node Temperature,hourly;
+
+  Output:Variable,TU1 VRF DX CCoil Outlet Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,TU1 VRF DX CCoil Outlet Node,System Node Standard Density Volume Flow Rate,hourly;
+
+  Output:Variable,TU1 VRF DX CCoil Outlet Node,System Node Current Density Volume Flow Rate,hourly;
+
+  Output:Variable,TU1 VRF DX HCoil Outlet Node,System Node Temperature,hourly;
+
+  Output:Variable,TU1 VRF DX HCoil Outlet Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,TU1 VRF DX HCoil Outlet Node,System Node Standard Density Volume Flow Rate,hourly;
+
+  Output:Variable,TU1 VRF DX HCoil Outlet Node,System Node Current Density Volume Flow Rate,hourly;
+
+  Output:Variable,*,Zone Predicted Sensible Load to Setpoint Heat Transfer Rate,hourly;
+
+  Output:Variable,*,Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate,hourly;
+
+  Output:Variable,*,Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,hourly;
+
+  Output:Variable,*,Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate,hourly;
+
+  Output:Variable,*,Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate,hourly;
+
+  Output:Variable,*,Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,hourly;
+
+  Output:Variable,*,Zone Predicted Moisture Load Moisture Transfer Rate,hourly;
+
+  Output:Variable,*,Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate,hourly;
+
+  Output:Variable,*,Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate,hourly;
+
+  Output:Variable,*,Zone System Predicted Moisture Load Moisture Transfer Rate,hourly;
+
+  Output:Variable,*,Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate,hourly;
+
+  Output:Variable,*,Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate,hourly;
+
+  Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
+
+  Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
+
+  Output:Variable,*,Cooling Coil VRF Evaporating Temperature,hourly;
+
+  Output:Variable,*,Cooling Coil VRF Super Heating Degrees,hourly;
+
+  Output:Variable,*,Heating Coil Heating Rate,hourly;
+
+  Output:Variable,*,Heating Coil Runtime Fraction,hourly;
+
+  Output:Variable,*,Heating Coil VRF Condensing Temperature,hourly;
+
+  Output:Variable,*,Heating Coil VRF Subcooling Degrees,hourly;
+
+  Output:Variable,*,Heating Coil Electricity Rate,hourly;
+
+  Output:Diagnostics,
+    DisplayAdvancedReportVariables,  !- Key 1
+    DisplayZoneAirHeatBalanceOffBalance;  !- Key 2
+

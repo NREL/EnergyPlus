@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -922,9 +922,9 @@ namespace ResultsFramework {
 
         if (numAlphas > 0) {
             std::string option = alphas(1);
-            if (UtilityRoutines::SameString(option, "TimeSeries")) {
+            if (Util::SameString(option, "TimeSeries")) {
                 tsEnabled = true;
-            } else if (UtilityRoutines::SameString(option, "TimeSeriesAndTabular")) {
+            } else if (Util::SameString(option, "TimeSeriesAndTabular")) {
                 tsEnabled = true;
                 tsAndTabularEnabled = true;
             }
@@ -935,15 +935,15 @@ namespace ResultsFramework {
             outputMsgPack = false;
 
             if (numAlphas >= 2) {
-                outputJSON = UtilityRoutines::SameString(alphas(2), "Yes");
+                outputJSON = Util::SameString(alphas(2), "Yes");
             }
 
             if (numAlphas >= 3) {
-                outputCBOR = UtilityRoutines::SameString(alphas(3), "Yes");
+                outputCBOR = Util::SameString(alphas(3), "Yes");
             }
 
             if (numAlphas >= 4) {
-                outputMsgPack = UtilityRoutines::SameString(alphas(4), "Yes");
+                outputMsgPack = Util::SameString(alphas(4), "Yes");
             }
         }
     }

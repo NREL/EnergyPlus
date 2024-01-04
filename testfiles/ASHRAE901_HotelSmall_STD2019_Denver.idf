@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,23.2;
+  Version,24.1;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -13804,7 +13804,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     CorridorFlr2_People,     !- Name
@@ -13819,7 +13819,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     CorridorFlr3_People,     !- Name
@@ -13834,7 +13834,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     CorridorFlr4_People,     !- Name
@@ -13849,7 +13849,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     ElevatorCoreFlr1_People, !- Name
@@ -13864,7 +13864,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     ElevatorCoreFlr2_People, !- Name
@@ -13879,7 +13879,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     ElevatorCoreFlr3_People, !- Name
@@ -13894,7 +13894,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     ElevatorCoreFlr4_People, !- Name
@@ -13909,7 +13909,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     EmployeeLoungeFlr1_People,  !- Name
@@ -13924,7 +13924,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     ExerciseCenterFlr1_People,  !- Name
@@ -13939,7 +13939,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     FrontLoungeFlr1_People,  !- Name
@@ -13954,7 +13954,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     FrontOfficeFlr1_People,  !- Name
@@ -13969,7 +13969,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     FrontStairsFlr1_People,  !- Name
@@ -13984,7 +13984,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     FrontStairsFlr2_People,  !- Name
@@ -13999,7 +13999,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     FrontStairsFlr3_People,  !- Name
@@ -14014,7 +14014,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     FrontStairsFlr4_People,  !- Name
@@ -14029,7 +14029,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     FrontStorageFlr1_People, !- Name
@@ -14044,7 +14044,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     FrontStorageFlr2_People, !- Name
@@ -14059,7 +14059,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     FrontStorageFlr3_People, !- Name
@@ -14074,7 +14074,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     FrontStorageFlr4_People, !- Name
@@ -14089,7 +14089,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom101_People,     !- Name
@@ -14104,7 +14104,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom102_People,     !- Name
@@ -14119,7 +14119,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom103_People,     !- Name
@@ -14134,7 +14134,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom104_People,     !- Name
@@ -14149,7 +14149,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom105_People,     !- Name
@@ -14164,7 +14164,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom201_People,     !- Name
@@ -14179,7 +14179,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom202_205_People, !- Name
@@ -14194,7 +14194,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom206_208_People, !- Name
@@ -14209,7 +14209,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom209_212_People, !- Name
@@ -14224,7 +14224,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom213_People,     !- Name
@@ -14239,7 +14239,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom214_People,     !- Name
@@ -14254,7 +14254,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom215_218_People, !- Name
@@ -14269,7 +14269,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom219_People,     !- Name
@@ -14284,7 +14284,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom220_223_People, !- Name
@@ -14299,7 +14299,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom224_People,     !- Name
@@ -14314,7 +14314,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom301_People,     !- Name
@@ -14329,7 +14329,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom302_305_People, !- Name
@@ -14344,7 +14344,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom306_308_People, !- Name
@@ -14359,7 +14359,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom309_312_People, !- Name
@@ -14374,7 +14374,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom313_People,     !- Name
@@ -14389,7 +14389,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom314_People,     !- Name
@@ -14404,7 +14404,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom315_318_People, !- Name
@@ -14419,7 +14419,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom319_People,     !- Name
@@ -14434,7 +14434,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom320_323_People, !- Name
@@ -14449,7 +14449,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom324_People,     !- Name
@@ -14464,7 +14464,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom401_People,     !- Name
@@ -14479,7 +14479,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom402_405_People, !- Name
@@ -14494,7 +14494,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom406_408_People, !- Name
@@ -14509,7 +14509,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom409_412_People, !- Name
@@ -14524,7 +14524,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom413_People,     !- Name
@@ -14539,7 +14539,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom414_People,     !- Name
@@ -14554,7 +14554,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom415_418_People, !- Name
@@ -14569,7 +14569,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom419_People,     !- Name
@@ -14584,7 +14584,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom420_423_People, !- Name
@@ -14599,7 +14599,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     GuestRoom424_People,     !- Name
@@ -14614,7 +14614,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     LaundryRoomFlr1_People,  !- Name
@@ -14629,7 +14629,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     MechanicalRoomFlr1_People,  !- Name
@@ -14644,7 +14644,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     MeetingRoomFlr1_People,  !- Name
@@ -14659,7 +14659,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     RearStairsFlr1_People,   !- Name
@@ -14674,7 +14674,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     RearStairsFlr2_People,   !- Name
@@ -14689,7 +14689,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     RearStairsFlr3_People,   !- Name
@@ -14704,7 +14704,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     RearStairsFlr4_People,   !- Name
@@ -14719,7 +14719,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     RearStorageFlr1_People,  !- Name
@@ -14734,7 +14734,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     RearStorageFlr2_People,  !- Name
@@ -14749,7 +14749,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     RearStorageFlr3_People,  !- Name
@@ -14764,7 +14764,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     RearStorageFlr4_People,  !- Name
@@ -14779,7 +14779,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
   People,
     RestroomFlr1_People,     !- Name
@@ -14794,7 +14794,7 @@
     Activity_Sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
 !-   ===========  ALL OBJECTS IN CLASS: LIGHTS ===========
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -165,30 +165,6 @@ public:
                          std::string_view ObjType,       // Object Type (ref: IDD Objects)
                          std::string const &NameTypeVal, // Object "name" field type ( used as search key )
                          std::string const &ObjName      // Name of the object type
-    );
-
-    void lowerRangeCheck(EnergyPlusData &state,
-                         bool &ErrorsFound,                         // Set to true if error detected
-                         std::string const &WhatFieldString,        // Descriptive field for string
-                         std::string const &WhatObjectString,       // Descriptive field for object, Zone Name, etc.
-                         std::string const &ErrorLevel,             // 'Warning','Severe','Fatal')
-                         std::string const &LowerBoundString,       // String for error message, if applicable
-                         bool const LowerBoundCondition,            // Condition for error condition, if applicable
-                         std::string_view const ValueString = {},   // Value with digits if to be displayed with error
-                         std::string_view const WhatObjectName = {} // ObjectName -- used for error messages
-    );
-
-    void rangeCheck(EnergyPlusData &state,
-                    bool &ErrorsFound,                         // Set to true if error detected
-                    std::string const &WhatFieldString,        // Descriptive field for string
-                    std::string const &WhatObjectString,       // Descriptive field for object, Zone Name, etc.
-                    std::string const &ErrorLevel,             // 'Warning','Severe','Fatal')
-                    std::string const &LowerBoundString,       // String for error message, if applicable
-                    bool const LowerBoundCondition,            // Condition for error condition, if applicable
-                    std::string const &UpperBoundString,       // String for error message, if applicable
-                    bool const UpperBoundCondition,            // Condition for error condition, if applicable
-                    std::string_view const ValueString = {},   // Value with digits if to be displayed with error
-                    std::string_view const WhatObjectName = {} // ObjectName -- used for error messages
     );
 
     void getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumeric);

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -459,9 +459,9 @@ namespace HVACFan {
 
         if (isAlphaFieldBlank(5)) {
             speedControl = SpeedControlMethod::Discrete;
-        } else if (UtilityRoutines::SameString(alphaArgs(5), "Continuous")) {
+        } else if (Util::SameString(alphaArgs(5), "Continuous")) {
             speedControl = SpeedControlMethod::Continuous;
-        } else if (UtilityRoutines::SameString(alphaArgs(5), "Discrete")) {
+        } else if (Util::SameString(alphaArgs(5), "Discrete")) {
             speedControl = SpeedControlMethod::Discrete;
         } else {
             ShowSevereError(state, format("{}{}=\"{}\", invalid entry.", routineName, locCurrentModuleObject, alphaArgs(1)));
@@ -484,11 +484,11 @@ namespace HVACFan {
         if (m_designElecPowerWasAutosized) {
             if (isAlphaFieldBlank(6)) {
                 m_powerSizingMethod = PowerSizingMethod::PowerPerFlowPerPressure;
-            } else if (UtilityRoutines::SameString(alphaArgs(6), "PowerPerFlow")) {
+            } else if (Util::SameString(alphaArgs(6), "PowerPerFlow")) {
                 m_powerSizingMethod = PowerSizingMethod::PowerPerFlow;
-            } else if (UtilityRoutines::SameString(alphaArgs(6), "PowerPerFlowPerPressure")) {
+            } else if (Util::SameString(alphaArgs(6), "PowerPerFlowPerPressure")) {
                 m_powerSizingMethod = PowerSizingMethod::PowerPerFlowPerPressure;
-            } else if (UtilityRoutines::SameString(alphaArgs(6), "TotalEfficiencyAndPressure")) {
+            } else if (Util::SameString(alphaArgs(6), "TotalEfficiencyAndPressure")) {
                 m_powerSizingMethod = PowerSizingMethod::TotalEfficiencyAndPressure;
             } else {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid entry.", routineName, locCurrentModuleObject, alphaArgs(1)));
@@ -518,7 +518,7 @@ namespace HVACFan {
         }
         m_nightVentPressureDelta = numericArgs(10);
         m_nightVentFlowFraction = numericArgs(11); // not used
-        m_zoneNum = UtilityRoutines::FindItemInList(alphaArgs(8), state.dataHeatBal->Zone);
+        m_zoneNum = Util::FindItemInList(alphaArgs(8), state.dataHeatBal->Zone);
         if (m_zoneNum > 0) m_heatLossesDestination = ThermalLossDestination::ZoneGains;
         if (m_zoneNum == 0) {
             if (isAlphaFieldBlank(8)) {

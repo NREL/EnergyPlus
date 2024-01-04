@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -383,10 +383,10 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         {},
-                        "ENERGYTRANSFER",
-                        "BOILERS",
+                        eResourceSOV::EnergyTransfer,
+                        EndUseCatSOV::Boilers,
                         {},
-                        "Plant");
+                        GroupSOV::Plant);
     SetupOutputVariable(state,
                         format("Boiler {} Rate", sFuelType),
                         OutputProcessor::Unit::W,
@@ -442,10 +442,10 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         {},
-                        "ELECTRICITY",
-                        "Heating",
+                        eResourceSOV::Electricity,
+                        EndUseCatSOV::Heating,
                         "Boiler Parasitic",
-                        "Plant");
+                        GroupSOV::Plant);
     if (this->FuelType != Constant::eFuel::Electricity) {
         SetupOutputVariable(state,
                             format("Boiler Ancillary {} Rate", sFuelType),

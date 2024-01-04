@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1602,6 +1602,7 @@ void SQLite::createSQLiteTimeIndexRecord(int const reportingInterval,
                                          int const cumlativeSimulationDays,
                                          int const curEnvirNum,
                                          int const simulationYear,
+                                         bool const curYearIsLeapYear,
                                          ObjexxFCL::Optional_int_const month,
                                          ObjexxFCL::Optional_int_const dayOfMonth,
                                          ObjexxFCL::Optional_int_const hour,
@@ -1615,7 +1616,10 @@ void SQLite::createSQLiteTimeIndexRecord(int const reportingInterval,
         int intStartMinute = 0;
         int intervalInMinutes = 60;
 
-        static const std::vector<int> lastDayOfMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        static std::vector<int> lastDayOfMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        if (curYearIsLeapYear) {
+            lastDayOfMonth[1] = 29;
+        }
 
         switch (reportingInterval) {
         case LocalReportEach:

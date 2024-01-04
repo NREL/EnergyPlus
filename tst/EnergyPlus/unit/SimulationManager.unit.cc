@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -135,13 +135,13 @@ TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
     fs::remove(state->dataStrGlobals->outputPerfLogFilePath);
 
     // make sure the static variables are cleared
-    UtilityRoutines::appendPerfLog(*state, "RESET", "RESET");
+    Util::appendPerfLog(*state, "RESET", "RESET");
 
     // call the function to test
     SimulationManager::writeIntialPerfLogValues(*state, "MODE193");
 
     // force the file to be written
-    UtilityRoutines::appendPerfLog(*state, "lastHeader", "lastValue", true);
+    Util::appendPerfLog(*state, "lastHeader", "lastValue", true);
 
     std::ifstream perfLogFile;
     std::stringstream perfLogStrSteam;

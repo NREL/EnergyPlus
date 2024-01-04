@@ -254,6 +254,8 @@ set(SRC
     ElectricPowerServiceManager.cc
     ElectricPowerServiceManager.hh
     EnergyPlus.hh
+    EnergyPlusLogger.cc 
+    EnergyPlusLogger.hh
     EvaporativeCoolers.cc
     EvaporativeCoolers.hh
     EvaporativeFluidCoolers.cc
@@ -729,7 +731,7 @@ if(LINK_WITH_PYTHON)
 endif()
 
 add_library(energyplusparser STATIC ${INPUTPARSING_SRC})
-target_link_libraries(energyplusparser PUBLIC embedded_epjson_source ModernJSON re2 fmt::fmt ${CMAKE_DL_LIBS})
+target_link_libraries(energyplusparser PUBLIC embedded_epjson_source nlohmann_json re2 fmt::fmt ${CMAKE_DL_LIBS})
 target_link_libraries(energyplusparser PRIVATE project_options project_fp_options project_warnings)
 if(WIN32)
   target_link_libraries(energyplusparser PUBLIC Shlwapi)
@@ -739,16 +741,23 @@ if ((CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1) O
     ( ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)))
   target_link_libraries(energyplusparser PRIVATE stdc++fs)
 endif()
+if(ENABLE_UNITY)
+  set_target_properties(energyplusparser PROPERTIES UNITY_BUILD ON)
+endif()
 
 # first we will create a static library of EnergyPlus this will be linked
 # statically to create the DLL and also the unit tests
 add_library(energypluslib STATIC ${SRC})
 
+if(ENABLE_UNITY)
+  set_target_properties(energypluslib PROPERTIES UNITY_BUILD ON)
+endif()
+
 target_link_libraries(
   energypluslib
   PUBLIC embedded_epjson_source
          fmt::fmt
-         ModernJSON
+         nlohmann_json
          objexx
          sqlite
          bcvtb
@@ -827,6 +836,9 @@ target_link_libraries(energyplusapi PRIVATE energypluslib)
 target_link_libraries(energyplusapi PRIVATE project_options project_fp_options project_warnings)
 
 set_target_properties(energyplusapi PROPERTIES INSTALL_NAME_DIR "@executable_path")
+if(ENABLE_UNITY)
+  set_target_properties(energyplusapi PROPERTIES UNITY_BUILD ON)
+endif()
 
 
 # now the actual E+ executable

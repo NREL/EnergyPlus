@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -553,8 +553,8 @@ Real64 PondGroundHeatExchangerData::CalcTotalFLux(EnergyPlusData &state, Real64 
     }
 
     // absolute temperatures
-    Real64 SurfTempAbs = PondBulkTemp + Constant::KelvinConv;            // absolute value of surface temp
-    Real64 SkyTempAbs = state.dataEnvrn->SkyTemp + Constant::KelvinConv; // absolute value of sky temp
+    Real64 SurfTempAbs = PondBulkTemp + Constant::Kelvin;            // absolute value of surface temp
+    Real64 SkyTempAbs = state.dataEnvrn->SkyTemp + Constant::Kelvin; // absolute value of sky temp
 
     // ASHRAE simple convection coefficient model for external surfaces.
     Real64 ConvCoef = Convect::CalcASHRAESimpExtConvCoeff(Material::SurfaceRoughness::VeryRough, DataEnvironment::WindSpeedAt(state, PondHeight));

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -423,13 +423,21 @@ ENERGYPLUSLIB_API Real64 getPluginTrendVariableDirection(EnergyPlusState state, 
 
 // ----- FUNCTIONS RELATED TO MISC CURRENT SIMULATION STATE
 
-/// \brief Returns the current year of the simulation.
+/// \brief Returns the current year of the simulation, taken from the EPW.
+/// \details This is directly read from the EPW, and as such, if the EPW is for example a TMY3 file
+///          the year could be set to an abritrary number and change from one timestep to the next. See calendarYear for an alternative
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \see apiDataFullyReady
+ENERGYPLUSLIB_API int year(EnergyPlusState state);
+
+/// \brief Returns the Calendar Year of the simulation (based on the RunPeriod object). Only valid for weather file run periods.
 /// \details A simulation can span multiple years and will always have a "meaningful" year that is either user-defined explicitly,
 ///          determined based on other inputs in the input file, or chosen as the current year.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \see apiDataFullyReady
-ENERGYPLUSLIB_API int year(EnergyPlusState state);
+ENERGYPLUSLIB_API int calendarYear(EnergyPlusState state);
 
 /// \brief Returns the current month of the simulation, from 1 for January to 12 for December.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.

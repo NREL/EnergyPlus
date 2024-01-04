@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -954,11 +954,11 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 72;
 
     // Fake a design day
-    state->dataWeatherManager->DesDayInput.allocate(1);
+    state->dataWeather->DesDayInput.allocate(1);
     std::string DDTitle = "CHICAGO ANN CLG 1% CONDNS DB=>MWB";
-    state->dataWeatherManager->DesDayInput(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Title = DDTitle;
-    state->dataWeatherManager->DesDayInput(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Month = 7;
-    state->dataWeatherManager->DesDayInput(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).DayOfMonth = 15;
+    state->dataWeather->DesDayInput(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Title = DDTitle;
+    state->dataWeather->DesDayInput(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Month = 7;
+    state->dataWeather->DesDayInput(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).DayOfMonth = 15;
     // Also need to set this, it's used to check if DDNum <= TotDesDays
     state->dataEnvrn->TotDesDays = 1;
 
