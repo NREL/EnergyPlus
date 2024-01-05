@@ -10618,8 +10618,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 for (int kEndUseSub = 1; kEndUseSub <= op->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     PreDefTableEntry(state,
                                      resource_entry_map(iResource),
-                                     op->EndUseCategory(jEndUse).DisplayName + " -- " +
-                                         op->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
+                                     op->EndUseCategory(jEndUse).DisplayName + " -- " + op->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
                                      localUnconvert * collapsedIndEndUseSub(kEndUseSub, jEndUse, iResource));
                     ++i;
                 }
