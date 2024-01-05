@@ -75,7 +75,7 @@ namespace DataZoneEnergyDemands {
         virtual void beginEnvironmentInit() = 0;
 
         virtual void setUpOutputVars(
-            EnergyPlusData &state, std::string_view prefix, std::string_view name, bool staged, bool attachMeters, int zoneMult, int listMult) = 0;
+            EnergyPlusData &state, std::string_view prefix, std::string const &name, bool staged, bool attachMeters, int zoneMult, int listMult) = 0;
     };
 
     struct ZoneSystemSensibleDemand : ZoneSystemDemandData // Sensible cooling/heating loads to be met (watts)
@@ -105,7 +105,7 @@ namespace DataZoneEnergyDemands {
 
         void setUpOutputVars(EnergyPlusData &state,
                              std::string_view prefix,
-                             std::string_view name,
+                             std::string const &name,
                              bool staged,
                              bool attachMeters,
                              int zoneMult,
@@ -146,7 +146,7 @@ namespace DataZoneEnergyDemands {
 
         void setUpOutputVars(EnergyPlusData &state,
                              std::string_view prefix,
-                             std::string_view name,
+                             std::string const &name,
                              [[maybe_unused]] bool staged = false,
                              [[maybe_unused]] bool attachMeters = false,
                              [[maybe_unused]] int zoneMult = 0,

@@ -58,7 +58,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
@@ -68,6 +67,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/Material.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -170,38 +170,38 @@ public:
     bool sqliteWithinTransaction();
 
     void createSQLiteReportDictionaryRecord(int const reportVariableReportID,
-                                            int const storeTypeIndex,
+                                            OutputProcessor::StoreType const storeType,
                                             std::string_view indexGroup,
                                             std::string_view keyedValueString,
                                             std::string_view const variableName,
-                                            int const indexType,
+                                            OutputProcessor::TimeStepType const timeStepType,
                                             std::string_view units,
-                                            int const reportingFreq,
+                                            OutputProcessor::ReportFreq const reportFreq,
                                             bool isMeter,
                                             std::string_view const ScheduleName = {});
 
     void createSQLiteReportDataRecord(int const recordIndex,
                                       Real64 const value,
-                                      ObjexxFCL::Optional_int_const reportingInterval = _,
-                                      ObjexxFCL::Optional<Real64 const> minValue = _,
-                                      ObjexxFCL::Optional_int_const minValueDate = _,
-                                      ObjexxFCL::Optional<Real64 const> maxValue = _,
-                                      ObjexxFCL::Optional_int_const maxValueDate = _,
-                                      ObjexxFCL::Optional_int_const minutesPerTimeStep = _);
+                                      OutputProcessor::ReportFreq const reportFreq = OutputProcessor::ReportFreq::Invalid,
+                                      Real64 const minValue = 0.0,
+                                      int const minValueDate = -1,
+                                      Real64 const maxValue = 0.0,
+                                      int const maxValueDate = -1,
+                                      int const minutesPerTimeStep = -1);
 
-    void createSQLiteTimeIndexRecord(int const reportingInterval,
+    void createSQLiteTimeIndexRecord(OutputProcessor::ReportFreq const reportFreq,
                                      int const recordIndex,
                                      int const CumlativeSimulationDays,
                                      int const curEnvirNum,
                                      int const simulationYear,
                                      bool const curYearIsLeapYear,
-                                     ObjexxFCL::Optional_int_const Month = _,
-                                     ObjexxFCL::Optional_int_const DayOfMonth = _,
-                                     ObjexxFCL::Optional_int_const Hour = _,
-                                     ObjexxFCL::Optional<Real64 const> EndMinute = _,
-                                     ObjexxFCL::Optional<Real64 const> StartMinute = _,
-                                     ObjexxFCL::Optional_int_const DST = _,
-                                     ObjexxFCL::Optional_string_const DayType = _,
+                                     int const Month = -1,
+                                     int const DayOfMonth = -1,
+                                     int const Hour = -1,
+                                     Real64 const EndMinute = -1.0,
+                                     Real64 const StartMinute = -1.0,
+                                     int const DST = -1,
+                                     std::string_view const DayType = "",
                                      bool const warmupFlag = false);
 
     void createYearlyTimeIndexRecord(int const simulationYear, int const curEnvirNum);
@@ -280,10 +280,6 @@ public:
 
 private:
     int createSQLiteStringTableRecord(std::string_view stringValue, int const stringType);
-
-    static std::string storageType(const int storageTypeIndex);
-    static std::string timestepTypeName(const int timestepType);
-    static std::string reportingFreqName(const int reportingFreqIndex);
 
     static void adjustReportingHourAndMinutes(int &hour, int &minutes);
     // Given combinedString, parse out units and description.

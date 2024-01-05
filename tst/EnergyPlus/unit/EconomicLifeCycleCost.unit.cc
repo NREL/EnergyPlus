@@ -597,6 +597,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput_EnsureFuelTypesAllRecog
     const json &enum_values = resource_field.at("enum");
 
     // Should support all fuels + ElectricityXXX (Purchased, Produced, SurplusSold, Net)
+    // THIS IS BRITTLE AS HECK.  DON'T RELY ON SUBSETS OF ENUMERATIONS BEING IN SOME ORDER.
     constexpr size_t numResources = static_cast<size_t>(Constant::eFuel::Num) + 3;
     // Constant::eFuel::Num has 15 fuel types including "None" (which is a fuel type for "OtherEquipment")
     // "LifeCycleCost:UsePriceEscalation" has 18 fuel types including  ElectricityXXX (Purchased, Produced, SurplusSold, Net)
@@ -619,10 +620,11 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput_EnsureFuelTypesAllRecog
     });
     // All should be valid resources
     for (const auto &enum_value : enum_values) {
-        const std::string enum_string = enum_value.get<std::string>();
+        const std::string enum_string = Util::makeUPPER(enum_value.get<std::string>());
 
         const auto resource = static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, enum_string));
-        EXPECT_TRUE(compare_enums(Constant::eResource::Invalid, resource)) << "Failed for " << enum_string;
+        // WHY IS COMPARE ENUMS THIS WAY?
+        EXPECT_FALSE(compare_enums(Constant::eResource::Invalid, resource, false)) << "Failed for " << enum_string;
 
         idf_objects += fmt::format(R"idf(
 LifeCycleCost:UsePriceEscalation,

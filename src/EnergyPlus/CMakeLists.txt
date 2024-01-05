@@ -567,8 +567,6 @@ set(SRC
     SolarReflectionManager.hh
     SolarShading.cc
     SolarShading.hh
-    SortAndStringUtilities.cc
-    SortAndStringUtilities.hh
     SplitterComponent.cc
     SplitterComponent.hh
     StandardRatings.cc
@@ -1115,16 +1113,17 @@ if(BUILD_TESTING)
   set(PY_FILE "${EXAMPLES_FILES_DIR}/${TEST_CASE}.py")
   configure_file(${PY_FILE} "${INPUT_TEST_DIR}/${TEST_CASE}.py" COPYONLY)
 
-  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromWithin
-    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromWithin/out-${NON_ASCII_DIRNAME}" ${TEST_CASE}.idf
-    WORKING_DIRECTORY  "${CLI_TEST_DIR}/${NON_ASCII_DIRNAME}"
-  )
+  if(LINK_WITH_PYTHON)
+    add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromWithin
+      COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromWithin/out-${NON_ASCII_DIRNAME}" ${TEST_CASE}.idf
+      WORKING_DIRECTORY  "${CLI_TEST_DIR}/${NON_ASCII_DIRNAME}"
+    )
 
-  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromOutside
-    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromOutside/out-${NON_ASCII_DIRNAME}" ${NON_ASCII_DIRNAME}/${TEST_CASE}.idf
-    WORKING_DIRECTORY  "${CLI_TEST_DIR}"
-  )
-
+    add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromOutside
+      COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromOutside/out-${NON_ASCII_DIRNAME}" ${NON_ASCII_DIRNAME}/${TEST_CASE}.idf
+      WORKING_DIRECTORY  "${CLI_TEST_DIR}"
+    )
+  endif()
 endif()
 
 if(UNIX AND NOT APPLE)

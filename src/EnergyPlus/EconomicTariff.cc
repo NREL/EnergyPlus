@@ -145,9 +145,9 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
     OutputProcessor::VariableType TypeVar;
     OutputProcessor::StoreType AvgSumVar;
     OutputProcessor::TimeStepType StepTypeVar;
-    OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None); // Units sting, may be blank
-    Array1D_string NamesOfKeys;                                  // Specific key name
-    Array1D_int IndexesForKeyVar;                                // Array index
+    Constant::Units UnitsVar = Constant::Units::None; // Units sting, may be blank
+    Array1D_string NamesOfKeys;                       // Specific key name
+    Array1D_int IndexesForKeyVar;                     // Array index
 
     auto &tariff(state.dataEconTariff->tariff);
 
@@ -200,7 +200,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             ShowContinueError(state,
                               format("Meter referenced is not present due to a lack of equipment that uses that energy source/meter:\"{}\".",
                                      tariff(iInObj).reportMeter));
-            tariff(iInObj).reportMeterIndx = 0;
+            tariff(iInObj).reportMeterIndx = -1;
         } else {
             NamesOfKeys.allocate(KeyCount);
             IndexesForKeyVar.allocate(KeyCount);
@@ -224,32 +224,41 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         tariff(iInObj).kindGasMtr = kindMeterNotGas;
 
         // Determine whether this meter is related to electricity, or water, or gas
-        if (tariff(iInObj).reportMeterIndx != 0) {
-
-            std::string const &SELECT_CASE_var(Util::makeUPPER(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType));
-
+        if (tariff(iInObj).reportMeterIndx != -1) {
+            switch (state.dataOutputProcessor->meters[tariff(iInObj).reportMeterIndx]->resource) {
             // Various types of electricity meters
-            if (SELECT_CASE_var == "ELECTRICITY") {
+            case Constant::eResource::Electricity: {
                 tariff(iInObj).kindElectricMtr = kindMeterElecSimple;
-            } else if (SELECT_CASE_var == "ELECTRICITYPRODUCED") {
+            } break;
+            case Constant::eResource::ElectricityProduced: {
                 tariff(iInObj).kindElectricMtr = kindMeterElecProduced;
-            } else if (SELECT_CASE_var == "ELECTRICITYPURCHASED") {
+            } break;
+            case Constant::eResource::ElectricityPurchased: {
                 tariff(iInObj).kindElectricMtr = kindMeterElecPurchased;
-            } else if (SELECT_CASE_var == "ELECTRICITYSURPLUSSOLD") {
+            } break;
+            case Constant::eResource::ElectricitySurplusSold: {
                 tariff(iInObj).kindElectricMtr = kindMeterElecSurplusSold;
-            } else if (SELECT_CASE_var == "ELECTRICITYNET") {
+            } break;
+            case Constant::eResource::ElectricityNet: {
                 tariff(iInObj).kindElectricMtr = kindMeterElecNet;
-
-                // Handle the case where its a water meter
-            } else if (SELECT_CASE_var == "WATER" || SELECT_CASE_var == "H2O" || SELECT_CASE_var == "ONSITEWATER" ||
-                       SELECT_CASE_var == "WATERPRODUCED" || SELECT_CASE_var == "ONSITE WATER" || SELECT_CASE_var == "MAINSWATER" ||
-                       SELECT_CASE_var == "WATERSUPPLY" || SELECT_CASE_var == "RAINWATER" || SELECT_CASE_var == "PRECIPITATION" ||
-                       SELECT_CASE_var == "WELLWATER" || SELECT_CASE_var == "GROUNDWATER" || SELECT_CASE_var == "CONDENSATE") {
+            } break;
+            // Handle the case where its a water meter
+            case Constant::eResource::Water:
+            case Constant::eResource::OnSiteWater:
+            case Constant::eResource::MainsWater:
+            case Constant::eResource::RainWater:
+            case Constant::eResource::WellWater:
+            case Constant::eResource::Condensate: {
                 tariff(iInObj).kindWaterMtr = kindMeterWater;
-                // Or a Natural Gas meter
-            } else if (SELECT_CASE_var == "GAS" || SELECT_CASE_var == "NATURALGAS") {
+            } break;
+            // Or a Natural Gas meter
+            case Constant::eResource::NaturalGas: {
                 tariff(iInObj).kindGasMtr = kindMeterGas;
-            }
+            } break;
+            default: {
+                // Do or assert something here?
+            } break;
+            } // switch
         }
 
         // Assign the right conversion factors based on the resource type
@@ -661,9 +670,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             OutputReportTabular::AddTOCEntry(state, "Tariff Report", tariff(iInObj).tariffName);
         }
         // associate the resource number with each tariff
-        if (tariff(iInObj).reportMeterIndx >= 1) {
-            tariff(iInObj).resource = static_cast<Constant::eResource>(getEnumValue(
-                Constant::eResourceNamesUC, Util::makeUPPER(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType)));
+        if (tariff(iInObj).reportMeterIndx != -1) {
+            tariff(iInObj).resource = state.dataOutputProcessor->meters[tariff(iInObj).reportMeterIndx]->resource;
         }
     }
 }
