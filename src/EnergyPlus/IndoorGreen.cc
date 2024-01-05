@@ -203,6 +203,9 @@ namespace IndoorGreen {
                 // get zone pointer
                 state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr =
                     state.dataSurface->Surface(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr).Zone;
+                state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr =
+                    state.dataSurface->Surface(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr).spaceNum;
+                
                 if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr <= 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", invalid {} entered={}",
@@ -475,7 +478,7 @@ namespace IndoorGreen {
                 
                 SetupOutputVariable(state,
                                     "Indoor Living Wall Sensible Heat Gain Rate ",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     //state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SensibleRate,
                                     //state.dataHeatBalSurf->SurfQConvInRep(loop),// loop: surface number
                                     state.dataHeatBalSurf->SurfQConvInRep(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr), // positive sign: heat loss from plants; negative sign: heat gain from plants
@@ -484,7 +487,7 @@ namespace IndoorGreen {
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).IndoorGreenName);
                  SetupOutputVariable(state,
                                     "Indoor Living Wall Sensible Heat Gain Rate ",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     //state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SensibleRate,
                                     //state.dataHeatBalSurf->SurfQConvInRep(loop),// loop: surface number
                                     state.dataHeatBalSurf->SurfQConvInRep(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr), // positive sign: heat loss from plants; negative sign: heat gain from plants
@@ -493,63 +496,63 @@ namespace IndoorGreen {
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).IndoorGreenName);
                 SetupOutputVariable(state,
                                     "Indoor Living Wall Latent Heat Gain Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LatentRate,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).IndoorGreenName);
                 SetupOutputVariable(state,
                                     "Indoor Living Wall Evapotranspiration Rate",
-                                    OutputProcessor::Unit::kg_m2s, 
+                                    Constant::Units::kg_m2s, 
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ETRate,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).IndoorGreenName);
                 SetupOutputVariable(state,
                                     "Indoor Living Wall Energy Required For Evapotranspiration Per Unit Area",
-                                    OutputProcessor::Unit::W_m2, 
+                                    Constant::Units::W_m2, 
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LambdaET,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).IndoorGreenName);
                 SetupOutputVariable(state,
                                     "Indoor Living Wall LED Operational PPFD",
-                                    OutputProcessor::Unit::umol_m2s, 
+                                    Constant::Units::umol_m2s, 
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LEDActualPPFD,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).IndoorGreenName);
                 SetupOutputVariable(state,
                                     "Indoor Living Wall LED Sensible Heat Gain Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SensibleRate,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).IndoorGreenName);
                 SetupOutputVariable(state,
                                     "Indoor Living Wall LED Operational Power",
-                                    OutputProcessor::Unit::W,  
+                                    Constant::Units::W,  
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LEDActualEleP,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).IndoorGreenName);
                SetupOutputVariable(state,
                                     "Indoor Living Wall LED Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LEDActualEleCon,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).IndoorGreenName,
-                                    {},
-                                    "Electricity",
-                                    "InteriorLights",
-                                    "IndoorLivingWall",
-                                    "Building",
+                                    Constant::eResource::Electricity,
+                                    OutputProcessor::SOVEndUseCat::InteriorLights,
+                                    "IndoorLivingWall",//End Use subcategory
+                                    OutputProcessor::SOVGroup::Building,
                                     state.dataHeatBal->Zone(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr).Name,
                                     state.dataHeatBal->Zone(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr).Multiplier,
                                     state.dataHeatBal->Zone(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr).ListMultiplier,
                                     {},
-                                    {});
+                                    {},
+                                    state.dataHeatBal->space(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SpacePtr).spaceType);
             }
     }
 

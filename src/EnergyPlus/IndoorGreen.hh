@@ -91,6 +91,7 @@ namespace IndoorGreen {
         int SurfPtr = 0;
         int ZoneListPtr = 0;
         int ZonePtr = 0;                    // point to the zone where the indoor greenery system is located
+        int SpacePtr = 0;                   // point to the space where the indoor greenery system is located
         int ETCalculationMethod = 0;        // - Method for ET calculation-(Penman-Monteith=1, Stanghellini=2, Data-driven=3)
         int LightingMethod = 0;             // - Method for light calculation-(LED=1, Daylighting=2, LED-Daylighting=3)
         bool CheckIndoorGreenName = true;
