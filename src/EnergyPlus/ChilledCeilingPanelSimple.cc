@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -685,28 +685,28 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         auto &thisCP = state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum);
         SetupOutputVariable(state,
                             "Cooling Panel Total Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisCP.Power,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisCP.Name);
         SetupOutputVariable(state,
                             "Cooling Panel Total System Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisCP.TotPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisCP.Name);
         SetupOutputVariable(state,
                             "Cooling Panel Convective Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisCP.ConvPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisCP.Name);
         SetupOutputVariable(state,
                             "Cooling Panel Radiant Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisCP.RadPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -714,38 +714,36 @@ void GetCoolingPanelInput(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Cooling Panel Total Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisCP.Energy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisCP.Name,
+                            Constant::eResource::EnergyTransfer,
+                            OutputProcessor::SOVEndUseCat::CoolingPanel,
                             {},
-                            "ENERGYTRANSFER",
-                            "COOLINGPANEL",
-                            {},
-                            "System");
+                            OutputProcessor::SOVGroup::HVAC);
         SetupOutputVariable(state,
                             "Cooling Panel Total System Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisCP.TotEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisCP.Name,
+                            Constant::eResource::EnergyTransfer,
+                            OutputProcessor::SOVEndUseCat::CoolingPanel,
                             {},
-                            "ENERGYTRANSFER",
-                            "COOLINGPANEL",
-                            {},
-                            "System");
+                            OutputProcessor::SOVGroup::HVAC);
         SetupOutputVariable(state,
                             "Cooling Panel Convective Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisCP.ConvEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisCP.Name);
         SetupOutputVariable(state,
                             "Cooling Panel Radiant Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisCP.RadEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
@@ -753,21 +751,21 @@ void GetCoolingPanelInput(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Cooling Panel Water Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             thisCP.WaterMassFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisCP.Name);
         SetupOutputVariable(state,
                             "Cooling Panel Water Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             thisCP.WaterInletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisCP.Name);
         SetupOutputVariable(state,
                             "Cooling Panel Water Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             thisCP.WaterOutletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1223,7 +1221,8 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
         CoolingPanelOn = false;
     }
     // Calculate the "zone" temperature for determining the output of the cooling panel
-    Real64 Tzone = Xr * state.dataHeatBal->ZoneMRT(ZoneNum) + ((1.0 - Xr) * state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
+    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
+    Real64 Tzone = Xr * thisZoneHB.MRT + ((1.0 - Xr) * thisZoneHB.MAT);
 
     // Logical controls: if the WaterInletTemperature is higher than Tzone, do not run the panel
     if (waterInletTemp >= Tzone) CoolingPanelOn = false;
@@ -1455,10 +1454,11 @@ Real64 CoolingPanelParams::getCoolingPanelControlTemp(EnergyPlusData &state, int
         return state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
     } break;
     case ClgPanelCtrlType::MRT: {
-        return state.dataHeatBal->ZoneMRT(ZoneNum);
+        return state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MRT;
     } break;
     case ClgPanelCtrlType::Operative: {
-        return 0.5 * (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
+        return 0.5 * (state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT +
+                      state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MRT);
     } break;
     case ClgPanelCtrlType::ODB: {
         return state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;

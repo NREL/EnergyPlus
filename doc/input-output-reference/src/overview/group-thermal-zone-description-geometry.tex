@@ -225,6 +225,8 @@ The outdoor wind speed calculated at the height above ground of the zone centroi
 \item
   Zone,Average,Space Mean Radiant Temperature {[}C{]}
 \item
+  Zone,Average,Enclosure Mean Radiant Temperature {[}C{]}
+\item
   Zone,Average,Space Operative Temperature {[}C{]}
 \item
   HVAC,Average,Space Air Heat Balance Internal Convective Heat Gain Rate {[}W{]}
@@ -384,8 +386,10 @@ This is the dewpoint temperature of the zone calculated from the Zone Mean Air T
 This is the zone air node temperature for the well-mixed room air model, which is the default room air model type (\hyperref[roomairmodeltype]{RoomAirModelType} = Mixing). But for other types of Room Air Model (the RoomAir:TemperaturePattern:* and RoomAirSettings:* objects) the zone thermostat air temperature may depend on the Thermostat Height and Thermostat Offset.
 
 \paragraph{Zone Mean Radiant Temperature {[}C{]}}\label{zone-mean-radiant-temperature-c}
+\paragraph{Space Mean Radiant Temperature {[}C{]}}\label{space-mean-radiant-temperature-c}
+\paragraph{Enclosure Mean Radiant Temperature {[}C{]}}\label{enclosure-mean-radiant-temperature-c}
 
-The Mean Radiant Temperature (MRT) in degrees Celsius of a space is a measure of the combined effects of temperatures of surfaces within that space. Specifically it is the surface area $\times$ emissivity weighted average of the zone inside surface temperatures (ref. Surface Inside Temperature), where emissivity is the Thermal Absorptance of the inside material layer of each surface.
+The Mean Radiant Temperature (MRT) in degrees Celsius is the surface area $\times$ emissivity weighted average of the \hyperref[surface-inside-face-temperature-c]{Surface Inside Face Temperature}, where emissivity is the Thermal Absorptance of the inside material layer of each surface. Zone Mean Radiant Temperature is based on all surfaces in the zone (regardless of what enclosure each surface is in). Enclosure Mean Radiant Temperature is based on all surfaces in an enclosure (one or more \hyperref[space]{Spaces}, see \hyperref[constructionairboundary]{Construction:AirBoundary}). Space Mean Radiant Temperature is based on all surfaces in the enclosure which contains the space (same as its Enclsoure Mean Radiant Temperature).
 
 \paragraph{Zone Operative Temperature {[}C{]}}\label{zone-operative-temperature-c}
 

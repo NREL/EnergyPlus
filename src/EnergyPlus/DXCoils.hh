@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -384,11 +384,11 @@ namespace DXCoils {
         Array1D<Real64> MSLatentCapacityTimeConstant; // Time constant for latent capacity to reach steady state
         Array1D<Real64> MSFanPowerPerEvapAirFlowRate;
         Array1D<Real64> MSFanPowerPerEvapAirFlowRate_2023;
-        Real64 FuelUsed;         // Energy used, in addition to electricity [W]
-        Real64 FuelConsumed;     // Energy consumed, in addition to electricity [J]
-        Real64 MSFuelWasteHeat;  // Total waste heat [J]
-        bool MSHPHeatRecActive;  // True when entered Heat Rec Vol Flow Rate > 0
-        int MSHPDesignSpecIndex; // index to MSHPDesignSpecification object used for variable speed coils
+        Real64 FuelUsed = 0.0;     // Energy used, in addition to electricity [W]
+        Real64 FuelConsumed = 0.0; // Energy consumed, in addition to electricity [J]
+        Real64 MSFuelWasteHeat;    // Total waste heat [J]
+        bool MSHPHeatRecActive;    // True when entered Heat Rec Vol Flow Rate > 0
+        int MSHPDesignSpecIndex;   // index to MSHPDesignSpecification object used for variable speed coils
         // End of multispeed DX coil input
         // VRF system variables used for sizing
         bool CoolingCoilPresent;         // FALSE if coil not present

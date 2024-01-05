@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -207,12 +207,10 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->OutBaroPress = 100000;
 
-    state->dataHeatBal->ZoneMRT.allocate(1);
-
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 0.0;
-    state->dataHeatBal->ZoneMRT(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MRT = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.0;
 
     HeatBalanceManager::ManageHeatBalance(*state);
@@ -7680,12 +7678,10 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    state->dataHeatBal->ZoneMRT.allocate(1);
-
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 0.0;
-    state->dataHeatBal->ZoneMRT(1) = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MRT = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.0;
 
     HeatBalanceManager::ManageHeatBalance(*state);

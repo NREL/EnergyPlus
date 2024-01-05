@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DaylightingManager.hh>
@@ -687,7 +688,6 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     int ConstrNum; // Construction number
 
     int SurfNumAdj;  // An interzone surface's number in the adjacent zone
-    int ZoneNumAdj;  // An interzone surface's adjacent zone number
     Real64 LWAbsIn;  // effective long wave absorptance/emissivity back side
     Real64 LWAbsOut; // effective long wave absorptance/emissivity front side
     Real64 outir(0);
@@ -725,10 +725,10 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
         if (SurfNumAdj > 0) {
             // this is interzone window. the outside condition is determined from the adjacent zone
             // condition
-            ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
+            int enclNumAdj = state.dataSurface->Surface(SurfNumAdj).RadEnclIndex;
             RefAirTemp = state.dataSurface->Surface(SurfNumAdj).getInsideAirTemperature(state, SurfNumAdj);
             Tout = RefAirTemp + Constant::Kelvin; // outside air temperature
-            tsky = state.dataHeatBal->ZoneMRT(ZoneNumAdj) +
+            tsky = state.dataViewFactor->EnclRadInfo(enclNumAdj).MRT +
                    Constant::Kelvin; // TODO this misses IR from sources such as high temp radiant and baseboards
 
             // The IR radiance of this window's "exterior" surround is the IR radiance

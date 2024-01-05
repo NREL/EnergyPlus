@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,14 +64,14 @@ struct EnergyPlusData;
 class XingGroundTempsModel : public BaseGroundTempsModel
 {
 public:
-    Real64 depth;
-    Real64 groundThermalDiffisivity;
-    Real64 simTimeInDays;
-    Real64 aveGroundTemp;
-    Real64 surfTempAmplitude_1;
-    Real64 phaseShift_1;
-    Real64 surfTempAmplitude_2;
-    Real64 phaseShift_2;
+    Real64 depth = 0.0;
+    Real64 groundThermalDiffisivity = 0.0;
+    Real64 simTimeInDays = 0.0;
+    Real64 aveGroundTemp = 0.0;
+    Real64 surfTempAmplitude_1 = 0.0;
+    Real64 phaseShift_1 = 0.0;
+    Real64 surfTempAmplitude_2 = 0.0;
+    Real64 phaseShift_2 = 0.0;
 
     static std::shared_ptr<XingGroundTempsModel> XingGTMFactory(EnergyPlusData &state, std::string objectName);
 

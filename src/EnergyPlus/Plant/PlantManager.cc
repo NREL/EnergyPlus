@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -115,6 +115,7 @@
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
+#include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -736,7 +737,7 @@ void GetPlantLoopData(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Plant System Cycle On Off Status",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataPlnt->PlantAvailMgr(LoopNum).AvailStatus,
                             OutputProcessor::SOVTimeStepType::Plant,
                             OutputProcessor::SOVStoreType::Average,
@@ -1314,8 +1315,12 @@ void GetPlantInput(EnergyPlusData &state)
                         // now deal with demand components of the ZoneHVAC type served by ControlCompOutput
                         break;
                     }
+                    case PlantEquipmentType::SwimmingPool_Indoor: {
+                        this_comp.CurOpSchemeType = OpScheme::Demand;
+                        this_comp.compPtr = SwimmingPool::SwimmingPoolData::factory(state, CompNames(CompNum));
+                        break;
+                    }
                     case PlantEquipmentType::PackagedTESCoolingCoil:
-                    case PlantEquipmentType::SwimmingPool_Indoor:
                     case PlantEquipmentType::CoilWaterCooling:
                     case PlantEquipmentType::CoilWaterDetailedFlatCooling:
                     case PlantEquipmentType::CoilWaterSimpleHeating:
@@ -1912,21 +1917,21 @@ void SetupReports(EnergyPlusData &state)
         // CurrentModuleObject='Plant/Condenser Loop'
         SetupOutputVariable(state,
                             "Plant Supply Side Cooling Demand Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             loop.CoolingDemand,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
         SetupOutputVariable(state,
                             "Plant Supply Side Heating Demand Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             loop.HeatingDemand,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
         SetupOutputVariable(state,
                             "Plant Supply Side Inlet Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             loop.InletNodeFlowrate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1934,14 +1939,14 @@ void SetupReports(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Plant Supply Side Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             loop.InletNodeTemperature,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
         SetupOutputVariable(state,
                             "Plant Supply Side Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             loop.OutletNodeTemperature,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1949,28 +1954,28 @@ void SetupReports(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Plant Supply Side Not Distributed Demand Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             loop.DemandNotDispatched,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
         SetupOutputVariable(state,
                             "Plant Supply Side Unmet Demand Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             loop.UnmetDemand,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
         SetupOutputVariable(state,
                             "Debug Plant Loop Bypass Fraction",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             loop.BypassFrac,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
         SetupOutputVariable(state,
                             "Debug Plant Last Simulated Loop Side",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             loop.LastLoopSideSimulated,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1983,56 +1988,56 @@ void SetupReports(EnergyPlusData &state)
         for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             SetupOutputVariable(state,
                                 "Plant Demand Side Lumped Capacitance Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).LoopSideInlet_TankTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             SetupOutputVariable(state,
                                 "Plant Supply Side Lumped Capacitance Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).LoopSideInlet_TankTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             SetupOutputVariable(state,
                                 "Plant Demand Side Lumped Capacitance Heat Transport Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).LoopSideInlet_MdotCpDeltaT,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             SetupOutputVariable(state,
                                 "Plant Supply Side Lumped Capacitance Heat Transport Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).LoopSideInlet_MdotCpDeltaT,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             SetupOutputVariable(state,
                                 "Plant Demand Side Lumped Capacitance Heat Storage Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).LoopSideInlet_McpDTdt,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             SetupOutputVariable(state,
                                 "Plant Supply Side Lumped Capacitance Heat Storage Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).LoopSideInlet_McpDTdt,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             SetupOutputVariable(state,
                                 "Plant Demand Side Lumped Capacitance Excessive Storage Time",
-                                OutputProcessor::Unit::hr,
+                                Constant::Units::hr,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).LoopSideInlet_CapExcessStorageTimeReport,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             SetupOutputVariable(state,
                                 "Plant Supply Side Lumped Capacitance Excessive Storage Time",
-                                OutputProcessor::Unit::hr,
+                                Constant::Units::hr,
                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).LoopSideInlet_CapExcessStorageTimeReport,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -2045,7 +2050,7 @@ void SetupReports(EnergyPlusData &state)
                             OpScheme::Demand) {
                             SetupOutputVariable(state,
                                                 "Plant Component Distributed Demand Rate",
-                                                OutputProcessor::Unit::W,
+                                                Constant::Units::W,
                                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).MyLoad,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Average,

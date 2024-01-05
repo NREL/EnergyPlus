@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -425,51 +425,50 @@ void FluidCoolerspecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Cooling Tower Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->InletWaterTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Cooling Tower Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->OutletWaterTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Cooling Tower Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->WaterMassFlowRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Cooling Tower Heat Transfer Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->Qactual,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Cooling Tower Fan Electricity Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->FanPower,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Cooling Tower Fan Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->FanEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::HeatRejection,
                         {},
-                        "Electricity",
-                        "HeatRejection",
-                        {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 }
 
 bool FluidCoolerspecs::validateSingleSpeedInputs(EnergyPlusData &state,
@@ -1634,11 +1633,11 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
             state,
             state.dataOutRptPredefined->pdchCTFCFluidType,
             this->Name,
-            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName); // Fluid Name more reasonably than FluidType
+            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName); // Fluid Name more reasonable than FluidType
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchCTFCRange, this->Name, this->DesignEnteringWaterTemp - this->DesignLeavingWaterTemp);
         OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchCTFCRange, this->Name, this->DesignEnteringWaterTemp - this->DesignEnteringAirWetBulbTemp);
+            state, state.dataOutRptPredefined->pdchCTFCRange, this->Name, this->DesignLeavingWaterTemp - this->DesignEnteringAirWetBulbTemp);
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchCTFCDesFanPwr, this->Name, this->HighSpeedFanPower); // eqival to Design Fan Power?
         OutputReportPredefined::PreDefTableEntry(
@@ -2002,7 +2001,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
 
     // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
     Real64 LoopMinTemp = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MinTemp;
-    if (this->OutletWaterTemp < LoopMinTemp && this->WaterMassFlowRate > 0.0) {
+    if ((this->OutletWaterTemp < LoopMinTemp) && (this->WaterMassFlowRate > 0.0)) {
         ++this->OutletWaterTempErrorCount;
 
         if (this->OutletWaterTempErrorCount < 2) {

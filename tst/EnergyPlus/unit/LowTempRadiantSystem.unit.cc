@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2926,7 +2926,6 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     Real64 acceptibleError = 0.001;
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
-    state->dataHeatBal->ZoneMRT.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBalSurf->SurfTempIn.allocate(1);
     state->dataHeatBalSurf->SurfTempUserLoc.allocate(1);
@@ -2935,8 +2934,9 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     state->dataLowTempRadSys->ElecRadSys.allocate(1);
 
     // Test Data
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 23.456;
-    state->dataHeatBal->ZoneMRT(1) = 12.345;
+    auto &zoneHB1 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
+    zoneHB1.MAT = 23.456;
+    zoneHB1.MRT = 12.345;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 34.567;
     state->dataHeatBal->Zone(1).OutWetBulbTemp = 1.234;
     state->dataHeatBalSurf->SurfTempIn(1) = 5.678;
@@ -2953,19 +2953,19 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
 
     // Test 1: MAT Control
     state->dataLowTempRadSys->HydrRadSys(1).controlType = LowTempRadiantControlTypes::MATControl;
-    expectedResult = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT;
+    expectedResult = zoneHB1.MAT;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->HydrRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->HydrRadSys(1).controlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->CFloRadSys(1).controlType = LowTempRadiantControlTypes::MATControl;
-    expectedResult = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT;
+    expectedResult = zoneHB1.MAT;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->CFloRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->CFloRadSys(1).controlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->ElecRadSys(1).controlType = LowTempRadiantControlTypes::MATControl;
-    expectedResult = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT;
+    expectedResult = zoneHB1.MAT;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->ElecRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->ElecRadSys(1).controlType);
@@ -2973,19 +2973,19 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
 
     // Test 2: MRT Control
     state->dataLowTempRadSys->HydrRadSys(1).controlType = LowTempRadiantControlTypes::MRTControl;
-    expectedResult = state->dataHeatBal->ZoneMRT(1);
+    expectedResult = zoneHB1.MRT;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->HydrRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->HydrRadSys(1).controlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->CFloRadSys(1).controlType = LowTempRadiantControlTypes::MRTControl;
-    expectedResult = state->dataHeatBal->ZoneMRT(1);
+    expectedResult = zoneHB1.MRT;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->CFloRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->CFloRadSys(1).controlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->ElecRadSys(1).controlType = LowTempRadiantControlTypes::MRTControl;
-    expectedResult = state->dataHeatBal->ZoneMRT(1);
+    expectedResult = zoneHB1.MRT;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->ElecRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->ElecRadSys(1).controlType);
@@ -2993,19 +2993,19 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
 
     // Test 3: Operative Temperature Control
     state->dataLowTempRadSys->HydrRadSys(1).controlType = LowTempRadiantControlTypes::OperativeControl;
-    expectedResult = (state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT + state->dataHeatBal->ZoneMRT(1)) / 2.0;
+    expectedResult = (zoneHB1.MAT + zoneHB1.MRT) / 2.0;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->HydrRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->HydrRadSys(1).controlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->CFloRadSys(1).controlType = LowTempRadiantControlTypes::OperativeControl;
-    expectedResult = (state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT + state->dataHeatBal->ZoneMRT(1)) / 2.0;
+    expectedResult = (zoneHB1.MAT + zoneHB1.MRT) / 2.0;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->CFloRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->CFloRadSys(1).controlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->ElecRadSys(1).controlType = LowTempRadiantControlTypes::OperativeControl;
-    expectedResult = (state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT + state->dataHeatBal->ZoneMRT(1)) / 2.0;
+    expectedResult = (zoneHB1.MAT + zoneHB1.MRT) / 2.0;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->ElecRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->ElecRadSys(1).controlType);

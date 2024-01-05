@@ -1431,7 +1431,6 @@
 
   ComfortViewFactorAngles,
     Angle Fac List 1,        !- Name
-    West Zone,               !- Zone Name
     Zn001:Wall001,           !- Surface 1 Name
     0.15,                    !- Angle Factor 1
     Zn001:Wall002,           !- Surface 2 Name
@@ -1447,7 +1446,6 @@
 
   ComfortViewFactorAngles,
     Angle Fac List 2,        !- Name
-    EAST ZONE,               !- Zone Name
     Zn002:Wall001,           !- Surface 1 Name
     0.15,                    !- Angle Factor 1
     Zn002:Wall002,           !- Surface 2 Name
@@ -1463,7 +1461,6 @@
 
   ComfortViewFactorAngles,
     Angle Fac List 3,        !- Name
-    NORTH ZONE,              !- Zone Name
     Zn003:Wall001,           !- Surface 1 Name
     0.15,                    !- Angle Factor 1
     Zn003:Wall002,           !- Surface 2 Name

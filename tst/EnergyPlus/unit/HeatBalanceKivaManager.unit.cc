@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -497,7 +497,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_setupKivaInstances_ThermalComfort)
         "  3.82e-08,                !- Carbon Dioxide Generation Rate",
 
         "  Yes,                     !- Enable ASHRAE 55 Comfort Warnings",
-        "  ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "  EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "  ,                        !- Surface NameAngle Factor List Name",
         "  Work Eff Sched,          !- Work Efficiency Schedule Name",
         "  ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",

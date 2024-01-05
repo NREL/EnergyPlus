@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -4546,9 +4546,17 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         // set supplemental heating coil operation temperature limits
         if (thisVrfTU.SuppHeatingCoilPresent) {
             // Set maximum supply air temperature for supplemental heating coil
-            thisVrfTU.MaxSATFromSuppHeatCoil = rNumericArgs(11);
+            if (NumNums < 11) {
+                thisVrfTU.MaxSATFromSuppHeatCoil = DataSizing::AutoSize;
+            } else {
+                thisVrfTU.MaxSATFromSuppHeatCoil = rNumericArgs(11);
+            }
             // set maximum outdoor dry-bulb temperature for supplemental heating coil operation
-            thisVrfTU.MaxOATSuppHeatingCoil = rNumericArgs(12);
+            if (NumNums < 12) {
+                thisVrfTU.MaxOATSuppHeatingCoil = 21.0;
+            } else {
+                thisVrfTU.MaxOATSuppHeatingCoil = rNumericArgs(12);
+            }
         }
 
         // Add cooling coil to component sets array
@@ -4787,61 +4795,60 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         if (thisVrfTU.CoolingCoilPresent) {
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Cooling Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrfTU.ParasiticCoolElecPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrfTU.Name);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Cooling Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisVrfTU.ParasiticElecCoolConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrfTU.Name,
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "Electricity",
-                                "COOLING",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Total Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrfTU.TotalCoolingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrfTU.Name);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Sensible Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrfTU.SensibleCoolingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrfTU.Name);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Latent Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrfTU.LatentCoolingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrfTU.Name);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Total Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisVrfTU.TotalCoolingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrfTU.Name);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Sensible Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisVrfTU.SensibleCoolingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrfTU.Name);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Latent Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisVrfTU.LatentCoolingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -4850,61 +4857,60 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         if (thisVrfTU.HeatingCoilPresent) {
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Heating Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrfTU.ParasiticHeatElecPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrfTU.Name);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Heating Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisVrfTU.ParasiticElecHeatConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrfTU.Name,
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Heating,
                                 {},
-                                "Electricity",
-                                "HEATING",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Total Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrfTU.TotalHeatingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrfTU.Name);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Sensible Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrfTU.SensibleHeatingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrfTU.Name);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Latent Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrfTU.LatentHeatingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrfTU.Name);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Total Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisVrfTU.TotalHeatingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrfTU.Name);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Sensible Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisVrfTU.SensibleHeatingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrfTU.Name);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Latent Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisVrfTU.LatentHeatingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -4912,7 +4918,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
         SetupOutputVariable(state,
                             "Zone VRF Air Terminal Fan Availability Status",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisVrfTU.AvailStatus,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -4929,21 +4935,21 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         if (thisVrfTU.NumOfSpeedCooling > 1 || thisVrfTU.NumOfSpeedHeating > 1) {
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Multispeed Fan Cycling Ratio",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisVrfTU.CycRatio,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrfTU.Name);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Multispeed Fan Speed Ratio",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisVrfTU.SpeedRatio,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrfTU.Name);
             SetupOutputVariable(state,
                                 "Zone VRF Air Terminal Multispeed Fan Speed Level",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisVrfTU.SpeedNum,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -4956,74 +4962,72 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         std::string_view const sFuelType = Constant::eFuelNames[static_cast<int>(thisVrf.fuel)];
         SetupOutputVariable(state,
                             "VRF Heat Pump Total Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisVrf.TotalCoolingCapacity,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisVrf.Name);
         SetupOutputVariable(state,
                             "VRF Heat Pump Total Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisVrf.TotalHeatingCapacity,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisVrf.Name);
         SetupOutputVariable(state,
                             format("VRF Heat Pump Cooling {} Rate", sFuelType),
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisVrf.ElecCoolingPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisVrf.Name);
         SetupOutputVariable(state,
                             format("VRF Heat Pump Cooling {} Energy", sFuelType),
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisVrf.CoolElecConsumption,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisVrf.Name,
+                            Constant::eFuel2eResource[(int)thisVrf.fuel],
+                            OutputProcessor::SOVEndUseCat::Cooling,
                             {},
-                            sFuelType,
-                            "COOLING",
-                            {},
-                            "System");
+                            OutputProcessor::SOVGroup::HVAC);
         SetupOutputVariable(state,
                             format("VRF Heat Pump Heating {} Rate", sFuelType),
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisVrf.ElecHeatingPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisVrf.Name);
         SetupOutputVariable(state,
                             format("VRF Heat Pump Heating {} Energy", sFuelType),
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisVrf.HeatElecConsumption,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisVrf.Name,
+                            Constant::eFuel2eResource[(int)thisVrf.fuel],
+                            OutputProcessor::SOVEndUseCat::Heating,
                             {},
-                            sFuelType,
-                            "HEATING",
-                            {},
-                            "System");
+                            OutputProcessor::SOVGroup::HVAC);
 
         SetupOutputVariable(state,
                             "VRF Heat Pump Cooling COP",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisVrf.OperatingCoolingCOP,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisVrf.Name);
         SetupOutputVariable(state,
                             "VRF Heat Pump Heating COP",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisVrf.OperatingHeatingCOP,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisVrf.Name);
         SetupOutputVariable(state,
                             "VRF Heat Pump COP",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisVrf.OperatingCOP,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -5033,91 +5037,91 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             // For VRF_FluidTCtrl Model
             SetupOutputVariable(state,
                                 "VRF Heat Pump Compressor Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrf.Ncomp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Outdoor Unit Fan Power",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrf.OUFanPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Compressor Rotating Speed",
-                                OutputProcessor::Unit::rev_min,
+                                Constant::Units::rev_min,
                                 thisVrf.CompActSpeed,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Indoor Unit Evaporating Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisVrf.IUEvaporatingTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Outdoor Unit Condensing Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisVrf.CondensingTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Indoor Unit Condensing Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisVrf.IUCondensingTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Outdoor Unit Evaporating Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisVrf.EvaporatingTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Cooling Capacity at Max Compressor Speed",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrf.CoolingCapacity,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Heating Capacity at Max Compressor Speed",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrf.HeatingCapacity,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Indoor Unit Piping Correction for Cooling",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisVrf.PipingCorrectionCooling,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Indoor Unit Piping Correction for Heating",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisVrf.PipingCorrectionHeating,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Outdoor Unit Evaporator Heat Extract Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrf.OUEvapHeatRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Outdoor Unit Condenser Heat Release Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrf.OUCondHeatRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -5127,14 +5131,14 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             // For VRF_SysCurve Model
             SetupOutputVariable(state,
                                 "VRF Heat Pump Maximum Capacity Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataHVACVarRefFlow->MaxCoolingCapacity(NumCond),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Maximum Capacity Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataHVACVarRefFlow->MaxHeatingCapacity(NumCond),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -5145,62 +5149,60 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             (thisVrf.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle && thisVrf.fuel == Constant::eFuel::Electricity)) {
             SetupOutputVariable(state,
                                 "VRF Heat Pump Defrost Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrf.DefrostPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Defrost Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisVrf.DefrostConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Heating,
                                 {},
-                                "Electricity",
-                                "HEATING",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
         } else { // defrost energy applied to fuel type
             SetupOutputVariable(state,
                                 format("VRF Heat Pump Defrost {} Rate", sFuelType),
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrf.DefrostPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 format("VRF Heat Pump Defrost {} Energy", sFuelType),
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisVrf.DefrostConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
+                                Constant::eFuel2eResource[(int)thisVrf.fuel],
+                                OutputProcessor::SOVEndUseCat::Heating,
                                 {},
-                                sFuelType,
-                                "HEATING",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
         }
 
         SetupOutputVariable(state,
                             "VRF Heat Pump Part Load Ratio",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisVrf.VRFCondPLR,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisVrf.Name);
         SetupOutputVariable(state,
                             "VRF Heat Pump Runtime Fraction",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisVrf.VRFCondRTF,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisVrf.Name);
         SetupOutputVariable(state,
                             "VRF Heat Pump Cycling Ratio",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisVrf.VRFCondCyclingRatio,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -5208,14 +5210,14 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         SetupOutputVariable(state,
                             "VRF Heat Pump Operating Mode",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisVrf.OperatingMode,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisVrf.Name);
         SetupOutputVariable(state,
                             "VRF Heat Pump Condenser Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             thisVrf.CondenserInletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -5223,33 +5225,32 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         SetupOutputVariable(state,
                             "VRF Heat Pump Crankcase Heater Electricity Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisVrf.CrankCaseHeaterPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisVrf.Name);
         SetupOutputVariable(state,
                             "VRF Heat Pump Crankcase Heater Electricity Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisVrf.CrankCaseHeaterElecConsumption,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisVrf.Name,
+                            Constant::eResource::Electricity,
+                            OutputProcessor::SOVEndUseCat::Cooling,
                             {},
-                            "Electricity",
-                            "COOLING",
-                            {},
-                            "System");
+                            OutputProcessor::SOVGroup::HVAC);
         SetupOutputVariable(state,
                             "VRF Heat Pump Terminal Unit Cooling Load Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisVrf.TUCoolingLoad,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisVrf.Name);
         SetupOutputVariable(state,
                             "VRF Heat Pump Terminal Unit Heating Load Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisVrf.TUHeatingLoad,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -5257,119 +5258,115 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         if (thisVrf.HeatRecoveryUsed) {
             SetupOutputVariable(state,
                                 "VRF Heat Pump Heat Recovery Status Change Multiplier",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisVrf.SUMultiplier,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Simultaneous Cooling and Heating Efficiency",
-                                OutputProcessor::Unit::Btu_h_W,
+                                Constant::Units::Btu_h_W,
                                 thisVrf.SCHE,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Heat Recovery Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrf.VRFHeatRec,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Heat Recovery Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisVrf.VRFHeatEnergyRec,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::SOVEndUseCat::HeatRecovery,
                                 {},
-                                "ENERGYTRANSFER",
-                                "HEATRECOVERY",
-                                {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
         }
 
         if (thisVrf.CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
             SetupOutputVariable(state,
                                 "VRF Heat Pump Evaporative Condenser Water Use Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 thisVrf.EvapWaterConsumpRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
+                                Constant::eResource::Water,
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "Water",
-                                "Cooling",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Evaporative Condenser Pump Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrf.EvapCondPumpElecPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Evaporative Condenser Pump Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisVrf.EvapCondPumpElecConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisVrf.Name,
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "Electricity",
-                                "COOLING",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
 
             if (thisVrf.BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(state,
                                     "VRF Heat Pump Basin Heater Electricity Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     thisVrf.BasinHeaterPower,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     thisVrf.Name);
                 SetupOutputVariable(state,
                                     "VRF Heat Pump Basin Heater Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     thisVrf.BasinHeaterConsumption,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     thisVrf.Name,
+                                    Constant::eResource::Electricity,
+                                    OutputProcessor::SOVEndUseCat::Cooling,
                                     {},
-                                    "Electricity",
-                                    "COOLING",
-                                    {},
-                                    "System");
+                                    OutputProcessor::SOVGroup::HVAC);
             }
 
         } else if (thisVrf.CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
             SetupOutputVariable(state,
                                 "VRF Heat Pump Condenser Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisVrf.CondenserSideOutletTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Condenser Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisVrf.WaterCondenserMassFlow,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Condenser Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisVrf.QCondenser,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisVrf.Name);
             SetupOutputVariable(state,
                                 "VRF Heat Pump Condenser Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisVrf.QCondEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -9236,6 +9233,7 @@ void VRFTerminalUnitEquipment::ControlVRF(EnergyPlusData &state,
     PartLoadRatio = 0.0;
     state.dataHVACVarRefFlow->LoopDXCoolCoilRTF = 0.0;
     state.dataHVACVarRefFlow->LoopDXHeatCoilRTF = 0.0;
+    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatPartLoadRatio = 0.0;
 
     // The RETURNS here will jump back to SimVRF where the CalcVRF routine will simulate with latest PLR
 
@@ -9442,7 +9440,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
 
     // The coil will not operate at PLR=0 or PLR=1, calculate the operating part-load ratio
 
-    if ((VRFHeatingMode || HRHeatingMode) || (VRFCoolingMode || HRCoolingMode)) {
+    if ((VRFHeatingMode || HRHeatingMode) || ((VRFCoolingMode && DXCoolingCoilOprCtrl) || HRCoolingMode)) {
 
         int NumOfSpeed = 1;
         if (this->NumOfSpeedHeating > 1 && ((VRFHeatingMode || HRHeatingMode))) {
@@ -10115,10 +10113,14 @@ void SetAverageAirFlow(EnergyPlusData &state,
 
     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode == DataHVACGlobals::CycFanCycCoil &&
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SpeedNum == 0) {
+        Real64 partLoadRat = PartLoadRatio;
+        if (partLoadRat == 0.0 && state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatPartLoadRatio > 0.0) {
+            partLoadRat = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatPartLoadRatio;
+        }
         AverageUnitMassFlow =
-            (PartLoadRatio * state.dataHVACVarRefFlow->CompOnMassFlow) + ((1 - PartLoadRatio) * state.dataHVACVarRefFlow->CompOffMassFlow);
+            (partLoadRat * state.dataHVACVarRefFlow->CompOnMassFlow) + ((1 - partLoadRat) * state.dataHVACVarRefFlow->CompOffMassFlow);
         AverageOAMassFlow =
-            (PartLoadRatio * state.dataHVACVarRefFlow->OACompOnMassFlow) + ((1 - PartLoadRatio) * state.dataHVACVarRefFlow->OACompOffMassFlow);
+            (partLoadRat * state.dataHVACVarRefFlow->OACompOnMassFlow) + ((1 - partLoadRat) * state.dataHVACVarRefFlow->OACompOffMassFlow);
     } else {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SpeedNum == 0) {
             if (PartLoadRatio == 0.0) {
@@ -12620,6 +12622,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
     PartLoadRatio = 0.0;
     state.dataHVACVarRefFlow->LoopDXCoolCoilRTF = 0.0;
     state.dataHVACVarRefFlow->LoopDXHeatCoilRTF = 0.0;
+    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatPartLoadRatio = 0.0;
     VRFCond = this->VRFSysNum;
     IndexToTUInTUList = this->IndexToTUInTUList;
     auto &thisVRFCond = state.dataHVACVarRefFlow->VRF(VRFCond);
@@ -12791,7 +12794,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
 
     // The coil will not operate at PLR=0 or PLR=1, calculate the operating part-load ratio
 
-    if ((VRFHeatingMode || HRHeatingMode) || (VRFCoolingMode || HRCoolingMode)) {
+    if ((VRFHeatingMode || HRHeatingMode) || ((VRFCoolingMode && DXCoolingCoilOprCtrl) || HRCoolingMode)) {
         auto f = [&state, VRFTUNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio](Real64 const PartLoadRatio) {
             Real64 QZnReqTemp = QZnReq;    // denominator representing zone load (W)
             Real64 ActualOutput;           // delivered capacity of VRF terminal unit

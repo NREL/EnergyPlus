@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -227,36 +227,31 @@ struct ErrorObjectHeader
     std::string_view objectName;
 };
 
-// Wrappers for common errors
 void ShowSevereDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh);
-
 void ShowSevereEmptyField(EnergyPlusData &state,
                           ErrorObjectHeader const &eoh,
                           std::string_view fieldName,
                           std::string_view depFieldName = {},
                           std::string_view depFieldValue = {});
-
 void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
-
 void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
-
 void ShowSevereInvalidBool(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
 
+void ShowSevereCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg);
+void ShowWarningDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh);
 void ShowWarningEmptyField(EnergyPlusData &state,
                            ErrorObjectHeader const &eoh,
                            std::string_view fieldName,
                            std::string_view defaultValue,
                            std::string_view depFieldName = {},
                            std::string_view depFieldValue = {});
-
 void ShowWarningItemNotFound(
     EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
-
-void ShowWarningInvalidBool(
-    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
-
 void ShowWarningInvalidKey(
     EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
+void ShowWarningInvalidBool(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view defaultValue);
+void ShowWarningCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg);
 
 namespace Util {
 

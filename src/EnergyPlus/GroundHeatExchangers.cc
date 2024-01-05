@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2518,49 +2518,49 @@ void GLHEBase::setupOutput(EnergyPlusData &state)
 {
     SetupOutputVariable(state,
                         "Ground Heat Exchanger Average Borehole Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->bhTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->name);
     SetupOutputVariable(state,
                         "Ground Heat Exchanger Heat Transfer Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->QGLHE,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->name);
     SetupOutputVariable(state,
                         "Ground Heat Exchanger Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->inletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->name);
     SetupOutputVariable(state,
                         "Ground Heat Exchanger Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->outletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->name);
     SetupOutputVariable(state,
                         "Ground Heat Exchanger Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->massFlowRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->name);
     SetupOutputVariable(state,
                         "Ground Heat Exchanger Average Fluid Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->aveFluidTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->name);
     SetupOutputVariable(state,
                         "Ground Heat Exchanger Farfield Ground Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->tempGround,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,

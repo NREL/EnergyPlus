@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -349,42 +349,42 @@ void PondGroundHeatExchangerData::setupOutputVars(EnergyPlusData &state)
 {
     SetupOutputVariable(state,
                         "Pond Heat Exchanger Heat Transfer Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->HeatTransferRate,
                         OutputProcessor::SOVTimeStepType::Plant,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Pond Heat Exchanger Heat Transfer Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->Energy,
                         OutputProcessor::SOVTimeStepType::Plant,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name);
     SetupOutputVariable(state,
                         "Pond Heat Exchanger Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->MassFlowRate,
                         OutputProcessor::SOVTimeStepType::Plant,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Pond Heat Exchanger Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->InletTemp,
                         OutputProcessor::SOVTimeStepType::Plant,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Pond Heat Exchanger Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->OutletTemp,
                         OutputProcessor::SOVTimeStepType::Plant,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Pond Heat Exchanger Bulk Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->PondTemp,
                         OutputProcessor::SOVTimeStepType::Plant,
                         OutputProcessor::SOVStoreType::Average,
