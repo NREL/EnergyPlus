@@ -409,6 +409,7 @@ namespace ElectricBaseboardRadiator {
                 }
                 if (elecBaseboard.SurfacePtr(SurfNum) != 0) {
                     state.dataSurface->surfIntConv(elecBaseboard.SurfacePtr(SurfNum)).getsRadiantHeat = true;
+                    state.dataSurface->allGetsRadiantHeatSurfaceList.emplace_back(elecBaseboard.SurfacePtr(SurfNum));
                 }
 
                 AllFracsSummed += elecBaseboard.FracDistribToSurf(SurfNum);
@@ -903,7 +904,12 @@ namespace ElectricBaseboardRadiator {
         Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
         // Initialize arrays
-        state.dataHeatBalFanSys->SurfQElecBaseboard = 0.0;
+        for (auto &elecBaseboard : state.dataElectBaseboardRad->ElecBaseboard) {
+            for (int radSurfNum = 1; radSurfNum <= elecBaseboard.TotSurfToDistrib; ++radSurfNum) {
+                int surfNum = elecBaseboard.SurfacePtr(radSurfNum);
+                state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).ElecBaseboard = 0.0;
+            }
+        }
         state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson = 0.0;
 
         for (auto &elecBaseboard : state.dataElectBaseboardRad->ElecBaseboard) {
@@ -916,8 +922,7 @@ namespace ElectricBaseboardRadiator {
                     if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
                         Real64 ThisSurfIntensity =
                             (elecBaseboard.QBBElecRadSource * elecBaseboard.FracDistribToSurf(RadSurfNum) / state.dataSurface->Surface(SurfNum).Area);
-                        state.dataHeatBalFanSys->SurfQElecBaseboard(SurfNum) += ThisSurfIntensity;
-                        state.dataHeatBalSurf->AnyRadiantSystems = true;
+                        state.dataHeatBalFanSys->surfQRadFromHVAC(SurfNum).ElecBaseboard += ThisSurfIntensity;
                         if (ThisSurfIntensity > DataHeatBalFanSys::MaxRadHeatFlux) {
                             ShowSevereError(state, "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected");
                             ShowContinueError(state, "Surface = " + state.dataSurface->Surface(SurfNum).Name);
