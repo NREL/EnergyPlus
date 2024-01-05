@@ -176,7 +176,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance)
     Real64 speedRatio = 1.0;
     int fanOpMode = 1;
     bool singleMode = false;
-    thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
+    thisCoil.simulate(*state, useAlternateMode, speedNum, speedRatio, fanOpMode, singleMode);
     //    std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
     EXPECT_NEAR(2500, thisCoil.totalCoolingEnergyRate, 0.1); // expect the coil to run full out, at speed 1
     EXPECT_NEAR(19.485, evapOutletNode.Temp, 0.01);
@@ -185,7 +185,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance)
     // alter values and run at rated conditions normal mode speed 2
     evapInletNode.MassFlowRate = thisCoil.performance->RatedAirMassFlowRateMaxSpeed();
     speedNum = 2;
-    thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
+    thisCoil.simulate(*state, useAlternateMode, speedNum, speedRatio, fanOpMode, singleMode);
     //    std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
     EXPECT_NEAR(5000, thisCoil.totalCoolingEnergyRate, 0.01); // expect the coil to run full out, at speed 1
     // EXPECT_NEAR(17.896, evapOutletNode.Temp, 0.01);
@@ -195,7 +195,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance)
     // ok so now run at alternate mode, speed 1
     useAlternateMode = DataHVACGlobals::coilEnhancedMode;
     speedNum = 1;
-    thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
+    thisCoil.simulate(*state, useAlternateMode, speedNum, speedRatio, fanOpMode, singleMode);
     //    std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
     EXPECT_NEAR(2250, thisCoil.totalCoolingEnergyRate, 0.01); // expect the coil to run full out, at speed 1
     // EXPECT_NEAR(24.45, evapOutletNode.Temp, 0.01);
@@ -205,7 +205,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance)
     // ok so now run at alternate mode, speed 2
     useAlternateMode = DataHVACGlobals::coilEnhancedMode;
     speedNum = 2;
-    thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
+    thisCoil.simulate(*state, useAlternateMode, speedNum, speedRatio, fanOpMode, singleMode);
     //    std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
     EXPECT_NEAR(4500, thisCoil.totalCoolingEnergyRate, 0.01); // expect the coil to run full out, at speed 1
     // EXPECT_NEAR(20.39, evapOutletNode.Temp, 0.01);
