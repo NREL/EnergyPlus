@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -605,40 +605,39 @@ namespace HVACFan {
 
         SetupOutputVariable(state,
                             "Fan Electricity Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             m_fanPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             name);
         SetupOutputVariable(state,
                             "Fan Rise in Air Temperature",
-                            OutputProcessor::Unit::deltaC,
+                            Constant::Units::deltaC,
                             m_deltaTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             name);
         SetupOutputVariable(state,
                             "Fan Heat Gain to Air",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             m_powerLossToAir,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             name);
         SetupOutputVariable(state,
                             "Fan Electricity Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             m_fanEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name,
-                            {},
-                            "Electricity",
-                            "Fans",
+                            Constant::eResource::Electricity,
+                            OutputProcessor::SOVEndUseCat::Fans,
                             m_endUseSubcategoryName,
-                            "System");
+                            OutputProcessor::SOVGroup::HVAC);
         SetupOutputVariable(state,
                             "Fan Air Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             m_outletAirMassFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -646,7 +645,7 @@ namespace HVACFan {
         if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds == 1) {
             SetupOutputVariable(state,
                                 "Fan Runtime Fraction",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 m_fanRunTimeFractionAtSpeed[0],
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -655,7 +654,7 @@ namespace HVACFan {
             for (int speedLoop = 0; speedLoop < m_numSpeeds; ++speedLoop) {
                 SetupOutputVariable(state,
                                     "Fan Runtime Fraction Speed " + fmt::to_string(speedLoop + 1),
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     m_fanRunTimeFractionAtSpeed[speedLoop],
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,

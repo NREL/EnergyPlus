@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2851,6 +2851,11 @@ namespace SurfaceGeometry {
     void CreateMissingSpaces(EnergyPlusData &state, Array1D<SurfaceGeometry::SurfaceData> &Surfaces)
     {
         // Scan surfaces to see if Space was assigned in input
+        EPVector<bool> anySurfacesWithSpace;    // True if any surfaces in a zone do not have a space assigned in input
+        EPVector<bool> anySurfacesWithoutSpace; // True if any surfaces in a zone have a space assigned in input
+        anySurfacesWithSpace.resize(state.dataGlobal->NumOfZones, false);
+        anySurfacesWithoutSpace.resize(state.dataGlobal->NumOfZones, false);
+
         for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
             auto &thisSurf = Surfaces(surfNum);
             if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
@@ -2859,20 +2864,20 @@ namespace SurfaceGeometry {
                 thisSurf.spaceNum = Surfaces(thisSurf.BaseSurf).spaceNum;
             }
             if (thisSurf.spaceNum > 0) {
-                state.dataHeatBal->Zone(thisSurf.Zone).anySurfacesWithSpace = true;
+                anySurfacesWithSpace(thisSurf.Zone) = true;
             } else {
-                state.dataHeatBal->Zone(thisSurf.Zone).anySurfacesWithoutSpace = true;
+                anySurfacesWithoutSpace(thisSurf.Zone) = true;
             }
         }
 
         // Create any missing Spaces
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             auto &thisZone = state.dataHeatBal->Zone(zoneNum);
-            if (thisZone.anySurfacesWithoutSpace) {
+            if (anySurfacesWithoutSpace(zoneNum)) {
                 // If any surfaces in the zone are not assigned to a space, may need to create a new space
                 // Every zone has at least one space, created in HeatBalanceManager::GetSpaceData
                 // If no surfaces have a space assigned, then the default space will be used, otherwise, create a new space
-                if (thisZone.anySurfacesWithSpace) {
+                if (anySurfacesWithSpace(zoneNum)) {
                     // Add new space
                     ++state.dataGlobal->numSpaces;
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).zoneNum = zoneNum;
@@ -7901,42 +7906,42 @@ namespace SurfaceGeometry {
 
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Baffle Surface Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 state.dataHeatBal->ExtVentedCavity(Item).Tbaffle,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->ExtVentedCavity(Item).Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Air Drybulb Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 state.dataHeatBal->ExtVentedCavity(Item).TAirCav,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->ExtVentedCavity(Item).Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Total Natural Ventilation Air Change Rate",
-                                OutputProcessor::Unit::ach,
+                                Constant::Units::ach,
                                 state.dataHeatBal->ExtVentedCavity(Item).PassiveACH,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->ExtVentedCavity(Item).Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 state.dataHeatBal->ExtVentedCavity(Item).PassiveMdotVent,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->ExtVentedCavity(Item).Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 state.dataHeatBal->ExtVentedCavity(Item).PassiveMdotWind,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->ExtVentedCavity(Item).Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 state.dataHeatBal->ExtVentedCavity(Item).PassiveMdotTherm,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -8526,7 +8531,7 @@ namespace SurfaceGeometry {
                     if (thisGndSurfsObj.GndSurfs(gSurfNum).TempSchPtr != 0 && SetTempSchReportVar) {
                         SetupOutputVariable(state,
                                             "Surfaces Property Ground Surfaces Average Temperature",
-                                            OutputProcessor::Unit::C,
+                                            Constant::Units::C,
                                             thisGndSurfsObj.SurfsTempAvg,
                                             OutputProcessor::SOVTimeStepType::Zone,
                                             OutputProcessor::SOVStoreType::State,
@@ -8536,7 +8541,7 @@ namespace SurfaceGeometry {
                     if (thisGndSurfsObj.GndSurfs(gSurfNum).ReflSchPtr != 0 && SetReflSchReportVar) {
                         SetupOutputVariable(state,
                                             "Surfaces Property Ground Surfaces Average Reflectance",
-                                            OutputProcessor::Unit::None,
+                                            Constant::Units::None,
                                             thisGndSurfsObj.SurfsReflAvg,
                                             OutputProcessor::SOVTimeStepType::Zone,
                                             OutputProcessor::SOVStoreType::State,
@@ -8627,7 +8632,6 @@ namespace SurfaceGeometry {
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 state.dataSurface->Surface(Found).InsideHeatSourceTermSchedule =
                     ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
-                state.dataSurface->AnyHeatBalanceInsideSourceTerm = true;
                 if (state.dataSurface->Surface(Found).InsideHeatSourceTermSchedule == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", cannot find the matching Schedule: {}=\"{}",
@@ -8636,13 +8640,14 @@ namespace SurfaceGeometry {
                                            state.dataIPShortCut->cAlphaFieldNames(2),
                                            state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
+                } else {
+                    state.dataSurface->allInsideSourceSurfaceList.emplace_back(Found);
                 }
             }
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 state.dataSurface->Surface(Found).OutsideHeatSourceTermSchedule =
                     ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
-                state.dataSurface->AnyHeatBalanceOutsideSourceTerm = true;
                 if (state.dataSurface->Surface(Found).OutsideHeatSourceTermSchedule == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", cannot find the matching Schedule: {}=\"{}",
@@ -8657,6 +8662,8 @@ namespace SurfaceGeometry {
                                            cCurrentModuleObject,
                                            state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
+                } else {
+                    state.dataSurface->allOutsideSourceSurfaceList.emplace_back(Found);
                 }
             }
 
@@ -11912,7 +11919,7 @@ namespace SurfaceGeometry {
                 state.dataIPShortCut->cAlphaArgs(1) = format("{:.3R}", state.dataSurface->OSC(Loop).SurfFilmCoef);
                 SetupOutputVariable(state,
                                     "Surface Other Side Coefficients Exterior Air Drybulb Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     state.dataSurface->OSC(Loop).OSCTempCalc,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -12027,28 +12034,28 @@ namespace SurfaceGeometry {
             // setup output vars for modeled coefficients
             SetupOutputVariable(state,
                                 "Surface Other Side Conditions Modeled Convection Air Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 state.dataSurface->OSCM(OSCMNum).TConv,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataSurface->OSCM(OSCMNum).Name);
             SetupOutputVariable(state,
                                 "Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient",
-                                OutputProcessor::Unit::W_m2K,
+                                Constant::Units::W_m2K,
                                 state.dataSurface->OSCM(OSCMNum).HConv,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataSurface->OSCM(OSCMNum).Name);
             SetupOutputVariable(state,
                                 "Surface Other Side Conditions Modeled Radiation Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 state.dataSurface->OSCM(OSCMNum).TRad,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataSurface->OSCM(OSCMNum).Name);
             SetupOutputVariable(state,
                                 "Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient",
-                                OutputProcessor::Unit::W_m2K,
+                                Constant::Units::W_m2K,
                                 state.dataSurface->OSCM(OSCMNum).HRad,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -15600,7 +15607,7 @@ namespace SurfaceGeometry {
         for (auto &thisEnclosure : state.dataViewFactor->EnclRadInfo) {
             SetupOutputVariable(state,
                                 "Enclosure Mean Radiant Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisEnclosure.MRT,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,

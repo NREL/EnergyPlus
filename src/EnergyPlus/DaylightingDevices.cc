@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -300,28 +300,28 @@ namespace Dayltg {
                 // Setup report variables: CurrentModuleObject='DaylightingDevice:Tubular'
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Transmitted Solar Radiation Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransmittedSolar,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeAbsorbedSolar,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Heat Gain Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).HeatGain,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Heat Loss Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).HeatLoss,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
@@ -329,28 +329,28 @@ namespace Dayltg {
 
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Beam Solar Transmittance",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolBeam,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Beam Visible Transmittance",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisBeam,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Diffuse Solar Transmittance",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolDiff,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Diffuse Visible Transmittance",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisDiff,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
