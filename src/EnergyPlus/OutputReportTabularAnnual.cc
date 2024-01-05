@@ -1358,7 +1358,7 @@ std::vector<Real64> AnnualTable::calculateBins(int const numberOfBins,
         } else {
             // determine which bin the results are in
             binNum = int((*valueIt - bottomOfBins) / intervalSize);
-            if (binNum < binNum && binNum >= 0) {
+            if (binNum < numberOfBins && binNum >= 0) {
                 returnBins[binNum] += *elapsedTimeIt;
             }
         }
