@@ -976,7 +976,7 @@ namespace SolarReflectionManager {
                                                            state.dataSolarReflectionManager->SunVecMir,
                                                            ReflDistance,
                                                            state.dataSolarReflectionManager->HitPtObs); // ReflDistance cutoff added
-                                    if (hitObs) {          // => Could skip distance check (unless < vs <= ReflDistance really matters)
+                                    if (hitObs) { // => Could skip distance check (unless < vs <= ReflDistance really matters)
                                         if (distance_squared(state.dataSolarReflectionManager->HitPtObs, state.dataSolarReflectionManager->RecPt) <
                                             ReflDistanceSq) {
                                             hitObsRefl = true;

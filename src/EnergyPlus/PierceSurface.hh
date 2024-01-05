@@ -86,7 +86,7 @@
 namespace EnergyPlus {
 
 inline bool PierceSurface_Triangular(DataSurfaces::Surface2D const &s2d, // 2D surface
-                                     Vector2<Real64> const &h2d         // 2D hit point
+                                     Vector2<Real64> const &h2d          // 2D hit point
 )
 {
     // Purpose: Check if a 2D hit point is in a triangular 2D surface
@@ -207,7 +207,7 @@ inline bool PierceSurface_Nonconvex(DataSurfaces::Surface2D const &s2d, // 2D su
     Slab const &slab(slabs[iSlab]);
 
     // Check hit point within slab bounding box x range
-    Real64 const xHit(h2d.x);                         // Hit point x coordinate
+    Real64 const xHit(h2d.x);                               // Hit point x coordinate
     if ((xHit < slab.xl) || (xHit > slab.xu)) return false; // Hit point outside slab bounding box
 
     // Find edge pair surrounding hit point
@@ -228,7 +228,7 @@ inline bool PierceSurface_Nonconvex(DataSurfaces::Surface2D const &s2d, // 2D su
         Surface2D::Edge e1(s2d.edges[se1]);
         Real64 const x1(v1.x + (yHit - v1.y) * eXY1);
         if (x1 < xHit) return false; // Hit point is right of right edge
-    } else {                   // 4+ edges: Binary search for edges surrounding hit point
+    } else {                         // 4+ edges: Binary search for edges surrounding hit point
         assert(nEdges >= 4u);
         assert(nEdges % 2 == 0u);
         size_type l(0u), u(nEdges - 1);
@@ -280,7 +280,7 @@ bool PierceSurface_polygon(DataSurfaces::SurfaceData const &surface, // Surface
     using Vertex2D = Vector2<Real64>;
     Surface2D const &s2d(surface.surface2d);
     int const axis(s2d.axis);
-    Vertex2D const h2d(axis == 0 ? hitPt.y : hitPt.x, axis == 2 ? hitPt.y : hitPt.z);                 // Hit point in 2D surface's plane
+    Vertex2D const h2d(axis == 0 ? hitPt.y : hitPt.x, axis == 2 ? hitPt.y : hitPt.z);                       // Hit point in 2D surface's plane
     if ((h2d.x < s2d.vl.x) || (s2d.vu.x < h2d.x) || (h2d.y < s2d.vl.y) || (s2d.vu.y < h2d.y)) return false; // Misses 2D surface bounding box
     ShapeCat const shapeCat(surface.shapeCat);
     if (shapeCat == ShapeCat::Rectangular) { // Rectangular is most common: Special case algorithm is faster but assumes these are really rectangular

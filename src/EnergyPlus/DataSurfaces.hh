@@ -180,7 +180,7 @@ namespace DataSurfaces {
     int constexpr iFWC_Floor = (int)FWC::Floor;
     int constexpr iFWC_Wall = (int)FWC::Wall;
     int constexpr iFWC_Ceiling = (int)FWC::Ceiling;
-        
+
     enum class SurfaceFilter
     {
         Invalid = -1,
@@ -220,7 +220,7 @@ namespace DataSurfaces {
 
     constexpr int iWinCover_Bare = (int)WinCover::Bare;
     constexpr int iWinCover_Shaded = (int)WinCover::Shaded;
-        
+
     enum class WinShadingType
     {
         Invalid = -1,
@@ -346,7 +346,8 @@ namespace DataSurfaces {
         "Air Boundary - No Heat Transfer"};
 
     // Daylighting illuminance components
-    enum class Lum {
+    enum class Lum
+    {
         Invalid = -1,
         Illum,
         Back,
@@ -358,7 +359,7 @@ namespace DataSurfaces {
     constexpr int iLum_Illum = (int)Lum::Illum;
     constexpr int iLum_Back = (int)Lum::Back;
     constexpr int iLum_Source = (int)Lum::Source;
-        
+
     // IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control
     // original expression: SHADE_FLAG == ShadeOff || SHADE_FLAG == ShadeOff
     constexpr bool NOT_SHADED(WinShadingType const ShadingFlag)
@@ -728,23 +729,23 @@ namespace DataSurfaces {
 
         // Vertices
         Array1D<Vector> NewVertex;
-        Vertices Vertex; // Surface Vertices are represented by Number of Sides and Vector (type)
+        Vertices Vertex;          // Surface Vertices are represented by Number of Sides and Vector (type)
         Vector3<Real64> Centroid; // computed centroid (also known as center of mass or surface balance point)
         Vector3<Real64> lcsx;
         Vector3<Real64> lcsy;
         Vector3<Real64> lcsz;
         Vector3<Real64> NewellAreaVector;
         Vector3<Real64> NewellSurfaceNormalVector; // same as OutNormVec in vector notation
-        Vector3<Real64> OutNormVec;       // Direction cosines (outward normal vector) for surface
-        Real64 SinAzim;                   // Sine of surface azimuth angle
-        Real64 CosAzim;                   // Cosine of surface azimuth angle
-        Real64 SinTilt;                   // Sine of surface tilt angle
-        Real64 CosTilt;                   // Cosine of surface tilt angle
-        bool IsConvex;                    // true if the surface is convex.
-        bool IsDegenerate;                // true if the surface is degenerate.
-        bool VerticesProcessed;           // true if vertices have been processed (only used for base surfaces)
-        Real64 XShift;                    // relative coordinate shift data - used by child subsurfaces
-        Real64 YShift;                    // relative coordinate shift data - used by child subsurfaces
+        Vector3<Real64> OutNormVec;                // Direction cosines (outward normal vector) for surface
+        Real64 SinAzim;                            // Sine of surface azimuth angle
+        Real64 CosAzim;                            // Cosine of surface azimuth angle
+        Real64 SinTilt;                            // Sine of surface tilt angle
+        Real64 CosTilt;                            // Cosine of surface tilt angle
+        bool IsConvex;                             // true if the surface is convex.
+        bool IsDegenerate;                         // true if the surface is degenerate.
+        bool VerticesProcessed;                    // true if vertices have been processed (only used for base surfaces)
+        Real64 XShift;                             // relative coordinate shift data - used by child subsurfaces
+        Real64 YShift;                             // relative coordinate shift data - used by child subsurfaces
 
         // Boundary conditions and interconnections
         bool HeatTransSurf;                      // True if surface is a heat transfer surface (light shelf can also be IsShadowing)
@@ -831,7 +832,7 @@ namespace DataSurfaces {
             : Construction(0), RepresentativeCalcSurfNum(-1), ConstructionStoredInputValue(0), Class(SurfaceClass::None), Shape(SurfaceShape::None),
               Sides(0), Area(0.0), GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0), Azimuth(0.0), Height(0.0), Reveal(0.0), Tilt(0.0),
               Width(0.0), shapeCat(ShapeCat::Invalid), plane(0.0, 0.0, 0.0, 0.0), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
-              lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(0.0,0.0,0.0), SinAzim(0.0),
+              lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(0.0, 0.0, 0.0), SinAzim(0.0),
               CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0),
               HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
               HeatTransferAlgorithm(HeatTransferModel::Invalid), BaseSurf(0), NumSubSurfaces(0), Zone(0), spaceNum(0), ExtBoundCond(0),
@@ -877,55 +878,56 @@ namespace DataSurfaces {
         Surface2D computed_surface2d() const;
     };
 
-    struct SurfaceWindowRefPt {
-        Real64 solidAng = 0.0; // Solid angle subtended by window from daylit ref points 1 and 2
+    struct SurfaceWindowRefPt
+    {
+        Real64 solidAng = 0.0;    // Solid angle subtended by window from daylit ref points 1 and 2
         Real64 solidAngWtd = 0.0; // Solid angle subtended by window from ref pts weighted by glare pos factor
         std::array<std::array<Real64, (int)WinCover::Num>, (int)Lum::Num> lums = {{0.0, 0.0}};
         Real64 illumFromWinRep = 0.0; // Illuminance from window at reference point N [lux]
-        Real64 lumWinRep = 0.0; // Window luminance as viewed from reference point N [cd/m2]
+        Real64 lumWinRep = 0.0;       // Window luminance as viewed from reference point N [cd/m2]
     };
-        
+
     struct SurfaceWindowCalc // Calculated window-related values
     {
         // Members
         Array1D<SurfaceWindowRefPt> refPts;
 
-        Vector3<Real64> WinCenter = {0.0, 0.0, 0.0};                              // X,Y,Z coordinates of window center point in building coord system
+        Vector3<Real64> WinCenter = {0.0, 0.0, 0.0}; // X,Y,Z coordinates of window center point in building coord system
 
-        Real64 theta = 0.0;                                    // Azimuth of window normal (rad)
-        Real64 phi = 0.0;                                      // Altitude of window normal (rad)
-        Real64 rhoCeilingWall = 0.0;   // Average interior reflectance seen by light moving up across horizontal plane thru center of window
-        Real64 rhoFloorWall = 0.0;     // Same as above, but for light moving down
-        Real64 fractionUpgoing = 0.0;  // Fraction light entering window that goes upward
+        Real64 theta = 0.0;           // Azimuth of window normal (rad)
+        Real64 phi = 0.0;             // Altitude of window normal (rad)
+        Real64 rhoCeilingWall = 0.0;  // Average interior reflectance seen by light moving up across horizontal plane thru center of window
+        Real64 rhoFloorWall = 0.0;    // Same as above, but for light moving down
+        Real64 fractionUpgoing = 0.0; // Fraction light entering window that goes upward
 
         Real64 glazedFrac = 1.0;       // (Glazed area)/(Glazed area + divider area)
         Real64 centerGlassArea = 0.0;  // Center of glass area (m2); area of glass where 1-D conduction dominates
         Real64 edgeGlassCorrFac = 1.0; // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal bridging
-                                 // effects near frame and divider
-            
-        int screenNum = 0;           // Screen number for a window with a screen (do not confuse with material number)
-        Real64 lightWellEff = 1.0;     // Light well efficiency (multiplier on exterior window vis trans due to light well losses)
-            
+                                       // effects near frame and divider
+
+        int screenNum = 0;         // Screen number for a window with a screen (do not confuse with material number)
+        Real64 lightWellEff = 1.0; // Light well efficiency (multiplier on exterior window vis trans due to light well losses)
+
         // What is 10 here?
-        std::array<Real64, 10+1> thetaFace = {296.15};                                                // Face temperatures of window layers (K)
+        std::array<Real64, 10 + 1> thetaFace = {296.15}; // Face temperatures of window layers (K)
 
         // Multiplier on sunlit fraction due to shadowing of glass by
         // frame and divider outside projections
-        std::array<Real64, (int)Constant::HoursInDay+1> OutProjSLFracMult = {1.0};
+        std::array<Real64, (int)Constant::HoursInDay + 1> OutProjSLFracMult = {1.0};
         // Multiplier on sunlit fraction due to shadowing of glass by
         // frame and divider inside and outside projections
-        std::array<Real64, (int)Constant::HoursInDay+1> InOutProjSLFracMult = {1.0}; 
-        std::array<Real64, Material::MaxSlatAngs+1> EffShBlindEmiss = {0.0}; // Effective emissivity of interior blind or shade
-        std::array<Real64, Material::MaxSlatAngs+1> EffGlassEmiss = {0.0};   // Effective emissivity of glass adjacent to interior blind or shade
+        std::array<Real64, (int)Constant::HoursInDay + 1> InOutProjSLFracMult = {1.0};
+        std::array<Real64, Material::MaxSlatAngs + 1> EffShBlindEmiss = {0.0}; // Effective emissivity of interior blind or shade
+        std::array<Real64, Material::MaxSlatAngs + 1> EffGlassEmiss = {0.0};   // Effective emissivity of glass adjacent to interior blind or shade
 
         // for shadowing of ground by building and obstructions [W/m2]
         // Enclosure inside surface area minus this surface and its
         // subsurfaces for floor/wall/ceiling (m2)
-        std::array<Real64, (int)FWC::Num> EnclAreaMinusThisSurf = {0.0, 0.0, 0.0}; 
+        std::array<Real64, (int)FWC::Num> EnclAreaMinusThisSurf = {0.0, 0.0, 0.0};
         // Enclosure product of inside surface area times vis
         // reflectance minus this surface and its subsurfaces, for
         // floor/wall/ceiling (m2)
-        std::array<Real64, (int)FWC::Num> EnclAreaReflProdMinusThisSurf = {0.0, 0.0, 0.0}; 
+        std::array<Real64, (int)FWC::Num> EnclAreaReflProdMinusThisSurf = {0.0, 0.0, 0.0};
 
         BSDFWindowDescript ComplexFen; // Data for complex fenestration, see DataBSDFWindow.cc for declaration
     };
@@ -933,7 +935,7 @@ namespace DataSurfaces {
     struct SurfaceWindowFrameDiv
     {
     };
-        
+
     enum class NfrcProductOptions : int
     {
         Invalid = -1,
@@ -1696,13 +1698,13 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> SurfWinDaylFacPoint;                                // Pointer to daylight factors for the window
     Array1D<Real64> SurfWinVisTransSelected;                         // Window vis trans at normal incidence selected for use in dayltg calculation
     Array1D<Real64> SurfWinSwitchingFactor;                          // Window switching factor (0.0 = unswitched; 1.0 = fully switched)
-    Array1D<Real64> SurfWinVisTransRatio;    // For windows with switchable glazing,
-                                             // ratio of normal transmittance in switched state to that in unswitched state
-    Array1D<Real64> SurfWinFrameArea;        // Frame projected area (m2)
-    Array1D<Real64> SurfWinFrameConductance; // Frame conductance [no air films] (W/m2-K)
-    Array1D<Real64> SurfWinFrameSolAbsorp;   // Frame solar absorptance (assumed same inside and outside)
-    Array1D<Real64> SurfWinFrameVisAbsorp;   // Frame visible absorptance (assumed same inside and outside)
-    Array1D<Real64> SurfWinFrameEmis;        // Frame thermal emissivity (thermal absorptance) (assumed same inside and outside)
+    Array1D<Real64> SurfWinVisTransRatio;                            // For windows with switchable glazing,
+                                                                     // ratio of normal transmittance in switched state to that in unswitched state
+    Array1D<Real64> SurfWinFrameArea;                                // Frame projected area (m2)
+    Array1D<Real64> SurfWinFrameConductance;                         // Frame conductance [no air films] (W/m2-K)
+    Array1D<Real64> SurfWinFrameSolAbsorp;                           // Frame solar absorptance (assumed same inside and outside)
+    Array1D<Real64> SurfWinFrameVisAbsorp;                           // Frame visible absorptance (assumed same inside and outside)
+    Array1D<Real64> SurfWinFrameEmis;                 // Frame thermal emissivity (thermal absorptance) (assumed same inside and outside)
     Array1D<Real64> SurfWinFrEdgeToCenterGlCondRatio; // Ratio of frame edge of glass conductance (without air films) to center of glass conductance
                                                       // (without air films)
     Array1D<Real64> SurfWinFrameEdgeArea;             // Area of glass near frame (m2)

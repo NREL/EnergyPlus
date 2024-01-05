@@ -3047,7 +3047,7 @@ namespace WindowComplexManager {
             theta = 273.15;
         }
 
-        edgeGlCorrFac = (SurfNum != 0) ?state.dataSurface->SurfaceWindow(SurfNum).edgeGlassCorrFac : 1;
+        edgeGlCorrFac = (SurfNum != 0) ? state.dataSurface->SurfaceWindow(SurfNum).edgeGlassCorrFac : 1;
 
         //  call TARCOG
         int constexpr Debug_mode = 0;
@@ -3387,7 +3387,7 @@ namespace WindowComplexManager {
             for (k = 1; k <= nlayer; ++k) {
                 state.dataSurface->SurfaceWindow(SurfNum).thetaFace[2 * k - 1] = theta(2 * k - 1);
                 state.dataSurface->SurfaceWindow(SurfNum).thetaFace[2 * k] = theta(2 * k);
-                
+
                 // temperatures for reporting
                 state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = theta(2 * k - 1) - Constant::Kelvin;
                 state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, k) = theta(2 * k) - Constant::Kelvin;

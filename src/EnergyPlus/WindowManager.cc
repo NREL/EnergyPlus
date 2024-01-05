@@ -1642,7 +1642,7 @@ namespace WindowManager {
             if (FrDivNum == 0) continue;
 
             // Surface is a window with a frame and/or divider
-                    
+
             auto &surfWin = state.dataSurface->SurfaceWindow(SurfNum);
             FrWidth = state.dataSurface->FrameDivider(FrDivNum).FrameWidth;
             GlHeight = surf.Height;
@@ -1664,29 +1664,27 @@ namespace WindowManager {
             state.dataSurface->SurfWinDividerVisAbsorp(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).DividerVisAbsorp;
             state.dataSurface->SurfWinDividerEmis(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).DividerEmis;
             state.dataSurface->SurfWinDivEdgeToCenterGlCondRatio(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).DivEdgeToCenterGlCondRatio;
-            
+
             state.dataSurface->SurfWinOutsideRevealSolAbs(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).OutsideRevealSolAbs;
             state.dataSurface->SurfWinInsideSillDepth(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).InsideSillDepth;
             state.dataSurface->SurfWinInsideReveal(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).InsideReveal;
             state.dataSurface->SurfWinInsideSillSolAbs(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).InsideSillSolAbs;
             state.dataSurface->SurfWinInsideRevealSolAbs(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).InsideRevealSolAbs;
-            
+
             FrEdgeWidth = state.dataSurface->FrameDivider(FrDivNum).FrameEdgeWidth;
             DivEdgeWidth = state.dataSurface->FrameDivider(FrDivNum).DividerEdgeWidth;
             state.dataSurface->SurfWinFrameEdgeArea(SurfNum) =
-                    2 * FrEdgeWidth * (GlHeight - FrEdgeWidth - NumHorDividers * DivWidth + GlWidth - FrEdgeWidth - NumVertDividers * DivWidth);
+                2 * FrEdgeWidth * (GlHeight - FrEdgeWidth - NumHorDividers * DivWidth + GlWidth - FrEdgeWidth - NumVertDividers * DivWidth);
             state.dataSurface->SurfWinDividerEdgeArea(SurfNum) =
-                    2 * DivEdgeWidth * (NumHorDividers * (GlWidth - 2 * FrEdgeWidth) + NumVertDividers * (GlHeight - 2 * FrEdgeWidth)) -
-                    NumHorDividers * NumVertDividers * (4 * pow_2(DivEdgeWidth) + 4 * FrEdgeWidth * DivWidth);
-            surfWin.centerGlassArea = surf.Area -
-                    state.dataSurface->SurfWinFrameEdgeArea(SurfNum) -
-                    state.dataSurface->SurfWinDividerEdgeArea(SurfNum);
+                2 * DivEdgeWidth * (NumHorDividers * (GlWidth - 2 * FrEdgeWidth) + NumVertDividers * (GlHeight - 2 * FrEdgeWidth)) -
+                NumHorDividers * NumVertDividers * (4 * pow_2(DivEdgeWidth) + 4 * FrEdgeWidth * DivWidth);
+            surfWin.centerGlassArea =
+                surf.Area - state.dataSurface->SurfWinFrameEdgeArea(SurfNum) - state.dataSurface->SurfWinDividerEdgeArea(SurfNum);
             surfWin.edgeGlassCorrFac =
-                    (state.dataSurface->SurfWinFrameEdgeArea(SurfNum) * state.dataSurface->SurfWinFrEdgeToCenterGlCondRatio(SurfNum) +
-                     state.dataSurface->SurfWinDividerEdgeArea(SurfNum) * state.dataSurface->SurfWinDivEdgeToCenterGlCondRatio(SurfNum) +
-                     surfWin.centerGlassArea) /
-                    (state.dataSurface->SurfWinFrameEdgeArea(SurfNum) + state.dataSurface->SurfWinDividerEdgeArea(SurfNum) +
-                     surfWin.centerGlassArea);
+                (state.dataSurface->SurfWinFrameEdgeArea(SurfNum) * state.dataSurface->SurfWinFrEdgeToCenterGlCondRatio(SurfNum) +
+                 state.dataSurface->SurfWinDividerEdgeArea(SurfNum) * state.dataSurface->SurfWinDivEdgeToCenterGlCondRatio(SurfNum) +
+                 surfWin.centerGlassArea) /
+                (state.dataSurface->SurfWinFrameEdgeArea(SurfNum) + state.dataSurface->SurfWinDividerEdgeArea(SurfNum) + surfWin.centerGlassArea);
         } // for (SurfNum)
 
         // Set SolarDiffusing to true for exterior windows that have a construction with an innermost diffusing glass layer
@@ -2728,10 +2726,10 @@ namespace WindowManager {
         state.dataWindowManager->fvec = {0.0};
 
         auto const &surfWin = state.dataSurface->SurfaceWindow(SurfNum);
-        
+
         switch (state.dataWindowManager->ngllayer) {
 
-        case 1: { // single pane 
+        case 1: { // single pane
             state.dataWindowManager->fvec[0] =
                 state.dataWindowManager->Outir * state.dataWindowManager->emis[0] -
                 state.dataWindowManager->emis[0] * state.dataWindowManager->sigma * pow_4(state.dataWindowManager->thetas[0]) +
@@ -2866,7 +2864,7 @@ namespace WindowManager {
                 state.dataWindowManager->AbsRadGlassFace[7];
         } break;
         } // switch
-    } // CalcWindowHeatBalanceInternalRoutines()
+    }     // CalcWindowHeatBalanceInternalRoutines()
 
     //****************************************************************************
 
@@ -3066,7 +3064,7 @@ namespace WindowManager {
         int i; // Counter
 
         auto const &surfWin = state.dataSurface->SurfaceWindow(SurfNum);
-        
+
         if (nglasslayer == 1) {
             Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis[0] +
                        state.dataWindowManager->hcout * state.dataWindowManager->tout + state.dataWindowManager->AbsRadGlassFace[0];
@@ -3127,8 +3125,7 @@ namespace WindowManager {
             if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 state.dataWindowManager->hrgap[0] =
                     0.5 * std::abs(state.dataWindowManager->A23) * pow_3(state.dataWindowManager->thetas[1] + state.dataWindowManager->thetas[2]);
-                hgap(1) = hgap(1) * surfWin.edgeGlassCorrFac +
-                          state.dataWindowManager->hrgap[0] * (surfWin.edgeGlassCorrFac - 1.0);
+                hgap(1) = hgap(1) * surfWin.edgeGlassCorrFac + state.dataWindowManager->hrgap[0] * (surfWin.edgeGlassCorrFac - 1.0);
             }
 
             Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis[0] +
@@ -3239,8 +3236,7 @@ namespace WindowManager {
             if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 state.dataWindowManager->hrgap[0] =
                     0.5 * std::abs(state.dataWindowManager->A23) * pow_3(state.dataWindowManager->thetas[1] + state.dataWindowManager->thetas[2]);
-                hgap(1) = hgap(1) * surfWin.edgeGlassCorrFac +
-                          state.dataWindowManager->hrgap[0] * (surfWin.edgeGlassCorrFac - 1.0);
+                hgap(1) = hgap(1) * surfWin.edgeGlassCorrFac + state.dataWindowManager->hrgap[0] * (surfWin.edgeGlassCorrFac - 1.0);
             }
 
             WindowGasConductance(state, state.dataWindowManager->thetas[3], state.dataWindowManager->thetas[4], 2, con, pr, gr);
@@ -3249,8 +3245,7 @@ namespace WindowManager {
             if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 state.dataWindowManager->hrgap[1] =
                     0.5 * std::abs(state.dataWindowManager->A45) * pow_3(state.dataWindowManager->thetas[3] + state.dataWindowManager->thetas[4]);
-                hgap(2) = hgap(2) * surfWin.edgeGlassCorrFac +
-                          state.dataWindowManager->hrgap[1] * (surfWin.edgeGlassCorrFac - 1.0);
+                hgap(2) = hgap(2) * surfWin.edgeGlassCorrFac + state.dataWindowManager->hrgap[1] * (surfWin.edgeGlassCorrFac - 1.0);
             }
 
             Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis[0] +
@@ -3367,8 +3362,7 @@ namespace WindowManager {
             if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 state.dataWindowManager->hrgap[0] =
                     0.5 * std::abs(state.dataWindowManager->A23) * pow_3(state.dataWindowManager->thetas[1] + state.dataWindowManager->thetas[2]);
-                hgap(1) = hgap(1) * surfWin.edgeGlassCorrFac +
-                          state.dataWindowManager->hrgap[0] * (surfWin.edgeGlassCorrFac - 1.0);
+                hgap(1) = hgap(1) * surfWin.edgeGlassCorrFac + state.dataWindowManager->hrgap[0] * (surfWin.edgeGlassCorrFac - 1.0);
             }
 
             WindowGasConductance(state, state.dataWindowManager->thetas[3], state.dataWindowManager->thetas[4], 2, con, pr, gr);
@@ -3377,8 +3371,7 @@ namespace WindowManager {
             if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 state.dataWindowManager->hrgap[1] =
                     0.5 * std::abs(state.dataWindowManager->A45) * pow_3(state.dataWindowManager->thetas[3] + state.dataWindowManager->thetas[4]);
-                hgap(2) = hgap(2) * surfWin.edgeGlassCorrFac +
-                          state.dataWindowManager->hrgap[1] * (surfWin.edgeGlassCorrFac - 1.0);
+                hgap(2) = hgap(2) * surfWin.edgeGlassCorrFac + state.dataWindowManager->hrgap[1] * (surfWin.edgeGlassCorrFac - 1.0);
             }
 
             WindowGasConductance(state, state.dataWindowManager->thetas[5], state.dataWindowManager->thetas[6], 3, con, pr, gr);
@@ -3387,8 +3380,7 @@ namespace WindowManager {
             if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 state.dataWindowManager->hrgap[2] =
                     0.5 * std::abs(state.dataWindowManager->A67) * pow_3(state.dataWindowManager->thetas[5] + state.dataWindowManager->thetas[6]);
-                hgap(3) = hgap(3) * surfWin.edgeGlassCorrFac +
-                          state.dataWindowManager->hrgap[2] * (surfWin.edgeGlassCorrFac - 1.0);
+                hgap(3) = hgap(3) * surfWin.edgeGlassCorrFac + state.dataWindowManager->hrgap[2] * (surfWin.edgeGlassCorrFac - 1.0);
             }
             Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis[0] +
                        state.dataWindowManager->hcout * state.dataWindowManager->tout + state.dataWindowManager->AbsRadGlassFace[0];
@@ -6279,7 +6271,7 @@ namespace WindowManager {
                 // Add long-wave from inside window surface absorbed by divider inside projection
                 state.dataSurface->SurfWinDividerQRadInAbs(SurfNum) +=
                     state.dataSurface->SurfWinProjCorrDivIn(SurfNum) * state.dataSurface->FrameDivider(FrDivNum).DividerEmis * EmisGlassIn *
-                        state.dataWindowManager->sigma * pow_4(state.dataSurface->SurfaceWindow(SurfNum).thetaFace[2 * TotGlassLayers]);
+                    state.dataWindowManager->sigma * pow_4(state.dataSurface->SurfaceWindow(SurfNum).thetaFace[2 * TotGlassLayers]);
             }
             Afac =
                 (HOutRad * TOutRadDiv + HOutConvDiv * tout + state.dataSurface->SurfWinDividerQRadOutAbs(SurfNum)) / (HOutRad + DivCon + HOutConvDiv);

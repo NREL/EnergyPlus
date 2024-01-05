@@ -3583,7 +3583,8 @@ namespace AirflowNetwork {
         for (int i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
             int j = MultizoneSurfaceData(i).SurfNum;
             auto const &surf = m_state.dataSurface->Surface(j);
-            if (surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::Door || surf.OriginalClass == SurfaceClass::GlassDoor) {
+            if (surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::Door ||
+                surf.OriginalClass == SurfaceClass::GlassDoor) {
                 for (n = 1; n <= AirflowNetworkNumOfZones; ++n) {
                     if (MultizoneZoneData(n).ZoneNum == m_state.dataSurface->Surface(j).Zone) {
                         if (MultizoneZoneData(n).OccupantVentilationControlNum > 0 && MultizoneSurfaceData(i).OccupantVentilationControlNum == 0) {
@@ -4621,7 +4622,7 @@ namespace AirflowNetwork {
                 AirflowNetworkLinkageData(count).CompNum = compnum;
 
                 auto &surf = m_state.dataSurface->Surface(MultizoneSurfaceData(count).SurfNum);
-                
+
                 switch (AirflowNetworkLinkageData(count).element->type()) {
                 case ComponentType::DOP: {
                     // if (AirflowNetworkLinkageData(count).CompName ==
@@ -4638,17 +4639,15 @@ namespace AirflowNetwork {
                         ShowContinueError(m_state, "10 deg of being horizontal. Airflows through large horizontal openings are poorly");
                         ShowContinueError(m_state, "modeled in the AirflowNetwork model resulting in only one-way airflow.");
                     }
-                    if (!(surf.OriginalClass == SurfaceClass::Window ||
-                          surf.OriginalClass == SurfaceClass::GlassDoor ||
-                          surf.OriginalClass == SurfaceClass::Door ||
-                          surf.IsAirBoundarySurf)) {
+                    if (!(surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::GlassDoor ||
+                          surf.OriginalClass == SurfaceClass::Door || surf.IsAirBoundarySurf)) {
                         ShowSevereError(m_state,
                                         format(RoutineName) +
                                             "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
                                             AirflowNetworkLinkageData(count).Name);
                         ErrorsFound = true;
                     }
-                    
+
                     if (surf.OriginalClass == SurfaceClass::Door || surf.OriginalClass == SurfaceClass::GlassDoor) {
                         if (MultizoneCompDetOpeningData(AirflowNetworkCompData(compnum).TypeNum).LVOType == 2) {
                             ShowSevereError(m_state,
@@ -4671,10 +4670,8 @@ namespace AirflowNetwork {
                         ErrorsFound = true;
                     }
 
-                    if (!(surf.OriginalClass == SurfaceClass::Window ||
-                          surf.OriginalClass == SurfaceClass::GlassDoor ||
-                          surf.OriginalClass == SurfaceClass::Door ||
-                          surf.IsAirBoundarySurf)) {
+                    if (!(surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::GlassDoor ||
+                          surf.OriginalClass == SurfaceClass::Door || surf.IsAirBoundarySurf)) {
                         ShowSevereError(m_state,
                                         format(RoutineName) +
                                             "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
@@ -4721,10 +4718,8 @@ namespace AirflowNetwork {
                                           "with the object of AirflowNetwork:Multizone:Component:HorizontalOpening = " +
                                               AirflowNetworkCompData(compnum).Name);
                     }
-                    if (!(surf.OriginalClass == SurfaceClass::Window ||
-                          surf.OriginalClass == SurfaceClass::GlassDoor ||
-                          surf.OriginalClass == SurfaceClass::Door ||
-                          surf.IsAirBoundarySurf)) {
+                    if (!(surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::GlassDoor ||
+                          surf.OriginalClass == SurfaceClass::Door || surf.IsAirBoundarySurf)) {
                         ShowSevereError(m_state,
                                         format(RoutineName) +
                                             "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
@@ -6429,8 +6424,7 @@ namespace AirflowNetwork {
             if (MultizoneSurfaceData(i).OccupantVentilationControlNum == 0) MultizoneSurfaceData(i).OpenFactor = 0.0;
             j = MultizoneSurfaceData(i).SurfNum;
             auto const &surf = m_state.dataSurface->Surface(j);
-            if (surf.OriginalClass == SurfaceClass::Window ||
-                surf.OriginalClass == SurfaceClass::Door ||
+            if (surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::Door ||
                 surf.OriginalClass == SurfaceClass::GlassDoor || surf.IsAirBoundarySurf) {
                 if (MultizoneSurfaceData(i).OccupantVentilationControlNum > 0) {
                     if (MultizoneSurfaceData(i).OpeningStatus == OpenStatus::FreeOperation) {
@@ -6511,8 +6505,7 @@ namespace AirflowNetwork {
                 if (i > AirflowNetworkNumOfSurfaces - NumOfLinksIntraZone) continue;
                 j = MultizoneSurfaceData(i).SurfNum;
                 auto const &surf = m_state.dataSurface->Surface(j);
-                if (surf.OriginalClass == SurfaceClass::Window ||
-                    surf.OriginalClass == SurfaceClass::Door ||
+                if (surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::Door ||
                     surf.OriginalClass == SurfaceClass::GlassDoor) {
                     if (MultizoneSurfaceData(i).HybridCtrlGlobal) {
                         MultizoneSurfaceData(i).OpenFactor = GlobalOpenFactor;
@@ -11301,7 +11294,7 @@ namespace AirflowNetwork {
                     for (ANSurfaceNum = 1; ANSurfaceNum <= AirflowNetworkNumOfSurfaces; ++ANSurfaceNum) {
                         SurfNum = MultizoneSurfaceData(ANSurfaceNum).SurfNum;
                         auto const &surf = m_state.dataSurface->Surface(SurfNum);
-                        
+
                         if (surf.Zone == ActualZoneNum) {
                             if (VentilationCtrl == HybridVentCtrl_Close) {
                                 MultizoneSurfaceData(ANSurfaceNum).HybridVentClose = true;
@@ -11312,8 +11305,7 @@ namespace AirflowNetwork {
                                 if (ControlType == GlobalCtrlType) {
                                     MultizoneSurfaceData(ANSurfaceNum).HybridCtrlGlobal = true;
                                     if (HybridVentSysAvailMaster(SysAvailNum) == ActualZoneNum) {
-                                        if ((surf.OriginalClass == SurfaceClass::Window ||
-                                             surf.OriginalClass == SurfaceClass::Door ||
+                                        if ((surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::Door ||
                                              surf.OriginalClass == SurfaceClass::GlassDoor) &&
                                             surf.ExtBoundCond == ExternalEnvironment) {
                                             MultizoneSurfaceData(ANSurfaceNum).HybridCtrlMaster = true;

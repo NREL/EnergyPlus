@@ -232,7 +232,9 @@ namespace WindowManager {
 
             state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
                 aLayers[totLayers - 1]->getTemperature(FenestrationCommon::Side::Back) - state.dataWindowManager->TKelvin;
-            std::fill(window.EffGlassEmiss.begin(), window.EffGlassEmiss.end(), aLayers[totLayers - 1]->getSurface(FenestrationCommon::Side::Back)->getEmissivity());
+            std::fill(window.EffGlassEmiss.begin(),
+                      window.EffGlassEmiss.end(),
+                      aLayers[totLayers - 1]->getSurface(FenestrationCommon::Side::Back)->getEmissivity());
 
             state.dataSurface->SurfWinHeatGain(SurfNum) =
                 state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;

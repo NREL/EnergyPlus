@@ -2426,9 +2426,7 @@ namespace SurfaceGeometry {
 
             surf.OriginalClass = surf.Class;
 
-            if (surf.Class == SurfaceClass::GlassDoor ||
-                surf.Class == SurfaceClass::TDD_Diffuser)
-                surf.Class = SurfaceClass::Window;
+            if (surf.Class == SurfaceClass::GlassDoor || surf.Class == SurfaceClass::TDD_Diffuser) surf.Class = SurfaceClass::Window;
 
             if (surf.Class == SurfaceClass::TDD_Dome) {
                 // Reset the TDD:DOME subsurface to act as a base surface that can shade and be shaded
@@ -2553,13 +2551,10 @@ namespace SurfaceGeometry {
                 if (LayNumOutside != state.dataConstruction->Construct(surf.Construction).LayerPoint(1)) {
                     ShowSevereError(state, format("{}Only one EcoRoof Material is currently allowed for all constructions.", RoutineName));
                     ShowContinueError(state, format("... first material={}", state.dataMaterial->Material(LayNumOutside)->Name));
-                    ShowContinueError(
-                        state,
-                        format("... conflicting Construction={} uses material={}",
-                               state.dataConstruction->Construct(surf.Construction).Name,
-                               state.dataMaterial
-                                   ->Material(state.dataConstruction->Construct(surf.Construction).LayerPoint(1))
-                                   ->Name));
+                    ShowContinueError(state,
+                                      format("... conflicting Construction={} uses material={}",
+                                             state.dataConstruction->Construct(surf.Construction).Name,
+                                             state.dataMaterial->Material(state.dataConstruction->Construct(surf.Construction).LayerPoint(1))->Name));
                     ErrorsFound = true;
                 }
             }
@@ -2626,19 +2621,13 @@ namespace SurfaceGeometry {
                 if (surf.HeatTransSurf && surf.ExtBoundCond == Ground) continue;
                 if (surf.HeatTransSurf && surf.ExtBoundCond == KivaFoundation) {
                     state.dataSurface->AllHTKivaSurfaceList.push_back(SurfNum);
-                    if (!ErrorsFound)
-                        state.dataSurfaceGeometry->kivaManager.foundationInputs[surf.OSCPtr].surfaces.push_back(
-                            SurfNum);
+                    if (!ErrorsFound) state.dataSurfaceGeometry->kivaManager.foundationInputs[surf.OSCPtr].surfaces.push_back(SurfNum);
                     continue;
                 }
-                if (surf.HeatTransSurf && surf.ExtBoundCond == OtherSideCoefNoCalcExt)
-                    continue;
-                if (surf.HeatTransSurf && surf.ExtBoundCond == OtherSideCoefCalcExt)
-                    continue;
+                if (surf.HeatTransSurf && surf.ExtBoundCond == OtherSideCoefNoCalcExt) continue;
+                if (surf.HeatTransSurf && surf.ExtBoundCond == OtherSideCoefCalcExt) continue;
                 // Exclude windows and doors, i.e., consider only their base surfaces as possible obstructions
-                if (surf.Class == SurfaceClass::Window ||
-                    surf.Class == SurfaceClass::Door)
-                    continue;
+                if (surf.Class == SurfaceClass::Window || surf.Class == SurfaceClass::Door) continue;
                 // Exclude duplicate shading surfaces
                 if (surf.MirroredSurf) continue;
                 // Exclude air boundary surfaces
@@ -2655,9 +2644,8 @@ namespace SurfaceGeometry {
                             [](Construction::ConstructionProps const &e) { return e.TypeIsIRT; })) {
                 for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     auto &surf = state.dataSurface->Surface(SurfNum);
-                    if (!surf.HeatTransSurf) continue; // ignore shading surfaces
-                    if (surf.ExtBoundCond > 0 && surf.ExtBoundCond != SurfNum)
-                        continue; // interzone, not adiabatic surface
+                    if (!surf.HeatTransSurf) continue;                                   // ignore shading surfaces
+                    if (surf.ExtBoundCond > 0 && surf.ExtBoundCond != SurfNum) continue; // interzone, not adiabatic surface
                     if (!state.dataConstruction->Construct(surf.Construction).TypeIsIRT) {
                         continue;
                     }
@@ -2944,8 +2932,7 @@ namespace SurfaceGeometry {
                     thisSpace.HTSurfaceLast = SurfNum;
 
                     // Window surfaces are grouped next within each space
-                    if ((surf.Class == DataSurfaces::SurfaceClass::Window) ||
-                        (surf.Class == DataSurfaces::SurfaceClass::GlassDoor) ||
+                    if ((surf.Class == DataSurfaces::SurfaceClass::Window) || (surf.Class == DataSurfaces::SurfaceClass::GlassDoor) ||
                         (surf.Class == DataSurfaces::SurfaceClass::TDD_Diffuser)) {
                         if (thisSpace.WindowSurfaceFirst == 0) {
                             thisSpace.WindowSurfaceFirst = SurfNum;
@@ -7457,11 +7444,8 @@ namespace SurfaceGeometry {
         // may be overridden below for shading surfaces with an associated Shading Surface Reflectance object.
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             auto const &surf = state.dataSurface->Surface(SurfNum);
-            if (!(surf.Class == SurfaceClass::Shading ||
-                  surf.Class == SurfaceClass::Detached_F ||
-                  surf.Class == SurfaceClass::Detached_B ||
-                  surf.Class == SurfaceClass::Overhang ||
-                  surf.Class == SurfaceClass::Fin))
+            if (!(surf.Class == SurfaceClass::Shading || surf.Class == SurfaceClass::Detached_F || surf.Class == SurfaceClass::Detached_B ||
+                  surf.Class == SurfaceClass::Overhang || surf.Class == SurfaceClass::Fin))
                 continue;
             state.dataSurface->SurfShadowDiffuseSolRefl(SurfNum) = 0.2;
             state.dataSurface->SurfShadowDiffuseVisRefl(SurfNum) = 0.2;
@@ -7502,17 +7486,13 @@ namespace SurfaceGeometry {
             WrongSurfaceType = false;
             if (SurfNum != 0) {
                 auto const &surf = state.dataSurface->Surface(SurfNum);
-                if (!(surf.Class == SurfaceClass::Shading ||
-                      surf.Class == SurfaceClass::Detached_F ||
-                      surf.Class == SurfaceClass::Detached_B ||
-                      surf.Class == SurfaceClass::Overhang ||
-                      surf.Class == SurfaceClass::Fin))
+                if (!(surf.Class == SurfaceClass::Shading || surf.Class == SurfaceClass::Detached_F || surf.Class == SurfaceClass::Detached_B ||
+                      surf.Class == SurfaceClass::Overhang || surf.Class == SurfaceClass::Fin))
                     WrongSurfaceType = true;
                 if (WrongSurfaceType) {
-                    ShowSevereError(state,
-                                    format("GetShadingSurfReflectanceData: {}=\"{}\", surface is not a shading surface.",
-                                           cCurrentModuleObject,
-                                           surf.Name));
+                    ShowSevereError(
+                        state,
+                        format("GetShadingSurfReflectanceData: {}=\"{}\", surface is not a shading surface.", cCurrentModuleObject, surf.Name));
                     ErrorsFound = true;
                     continue;
                 }
@@ -7565,11 +7545,8 @@ namespace SurfaceGeometry {
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             auto const &surf = state.dataSurface->Surface(SurfNum);
-            if (!(surf.Class == SurfaceClass::Shading ||
-                  surf.Class == SurfaceClass::Detached_F ||
-                  surf.Class == SurfaceClass::Detached_B ||
-                  surf.Class == SurfaceClass::Overhang ||
-                  surf.Class == SurfaceClass::Fin))
+            if (!(surf.Class == SurfaceClass::Shading || surf.Class == SurfaceClass::Detached_F || surf.Class == SurfaceClass::Detached_B ||
+                  surf.Class == SurfaceClass::Overhang || surf.Class == SurfaceClass::Fin))
                 continue;
 
             constexpr std::string_view fmt = "ShadingProperty Reflectance,{},{},{:.2R},{:.2R},{:.2R}, {}\n";
@@ -10852,7 +10829,7 @@ namespace SurfaceGeometry {
             // Check that associated surface is a 2- or 3-pane exterior window
             WrongSurfaceType = false;
             if (SurfNum != 0) {
-                auto const &surf = state.dataSurface->Surface(SurfNum);                    
+                auto const &surf = state.dataSurface->Surface(SurfNum);
                 if (surf.Class != SurfaceClass::Window) WrongSurfaceType = true;
                 if (surf.Class == SurfaceClass::Window) {
                     ConstrNum = surf.Construction;
@@ -11070,8 +11047,7 @@ namespace SurfaceGeometry {
                     }
                     // Require that gas be air in airflow gaps on either side of a between glass shade/blind
                     if (surf.HasShadeControl) {
-                        for (std::size_t listIndex = 0; listIndex < surf.windowShadingControlList.size();
-                             ++listIndex) {
+                        for (std::size_t listIndex = 0; listIndex < surf.windowShadingControlList.size(); ++listIndex) {
                             int WSCPtr = surf.windowShadingControlList[listIndex];
                             if (ANY_BETWEENGLASS_SHADE_BLIND(state.dataSurface->WindowShadingControl(WSCPtr).ShadingType)) {
                                 ConstrNumSh = surf.shadedConstructionList[listIndex];
@@ -12429,7 +12405,7 @@ namespace SurfaceGeometry {
             surfacenotused.dimension(NFaces, 0);
 
             for (int SurfNum = thisZone.AllSurfaceFirst; SurfNum <= thisZone.AllSurfaceLast; ++SurfNum) {
-                auto &thisSurface =  state.dataSurface->Surface(SurfNum);
+                auto &thisSurface = state.dataSurface->Surface(SurfNum);
                 // Only include Base Surfaces in Calc.
 
                 if (thisSurface.Class != SurfaceClass::Wall && thisSurface.Class != SurfaceClass::Floor && thisSurface.Class != SurfaceClass::Roof) {
@@ -13406,14 +13382,9 @@ namespace SurfaceGeometry {
             // Setting relative coordinates for shadowing calculations for subsurfaces
             switch (ThisShape) {
             case SurfaceShape::RectangularDoorWindow: { // Rectangular heat transfer subsurface
-                PlaneEquation(state.dataSurface->Surface(surf.BaseSurf).Vertex,
-                              state.dataSurface->Surface(surf.BaseSurf).Sides,
-                              BasePlane,
-                              SError);
+                PlaneEquation(state.dataSurface->Surface(surf.BaseSurf).Vertex, state.dataSurface->Surface(surf.BaseSurf).Sides, BasePlane, SError);
                 if (SError) {
-                    ShowSevereError(
-                        state,
-                        format("{}Degenerate surface (likely two vertices equal):\"{}\".", RoutineName, surf.Name));
+                    ShowSevereError(state, format("{}Degenerate surface (likely two vertices equal):\"{}\".", RoutineName, surf.Name));
                     ErrorInSurface = true;
                 }
                 ThisReveal = -Pt2Plane(surf.Vertex(2), BasePlane);
@@ -13460,9 +13431,7 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->Zpsv(3) = ZLLC;
                 state.dataSurfaceGeometry->Zpsv(4) = ZLLC;
 
-                if (surf.Class == SurfaceClass::Window &&
-                    surf.ExtBoundCond == ExternalEnvironment &&
-                    surf.FrameDivider > 0) {
+                if (surf.Class == SurfaceClass::Window && surf.ExtBoundCond == ExternalEnvironment && surf.FrameDivider > 0) {
                     FrDivNum = surf.FrameDivider;
                     // Set flag for calculating beam solar reflection from outside and/or inside window reveal
                     if ((surf.Reveal > 0.0 && state.dataSurface->FrameDivider(FrDivNum).OutsideRevealSolAbs > 0.0) ||
@@ -13477,27 +13446,19 @@ namespace SurfaceGeometry {
                     // Surface(ThisSurf)%FrameDivider will be 0 for triangular windows)
                     FrWidth = state.dataSurface->FrameDivider(FrDivNum).FrameWidth;
                     if (FrWidth > 0.0) {
-                        FrArea = (surf.Height + 2.0 * FrWidth) *
-                                     (surf.Width + 2.0 * FrWidth) -
-                                 surf.Area / surf.Multiplier;
+                        FrArea = (surf.Height + 2.0 * FrWidth) * (surf.Width + 2.0 * FrWidth) - surf.Area / surf.Multiplier;
                         state.dataSurface->SurfWinFrameArea(ThisSurf) = FrArea * surf.Multiplier;
-                        if ((state.dataSurface->Surface(surf.BaseSurf).Area -
-                             state.dataSurface->SurfWinFrameArea(ThisSurf)) <= 0.0) {
-                            ShowSevereError(state,
-                                            format("{}Base Surface=\"{}\", ",
-                                                   RoutineName,
-                                                   state.dataSurface->Surface(surf.BaseSurf).Name));
+                        if ((state.dataSurface->Surface(surf.BaseSurf).Area - state.dataSurface->SurfWinFrameArea(ThisSurf)) <= 0.0) {
+                            ShowSevereError(state, format("{}Base Surface=\"{}\", ", RoutineName, state.dataSurface->Surface(surf.BaseSurf).Name));
                             ShowContinueError(state,
-                                              format("Window Surface=\"{}\" area (with frame) is too large to fit on the surface.",
-                                                     surf.Name));
+                                              format("Window Surface=\"{}\" area (with frame) is too large to fit on the surface.", surf.Name));
                             ShowContinueError(state,
                                               format("Base surface area (-windows and doors)=[{:.2T}] m2, frame area=[{:.2T}] m2.",
                                                      state.dataSurface->Surface(surf.BaseSurf).Area,
                                                      state.dataSurface->SurfWinFrameArea(ThisSurf)));
                             ErrorInSurface = true;
                         }
-                        state.dataSurface->Surface(surf.BaseSurf).Area -=
-                            state.dataSurface->SurfWinFrameArea(ThisSurf);
+                        state.dataSurface->Surface(surf.BaseSurf).Area -= state.dataSurface->SurfWinFrameArea(ThisSurf);
                     }
                     // If exterior window has divider, subtract divider area to get glazed area
                     DivWidth = state.dataSurface->FrameDivider(surf.FrameDivider).DividerWidth;
@@ -13508,10 +13469,7 @@ namespace SurfaceGeometry {
                                                   state.dataSurface->FrameDivider(FrDivNum).VertDividers * DivWidth);
                         state.dataSurface->SurfWinDividerArea(ThisSurf) = DivArea * surf.Multiplier;
                         if ((surf.Area - state.dataSurface->SurfWinDividerArea(ThisSurf)) <= 0.0) {
-                            ShowSevereError(state,
-                                            format("{}Divider area exceeds glazed opening for window {}",
-                                                   RoutineName,
-                                                   surf.Name));
+                            ShowSevereError(state, format("{}Divider area exceeds glazed opening for window {}", RoutineName, surf.Name));
                             ShowContinueError(state,
                                               format("Window surface area=[{:.2T}] m2, divider area=[{:.2T}] m2.",
                                                      surf.Area,
@@ -13520,9 +13478,7 @@ namespace SurfaceGeometry {
                         }
                         surf.Area -= state.dataSurface->SurfWinDividerArea(ThisSurf); // Glazed area
                         if (DivArea <= 0.0) {
-                            ShowWarningError(
-                                state,
-                                format("{}Calculated Divider Area <= 0.0 for Window={}", RoutineName, surf.Name));
+                            ShowWarningError(state, format("{}Calculated Divider Area <= 0.0 for Window={}", RoutineName, surf.Name));
                             if (state.dataSurface->FrameDivider(FrDivNum).HorDividers == 0) {
                                 ShowContinueError(state, "..Number of Horizontal Dividers = 0.");
                             }
@@ -13562,14 +13518,9 @@ namespace SurfaceGeometry {
             } break;
             case SurfaceShape::TriangularWindow:
             case SurfaceShape::TriangularDoor: {
-                PlaneEquation(state.dataSurface->Surface(surf.BaseSurf).Vertex,
-                              state.dataSurface->Surface(surf.BaseSurf).Sides,
-                              BasePlane,
-                              SError);
+                PlaneEquation(state.dataSurface->Surface(surf.BaseSurf).Vertex, state.dataSurface->Surface(surf.BaseSurf).Sides, BasePlane, SError);
                 if (SError) {
-                    ShowSevereError(
-                        state,
-                        format("{}Degenerate surface (likely two vertices equal):\"{}\".", RoutineName, surf.Name));
+                    ShowSevereError(state, format("{}Degenerate surface (likely two vertices equal):\"{}\".", RoutineName, surf.Name));
                     ErrorInSurface = true;
                 }
                 ThisReveal = -Pt2Plane(surf.Vertex(2), BasePlane);
@@ -13589,8 +13540,7 @@ namespace SurfaceGeometry {
                 surf.Height = ThisHeight;
                 // Effective height and width of a triangular window for use in calc of convective air flow
                 // in gap between glass and shading device when shading device is present
-                surf.Height =
-                    4.0 * surf.Area / (3.0 * surf.Width);
+                surf.Height = 4.0 * surf.Area / (3.0 * surf.Width);
                 surf.Width *= 0.75;
 
                 Xp = surf.Vertex(1).x - BaseXLLC;
@@ -13828,8 +13778,7 @@ namespace SurfaceGeometry {
         DotSelfX23 = magnitude_squared(x23);
 
         if (DotSelfX23 <= .1e-6) {
-            ShowSevereError(state,
-                            format("CalcCoordinateTransformation: Invalid dot product, surface=\"{}\":", surf.Name));
+            ShowSevereError(state, format("CalcCoordinateTransformation: Invalid dot product, surface=\"{}\":", surf.Name));
             for (I = 1; I <= surf.Sides; ++I) {
                 auto const &point = surf.Vertex(I);
                 ShowContinueError(state, format(" ({:8.3F},{:8.3F},{:8.3F})", point.x, point.y, point.z));
@@ -13841,8 +13790,7 @@ namespace SurfaceGeometry {
 
         Gamma = dot(x21, x23) / magnitude_squared(x23);
 
-        CompCoordTranslVector = surf.Vertex(2) +
-                                Gamma * (surf.Vertex(3) - surf.Vertex(2));
+        CompCoordTranslVector = surf.Vertex(2) + Gamma * (surf.Vertex(3) - surf.Vertex(2));
     }
 
     void CreateShadedWindowConstruction(EnergyPlusData &state,
@@ -14009,12 +13957,10 @@ namespace SurfaceGeometry {
         for (int StormWinNum = 1; StormWinNum <= state.dataSurface->TotStormWin; ++StormWinNum) {
             int SurfNum = state.dataSurface->StormWindow(StormWinNum).BaseWindowNum; // Surface number
             auto &surf = state.dataSurface->Surface(SurfNum);
-            int ConstrNum = surf.Construction;        // Number of unshaded construction
+            int ConstrNum = surf.Construction; // Number of unshaded construction
             // Fatal error if base construction has more than three glass layers
             if (state.dataConstruction->Construct(ConstrNum).TotGlassLayers > 3) {
-                ShowFatalError(
-                    state,
-                    format("Window={} has more than 3 glass layers; a storm window cannot be applied.", surf.Name));
+                ShowFatalError(state, format("Window={} has more than 3 glass layers; a storm window cannot be applied.", surf.Name));
             }
 
             // create unshaded construction with storm window
@@ -14033,7 +13979,8 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfWinStormWinConstr(SurfNum) = ConstrNewSt;
 
             // create shaded constructions with storm window
-            surf.shadedStormWinConstructionList.resize(surf.shadedConstructionList.size(), 0); // make the shaded storm window size the same size as the number of shaded constructions
+            surf.shadedStormWinConstructionList.resize(surf.shadedConstructionList.size(),
+                                                       0); // make the shaded storm window size the same size as the number of shaded constructions
             for (std::size_t iConstruction = 0; iConstruction < surf.shadedConstructionList.size(); ++iConstruction) {
                 int curConstruction = surf.shadedConstructionList[iConstruction];
                 // Set ShAndSt, which is true if the window has a shaded construction to which a storm window
@@ -14054,9 +14001,7 @@ namespace SurfaceGeometry {
                         state.dataMaterial->Material(MatBetweenGlassSh)->group == Material::Group::WindowBlind) {
                         ShAndSt = true;
                     } else {
-                        ShowContinueError(state,
-                                          format("Window={} has a shaded construction to which a storm window cannot be applied.",
-                                                 surf.Name));
+                        ShowContinueError(state, format("Window={} has a shaded construction to which a storm window cannot be applied.", surf.Name));
                         ShowContinueError(state, "Storm windows can only be applied to shaded constructions that:");
                         ShowContinueError(state, "have an interior shade or blind and up to three glass layers, or");
                         ShowContinueError(state, "have a between-glass shade or blind and two glass layers.");

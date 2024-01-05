@@ -260,14 +260,14 @@ namespace DElightManagerF {
                     refPt.absCoords = {0.0, 0.0, 0.0};
                     refPt.lums[(int)Lum::Illum] = 0.0;
                     refPt.glareIndex = 0.0;
-                }                    
+                }
 
                 // RJH 2008-03-07: Allocate and Init DaylIllumAtRefPt array for this DElight zone
-                //znDayl.DaylIllumAtRefPt.allocate(znDayl.TotalDaylRefPoints);
-                //znDayl.DaylIllumAtRefPt = 0.0;
+                // znDayl.DaylIllumAtRefPt.allocate(znDayl.TotalDaylRefPoints);
+                // znDayl.DaylIllumAtRefPt = 0.0;
                 // The following not used in DElight but allocated for convenience
-                //znDayl.GlareIndexAtRefPt.allocate(znDayl.TotalDaylRefPoints);
-                //znDayl.GlareIndexAtRefPt = 0.0;
+                // znDayl.GlareIndexAtRefPt.allocate(znDayl.TotalDaylRefPoints);
+                // znDayl.GlareIndexAtRefPt = 0.0;
 
                 // Increment counter of Thermal Zones with valid hosted DElight object
                 ++iNumDElightZones;
@@ -585,7 +585,7 @@ namespace DElightManagerF {
                                     RefPt_WCS_Coord.x = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
                                     RefPt_WCS_Coord.y = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
                                     RefPt_WCS_Coord.z = refPt.coords.z + thisZone.OriginZ;
-                                    if (ldoTransform) {          // Geometry transform
+                                    if (ldoTransform) {         // Geometry transform
                                         Xo = RefPt_WCS_Coord.x; // world coordinates.... shifted by relative north angle...
                                         Yo = RefPt_WCS_Coord.y;
                                         // next derotate the building
