@@ -200,7 +200,7 @@ namespace OutputProcessor {
         V,
         deltaC,
         kmol_s,
-        mol_m2s,
+        umol_m2s,
         rev_min,
         Btu_h_W,
         W_m2K,

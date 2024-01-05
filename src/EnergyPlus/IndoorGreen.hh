@@ -120,11 +120,11 @@ struct IndoorGreenData : BaseGlobalStruct
     int NumIndoorGreen = 0; // Number of Indoor Greenery Systems found in input
     bool getInputFlag = true;
     // Object Data
-    Array1D<IndoorGreen::IndoorGreenParams> indoorgreens;  
+    Array1D<IndoorGreen::IndoorGreenParams> indoorgreen;  
     void clear_state() override
     {
         //NumIndoorGreen = 0;
-        //indoorgreens.deallocate();
+        //indoorgreen.deallocate();
         //getInputFlag = true;
         *this = IndoorGreenData();
     }
