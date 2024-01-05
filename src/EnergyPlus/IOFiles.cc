@@ -319,6 +319,14 @@ std::vector<std::string> InputOutputFile::getLines()
     return std::vector<std::string>();
 }
 
+bool IOFiles::OutputControl::writeTabular(EnergyPlusData &state)
+{
+    bool const htmlTabular = state.files.outputControl.tabular;
+    bool const jsonTabular = state.files.outputControl.json && state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled();
+    bool const sqliteTabular = state.files.outputControl.sqlite; // && @JasonGlazer thinks something else maybe?
+    return (htmlTabular || jsonTabular || sqliteTabular);
+}
+
 void IOFiles::OutputControl::getInput(EnergyPlusData &state)
 {
     auto &ip = state.dataInputProcessing->inputProcessor;

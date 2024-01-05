@@ -2844,6 +2844,11 @@ namespace SurfaceGeometry {
     void CreateMissingSpaces(EnergyPlusData &state, Array1D<SurfaceGeometry::SurfaceData> &Surfaces)
     {
         // Scan surfaces to see if Space was assigned in input
+        EPVector<bool> anySurfacesWithSpace;    // True if any surfaces in a zone do not have a space assigned in input
+        EPVector<bool> anySurfacesWithoutSpace; // True if any surfaces in a zone have a space assigned in input
+        anySurfacesWithSpace.resize(state.dataGlobal->NumOfZones, false);
+        anySurfacesWithoutSpace.resize(state.dataGlobal->NumOfZones, false);
+
         for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
             auto &thisSurf = Surfaces(surfNum);
             if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
@@ -2852,20 +2857,20 @@ namespace SurfaceGeometry {
                 thisSurf.spaceNum = Surfaces(thisSurf.BaseSurf).spaceNum;
             }
             if (thisSurf.spaceNum > 0) {
-                state.dataHeatBal->Zone(thisSurf.Zone).anySurfacesWithSpace = true;
+                anySurfacesWithSpace(thisSurf.Zone) = true;
             } else {
-                state.dataHeatBal->Zone(thisSurf.Zone).anySurfacesWithoutSpace = true;
+                anySurfacesWithoutSpace(thisSurf.Zone) = true;
             }
         }
 
         // Create any missing Spaces
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             auto &thisZone = state.dataHeatBal->Zone(zoneNum);
-            if (thisZone.anySurfacesWithoutSpace) {
+            if (anySurfacesWithoutSpace(zoneNum)) {
                 // If any surfaces in the zone are not assigned to a space, may need to create a new space
                 // Every zone has at least one space, created in HeatBalanceManager::GetSpaceData
                 // If no surfaces have a space assigned, then the default space will be used, otherwise, create a new space
-                if (thisZone.anySurfacesWithSpace) {
+                if (anySurfacesWithSpace(zoneNum)) {
                     // Add new space
                     ++state.dataGlobal->numSpaces;
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).zoneNum = zoneNum;
@@ -8624,7 +8629,6 @@ namespace SurfaceGeometry {
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 state.dataSurface->Surface(Found).InsideHeatSourceTermSchedule =
                     ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
-                state.dataSurface->AnyHeatBalanceInsideSourceTerm = true;
                 if (state.dataSurface->Surface(Found).InsideHeatSourceTermSchedule == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", cannot find the matching Schedule: {}=\"{}",
@@ -8633,13 +8637,14 @@ namespace SurfaceGeometry {
                                            state.dataIPShortCut->cAlphaFieldNames(2),
                                            state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
+                } else {
+                    state.dataSurface->allInsideSourceSurfaceList.emplace_back(Found);
                 }
             }
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 state.dataSurface->Surface(Found).OutsideHeatSourceTermSchedule =
                     ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
-                state.dataSurface->AnyHeatBalanceOutsideSourceTerm = true;
                 if (state.dataSurface->Surface(Found).OutsideHeatSourceTermSchedule == 0) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", cannot find the matching Schedule: {}=\"{}",
@@ -8654,6 +8659,8 @@ namespace SurfaceGeometry {
                                            cCurrentModuleObject,
                                            state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
+                } else {
+                    state.dataSurface->allOutsideSourceSurfaceList.emplace_back(Found);
                 }
             }
 

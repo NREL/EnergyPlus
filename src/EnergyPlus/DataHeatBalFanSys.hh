@@ -89,6 +89,15 @@ namespace DataHeatBalFanSys {
         int DualPMVErrIndex = 0; // Dual PMV setpoint error index
     };
 
+    struct SurfQRadFromHVACData
+    {
+        Real64 HTRadSys;       // Current radiant heat flux to surface from high temperature radiant heaters
+        Real64 HWBaseboard;    // Current radiant heat flux to surface from hot water baseboard heaters
+        Real64 SteamBaseboard; // Current radiant heat flux to surface from steam baseboard heaters
+        Real64 ElecBaseboard;  // Current radiant heat flux to surface from electric baseboard heaters
+        Real64 CoolingPanel;   // Current radiant heat flux to surface from simple cooling panels
+    };
+
 } // namespace DataHeatBalFanSys
 
 struct HeatBalFanSysData : BaseGlobalStruct
@@ -121,17 +130,8 @@ struct HeatBalFanSysData : BaseGlobalStruct
     // temperature at source
     Array1D<Real64> CTFTuserConstPart; // Constant Outside Portion of the CTF calculation of
     // temperature at the user specified location
-    Array1D<Real64> SurfQHTRadSys; // Current radiant heat flux at a surface due to the presence
-    // of high temperature radiant heaters
-    Array1D<Real64> SurfQHWBaseboard; // Current radiant heat flux at a surface due to the presence
-    // of hot water baseboard heaters
-    Array1D<Real64> SurfQSteamBaseboard; // Current radiant heat flux at a surface due to the presence
-    // of steam baseboard heaters
-    Array1D<Real64> SurfQElecBaseboard; // Current radiant heat flux at a surface due to the presence
-    // of electric baseboard heaters
-    Array1D<Real64> SurfQCoolingPanel; // Current radiant heat flux at a surface due to the presence
-    // of simple cooling panels
-    Array1D<Real64> QRadSurfAFNDuct;     // Current radiant heat flux at a surface due to radiation from AFN ducts
+    EPVector<DataHeatBalFanSys::SurfQRadFromHVACData> surfQRadFromHVAC; // Radiant heat flux to surface from radiant HVAC equipment
+    Array1D<Real64> QRadSurfAFNDuct;                                    // Current radiant heat flux at a surface due to radiation from AFN ducts
     Array1D<Real64> QPoolSurfNumerator;  // Current pool heat flux impact at the surface (numerator of surface heat balance)
     Array1D<Real64> PoolHeatTransCoefs;  // Current pool heat transfer coefficients (denominator of surface heat balance)
     Array1D<Real64> RadSysTiHBConstCoef; // Inside heat balance coefficient that is constant

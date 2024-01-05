@@ -754,6 +754,8 @@ namespace SteamBaseboardRadiator {
                 if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum) != 0) {
                     state.dataSurface->surfIntConv(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum))
                         .getsRadiantHeat = true;
+                    state.dataSurface->allGetsRadiantHeatSurfaceList.emplace_back(
+                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum));
                 }
 
                 AllFracsSummed += state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracDistribToSurf(SurfNum);
@@ -1512,32 +1514,32 @@ namespace SteamBaseboardRadiator {
 
         Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
-        int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
-        int BaseboardNum;         // Counter for the baseboard
-        int SurfNum;              // Pointer to the Surface derived type
-        int ZoneNum;              // Pointer to the Zone derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
-        state.dataHeatBalFanSys->SurfQSteamBaseboard = 0.0;
+        for (auto &thisSteamBB : state.dataSteamBaseboardRadiator->SteamBaseboard) {
+            for (int radSurfNum = 1; radSurfNum <= thisSteamBB.TotSurfToDistrib; ++radSurfNum) {
+                int surfNum = thisSteamBB.SurfacePtr(radSurfNum);
+                state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).SteamBaseboard = 0.0;
+            }
+        }
         state.dataHeatBalFanSys->ZoneQSteamBaseboardToPerson = 0.0;
 
-        for (BaseboardNum = 1; BaseboardNum <= state.dataSteamBaseboardRadiator->NumSteamBaseboards; ++BaseboardNum) {
+        for (int BaseboardNum = 1; BaseboardNum <= state.dataSteamBaseboardRadiator->NumSteamBaseboards; ++BaseboardNum) {
 
-            ZoneNum = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr;
+            int ZoneNum = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr;
             SteamBaseboardDesignData SteamBaseboardDesignDataObject{
                 state.dataSteamBaseboardRadiator->SteamBaseboardDesign(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum)
                                                                            .DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
             state.dataHeatBalFanSys->ZoneQSteamBaseboardToPerson(ZoneNum) +=
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).QBBSteamRadSource * SteamBaseboardDesignDataObject.FracDistribPerson;
 
-            for (RadSurfNum = 1; RadSurfNum <= state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib; ++RadSurfNum) {
-                SurfNum = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfacePtr(RadSurfNum);
+            for (int RadSurfNum = 1; RadSurfNum <= state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib; ++RadSurfNum) {
+                int SurfNum = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfacePtr(RadSurfNum);
                 if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
                     ThisSurfIntensity = (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).QBBSteamRadSource *
                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracDistribToSurf(RadSurfNum) /
                                          state.dataSurface->Surface(SurfNum).Area);
-                    state.dataHeatBalFanSys->SurfQSteamBaseboard(SurfNum) += ThisSurfIntensity;
-                    state.dataHeatBalSurf->AnyRadiantSystems = true;
+                    state.dataHeatBalFanSys->surfQRadFromHVAC(SurfNum).SteamBaseboard += ThisSurfIntensity;
 
                     if (ThisSurfIntensity > MaxRadHeatFlux) { // CR 8074, trap for excessive intensity (throws off surface balance )
                         ShowSevereError(state, "DistributeBBSteamRadGains:  excessive thermal radiation heat flux intensity detected");
