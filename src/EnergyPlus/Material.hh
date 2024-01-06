@@ -121,10 +121,10 @@ namespace Material {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(GapVentType::Num)> GapVentTypeUC = {"SEALED", "VENTEDINDOOR", "VENTEDOUTDOOR"};
+    constexpr std::array<std::string_view, (int)GapVentType::Num> GapVentTypeUC = {"SEALED", "VENTEDINDOOR", "VENTEDOUTDOOR"};
 
-    extern const std::array<std::string_view, static_cast<int>(GasType::Num)> gasTypeNames;
-    extern const std::array<std::string_view, static_cast<int>(GapVentType::Num)> GapVentTypeNames;
+    extern const std::array<std::string_view, (int)GasType::Num> gasTypeNames;
+    extern const std::array<std::string_view, (int)GapVentType::Num> GapVentTypeNames;
 
     enum class SlatAngleType
     {
@@ -135,7 +135,7 @@ namespace Material {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(SlatAngleType::Num)> SlatAngleTypeUC = {
+    constexpr std::array<std::string_view, (int)SlatAngleType::Num> SlatAngleTypeUC = {
         "FIXEDSLATANGLE", "MAXIMIZESOLAR", "BLOCKBEAMSOLAR"};
 
     // Parameter for window screens beam reflectance accounting
@@ -148,6 +148,9 @@ namespace Material {
         Num
     };
 
+    constexpr std::array<std::string_view, (int)ScreenBeamReflectanceModel::Num> ScreenBeamReflectanceModelNamesUC = {
+        "DONOTMODEL", "MODELASDIRECTBEAM", "MODELASDIFFUSE"};
+
     enum class VariableAbsCtrlSignal
     {
         Invalid = -1,
@@ -158,7 +161,7 @@ namespace Material {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(VariableAbsCtrlSignal::Num)> VariableAbsCtrlSignalUC = {
+    constexpr std::array<std::string_view, (int)VariableAbsCtrlSignal::Num> VariableAbsCtrlSignalUC = {
         "SURFACETEMPERATURE", "SURFACERECEIVEDSOLARRADIATION", "SPACEHEATINGCOOLINGMODE", "SCHEDULED"};
 
     // Parameters to indicate surface roughness for use with the Material
@@ -175,14 +178,13 @@ namespace Material {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(SurfaceRoughness::Num)> SurfaceRoughnessUC{
+    constexpr std::array<std::string_view, (int)SurfaceRoughness::Num> SurfaceRoughnessUC{
         "VERYROUGH", "ROUGH", "MEDIUMROUGH", "MEDIUMSMOOTH", "SMOOTH", "VERYSMOOTH"};
 
-    extern const std::array<std::string_view, static_cast<int>(SurfaceRoughness::Num)> RoughnessNames;
+    extern const std::array<std::string_view, (int)SurfaceRoughness::Num> RoughnessNames;
 
     struct MaterialBase
     {
-
         // Members
         std::string Name = "";        // Name of material layer
         Group group = Group::Invalid; // Material group type (see Material Parameters above.  Currently
@@ -201,10 +203,35 @@ namespace Material {
         Real64 SpecHeat = 0.0;  // Layer specific heat (J/kgK)
         Real64 Thickness = 0.0; // Layer thickness (m)
 
-        virtual bool dummy()
-        {
-            return true;
-        }
+        Real64 AbsorpThermal = 0.0;              // Layer thermal absorptance
+        Real64 AbsorpThermalInput = 0.0;         // Layer thermal absorptance input by user
+        Real64 AbsorpThermalBack = 0.0;       // Infrared radiation back absorption
+        Real64 AbsorpThermalFront = 0.0;      // Infrared radiation front absorption
+
+        Real64 AbsorpSolar = 0.0;                // Layer solar absorptance
+        Real64 AbsorpSolarInput = 0.0;           // Layer solar absorptance input by user
+
+        Real64 AbsorpVisible = 0.0;              // Layer Visible Absorptance
+        Real64 AbsorpVisibleInput = 0.0;         // Layer Visible Absorptance input by user
+
+        Real64 Trans = 0.0;                      // Transmittance of layer (glass, shade)
+        Real64 TransVis = 0.0;                   // Visible transmittance (at normal incidence)
+        Real64 TransThermal = 0.0;               // Infrared radiation transmittance
+
+        Real64 ReflectSolBeamBack = 0.0;      // Solar back reflectance (beam to everything)
+        Real64 ReflectSolBeamFront = 0.0;     // Solar front reflectance (beam to everything)
+
+        // TODO: these and others need to be moved to a child class
+        // Simple Glazing System
+        Real64 SimpleWindowUfactor = 0.0;       // user input for simple window U-factor with film coeffs (W/m2-k)
+        Real64 SimpleWindowSHGC = 0.0;          // user input for simple window Solar Heat Gain Coefficient (non-dimensional)
+        Real64 SimpleWindowVisTran = 0.0;       // (optional) user input for simple window Visual Transmittance (non-dimensional)
+        bool SimpleWindowVTinputByUser = false; // false means not input, true means user provide VT input
+        bool WarnedForHighDiffusivity = false;  // used to limit error messaging to just the first instance
+
+        bool isUsed = false;
+            
+        virtual bool dummy() { return true; }   // Need at least one virtual function (vtable) for dynamic casting to work (duh)
     };
 
     struct MaterialChild : public MaterialBase
@@ -214,23 +241,10 @@ namespace Material {
         Real64 ThermGradCoef = 0.0; // Thermal-gradient coefficient for moisture capacity
         // based on the water vapor density (kg/kgK)
         Real64 VaporDiffus = 0.0;                                         // Layer vapor diffusivity
-        Array1D<GasType> gasTypes = Array1D<GasType>(5, GasType::Custom); // Gas type (air=1, argon=2, krypton=3, xenon=4, custom=0) for
-        //  up to 5 gases in a mixture [Window gas only].  It is defined as parameter (GasCoefs)
         int GlassSpectralDataPtr = 0;                               // Number of a spectral data set associated with a window glass material
-        int NumberOfGasesInMixture = 0;                             // Number of gases in a window gas mixture
-        Array2D<Real64> GasCon = Array2D<Real64>(3, 5, 0.0);        // Gas conductance coefficients for up to 5 gases in a mixture
-        Array2D<Real64> GasVis = Array2D<Real64>(3, 5, 0.0);        // Gas viscosity coefficients for up to 5 gases in a mixture
-        Array2D<Real64> GasCp = Array2D<Real64>(3, 5, 0.0);         // Gas specific-heat coefficients for up to 5 gases in a mixture
-        Array1D<Real64> GasWght = Array1D<Real64>(5, 0.0);          // Gas molecular weight for up to 5 gases in a mixture
-        Array1D<Real64> GasSpecHeatRatio = Array1D<Real64>(5, 0.0); // Gas specific heat ratio (used for low pressure calculations)
-        Array1D<Real64> GasFract = Array1D<Real64>(5, 0.0);         // Gas fractions for up to 5 gases in a mixture
         // Radiation parameters
-        Real64 AbsorpSolar = 0.0;                // Layer solar absorptance
-        Real64 AbsorpSolarInput = 0.0;           // Layer solar absorptance input by user
         bool AbsorpSolarEMSOverrideOn = false;   // if true, then EMS calling to override value for solar absorptance
         Real64 AbsorpSolarEMSOverride = false;   // value to use when EMS calling to override value for solar absorptance
-        Real64 AbsorpThermal = 0.0;              // Layer thermal absorptance
-        Real64 AbsorpThermalInput = 0.0;         // Layer thermal absorptance input by user
         bool AbsorpThermalEMSOverrideOn = false; // if true, then EMS calling to override value for thermal absorptance
         Real64 AbsorpThermalEMSOverride = 0.0;   // value to use when EMS calling to override value for thermal absorptance
         // dynamic thermal and solar absorptance coating parameters
@@ -239,36 +253,23 @@ namespace Material {
         int absorpThermalVarFuncIdx = 0;
         int absorpSolarVarSchedIdx = 0;
         int absorpSolarVarFuncIdx = 0;
-        Real64 AbsorpVisible = 0.0;              // Layer Visible Absorptance
-        Real64 AbsorpVisibleInput = 0.0;         // Layer Visible Absorptance input by user
         bool AbsorpVisibleEMSOverrideOn = false; // if true, then EMS calling to override value for visible absorptance
         Real64 AbsorpVisibleEMSOverride = 0.0;   // value to use when EMS calling to override value for visible absorptance
 
         // Window-related radiation parameters
-        Real64 Trans = 0.0;                   // Transmittance of layer (glass, shade)
-        Real64 TransVis = 0.0;                // Visible transmittance (at normal incidence)
         Real64 GlassTransDirtFactor = 1.0;    // Multiplier on glass transmittance due to dirt
         bool SolarDiffusing = false;          // True if glass diffuses beam solar radiation
         Real64 ReflectShade = 0.0;            // Shade or screen reflectance (interior shade only)
         Real64 ReflectShadeVis = 0.0;         // Shade reflectance for visible radiation
-        Real64 AbsorpThermalBack = 0.0;       // Infrared radiation back absorption
-        Real64 AbsorpThermalFront = 0.0;      // Infrared radiation front absorption
-        Real64 ReflectSolBeamBack = 0.0;      // Solar back reflectance (beam to everything)
-        Real64 ReflectSolBeamFront = 0.0;     // Solar front reflectance (beam to everything)
         Real64 ReflectSolDiffBack = 0.0;      // Solar back diffuse reflectance
         Real64 ReflectSolDiffFront = 0.0;     // Solar front diffuse reflectance
         Real64 ReflectVisBeamBack = 0.0;      // Visible back reflectance (beam to everything)
         Real64 ReflectVisBeamFront = 0.0;     // Visible front reflectance (beam to everything)
         Real64 ReflectVisDiffBack = 0.0;      // Visible back diffuse reflectance
         Real64 ReflectVisDiffFront = 0.0;     // Visible front diffuse reflectance
-        std::string ReflectanceModeling = ""; // method used to account for screen scattering
         Real64 TransSolBeam = 0.0;            // Solar transmittance (beam to everything)
-        Real64 TransThermal = 0.0;            // Infrared radiation transmittance
         Real64 TransVisBeam = 0.0;            // Visible transmittance (beam to everything)
         int BlindDataPtr = 0;                 // Pointer to window blind data
-        int ScreenDataPtr = 0;                // Pointer to window screen data
-        int ScreenMapResolution = 0;          // Resolution of azimuth and altitude angles to print in transmittance map
-
         // Complex fenestration parameters
         Real64 YoungModulus = 0.0;       // Young's modulus (Pa) - used in window deflection calculations
         Real64 PoissonsRatio = 0.0;      // Poisson's ratio - used in window deflection calculations
@@ -336,13 +337,10 @@ namespace Material {
         // Added 12/22/2008 for thermochromic window glazing material
         Real64 SpecTemp = 0.0; // Temperature corresponding to the specified material properties
         int TCParent = 0;      // Reference to the parent object WindowMaterial:Glazing:Thermochromic
-        // Simple Glazing System
-        Real64 SimpleWindowUfactor = 0.0;       // user input for simple window U-factor with film coeffs (W/m2-k)
-        Real64 SimpleWindowSHGC = 0.0;          // user input for simple window Solar Heat Gain Coefficient (non-dimensional)
-        Real64 SimpleWindowVisTran = 0.0;       // (optional) user input for simple window Visual Transmittance (non-dimensional)
-        bool SimpleWindowVTinputByUser = false; // false means not input, true means user provide VT input
-        bool WarnedForHighDiffusivity = false;  // used to limit error messaging to just the first instance
         // Equivalent Layer (ASHWAT) Model
+        Real64 ScreenWireSpacing = 0.0;                              // insect screen wire spacing
+        Real64 ScreenWireDiameter = 0.0;                             // insect screen wire diameter
+
         Real64 ReflFrontBeamBeam = 0.0;                              // Beam-Beam solar reflectance front at zero incident
         Real64 ReflBackBeamBeam = 0.0;                               // Beam-Beam solar reflectance back at zero incident
         Real64 TausFrontBeamBeam = 0.0;                              // Beam-Beam solar transmittance front at zero incident
@@ -359,6 +357,7 @@ namespace Material {
         Real64 ReflBackBeamDiffVis = 0.0;                            // Beam-Diffuse visible reflectance back at zero incident
         Real64 TausFrontBeamDiffVis = 0.0;                           // Beam-Diffuse visible transmittance front at zero incident
         Real64 TausBackBeamDiffVis = 0.0;                            // Beam-Diffuse visible transmittance back at zero incident
+
         Real64 ReflFrontDiffDiff = 0.0;                              // Diffuse-Diffuse solar reflectance front
         Real64 ReflBackDiffDiff = 0.0;                               // Diffuse-Diffuse solar reflectance back
         Real64 TausDiffDiff = 0.0;                                   // Diffuse-Diffuse solar transmittance (front and back)
@@ -368,12 +367,10 @@ namespace Material {
         Real64 EmissThermalFront = 0.0;                              // Front side thermal or infrared Emissivity
         Real64 EmissThermalBack = 0.0;                               // Back side thermal or infrared Emissivity
         Real64 TausThermal = 0.0;                                    // Thermal transmittance (front and back)
-        GapVentType gapVentType = GapVentType::Sealed;               // Gap Ven type for equivalent Layer window model
+
         bool ISPleatedDrape = false;                                 // if pleated drape= true, if nonpleated drape = false
         Real64 PleatedDrapeWidth = 0.0;                              // width of the pleated drape fabric section
         Real64 PleatedDrapeLength = 0.0;                             // length of the pleated drape fabric section
-        Real64 ScreenWireSpacing = 0.0;                              // insect screen wire spacing
-        Real64 ScreenWireDiameter = 0.0;                             // insect screen wire diameter
         Real64 SlatWidth = 0.0;                                      // slat width
         Real64 SlatSeparation = 0.0;                                 // slat separation
         Real64 SlatCrown = 0.0;                                      // slat crown
@@ -388,10 +385,8 @@ namespace Material {
         // material
         int GlassSpecAngBRefleDataPtr = 0; // Data set index of back reflectance as a function of spectral and angle associated with a window glass
         // material
-        virtual bool dummy()
-        {
-            return true;
-        }
+
+        virtual bool dummy() { return true; }
     };
 
     struct WindowBlindProperties
@@ -565,48 +560,103 @@ namespace Material {
         Real64 InitialPressure = 0.0;     // Window(s) pressure in time of fabrication
     };
 
-    struct ScreenProperties
-    {
-        // Members
-        int MaterialNumber = 0; // Material pointer for the screen
-        Real64 BmBmTrans = 0.0; // Beam solar transmittance (dependent on sun angle)
-        // (this value can include scattering if the user so chooses)
-        Real64 BmBmTransBack = 0.0; // Beam solar transmittance (dependent on sun angle) from back side of screen
-        Real64 BmBmTransVis = 0.0;  // Visible solar transmittance (dependent on sun angle)
-        // (this value can include visible scattering if the user so chooses)
-        Real64 BmDifTrans = 0.0;     // Beam solar transmitted as diffuse radiation (dependent on sun angle)
-        Real64 BmDifTransBack = 0.0; // Beam solar transmitted as diffuse radiation (dependent on sun angle) from back side
-        Real64 BmDifTransVis = 0.0;  // Visible solar transmitted as diffuse radiation (dependent on sun angle)
-        // The following reflectance properties are dependent on sun angle:
-        Real64 ReflectSolBeamFront = 0.0;          // Beam solar reflected as diffuse radiation when sun is in front of screen
-        Real64 ReflectVisBeamFront = 0.0;          // Visible solar reflected as diffuse radiation when sun is in front of screen
-        Real64 ReflectSolBeamBack = 0.0;           // Beam solar reflected as diffuse radiation when sun is in back of screen
-        Real64 ReflectVisBeamBack = 0.0;           // Visible solar reflected as diffuse radiation when sun is in back of screen
-        Real64 AbsorpSolarBeamFront = 0.0;         // Front surface solar beam absorptance
-        Real64 AbsorpSolarBeamBack = 0.0;          // Back surface solar beam absorptance
-        Real64 DifDifTrans = 0.0;                  // Back surface diffuse solar transmitted
-        Real64 DifDifTransVis = 0.0;               // Back surface diffuse visible solar transmitted
-        Real64 DifScreenAbsorp = 0.0;              // Absorption of diffuse radiation
-        Real64 DifReflect = 0.0;                   // Back reflection of solar diffuse radiation
-        Real64 DifReflectVis = 0.0;                // Back reflection of visible diffuse radiation
-        Real64 ReflectScreen = 0.0;                // Screen assembly solar reflectance (user input adjusted for holes in screen)
-        Real64 ReflectScreenVis = 0.0;             // Screen assembly visible reflectance (user input adjusted for holes in screen)
-        Real64 ReflectCylinder = 0.0;              // Screen material solar reflectance (user input, does not account for holes in screen)
-        Real64 ReflectCylinderVis = 0.0;           // Screen material visible reflectance (user input, does not account for holes in screen)
-        Real64 ScreenDiameterToSpacingRatio = 0.0; // ratio of screen material diameter to screen material spacing
-        ScreenBeamReflectanceModel screenBeamReflectanceModel =
-            ScreenBeamReflectanceModel::Invalid; // user specified method of accounting for scattered solar beam
+    struct MaterialGasMixture : public MaterialBase {
+        Array1D<GasType> gasTypes = Array1D<GasType>(5, GasType::Custom); // Gas type (air=1, argon=2, krypton=3, xenon=4, custom=0) for
+        //  up to 5 gases in a mixture [Window gas only].  It is defined as parameter (GasCoefs)
+        int numGases = 0;                             // Number of gases in a window gas mixture
+        Array2D<Real64> GasCon = Array2D<Real64>(3, 5, 0.0);        // Gas conductance coefficients for up to 5 gases in a mixture
+        Array2D<Real64> GasVis = Array2D<Real64>(3, 5, 0.0);        // Gas viscosity coefficients for up to 5 gases in a mixture
+        Array2D<Real64> GasCp = Array2D<Real64>(3, 5, 0.0);         // Gas specific-heat coefficients for up to 5 gases in a mixture
+        Array1D<Real64> GasWght = Array1D<Real64>(5, 0.0);          // Gas molecular weight for up to 5 gases in a mixture
+        Array1D<Real64> GasSpecHeatRatio = Array1D<Real64>(5, 0.0); // Gas specific heat ratio (used for low pressure calculations)
+        Array1D<Real64> GasFract = Array1D<Real64>(5, 0.0);         // Gas fractions for up to 5 gases in a mixture
+
+        GapVentType gapVentType = GapVentType::Sealed;               // Gap Ven type for equivalent Layer window model
+            
+        virtual bool dummy() { return true; }
+
+        MaterialGasMixture() : MaterialBase() { group = Group::WindowGasMixture; }
     };
 
-    struct ScreenTransData
+
+    struct ScreenBmTransAbsRef {
+        Real64 BmTrans = 0.0; // Beam solar transmittance (dependent on sun angle)
+        // (this value can include scattering if the user so chooses)
+        Real64 BmTransBack = 0.0; // Beam solar transmittance (dependent on sun angle) from back side of screen
+        Real64 BmTransVis = 0.0;  // Visible solar transmittance (dependent on sun angle)
+        // (this value can include visible scattering if the user so chooses)
+        Real64 DfTrans = 0.0;     // Beam solar transmitted as diffuse radiation (dependent on sun angle)
+        Real64 DfTransBack = 0.0; // Beam solar transmitted as diffuse radiation (dependent on sun angle) from back side
+        Real64 DfTransVis = 0.0;  // Visible solar transmitted as diffuse radiation (dependent on sun angle)
+
+        // The following reflectance properties are dependent on sun angle:
+        Real64 RefSolFront = 0.0;          // Beam solar reflected as diffuse radiation when sun is in front of screen
+        Real64 RefVisFront = 0.0;          // Visible solar reflected as diffuse radiation when sun is in front of screen
+        Real64 RefSolBack = 0.0;           // Beam solar reflected as diffuse radiation when sun is in back of screen
+        Real64 RefVisBack = 0.0;           // Visible solar reflected as diffuse radiation when sun is in back of screen
+        Real64 AbsSolFront = 0.0;          // Front surface solar beam absorptance
+        Real64 AbsSolBack = 0.0;           // Back surface solar beam absorptance
+
+    };
+
+    constexpr int minDegResolution = 5;
+        
+    constexpr int maxIPhi = (Constant::PiOvr2 * Constant::RadToDeg / minDegResolution) + 1;
+    constexpr int maxITheta = (Constant::PiOvr2 * Constant::RadToDeg / minDegResolution) + 1;
+        
+    struct MaterialScreen : public MaterialBase
     {
-        // Members
-        Array2D<Real64> Trans;
-        Array2D<Real64> Scatt;
+        Real64 diameterToSpacingRatio = 0.0; // ratio of screen material diameter to screen material spacing
+
+        ScreenBeamReflectanceModel bmRefModel = ScreenBeamReflectanceModel::Invalid; // user specified method of accounting for scattered solar beam
+
+        Real64 DfTrans = 0.0;                  // Back surface diffuse solar transmitted
+        Real64 DfTransVis = 0.0;               // Back surface diffuse visible solar transmitted
+        Real64 DfRef = 0.0;                  // Back reflection of solar diffuse radiation
+        Real64 DfRefVis = 0.0;               // Back reflection of visible diffuse radiation
+        Real64 DfAbs = 0.0;                  // Absorption of diffuse radiation
+
+        Real64 ShadeRef = 0.0;                 // Screen assembly solar reflectance (user input adjusted for holes in screen)
+        Real64 ShadeRefVis = 0.0;              // Screen assembly visible reflectance (user input adjusted for holes in screen)
+        Real64 CylinderRef = 0.0;              // Screen material solar reflectance (user input, does not account for holes in screen)
+        Real64 CylinderRefVis = 0.0;           // Screen material visible reflectance (user input, does not account for holes in screen)
+
+        int mapDegResolution = 0;               // Resolution of azimuth and altitude angles to print in transmittance map
+        Real64 dPhi = (Real64)minDegResolution; // phi increments (deg)
+        Real64 dTheta = (Real64)minDegResolution;// theta increments (deg)
+
+        std::array<std::array<ScreenBmTransAbsRef, maxITheta>, maxIPhi> btars;
+
+        // These are shared with window shade and blind
+        Real64 toGlassDist = 0.0;    // Distance between window shade and adjacent glass (m)
+        Real64 topOpeningMult = 0.0; // Area of air-flow opening at top of shade, expressed as a fraction
+        //  of the shade-to-glass opening area at the top of the shade
+        Real64 bottomOpeningMult = 0.0; // Area of air-flow opening at bottom of shade, expressed as a fraction
+        //  of the shade-to-glass opening area at the bottom of the shade
+        Real64 leftOpeningMult = 0.0; // Area of air-flow opening at left side of shade, expressed as a fraction
+        //  of the shade-to-glass opening area at the left side of the shade
+        Real64 rightOpeningMult = 0.0; // Area of air-flow opening at right side of shade, expressed as a fraction
+        //  of the shade-to-glass opening area at the right side of the shade
+        Real64 airFlowPermeability = 0.0; // The effective area of openings in the shade itself, expressed as a
+        //  fraction of the shade area
+
+        virtual bool dummy() { return true; }
+
+        MaterialScreen() : MaterialBase() { group = Group::Screen; }
     };
 
     void GetMaterialData(EnergyPlusData &state, bool &errorsFound); // set to true if errors found in input
     void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound);
+
+    void NormalizePhiTheta(Real64 &phi, Real64 &theta);
+    void GetPhiThetaIndices(Real64 phi, Real64 theta, Real64 dPhi, Real64 dTheta, int &iPhi1, int &iPhi2, int &iTheta1, int &iTheta2);
+
+    void CalcScreenTransmittance(EnergyPlusData &state,
+                                 Real64 surfTilt, 
+                                 MaterialScreen const *screen,
+                                 Real64 phi,     // Sun altitude relative to surface outward normal (rad)
+                                 Real64 theta,   // Sun azimuth relative to surface outward normal (rad)
+                                 ScreenBmTransAbsRef &tar);
 
 } // namespace Material
 
@@ -619,8 +669,6 @@ struct MaterialData : BaseGlobalStruct
     EPVector<Material::WindowBlindProperties> Blind;
     EPVector<Material::WindowComplexShade> ComplexShade;
     EPVector<Material::WindowThermalModelParams> WindowThermalModel;
-    EPVector<Material::ScreenProperties> Screens;
-    EPVector<Material::ScreenTransData> ScreenTrans;
     void clear_state() override
     {
         for (int i = 0; i < TotMaterials; ++i) {

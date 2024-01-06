@@ -87,6 +87,41 @@ namespace General {
         return Lower + InterpFac * (Upper - Lower);
     }
 
+
+    // Disaggregated implementation of bilinear interpolation so that coefficients can be used with multiple variables
+    struct BilinearInterpCoeffs
+    {
+        Real64 denom;
+        Real64 x1y1;
+        Real64 x1y2;
+        Real64 x2y1;
+        Real64 x2y2;
+    };
+
+    inline void GetBilinearInterpCoeffs(Real64 const X,
+                                        Real64 const Y,
+                                        Real64 const X1,
+                                        Real64 const X2,
+                                        Real64 const Y1,
+                                        Real64 const Y2,
+                                        BilinearInterpCoeffs &coeffs)
+    {
+        coeffs.denom = (X2 - X1) * (Y2 - Y1);
+        coeffs.x1y1 = (X2 - X) * (Y2 - Y);
+        coeffs.x2y1 = (X - X1) * (Y2 - Y);
+        coeffs.x1y2 = (X2 - X) * (Y - Y1);
+        coeffs.x2y2 = (X - X1) * (Y - Y1);
+    }
+
+    inline Real64 BilinearInterp(Real64 const Fx1y1,
+                                 Real64 const Fx1y2,
+                                 Real64 const Fx2y1,
+                                 Real64 const Fx2y2,
+                                 BilinearInterpCoeffs const &coeffs)
+    {
+        return (coeffs.x1y1 * Fx1y1 + coeffs.x2y1 * Fx2y1 + coeffs.x1y2 * Fx1y2 + coeffs.x2y2 * Fx2y2) / coeffs.denom;
+    }
+        
     constexpr Real64 POLYF(Real64 const X,          // Cosine of angle of incidence
                            Array1D<Real64> const &A // Polynomial coefficients
     )

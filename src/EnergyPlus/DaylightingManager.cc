@@ -3377,11 +3377,23 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                         //                          pass angle from sun to window normal here using PHSUN and THSUN from above and surface angles
                         //                          SunAltitudeToWindowNormalAngle = PHSUN - SurfaceWindow(IWin)%Phi
                         //                          SunAzimuthToWindowNormalAngle = THSUN - SurfaceWindow(IWin)%Theta
-                        DataHeatBalance::CalcScreenTransmittance(state,
-                                                                 IWin,
-                                                                 (state.dataDaylightingManager->PHSUN - state.dataSurface->SurfWinPhi(IWin)),
-                                                                 (state.dataDaylightingManager->THSUN - state.dataSurface->SurfWinTheta(IWin)));
-                        transBmBmMult[1] = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).BmBmTrans;
+                        auto const *screen = dynamic_cast<Material::MaterialScreen*>
+                            (state.dataMaterial->Material(state.dataSurface->SurfWinScreenNumber(IWin)));
+                        assert(screen != nullptr);
+
+                        Real64 phi = state.dataDaylightingManager->PHSUN - state.dataSurface->SurfWinPhi(IWin);
+                        Real64 theta = state.dataDaylightingManager->THSUN - state.dataSurface->SurfWinTheta(IWin);
+                        int ip1, ip2, it1, it2;
+                        General::BilinearInterpCoeffs coeffs;
+                        Material::NormalizePhiTheta(phi, theta);
+                        Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
+                        GetBilinearInterpCoeffs(
+                            phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
+                        transBmBmMult[1] = BilinearInterp(
+                            screen->btars[ip1][it1].BmTrans, screen->btars[ip1][it2].BmTrans,
+                            screen->btars[ip2][it1].BmTrans, screen->btars[ip2][it2].BmTrans,
+                            coeffs);
+                        
                         state.dataDaylightingManager->EDIRSUdisk(iHour, 2) = RAYCOS.z * TVISS * transBmBmMult[1] * ObTransDisk;
                     }
 
@@ -3559,12 +3571,24 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                 //                             pass angle from sun to window normal here using PHSUN and THSUN from above and
                                 //                             surface angles SunAltitudeToWindowNormalAngle = PHSUN - SurfaceWindow(IWin)%Phi
                                 //                             SunAzimuthToWindowNormalAngle = THSUN - SurfaceWindow(IWin)%Theta
-                                DataHeatBalance::CalcScreenTransmittance(
-                                    state,
-                                    IWin,
-                                    (state.dataDaylightingManager->PHSUN - state.dataSurface->SurfWinPhi(IWin)),
-                                    (state.dataDaylightingManager->THSUN - state.dataSurface->SurfWinTheta(IWin)));
-                                TransBmBmMultRefl(1) = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).BmBmTrans;
+                                auto const *screen = dynamic_cast<Material::MaterialScreen const*>
+                                        (state.dataMaterial->Material(state.dataSurface->SurfWinScreenNumber(IWin)));
+                                assert(screen != nullptr);
+
+                                Real64 phi = state.dataDaylightingManager->PHSUN - state.dataSurface->SurfWinPhi(IWin);
+                                Real64 theta = state.dataDaylightingManager->THSUN - state.dataSurface->SurfWinTheta(IWin);
+                                int ip1, ip2, it1, it2; // lo/hi phi/theta interpolation map indices
+                                General::BilinearInterpCoeffs coeffs;
+                                Material::NormalizePhiTheta(phi, theta);
+                                Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
+                                General::GetBilinearInterpCoeffs(
+                                    phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
+                                
+                                TransBmBmMultRefl(1) = General::BilinearInterp(
+                                    screen->btars[ip1][it1].BmTrans, screen->btars[ip1][it2].BmTrans,
+                                    screen->btars[ip2][it1].BmTrans, screen->btars[ip2][it2].BmTrans,
+                                    coeffs);
+                                
                                 state.dataDaylightingManager->EDIRSUdisk(iHour, 2) += SunVecMir.z * SpecReflectance * TVisRefl * TransBmBmMultRefl(1);
                             } // End of check if window has a blind or screen
 
@@ -7851,15 +7875,33 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     }
 
                 } else if (ScreenOn) { // Screen: get beam-beam, beam-diffuse and diffuse-diffuse vis trans/ref of screen and glazing system
-                    DataHeatBalance::CalcScreenTransmittance(
-                        state, IWin, (PH - state.dataSurface->SurfWinPhi(IWin)), (TH - state.dataSurface->SurfWinTheta(IWin)));
+                    auto const *screen = dynamic_cast<Material::MaterialScreen*>(state.dataMaterial->Material(state.dataSurface->SurfWinScreenNumber(IWin)));
+                    assert(screen != nullptr);
+                    
+                    Real64 phi = PH - state.dataSurface->SurfWinPhi(IWin);
+                    Real64 theta = TH - state.dataSurface->SurfWinTheta(IWin);
+                    int ip1, ip2, it1, it2; // lo/hi phi/theta interpolation map indices
+                    General::BilinearInterpCoeffs coeffs;
+
+                    Material::NormalizePhiTheta(phi, theta);
+                    Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
+                    General::GetBilinearInterpCoeffs(phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
+
                     ReflGlDiffDiffFront = state.dataConstruction->Construct(IConst).ReflectVisDiffFront;
-                    ReflScDiffDiffBack = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).DifReflectVis;
-                    TransScBmDiffFront = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).BmDifTransVis;
+                    ReflScDiffDiffBack = screen->DfRefVis;
+
+                    auto const &b11 = screen->btars[ip1][it1];
+                    auto const &b12 = screen->btars[ip1][it2];
+                    auto const &b21 = screen->btars[ip2][it1];
+                    auto const &b22 = screen->btars[ip2][it2];
+                    
+                    TransScBmDiffFront = General::BilinearInterp(b11.DfTransVis, b12.DfTransVis, b21.DfTransVis, b22.DfTransVis, coeffs);
+
                     transMult[1] = TransScBmDiffFront * state.dataSurface->SurfWinGlazedFrac(IWin) *
                                    state.dataConstruction->Construct(IConst).TransDiffVis / (1 - ReflGlDiffDiffFront * ReflScDiffDiffBack) *
                                    state.dataSurface->SurfWinLightWellEff(IWin);
-                    transBmBmMult[1] = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).BmBmTransVis;
+
+                    transBmBmMult[1] = General::BilinearInterp(b11.BmTransVis, b12.BmTransVis, b21.BmTransVis, b22.BmTransVis, coeffs);
 
                 } else if (BlindOn) { // Blind: get beam-diffuse and beam-beam vis trans of blind+glazing system
                     // PETER:  As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
@@ -8076,55 +8118,72 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
             if (ShadeOn || BlindOn || ScreenOn || state.dataSurface->SurfWinSolarDiffusing(IWin)) {
                 std::fill(transBmBmMult.begin(), transBmBmMult.end(), 0.0);
                 std::fill(transMult.begin(), transMult.end(), 0.0);
-
+                    
                 // TH 7/7/2010 moved from inside the loop: DO JB = 1,MaxSlatAngs
                 if (BlindOn)
                     ProfileAngle(state, IWin, state.dataSurface->SurfSunCosHourly(IHR), state.dataMaterial->Blind(BlNum).SlatOrientation, ProfAng);
 
                 for (int JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
                     if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
-
+                    
                     if (ShadeOn || ScreenOn || state.dataSurface->SurfWinSolarDiffusing(IWin)) { // Shade or screen on or diffusing glass
                         if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                             // Shaded visible transmittance of TDD for collimated beam from the sun
                             transMult[1] = TransTDD(state, PipeNum, COSBSun, RadType::VisibleBeam) * state.dataSurface->SurfWinGlazedFrac(IWin);
                         } else {
                             if (ScreenOn) {
-                                transMult[1] = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).BmBmTransVis *
-                                               state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
+                                auto const *screen = dynamic_cast<Material::MaterialScreen const *>
+                                    (state.dataMaterial->Material(state.dataSurface->SurfWinScreenNumber(IWin)));
+                                assert(screen != nullptr);
+                                Real64 phi = state.dataDaylightingManager->PHSUN - state.dataSurface->SurfWinPhi(IWin);
+                                Real64 theta = state.dataDaylightingManager->THSUN - state.dataSurface->SurfWinTheta(IWin);
+                                int ip1, ip2, it1, it2;
+                                General::BilinearInterpCoeffs coeffs;
+                                Material::NormalizePhiTheta(phi, theta);
+                                Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
+                                General::GetBilinearInterpCoeffs(
+                                    phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
+                                Real64 BmBmTransVis = General::BilinearInterp(
+                                    screen->btars[ip1][it1].BmTransVis, screen->btars[ip1][it2].BmTransVis,
+                                    screen->btars[ip2][it1].BmTransVis, screen->btars[ip2][it2].BmTransVis,
+                                    coeffs);
+                                        
+                                transMult[1] = BmBmTransVis * state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
                             } else {
                                 int IConstShaded = state.dataSurface->SurfWinActiveShadedConstruction(IWin);
                                 if (state.dataSurface->SurfWinSolarDiffusing(IWin)) IConstShaded = state.dataSurface->Surface(IWin).Construction;
                                 transMult[1] = General::POLYF(COSBSun, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) *
-                                               state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
+                                    state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
                             }
                         }
-
+                        
                     } else { // Blind on
-
+                            
                         // As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
                         // for TDDs because it is based on TVISBSun which is correctly calculated for TDDs above.
-
-                        TransBlBmDiffFront = Window::InterpProfAng(ProfAng, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
-
+                            
+                        TransBlBmDiffFront =
+                            Window::InterpProfAng(ProfAng, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
+                        
                         if (ShType == WinShadingType::IntBlind) { // Interior blind
                             // TH CR 8121, 7/7/2010
-                            // ReflBlBmDiffFront = Window::InterpProfAng(ProfAng,Blind(BlNum)%VisFrontBeamDiffRefl)
-                            ReflBlBmDiffFront = Window::InterpProfAng(ProfAng, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
-
+                            // ReflBlBmDiffFront = WindowManager::InterpProfAng(ProfAng,Blind(BlNum)%VisFrontBeamDiffRefl)
+                            ReflBlBmDiffFront =
+                                Window::InterpProfAng(ProfAng, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
+                                
                             // TH added 7/12/2010 for CR 8121
                             ReflBlDiffDiffFront = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffRefl(JB);
                             TransBlDiffDiffFront = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffTrans(JB);
-
+                            
                             transMult[JB] = TVISBSun * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
-                                                                                 (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
-
+                                                        (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
+                            
                         } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
                             transMult[JB] = TransBlBmDiffFront *
-                                            (state.dataConstruction->Construct(IConst).TransDiffVis /
-                                             (1.0 - ReflGlDiffDiffFront * state.dataMaterial->Blind(BlNum).VisBackDiffDiffRefl(JB))) *
-                                            state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
-
+                                (state.dataConstruction->Construct(IConst).TransDiffVis /
+                                 (1.0 - ReflGlDiffDiffFront * state.dataMaterial->Blind(BlNum).VisBackDiffDiffRefl(JB))) *
+                                    state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
+                            
                         } else { // Between-glass blind
                             t1 = General::POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef(1));
                             tfshBd = Window::InterpProfAng(ProfAng, state.dataMaterial->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
@@ -8135,7 +8194,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                             } else { // 3 glass layers; blind between layers 2 and 3
                                 t2 = General::POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef(2));
                                 transMult[JB] = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) * td3 *
-                                                state.dataSurface->SurfWinLightWellEff(IWin);
+                                    state.dataSurface->SurfWinLightWellEff(IWin);
                             }
                         }
                         if (state.dataSurface->SurfWinMovableSlats(IWin)) {
@@ -8149,18 +8208,18 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                                                                   state.dataMaterial->Blind(BlNum).SlatSeparation,
                                                                                   state.dataMaterial->Blind(BlNum).SlatThickness);
                     } // ShadeOn/ScreenOn/BlindOn/Diffusing glass
-
+                        
+                    
                     if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                         std::fill(transBmBmMult.begin(), transBmBmMult.end(), 0.0); // No beam, diffuse only
                     }
-
+                
                     // Daylighting shelf simplification:  No beam makes it past end of shelf, all light is diffuse
                     if (InShelfSurf > 0) { // Inside daylighting shelf
-                        std::fill(
-                            transBmBmMult.begin(), transBmBmMult.end(), 0.0); // No beam, diffuse only
-                                                                              // SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
+                        std::fill(transBmBmMult.begin(), transBmBmMult.end(), 0.0); // No beam, diffuse only
+                        // SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
                     }
-
+                    
                     state.dataDaylightingManager->WLUMSU(IHR, JB + 1) += ZSU1 * transMult[JB] / Constant::Pi;
                     state.dataDaylightingManager->WLUMSUdisk(IHR, JB + 1) = ZSU1 * transBmBmMult[JB] / Constant::Pi;
                     FLFWSU(JB + 1) += ZSU1 * transMult[JB] * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
@@ -8201,20 +8260,24 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
                 for (int JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
                     if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
-
+                    
                     if (ShadeOn || state.dataSurface->SurfWinSolarDiffusing(IWin)) { // Shade on or diffusing glass
                         int IConstShaded = state.dataSurface->SurfWinActiveShadedConstruction(IWin);
                         if (state.dataSurface->SurfWinSolarDiffusing(IWin)) IConstShaded = state.dataSurface->Surface(IWin).Construction;
                         transMult[1] = state.dataConstruction->Construct(IConstShaded).TransDiffVis * state.dataSurface->SurfWinGlazedFrac(IWin) *
-                                       state.dataSurface->SurfWinLightWellEff(IWin);
-
+                            state.dataSurface->SurfWinLightWellEff(IWin);
+                            
                     } else if (ScreenOn) { // Exterior screen on
-                        TransScDiffDiffFront = state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(IWin)).DifDifTransVis;
+                        auto const *screen = dynamic_cast<Material::MaterialScreen const *>
+                            (state.dataMaterial->Material(state.dataSurface->SurfWinScreenNumber(IWin)));
+                        TransScDiffDiffFront = screen->DfTransVis; 
+                        
                         transMult[1] = TransScDiffDiffFront *
-                                       (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * ReflScDiffDiffBack)) *
-                                       state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
-
+                            (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * ReflScDiffDiffBack)) *
+                                state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
+                    
                     } else { // Blind on
+
                         TransBlDiffDiffFront = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffTrans(JB);
                         if (ShType == WinShadingType::IntBlind) { // Interior blind
                             ReflBlDiffDiffFront = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffRefl(JB);
@@ -8240,12 +8303,12 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                                 state.dataSurface->SurfWinLightWellEff(IWin);
                             }
                         } // End of check of interior/exterior/between-glass blind
-                    }     // ShadeOn/BlindOn
+                    } // if (Blind)
 
                     state.dataDaylightingManager->WLUMSU(IHR, JB + 1) += ZSU1refl * transMult[JB] / Constant::Pi;
                     FLFWSU(JB + 1) += ZSU1refl * transMult[JB] * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
                     FLCWSU(JB + 1) += ZSU1refl * transMult[JB] * state.dataSurface->SurfWinFractionUpgoing(IWin);
-                } // End of loop over slat angles
+                } // for (JB)
             }     // End of check if window has shade, blind or diffusing glass
         }         // End of check if ZSU1refl > 0.0
     }             // End of check if solar reflections are in effect

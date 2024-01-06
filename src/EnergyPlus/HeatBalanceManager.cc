@@ -4178,23 +4178,18 @@ namespace HeatBalanceManager {
 
             state.dataHeatBal->NominalR.redimension(state.dataMaterial->TotMaterials, 0.0);
 
-            // Initialize new materials
-            for (loop = TotMaterialsPrev + 1; loop <= state.dataMaterial->TotMaterials; ++loop) {
-                auto *thisMaterial = new Material::MaterialChild;
-                state.dataMaterial->Material.push_back(thisMaterial);
-            }
-
             // Glass objects
             NextLine = W5DataFile.readLine();
             if (NextLine.eof) goto Label1000;
             ++FileLineCount;
-            MaterNum = TotMaterialsPrev;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
-                    ++MaterNum;
                     auto *thisMaterial = new Material::MaterialChild;
-                    state.dataMaterial->Material(MaterNum) = thisMaterial;
-                    MaterNumSysGlass(IGlass, IGlSys) = MaterNum;
+                    state.dataMaterial->Material.push_back(thisMaterial);
+                    // Material is an EPVector so this matters whether
+                    // we are accessing it Fortran-style or C-style
+                    MaterNumSysGlass(IGlass, IGlSys) = state.dataMaterial->Material.size();
+
                     thisMaterial->group = Material::Group::WindowGlass;
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
@@ -4217,9 +4212,9 @@ namespace HeatBalanceManager {
                     if (thisMaterial->Thickness <= 0.0) {
                     }
                     if (NGlSys == 1) {
-                        thisMaterial->Name = "W5:" + DesiredConstructionName + ":GLASS" + NumName(IGlass);
+                        thisMaterial->Name = format("W5:{}:GLASS", DesiredConstructionName, NumName(IGlass));
                     } else {
-                        thisMaterial->Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GLASS" + NumName(IGlass);
+                        thisMaterial->Name = format("W5:{}:{}:GLASS", DesiredConstructionName, NumName(IGlSys), NumName(IGlass));
                     }
                     thisMaterial->Roughness = Material::SurfaceRoughness::VerySmooth;
                     thisMaterial->AbsorpThermal = thisMaterial->AbsorpThermalBack;
@@ -4241,48 +4236,46 @@ namespace HeatBalanceManager {
             ++FileLineCount;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
-                    ++MaterNum;
-                    state.dataMaterial->Material(MaterNum) = new Material::MaterialChild;
-                    auto *thisMaterial = state.dataMaterial->Material(MaterNum);
-                    MaterNumSysGap(IGap, IGlSys) = MaterNum;
+                    auto *matGas = new Material::MaterialGasMixture;
+                    state.dataMaterial->Material.push_back(matGas);
+                    // Material is an EP-vector
+                    MaterNumSysGap(IGap, IGlSys) = state.dataMaterial->Material.size();
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
-                    readList(NextLine.data.substr(23), thisMaterial->Thickness, NumGases(IGap, IGlSys));
+                    readList(NextLine.data.substr(23), matGas->Thickness, NumGases(IGap, IGlSys));
                     if (NGlSys == 1) {
-                        thisMaterial->Name = "W5:" + DesiredConstructionName + ":GAP" + NumName(IGap);
+                        matGas->Name = format("W5:{}:GAP{}", DesiredConstructionName, NumName(IGap));
                     } else {
-                        thisMaterial->Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GAP" + NumName(IGap);
+                        matGas->Name = format("W5:{}:{}:GAP{}", DesiredConstructionName, NumName(IGlSys), NumName(IGap));
                     }
-                    thisMaterial->Thickness *= 0.001;
-                    thisMaterial->Roughness = Material::SurfaceRoughness::MediumRough; // Unused
+                    matGas->Thickness *= 0.001;
+                    matGas->Roughness = Material::SurfaceRoughness::MediumRough; // Unused
                 }
             }
 
+            // Gap/gas materials are read in multiple passes
             NextLine = W5DataFile.readLine();
-            if (NextLine.eof) goto Label1000;
+            if (NextLine.eof) goto Label1000; // Exsqueeze me?
             ++FileLineCount;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
-                    MaterNum = MaterNumSysGap(IGap, IGlSys);
-                    auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
-                    assert(thisMaterial != nullptr);
-                    thisMaterial->NumberOfGasesInMixture = NumGases(IGap, IGlSys);
-                    thisMaterial->group = Material::Group::WindowGas;
-                    if (NumGases(IGap, IGlSys) > 1) thisMaterial->group = Material::Group::WindowGasMixture;
-                    for (IGas = 1; IGas <= NumGases(IGap, IGlSys); ++IGas) {
+                    int MatNum = MaterNumSysGap(IGap, IGlSys);
+                    auto *matGas = dynamic_cast<Material::MaterialGasMixture*>(state.dataMaterial->Material(MatNum));
+                    assert(matGas != nullptr);
+                    matGas->numGases = NumGases(IGap, IGlSys);
+                    for (int IGas = 1; IGas <= matGas->numGases; ++IGas) {
                         NextLine = W5DataFile.readLine();
                         ++FileLineCount;
                         readList(NextLine.data.substr(19),
                                  GasName(IGas),
-                                 thisMaterial->GasFract(IGas),
-                                 thisMaterial->GasWght(IGas),
-                                 thisMaterial->GasCon(_, IGas),
-                                 thisMaterial->GasVis(_, IGas),
-                                 thisMaterial->GasCp(_, IGas));
+                                 matGas->GasFract(IGas),
+                                 matGas->GasWght(IGas),
+                                 matGas->GasCon(_, IGas),
+                                 matGas->GasVis(_, IGas),
+                                 matGas->GasCp(_, IGas));
                         // Nominal resistance of gap at room temperature (based on first gas in mixture)
-                        state.dataHeatBal->NominalR(MaterNum) =
-                            thisMaterial->Thickness /
-                            (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 + thisMaterial->GasCon(3, 1) * 90000.0);
+                        state.dataHeatBal->NominalR(MatNum) =
+                            matGas->Thickness / (matGas->GasCon(1, 1) + matGas->GasCon(2, 1) * 300.0 + matGas->GasCon(3, 1) * 90000.0);
                     }
                 }
             }
@@ -4538,15 +4531,17 @@ namespace HeatBalanceManager {
                 state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) = 0.0;
                 for (loop = 1; loop <= NGlass(IGlSys) + NGaps(IGlSys); ++loop) {
                     MatNum = thisConstruct.LayerPoint(loop);
-                    auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatNum));
-                    assert(thisMaterial != nullptr);
-                    if (thisMaterial->group == Material::Group::WindowGlass) {
-                        state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += thisMaterial->Thickness / thisMaterial->Conductivity;
-                    } else if (thisMaterial->group == Material::Group::WindowGas || thisMaterial->group == Material::Group::WindowGasMixture) {
+                    auto const *matBase = state.dataMaterial->Material(MatNum);
+                    assert(matBase != nullptr);
+                    if (matBase->group == Material::Group::WindowGlass) {
+                        state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += matBase->Thickness / matBase->Conductivity;
+                    } else if (matBase->group == Material::Group::WindowGas || matBase->group == Material::Group::WindowGasMixture) {
+                        auto const *matGas = dynamic_cast<Material::MaterialGasMixture const*>(matBase);
+                        assert(matGas != nullptr);
+                            
                         // If mixture, use conductivity of first gas in mixture
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) +=
-                            thisMaterial->Thickness /
-                            (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 + thisMaterial->GasCon(3, 1) * 90000.0);
+                            matGas->Thickness / (matGas->GasCon(1, 1) + matGas->GasCon(2, 1) * 300.0 + matGas->GasCon(3, 1) * 90000.0);
                     }
                 }
 

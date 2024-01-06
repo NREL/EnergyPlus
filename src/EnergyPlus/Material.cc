@@ -1159,31 +1159,29 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         ++MaterNum;
-        auto *thisMaterial = new MaterialChild;
-        state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->group = Group::WindowGas;
-        thisMaterial->gasTypes(1) = GasType::Invalid;
-        thisMaterial->NumberOfGasesInMixture = 1;
-        thisMaterial->GasFract(1) = 1.0;
+        auto *matGas = new MaterialGasMixture;
+        state.dataMaterial->Material(MaterNum) = matGas;
+        matGas->group = Group::WindowGas;
+        matGas->numGases = 1;
+        matGas->GasFract(1) = 1.0;
 
         // Load the material derived type from the input data.
 
-        thisMaterial->Name = MaterialNames(1);
-        thisMaterial->NumberOfGasesInMixture = 1;
-        thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumValue(GasTypeUC, Util::makeUPPER(MaterialNames(2))));
-        thisMaterial->Roughness = SurfaceRoughness::MediumRough;
+        matGas->Name = MaterialNames(1);
+        matGas->gasTypes(1) = static_cast<GasType>(getEnumValue(GasTypeUC, Util::makeUPPER(MaterialNames(2))));
+        matGas->Roughness = SurfaceRoughness::MediumRough;
 
-        thisMaterial->Thickness = MaterialProps(1);
-        thisMaterial->ROnly = true;
+        matGas->Thickness = MaterialProps(1);
+        matGas->ROnly = true;
 
-        gasType = thisMaterial->gasTypes(1);
+        gasType = matGas->gasTypes(1);
         if (gasType != GasType::Custom) {
-            thisMaterial->GasWght(1) = GasWght[static_cast<int>(gasType)];
-            thisMaterial->GasSpecHeatRatio(1) = GasSpecificHeatRatio[static_cast<int>(gasType)];
+            matGas->GasWght(1) = GasWght[static_cast<int>(gasType)];
+            matGas->GasSpecHeatRatio(1) = GasSpecificHeatRatio[static_cast<int>(gasType)];
             for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                thisMaterial->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
-                thisMaterial->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
-                thisMaterial->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
+                matGas->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
+                matGas->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
+                matGas->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
             }
         }
 
@@ -1191,12 +1189,12 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         if (gasType == GasType::Custom) {
             for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                thisMaterial->GasCon(ICoeff, 1) = MaterialProps(1 + ICoeff);
-                thisMaterial->GasVis(ICoeff, 1) = MaterialProps(4 + ICoeff);
-                thisMaterial->GasCp(ICoeff, 1) = MaterialProps(7 + ICoeff);
+                matGas->GasCon(ICoeff, 1) = MaterialProps(1 + ICoeff);
+                matGas->GasVis(ICoeff, 1) = MaterialProps(4 + ICoeff);
+                matGas->GasCp(ICoeff, 1) = MaterialProps(7 + ICoeff);
             }
-            thisMaterial->GasWght(1) = MaterialProps(11);
-            thisMaterial->GasSpecHeatRatio(1) = MaterialProps(12);
+            matGas->GasWght(1) = MaterialProps(11);
+            matGas->GasSpecHeatRatio(1) = MaterialProps(12);
 
             // Check for errors in custom gas properties
             //      IF(dataMaterial.Material(MaterNum)%GasCon(1,1) <= 0.0) THEN
@@ -1205,17 +1203,17 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             //                 //TRIM(MaterialNames(1))//' should be > 0.')
             //      END IF
 
-            if (thisMaterial->GasVis(1, 1) <= 0.0) {
+            if (matGas->GasVis(1, 1) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(3 + ICoeff) + " not > 0.0");
             }
-            if (thisMaterial->GasCp(1, 1) <= 0.0) {
+            if (matGas->GasCp(1, 1) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(5 + ICoeff) + " not > 0.0");
             }
-            if (thisMaterial->GasWght(1) <= 0.0) {
+            if (matGas->GasWght(1) <= 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(8) + " not > 0.0");
@@ -1224,9 +1222,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // Nominal resistance of gap at room temperature
         if (!ErrorsFound) {
-            DenomRGas = (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 + thisMaterial->GasCon(3, 1) * 90000.0);
+            DenomRGas = (matGas->GasCon(1, 1) + matGas->GasCon(2, 1) * 300.0 + matGas->GasCon(3, 1) * 90000.0);
             if (DenomRGas > 0.0) {
-                state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / DenomRGas;
+                state.dataHeatBal->NominalR(MaterNum) = matGas->Thickness / DenomRGas;
             } else {
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state,
@@ -1265,79 +1263,77 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         ++MaterNum;
-        auto *thisMaterial = new MaterialChild;
-        state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->group = Group::GapEquivalentLayer;
-        thisMaterial->gasTypes(1) = GasType::Invalid;
-        thisMaterial->NumberOfGasesInMixture = 1;
-        thisMaterial->GasFract(1) = 1.0;
+        auto *matGas = new MaterialGasMixture;
+        state.dataMaterial->Material(MaterNum) = matGas;
+        matGas->group = Group::GapEquivalentLayer;
+        matGas->numGases = 1;
+        matGas->GasFract(1) = 1.0;
 
         // Load the material derived type from the input data.
 
-        thisMaterial->Name = MaterialNames(1);
-        thisMaterial->NumberOfGasesInMixture = 1;
-        thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumValue(GasTypeUC, Util::makeUPPER(MaterialNames(2))));
+        matGas->Name = MaterialNames(1);
+        matGas->gasTypes(1) = static_cast<GasType>(getEnumValue(GasTypeUC, Util::makeUPPER(MaterialNames(2)))); // Error check?
 
-        thisMaterial->Roughness = SurfaceRoughness::MediumRough;
+        matGas->Roughness = SurfaceRoughness::MediumRough;
 
-        thisMaterial->Thickness = MaterialProps(1);
-        thisMaterial->ROnly = true;
+        matGas->Thickness = MaterialProps(1);
+        matGas->ROnly = true;
 
-        gasType = thisMaterial->gasTypes(1);
+        gasType = matGas->gasTypes(1);
         if (gasType != GasType::Custom) {
-            thisMaterial->GasWght(1) = GasWght[static_cast<int>(gasType)];
-            thisMaterial->GasSpecHeatRatio(1) = GasSpecificHeatRatio[static_cast<int>(gasType)];
+            matGas->GasWght(1) = GasWght[static_cast<int>(gasType)];
+            matGas->GasSpecHeatRatio(1) = GasSpecificHeatRatio[static_cast<int>(gasType)];
             for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                thisMaterial->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
-                thisMaterial->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
-                thisMaterial->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
+                matGas->GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
+                matGas->GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
+                matGas->GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
             }
         }
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             // Get gap vent type
-            thisMaterial->gapVentType = static_cast<GapVentType>(getEnumValue(GapVentTypeUC, Util::makeUPPER(MaterialNames(3))));
+            matGas->gapVentType = static_cast<GapVentType>(getEnumValue(GapVentTypeUC, Util::makeUPPER(MaterialNames(3))));
         }
 
         if (gasType == GasType::Custom) {
             for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                thisMaterial->GasCon(ICoeff, 1) = MaterialProps(1 + ICoeff);
-                thisMaterial->GasVis(ICoeff, 1) = MaterialProps(4 + ICoeff);
-                thisMaterial->GasCp(ICoeff, 1) = MaterialProps(7 + ICoeff);
+                matGas->GasCon(ICoeff, 1) = MaterialProps(1 + ICoeff);
+                matGas->GasVis(ICoeff, 1) = MaterialProps(4 + ICoeff);
+                matGas->GasCp(ICoeff, 1) = MaterialProps(7 + ICoeff);
             }
-            thisMaterial->GasWght(1) = MaterialProps(11);
-            thisMaterial->GasSpecHeatRatio(1) = MaterialProps(12);
+            matGas->GasWght(1) = MaterialProps(11);
+            matGas->GasSpecHeatRatio(1) = MaterialProps(12);
 
-            if (thisMaterial->GasVis(1, 1) <= 0.0) {
+            if (matGas->GasVis(1, 1) <= 0.0) {
                 ErrorsFound = true;
-                ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(5) + " not > 0.0");
+                ShowSevereError(state, format("{}=\"{}\", Illegal value.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
+                ShowContinueError(state, format("{} not > 0.0", state.dataIPShortCut->cNumericFieldNames(5)));
             }
-            if (thisMaterial->GasCp(1, 1) <= 0.0) {
+            if (matGas->GasCp(1, 1) <= 0.0) {
                 ErrorsFound = true;
-                ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(8) + " not > 0.0");
+                ShowSevereError(state, format("{}=\"{}\", Illegal value.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
+                ShowContinueError(state, format("{} not > 0.0", state.dataIPShortCut->cNumericFieldNames(8)));
             }
-            if (thisMaterial->GasWght(1) <= 0.0) {
+            if (matGas->GasWght(1) <= 0.0) {
                 ErrorsFound = true;
-                ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-                ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(11) + " not > 0.0");
+                ShowSevereError(state, format("{}=\"{}\", Illegal value.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
+                ShowContinueError(state, format("{} not > 0.0", state.dataIPShortCut->cNumericFieldNames(11)));
             }
         }
 
         // Nominal resistance of gap at room temperature
         if (!ErrorsFound) {
-            DenomRGas = (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 + thisMaterial->GasCon(3, 1) * 90000.0);
+            DenomRGas = (matGas->GasCon(1, 1) + matGas->GasCon(2, 1) * 300.0 + matGas->GasCon(3, 1) * 90000.0);
             if (DenomRGas > 0.0) {
-                state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / DenomRGas;
+                state.dataHeatBal->NominalR(MaterNum) = matGas->Thickness / DenomRGas;
             } else {
-                ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
+                ShowSevereError(state, format("{}=\"{}\", Illegal value.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
                 ShowContinueError(state,
                                   format("Nominal resistance of gap at room temperature calculated at a negative Conductivity=[{:.3R}].", DenomRGas));
                 ErrorsFound = true;
             }
         }
-    }
+    } // for (Loop : W5MatEQL) 
 
     // Window gas mixtures (for gaps with two or more gases)
 
@@ -1368,47 +1364,51 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         ++MaterNum;
-        auto *thisMaterial = new MaterialChild;
-        state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->group = Group::WindowGasMixture;
-        thisMaterial->gasTypes = GasType::Invalid;
+        auto *matGas = new MaterialGasMixture;
+        state.dataMaterial->Material(MaterNum) = matGas;
+        matGas->group = Group::WindowGasMixture;
+        matGas->gasTypes = GasType::Invalid;
 
         // Load the material derived type from the input data.
 
-        thisMaterial->Name = state.dataIPShortCut->cAlphaArgs(1);
+        matGas->Name = state.dataIPShortCut->cAlphaArgs(1);
         NumGases = MaterialProps(2);
-        thisMaterial->NumberOfGasesInMixture = NumGases;
+        matGas->numGases = NumGases;
         for (NumGas = 1; NumGas <= NumGases; ++NumGas) {
-            thisMaterial->gasTypes(NumGas) =
-                static_cast<GasType>(getEnumValue(GasTypeUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(1 + NumGas))));
+             matGas->gasTypes(NumGas) = static_cast<GasType>(getEnumValue(GasTypeUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(1 + NumGas))));
+             if (matGas->gasTypes(NumGas) == GasType::Invalid) {
+                 ShowSevereError(state, format("{}=\"{}\", Illegal value.", state.dataHeatBalMgr->CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1 + NumGas)));
+                     // Error check?
+                 ErrorsFound = true;
+             }
         }
 
-        thisMaterial->Roughness = SurfaceRoughness::MediumRough; // Unused
+        matGas->Roughness = SurfaceRoughness::MediumRough; // Unused
 
-        thisMaterial->Thickness = MaterialProps(1);
-        if (thisMaterial->Thickness <= 0.0) {
-            ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", Illegal value.");
+        matGas->Thickness = MaterialProps(1);
+        if (matGas->Thickness <= 0.0) {
+            ShowSevereError(state, format("{}=\"{}\", Illegal value.", state.dataHeatBalMgr->CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(1) + " must be greater than 0.");
         }
-        thisMaterial->ROnly = true;
+        matGas->ROnly = true;
 
         for (NumGas = 1; NumGas <= NumGases; ++NumGas) {
-            gasType = thisMaterial->gasTypes(NumGas);
+            gasType = matGas->gasTypes(NumGas);
             if (gasType != GasType::Custom) {
-                thisMaterial->GasWght(NumGas) = GasWght[static_cast<int>(gasType)];
-                thisMaterial->GasSpecHeatRatio(NumGas) = GasSpecificHeatRatio[static_cast<int>(gasType)];
-                thisMaterial->GasFract(NumGas) = MaterialProps(2 + NumGas);
+                matGas->GasWght(NumGas) = GasWght[static_cast<int>(gasType)];
+                matGas->GasSpecHeatRatio(NumGas) = GasSpecificHeatRatio[static_cast<int>(gasType)];
+                matGas->GasFract(NumGas) = MaterialProps(2 + NumGas);
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    thisMaterial->GasCon(ICoeff, NumGas) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
-                    thisMaterial->GasVis(ICoeff, NumGas) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
-                    thisMaterial->GasCp(ICoeff, NumGas) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
+                    matGas->GasCon(ICoeff, NumGas) = GasCoeffsCon[ICoeff - 1][static_cast<int>(gasType)];
+                    matGas->GasVis(ICoeff, NumGas) = GasCoeffsVis[ICoeff - 1][static_cast<int>(gasType)];
+                    matGas->GasCp(ICoeff, NumGas) = GasCoeffsCp[ICoeff - 1][static_cast<int>(gasType)];
                 }
             }
         }
 
         // Nominal resistance of gap at room temperature (based on first gas in mixture)
         state.dataHeatBal->NominalR(MaterNum) =
-            thisMaterial->Thickness / (thisMaterial->GasCon(1, 1) + thisMaterial->GasCon(2, 1) * 300.0 + thisMaterial->GasCon(3, 1) * 90000.0);
+            matGas->Thickness / (matGas->GasCon(1, 1) + matGas->GasCon(2, 1) * 300.0 + matGas->GasCon(3, 1) * 90000.0);
     }
 
     // Window Shade Materials
@@ -1708,44 +1708,41 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         ++MaterNum;
-        auto *thisMaterial = new MaterialChild;
-        state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->group = Group::Screen;
+        auto *matScreen = new MaterialScreen;
+        state.dataMaterial->Material(MaterNum) = matScreen;
 
         // Load the material derived type from the input data.
 
-        thisMaterial->Name = MaterialNames(1);
-        thisMaterial->ReflectanceModeling = MaterialNames(2);
-        if (!(Util::SameString(MaterialNames(2), "DoNotModel") || Util::SameString(MaterialNames(2), "ModelAsDirectBeam") ||
-              Util::SameString(MaterialNames(2), "ModelAsDiffuse"))) {
+        matScreen->Name = MaterialNames(1);
+        matScreen->bmRefModel = static_cast<ScreenBeamReflectanceModel>(getEnumValue(ScreenBeamReflectanceModelNamesUC, Util::makeUPPER(MaterialNames(2))));
+        if (matScreen->bmRefModel == ScreenBeamReflectanceModel::Invalid) {
+            ShowSevereError(state, format("{}=\"{}\", Illegal value.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
+            ShowContinueError(state, format("{}=\"{}\", must be one of DoNotModel, ModelAsDirectBeam or ModelAsDiffuse.",
+                                            state.dataIPShortCut->cAlphaFieldNames(2), MaterialNames(2)));
             ErrorsFound = true;
-            ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-            ShowContinueError(state,
-                              state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + MaterialNames(2) +
-                                  "\", must be one of DoNotModel, ModelAsDirectBeam or ModelAsDiffuse.");
         }
-        thisMaterial->Roughness = SurfaceRoughness::MediumRough;
-        thisMaterial->ReflectShade = MaterialProps(1);
-        if (thisMaterial->ReflectShade < 0.0 || thisMaterial->ReflectShade > 1.0) {
+        matScreen->Roughness = SurfaceRoughness::MediumRough;
+        matScreen->ShadeRef = MaterialProps(1);
+        if (matScreen->ShadeRef < 0.0 || matScreen->ShadeRef > 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(1) + " must be >= 0 and <= 1");
         }
-        thisMaterial->ReflectShadeVis = MaterialProps(2);
-        if (thisMaterial->ReflectShadeVis < 0.0 || thisMaterial->ReflectShadeVis > 1.0) {
+        matScreen->ShadeRefVis = MaterialProps(2);
+        if (matScreen->ShadeRefVis < 0.0 || matScreen->ShadeRefVis > 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(2) + " must be >= 0 and <= 1 for material " + thisMaterial->Name + '.');
+            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(2) + " must be >= 0 and <= 1 for material " + matScreen->Name + '.');
         }
-        thisMaterial->AbsorpThermal = MaterialProps(3);
-        thisMaterial->AbsorpThermalInput = MaterialProps(3);
-        if (thisMaterial->AbsorpThermal < 0.0 || thisMaterial->AbsorpThermal > 1.0) {
+        matScreen->AbsorpThermal = MaterialProps(3);
+        matScreen->AbsorpThermalInput = MaterialProps(3);
+        if (matScreen->AbsorpThermal < 0.0 || matScreen->AbsorpThermal > 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(3) + " must be >= 0 and <= 1");
         }
-        thisMaterial->Conductivity = MaterialProps(4);
-        thisMaterial->Thickness = MaterialProps(6); // thickness = diameter
+        matScreen->Conductivity = MaterialProps(4);
+        matScreen->Thickness = MaterialProps(6); // thickness = diameter
 
         if (MaterialProps(5) > 0.0) {
             //      Screens(ScNum)%ScreenDiameterToSpacingRatio = MaterialProps(6)/MaterialProps(5) or
@@ -1757,7 +1754,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                                   state.dataIPShortCut->cNumericFieldNames(6) + " must be less than " + state.dataIPShortCut->cNumericFieldNames(5));
             } else {
                 //       Calculate direct normal transmittance (open area fraction)
-                thisMaterial->Trans = pow_2(1.0 - MaterialProps(6) / MaterialProps(5));
+                matScreen->Trans = pow_2(1.0 - MaterialProps(6) / MaterialProps(5));
             }
         } else {
             ErrorsFound = true;
@@ -1773,91 +1770,91 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         //   Modify reflectance to account for the open area in the screen assembly
-        thisMaterial->ReflectShade *= (1.0 - thisMaterial->Trans);
-        thisMaterial->ReflectShadeVis *= (1.0 - thisMaterial->Trans);
+        matScreen->ShadeRef *= (1.0 - matScreen->Trans);
+        matScreen->ShadeRefVis *= (1.0 - matScreen->Trans);
 
-        thisMaterial->WinShadeToGlassDist = MaterialProps(7);
-        if (thisMaterial->WinShadeToGlassDist < 0.001 || thisMaterial->WinShadeToGlassDist > 1.0) {
+        matScreen->toGlassDist = MaterialProps(7);
+        if (matScreen->toGlassDist < 0.001 || matScreen->toGlassDist > 1.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state,
                               state.dataIPShortCut->cNumericFieldNames(7) + " must be greater than or equal to 0.001 and less than or equal to 1.");
         }
 
-        thisMaterial->WinShadeTopOpeningMult = MaterialProps(8);
-        if (thisMaterial->WinShadeTopOpeningMult < 0.0 || thisMaterial->WinShadeTopOpeningMult > 1.0) {
+        matScreen->topOpeningMult = MaterialProps(8);
+        if (matScreen->topOpeningMult < 0.0 || matScreen->topOpeningMult > 1.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state,
                               state.dataIPShortCut->cNumericFieldNames(8) + " must be greater than or equal to 0 and less than or equal to 1.");
         }
 
-        thisMaterial->WinShadeBottomOpeningMult = MaterialProps(9);
-        if (thisMaterial->WinShadeBottomOpeningMult < 0.0 || thisMaterial->WinShadeBottomOpeningMult > 1.0) {
+        matScreen->bottomOpeningMult = MaterialProps(9);
+        if (matScreen->bottomOpeningMult < 0.0 || matScreen->bottomOpeningMult > 1.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state,
                               state.dataIPShortCut->cNumericFieldNames(9) + " must be greater than or equal to 0 and less than or equal to 1.");
         }
 
-        thisMaterial->WinShadeLeftOpeningMult = MaterialProps(10);
-        if (thisMaterial->WinShadeLeftOpeningMult < 0.0 || thisMaterial->WinShadeLeftOpeningMult > 1.0) {
+        matScreen->leftOpeningMult = MaterialProps(10);
+        if (matScreen->leftOpeningMult < 0.0 || matScreen->leftOpeningMult > 1.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state,
                               state.dataIPShortCut->cNumericFieldNames(10) + " must be greater than or equal to 0 and less than or equal to 1.");
         }
 
-        thisMaterial->WinShadeRightOpeningMult = MaterialProps(11);
-        if (thisMaterial->WinShadeRightOpeningMult < 0.0 || thisMaterial->WinShadeRightOpeningMult > 1.0) {
+        matScreen->rightOpeningMult = MaterialProps(11);
+        if (matScreen->rightOpeningMult < 0.0 || matScreen->rightOpeningMult > 1.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state,
                               state.dataIPShortCut->cNumericFieldNames(11) + " must be greater than or equal to 0 and less than or equal to 1.");
         }
 
-        thisMaterial->ScreenMapResolution = MaterialProps(12);
-        if (thisMaterial->ScreenMapResolution < 0 || thisMaterial->ScreenMapResolution > 5 || thisMaterial->ScreenMapResolution == 4) {
+        matScreen->mapDegResolution = MaterialProps(12);
+        if (matScreen->mapDegResolution < 0 || matScreen->mapDegResolution > 5 || matScreen->mapDegResolution == 4) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(12) + " must be 0, 1, 2, 3, or 5.");
             ErrorsFound = true;
         }
 
         //   Default air flow permeability to open area fraction
-        thisMaterial->WinShadeAirFlowPermeability = thisMaterial->Trans;
-        thisMaterial->TransThermal = thisMaterial->Trans;
-        thisMaterial->TransVis = thisMaterial->Trans;
+        matScreen->airFlowPermeability = matScreen->Trans;
+        matScreen->TransThermal = matScreen->Trans;
+        matScreen->TransVis = matScreen->Trans;
 
-        thisMaterial->ROnly = true;
+        matScreen->ROnly = true;
 
         //   Calculate absorptance accounting for the open area in the screen assembly (used only in CreateShadedWindowConstruction)
-        thisMaterial->AbsorpSolar = max(0.0, 1.0 - thisMaterial->Trans - thisMaterial->ReflectShade);
-        thisMaterial->AbsorpSolarInput = thisMaterial->AbsorpSolar;
-        thisMaterial->AbsorpVisible = max(0.0, 1.0 - thisMaterial->TransVis - thisMaterial->ReflectShadeVis);
-        thisMaterial->AbsorpVisibleInput = thisMaterial->AbsorpVisible;
-        thisMaterial->AbsorpThermal *= (1.0 - thisMaterial->Trans);
-        thisMaterial->AbsorpThermalInput = thisMaterial->AbsorpThermal;
+        matScreen->AbsorpSolar = max(0.0, 1.0 - matScreen->Trans - matScreen->ShadeRef);
+        matScreen->AbsorpSolarInput = matScreen->AbsorpSolar;
+        matScreen->AbsorpVisible = max(0.0, 1.0 - matScreen->TransVis - matScreen->ShadeRefVis);
+        matScreen->AbsorpVisibleInput = matScreen->AbsorpVisible;
+        matScreen->AbsorpThermal *= (1.0 - matScreen->Trans);
+        matScreen->AbsorpThermalInput = matScreen->AbsorpThermal;
 
-        if (thisMaterial->Conductivity > 0.0) {
-            state.dataHeatBal->NominalR(MaterNum) = (1.0 - thisMaterial->Trans) * thisMaterial->Thickness / thisMaterial->Conductivity;
+        if (matScreen->Conductivity > 0.0) {
+            state.dataHeatBal->NominalR(MaterNum) = (1.0 - matScreen->Trans) * matScreen->Thickness / matScreen->Conductivity;
         } else {
             state.dataHeatBal->NominalR(MaterNum) = 1.0;
             ShowWarningError(
                 state,
-                "Conductivity for material=\"" + thisMaterial->Name +
+                "Conductivity for material=\"" + matScreen->Name +
                     "\" must be greater than 0 for calculating Nominal R-value, Nominal R is defaulted to 1 and the simulation continues.");
         }
 
-        if (thisMaterial->Trans + thisMaterial->ReflectShade >= 1.0) {
+        if (matScreen->Trans + matScreen->ShadeRef >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowContinueError(state, "Calculated solar transmittance + solar reflectance not < 1.0");
             ShowContinueError(state, "See Engineering Reference for calculation procedure for solar transmittance.");
         }
 
-        if (thisMaterial->TransVis + thisMaterial->ReflectShadeVis >= 1.0) {
+        if (matScreen->TransVis + matScreen->ShadeRefVis >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowContinueError(state, "Calculated visible transmittance + visible reflectance not < 1.0");
             ShowContinueError(state, "See Engineering Reference for calculation procedure for visible solar transmittance.");
         }
 
-        if (thisMaterial->TransThermal + thisMaterial->AbsorpThermal >= 1.0) {
+        if (matScreen->TransThermal + matScreen->AbsorpThermal >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowSevereError(state, "Thermal hemispherical emissivity plus open area fraction (1-diameter/spacing)**2 not < 1.0");
@@ -1893,32 +1890,32 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
 
         ++MaterNum;
-        auto *thisMaterial = new MaterialChild;
-        state.dataMaterial->Material(MaterNum) = thisMaterial;
-        thisMaterial->group = Group::ScreenEquivalentLayer;
+        auto *matScreen = new MaterialChild;
+        state.dataMaterial->Material(MaterNum) = matScreen;
+        matScreen->group = Group::ScreenEquivalentLayer;
 
         // Load the material derived type from the input data.
         // WindowMaterial:Screen:EquivalentLayer,
-        thisMaterial->Name = MaterialNames(1);
-        thisMaterial->Roughness = SurfaceRoughness::MediumRough;
-        thisMaterial->ROnly = true;
-        thisMaterial->TausFrontBeamBeam = MaterialProps(1);
-        thisMaterial->TausBackBeamBeam = MaterialProps(1);
-        thisMaterial->TausFrontBeamDiff = MaterialProps(2);
-        thisMaterial->TausBackBeamDiff = MaterialProps(2);
-        thisMaterial->ReflFrontBeamDiff = MaterialProps(3);
-        thisMaterial->ReflBackBeamDiff = MaterialProps(3);
-        thisMaterial->TausFrontBeamBeamVis = MaterialProps(4);
-        thisMaterial->TausFrontBeamDiffVis = MaterialProps(5);
-        thisMaterial->ReflFrontDiffDiffVis = MaterialProps(6);
-        thisMaterial->TausThermal = MaterialProps(7);
-        thisMaterial->EmissThermalFront = MaterialProps(8);
-        thisMaterial->EmissThermalBack = MaterialProps(8);
+        matScreen->Name = MaterialNames(1);
+        matScreen->Roughness = SurfaceRoughness::MediumRough;
+        matScreen->ROnly = true;
+        matScreen->TausFrontBeamBeam = MaterialProps(1);
+        matScreen->TausBackBeamBeam = MaterialProps(1);
+        matScreen->TausFrontBeamDiff = MaterialProps(2);
+        matScreen->TausBackBeamDiff = MaterialProps(2);
+        matScreen->ReflFrontBeamDiff = MaterialProps(3);
+        matScreen->ReflBackBeamDiff = MaterialProps(3);
+        matScreen->TausFrontBeamBeamVis = MaterialProps(4);
+        matScreen->TausFrontBeamDiffVis = MaterialProps(5);
+        matScreen->ReflFrontDiffDiffVis = MaterialProps(6);
+        matScreen->TausThermal = MaterialProps(7);
+        matScreen->EmissThermalFront = MaterialProps(8);
+        matScreen->EmissThermalBack = MaterialProps(8);
 
         // Assumes thermal emissivity is the same as thermal absorptance
-        thisMaterial->AbsorpThermalFront = thisMaterial->EmissThermalFront;
-        thisMaterial->AbsorpThermalBack = thisMaterial->EmissThermalBack;
-        thisMaterial->TransThermal = thisMaterial->TausThermal;
+        matScreen->AbsorpThermalFront = matScreen->EmissThermalFront;
+        matScreen->AbsorpThermalBack = matScreen->EmissThermalBack;
+        matScreen->TransThermal = matScreen->TausThermal;
 
         if (MaterialProps(3) < 0.0 || MaterialProps(3) > 1.0) {
             ErrorsFound = true;
@@ -1929,69 +1926,69 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         if (MaterialProps(6) < 0.0 || MaterialProps(6) > 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(6) + " must be >= 0 and <= 1 for material " + thisMaterial->Name + '.');
+            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(6) + " must be >= 0 and <= 1 for material " + matScreen->Name + '.');
         }
 
         if (!state.dataIPShortCut->lNumericFieldBlanks(9)) {
             if (MaterialProps(9) > 0.00001) {
-                thisMaterial->ScreenWireSpacing = MaterialProps(9); // screen wire spacing
+                matScreen->ScreenWireSpacing = MaterialProps(9); // screen wire spacing
             } else {
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(9) + " must be > 0.");
                 ShowContinueError(state, "...Setting screen wire spacing to a default value of 0.025m and simulation continues.");
-                thisMaterial->ScreenWireSpacing = 0.025;
+                matScreen->ScreenWireSpacing = 0.025;
             }
         }
 
         if (!state.dataIPShortCut->lNumericFieldBlanks(10)) {
-            if (MaterialProps(10) > 0.00001 && MaterialProps(10) < thisMaterial->ScreenWireSpacing) {
-                thisMaterial->ScreenWireDiameter = MaterialProps(10); // screen wire spacing
+            if (MaterialProps(10) > 0.00001 && MaterialProps(10) < matScreen->ScreenWireSpacing) {
+                matScreen->ScreenWireDiameter = MaterialProps(10); // screen wire spacing
             } else {
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(10) + " must be > 0.");
                 ShowContinueError(state, "...Setting screen wire diameter to a default value of 0.005m and simulation continues.");
-                thisMaterial->ScreenWireDiameter = 0.005;
+                matScreen->ScreenWireDiameter = 0.005;
             }
         }
 
-        if (thisMaterial->ScreenWireSpacing > 0.0) {
-            if (thisMaterial->ScreenWireDiameter / thisMaterial->ScreenWireSpacing >= 1.0) {
+        if (matScreen->ScreenWireSpacing > 0.0) {
+            if (matScreen->ScreenWireDiameter / matScreen->ScreenWireSpacing >= 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                 ShowContinueError(state,
                                   state.dataIPShortCut->cNumericFieldNames(10) + " must be less than " + state.dataIPShortCut->cNumericFieldNames(9));
             } else {
                 //  Calculate direct normal transmittance (open area fraction)
-                Openness = pow_2(1.0 - thisMaterial->ScreenWireDiameter / thisMaterial->ScreenWireSpacing);
-                if ((thisMaterial->TausFrontBeamBeam - Openness) / Openness > 0.01) {
+                Openness = pow_2(1.0 - matScreen->ScreenWireDiameter / matScreen->ScreenWireSpacing);
+                if ((matScreen->TausFrontBeamBeam - Openness) / Openness > 0.01) {
                     ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", screen openness specified.");
                     ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(1) + " is > 1.0% of the value calculated from input fields:");
                     ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(9) + " and " + (state.dataIPShortCut->cNumericFieldNames(10)));
                     ShowContinueError(state, " using the formula (1-diameter/spacing)**2");
                     ShowContinueError(state, " ...the screen diameter is recalculated from the material openness specified ");
                     ShowContinueError(state, " ...and wire spacing using the formula = wire spacing * (1.0 - SQRT(Opennes))");
-                    thisMaterial->ScreenWireDiameter = thisMaterial->ScreenWireSpacing * (1.0 - std::sqrt(thisMaterial->TausFrontBeamBeam));
+                    matScreen->ScreenWireDiameter = matScreen->ScreenWireSpacing * (1.0 - std::sqrt(matScreen->TausFrontBeamBeam));
                     ShowContinueError(
                         state,
-                        format(" ...Recalculated {}={:.4R} m", state.dataIPShortCut->cNumericFieldNames(10), thisMaterial->ScreenWireDiameter));
+                        format(" ...Recalculated {}={:.4R} m", state.dataIPShortCut->cNumericFieldNames(10), matScreen->ScreenWireDiameter));
                 }
             }
         }
 
-        if (thisMaterial->TausFrontBeamBeam + thisMaterial->ReflFrontBeamDiff >= 1.0) {
+        if (matScreen->TausFrontBeamBeam + matScreen->ReflFrontBeamDiff >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowContinueError(state, "Calculated solar transmittance + solar reflectance not < 1.0");
             ShowContinueError(state, "See Engineering Reference for calculation procedure for solar transmittance.");
         }
 
-        if (thisMaterial->TausFrontBeamBeamVis + thisMaterial->ReflFrontDiffDiffVis >= 1.0) {
+        if (matScreen->TausFrontBeamBeamVis + matScreen->ReflFrontDiffDiffVis >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowContinueError(state, "Calculated visible transmittance + visible reflectance not < 1.0");
             ShowContinueError(state, "See Engineering Reference for calculation procedure for visible solar transmittance.");
         }
-        if (thisMaterial->TransThermal + thisMaterial->AbsorpThermal >= 1.0) {
+        if (matScreen->TransThermal + matScreen->AbsorpThermal >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowSevereError(state, "Thermal hemispherical emissivity plus open area fraction (1-diameter/spacing)**2 not < 1.0");
@@ -2680,6 +2677,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             ShowContinueError(state, "...All Material names must be unique regardless of subtype.");
             continue;
         }
+        
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
@@ -2777,6 +2775,11 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
     // try assigning phase change material properties for each material, won't do anything for non pcm surfaces
     for (auto *mBase : state.dataMaterial->Material) {
+        if (mBase->group == Material::Group::Screen ||
+            mBase->group == Material::Group::WindowGas || 
+            mBase->group == Material::Group::WindowGasMixture ||
+            mBase->group == Material::Group::GapEquivalentLayer) continue;
+            
         auto *m = dynamic_cast<MaterialChild *>(mBase);
         assert(m != nullptr);
         m->phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory(state, m->Name);
@@ -2884,4 +2887,223 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
     }
 }
 
+void CalcScreenTransmittance(EnergyPlusData &state,
+                             Real64 surfTilt, 
+                             MaterialScreen const *screen,
+                             Real64 phi,     // Optional sun altitude relative to surface outward normal (radians)
+                             Real64 theta,   // Optional sun azimuth relative to surface outward normal (radians)
+                             ScreenBmTransAbsRef &tar
+)
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Richard Raustad
+    //       DATE WRITTEN   May 2006
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    //  Calculate transmittance of window screen given azimuth and altitude angle
+    //  of sun and surface orientation.
+
+    // METHODOLOGY EMPLOYED:
+    //  Window screen solar beam transmittance varies as the sun moves across the sky
+    //  due to the geometry of the screen material and the angle of incidence
+    //  of the solar beam. Azimuth and altitude angle are calculated with respect
+    //  to the surface outward normal. Solar beam reflectance and absorptance are also
+    //  accounted for.
+
+    Real64 constexpr Small(1.E-9); // Small Number used to approximate zero
+
+    Real64 Tdirect;                   // Beam solar transmitted through screen (dependent on sun angle)
+    Real64 Tscattered;                // Beam solar reflected through screen (dependent on sun angle)
+    Real64 TscatteredVis;             // Visible beam solar reflected through screen (dependent on sun angle)
+    Real64 Tscattermax;               // Maximum solar beam  scattered transmittance
+    Real64 TscattermaxVis;            // Maximum visible beam scattered transmittance
+    Real64 ExponentInterior;          // Exponent used in scattered transmittance calculation
+    // when Delta < DeltaMax (0,0 to peak)
+    Real64 ExponentExterior; // Exponent used in scattered transmittance calculation
+    // when Delta > DeltaMax (peak to max)
+    Real64 IncidentAngle;  // Solar angle wrt surface outward normal to determine
+    // if sun is in front of screen (rad)
+
+    NormalizePhiTheta(phi, theta);
+    Real64 sinPhi = std::sin(phi);
+    Real64 cosPhi = std::cos(phi);
+    Real64 sinTheta = std::sin(theta);
+    Real64 cosTheta = std::cos(theta);
+    
+    Real64 NormalAltitude = phi; // + surfTilt - Constant::PiOvr2;
+    Real64 NormalAzimuth = theta;
+
+    if (NormalAltitude != 0.0 && NormalAzimuth != 0.0) {
+        IncidentAngle = std::acos(std::sin(NormalAltitude) / (std::tan(NormalAzimuth) * std::tan(NormalAltitude) / std::sin(NormalAzimuth)));
+    } else if (NormalAltitude != 0.0 && NormalAzimuth == 0.0) {
+        IncidentAngle = NormalAltitude;
+    } else if (NormalAltitude == 0.0 && NormalAzimuth != 0.0) {
+        IncidentAngle = NormalAzimuth;
+    } else {
+        IncidentAngle = 0.0;
+    }
+
+    // ratio of screen material diameter to screen material spacing
+    Real64 Gamma = screen->diameterToSpacingRatio;
+
+    // ************************************************************************************************
+    // * calculate transmittance of totally absorbing screen material (beam passing through open area)*
+    // ************************************************************************************************
+
+    // calculate compliment of relative solar azimuth
+    Real64 Beta = Constant::PiOvr2 - theta;
+
+    // Catch all divide by zero instances
+    Real64 TransYDir;
+    Real64 TransXDir;
+    if (Beta > Small && std::abs(phi - Constant::PiOvr2) > Small) {
+        Real64 AlphaDblPrime = std::atan(std::tan(phi) / std::cos(theta));
+        TransYDir = 1.0 - Gamma * (std::cos(AlphaDblPrime) + std::sin(AlphaDblPrime) * std::tan(phi) * std::sqrt(1.0 + pow_2(1.0 / std::tan(Beta))));
+        TransYDir = max(0.0, TransYDir);
+    } else {
+        TransYDir = 0.0;
+    }
+
+    Real64 COSMu = std::sqrt(pow_2(cosPhi) * pow_2(cosTheta) + pow_2(sinPhi));
+    if (COSMu <= Small) {
+        TransXDir = 1.0 - Gamma;
+    } else {            
+        Real64 Epsilon = std::acos(cosPhi * cosTheta / COSMu);
+        Real64 Eta = Constant::PiOvr2 - Epsilon;
+        if (std::cos(Epsilon) != 0.0 && Eta != 0.0) {
+            Real64 MuPrime = std::atan(std::tan(std::acos(COSMu)) / std::cos(Epsilon));
+            TransXDir = 1.0 - Gamma * (std::cos(MuPrime) + std::sin(MuPrime) * std::tan(std::acos(COSMu)) * std::sqrt(1.0 + pow_2(1.0 / std::tan(Eta))));
+            TransXDir = max(0.0, TransXDir);
+        } else {
+            TransXDir = 0.0;
+        }
+    }
+    Tdirect = max(0.0, TransXDir * TransYDir);
+
+    // *******************************************************************************
+    // * calculate transmittance of scattered beam due to reflecting screen material *
+    // *******************************************************************************
+
+    Real64 ReflCyl = screen->CylinderRef;
+    Real64 ReflCylVis = screen->CylinderRefVis;
+
+    if (std::abs(theta - Constant::PiOvr2) < Small || std::abs(phi - Constant::PiOvr2) < Small) {
+        Tscattered = 0.0;
+        TscatteredVis = 0.0;
+    } else {
+        //   DeltaMax and Delta are in degrees
+        Real64 DeltaMax = 89.7 - (10.0 * Gamma / 0.16);
+        Real64 Delta = std::sqrt(pow_2(theta / Constant::DegToRadians) + pow_2(phi / Constant::DegToRadians));
+
+        //   Use empirical model to determine maximum (peak) scattering
+        Real64 Tscattermax = 0.0229 * Gamma + 0.2971 * ReflCyl - 0.03624 * pow_2(Gamma) + 0.04763 * pow_2(ReflCyl) - 0.44416 * Gamma * ReflCyl;
+        Real64 TscattermaxVis = 0.0229 * Gamma + 0.2971 * ReflCylVis - 0.03624 * pow_2(Gamma) + 0.04763 * pow_2(ReflCylVis) - 0.44416 * Gamma * ReflCylVis;
+
+        //   Vary slope of interior and exterior surface of scattering model
+        Real64 ExponentInterior = -pow_2(Delta - DeltaMax) / 600.0;
+        Real64 ExponentExterior = -std::pow(std::abs(Delta - DeltaMax), 2.5) / 600.0;
+
+        //   Determine ratio of scattering at 0,0 incident angle to maximum (peak) scattering
+        Real64 PeakToPlateauRatio = 1.0 / (0.2 * (1 - Gamma) * ReflCyl);
+        Real64 PeakToPlateauRatioVis = 1.0 / (0.2 * (1 - Gamma) * ReflCylVis);
+
+        //     Apply offset for plateau and use exterior exponential function to simulate actual scattering as a function of solar angles
+        if (Delta > DeltaMax) {
+            Tscattered = 0.2 * (1.0 - Gamma) * ReflCyl * Tscattermax * (1.0 + (PeakToPlateauRatio - 1.0) * std::exp(ExponentExterior));
+            TscatteredVis = 0.2 * (1.0 - Gamma) * ReflCylVis * TscattermaxVis * (1.0 + (PeakToPlateauRatioVis - 1.0) * std::exp(ExponentExterior));
+            //     Trim off offset if solar angle (delta) is greater than maximum (peak) scattering angle
+            Tscattered -= (0.2 * (1.0 - Gamma) * ReflCyl * Tscattermax) * max(0.0, (Delta - DeltaMax) / (90.0 - DeltaMax));
+            TscatteredVis -= (0.2 * (1.0 - Gamma) * ReflCylVis * TscattermaxVis) * max(0.0, (Delta - DeltaMax) / (90.0 - DeltaMax));
+        } else {
+            Tscattered = 0.2 * (1.0 - Gamma) * ReflCyl * Tscattermax * (1.0 + (PeakToPlateauRatio - 1.0) * std::exp(ExponentInterior));
+            TscatteredVis = 0.2 * (1.0 - Gamma) * ReflCylVis * TscattermaxVis * (1.0 + (PeakToPlateauRatioVis - 1.0) * std::exp(ExponentInterior));
+        }
+    }
+    Tscattered = max(0.0, Tscattered);
+    TscatteredVis = max(0.0, TscatteredVis);
+
+    if (screen->bmRefModel == Material::ScreenBeamReflectanceModel::DoNotModel) {
+        if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
+            tar.BmTrans = Tdirect;
+            tar.BmTransVis = Tdirect;
+            tar.BmTransBack = 0.0;
+        } else {
+            tar.BmTrans = 0.0;
+            tar.BmTransVis = 0.0;
+            tar.BmTransBack = Tdirect;
+        }
+        Tscattered = 0.0;
+        TscatteredVis = 0.0;
+    } else if (screen->bmRefModel == Material::ScreenBeamReflectanceModel::DirectBeam) {
+        if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
+            tar.BmTrans = Tdirect + Tscattered;
+            tar.BmTransVis = Tdirect + TscatteredVis;
+            tar.BmTransBack = 0.0;
+        } else {
+            tar.BmTrans = 0.0;
+            tar.BmTransVis = 0.0;
+            tar.BmTransBack = Tdirect + Tscattered;
+        }
+        Tscattered = 0.0;
+        TscatteredVis = 0.0;
+    } else if (screen->bmRefModel == Material::ScreenBeamReflectanceModel::Diffuse) {
+        if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
+            tar.BmTrans = Tdirect;
+            tar.BmTransVis = Tdirect;
+            tar.BmTransBack = 0.0;
+        } else {
+            tar.BmTrans = 0.0;
+            tar.BmTransVis = 0.0;
+            tar.BmTransBack = Tdirect;
+        }
+    }
+
+    if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
+        tar.DfTrans = Tscattered;
+        tar.DfTransVis = TscatteredVis;
+        tar.DfTransBack = 0.0;
+        tar.RefSolFront = max(0.0, ReflCyl * (1.0 - Tdirect) - Tscattered);
+        tar.RefVisFront = max(0.0, ReflCylVis * (1.0 - Tdirect) - TscatteredVis);
+        tar.AbsSolFront = max(0.0, (1.0 - Tdirect) * (1.0 - ReflCyl));
+        tar.RefSolBack = 0.0;
+        tar.RefVisBack = 0.0;
+        tar.AbsSolBack = 0.0;
+    } else {
+        tar.DfTrans = 0.0;
+        tar.DfTransVis = 0.0;
+        tar.DfTransBack = Tscattered;
+        tar.RefSolBack = max(0.0, ReflCyl * (1.0 - Tdirect) - Tscattered);
+        tar.RefVisBack = max(0.0, ReflCylVis * (1.0 - Tdirect) - TscatteredVis);
+        tar.AbsSolBack = max(0.0, (1.0 - Tdirect) * (1.0 - ReflCyl));
+        tar.RefSolFront = 0.0;
+        tar.RefVisFront = 0.0;
+        tar.AbsSolFront = 0.0;
+    }
+} // CalcScreenTransmittance()
+        
+void NormalizePhiTheta(Real64 &Phi, Real64 &Theta) {
+    Theta = std::abs(Theta);
+    if (Theta > Constant::Pi) {
+        Theta = 0.0;
+    } else if (Theta > Constant::PiOvr2) {
+        Theta = Constant::Pi - Theta;
+    }
+    
+    Phi = std::abs(Phi);
+    if (Phi > Constant::PiOvr2) {
+        Phi = Constant::Pi - Phi;
+    }
+} // NormalizePhiTheta()
+
+void GetPhiThetaIndices(Real64 phi, Real64 theta, Real64 dPhi, Real64 dTheta, int &iPhi1, int &iPhi2, int &iTheta1, int &iTheta2)
+{
+    iPhi1 = int(phi / dPhi);
+    iPhi2 = (phi == Constant::PiOvr2) ? iPhi1 : iPhi1 + 1;
+    iTheta1 = int(theta / dTheta);
+    iTheta2 = (theta == Constant::PiOvr2) ? iTheta1 : iTheta1 + 1;
+} // GetPhiThetaIndices()
+                        
 } // namespace EnergyPlus::Material

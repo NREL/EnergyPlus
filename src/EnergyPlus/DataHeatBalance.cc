@@ -353,20 +353,19 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
     thisConstruct.DayltPropPtr = 0;
     int InsideMaterNum = thisConstruct.LayerPoint(InsideLayer); // Material "number" of the Inside layer
     if (InsideMaterNum != 0) {
-        auto const *thisMaterialInside = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(InsideMaterNum));
-        thisConstruct.InsideAbsorpVis = thisMaterialInside->AbsorpVisible;
-        thisConstruct.InsideAbsorpSolar = thisMaterialInside->AbsorpSolar;
+        auto const *mat = state.dataMaterial->Material(InsideMaterNum);
+        thisConstruct.InsideAbsorpVis = mat->AbsorpVisible;
+        thisConstruct.InsideAbsorpSolar = mat->AbsorpSolar;
 
         // Following line applies only to opaque surfaces; it is recalculated later for windows.
-        thisConstruct.ReflectVisDiffBack = 1.0 - thisMaterialInside->AbsorpVisible;
+        thisConstruct.ReflectVisDiffBack = 1.0 - mat->AbsorpVisible;
     }
 
     int OutsideMaterNum = thisConstruct.LayerPoint(1); // Material "number" of the Outside layer
     if (OutsideMaterNum != 0) {
-        auto const *thisMaterialOutside = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(OutsideMaterNum));
-        assert(thisMaterialOutside != nullptr);
-        thisConstruct.OutsideAbsorpVis = thisMaterialOutside->AbsorpVisible;
-        thisConstruct.OutsideAbsorpSolar = thisMaterialOutside->AbsorpSolar;
+        auto const *mat = state.dataMaterial->Material(OutsideMaterNum);
+        thisConstruct.OutsideAbsorpVis = mat->AbsorpVisible;
+        thisConstruct.OutsideAbsorpSolar = mat->AbsorpSolar;
     }
 
     thisConstruct.TotSolidLayers = 0;
@@ -397,9 +396,9 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
     }
 
     if (InsideMaterNum == 0) return;
-    auto const *thisMaterialInside = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(InsideMaterNum));
+    auto const *thisMaterialInside = state.dataMaterial->Material(InsideMaterNum);
     if (OutsideMaterNum == 0) return;
-    auto const *thisMaterialOutside = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(OutsideMaterNum));
+    auto const *thisMaterialOutside = state.dataMaterial->Material(OutsideMaterNum);
 
     if (thisConstruct.TypeIsWindow) {
 
@@ -500,14 +499,19 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
 
         // If there is a diffusing glass layer no shade, screen or blind is allowed
         for (int Layer = 1; Layer <= TotLayers; ++Layer) {
-            int const MaterNum = thisConstruct.LayerPoint(Layer);
-            if (MaterNum == 0) continue; // error -- has been caught will stop program later
-            auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
-            assert(thisMaterial != nullptr);
-            if (thisMaterial->SolarDiffusing && TotShadeLayers > 0) {
+            int const MatNum = thisConstruct.LayerPoint(Layer);
+            if (MatNum == 0) continue; // error -- has been caught will stop program later
+            auto const *mat = state.dataMaterial->Material(MatNum);
+            if (mat->group != Material::Group::WindowGlass && mat->group != Material::Group::WindowSimpleGlazing &&
+                mat->group != Material::Group::GlassEquivalentLayer)
+                continue;
+            
+            auto const *matGlass = dynamic_cast<Material::MaterialChild const *>(mat);
+            assert(matGlass != nullptr);
+            if (matGlass->SolarDiffusing && TotShadeLayers > 0) {
                 ErrorsFound = true;
                 ShowSevereError(state, format("CheckAndSetConstructionProperties: Window construction={}", thisConstruct.Name));
-                ShowContinueError(state, format("has diffusing glass={} and a shade, screen or blind layer.", thisMaterial->Name));
+                ShowContinueError(state, format("has diffusing glass={} and a shade, screen or blind layer.", matGlass->Name));
                 break;
             }
         }
@@ -516,17 +520,18 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         if (TotGlassLayers > 1) {
             int GlassLayNum = 0;
             for (int Layer = 1; Layer <= TotLayers; ++Layer) {
-                int const MaterNum = thisConstruct.LayerPoint(Layer);
-                if (MaterNum == 0) continue; // error -- has been caught will stop program later
-                auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
-                assert(thisMaterial != nullptr);
-                if (thisMaterial->group == Material::Group::WindowGlass) {
-                    ++GlassLayNum;
-                    if (GlassLayNum < TotGlassLayers && thisMaterial->SolarDiffusing) {
-                        ErrorsFound = true;
-                        ShowSevereError(state, format("CheckAndSetConstructionProperties: Window construction={}", thisConstruct.Name));
-                        ShowContinueError(state, format("has diffusing glass={} that is not the innermost glass layer.", thisMaterial->Name));
-                    }
+                int const MatNum = thisConstruct.LayerPoint(Layer);
+                if (MatNum == 0) continue; // error -- has been caught will stop program later
+                auto const *mat = state.dataMaterial->Material(MatNum);
+                if (mat->group != Material::Group::WindowGlass) continue;
+                
+                auto const *matGlass = dynamic_cast<Material::MaterialChild const *>(mat);
+                assert(matGlass != nullptr);
+                ++GlassLayNum;
+                if (GlassLayNum < TotGlassLayers && matGlass->SolarDiffusing) {
+                    ErrorsFound = true;
+                    ShowSevereError(state, format("CheckAndSetConstructionProperties: Window construction={}", thisConstruct.Name));
+                    ShowContinueError(state, format("has diffusing glass={} that is not the innermost glass layer.", matGlass->Name));
                 }
             }
         }
@@ -599,8 +604,8 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                         // Gas on either side of a between-glass shade/blind must be the same
                         int const MatGapL = thisConstruct.LayerPoint(LayNumSh - 1);
                         int const MatGapR = thisConstruct.LayerPoint(LayNumSh + 1);
-                        auto const *thisMaterialGapL = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatGapL));
-                        auto const *thisMaterialGapR = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MatGapR));
+                        auto const *thisMaterialGapL = dynamic_cast<const Material::MaterialGasMixture *>(state.dataMaterial->Material(MatGapL));
+                        auto const *thisMaterialGapR = dynamic_cast<const Material::MaterialGasMixture *>(state.dataMaterial->Material(MatGapR));
                         for (int IGas = 1; IGas <= 5; ++IGas) {
                             if ((thisMaterialGapL->gasTypes(IGas) != thisMaterialGapR->gasTypes(IGas)) ||
                                 (thisMaterialGapL->GasFract(IGas) != thisMaterialGapR->GasFract(IGas)))
@@ -939,6 +944,7 @@ void AddVariableSlatBlind(EnergyPlusData &state,
     }
 }
 
+#ifdef GET_OUT        
 void CalcScreenTransmittance(EnergyPlusData &state,
                              int const SurfaceNum,
                              ObjexxFCL::Optional<Real64 const> Phi,     // Optional sun altitude relative to surface outward normal (radians)
@@ -1072,7 +1078,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         }
         SunAltitude = SunAltitudeToScreenNormal;
     } else {
-        SunAltitude = (Constant::PiOvr2 - std::acos(state.dataEnvrn->SOLCOS(3)));
+        SunAltitude = (Constant::PiOvr2 - std::acos(state.dataEnvrn->SOLCOS.z));
         SurfaceTilt = state.dataSurface->Surface(SurfaceNum).Tilt * Constant::DegToRadians;
         SunAltitudeToScreenNormal = std::abs(SunAltitude + (SurfaceTilt - Constant::PiOvr2));
         if (SunAltitudeToScreenNormal > Constant::PiOvr2) {
@@ -1096,10 +1102,10 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         IncidentAngle = 0.0;
     }
 
-    auto &thisScreen = state.dataMaterial->Screens(ScNum);
-
     // ratio of screen material diameter to screen material spacing
-    Gamma = thisScreen.ScreenDiameterToSpacingRatio;
+    auto *screen = dynamic_cast<Material::MaterialScreen*>(state.dataMaterial->Material(ScNum));
+    assert(screen != nullptr);
+    Gamma = screen->diameterToSpacingRatio;
 
     // ************************************************************************************************
     // * calculate transmittance of totally absorbing screen material (beam passing through open area)*
@@ -1148,8 +1154,8 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     // * calculate transmittance of scattered beam due to reflecting screen material *
     // *******************************************************************************
 
-    ReflectCyl = thisScreen.ReflectCylinder;
-    ReflectCylVis = thisScreen.ReflectCylinderVis;
+    ReflectCyl = screen->CylinderRefl;
+    ReflectCylVis = screen->CylinderReflVis;
 
     if (std::abs(SunAzimuthToScreenNormal - Constant::PiOvr2) < Small || std::abs(SunAltitudeToScreenNormal - Constant::PiOvr2) < Small) {
         Tscattered = 0.0;
@@ -1188,65 +1194,69 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Tscattered = max(0.0, Tscattered);
     TscatteredVis = max(0.0, TscatteredVis);
 
-    if (thisScreen.screenBeamReflectanceModel == Material::ScreenBeamReflectanceModel::DoNotModel) {
+    if (screen->beamReflectanceModel == Material::ScreenBeamReflectanceModel::DoNotModel) {
         if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
-            thisScreen.BmBmTrans = Tdirect;
-            thisScreen.BmBmTransVis = Tdirect;
-            thisScreen.BmBmTransBack = 0.0;
+            screen->BmBmTrans = Tdirect;
+            screen->BmBmTransVis = Tdirect;
+            screen->BmBmTransBack = 0.0;
         } else {
-            thisScreen.BmBmTrans = 0.0;
-            thisScreen.BmBmTransVis = 0.0;
-            thisScreen.BmBmTransBack = Tdirect;
+            screen->BmBmTrans = 0.0;
+            screen->BmBmTransVis = 0.0;
+            screen->BmBmTransBack = Tdirect;
         }
         Tscattered = 0.0;
         TscatteredVis = 0.0;
-    } else if (thisScreen.screenBeamReflectanceModel == Material::ScreenBeamReflectanceModel::DirectBeam) {
+    } else if (screen->beamReflectanceModel == Material::ScreenBeamReflectanceModel::DirectBeam) {
         if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
-            thisScreen.BmBmTrans = Tdirect + Tscattered;
-            thisScreen.BmBmTransVis = Tdirect + TscatteredVis;
-            thisScreen.BmBmTransBack = 0.0;
+            screen->BmBmTrans = Tdirect + Tscattered;
+            screen->BmBmTransVis = Tdirect + TscatteredVis;
+            screen->BmBmTransBack = 0.0;
         } else {
-            thisScreen.BmBmTrans = 0.0;
-            thisScreen.BmBmTransVis = 0.0;
-            thisScreen.BmBmTransBack = Tdirect + Tscattered;
+            screen->BmBmTrans = 0.0;
+            screen->BmBmTransVis = 0.0;
+            screen->BmBmTransBack = Tdirect + Tscattered;
         }
         Tscattered = 0.0;
         TscatteredVis = 0.0;
-    } else if (thisScreen.screenBeamReflectanceModel == Material::ScreenBeamReflectanceModel::Diffuse) {
+    } else if (screen->beamReflectanceModel == Material::ScreenBeamReflectanceModel::Diffuse) {
         if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
-            thisScreen.BmBmTrans = Tdirect;
-            thisScreen.BmBmTransVis = Tdirect;
-            thisScreen.BmBmTransBack = 0.0;
+            screen->BmBmTrans = Tdirect;
+            screen->BmBmTransVis = Tdirect;
+            screen->BmBmTransBack = 0.0;
         } else {
-            thisScreen.BmBmTrans = 0.0;
-            thisScreen.BmBmTransVis = 0.0;
-            thisScreen.BmBmTransBack = Tdirect;
+            screen->BmBmTrans = 0.0;
+            screen->BmBmTransVis = 0.0;
+            screen->BmBmTransBack = Tdirect;
         }
     }
 
     if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
-        thisScreen.BmDifTrans = Tscattered;
-        thisScreen.BmDifTransVis = TscatteredVis;
-        thisScreen.BmDifTransBack = 0.0;
-        thisScreen.ReflectSolBeamFront = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
-        thisScreen.ReflectVisBeamFront = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
-        thisScreen.AbsorpSolarBeamFront = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
-        thisScreen.ReflectSolBeamBack = 0.0;
-        thisScreen.ReflectVisBeamBack = 0.0;
-        thisScreen.AbsorpSolarBeamBack = 0.0;
+        screen->BmDifTrans = Tscattered;
+        screen->BmDifTransVis = TscatteredVis;
+        screen->BmDifTransBack = 0.0;
+        screen->ReflectSolBeamFront = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
+        screen->ReflectVisBeamFront = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
+        screen->AbsorpSolarBeamFront = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
+        screen->ReflectSolBeamBack = 0.0;
+        screen->ReflectVisBeamBack = 0.0;
+        screen->AbsorpSolarBeamBack = 0.0;
     } else {
-        thisScreen.BmDifTrans = 0.0;
-        thisScreen.BmDifTransVis = 0.0;
-        thisScreen.BmDifTransBack = Tscattered;
-        thisScreen.ReflectSolBeamBack = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
-        thisScreen.ReflectVisBeamBack = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
-        thisScreen.AbsorpSolarBeamBack = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
-        thisScreen.ReflectSolBeamFront = 0.0;
-        thisScreen.ReflectVisBeamFront = 0.0;
-        thisScreen.AbsorpSolarBeamFront = 0.0;
+        screen->BmDifTrans = 0.0;
+        screen->BmDifTransVis = 0.0;
+        screen->BmDifTransBack = Tscattered;
+        screen->ReflectSolBeamBack = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
+        screen->ReflectVisBeamBack = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
+        screen->AbsorpSolarBeamBack = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
+        screen->ReflectSolBeamFront = 0.0;
+        screen->ReflectVisBeamFront = 0.0;
+        screen->AbsorpSolarBeamFront = 0.0;
     }
-}
+} // CalcScreenTransmittance()
+#else // GET_OUT
 
+                
+#endif // GET_OUT
+        
 Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
                                      int const numSurf, // index for Surface array.
                                      bool &isValid      // returns true if result is valid

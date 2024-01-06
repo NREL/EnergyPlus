@@ -3551,16 +3551,34 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                         DividerAbs * thisMaterial->Trans * (DivIncSolarInBm + DivIncSolarInDif);
 
                                 } else if (ShadeFlag == DataSurfaces::WinShadingType::ExtScreen) { // Exterior screen
+                                    int screenNum = state.dataSurface->SurfWinScreenNumber(SurfNum);
+                                    auto const *screen = dynamic_cast<Material::MaterialScreen const *>(state.dataMaterial->Material(screenNum));
+                                    assert(screen != nullptr);
+
+                                    auto &surf = state.dataSurface->Surface(SurfNum);
+                                    Real64 phiWin = std::asin(surf.OutNormVec(3)); 
+                                    Real64 phiSun = std::asin(state.dataEnvrn->SOLCOS.z); // Altitude and azimuth angle of sun (radians)
+                                    Real64 thetaWin = std::atan2(surf.OutNormVec(2), surf.OutNormVec(1));
+                                    Real64 thetaSun = std::atan2(state.dataEnvrn->SOLCOS.y, state.dataEnvrn->SOLCOS.x);
+                                    Real64 phi = phiSun - phiWin; 
+                                    Real64 theta = thetaSun - thetaWin;
+                                    int ip1, ip2, it1, it2; // hi/lo phi and theta map indices
+                                    General::BilinearInterpCoeffs coeffs;
+                                    Material::NormalizePhiTheta(phi, theta);
+                                    Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
+                                    GetBilinearInterpCoeffs(
+                                        phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
+                                    auto const &b11 = screen->btars[ip1][it1];
+                                    auto const &b12 = screen->btars[ip1][it2];
+                                    auto const &b21 = screen->btars[ip2][it1];
+                                    auto const &b22 = screen->btars[ip2][it2];
+                                    Real64 BmDfTrans = BilinearInterp(b11.DfTrans, b12.DfTrans, b21.DfTrans, b22.DfTrans, coeffs);
+                                    Real64 BmBmTrans = BilinearInterp(b11.BmTrans, b12.BmTrans, b21.BmTrans, b22.BmTrans, coeffs);
+                        
                                     state.dataSurface->SurfWinDividerQRadOutAbs(SurfNum) =
-                                        DividerAbs *
-                                        (state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(SurfNum)).BmBmTrans +
-                                         state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(SurfNum)).BmDifTrans) *
-                                        (DivIncSolarOutBm + DivIncSolarOutDif);
+                                        DividerAbs * (BmBmTrans + BmDfTrans) * (DivIncSolarOutBm + DivIncSolarOutDif);
                                     state.dataSurface->SurfWinDividerQRadInAbs(SurfNum) =
-                                        DividerAbs *
-                                        (state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(SurfNum)).BmBmTrans +
-                                         state.dataMaterial->Screens(state.dataSurface->SurfWinScreenNumber(SurfNum)).BmDifTrans) *
-                                        (DivIncSolarInBm + DivIncSolarInDif);
+                                        DividerAbs * (BmBmTrans + BmDfTrans) * (DivIncSolarInBm + DivIncSolarInDif);
                                 }
                             }
                         }
@@ -8852,8 +8870,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                             // (HeatBalanceSurfaceManager USEing and WindowManager and
                             // WindowManager USEing HeatBalanceSurfaceManager)
                             if (surface.ExtBoundCond == DataSurfaces::ExternalEnvironment) {
-                                auto const *thisMaterial =
-                                    dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(construct.LayerPoint(1)));
+                                auto const *thisMaterial = state.dataMaterial->Material(construct.LayerPoint(1));
                                 assert(thisMaterial != nullptr);
                                 Material::SurfaceRoughness RoughSurf = thisMaterial->Roughness; // Outside surface roughness
                                 Real64 EmisOut = thisMaterial->AbsorpThermalFront;              // Glass outside surface emissivity
@@ -8862,9 +8879,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                     // Exterior shade in place
                                     int const ConstrNumSh = Surface(surfNum).activeShadedConstruction;
                                     if (ConstrNumSh != 0) {
-                                        auto const *thisMaterial2 = dynamic_cast<Material::MaterialChild *>(
-                                            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1)));
-                                        assert(thisMaterial2 != nullptr);
+                                        auto const *thisMaterial2 = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1));
                                         RoughSurf = thisMaterial2->Roughness;
                                         EmisOut = thisMaterial2->AbsorpThermal;
                                     }

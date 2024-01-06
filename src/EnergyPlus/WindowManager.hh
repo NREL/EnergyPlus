@@ -95,7 +95,11 @@ namespace Window {
                                        int iquasi,   // When there is no spectral data, this is the wavelength
                                        int ngllayer, // Number of glass layers in construction
                                        Real64 wlbot, // Lowest and highest wavelength considered
-                                       Real64 wltop);
+                                       Real64 wltop,
+                                       std::array<Real64, nume> &stPhi,
+                                       std::array<Real64, nume> &srfPhi,
+                                       std::array<Real64, nume> &srbPhi,
+                                       Array2D<Real64> &saPhi);
 
     void SystemPropertiesAtLambdaAndPhi(EnergyPlusData &state,
                                         int n,       // Number of glass layers
@@ -103,11 +107,6 @@ namespace Window {
                                         Real64 &rft, // System front and back reflectance
                                         Real64 &rbt,
                                         Array1A<Real64> aft // System absorptance of each glass layer
-    );
-
-    void SolarSprectrumAverage(EnergyPlusData &state,
-                               Array1A<Real64> p, // Quantity to be weighted by solar spectrum
-                               Real64 &psol       // Quantity p weighted by solar spectrum
     );
 
     Real64 solarSpectrumAverage(EnergyPlusData &state, gsl::span<Real64> p);
@@ -212,10 +211,11 @@ namespace Window {
                          Array2<Real64> &ajac, // As input: matrix to be decomposed;
                          int n,                // Dimension of matrix
                          Array1D_int &indx,    // Vector of row permutations
-                         Real64 &d             // +1 if even number of row interchange is even, -1
+                         int &d             // +1 if even number of row interchange is even, -1
     );
 
-    void LUsolution(Array2<Real64> const &a, // Matrix and vector in a.x = b;
+    void LUsolution(EnergyPlusData &state,
+                    Array2<Real64> const &a, // Matrix and vector in a.x = b;
                     int n,                   // Dimension of a and b
                     Array1D_int const &indx, // Vector of row permutations
                     Array1D<Real64> &b       // Matrix and vector in a.x = b;
@@ -410,20 +410,10 @@ namespace Window {
     );
 
     void InvertMatrix(EnergyPlusData &state,
-                      Array2A<Real64> a, // Matrix to be inverted
-                      Array2A<Real64> y, // Inverse of matrix a
-                      Array1A_int indx,  // Index vector for LU decomposition
-                      int np,            // Dimension of matrix
+                      Array2D<Real64> &a, // Matrix to be inverted
+                      Array2D<Real64> &y, // Inverse of matrix a
+                      Array1D_int &indx,  // Index vector for LU decomposition
                       int n);
-
-    void LUDCMP(EnergyPlusData &state,
-                Array2A<Real64> A, // matrix
-                int N,
-                int NP,
-                Array1A_int INDX,
-                int &D);
-
-    void LUBKSB(Array2A<Real64> A, int N, int NP, Array1A_int INDX, Array1A<Real64> B);
 
     // added for custom solar or visible spectrum
     void CheckAndReadCustomSprectrumData(EnergyPlusData &state);
@@ -543,31 +533,12 @@ struct WindowManagerData : BaseGlobalStruct
     std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> tPhi = {0.0};     // transmittance at angle of incidence
     std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> rfPhi = {0.0};    // front reflectance at angle of incidence
     std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> rbPhi = {0.0};    // back reflectance at angle of incidence
-    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> tadjPhi = {0.0};  // transmittance at angle of incidence
-    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> rfadjPhi = {0.0}; // front reflectance at angle of incidence
-    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> rbadjPhi = {0.0}; // back reflectance at angle of incidence
 
     std::array<int, Window::maxGlassLayers> numpt = {0};                    // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
-    std::array<Real64, Window::nume> stPhi = {0.0};            // Glazing system transmittance at angle of incidence for each wavelength in wle
-    std::array<Real64, Window::nume> srfPhi = {0.0};           // Glazing system front reflectance at angle of incidence for each wavelength in wle
-    std::array<Real64, Window::nume> srbPhi = {0.0};           // Glazing system back reflectance at angle of incidence for each wavelenth in wle
-    Array2D<Real64> saPhi;                             // For each layer, glazing system absorptance at angle of incidence
                                                        // for each wavelenth in wle
     std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxGlassLayers> top = {0.0};  // Transmittance matrix for subr. op
     std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxGlassLayers> rfop = {0.0}; // Front reflectance matrix for subr. op
     std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxGlassLayers> rbop = {0.0}; // Back transmittance matrix for subr. op
-
-    // These need to stay as Array1D for a little longer because changing them spreads into many source files
-    Array1D<Real64> tsolPhi;        // Glazing system solar transmittance for each angle of incidence
-    Array1D<Real64> rfsolPhi;       // Glazing system solar front reflectance for each angle of incidence
-    Array1D<Real64> rbsolPhi;       // Glazing system solar back reflectance for each angle of incidence
-    Array2D<Real64> solabsPhi;      // Glazing system solar absorptance for each angle of incidence
-    Array2D<Real64> solabsBackPhi;  // Glazing system back solar absorptance for each angle of incidence
-    Array1D<Real64> solabsShadePhi; // Glazing system interior shade solar absorptance for each angle of incidence
-    Array1D<Real64> tvisPhi;        // Glazing system visible transmittance for each angle of incidence
-    Array1D<Real64> rfvisPhi;       // Glazing system visible front reflectance for each angle of incidence
-    Array1D<Real64> rbvisPhi;       // Glazing system visible back reflectance for each angle of incidence
-    Array1D<Real64> CosPhiIndepVar; // Cos of incidence angles at 10-deg increments for curve fits
 
     std::unique_ptr<Window::CWindowModel> inExtWindowModel;       // Information about windows model (interior or exterior)
     std::unique_ptr<Window::CWindowOpticalModel> winOpticalModel; // Information about windows optical model (Simplified or BSDF)
@@ -633,23 +604,9 @@ struct WindowManagerData : BaseGlobalStruct
         this->A45 = 0.0;
         this->A67 = 0.0;
         this->numpt = {0};
-        this->stPhi = {0.0};
-        this->srfPhi = {0.0};
-        this->srbPhi = {0.0};
-        this->saPhi = Array2D<Real64>(5, Window::nume, 0.0);
         this->top = {0.0};
         this->rfop = {0.0};
         this->rbop = {0.0};
-        this->tsolPhi = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
-        this->rfsolPhi = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
-        this->rbsolPhi = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
-        this->solabsPhi = Array2D<Real64>(5, Window::maxIncidentAngles, 0.0);
-        this->solabsBackPhi = Array2D<Real64>(5, Window::maxIncidentAngles, 0.0);
-        this->solabsShadePhi = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
-        this->tvisPhi = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
-        this->rfvisPhi = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
-        this->rbvisPhi = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
-        this->CosPhiIndepVar = Array1D<Real64>(Window::maxIncidentAngles, 0.0);
         Window::CWindowConstructionsSimplified::clearState();
         this->RunMeOnceFlag = false;
         this->lSimpleGlazingSystem = false; // true if using simple glazing system block model
@@ -672,28 +629,6 @@ struct WindowManagerData : BaseGlobalStruct
     // Default Constructor
     WindowManagerData()
     {
-        saPhi.allocate(Window::maxGlassLayers, Window::nume);                         // For each layer, glazing system absorptance at angle of incidence
-        saPhi = 0.0;                                     // for each wavelenth in wle
-        tsolPhi.allocate(Window::maxIncidentAngles); // Glazing system solar transmittance for each angle of incidence
-        tsolPhi = 0.0;
-        rfsolPhi.allocate(Window::maxIncidentAngles); // Glazing system solar front reflectance for each angle of incidence
-        rfsolPhi = 0.0;
-        rbsolPhi.allocate(Window::maxIncidentAngles); // Glazing system solar back reflectance for each angle of incidence
-        rbsolPhi = 0.0;
-        solabsPhi.allocate(5, Window::maxIncidentAngles); // Glazing system solar absorptance for each angle of incidence
-        solabsPhi = 0.0;
-        solabsBackPhi.allocate(5, Window::maxIncidentAngles); // Glazing system back solar absorptance for each angle of incidence
-        solabsBackPhi = 0.0;
-        solabsShadePhi.allocate(Window::maxIncidentAngles); // Glazing system interior shade solar absorptance for each angle of incidence
-        solabsShadePhi = 0.0;
-        tvisPhi.allocate(Window::maxIncidentAngles); // Glazing system visible transmittance for each angle of incidence
-        tvisPhi = 0.0;
-        rfvisPhi.allocate(Window::maxIncidentAngles); // Glazing system visible front reflectance for each angle of incidence
-        rfvisPhi = 0.0;
-        rbvisPhi.allocate(Window::maxIncidentAngles); // Glazing system visible back reflectance for each angle of incidence
-        rbvisPhi = 0.0;
-        CosPhiIndepVar.allocate(Window::maxIncidentAngles); // Cos of incidence angles at 10-deg increments for curve fits
-        CosPhiIndepVar = 0.0;
         SimpleGlazingSHGC = 0.0;
         SimpleGlazingU = 0.0;
         tmpReflectSolBeamFront = 0.0;

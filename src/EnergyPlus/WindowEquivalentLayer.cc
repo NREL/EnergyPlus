@@ -206,20 +206,21 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
 
     for (Layer = 1; Layer <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Layer) {
 
-        MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
-        auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
-        assert(thisMaterial != nullptr);
-
         Material::Group group1 = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1))->group;
         if (group1 != Material::Group::GlassEquivalentLayer && group1 != Material::Group::ShadeEquivalentLayer &&
             group1 != Material::Group::DrapeEquivalentLayer && group1 != Material::Group::ScreenEquivalentLayer &&
             group1 != Material::Group::BlindEquivalentLayer && group1 != Material::Group::GapEquivalentLayer)
             continue;
 
-        if (thisMaterial->group == Material::Group::GapEquivalentLayer) {
+        MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
+        auto const *mat = state.dataMaterial->Material(MaterNum);
+
+        if (mat->group == Material::Group::GapEquivalentLayer) {
             // Gap or Gas Layer
             ++gLayer;
         } else {
+            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild const *>(mat);
+            assert(thisMaterial != nullptr);
             // Solid (Glazing or Shade) Layer
             ++sLayer;
             CFS(EQLNum).L(sLayer).Name = thisMaterial->Name;
@@ -229,7 +230,10 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).LWP_MAT.TAUL = thisMaterial->TausThermal;
         }
 
-        if (thisMaterial->group == Material::Group::BlindEquivalentLayer) {
+        if (mat->group == Material::Group::BlindEquivalentLayer) {
+            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild const *>(mat);
+            assert(thisMaterial != nullptr);
+
             CFS(EQLNum).VBLayerPtr = sLayer;
             if (thisMaterial->SlatOrientation == DataWindowEquivalentLayer::Orientation::Horizontal) {
                 CFS(EQLNum).L(sLayer).LTYPE = LayerType::VBHOR;
@@ -249,7 +253,9 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).S = thisMaterial->SlatSeparation;
             CFS(EQLNum).L(sLayer).W = thisMaterial->SlatWidth;
             CFS(EQLNum).L(sLayer).C = thisMaterial->SlatCrown;
-        } else if (thisMaterial->group == Material::Group::GlassEquivalentLayer) {
+        } else if (mat->group == Material::Group::GlassEquivalentLayer) {
+            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild const *>(mat);
+            assert(thisMaterial != nullptr);
             // glazing
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::GLAZE;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBB = thisMaterial->ReflFrontBeamBeam;
@@ -264,7 +270,9 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = thisMaterial->ReflFrontDiffDiff;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = thisMaterial->ReflBackDiffDiff;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = thisMaterial->TausDiffDiff;
-        } else if (thisMaterial->group == Material::Group::ShadeEquivalentLayer) {
+        } else if (mat->group == Material::Group::ShadeEquivalentLayer) {
+            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild const *>(mat);
+            assert(thisMaterial != nullptr);
             // roller blind
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::ROLLB;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TausFrontBeamBeam;
@@ -274,7 +282,9 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = thisMaterial->TausFrontBeamDiff;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = thisMaterial->TausBackBeamDiff;
 
-        } else if (thisMaterial->group == Material::Group::DrapeEquivalentLayer) {
+        } else if (mat->group == Material::Group::DrapeEquivalentLayer) {
+            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild const *>(mat);
+            assert(thisMaterial != nullptr);
             // drapery fabric
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::DRAPE;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TausFrontBeamBeam;
@@ -290,7 +300,9 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = -1.0;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = -1.0;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = -1.0;
-        } else if (thisMaterial->group == Material::Group::ScreenEquivalentLayer) {
+        } else if (mat->group == Material::Group::ScreenEquivalentLayer) {
+            auto const *thisMaterial = dynamic_cast<const Material::MaterialChild const *>(mat);
+            assert(thisMaterial != nullptr);
             // insect screen
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::INSCRN;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = thisMaterial->TausFrontBeamBeam;
@@ -303,23 +315,26 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             // wire geometry
             CFS(EQLNum).L(sLayer).S = thisMaterial->ScreenWireSpacing;
             CFS(EQLNum).L(sLayer).W = thisMaterial->ScreenWireDiameter;
-        } else if (thisMaterial->group == Material::Group::GapEquivalentLayer) {
+        } else if (mat->group == Material::Group::GapEquivalentLayer) {
+            auto const *matGas = dynamic_cast<const Material::MaterialGasMixture const *>(mat);
+            assert(matGas != nullptr);
+            
             // This layer is a gap.  Fill in the parameters
-            CFS(EQLNum).G(gLayer).Name = thisMaterial->Name;
+            CFS(EQLNum).G(gLayer).Name = matGas->Name;
             // previously the values of the levels are 1-3, now it's 0-2
-            CFS(EQLNum).G(gLayer).GTYPE = static_cast<int>(thisMaterial->gapVentType) + 1;
-            CFS(EQLNum).G(gLayer).TAS = thisMaterial->Thickness;
-            CFS(EQLNum).G(gLayer).FG.Name = Material::gasTypeNames[static_cast<int>(thisMaterial->gasTypes(1))];
-            CFS(EQLNum).G(gLayer).FG.AK = thisMaterial->GasCon(1, 1);
-            CFS(EQLNum).G(gLayer).FG.BK = thisMaterial->GasCon(2, 1);
-            CFS(EQLNum).G(gLayer).FG.CK = thisMaterial->GasCon(3, 1);
-            CFS(EQLNum).G(gLayer).FG.ACP = thisMaterial->GasCp(1, 1);
-            CFS(EQLNum).G(gLayer).FG.BCP = thisMaterial->GasCp(2, 1);
-            CFS(EQLNum).G(gLayer).FG.CCP = thisMaterial->GasCp(3, 1);
-            CFS(EQLNum).G(gLayer).FG.AVISC = thisMaterial->GasVis(1, 1);
-            CFS(EQLNum).G(gLayer).FG.BVISC = thisMaterial->GasVis(2, 1);
-            CFS(EQLNum).G(gLayer).FG.CVISC = thisMaterial->GasVis(3, 1);
-            CFS(EQLNum).G(gLayer).FG.MHAT = thisMaterial->GasWght(1);
+            CFS(EQLNum).G(gLayer).GTYPE = static_cast<int>(matGas->gapVentType) + 1;
+            CFS(EQLNum).G(gLayer).TAS = matGas->Thickness;
+            CFS(EQLNum).G(gLayer).FG.Name = Material::gasTypeNames[static_cast<int>(matGas->gasTypes(1))];
+            CFS(EQLNum).G(gLayer).FG.AK = matGas->GasCon(1, 1);
+            CFS(EQLNum).G(gLayer).FG.BK = matGas->GasCon(2, 1);
+            CFS(EQLNum).G(gLayer).FG.CK = matGas->GasCon(3, 1);
+            CFS(EQLNum).G(gLayer).FG.ACP = matGas->GasCp(1, 1);
+            CFS(EQLNum).G(gLayer).FG.BCP = matGas->GasCp(2, 1);
+            CFS(EQLNum).G(gLayer).FG.CCP = matGas->GasCp(3, 1);
+            CFS(EQLNum).G(gLayer).FG.AVISC = matGas->GasVis(1, 1);
+            CFS(EQLNum).G(gLayer).FG.BVISC = matGas->GasVis(2, 1);
+            CFS(EQLNum).G(gLayer).FG.CVISC = matGas->GasVis(3, 1);
+            CFS(EQLNum).G(gLayer).FG.MHAT = matGas->GasWght(1);
             // fills gas density and effective gap thickness
             BuildGap(state, CFS(EQLNum).G(gLayer), CFS(EQLNum).G(gLayer).GTYPE, CFS(EQLNum).G(gLayer).TAS);
         } else {

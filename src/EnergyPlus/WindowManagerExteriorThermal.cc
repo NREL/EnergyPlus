@@ -746,22 +746,22 @@ namespace Window {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
-        auto const *material = dynamic_cast<const Material::MaterialChild *>(materialBase);
-        assert(material != nullptr);
-        const int numGases = material->NumberOfGasesInMixture;
+        auto const *matGas = dynamic_cast<const Material::MaterialGasMixture const *>(materialBase);
+        assert(matGas != nullptr);
+        const int numGases = matGas->numGases;
         double constexpr vacuumCoeff = 1.4; // Load vacuum coefficient once it is implemented (Simon).
-        std::string const &gasName = material->Name;
+        std::string const &gasName = matGas->Name;
         Gases::CGas aGas;
         for (int i = 1; i <= numGases; ++i) {
-            Real64 wght = material->GasWght(i);
-            Real64 fract = material->GasFract(i);
+            Real64 wght = matGas->GasWght(i);
+            Real64 fract = matGas->GasFract(i);
             std::vector<double> gcon;
             std::vector<double> gvis;
             std::vector<double> gcp;
             for (int j = 1; j <= 3; ++j) {
-                gcon.push_back(material->GasCon(j, i));
-                gvis.push_back(material->GasVis(j, i));
-                gcp.push_back(material->GasCp(j, i));
+                gcon.push_back(matGas->GasCon(j, i));
+                gvis.push_back(matGas->GasVis(j, i));
+                gcp.push_back(matGas->GasCp(j, i));
             }
             Gases::CIntCoeff aCon(gcon[0], gcon[1], gcon[2]);
             Gases::CIntCoeff aCp(gcp[0], gcp[1], gcp[2]);
@@ -932,10 +932,7 @@ namespace Window {
         if (state.dataMaterial->Material(MatOutside)->group == Material::Group::Shade) { // Exterior shade present
             ShadeFlag = WinShadingType::ExtShade;
         } else if (state.dataMaterial->Material(MatOutside)->group == Material::Group::Screen) { // Exterior screen present
-            const int MatShade = MatOutside;
-            const int ScNum = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatShade))->ScreenDataPtr;
-            // Orphaned constructs with exterior screen are ignored
-            if (ScNum > 0) ShadeFlag = WinShadingType::ExtScreen;
+            ShadeFlag = WinShadingType::ExtScreen;
         } else if (state.dataMaterial->Material(MatOutside)->group == Material::Group::WindowBlind) { // Exterior blind present
             ShadeFlag = WinShadingType::ExtBlind;
         } else if (state.dataMaterial->Material(MatInside)->group == Material::Group::Shade) { // Interior shade present
