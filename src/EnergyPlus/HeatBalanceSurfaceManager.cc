@@ -4537,7 +4537,7 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
         } // JZ Loop
 
     } // IZ Loop
-}
+} // ComputeDifSolExcZoneWIZWindows()
 
 void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
 {
@@ -4562,8 +4562,11 @@ void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
     state.dataGlobal->AnySurfPropOverridesInModel = false;
     // first determine if anything needs to be done, once yes, then always init
     for (auto const *matBase : state.dataMaterial->Material) {
-        auto const *mat = dynamic_cast<const Material::MaterialChild *>(matBase);
+        if (matBase->group != Material::Group::Regular) continue;
+            
+        auto const *mat = dynamic_cast<Material::MaterialChild const *>(matBase);
         assert(mat != nullptr);
+        
         if ((mat->AbsorpSolarEMSOverrideOn) || (mat->AbsorpThermalEMSOverrideOn) || (mat->AbsorpVisibleEMSOverrideOn)) {
             state.dataGlobal->AnySurfPropOverridesInModel = true;
             break;
@@ -4573,51 +4576,39 @@ void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
     if (!state.dataGlobal->AnySurfPropOverridesInModel) return; // quick return if nothing has ever needed to be done
 
     // first, loop over materials
-    for (MaterNum = 1; MaterNum <= state.dataMaterial->TotMaterials; ++MaterNum) {
-        auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MaterNum));
-        assert(thisMaterial != nullptr);
-        if (thisMaterial->AbsorpSolarEMSOverrideOn) {
-            thisMaterial->AbsorpSolar = max(min(thisMaterial->AbsorpSolarEMSOverride, 0.9999), 0.0001);
-        } else {
-            thisMaterial->AbsorpSolar = thisMaterial->AbsorpSolarInput;
-        }
-        if (thisMaterial->AbsorpThermalEMSOverrideOn) {
-            thisMaterial->AbsorpThermal = max(min(thisMaterial->AbsorpThermalEMSOverride, 0.9999), 0.0001);
-        } else {
-            thisMaterial->AbsorpThermal = thisMaterial->AbsorpThermalInput;
-        }
-        if (thisMaterial->AbsorpVisibleEMSOverrideOn) {
-            thisMaterial->AbsorpVisible = max(min(thisMaterial->AbsorpVisibleEMSOverride, 0.9999), 0.0001);
-        } else {
-            thisMaterial->AbsorpVisible = thisMaterial->AbsorpVisibleInput;
-        }
+    for (auto *matBase : state.dataMaterial->Material) {
+        if (matBase->group != Material::Group::Regular) continue;
+            
+        auto *mat = dynamic_cast<Material::MaterialChild *>(matBase);
+        assert(mat != nullptr);
+        
+        mat->AbsorpSolar = mat->AbsorpSolarEMSOverrideOn ? max(min(mat->AbsorpSolarEMSOverride, 0.9999), 0.0001) : mat->AbsorpSolarInput;
+        mat->AbsorpThermal = mat->AbsorpThermalEMSOverrideOn ? max(min(mat->AbsorpThermalEMSOverride, 0.9999), 0.0001) : mat->AbsorpThermalInput;
+        mat->AbsorpVisible = mat->AbsorpVisibleEMSOverrideOn ? max(min(mat->AbsorpVisibleEMSOverride, 0.9999), 0.0001) : mat->AbsorpVisibleInput;
     } // loop over materials
 
     // second, loop over constructions
-    for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
-        auto &thisConstruct = state.dataConstruction->Construct(ConstrNum);
+    for (auto &thisConstruct : state.dataConstruction->Construct) { 
         if (thisConstruct.TypeIsWindow) continue; // only override opaque constructions
         TotLayers = thisConstruct.TotLayers;
         if (TotLayers == 0) continue; // error condition
         InsideMaterNum = thisConstruct.LayerPoint(TotLayers);
         if (InsideMaterNum != 0) {
-            auto const *thisMaterialInside = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(InsideMaterNum));
-            assert(thisMaterialInside != nullptr);
-            thisConstruct.InsideAbsorpVis = thisMaterialInside->AbsorpVisible;
-            thisConstruct.InsideAbsorpSolar = thisMaterialInside->AbsorpSolar;
-            thisConstruct.InsideAbsorpThermal = thisMaterialInside->AbsorpThermal;
+            auto const *mat = state.dataMaterial->Material(InsideMaterNum);
+            thisConstruct.InsideAbsorpVis = mat->AbsorpVisible;
+            thisConstruct.InsideAbsorpSolar = mat->AbsorpSolar;
+            thisConstruct.InsideAbsorpThermal = mat->AbsorpThermal;
         }
 
         OutsideMaterNum = thisConstruct.LayerPoint(1);
         if (OutsideMaterNum != 0) {
-            auto const *thisMaterialOutside = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(OutsideMaterNum));
-            assert(thisMaterialOutside != nullptr);
-            thisConstruct.OutsideAbsorpVis = thisMaterialOutside->AbsorpVisible;
-            thisConstruct.OutsideAbsorpSolar = thisMaterialOutside->AbsorpSolar;
-            thisConstruct.OutsideAbsorpThermal = thisMaterialOutside->AbsorpThermal;
+            auto const *mat = state.dataMaterial->Material(OutsideMaterNum);
+            thisConstruct.OutsideAbsorpVis = mat->AbsorpVisible;
+            thisConstruct.OutsideAbsorpSolar = mat->AbsorpSolar;
+            thisConstruct.OutsideAbsorpThermal = mat->AbsorpThermal;
         }
-    }
-}
+    } // for (ConstrNum)
+} // InitEMSControlledSurfaceProperties()
 
 void InitEMSControlledConstructions(EnergyPlusData &state)
 {
@@ -4824,8 +4815,8 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
             surface.Construction = surface.ConstructionStoredInputValue;
             state.dataSurface->SurfActiveConstruction(SurfNum) = surface.ConstructionStoredInputValue;
         }
-    }
-}
+    } // for (SurfNum)
+} // InitEMSControlledConstructions()
 
 // End Initialization Section of the Module
 //******************************************************************************

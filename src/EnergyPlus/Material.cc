@@ -2745,31 +2745,32 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
     if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup surface property EMS actuators
 
-        for (MaterNum = 1; MaterNum <= state.dataMaterial->TotMaterials; ++MaterNum) {
-            auto *thisMaterial = dynamic_cast<MaterialChild *>(state.dataMaterial->Material(MaterNum));
-            assert(thisMaterial != nullptr);
-            if (thisMaterial->group != Group::Regular) continue;
+        for (auto *mat : state.dataMaterial->Material) { 
+            if (mat->group != Group::Regular) continue;
+                
+            auto *matReg = dynamic_cast<MaterialChild *>(mat);
+            assert(matReg != nullptr);
             SetupEMSActuator(state,
                              "Material",
-                             thisMaterial->Name,
+                             matReg->Name,
                              "Surface Property Solar Absorptance",
                              "[ ]",
-                             thisMaterial->AbsorpSolarEMSOverrideOn,
-                             thisMaterial->AbsorpSolarEMSOverride);
+                             matReg->AbsorpSolarEMSOverrideOn,
+                             matReg->AbsorpSolarEMSOverride);
             SetupEMSActuator(state,
                              "Material",
-                             thisMaterial->Name,
+                             matReg->Name,
                              "Surface Property Thermal Absorptance",
                              "[ ]",
-                             thisMaterial->AbsorpThermalEMSOverrideOn,
-                             thisMaterial->AbsorpThermalEMSOverride);
+                             matReg->AbsorpThermalEMSOverrideOn,
+                             matReg->AbsorpThermalEMSOverride);
             SetupEMSActuator(state,
                              "Material",
-                             thisMaterial->Name,
+                             matReg->Name,
                              "Surface Property Visible Absorptance",
                              "[ ]",
-                             thisMaterial->AbsorpVisibleEMSOverrideOn,
-                             thisMaterial->AbsorpVisibleEMSOverride);
+                             matReg->AbsorpVisibleEMSOverrideOn,
+                             matReg->AbsorpVisibleEMSOverride);
         }
     }
 
