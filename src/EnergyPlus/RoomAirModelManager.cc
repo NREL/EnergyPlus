@@ -1044,7 +1044,7 @@ namespace RoomAir {
                      state.afn->AirflowNetworkNodeData(nodeNum1).EPlusZoneNum == zoneCV.ZonePtr)) {
                     int compNum = state.afn->AirflowNetworkLinkageData(iLink).CompNum;
                     int typeNum = state.afn->AirflowNetworkCompData(compNum).TypeNum;
-                    if (state.afn->AirflowNetworkCompData(compNum).CompTypeNum == AirflowNetwork::Type::SCR) {
+                    if (state.afn->AirflowNetworkLinkageData(iLink).element->type() == AirflowNetwork::Type::SCR) {
                         if (state.afn->MultizoneSurfaceCrackData(typeNum).exponent != 0.50) {
                             state.dataRoomAir->AirModel(zoneCV.ZonePtr).AirModel = RoomAirModel::Mixing;
                             ShowWarningError(state, format("Problem with {} = {}", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
@@ -1966,7 +1966,8 @@ namespace RoomAir {
                         // calculate the surface width and height
                         int compNum = state.afn->AirflowNetworkLinkageData(iMzLink).CompNum;
                         int typeNum = state.afn->AirflowNetworkCompData(compNum).TypeNum;
-                        if (state.afn->AirflowNetworkCompData(compNum).CompTypeNum == AirflowNetwork::Type::DOP) {
+                        AirflowNetwork::Type type = state.afn->AirflowNetworkLinkageData(iMzLink).element->type();
+                        if (type == AirflowNetwork::Type::DOP) {
                             Real64 WidthFactMax = 0.0;
                             Real64 HeightFactMax = 0.0;
 
@@ -1997,8 +1998,7 @@ namespace RoomAir {
                             surfParams.Width = WidthFactMax * mzSurf.Width;
                             surfParams.Height = HeightFactMax * mzSurf.Height;
 
-                        } else if (state.afn->AirflowNetworkCompData(compNum).CompTypeNum ==
-                                   AirflowNetwork::Type::SCR) { // surface type = CRACK
+                        } else if (type == AirflowNetwork::Type::SCR) { // surface type = CRACK
                             surfParams.Width = mzSurf.Width / 2;
                             auto const &zoneHeatBal = state.dataZoneTempPredictorCorrector->zoneHeatBalance(iZone);
                             Real64 AinCV =
@@ -2009,9 +2009,7 @@ namespace RoomAir {
                         }
 
                         // calculate the surface Zmin and Zmax
-                        if (state.afn->AirflowNetworkCompData(compNum).CompTypeNum == AirflowNetwork::Type::DOP ||
-                            state.afn->AirflowNetworkCompData(compNum).CompTypeNum ==
-                                AirflowNetwork::Type::SCR) { // surface type = CRACK
+                        if (type == AirflowNetwork::Type::DOP || type == AirflowNetwork::Type::SCR) { // surface type = CRACK
                             Real64 z_min(std::numeric_limits<Real64>::max()), z_max(std::numeric_limits<Real64>::lowest());
                             for (int i = 1; i <= mzSurf.Sides; ++i) {
                                 Real64 const z_i = mzSurf.Vertex(i).z;
@@ -2514,8 +2512,7 @@ namespace RoomAir {
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     for (int i = 1; i <= state.dataRoomAir->AFNSurfaceCrossVent(0, ZoneNum); ++i) {
-                        int N = state.afn->AirflowNetworkLinkageData(i).CompNum;
-                        if (state.afn->AirflowNetworkCompData(N).CompTypeNum == AirflowNetwork::Type::DOP) {
+                        if (state.afn->AirflowNetworkLinkageData(i).element->type() == AirflowNetwork::Type::DOP) {
                             SetupOutputVariable(state,
                                                 "Room Air Window Jet Region Average Air Velocity",
                                                 OutputProcessor::Unit::m_s,

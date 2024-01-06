@@ -105,7 +105,6 @@ namespace AirflowNetwork {
 
     enum class Type : int
     {
-        Unknown = -1,
         DOP = 0, // Detailed large opening component
         SOP,     // Simple opening component
         SCR,     // Surface crack component
@@ -165,10 +164,8 @@ namespace AirflowNetwork {
 
     enum class WindPressureCalculationType : int
     {
-        Invalid = 0,
-        Input = 1,
-        SurfAvg = 2,
-        Num
+        Input,
+        SurfAvg,
     };
 
     int constexpr PressureCtrlExhaust = 1;
@@ -1312,7 +1309,6 @@ namespace AirflowNetwork {
     {
         // Members
         std::string Name;           // Provide a unique element name
-        Type CompTypeNum;           // Provide numeric equivalent for AirflowNetworkCompType
         int TypeNum;                // Component number under same component type
         int CompNum;                // General component number
         std::string EPlusName;      // Provide a unique element name
@@ -1321,7 +1317,7 @@ namespace AirflowNetwork {
         ComponentType EPlusTypeNum; // Provide EPlus component type
 
         // Default Constructor
-        AirflowNetworkCompProp() : CompTypeNum(Type::Unknown), TypeNum(0), CompNum(0), EPlusTypeNum(ComponentType::Unknown)
+        AirflowNetworkCompProp() : TypeNum(0), CompNum(0), EPlusTypeNum(ComponentType::Unknown)
         {
         }
     };

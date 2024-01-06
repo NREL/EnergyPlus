@@ -754,7 +754,7 @@ namespace AirflowNetwork {
                         SumTermFlow += state.dataLoopNodes->Node(k1).MassFlowRate;
                     }
                 }
-                if (state.afn->AirflowNetworkCompData(state.afn->AirflowNetworkLinkageData(k).CompNum).CompTypeNum == Type::ELR) {
+                if (state.afn->AirflowNetworkLinkageData(k).element->type() == Type::ELR) {
                     // Calculate supply leak sensible losses
                     Node1 = state.afn->AirflowNetworkLinkageData(k).NodeNums[0];
                     Node2 = state.afn->AirflowNetworkLinkageData(k).NodeNums[1];
@@ -3997,7 +3997,7 @@ namespace AirflowNetwork {
                 ll = 3;
             }
 
-            Ltyp = state.afn->AirflowNetworkCompData(state.afn->AirflowNetworkLinkageData(i).CompNum).CompTypeNum;
+            Ltyp = state.afn->AirflowNetworkLinkageData(i).element->type();
             if (Ltyp == Type::DOP) {
                 ActLh = state.afn->MultizoneSurfaceData(i).Height;
                 ActLOwnh = ActLh * 1.0;
