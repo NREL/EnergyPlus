@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -252,17 +252,17 @@ namespace Window {
                         Real64 TauShIR = thisMaterialShade->TransThermal;
                         Real64 EpsShIR = thisMaterialShade->AbsorpThermal;
                         Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1) =
+                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[1] =
                             EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[1] = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     if (IntBlind) {
                         Real64 TauShIR = state.dataMaterial->Blind(BlNum).IRFrontTrans(ISlatAng);
                         Real64 EpsShIR = state.dataMaterial->Blind(BlNum).IRBackEmiss(ISlatAng);
                         Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(ISlatAng) =
+                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[ISlatAng] =
                             EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(ISlatAng) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[ISlatAng] = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     // Loop over remaining slat angles only if blind with movable slats
                     if (IntShade) break; // Loop over remaining slat angles only if blind

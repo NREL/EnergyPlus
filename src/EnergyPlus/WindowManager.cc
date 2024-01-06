@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1495,18 +1495,18 @@ namespace Window {
                         TauShIR = thisMaterialShade->TransThermal;
                         EpsShIR = thisMaterialShade->AbsorpThermal;
                         RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1) =
+                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[1] =
                             EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[1] = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     if (IntBlind) {
                         auto const &blind = state.dataMaterial->Blind(BlNum);
                         TauShIR = blind.IRFrontTrans(ISlatAng);
                         EpsShIR = blind.IRBackEmiss(ISlatAng);
                         RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(ISlatAng) =
+                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[ISlatAng] =
                             EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(ISlatAng) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[ISlatAng] = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     // Loop over remaining slat angles only if blind with movable slats
                     if (IntShade) break; // Loop over remaining slat angles only if blind
@@ -1642,6 +1642,7 @@ namespace Window {
             auto const &surf = state.dataSurface->Surface(SurfNum);
             if (surf.FrameDivider == 0) continue;
 
+            auto &surfWin = state.dataSurface->SurfaceWindow(SurfNum);
             auto const &frdiv = state.dataSurface->FrameDivider(surf.FrameDivider);
 
             FrWidth = frdiv.FrameWidth;
@@ -1678,14 +1679,13 @@ namespace Window {
             state.dataSurface->SurfWinDividerEdgeArea(SurfNum) =
                     2 * DivEdgeWidth * (NumHorDividers * (GlWidth - 2 * FrEdgeWidth) + NumVertDividers * (GlHeight - 2 * FrEdgeWidth)) -
                     NumHorDividers * NumVertDividers * (4 * pow_2(DivEdgeWidth) + 4 * FrEdgeWidth * DivWidth);
-            state.dataSurface->SurfWinCenterGlArea(SurfNum) = surf.Area -
-                    state.dataSurface->SurfWinFrameEdgeArea(SurfNum) - state.dataSurface->SurfWinDividerEdgeArea(SurfNum);
-            state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) =
+            surfWin.centerGlassArea = surf.Area - state.dataSurface->SurfWinFrameEdgeArea(SurfNum) - state.dataSurface->SurfWinDividerEdgeArea(SurfNum);
+            surfWin.edgeGlassCorrFac =
                     (state.dataSurface->SurfWinFrameEdgeArea(SurfNum) * state.dataSurface->SurfWinFrEdgeToCenterGlCondRatio(SurfNum) +
                      state.dataSurface->SurfWinDividerEdgeArea(SurfNum) * state.dataSurface->SurfWinDivEdgeToCenterGlCondRatio(SurfNum) +
-                     state.dataSurface->SurfWinCenterGlArea(SurfNum)) /
+                     surfWin.centerGlassArea) /
                     (state.dataSurface->SurfWinFrameEdgeArea(SurfNum) + state.dataSurface->SurfWinDividerEdgeArea(SurfNum) +
-                     state.dataSurface->SurfWinCenterGlArea(SurfNum));
+                     surfWin.centerGlassArea);
         } // for (SurfNum)
 
         // Set SolarDiffusing to true for exterior windows that have a construction with an innermost diffusing glass layer
@@ -2142,8 +2142,9 @@ namespace Window {
             wm->ngllayer =
                 state.dataConstruction->Construct(ConstrNum).TotSolidLayers; // Simon: This is necessary to keep for frame calculations
             // Simon: need to transfer surface temperatures because of frames calculation
+
             for (int i = 1; i <= 2 * state.dataConstruction->Construct(ConstrNum).TotSolidLayers; ++i) {
-                wm->thetas[i - 1] = window.ThetaFace(i);
+                wm->thetas[i - 1] = window.thetaFace[i];
             }
             wm->hcout = HextConvCoeff;
             wm->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
@@ -2520,16 +2521,16 @@ namespace Window {
                 SurfInsideTemp = wm->thetas[2 * wm->ngllayer + 1] - Constant::Kelvin;
                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                     EffShBlEmiss =
-                        General::Interp(window.EffShBlindEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                                        window.EffShBlindEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                        General::Interp(window.EffShBlindEmiss[state.dataSurface->SurfWinSlatsAngIndex(SurfNum)],
+                                        window.EffShBlindEmiss[std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)],
                                         state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                     EffGlEmiss =
-                        General::Interp(window.EffGlassEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                                        window.EffGlassEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                        General::Interp(window.EffGlassEmiss[state.dataSurface->SurfWinSlatsAngIndex(SurfNum)],
+                                        window.EffGlassEmiss[std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)],
                                         state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                 } else {
-                    EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
-                    EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1);
+                    EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[1];
+                    EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[1];
                 }
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
                     (EffShBlEmiss * SurfInsideTemp +
@@ -2551,7 +2552,7 @@ namespace Window {
             // Save temperatures for use next time step
 
             for (int k = 1; k <= wm->nglfacep; ++k) {
-                window.ThetaFace(k) = wm->thetas[k - 1];
+                window.thetaFace[k] = wm->thetas[k - 1];
             }
 
             // Added TH 12/23/2008 for thermochromic windows to save the current TC layer temperature
@@ -2660,9 +2661,11 @@ namespace Window {
         Real64 thetas_6_7_4;
 
         auto &wm = state.dataWindowManager;
+        auto const &surfWin = state.dataSurface->SurfaceWindow(SurfNum);
 
         // Have to zero fvec each time since LUdecompostion and LUsolution may
         // add values to this array in unexpected places
+
         wm->fvec = {0.0};
 
         switch (wm->ngllayer) {
@@ -2684,7 +2687,7 @@ namespace Window {
         case 2: { // double pane
             WindowGasConductance(state, wm->thetas[1], wm->thetas[2], 1, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[1], wm->thetas[2], 1, gr, pr, nu);
-            hgap(1) = (con / wm->gap[0] * nu) * state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum);
+            hgap(1) = (con / wm->gap[0] * nu) * surfWin.edgeGlassCorrFac;
 
             wm->fvec[0] =
                 wm->Outir * wm->emis[0] -
@@ -2711,11 +2714,11 @@ namespace Window {
         case 3: { // Triple Pane
             WindowGasConductance(state, wm->thetas[1], wm->thetas[2], 1, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[1], wm->thetas[2], 1, gr, pr, nu);
-            hgap(1) = con / wm->gap[0] * nu * state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum);
+            hgap(1) = con / wm->gap[0] * nu * surfWin.edgeGlassCorrFac;
 
             WindowGasConductance(state, wm->thetas[3], wm->thetas[4], 2, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[3], wm->thetas[4], 2, gr, pr, nu);
-            hgap(2) = con / wm->gap[1] * nu * state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum);
+            hgap(2) = con / wm->gap[1] * nu * surfWin.edgeGlassCorrFac;
 
             thetas_2_3_4 = pow_4(wm->thetas[1]) - pow_4(wm->thetas[2]);
             thetas_4_5_4 = pow_4(wm->thetas[3]) - pow_4(wm->thetas[4]);
@@ -2751,15 +2754,15 @@ namespace Window {
         case 4: { // Quad Pane
             WindowGasConductance(state, wm->thetas[1], wm->thetas[2], 1, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[1], wm->thetas[2], 1, gr, pr, nu);
-            hgap(1) = con / wm->gap[0] * nu * state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum);
+            hgap(1) = con / wm->gap[0] * nu * surfWin.edgeGlassCorrFac;
 
             WindowGasConductance(state, wm->thetas[3], wm->thetas[4], 2, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[3], wm->thetas[4], 2, gr, pr, nu);
-            hgap(2) = con / wm->gap[1] * nu * state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum);
+            hgap(2) = con / wm->gap[1] * nu * surfWin.edgeGlassCorrFac;
 
             WindowGasConductance(state, wm->thetas[5], wm->thetas[6], 3, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[5], wm->thetas[6], 3, gr, pr, nu);
-            hgap(3) = con / wm->gap[2] * nu * state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum);
+            hgap(3) = con / wm->gap[2] * nu * surfWin.edgeGlassCorrFac;
 
             thetas_2_3_4 = pow_4(wm->thetas[1]) - pow_4(wm->thetas[2]);
             thetas_4_5_4 = pow_4(wm->thetas[3]) - pow_4(wm->thetas[4]);
@@ -2994,7 +2997,8 @@ namespace Window {
 
         Array1D<Real64> hgap(maxGlassLayers);       // Gap gas conductance (W/m2-K)
 
-        
+        auto const &surfWin = state.dataSurface->SurfaceWindow(SurfNum);
+
         if (nglasslayer == 1) {
             Bface(1) = wm->Outir * wm->emis[0] + wm->hcout * wm->tout + wm->AbsRadGlassFace[0];
             Bface(2) = wm->Rmir * wm->emis[1] + wm->hcin * wm->tin + wm->AbsRadGlassFace[1];
@@ -3046,10 +3050,9 @@ namespace Window {
             WindowGasConductance(state, wm->thetas[1], wm->thetas[2], 1, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[1], wm->thetas[2], 1, gr, pr, nu);
             hgap(1) = con / wm->gap[0] * nu;
-            if (state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) > 1.0) { // Edge of glass correction
+            if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 wm->hrgap[0] = 0.5 * std::abs(wm->A23) * pow_3(wm->thetas[1] + wm->thetas[2]);
-                hgap(1) = hgap(1) * state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) +
-                          wm->hrgap[0] * (state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) - 1.0);
+                hgap(1) = hgap(1) * surfWin.edgeGlassCorrFac + wm->hrgap[0] * (surfWin.edgeGlassCorrFac - 1.0);
             }
 
             Bface(1) = wm->Outir * wm->emis[0] + wm->hcout * wm->tout + wm->AbsRadGlassFace[0];
@@ -3149,19 +3152,17 @@ namespace Window {
             WindowGasConductance(state, wm->thetas[1], wm->thetas[2], 1, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[1], wm->thetas[2], 1, gr, pr, nu);
             hgap(1) = con / wm->gap[0] * nu;
-            if (state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) > 1.0) { // Edge of glass correction
+            if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 wm->hrgap[0] = 0.5 * std::abs(wm->A23) * pow_3(wm->thetas[1] + wm->thetas[2]);
-                hgap(1) = hgap(1) * state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) +
-                          wm->hrgap[0] * (state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) - 1.0);
+                hgap(1) = hgap(1) * surfWin.edgeGlassCorrFac + wm->hrgap[0] * (surfWin.edgeGlassCorrFac - 1.0);
             }
 
             WindowGasConductance(state, wm->thetas[3], wm->thetas[4], 2, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[3], wm->thetas[4], 2, gr, pr, nu);
             hgap(2) = con / wm->gap[1] * nu;
-            if (state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) > 1.0) { // Edge of glass correction
+            if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 wm->hrgap[1] = 0.5 * std::abs(wm->A45) * pow_3(wm->thetas[3] + wm->thetas[4]);
-                hgap(2) = hgap(2) * state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) +
-                          wm->hrgap[1] * (state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) - 1.0);
+                hgap(2) = hgap(2) * surfWin.edgeGlassCorrFac + wm->hrgap[1] * (surfWin.edgeGlassCorrFac - 1.0);
             }
 
             Bface(1) = wm->Outir * wm->emis[0] + wm->hcout * wm->tout + wm->AbsRadGlassFace[0];
@@ -3267,29 +3268,25 @@ namespace Window {
             WindowGasConductance(state, wm->thetas[1], wm->thetas[2], 1, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[1], wm->thetas[2], 1, gr, pr, nu);
             hgap(1) = con / wm->gap[0] * nu;
-            if (state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) > 1.0) { // Edge of glass correction
+            if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 wm->hrgap[0] = 0.5 * std::abs(wm->A23) * pow_3(wm->thetas[1] + wm->thetas[2]);
-                hgap(1) = hgap(1) * state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) +
-                          wm->hrgap[0] * (state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) - 1.0);
+                hgap(1) = hgap(1) * surfWin.edgeGlassCorrFac + wm->hrgap[0] * (surfWin.edgeGlassCorrFac - 1.0);
             }
 
             WindowGasConductance(state, wm->thetas[3], wm->thetas[4], 2, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[3], wm->thetas[4], 2, gr, pr, nu);
             hgap(2) = con / wm->gap[1] * nu;
-            if (state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) > 1.0) { // Edge of glass correction
+            if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 wm->hrgap[1] = 0.5 * std::abs(wm->A45) * pow_3(wm->thetas[3] + wm->thetas[4]);
-                hgap(2) = hgap(2) * state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) +
-                          wm->hrgap[1] * (state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) - 1.0);
+                hgap(2) = hgap(2) * surfWin.edgeGlassCorrFac + wm->hrgap[1] * (surfWin.edgeGlassCorrFac - 1.0);
             }
 
             WindowGasConductance(state, wm->thetas[5], wm->thetas[6], 3, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[5], wm->thetas[6], 3, gr, pr, nu);
             hgap(3) = con / wm->gap[2] * nu;
-            if (state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) > 1.0) { // Edge of glass correction
-                wm->hrgap[2] =
-                    0.5 * std::abs(wm->A67) * pow_3(wm->thetas[5] + wm->thetas[6]);
-                hgap(3) = hgap(3) * state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) +
-                          wm->hrgap[2] * (state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) - 1.0);
+            if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
+                wm->hrgap[2] = 0.5 * std::abs(wm->A67) * pow_3(wm->thetas[5] + wm->thetas[6]);
+                hgap(3) = hgap(3) * surfWin.edgeGlassCorrFac + wm->hrgap[2] * (surfWin.edgeGlassCorrFac - 1.0);
             }
             Bface(1) = wm->Outir * wm->emis[0] + wm->hcout * wm->tout + wm->AbsRadGlassFace[0];
             Bface(2) = wm->AbsRadGlassFace[1];
@@ -4944,7 +4941,7 @@ namespace Window {
         } else {
             // Use previous time step values
             for (int i = 1; i <= wm->nglface; ++i) {
-                wm->thetas[i - 1] = state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(i);
+                wm->thetas[i - 1] = state.dataSurface->SurfaceWindow(SurfNum).thetaFace[i];
             }
         }
 
@@ -4963,10 +4960,8 @@ namespace Window {
             nglfacePrevDay = wm->nglface;
             if (StormWinFlagPrevDay == 0 && StormWinFlagThisDay == 1) nglfacePrevDay = wm->nglface - 2;
             if (StormWinFlagPrevDay == 1 && StormWinFlagThisDay == 0) nglfacePrevDay = wm->nglface + 2;
-            wm->thetas[wm->nglface] =
-                state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(nglfacePrevDay + 1);
-            wm->thetas[wm->nglface + 1] =
-                state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(nglfacePrevDay + 2);
+            wm->thetas[wm->nglface] = state.dataSurface->SurfaceWindow(SurfNum).thetaFace[nglfacePrevDay + 1];
+            wm->thetas[wm->nglface + 1] = state.dataSurface->SurfaceWindow(SurfNum).thetaFace[nglfacePrevDay + 2];
         } else {
             // No shade or blind previous time step; guess starting values of shade/blind
             // taking into account short- and long-wave radiation (from solar, lights and zone equipment)
@@ -6041,6 +6036,8 @@ namespace Window {
         Real64 DividerHeatGain; // Heat gain to zone from divider (W)
         // Real64 DividerHeatTransfer; // Heat transfer through divider (W)
 
+        auto const &surfWin = state.dataSurface->SurfaceWindow(SurfNum);
+        
         TInRad = root_4(state.dataSurface->SurfWinIRfromParentZone(SurfNum) / Constant::StefanBoltzmann);
         TOutRad = root_4(Outir / Constant::StefanBoltzmann);
         ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
@@ -6079,7 +6076,7 @@ namespace Window {
                 // Add long-wave from outside window surface absorbed by frame outside projection
                 state.dataSurface->SurfWinFrameQRadOutAbs(SurfNum) +=
                     0.5 * state.dataSurface->SurfWinProjCorrFrOut(SurfNum) * frdiv.FrameEmis * EmisGlassOut *
-                    Constant::StefanBoltzmann * pow_4(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(1));
+                    Constant::StefanBoltzmann * pow_4(surfWin.thetaFace[1]);
             }
             if (frdiv.FrameProjectionIn > 0.0) {
                 HInRad *= (1.0 + ProjCorrFrIn);
@@ -6087,7 +6084,7 @@ namespace Window {
                 // Add long-wave from inside window surface absorbed by frame inside projection
                 state.dataSurface->SurfWinFrameQRadInAbs(SurfNum) +=
                     0.5 * state.dataSurface->SurfWinProjCorrFrIn(SurfNum) * frdiv.FrameEmis * EmisGlassIn *
-                    Constant::StefanBoltzmann * pow_4(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * TotGlassLayers));
+                    Constant::StefanBoltzmann * pow_4(surfWin.thetaFace[2 * TotGlassLayers]);
             }
             Afac = (HOutRad * TOutRadFr + HOutConvFr * tout + state.dataSurface->SurfWinFrameQRadOutAbs(SurfNum)) / (HOutRad + FrameCon + HOutConvFr);
             Bfac = FrameCon / (HOutRad + FrameCon + HOutConvFr);
@@ -6146,7 +6143,7 @@ namespace Window {
                 // Add long-wave from outside window surface absorbed by divider outside projection
                 state.dataSurface->SurfWinDividerQRadOutAbs(SurfNum) +=
                     state.dataSurface->SurfWinProjCorrDivOut(SurfNum) * frdiv.DividerEmis * EmisGlassOut *
-                    Constant::StefanBoltzmann * pow_4(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(1));
+                    Constant::StefanBoltzmann * pow_4(surfWin.thetaFace[1]);
             }
 
             HInConvDiv = HInConv;
@@ -6159,7 +6156,7 @@ namespace Window {
                 // Add long-wave from inside window surface absorbed by divider inside projection
                 state.dataSurface->SurfWinDividerQRadInAbs(SurfNum) +=
                     state.dataSurface->SurfWinProjCorrDivIn(SurfNum) * frdiv.DividerEmis * EmisGlassIn *
-                    Constant::StefanBoltzmann * pow_4(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * TotGlassLayers));
+                    Constant::StefanBoltzmann * pow_4(surfWin.thetaFace[2 * TotGlassLayers]);
             }
             Afac =
                 (HOutRad * TOutRadDiv + HOutConvDiv * tout + state.dataSurface->SurfWinDividerQRadOutAbs(SurfNum)) / (HOutRad + DivCon + HOutConvDiv);
@@ -7769,6 +7766,7 @@ namespace Window {
         }
 
         PrintTransMap = false;
+
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             auto const &surf = state.dataSurface->Surface(SurfNum);
                 
@@ -7780,7 +7778,7 @@ namespace Window {
             MatNum = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1);
             auto *matScreen = dynamic_cast<Material::MaterialScreen *>(state.dataMaterial->Material(MatNum));
             assert(matScreen != nullptr);
-            state.dataSurface->SurfWinScreenNumber(SurfNum) = MatNum;
+            state.dataSurface->SurfaceWindow(SurfNum).screenNum = MatNum;
             
             if (matScreen->isUsed) continue; // Has already been initalized
 

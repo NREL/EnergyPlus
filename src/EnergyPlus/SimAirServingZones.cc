@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1373,7 +1373,7 @@ void GetAirPathData(EnergyPlusData &state)
     for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
         SetupOutputVariable(state,
                             "Air System Simulation Cycle On Off Status",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataAirLoop->PriAirSysAvailMgr(AirSysNum).AvailStatus,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Average,
@@ -2439,21 +2439,21 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
     if (!state.dataSimAirServingZones->OutputSetupFlag) {
         SetupOutputVariable(state,
                             "Air System Simulation Maximum Iteration Count",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataSimAirServingZones->salIterMax,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
                             "SimAir");
         SetupOutputVariable(state,
                             "Air System Simulation Iteration Count",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataSimAirServingZones->salIterTot,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
                             "SimAir");
         SetupOutputVariable(state,
                             "Air System Component Model Simulation Calls",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataSimAirServingZones->NumCallsTot,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
