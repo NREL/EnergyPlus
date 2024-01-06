@@ -506,16 +506,16 @@ namespace Material {
 
         // Default Constructor
         WindowBlindProperties()
-            : SolFrontBeamBeamTrans(MaxSlatAngs, 37, 0.0), SolFrontBeamBeamRefl(MaxSlatAngs, 37, 0.0), SolBackBeamBeamTrans(MaxSlatAngs, 37, 0.0),
-              SolBackBeamBeamRefl(MaxSlatAngs, 37, 0.0), SolFrontBeamDiffTrans(MaxSlatAngs, 37, 0.0), SolFrontBeamDiffRefl(MaxSlatAngs, 37, 0.0),
-              SolBackBeamDiffTrans(MaxSlatAngs, 37, 0.0), SolBackBeamDiffRefl(MaxSlatAngs, 37, 0.0), SolFrontDiffDiffTrans(MaxSlatAngs, 0.0),
+            : SolFrontBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0), SolBackBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0),
+              SolBackBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontBeamDiffTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontBeamDiffRefl(MaxSlatAngs, MaxProfAngs, 0.0),
+              SolBackBeamDiffTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolBackBeamDiffRefl(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontDiffDiffTrans(MaxSlatAngs, 0.0),
               SolFrontDiffDiffTransGnd(MaxSlatAngs, 0.0), SolFrontDiffDiffTransSky(MaxSlatAngs, 0.0), SolFrontDiffDiffRefl(MaxSlatAngs, 0.0),
               SolFrontDiffDiffReflGnd(MaxSlatAngs, 0.0), SolFrontDiffDiffReflSky(MaxSlatAngs, 0.0), SolBackDiffDiffTrans(MaxSlatAngs, 0.0),
-              SolBackDiffDiffRefl(MaxSlatAngs, 0.0), SolFrontBeamAbs(MaxSlatAngs, 37, 0.0), SolBackBeamAbs(MaxSlatAngs, 37, 0.0),
+              SolBackDiffDiffRefl(MaxSlatAngs, 0.0), SolFrontBeamAbs(MaxSlatAngs, MaxProfAngs, 0.0), SolBackBeamAbs(MaxSlatAngs, MaxProfAngs, 0.0),
               SolFrontDiffAbs(MaxSlatAngs, 0.0), SolFrontDiffAbsGnd(MaxSlatAngs, 0.0), SolFrontDiffAbsSky(MaxSlatAngs, 0.0),
-              SolBackDiffAbs(MaxSlatAngs, 0.0), VisFrontBeamBeamTrans(MaxSlatAngs, 37, 0.0), VisFrontBeamBeamRefl(MaxSlatAngs, 37, 0.0),
-              VisBackBeamBeamTrans(MaxSlatAngs, 37, 0.0), VisBackBeamBeamRefl(MaxSlatAngs, 37, 0.0), VisFrontBeamDiffTrans(MaxSlatAngs, 37, 0.0),
-              VisFrontBeamDiffRefl(MaxSlatAngs, 37, 0.0), VisBackBeamDiffTrans(MaxSlatAngs, 37, 0.0), VisBackBeamDiffRefl(MaxSlatAngs, 37, 0.0),
+              SolBackDiffAbs(MaxSlatAngs, 0.0), VisFrontBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0), VisFrontBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0),
+              VisBackBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0), VisBackBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0), VisFrontBeamDiffTrans(MaxSlatAngs, MaxProfAngs, 0.0),
+              VisFrontBeamDiffRefl(MaxSlatAngs, MaxProfAngs, 0.0), VisBackBeamDiffTrans(MaxSlatAngs, MaxProfAngs, 0.0), VisBackBeamDiffRefl(MaxSlatAngs, MaxProfAngs, 0.0),
               VisFrontDiffDiffTrans(MaxSlatAngs, 0.0), VisFrontDiffDiffRefl(MaxSlatAngs, 0.0), VisBackDiffDiffTrans(MaxSlatAngs, 0.0),
               VisBackDiffDiffRefl(MaxSlatAngs, 0.0), IRFrontTrans(MaxSlatAngs, 0.0), IRFrontEmiss(MaxSlatAngs, 0.0), IRBackTrans(MaxSlatAngs, 0.0),
               IRBackEmiss(MaxSlatAngs, 0.0)

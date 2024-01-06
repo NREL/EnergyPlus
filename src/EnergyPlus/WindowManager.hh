@@ -74,6 +74,8 @@ namespace Window {
     int constexpr numt3 = 81;                    // Number of wavelength values in the photopic response
 
     int constexpr maxGlassLayers = 5;
+    int constexpr maxGapLayers = 5;
+    int constexpr maxMixGases = 5;
     int constexpr maxIncidentAngles = 20;
     int constexpr maxSpectralDataElements = 800; // Maximum number in Spectral Data arrays.
 
@@ -491,24 +493,24 @@ struct WindowManagerData : BaseGlobalStruct
     Real64 Outir = 0.0;                                               // IR radiance of window's exterior surround (W/m2)
     Real64 Rmir = 0.0;                                                // IR radiance of window's interior surround (W/m2)
     Real64 Rtot = 0.0;                                                // Total thermal resistance of window (m2-K/W)
-    std::array<std::array<std::array<Real64, 5>, 5>, 3> gcon = {0.0}; // Gas thermal conductivity coefficients for each gap
-    std::array<std::array<std::array<Real64, 5>, 5>, 3> gvis = {0.0}; // Gas viscosity coefficients for each gap
-    std::array<std::array<std::array<Real64, 5>, 5>, 3> gcp = {0.0};  // Gas specific-heat coefficients for each gap
-    std::array<std::array<Real64, 5>, 5> gwght = {0.0};               // Gas molecular weights for each gap
-    std::array<std::array<Real64, 5>, 5> gfract = {0.0};              // Gas fractions for each gap
-    std::array<int, 5> gnmix = {0};                                  // Number of gases in gap
+    std::array<std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxMixGases>, 3> gcon = {0.0}; // Gas thermal conductivity coefficients for each gap
+    std::array<std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxMixGases>, 3> gvis = {0.0}; // Gas viscosity coefficients for each gap
+    std::array<std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxMixGases>, 3> gcp = {0.0};  // Gas specific-heat coefficients for each gap
+    std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxMixGases> gwght = {0.0};               // Gas molecular weights for each gap
+    std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxMixGases> gfract = {0.0};              // Gas fractions for each gap
+    std::array<int, Window::maxGlassLayers> gnmix = {0};                                  // Number of gases in gap
     std::array<Real64, Window::maxGlassLayers> gap = {0.0};                                // Gap width (m)
     std::array<Real64, Window::maxGlassLayers> thick = {0.0};                              // Glass layer thickness (m)
     std::array<Real64, Window::maxGlassLayers> scon = {0.0};                               // Glass layer conductance--conductivity/thickness (W/m2-K)
 
-    std::array<Real64, 10> tir = {0.0};             // Front and back IR transmittance for each glass layer
-    std::array<Real64, 10> emis = {0.0};            // Front and back IR emissivity for each glass layer
-    std::array<Real64, 10> rir = {0.0};             // Front and back IR reflectance for each glass layer
+    std::array<Real64, 2 * Window::maxGlassLayers> tir = {0.0};             // Front and back IR transmittance for each glass layer
+    std::array<Real64, 2 * Window::maxGlassLayers> emis = {0.0};            // Front and back IR emissivity for each glass layer
+    std::array<Real64, 2 * Window::maxGlassLayers> rir = {0.0};             // Front and back IR reflectance for each glass layer
                                                     //  (program calculates from tir and emis)
-    std::array<Real64, 10> AbsRadGlassFace = {0.0}; // Solar radiation and IR radiation from internal gains absorbed by glass face
-    std::array<Real64, 10> thetas = {0.0};          // Glass surface temperatures (K)
-    std::array<Real64, 10> thetasPrev = {0.0};      // Previous-iteration glass surface temperatures (K)
-    std::array<Real64, 10> fvec = {0.0};            // Glass face heat balance function
+    std::array<Real64, 2 * Window::maxGlassLayers> AbsRadGlassFace = {0.0}; // Solar radiation and IR radiation from internal gains absorbed by glass face
+    std::array<Real64, 2 * Window::maxGlassLayers> thetas = {0.0};          // Glass surface temperatures (K)
+    std::array<Real64, 2 * Window::maxGlassLayers> thetasPrev = {0.0};      // Previous-iteration glass surface temperatures (K)
+    std::array<Real64, 2 * Window::maxGlassLayers> fvec = {0.0};            // Glass face heat balance function
 
     std::array<Real64, Window::maxGlassLayers> hrgap = {0.0}; // Radiative gap conductance
 

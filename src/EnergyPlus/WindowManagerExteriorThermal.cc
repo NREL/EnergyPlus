@@ -552,7 +552,7 @@ namespace Window {
         Real64 Aright = 0.0;
         Real64 Afront = 0.0;
 
-        auto const *material = dynamic_cast<const Material::MaterialChild *>(materialBase);
+        auto const *material = dynamic_cast<Material::MaterialChild const *>(materialBase);
         assert(material != nullptr);
         if (material->group == Material::Group::WindowGlass || material->group == Material::Group::WindowSimpleGlazing) {
             emissFront = material->AbsorpThermalFront;
@@ -725,7 +725,7 @@ namespace Window {
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
         Real64 constexpr pres = 1e5; // Old code uses this constant pressure
-        auto const *material = dynamic_cast<const Material::MaterialChild *>(materialBase);
+        auto const *material = dynamic_cast<Material::MaterialChild const *>(materialBase);
         assert(material != nullptr);
         Real64 thickness = material->Thickness;
         Real64 gasPointer = material->GasPointer;
@@ -746,7 +746,7 @@ namespace Window {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
-        auto const *matGas = dynamic_cast<const Material::MaterialGasMixture const *>(materialBase);
+        auto const *matGas = dynamic_cast<Material::MaterialGasMixture const *>(materialBase);
         assert(matGas != nullptr);
         const int numGases = matGas->numGases;
         double constexpr vacuumCoeff = 1.4; // Load vacuum coefficient once it is implemented (Simon).
