@@ -567,7 +567,7 @@ private:
         Material(std::shared_ptr<std::ostream> const &errorStream,
                  std::shared_ptr<sqlite3> const &db,
                  int const materialNumber,
-                 EnergyPlus::Material::MaterialChild const *materialData)
+                 EnergyPlus::Material::MaterialBase const *materialData)
             : SQLiteData(errorStream, db), number(materialNumber), name(materialData->Name), group(materialData->group),
               roughness(materialData->Roughness), conductivity(materialData->Conductivity), density(materialData->Density),
               isoMoistCap(materialData->IsoMoistCap), porosity(materialData->Porosity), resistance(materialData->Resistance),

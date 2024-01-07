@@ -75,7 +75,6 @@ namespace Window {
 
     int constexpr maxGlassLayers = 5;
     int constexpr maxGapLayers = 5;
-    int constexpr maxMixGases = 5;
     int constexpr maxIncidentAngles = 20;
     int constexpr maxSpectralDataElements = 800; // Maximum number in Spectral Data arrays.
 
@@ -422,6 +421,13 @@ namespace Window {
 
     void initWindowModel(EnergyPlusData &state);
 
+    struct WindowGap {
+        int numGases = 0;
+        std::array<Material::Gas, Material::maxMixGases> gases;
+        Real64 width;
+            
+    };
+        
 } // namespace Window
 
 struct WindowManagerData : BaseGlobalStruct
@@ -493,11 +499,7 @@ struct WindowManagerData : BaseGlobalStruct
     Real64 Outir = 0.0;                                               // IR radiance of window's exterior surround (W/m2)
     Real64 Rmir = 0.0;                                                // IR radiance of window's interior surround (W/m2)
     Real64 Rtot = 0.0;                                                // Total thermal resistance of window (m2-K/W)
-    std::array<std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxMixGases>, 3> gcon = {0.0}; // Gas thermal conductivity coefficients for each gap
-    std::array<std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxMixGases>, 3> gvis = {0.0}; // Gas viscosity coefficients for each gap
-    std::array<std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxMixGases>, 3> gcp = {0.0};  // Gas specific-heat coefficients for each gap
-    std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxMixGases> gwght = {0.0};               // Gas molecular weights for each gap
-    std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxMixGases> gfract = {0.0};              // Gas fractions for each gap
+    std::array<std::array<Material::Gas, Material::maxMixGases>, Window::maxGlassLayers> gases = {Material::Gas()}; // Gas thermal conductivity coefficients for each gap
     std::array<int, Window::maxGlassLayers> gnmix = {0};                                  // Number of gases in gap
     std::array<Real64, Window::maxGlassLayers> gap = {0.0};                                // Gap width (m)
     std::array<Real64, Window::maxGlassLayers> thick = {0.0};                              // Glass layer thickness (m)
@@ -579,11 +581,7 @@ struct WindowManagerData : BaseGlobalStruct
         this->Outir = 0.0;
         this->Rmir = 0.0;
         this->Rtot = 0.0;
-        this->gcon = {0.0};
-        this->gvis = {0.0};
-        this->gcp = {0.0};
-        this->gwght = {0.0};
-        this->gfract = {0.0};
+        this->gases = {Material::Gas()};
         this->gnmix = {0};
         this->gap = {0.0};
         this->thick = {0.0};

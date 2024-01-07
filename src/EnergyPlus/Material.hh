@@ -102,6 +102,7 @@ namespace Material {
         Num
     };
 
+#ifdef GET_OUT        
     // Air       Argon     Krypton   Xenon
     // Gas conductivity coefficients for gases in a mixture
     extern const std::array<std::array<Real64, 10>, 3> GasCoeffsCon;
@@ -111,6 +112,7 @@ namespace Material {
     extern const std::array<std::array<Real64, 10>, 3> GasCoeffsCp;
     extern const std::array<Real64, 10> GasWght;
     extern const std::array<Real64, 10> GasSpecificHeatRatio;
+#endif // GET_OUT
 
     enum class GapVentType
     {
@@ -121,10 +123,10 @@ namespace Material {
         Num
     };
 
-    constexpr std::array<std::string_view, (int)GapVentType::Num> GapVentTypeUC = {"SEALED", "VENTEDINDOOR", "VENTEDOUTDOOR"};
+    constexpr std::array<std::string_view, (int)GapVentType::Num> gapVentTypeNamesUC = {"SEALED", "VENTEDINDOOR", "VENTEDOUTDOOR"};
 
     extern const std::array<std::string_view, (int)GasType::Num> gasTypeNames;
-    extern const std::array<std::string_view, (int)GapVentType::Num> GapVentTypeNames;
+    extern const std::array<std::string_view, (int)GapVentType::Num> gapVentTypeNames;
 
     enum class SlatAngleType
     {
@@ -135,7 +137,7 @@ namespace Material {
         Num
     };
 
-    constexpr std::array<std::string_view, (int)SlatAngleType::Num> SlatAngleTypeUC = {
+    constexpr std::array<std::string_view, (int)SlatAngleType::Num> slatAngleTypeNamesUC = {
         "FIXEDSLATANGLE", "MAXIMIZESOLAR", "BLOCKBEAMSOLAR"};
 
     // Parameter for window screens beam reflectance accounting
@@ -148,7 +150,7 @@ namespace Material {
         Num
     };
 
-    constexpr std::array<std::string_view, (int)ScreenBeamReflectanceModel::Num> ScreenBeamReflectanceModelNamesUC = {
+    constexpr std::array<std::string_view, (int)ScreenBeamReflectanceModel::Num> screenBeamReflectanceModelNamesUC = {
         "DONOTMODEL", "MODELASDIRECTBEAM", "MODELASDIFFUSE"};
 
     enum class VariableAbsCtrlSignal
@@ -161,7 +163,7 @@ namespace Material {
         Num
     };
 
-    constexpr std::array<std::string_view, (int)VariableAbsCtrlSignal::Num> VariableAbsCtrlSignalUC = {
+    constexpr std::array<std::string_view, (int)VariableAbsCtrlSignal::Num> variableAbsCtrlSignalNamesUC = {
         "SURFACETEMPERATURE", "SURFACERECEIVEDSOLARRADIATION", "SPACEHEATINGCOOLINGMODE", "SCHEDULED"};
 
     // Parameters to indicate surface roughness for use with the Material
@@ -178,10 +180,10 @@ namespace Material {
         Num
     };
 
-    constexpr std::array<std::string_view, (int)SurfaceRoughness::Num> SurfaceRoughnessUC{
+    constexpr std::array<std::string_view, (int)SurfaceRoughness::Num> surfaceRoughnessNamesUC{
         "VERYROUGH", "ROUGH", "MEDIUMROUGH", "MEDIUMSMOOTH", "SMOOTH", "VERYSMOOTH"};
 
-    extern const std::array<std::string_view, (int)SurfaceRoughness::Num> RoughnessNames;
+    extern const std::array<std::string_view, (int)SurfaceRoughness::Num> surfaceRoughnessNames;
 
     struct MaterialBase
     {
@@ -230,17 +232,18 @@ namespace Material {
         bool WarnedForHighDiffusivity = false;  // used to limit error messaging to just the first instance
 
         bool isUsed = false;
-            
+
+        // Moved these into the base class for SQLite purposes
+        Real64 Porosity = 0.0;      // Layer porosity
+        Real64 IsoMoistCap = 0.0;   // Isothermal moisture capacity on water vapor density (m3/kg)
+        Real64 ThermGradCoef = 0.0; // Thermal-gradient coefficient for moisture capacity based on the water vapor density (kg/kgK)
+        Real64 VaporDiffus = 0.0;   // Layer vapor diffusivity
+
         virtual bool dummy() { return true; }   // Need at least one virtual function (vtable) for dynamic casting to work (duh)
     };
 
     struct MaterialChild : public MaterialBase
     {
-        Real64 IsoMoistCap = 0.0;   // Isothermal moisture capacity on water vapor density (m3/kg)
-        Real64 Porosity = 0.0;      // Layer porosity
-        Real64 ThermGradCoef = 0.0; // Thermal-gradient coefficient for moisture capacity
-        // based on the water vapor density (kg/kgK)
-        Real64 VaporDiffus = 0.0;                                         // Layer vapor diffusivity
         int GlassSpectralDataPtr = 0;                               // Number of a spectral data set associated with a window glass material
         // Radiation parameters
         bool AbsorpSolarEMSOverrideOn = false;   // if true, then EMS calling to override value for solar absorptance
@@ -560,22 +563,38 @@ namespace Material {
         Real64 InitialPressure = 0.0;     // Window(s) pressure in time of fabrication
     };
 
-    struct MaterialGasMixture : public MaterialBase {
-        Array1D<GasType> gasTypes = Array1D<GasType>(5, GasType::Custom); // Gas type (air=1, argon=2, krypton=3, xenon=4, custom=0) for
+    int constexpr maxMixGases = 5;
+
+    struct GasCoeffs
+    {
+        Real64 c0 = 0.0;
+        Real64 c1 = 0.0;
+        Real64 c2 = 0.0;
+    };
+
+    struct Gas {
+        GasType type = GasType::Custom;
+        GasCoeffs con = GasCoeffs();
+        GasCoeffs vis = GasCoeffs();
+        GasCoeffs cp = GasCoeffs();
+        Real64 wght = 0.0;
+        Real64 specHeatRatio = 0.0;
+        Real64 fract = 0.0;
+    };
+        
+    extern const std::array<Gas, 10> gases;
+
+    struct MaterialGasMix : public MaterialBase {
         //  up to 5 gases in a mixture [Window gas only].  It is defined as parameter (GasCoefs)
         int numGases = 0;                             // Number of gases in a window gas mixture
-        Array2D<Real64> GasCon = Array2D<Real64>(3, 5, 0.0);        // Gas conductance coefficients for up to 5 gases in a mixture
-        Array2D<Real64> GasVis = Array2D<Real64>(3, 5, 0.0);        // Gas viscosity coefficients for up to 5 gases in a mixture
-        Array2D<Real64> GasCp = Array2D<Real64>(3, 5, 0.0);         // Gas specific-heat coefficients for up to 5 gases in a mixture
-        Array1D<Real64> GasWght = Array1D<Real64>(5, 0.0);          // Gas molecular weight for up to 5 gases in a mixture
-        Array1D<Real64> GasSpecHeatRatio = Array1D<Real64>(5, 0.0); // Gas specific heat ratio (used for low pressure calculations)
-        Array1D<Real64> GasFract = Array1D<Real64>(5, 0.0);         // Gas fractions for up to 5 gases in a mixture
 
+        std::array<Gas, maxMixGases> gases = {Gas()};
+            
         GapVentType gapVentType = GapVentType::Sealed;               // Gap Ven type for equivalent Layer window model
             
         virtual bool dummy() { return true; }
 
-        MaterialGasMixture() : MaterialBase() { group = Group::WindowGasMixture; }
+        MaterialGasMix() : MaterialBase() { group = Group::WindowGas; }
     };
 
 

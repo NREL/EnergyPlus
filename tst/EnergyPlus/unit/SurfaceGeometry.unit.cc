@@ -3864,15 +3864,15 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_createAirMaterialFromDistance_Test)
 {
     state->dataMaterial->TotMaterials = 0;
     createAirMaterialFromDistance(*state, 0.008, "test_air_");
-    auto *thisMaterial = dynamic_cast<Material::MaterialGasMixture *>(state->dataMaterial->Material(state->dataMaterial->TotMaterials));
+    auto *thisMaterial = dynamic_cast<Material::MaterialGasMix *>(state->dataMaterial->Material(state->dataMaterial->TotMaterials));
     EXPECT_EQ(state->dataMaterial->TotMaterials, 1);
     EXPECT_EQ(thisMaterial->Name, "test_air_8MM");
     EXPECT_EQ(thisMaterial->Thickness, 0.008);
-    EXPECT_EQ(thisMaterial->GasCon(1, 1), 2.873e-3);
-    EXPECT_EQ(thisMaterial->GasCon(2, 1), 7.760e-5);
+    EXPECT_EQ(thisMaterial->gases[0].con.c0, 2.873e-3);
+    EXPECT_EQ(thisMaterial->gases[0].con.c1, 7.760e-5);
 
     createAirMaterialFromDistance(*state, 0.012, "test_air_");
-    thisMaterial = dynamic_cast<Material::MaterialGasMixture *>(state->dataMaterial->Material(state->dataMaterial->TotMaterials));
+    thisMaterial = dynamic_cast<Material::MaterialGasMix *>(state->dataMaterial->Material(state->dataMaterial->TotMaterials));
     EXPECT_EQ(state->dataMaterial->TotMaterials, 2);
     EXPECT_EQ(thisMaterial->Name, "test_air_12MM");
     EXPECT_EQ(thisMaterial->Thickness, 0.012);

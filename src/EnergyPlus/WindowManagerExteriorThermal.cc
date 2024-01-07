@@ -747,26 +747,19 @@ namespace Window {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
-        auto const *matGas = dynamic_cast<Material::MaterialGasMixture const *>(materialBase);
+        auto const *matGas = dynamic_cast<Material::MaterialGasMix const *>(materialBase);
         assert(matGas != nullptr);
         const int numGases = matGas->numGases;
         double constexpr vacuumCoeff = 1.4; // Load vacuum coefficient once it is implemented (Simon).
         std::string const &gasName = matGas->Name;
         Gases::CGas aGas;
-        for (int i = 1; i <= numGases; ++i) {
-            Real64 wght = matGas->GasWght(i);
-            Real64 fract = matGas->GasFract(i);
-            std::vector<double> gcon;
-            std::vector<double> gvis;
-            std::vector<double> gcp;
-            for (int j = 1; j <= 3; ++j) {
-                gcon.push_back(matGas->GasCon(j, i));
-                gvis.push_back(matGas->GasVis(j, i));
-                gcp.push_back(matGas->GasCp(j, i));
-            }
-            Gases::CIntCoeff aCon(gcon[0], gcon[1], gcon[2]);
-            Gases::CIntCoeff aCp(gcp[0], gcp[1], gcp[2]);
-            Gases::CIntCoeff aVis(gvis[0], gvis[1], gvis[2]);
+        for (int i = 0; i < numGases; ++i) {
+            auto const &gas = matGas->gases[i];
+            Real64 wght = gas.wght;
+            Real64 fract = gas.fract;
+            Gases::CIntCoeff aCon(gas.con.c0, gas.con.c1, gas.con.c2);
+            Gases::CIntCoeff aCp(gas.cp.c0, gas.cp.c1, gas.cp.c2);
+            Gases::CIntCoeff aVis(gas.vis.c0, gas.vis.c1, gas.vis.c2);
             Gases::CGasData aData(gasName, wght, vacuumCoeff, aCp, aCon, aVis);
             aGas.addGasItem(fract, aData);
         }

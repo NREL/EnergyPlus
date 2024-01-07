@@ -604,11 +604,11 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                         // Gas on either side of a between-glass shade/blind must be the same
                         int const MatGapL = thisConstruct.LayerPoint(LayNumSh - 1);
                         int const MatGapR = thisConstruct.LayerPoint(LayNumSh + 1);
-                        auto const *thisMaterialGapL = dynamic_cast<const Material::MaterialGasMixture *>(state.dataMaterial->Material(MatGapL));
-                        auto const *thisMaterialGapR = dynamic_cast<const Material::MaterialGasMixture *>(state.dataMaterial->Material(MatGapR));
-                        for (int IGas = 1; IGas <= 5; ++IGas) {
-                            if ((thisMaterialGapL->gasTypes(IGas) != thisMaterialGapR->gasTypes(IGas)) ||
-                                (thisMaterialGapL->GasFract(IGas) != thisMaterialGapR->GasFract(IGas)))
+                        auto const *thisMaterialGapL = dynamic_cast<const Material::MaterialGasMix *>(state.dataMaterial->Material(MatGapL));
+                        auto const *thisMaterialGapR = dynamic_cast<const Material::MaterialGasMix *>(state.dataMaterial->Material(MatGapR));
+                        for (int IGas = 0; IGas < Material::maxMixGases; ++IGas) {
+                            if ((thisMaterialGapL->gases[IGas].type != thisMaterialGapR->gases[IGas].type) ||
+                                (thisMaterialGapL->gases[IGas].fract != thisMaterialGapR->gases[IGas].fract))
                                 WrongWindowLayering = true;
                         }
                         // Gap width on either side of a between-glass shade/blind must be the same

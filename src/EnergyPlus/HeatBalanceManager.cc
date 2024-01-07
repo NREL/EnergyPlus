@@ -4237,7 +4237,7 @@ namespace HeatBalanceManager {
             ++FileLineCount;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
-                    auto *matGas = new Material::MaterialGasMixture;
+                    auto *matGas = new Material::MaterialGasMix;
                     state.dataMaterial->Material.push_back(matGas);
                     // Material is an EP-vector
                     MaterNumSysGap(IGap, IGlSys) = state.dataMaterial->Material.size();
@@ -4261,23 +4261,23 @@ namespace HeatBalanceManager {
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
                     int MatNum = MaterNumSysGap(IGap, IGlSys);
-                    auto *matGas = dynamic_cast<Material::MaterialGasMixture*>(state.dataMaterial->Material(MatNum));
+                    auto *matGas = dynamic_cast<Material::MaterialGasMix *>(state.dataMaterial->Material(MatNum));
                     assert(matGas != nullptr);
                     matGas->numGases = NumGases(IGap, IGlSys);
-                    for (int IGas = 1; IGas <= matGas->numGases; ++IGas) {
+                    for (int IGas = 0; IGas < matGas->numGases; ++IGas) {
                         NextLine = W5DataFile.readLine();
                         ++FileLineCount;
                         readList(NextLine.data.substr(19),
-                                 GasName(IGas),
-                                 matGas->GasFract(IGas),
-                                 matGas->GasWght(IGas),
-                                 matGas->GasCon(_, IGas),
-                                 matGas->GasVis(_, IGas),
-                                 matGas->GasCp(_, IGas));
-                        // Nominal resistance of gap at room temperature (based on first gas in mixture)
-                        state.dataHeatBal->NominalR(MatNum) =
-                            matGas->Thickness / (matGas->GasCon(1, 1) + matGas->GasCon(2, 1) * 300.0 + matGas->GasCon(3, 1) * 90000.0);
+                                 GasName(IGas+1),
+                                 matGas->gases[IGas].fract,
+                                 matGas->gases[IGas].wght,
+                                 matGas->gases[IGas].con.c0, matGas->gases[IGas].con.c1, matGas->gases[IGas].con.c2,
+                                 matGas->gases[IGas].vis.c0, matGas->gases[IGas].vis.c1, matGas->gases[IGas].vis.c2, 
+                                 matGas->gases[IGas].cp.c0, matGas->gases[IGas].cp.c1, matGas->gases[IGas].cp.c2);
                     }
+                    // Nominal resistance of gap at room temperature (based on first gas in mixture)
+                    state.dataHeatBal->NominalR(MatNum) =
+                        matGas->Thickness / (matGas->gases[0].con.c0 + matGas->gases[0].con.c1 * 300.0 + matGas->gases[0].con.c2 * 90000.0);
                 }
             }
 
@@ -4537,12 +4537,12 @@ namespace HeatBalanceManager {
                     if (matBase->group == Material::Group::WindowGlass) {
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += matBase->Thickness / matBase->Conductivity;
                     } else if (matBase->group == Material::Group::WindowGas || matBase->group == Material::Group::WindowGasMixture) {
-                        auto const *matGas = dynamic_cast<Material::MaterialGasMixture const*>(matBase);
+                        auto const *matGas = dynamic_cast<Material::MaterialGasMix const*>(matBase);
                         assert(matGas != nullptr);
                             
                         // If mixture, use conductivity of first gas in mixture
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) +=
-                            matGas->Thickness / (matGas->GasCon(1, 1) + matGas->GasCon(2, 1) * 300.0 + matGas->GasCon(3, 1) * 90000.0);
+                            matGas->Thickness / (matGas->gases[0].con.c0 + matGas->gases[0].con.c1 * 300.0 + matGas->gases[0].con.c2 * 90000.0);
                     }
                 }
 

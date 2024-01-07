@@ -2397,18 +2397,12 @@ namespace Window {
 
                 if (mat->group == Material::Group::WindowGas || mat->group == Material::Group::WindowGasMixture) {
                     ++IGap;
-                    auto const *matGas = dynamic_cast<Material::MaterialGasMixture const *>(state.dataMaterial->Material(LayPtr));
+                    auto const *matGas = dynamic_cast<Material::MaterialGasMix const *>(state.dataMaterial->Material(LayPtr));
                     assert(matGas != nullptr);
                     wm->gap[IGap - 1] = matGas->Thickness;
                     wm->gnmix[IGap - 1] = matGas->numGases;
-                    for (int IMix = 1; IMix <= wm->gnmix[IGap - 1]; ++IMix) {
-                        wm->gwght[IMix - 1][IGap - 1] = matGas->GasWght(IMix);
-                        wm->gfract[IMix - 1][IGap - 1] = matGas->GasFract(IMix);
-                        for (int ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                            wm->gcon[ICoeff - 1][IMix - 1][IGap - 1] = matGas->GasCon(ICoeff, IMix);
-                            wm->gvis[ICoeff - 1][IMix - 1][IGap - 1] = matGas->GasVis(ICoeff, IMix);
-                            wm->gcp[ICoeff - 1][IMix - 1][IGap - 1] = matGas->GasCp(ICoeff, IMix);
-                        }
+                    for (int IMix = 0; IMix < wm->gnmix[IGap - 1]; ++IMix) {
+                        wm->gases[IGap - 1][IMix] = matGas->gases[IMix];
                     }
                 }
 
@@ -2426,12 +2420,8 @@ namespace Window {
                     wm->gap[IGap - 1] = state.dataMaterial->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).BlindToGlassDist;
                 }
                 wm->gnmix[IGap - 1] = 1;
-                wm->gwght[0][IGap - 1] = Material::GasWght[(int)Material::GasType::Air];
-                for (int ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    wm->gcon[ICoeff - 1][0][IGap - 1] = Material::GasCoeffsCon[ICoeff - 1][(int)Material::GasType::Air];
-                    wm->gvis[ICoeff - 1][0][IGap - 1] = Material::GasCoeffsVis[ICoeff - 1][(int)Material::GasType::Air];
-                    wm->gcp[ICoeff - 1][0][IGap - 1] = Material::GasCoeffsCp[ICoeff - 1][(int)Material::GasType::Air];
-                }
+
+                wm->gases[IGap - 1][0] = Material::gases[(int)Material::GasType::Air];
             }
 
             // Exterior convection coefficient, exterior air temperature and IR radiance
@@ -4674,17 +4664,18 @@ namespace Window {
         // Autodesk:Logic Either assert NMix>0 or handle NMix<=0 in logic so that con and locals guar. initialized before use
         NMix = wm->gnmix[IGap - 1];
 
-        for (int IMix = 1; IMix <= NMix; ++IMix) {
-            frct[IMix - 1] = wm->gfract[IMix - 1][IGap - 1];
+        for (int IMix = 0; IMix < NMix; ++IMix) {
+            frct[IMix] = wm->gases[IGap - 1][IMix - 1].fract;
         }
 
         Real64 const tmean(0.5 * (tleft + tright)); // Average gap gas temperature (K)
         Real64 const tmean_2(pow_2(tmean));
 
-        fcon[0] = wm->gcon[0][0][IGap - 1] + wm->gcon[1][0][IGap - 1] * tmean + wm->gcon[2][0][IGap - 1] * tmean_2;
-        fvis[0] = wm->gvis[0][0][IGap - 1] + wm->gvis[1][0][IGap - 1] * tmean + wm->gvis[2][0][IGap - 1] * tmean_2;
-        fcp[0] = wm->gcp[0][0][IGap - 1] + wm->gcp[1][0][IGap - 1] * tmean + wm->gcp[2][0][IGap - 1] * tmean_2;
-        fdens[0] = pres * wm->gwght[0][IGap - 1] / (gaslaw * tmean); // Density using ideal gas law:
+        auto const &wmgas0 = wm->gases[IGap - 1][0];
+        fcon[0] = wmgas0.con.c0 + wmgas0.con.c1 * tmean + wmgas0.con.c2 * tmean_2;
+        fvis[0] = wmgas0.vis.c0 + wmgas0.vis.c1 * tmean + wmgas0.vis.c2 * tmean_2;
+        fcp[0] = wmgas0.cp.c0 + wmgas0.cp.c1 * tmean + wmgas0.cp.c2 * tmean_2;
+        fdens[0] = pres * wmgas0.wght / (gaslaw * tmean); // Density using ideal gas law:
         //  rho=(presure*molecweight)/(gasconst*tmean)
 
         if (NMix == 1) { // Single gas
@@ -4693,9 +4684,9 @@ namespace Window {
             cp = fcp[0];
             dens = fdens[0];
         } else if (NMix > 1) {                                                                   // Multiple gases; calculate mixture properties
-            molmix = frct[0] * wm->gwght[0][IGap - 1];                      // initialize eq. 56
+            molmix = frct[0] * wmgas0.wght;                      // initialize eq. 56
             cpmixm = molmix * fcp[0];                                                            // initialize eq. 58
-            kprime[0] = 3.75 * (gaslaw / wm->gwght[0][IGap - 1]) * fvis[0]; // eq. 67
+            kprime[0] = 3.75 * (gaslaw / wmgas0.wght) * fvis[0]; // eq. 67
             kdblprm[0] = fcon[0] - kprime[0];                                                    // eq. 67
 
             // Initialize summations for eqns 60-66
@@ -4708,13 +4699,15 @@ namespace Window {
 
             // Calculate properties of mixture constituents
             for (int i = 2; i <= NMix; ++i) {
-                fcon[i - 1] = wm->gcon[0][i - 1][IGap - 1] + wm->gcon[1][i - 1][IGap - 1] * tmean + wm->gcon[2][i - 1][IGap - 1] * tmean_2;
-                fvis[i - 1] = wm->gvis[0][i - 1][IGap - 1] + wm->gvis[1][i - 1][IGap - 1] * tmean + wm->gvis[2][i - 1][IGap - 1] * tmean_2;
-                fcp[i - 1] = wm->gcp[0][i - 1][IGap - 1] + wm->gcp[1][i - 1][IGap - 1] * tmean + wm->gcp[2][i - 1][IGap - 1] * tmean_2;
-                fdens[i - 1] = pres * wm->gwght[i - 1][IGap - 1] / (gaslaw * tmean);
-                molmix += frct[i - 1] * wm->gwght[i - 1][IGap - 1];                       // eq. 56
-                cpmixm += frct[i - 1] * fcp[i - 1] * wm->gwght[i - 1][IGap - 1];          // eq. 58-59
-                kprime[i - 1] = 3.75 * gaslaw / wm->gwght[i - 1][IGap - 1] * fvis[i - 1]; // eq. 67
+                auto const &wmgas = wm->gases[IGap - 1][i - 1];
+                    
+                fcon[i - 1] = wmgas.con.c0 + wmgas.con.c1 * tmean + wmgas.con.c2 * tmean_2;
+                fvis[i - 1] = wmgas.vis.c0 + wmgas.vis.c1 * tmean + wmgas.vis.c2 * tmean_2;
+                fcp[i - 1] = wmgas.cp.c0 + wmgas.cp.c1 * tmean + wmgas.cp.c2 * tmean_2;
+                fdens[i - 1] = pres * wmgas.wght / (gaslaw * tmean);
+                molmix += frct[i - 1] * wmgas.wght;                       // eq. 56
+                cpmixm += frct[i - 1] * fcp[i - 1] * wmgas.wght;          // eq. 58-59
+                kprime[i - 1] = 3.75 * gaslaw / wmgas.wght * fvis[i - 1]; // eq. 67
                 kdblprm[i - 1] = fcon[i - 1] - kprime[i - 1];                                                  // eq. 68
                 mukpdwn[i - 1] = 1.0;                                                                          // initialize denomonator of eq. 60
                 kpdown[i - 1] = 1.0;                                                                           // initialize denomonator of eq. 63
@@ -4722,22 +4715,24 @@ namespace Window {
             }
 
             for (int i = 1; i <= NMix; ++i) {
+                auto const &wmgasI = wm->gases[IGap - 1][i - 1];
+                    
                 for (int j = 1; j <= NMix; ++j) {
+                    auto const &wmgasJ = wm->gases[IGap - 1][j - 1];
+                    
                     // numerator of equation 61
-                    phimup = pow_2(1.0 + std::sqrt(fvis[i - 1] / fvis[j - 1]) * root_4(wm->gwght[j - 1][IGap - 1] / wm->gwght[i - 1][IGap - 1]));
+                    phimup = pow_2(1.0 + std::sqrt(fvis[i - 1] / fvis[j - 1]) * root_4(wmgasJ.wght / wmgasI.wght));
                     // denomonator of eq. 61, 64 and 66
-                    downer = two_sqrt_2 * std::sqrt(1 + (wm->gwght[i - 1][IGap - 1] / wm->gwght[j - 1][IGap - 1]));
+                    downer = two_sqrt_2 * std::sqrt(1 + (wmgasI.wght / wmgasJ.wght));
                     // calculate the denominator of eq. 60
                     if (i != j) mukpdwn[i - 1] += phimup / downer * frct[j - 1] / frct[i - 1];
                     // numerator of eq. 64; psiterm is the multiplied term in backets
-                    psiup = pow_2(1.0 + std::sqrt(kprime[i - 1] / kprime[j - 1]) * root_4(wm->gwght[i - 1][IGap - 1] / wm->gwght[j - 1][IGap - 1]));
-                    psiterm = 1.0 + 2.41 * (wm->gwght[i - 1][IGap - 1] - wm->gwght[j - 1][IGap - 1]) *
-                                        (wm->gwght[i - 1][IGap - 1] - 0.142 * wm->gwght[j - 1][IGap - 1]) /
-                                        pow_2(wm->gwght[i - 1][IGap - 1] + wm->gwght[j - 1][IGap - 1]);
+                    psiup = pow_2(1.0 + std::sqrt(kprime[i - 1] / kprime[j - 1]) * root_4(wmgasI.wght / wmgasJ.wght));
+                    psiterm = 1.0 + 2.41 * (wmgasI.wght - wmgasJ.wght) * (wmgasI.wght - 0.142 * wmgasJ.wght) / pow_2(wmgasI.wght + wmgasJ.wght);
                     // using the common denominator, downer, calculate the denominator for eq. 63
                     if (i != j) kpdown[i - 1] += psiup * (psiterm / downer) * (frct[j - 1] / frct[i - 1]);
                     // calculate the numerator of eq. 66
-                    phikup = pow_2(1.0 + std::sqrt(kprime[i - 1] / kprime[j - 1]) * root_4(wm->gwght[i - 1][IGap - 1] / wm->gwght[j - 1][IGap - 1]));
+                    phikup = pow_2(1.0 + std::sqrt(kprime[i - 1] / kprime[j - 1]) * root_4(wmgasI.wght / wmgasJ.wght));
                     // using the common denominator, downer, calculate the denomonator for eq. 65
                     if (i != j) kdpdown[i - 1] += (phikup / downer) * (frct[j - 1] / frct[i - 1]);
                 }
@@ -4811,19 +4806,19 @@ namespace Window {
         NMix = wm->gnmix[IGap - 1];
 
         for (int IMix = 1; IMix <= NMix; ++IMix) {
-            frct(IMix) = wm->gfract[IMix - 1][IGap - 1];
+            frct(IMix) = wm->gases[IGap - 1][IMix - 1].fract;
         }
 
         Real64 const tmean_2(pow_2(tmean));
-        fvis(1) = wm->gvis[0][0][IGap - 1] + wm->gvis[1][0][IGap - 1] * tmean +
-                  wm->gvis[2][0][IGap - 1] * tmean_2;
-        fdens(1) = pres * wm->gwght[0][IGap - 1] / (gaslaw * tmean); // Density using ideal gas law:
+        auto const &wmgas0 = wm->gases[IGap - 1][0];
+        fvis(1) = wmgas0.vis.c0 + wmgas0.vis.c1 * tmean + wmgas0.vis.c2 * tmean_2;
+        fdens(1) = pres * wmgas0.wght / (gaslaw * tmean); // Density using ideal gas law:
         //  rho=(presure*molecweight)/(gasconst*tmean)
         if (NMix == 1) { // Single gas
             visc = fvis(1);
             dens = fdens(1);
         } else {                                                            // Multiple gases; calculate mixture properties
-            molmix = frct(1) * wm->gwght[0][IGap - 1]; // initialize eq. 56
+            molmix = frct(1) * wmgas0.wght; // initialize eq. 56
 
             // Initialize summations for eqns 60-66
             mumix = 0.0;
@@ -4831,21 +4826,21 @@ namespace Window {
 
             // Calculate properties of mixture constituents
             for (int i = 2; i <= NMix; ++i) {
-                fvis(i) = wm->gvis[0][i - 1][IGap - 1] + wm->gvis[1][i - 1][IGap - 1] * tmean +
-                          wm->gvis[2][i - 1][IGap - 1] * tmean_2;
-                fdens(i) = pres * wm->gwght[i - 1][IGap - 1] / (gaslaw * tmean);
-                molmix += frct(i) * wm->gwght[i - 1][IGap - 1]; // eq. 56
+                auto const &wmgas = wm->gases[IGap - 1][i - 1];
+                fvis(i) = wmgas.vis.c0 + wmgas.vis.c1 * tmean + wmgas.vis.c2 * tmean_2;
+                fdens(i) = pres * wmgas.wght / (gaslaw * tmean);
+                molmix += frct(i) * wmgas.wght; // eq. 56
                 mukpdwn(i) = 1.0;                                                    // initialize denomonator of eq. 60
             }
 
             for (int i = 1; i <= NMix; ++i) {
+                auto const &wmgasI = wm->gases[IGap - 1][i - 1];
                 for (int j = 1; j <= NMix; ++j) {
+                    auto const &wmgasJ = wm->gases[IGap - 1][j - 1];
                     // numerator of equation 61
-                    phimup = pow_2(1.0 + std::sqrt(fvis(i) / fvis(j)) * root_4(wm->gwght[j - 1][IGap - 1] /
-                                                                               wm->gwght[i - 1][IGap - 1]));
+                    phimup = pow_2(1.0 + std::sqrt(fvis(i) / fvis(j)) * root_4(wmgasJ.wght / wmgasI.wght));
                     // denomonator of eq. 61, 64 and 66
-                    downer = two_sqrt_2 *
-                             std::sqrt(1 + (wm->gwght[i - 1][IGap - 1] / wm->gwght[j - 1][IGap - 1]));
+                    downer = two_sqrt_2 * std::sqrt(1 + (wmgasI.wght / wmgasJ.wght));
                     // calculate the denominator of eq. 60
                     if (i != j) mukpdwn(i) += phimup / downer * frct(j) / frct(i);
                 }
@@ -6608,18 +6603,12 @@ namespace Window {
                     assert(matCW != nullptr);
                     LayPtr = matCW->GasPointer;
                 }
-                auto const *matGas = dynamic_cast<Material::MaterialGasMixture const *>(state.dataMaterial->Material(LayPtr));
+                auto const *matGas = dynamic_cast<Material::MaterialGasMix const *>(state.dataMaterial->Material(LayPtr));
                 assert(matGas != nullptr);
                 wm->gap[IGap - 1] = matGas->Thickness;
                 wm->gnmix[IGap - 1] = matGas->numGases;
-                for (int IMix = 1; IMix <= wm->gnmix[IGap - 1]; ++IMix) {
-                    wm->gwght[IMix - 1][IGap - 1] = matGas->GasWght(IMix);
-                    wm->gfract[IMix - 1][IGap - 1] = matGas->GasFract(IMix);
-                    for (int ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                        wm->gcon[ICoeff - 1][IMix - 1][IGap - 1] = matGas->GasCon(ICoeff, IMix);
-                        wm->gvis[ICoeff - 1][IMix - 1][IGap - 1] = matGas->GasVis(ICoeff, IMix);
-                        wm->gcp[ICoeff - 1][IMix - 1][IGap - 1] = matGas->GasCp(ICoeff, IMix);
-                    }
+                for (int IMix = 0; IMix < wm->gnmix[IGap - 1]; ++IMix) {
+                    wm->gases[IGap - 1][IMix] = matGas->gases[IMix];
                 }
             }
         } // for (Lay)
@@ -7244,13 +7233,13 @@ namespace Window {
 
                         switch (mat->group) {
                         case Material::Group::WindowGas: {
-                            auto const *matGas = dynamic_cast<Material::MaterialGasMixture const *>(mat);
+                            auto const *matGas = dynamic_cast<Material::MaterialGasMix const *>(mat);
                             assert(matGas != nullptr);
                             static constexpr std::string_view Format_702(" WindowMaterial:Gas,{},{},{:.3R}\n");
                             print(state.files.eio,
                                   Format_702,
                                   matGas->Name,
-                                  Material::gasTypeNames[(int)matGas->gasTypes(1)],
+                                  Material::gasTypeNames[(int)matGas->gases[0].type],
                                   matGas->Thickness);
                             //! fw CASE(WindowGasMixture)
                         } break;
@@ -7467,15 +7456,15 @@ namespace Window {
                                   thisMaterial->EmissThermalBack);
                         } break;
                         case Material::Group::GapEquivalentLayer: {
-                            auto const *matGas = dynamic_cast<Material::MaterialGasMixture const *>(mat);
+                            auto const *matGas = dynamic_cast<Material::MaterialGasMix const *>(mat);
                             assert(matGas != nullptr);
                             static constexpr std::string_view Format_713(" WindowMaterial:Gap:EquivalentLayer,{},{},{:.3R},{}\n");
                             print(state.files.eio,
                                   Format_713,
                                   matGas->Name,
-                                  Material::gasTypeNames[(int)matGas->gasTypes(1)],
+                                  Material::gasTypeNames[(int)matGas->gases[0].type],
                                   matGas->Thickness,
-                                  Material::GapVentTypeNames[(int)matGas->gapVentType]);
+                                  Material::gapVentTypeNames[(int)matGas->gapVentType]);
                         } break;
                         default:
                             break;
@@ -8755,6 +8744,7 @@ namespace Window {
         LUdecomposition(state, a, n, indx, d);
 
         for (int j = 1; j <= n; ++j) {
+            tmp = 0.0;
             LUsolution(state, a, n, indx, tmp);
             for (int i = 1; i <= n; ++i)
                 y(j, i) = tmp(i);

@@ -316,25 +316,27 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).S = thisMaterial->ScreenWireSpacing;
             CFS(EQLNum).L(sLayer).W = thisMaterial->ScreenWireDiameter;
         } else if (mat->group == Material::Group::GapEquivalentLayer) {
-            auto const *matGas = dynamic_cast<Material::MaterialGasMixture const *>(mat);
+            auto const *matGas = dynamic_cast<Material::MaterialGasMix const *>(mat);
             assert(matGas != nullptr);
             
             // This layer is a gap.  Fill in the parameters
             CFS(EQLNum).G(gLayer).Name = matGas->Name;
             // previously the values of the levels are 1-3, now it's 0-2
-            CFS(EQLNum).G(gLayer).GTYPE = static_cast<int>(matGas->gapVentType) + 1;
+            CFS(EQLNum).G(gLayer).GTYPE = (int)matGas->gapVentType + 1;
             CFS(EQLNum).G(gLayer).TAS = matGas->Thickness;
-            CFS(EQLNum).G(gLayer).FG.Name = Material::gasTypeNames[static_cast<int>(matGas->gasTypes(1))];
-            CFS(EQLNum).G(gLayer).FG.AK = matGas->GasCon(1, 1);
-            CFS(EQLNum).G(gLayer).FG.BK = matGas->GasCon(2, 1);
-            CFS(EQLNum).G(gLayer).FG.CK = matGas->GasCon(3, 1);
-            CFS(EQLNum).G(gLayer).FG.ACP = matGas->GasCp(1, 1);
-            CFS(EQLNum).G(gLayer).FG.BCP = matGas->GasCp(2, 1);
-            CFS(EQLNum).G(gLayer).FG.CCP = matGas->GasCp(3, 1);
-            CFS(EQLNum).G(gLayer).FG.AVISC = matGas->GasVis(1, 1);
-            CFS(EQLNum).G(gLayer).FG.BVISC = matGas->GasVis(2, 1);
-            CFS(EQLNum).G(gLayer).FG.CVISC = matGas->GasVis(3, 1);
-            CFS(EQLNum).G(gLayer).FG.MHAT = matGas->GasWght(1);
+
+            auto const &gas = matGas->gases[0];
+            CFS(EQLNum).G(gLayer).FG.Name = Material::gasTypeNames[(int)gas.type];
+            CFS(EQLNum).G(gLayer).FG.AK = gas.con.c0;
+            CFS(EQLNum).G(gLayer).FG.BK = gas.con.c1;
+            CFS(EQLNum).G(gLayer).FG.CK = gas.con.c2;
+            CFS(EQLNum).G(gLayer).FG.ACP = gas.cp.c0;
+            CFS(EQLNum).G(gLayer).FG.BCP = gas.cp.c1;
+            CFS(EQLNum).G(gLayer).FG.CCP = gas.cp.c2;
+            CFS(EQLNum).G(gLayer).FG.AVISC = gas.cp.c0;
+            CFS(EQLNum).G(gLayer).FG.BVISC = gas.cp.c1;
+            CFS(EQLNum).G(gLayer).FG.CVISC = gas.cp.c2;
+            CFS(EQLNum).G(gLayer).FG.MHAT = gas.wght;
             // fills gas density and effective gap thickness
             BuildGap(state, CFS(EQLNum).G(gLayer), CFS(EQLNum).G(gLayer).GTYPE, CFS(EQLNum).G(gLayer).TAS);
         } else {
