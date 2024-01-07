@@ -2399,10 +2399,11 @@ namespace Window {
                     ++IGap;
                     auto const *matGas = dynamic_cast<Material::MaterialGasMix const *>(state.dataMaterial->Material(LayPtr));
                     assert(matGas != nullptr);
-                    wm->gap[IGap - 1] = matGas->Thickness;
-                    wm->gnmix[IGap - 1] = matGas->numGases;
-                    for (int IMix = 0; IMix < wm->gnmix[IGap - 1]; ++IMix) {
-                        wm->gases[IGap - 1][IMix] = matGas->gases[IMix];
+                    wm->gaps[IGap - 1].width = matGas->Thickness;
+                    wm->gaps[IGap - 1].numGases = matGas->numGases;
+                    for (int IMix = 0; IMix < wm->gaps[IGap - 1].numGases; ++IMix) {
+                        wm->gaps[IGap - 1].gases[IMix] = matGas->gases[IMix];
+                        wm->gaps[IGap - 1].gasFracts[IMix] = matGas->gasFracts[IMix];
                     }
                 }
 
@@ -2413,15 +2414,16 @@ namespace Window {
                 // Fill gap between blind/shade and adjacent glass with air properties.
                 ++IGap;
                 if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade) // Interior or exterior shade
-                    wm->gap[IGap - 1] = dynamic_cast<Material::MaterialChild const *>(state.dataMaterial->Material(ShadeLayPtr))->WinShadeToGlassDist;
+                    wm->gaps[IGap - 1].width = dynamic_cast<Material::MaterialChild const *>(state.dataMaterial->Material(ShadeLayPtr))->WinShadeToGlassDist;
                 else if (ShadeFlag == WinShadingType::ExtScreen) {
-                    wm->gap[IGap - 1] = dynamic_cast<Material::MaterialScreen const *>(state.dataMaterial->Material(ShadeLayPtr))->toGlassDist;
+                    wm->gaps[IGap - 1].width = dynamic_cast<Material::MaterialScreen const *>(state.dataMaterial->Material(ShadeLayPtr))->toGlassDist;
                 } else { // Interior or exterior blind
-                    wm->gap[IGap - 1] = state.dataMaterial->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).BlindToGlassDist;
+                    wm->gaps[IGap - 1].width = state.dataMaterial->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).BlindToGlassDist;
                 }
-                wm->gnmix[IGap - 1] = 1;
+                wm->gaps[IGap - 1].numGases = 1;
 
-                wm->gases[IGap - 1][0] = Material::gases[(int)Material::GasType::Air];
+                wm->gaps[IGap - 1].gases[0] = Material::gases[(int)Material::GasType::Air];
+                wm->gaps[IGap - 1].gasFracts[0] = 1;
             }
 
             // Exterior convection coefficient, exterior air temperature and IR radiance
@@ -2677,7 +2679,7 @@ namespace Window {
         case 2: { // double pane
             WindowGasConductance(state, wm->thetas[1], wm->thetas[2], 1, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[1], wm->thetas[2], 1, gr, pr, nu);
-            hgap(1) = (con / wm->gap[0] * nu) * surfWin.edgeGlassCorrFac;
+            hgap(1) = (con / wm->gaps[0].width * nu) * surfWin.edgeGlassCorrFac;
 
             wm->fvec[0] =
                 wm->Outir * wm->emis[0] -
@@ -2704,11 +2706,11 @@ namespace Window {
         case 3: { // Triple Pane
             WindowGasConductance(state, wm->thetas[1], wm->thetas[2], 1, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[1], wm->thetas[2], 1, gr, pr, nu);
-            hgap(1) = con / wm->gap[0] * nu * surfWin.edgeGlassCorrFac;
+            hgap(1) = con / wm->gaps[0].width * nu * surfWin.edgeGlassCorrFac;
 
             WindowGasConductance(state, wm->thetas[3], wm->thetas[4], 2, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[3], wm->thetas[4], 2, gr, pr, nu);
-            hgap(2) = con / wm->gap[1] * nu * surfWin.edgeGlassCorrFac;
+            hgap(2) = con / wm->gaps[1].width * nu * surfWin.edgeGlassCorrFac;
 
             thetas_2_3_4 = pow_4(wm->thetas[1]) - pow_4(wm->thetas[2]);
             thetas_4_5_4 = pow_4(wm->thetas[3]) - pow_4(wm->thetas[4]);
@@ -2744,15 +2746,15 @@ namespace Window {
         case 4: { // Quad Pane
             WindowGasConductance(state, wm->thetas[1], wm->thetas[2], 1, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[1], wm->thetas[2], 1, gr, pr, nu);
-            hgap(1) = con / wm->gap[0] * nu * surfWin.edgeGlassCorrFac;
+            hgap(1) = con / wm->gaps[0].width * nu * surfWin.edgeGlassCorrFac;
 
             WindowGasConductance(state, wm->thetas[3], wm->thetas[4], 2, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[3], wm->thetas[4], 2, gr, pr, nu);
-            hgap(2) = con / wm->gap[1] * nu * surfWin.edgeGlassCorrFac;
+            hgap(2) = con / wm->gaps[1].width * nu * surfWin.edgeGlassCorrFac;
 
             WindowGasConductance(state, wm->thetas[5], wm->thetas[6], 3, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[5], wm->thetas[6], 3, gr, pr, nu);
-            hgap(3) = con / wm->gap[2] * nu * surfWin.edgeGlassCorrFac;
+            hgap(3) = con / wm->gaps[2].width * nu * surfWin.edgeGlassCorrFac;
 
             thetas_2_3_4 = pow_4(wm->thetas[1]) - pow_4(wm->thetas[2]);
             thetas_4_5_4 = pow_4(wm->thetas[3]) - pow_4(wm->thetas[4]);
@@ -2826,7 +2828,7 @@ namespace Window {
         } else if (nglasslayer == 2) {
             WindowGasConductance(state, wm->thetas[1], wm->thetas[2], 1, con, pr, gr);
             NusseltNumber(state, 0, wm->thetas[1], wm->thetas[2], 1, gr, pr, nu);
-            hgap(1) = con / wm->gap[0] * nu;
+            hgap(1) = con / wm->gaps[0].width * nu;
 
             Bface(1) = wm->Outir * wm->emis[0] + wm->hcout * wm->tout + wm->AbsRadGlassFace[0];
             Bface(2) = wm->AbsRadGlassFace[1];
@@ -2850,11 +2852,11 @@ namespace Window {
         } else if (nglasslayer == 3) {
             WindowGasConductance(state, wm->thetas[1], wm->thetas[2], 1, con, pr, gr);
             NusseltNumber(state, 0, wm->thetas[1], wm->thetas[2], 1, gr, pr, nu);
-            hgap(1) = con / wm->gap[0] * nu;
+            hgap(1) = con / wm->gaps[0].width * nu;
 
             WindowGasConductance(state, wm->thetas[3], wm->thetas[4], 2, con, pr, gr);
             NusseltNumber(state, 0, wm->thetas[3], wm->thetas[4], 2, gr, pr, nu);
-            hgap(2) = con / wm->gap[1] * nu;
+            hgap(2) = con / wm->gaps[1].width * nu;
 
             Bface(1) = wm->Outir * wm->emis[0] + wm->hcout * wm->tout + wm->AbsRadGlassFace[0];
             Bface(2) = wm->AbsRadGlassFace[1];
@@ -2888,15 +2890,15 @@ namespace Window {
         } else if (nglasslayer == 4) {
             WindowGasConductance(state, wm->thetas[1], wm->thetas[2], 1, con, pr, gr);
             NusseltNumber(state, 0, wm->thetas[1], wm->thetas[2], 1, gr, pr, nu);
-            hgap(1) = con / wm->gap[0] * nu;
+            hgap(1) = con / wm->gaps[0].width * nu;
 
             WindowGasConductance(state, wm->thetas[3], wm->thetas[4], 2, con, pr, gr);
             NusseltNumber(state, 0, wm->thetas[3], wm->thetas[4], 2, gr, pr, nu);
-            hgap(2) = con / wm->gap[1] * nu;
+            hgap(2) = con / wm->gaps[1].width * nu;
 
             WindowGasConductance(state, wm->thetas[5], wm->thetas[6], 3, con, pr, gr);
             NusseltNumber(state, 0, wm->thetas[5], wm->thetas[6], 3, gr, pr, nu);
-            hgap(3) = con / wm->gap[2] * nu;
+            hgap(3) = con / wm->gaps[2].width * nu;
 
             Bface(1) = wm->Outir * wm->emis[0] + wm->hcout * wm->tout + wm->AbsRadGlassFace[0];
             Bface(2) = wm->AbsRadGlassFace[1];
@@ -3039,7 +3041,7 @@ namespace Window {
         } else if (nglasslayer == 2) {
             WindowGasConductance(state, wm->thetas[1], wm->thetas[2], 1, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[1], wm->thetas[2], 1, gr, pr, nu);
-            hgap(1) = con / wm->gap[0] * nu;
+            hgap(1) = con / wm->gaps[0].width * nu;
             if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 wm->hrgap[0] = 0.5 * std::abs(wm->A23) * pow_3(wm->thetas[1] + wm->thetas[2]);
                 hgap(1) = hgap(1) * surfWin.edgeGlassCorrFac + wm->hrgap[0] * (surfWin.edgeGlassCorrFac - 1.0);
@@ -3141,7 +3143,7 @@ namespace Window {
         } else if (nglasslayer == 3) {
             WindowGasConductance(state, wm->thetas[1], wm->thetas[2], 1, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[1], wm->thetas[2], 1, gr, pr, nu);
-            hgap(1) = con / wm->gap[0] * nu;
+            hgap(1) = con / wm->gaps[0].width * nu;
             if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 wm->hrgap[0] = 0.5 * std::abs(wm->A23) * pow_3(wm->thetas[1] + wm->thetas[2]);
                 hgap(1) = hgap(1) * surfWin.edgeGlassCorrFac + wm->hrgap[0] * (surfWin.edgeGlassCorrFac - 1.0);
@@ -3149,7 +3151,7 @@ namespace Window {
 
             WindowGasConductance(state, wm->thetas[3], wm->thetas[4], 2, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[3], wm->thetas[4], 2, gr, pr, nu);
-            hgap(2) = con / wm->gap[1] * nu;
+            hgap(2) = con / wm->gaps[1].width * nu;
             if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 wm->hrgap[1] = 0.5 * std::abs(wm->A45) * pow_3(wm->thetas[3] + wm->thetas[4]);
                 hgap(2) = hgap(2) * surfWin.edgeGlassCorrFac + wm->hrgap[1] * (surfWin.edgeGlassCorrFac - 1.0);
@@ -3257,7 +3259,7 @@ namespace Window {
         } else if (nglasslayer == 4) {
             WindowGasConductance(state, wm->thetas[1], wm->thetas[2], 1, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[1], wm->thetas[2], 1, gr, pr, nu);
-            hgap(1) = con / wm->gap[0] * nu;
+            hgap(1) = con / wm->gaps[0].width * nu;
             if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 wm->hrgap[0] = 0.5 * std::abs(wm->A23) * pow_3(wm->thetas[1] + wm->thetas[2]);
                 hgap(1) = hgap(1) * surfWin.edgeGlassCorrFac + wm->hrgap[0] * (surfWin.edgeGlassCorrFac - 1.0);
@@ -3265,7 +3267,7 @@ namespace Window {
 
             WindowGasConductance(state, wm->thetas[3], wm->thetas[4], 2, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[3], wm->thetas[4], 2, gr, pr, nu);
-            hgap(2) = con / wm->gap[1] * nu;
+            hgap(2) = con / wm->gaps[1].width * nu;
             if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 wm->hrgap[1] = 0.5 * std::abs(wm->A45) * pow_3(wm->thetas[3] + wm->thetas[4]);
                 hgap(2) = hgap(2) * surfWin.edgeGlassCorrFac + wm->hrgap[1] * (surfWin.edgeGlassCorrFac - 1.0);
@@ -3273,7 +3275,7 @@ namespace Window {
 
             WindowGasConductance(state, wm->thetas[5], wm->thetas[6], 3, con, pr, gr);
             NusseltNumber(state, SurfNum, wm->thetas[5], wm->thetas[6], 3, gr, pr, nu);
-            hgap(3) = con / wm->gap[2] * nu;
+            hgap(3) = con / wm->gaps[2].width * nu;
             if (surfWin.edgeGlassCorrFac > 1.0) { // Edge of glass correction
                 wm->hrgap[2] = 0.5 * std::abs(wm->A67) * pow_3(wm->thetas[5] + wm->thetas[6]);
                 hgap(3) = hgap(3) * surfWin.edgeGlassCorrFac + wm->hrgap[2] * (surfWin.edgeGlassCorrFac - 1.0);
@@ -3911,7 +3913,7 @@ namespace Window {
         // Conductance of gap between glass and shade assuming gap is sealed
         WindowGasConductance(state, TGlassFace, TShadeFace, TotGaps, con, pr, gr);
         NusseltNumber(state, SurfNum, TGlassFace, TShadeFace, TotGaps, gr, pr, nu);
-        hGapStill = con / wm->gap[TotGaps - 1] * nu;
+        hGapStill = con / wm->gaps[TotGaps - 1].width * nu;
 
         // For near-horizontal windows (i.e., no more than 5 deg from horizontal) assume
         // there is no air flow thru gap
@@ -4128,7 +4130,7 @@ namespace Window {
             // Conductance of gaps on either side of shade/blind assuming gaps are sealed
             WindowGasConductance(state, TGlassFace(IGap), TShadeFace(IGap), IGap + IGapInc, con, pr, gr);
             NusseltNumber(state, SurfNum, TGlassFace(IGap), TShadeFace(IGap), IGap + IGapInc, gr, pr, nu);
-            hGapStill(IGap) = con / wm->gap[IGap + IGapInc - 1] * nu;
+            hGapStill(IGap) = con / wm->gaps[IGap + IGapInc - 1].width * nu;
         }
 
         // For near-horizontal windows (i.e., no more than 5 deg from horizontal) assume
@@ -4144,7 +4146,7 @@ namespace Window {
         }
 
         GapHeight = state.dataSurface->Surface(SurfNum).Height;
-        GapDepth = wm->gap[IGapInc];
+        GapDepth = wm->gaps[IGapInc].width;
         AGap = GapDepth * state.dataSurface->Surface(SurfNum).Width;
 
         if (ShadeFlag == WinShadingType::BGShade) {
@@ -4303,7 +4305,7 @@ namespace Window {
         // Conductance of gap assuming it is sealed
         WindowGasConductance(state, TGlassFace1, TGlassFace2, GapNum, con, pr, gr);
         NusseltNumber(state, SurfNum, TGlassFace1, TGlassFace2, GapNum, gr, pr, nu);
-        hGapStill = con / wm->gap[GapNum - 1] * nu;
+        hGapStill = con / wm->gaps[GapNum - 1].width * nu;
         GapHeight = state.dataSurface->Surface(SurfNum).Height;
         GapDepth = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(2 * NGlass - 2))->Thickness;
         AGap = GapDepth * state.dataSurface->Surface(SurfNum).Width;
@@ -4422,7 +4424,7 @@ namespace Window {
         }
 
         GapHeight = state.dataSurface->Surface(SurfNum).Height;
-        GapDepth = wm->gap[IGapInc];
+        GapDepth = wm->gaps[IGapInc].width;
         AGap = GapDepth * state.dataSurface->Surface(SurfNum).Width;
         // Factor of 2 below assumes gaps on either side of shade/blind have same depth
         VGap = state.dataSurface->SurfWinAirflowThisTS(SurfNum) / (2.0 * GapDepth);
@@ -4437,7 +4439,7 @@ namespace Window {
             // Conductance of gaps on either side of shade/blind assuming gaps are sealed
             WindowGasConductance(state, TGlassFace(IGap), TShadeFace(IGap), IGap + IGapInc, con, pr, gr);
             NusseltNumber(state, SurfNum, TGlassFace(IGap), TShadeFace(IGap), IGap + IGapInc, gr, pr, nu);
-            hGapStill(IGap) = con / wm->gap[IGap + IGapInc - 1] * nu;
+            hGapStill(IGap) = con / wm->gaps[IGap + IGapInc - 1].width * nu;
             // Shade/blind or glass surface to air convection coefficient
             hcv(IGap) = 2.0 * hGapStill(IGap) + 4.0 * VGap;
             RhoAir(IGap) =
@@ -4662,16 +4664,16 @@ namespace Window {
         std::array<Real64, 10> fcp = {0.0};   // Specific heat of each gas in a mixture (J/m3-K)
 
         // Autodesk:Logic Either assert NMix>0 or handle NMix<=0 in logic so that con and locals guar. initialized before use
-        NMix = wm->gnmix[IGap - 1];
+        NMix = wm->gaps[IGap - 1].numGases;
 
         for (int IMix = 0; IMix < NMix; ++IMix) {
-            frct[IMix] = wm->gases[IGap - 1][IMix - 1].fract;
+            frct[IMix] = wm->gaps[IGap - 1].gasFracts[IMix];
         }
 
         Real64 const tmean(0.5 * (tleft + tright)); // Average gap gas temperature (K)
         Real64 const tmean_2(pow_2(tmean));
 
-        auto const &wmgas0 = wm->gases[IGap - 1][0];
+        auto const &wmgas0 = wm->gaps[IGap - 1].gases[0];
         fcon[0] = wmgas0.con.c0 + wmgas0.con.c1 * tmean + wmgas0.con.c2 * tmean_2;
         fvis[0] = wmgas0.vis.c0 + wmgas0.vis.c1 * tmean + wmgas0.vis.c2 * tmean_2;
         fcp[0] = wmgas0.cp.c0 + wmgas0.cp.c1 * tmean + wmgas0.cp.c2 * tmean_2;
@@ -4699,7 +4701,7 @@ namespace Window {
 
             // Calculate properties of mixture constituents
             for (int i = 2; i <= NMix; ++i) {
-                auto const &wmgas = wm->gases[IGap - 1][i - 1];
+                auto const &wmgas = wm->gaps[IGap - 1].gases[i - 1];
                     
                 fcon[i - 1] = wmgas.con.c0 + wmgas.con.c1 * tmean + wmgas.con.c2 * tmean_2;
                 fvis[i - 1] = wmgas.vis.c0 + wmgas.vis.c1 * tmean + wmgas.vis.c2 * tmean_2;
@@ -4715,10 +4717,10 @@ namespace Window {
             }
 
             for (int i = 1; i <= NMix; ++i) {
-                auto const &wmgasI = wm->gases[IGap - 1][i - 1];
+                auto const &wmgasI = wm->gaps[IGap - 1].gases[i - 1];
                     
                 for (int j = 1; j <= NMix; ++j) {
-                    auto const &wmgasJ = wm->gases[IGap - 1][j - 1];
+                    auto const &wmgasJ = wm->gaps[IGap - 1].gases[j - 1];
                     
                     // numerator of equation 61
                     phimup = pow_2(1.0 + std::sqrt(fvis[i - 1] / fvis[j - 1]) * root_4(wmgasJ.wght / wmgasI.wght));
@@ -4756,7 +4758,7 @@ namespace Window {
         } // End of check if single or multiple gases in gap
 
         pr = cp * visc / con;
-        gr = 9.807 * pow_3(wm->gap[IGap - 1]) * std::abs(tleft - tright) * pow_2(dens) / (tmean * pow_2(visc));
+        gr = 9.807 * pow_3(wm->gaps[IGap - 1].width) * std::abs(tleft - tright) * pow_2(dens) / (tmean * pow_2(visc));
     } // WindowGasConductance()
 
     //******************************************************************************
@@ -4803,14 +4805,14 @@ namespace Window {
 
         auto &wm = state.dataWindowManager;
 
-        NMix = wm->gnmix[IGap - 1];
+        NMix = wm->gaps[IGap - 1].numGases;
 
         for (int IMix = 1; IMix <= NMix; ++IMix) {
-            frct(IMix) = wm->gases[IGap - 1][IMix - 1].fract;
+            frct(IMix) = wm->gaps[IGap - 1].gasFracts[IMix - 1];
         }
 
         Real64 const tmean_2(pow_2(tmean));
-        auto const &wmgas0 = wm->gases[IGap - 1][0];
+        auto const &wmgas0 = wm->gaps[IGap - 1].gases[0];
         fvis(1) = wmgas0.vis.c0 + wmgas0.vis.c1 * tmean + wmgas0.vis.c2 * tmean_2;
         fdens(1) = pres * wmgas0.wght / (gaslaw * tmean); // Density using ideal gas law:
         //  rho=(presure*molecweight)/(gasconst*tmean)
@@ -4826,7 +4828,7 @@ namespace Window {
 
             // Calculate properties of mixture constituents
             for (int i = 2; i <= NMix; ++i) {
-                auto const &wmgas = wm->gases[IGap - 1][i - 1];
+                auto const &wmgas = wm->gaps[IGap - 1].gases[i - 1];
                 fvis(i) = wmgas.vis.c0 + wmgas.vis.c1 * tmean + wmgas.vis.c2 * tmean_2;
                 fdens(i) = pres * wmgas.wght / (gaslaw * tmean);
                 molmix += frct(i) * wmgas.wght; // eq. 56
@@ -4834,9 +4836,9 @@ namespace Window {
             }
 
             for (int i = 1; i <= NMix; ++i) {
-                auto const &wmgasI = wm->gases[IGap - 1][i - 1];
+                auto const &wmgasI = wm->gaps[IGap - 1].gases[i - 1];
                 for (int j = 1; j <= NMix; ++j) {
-                    auto const &wmgasJ = wm->gases[IGap - 1][j - 1];
+                    auto const &wmgasJ = wm->gaps[IGap - 1].gases[j - 1];
                     // numerator of equation 61
                     phimup = pow_2(1.0 + std::sqrt(fvis(i) / fvis(j)) * root_4(wmgasJ.wght / wmgasI.wght));
                     // denomonator of eq. 61, 64 and 66
@@ -5047,10 +5049,10 @@ namespace Window {
         auto &wm = state.dataWindowManager;
 
         if (SurfNum > 0) {
-            asp = state.dataSurface->Surface(SurfNum).Height / wm->gap[IGap - 1];
+            asp = state.dataSurface->Surface(SurfNum).Height / wm->gaps[IGap - 1].width;
         } else { // SurfNum = 0 when NusseltNumber is called from CalcNominalWindowCond, which applies to a
             // particular construction. So window height is not known and we assume 5 ft (1.524 m)
-            asp = 1.524 / wm->gap[IGap - 1];
+            asp = 1.524 / wm->gaps[IGap - 1].width;
         }
 
         wm->tiltr = wm->tilt * Constant::DegToRadians;
@@ -6605,10 +6607,11 @@ namespace Window {
                 }
                 auto const *matGas = dynamic_cast<Material::MaterialGasMix const *>(state.dataMaterial->Material(LayPtr));
                 assert(matGas != nullptr);
-                wm->gap[IGap - 1] = matGas->Thickness;
-                wm->gnmix[IGap - 1] = matGas->numGases;
-                for (int IMix = 0; IMix < wm->gnmix[IGap - 1]; ++IMix) {
-                    wm->gases[IGap - 1][IMix] = matGas->gases[IMix];
+                wm->gaps[IGap - 1].width = matGas->Thickness;
+                wm->gaps[IGap - 1].numGases = matGas->numGases;
+                for (int IMix = 0; IMix < wm->gaps[IGap - 1].numGases; ++IMix) {
+                    wm->gaps[IGap - 1].gases[IMix] = matGas->gases[IMix];
+                    wm->gaps[IGap - 1].gasFracts[IMix] = matGas->gasFracts[IMix];
                 }
             }
         } // for (Lay)

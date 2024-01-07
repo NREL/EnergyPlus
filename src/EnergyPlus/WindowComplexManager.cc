@@ -2931,7 +2931,7 @@ namespace WindowComplexManager {
                 nmix(IGap + 1) = thisMaterialGas->numGases;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
                     auto const &gas = thisMaterialGas->gases[IMix-1];
-                    frct(IMix, IGap + 1) = gas.fract;
+                    frct(IMix, IGap + 1) = thisMaterialGas->gasFracts[IMix-1];
 
                     // Now has to build-up gas coefficients arrays. All used gasses should be stored into these arrays and
                     // to be correctly referenced by gap arrays

@@ -423,9 +423,9 @@ namespace Window {
 
     struct WindowGap {
         int numGases = 0;
-        std::array<Material::Gas, Material::maxMixGases> gases;
-        Real64 width;
-            
+        std::array<Material::Gas, Material::maxMixGases> gases = {Material::Gas()};
+        std::array<Real64, Material::maxMixGases> gasFracts = {0.0};
+        Real64 width = 0.0;
     };
         
 } // namespace Window
@@ -499,9 +499,7 @@ struct WindowManagerData : BaseGlobalStruct
     Real64 Outir = 0.0;                                               // IR radiance of window's exterior surround (W/m2)
     Real64 Rmir = 0.0;                                                // IR radiance of window's interior surround (W/m2)
     Real64 Rtot = 0.0;                                                // Total thermal resistance of window (m2-K/W)
-    std::array<std::array<Material::Gas, Material::maxMixGases>, Window::maxGlassLayers> gases = {Material::Gas()}; // Gas thermal conductivity coefficients for each gap
-    std::array<int, Window::maxGlassLayers> gnmix = {0};                                  // Number of gases in gap
-    std::array<Real64, Window::maxGlassLayers> gap = {0.0};                                // Gap width (m)
+    std::array<Window::WindowGap, Window::maxGlassLayers> gaps = {Window::WindowGap()}; // Gas thermal conductivity coefficients for each gap
     std::array<Real64, Window::maxGlassLayers> thick = {0.0};                              // Glass layer thickness (m)
     std::array<Real64, Window::maxGlassLayers> scon = {0.0};                               // Glass layer conductance--conductivity/thickness (W/m2-K)
 
@@ -581,9 +579,7 @@ struct WindowManagerData : BaseGlobalStruct
         this->Outir = 0.0;
         this->Rmir = 0.0;
         this->Rtot = 0.0;
-        this->gases = {Material::Gas()};
-        this->gnmix = {0};
-        this->gap = {0.0};
+        this->gaps = {Window::WindowGap()};
         this->thick = {0.0};
         this->scon = {0.0};
         this->tir = {0.0};

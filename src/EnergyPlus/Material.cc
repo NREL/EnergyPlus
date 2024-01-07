@@ -101,10 +101,10 @@ constexpr std::array<Real64, 10> GasSpecificHeatRatio = {0.0, 1.4, 1.67, 1.68, 1
         
 constexpr std::array<Material::Gas, 10> gases = {
     Gas(), // Empty
-    {GasType::Air, {2.873e-3, 7.760e-5, 0.0}, {3.723e-6, 4.940e-8, 0.0}, {1002.737, 1.2324e-2, 0.0}, 28.97, 1.4, 0.0}, // Air
-    {GasType::Argon, {2.285e-3, 5.149e-5, 0.0}, {3.379e-6, 6.451e-8, 0.0}, {521.929, 0.0, 0.0}, 39.948, 1.67, 0.0}, // Argon
-    {GasType::Krypton, {9.443e-4, 2.826e-5, 0.0}, {2.213e-6, 7.777e-8, 0.0}, {248.091, 0.0, 0.0}, 83.8, 1.68, 0.0}, // Krypton
-    {GasType::Xenon, {4.538e-4, 1.723e-5, 0.0}, {1.069e-6, 7.414e-8, 0.0}, {158.340, 0.0, 0.0}, 131.3, 1.66, 0.0}, // Xenon
+    {GasType::Air, {2.873e-3, 7.760e-5, 0.0}, {3.723e-6, 4.940e-8, 0.0}, {1002.737, 1.2324e-2, 0.0}, 28.97, 1.4}, // Air
+    {GasType::Argon, {2.285e-3, 5.149e-5, 0.0}, {3.379e-6, 6.451e-8, 0.0}, {521.929, 0.0, 0.0}, 39.948, 1.67}, // Argon
+    {GasType::Krypton, {9.443e-4, 2.826e-5, 0.0}, {2.213e-6, 7.777e-8, 0.0}, {248.091, 0.0, 0.0}, 83.8, 1.68}, // Krypton
+    {GasType::Xenon, {4.538e-4, 1.723e-5, 0.0}, {1.069e-6, 7.414e-8, 0.0}, {158.340, 0.0, 0.0}, 131.3, 1.66}, // Xenon
     Gas(), // Empty
     Gas(), // Empty
     Gas(), // Empty
@@ -1179,7 +1179,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         state.dataMaterial->Material(MaterNum) = matGas;
         matGas->group = Group::WindowGas;
         matGas->numGases = 1;
-        matGas->gases[0].fract = 1.0;
+        matGas->gasFracts[0] = 1.0;
 
         // Load the material derived type from the input data.
 
@@ -1281,7 +1281,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         state.dataMaterial->Material(MaterNum) = matGas;
         matGas->group = Group::GapEquivalentLayer;
         matGas->numGases = 1;
-        matGas->gases[0].fract = 1.0;
+        matGas->gasFracts[0] = 1.0;
 
         // Load the material derived type from the input data.
 
@@ -1409,8 +1409,10 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         for (NumGas = 0; NumGas < NumGases; ++NumGas) {
             GasType gasType = matGas->gases[NumGas].type;
-            if (gasType != GasType::Custom)
+            if (gasType != GasType::Custom) {
+                matGas->gasFracts[NumGas] = MaterialProps(3 + NumGas);
                 matGas->gases[NumGas] = gases[(int)gasType];
+            }
         }
 
         // Nominal resistance of gap at room temperature (based on first gas in mixture)

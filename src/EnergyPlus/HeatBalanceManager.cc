@@ -4265,19 +4265,20 @@ namespace HeatBalanceManager {
                     assert(matGas != nullptr);
                     matGas->numGases = NumGases(IGap, IGlSys);
                     for (int IGas = 0; IGas < matGas->numGases; ++IGas) {
+                        auto &gas = matGas->gases[IGas];
                         NextLine = W5DataFile.readLine();
                         ++FileLineCount;
                         readList(NextLine.data.substr(19),
                                  GasName(IGas+1),
-                                 matGas->gases[IGas].fract,
-                                 matGas->gases[IGas].wght,
-                                 matGas->gases[IGas].con.c0, matGas->gases[IGas].con.c1, matGas->gases[IGas].con.c2,
-                                 matGas->gases[IGas].vis.c0, matGas->gases[IGas].vis.c1, matGas->gases[IGas].vis.c2, 
-                                 matGas->gases[IGas].cp.c0, matGas->gases[IGas].cp.c1, matGas->gases[IGas].cp.c2);
+                                 matGas->gasFracts[IGas],
+                                 gas.wght,
+                                 gas.con.c0, gas.con.c1, gas.con.c2,
+                                 gas.vis.c0, gas.vis.c1, gas.vis.c2, 
+                                 gas.cp.c0, gas.cp.c1, gas.cp.c2);
                     }
                     // Nominal resistance of gap at room temperature (based on first gas in mixture)
-                    state.dataHeatBal->NominalR(MatNum) =
-                        matGas->Thickness / (matGas->gases[0].con.c0 + matGas->gases[0].con.c1 * 300.0 + matGas->gases[0].con.c2 * 90000.0);
+                    auto const &gas0 = matGas->gases[0];
+                    state.dataHeatBal->NominalR(MatNum) = matGas->Thickness / (gas0.con.c0 + gas0.con.c1 * 300.0 + gas0.con.c2 * 90000.0);
                 }
             }
 

@@ -756,7 +756,7 @@ namespace Window {
         for (int i = 0; i < numGases; ++i) {
             auto const &gas = matGas->gases[i];
             Real64 wght = gas.wght;
-            Real64 fract = gas.fract;
+            Real64 fract = matGas->gasFracts[i];
             Gases::CIntCoeff aCon(gas.con.c0, gas.con.c1, gas.con.c2);
             Gases::CIntCoeff aCp(gas.cp.c0, gas.cp.c1, gas.cp.c2);
             Gases::CIntCoeff aVis(gas.vis.c0, gas.vis.c1, gas.vis.c2);

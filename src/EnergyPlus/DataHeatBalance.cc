@@ -608,7 +608,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                         auto const *thisMaterialGapR = dynamic_cast<const Material::MaterialGasMix *>(state.dataMaterial->Material(MatGapR));
                         for (int IGas = 0; IGas < Material::maxMixGases; ++IGas) {
                             if ((thisMaterialGapL->gases[IGas].type != thisMaterialGapR->gases[IGas].type) ||
-                                (thisMaterialGapL->gases[IGas].fract != thisMaterialGapR->gases[IGas].fract))
+                                (thisMaterialGapL->gasFracts[IGas] != thisMaterialGapR->gasFracts[IGas]))
                                 WrongWindowLayering = true;
                         }
                         // Gap width on either side of a between-glass shade/blind must be the same
