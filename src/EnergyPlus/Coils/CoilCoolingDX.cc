@@ -673,8 +673,13 @@ void CoilCoolingDX::size(EnergyPlusData &state)
     this->performance->size(state);
 }
 
-void CoilCoolingDX::simulate(
-    EnergyPlusData &state, int useAlternateMode, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode, Real64 LoadSHR)
+void CoilCoolingDX::simulate(EnergyPlusData &state,
+                             int const useAlternateMode,
+                             int const speedNum,
+                             Real64 const speedRatio,
+                             int const fanOpMode,
+                             bool const singleMode,
+                             Real64 const LoadSHR)
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit(state);

@@ -94,10 +94,10 @@ struct CoilCoolingDXCurveFitOperatingMode
                            DataLoopNode::NodeData &outletNode,
                            int speedNum,
                            Real64 speedRatio,
-                           int const fanOpMode,
+                           int fanOpMode,
                            DataLoopNode::NodeData &condInletNode,
                            DataLoopNode::NodeData &condOutletNode,
-                           bool const singleMode);
+                           bool singleMode);
 
     std::string name;
     Real64 ratedGrossTotalCap = 0.0;       // [W]

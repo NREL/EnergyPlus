@@ -130,14 +130,14 @@ CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusD
 void CoilCoolingDX205Performance::simulate(EnergyPlus::EnergyPlusData &state,
                                            const DataLoopNode::NodeData &inletNode,
                                            DataLoopNode::NodeData &outletNode,
-                                           int, // useAlternateMode,
-                                           int &speedNum,
-                                           Real64 &speedRatio,
+                                           int const, // useAlternateMode,
+                                           int const speedNum,
+                                           Real64 const speedRatio,
                                            int const fanOpMode,
                                            DataLoopNode::NodeData &condInletNode,
                                            DataLoopNode::NodeData &condOutletNode,
                                            bool const, // singleMode,
-                                           Real64)     // LoadSHR)
+                                           Real64 const)     // LoadSHR)
 {
     static constexpr std::string_view RoutineName = "CoilCoolingDX205Performance::simulate";
     Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
@@ -187,8 +187,8 @@ void CoilCoolingDX205Performance::simulate(EnergyPlus::EnergyPlusData &state,
 void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
                                             const DataLoopNode::NodeData &inletNode,
                                             DataLoopNode::NodeData &outletNode,
-                                            int &speedNum,
-                                            Real64 &speedRatio,
+                                            int const speedNum,
+                                            Real64 const speedRatio,
                                             int const fanOpMode,
                                             DataLoopNode::NodeData &condInletNode,
                                             DataLoopNode::NodeData &) // condOutletNode)

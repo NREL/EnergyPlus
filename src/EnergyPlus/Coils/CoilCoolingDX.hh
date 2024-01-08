@@ -87,12 +87,12 @@ struct CoilCoolingDX
     void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXInputSpecification &input_data);
     void oneTimeInit(EnergyPlusData &state);
     void simulate(EnergyPlusData &state,
-                  int const useAlternateMode,
-                  int const speedNum,
-                  Real64 const speedRatio,
-                  int const fanOpMode,
-                  bool const singleMode,
-                  Real64 const LoadSHR = -1.0);
+                  int useAlternateMode,
+                  int speedNum,
+                  Real64 speedRatio,
+                  int fanOpMode,
+                  bool singleMode,
+                  Real64 LoadSHR = -1.0);
     void setData(int fanIndex, int fanType, std::string const &fanName, int airLoopNum);
     void getFixedData(int &evapInletNodeIndex,
                       int &evapOutletNodeIndex,

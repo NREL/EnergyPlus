@@ -116,12 +116,12 @@ struct CoilCoolingDXPerformanceBase
                           const DataLoopNode::NodeData &,
                           DataLoopNode::NodeData &,
                           int,
-                          int &,
-                          Real64 &,
-                          int const,
+                          int,
+                          Real64,
+                          int,
                           DataLoopNode::NodeData &,
                           DataLoopNode::NodeData &,
-                          bool const,
+                          bool,
                           Real64 = 0.0)
     {
     }
