@@ -136,8 +136,8 @@ void CoilCoolingDX205Performance::simulate(EnergyPlus::EnergyPlusData &state,
                                            int const fanOpMode,
                                            DataLoopNode::NodeData &condInletNode,
                                            DataLoopNode::NodeData &condOutletNode,
-                                           bool const, // singleMode,
-                                           Real64 const)     // LoadSHR)
+                                           bool const,   // singleMode,
+                                           Real64 const) // LoadSHR)
 {
     static constexpr std::string_view RoutineName = "CoilCoolingDX205Performance::simulate";
     Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
