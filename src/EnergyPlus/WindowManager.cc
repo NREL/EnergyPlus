@@ -8283,6 +8283,21 @@ namespace Window {
         c.dim(15);
         p.dim(16);
 
+        struct BlindInputs {
+                Real64 slatWidth;
+                Real64 slatSeparation;
+                Real64 BmDfTrans;
+                Real64 BmDfRefFront;
+                Real64 BmDfRefBack;
+                Real64 DfDfTrans;
+                Real64 DfDfRefFront;
+                Real64 DfDfRefBack;
+                Real64 DfDfTransIR;
+                Real64 DfEmissFront;
+                Real64 DfEmissBack;
+        };
+
+        
         // The slat input properties are:
         // c(1)    0. (unused)
         // c(2)    Slat width (m)
@@ -8302,6 +8317,26 @@ namespace Window {
         // c(14)   emiss front diff
         // c(15)   emiss back diff
 
+        struct BlindOutputs {
+                Real64 BmBmTransFront;
+                Real64 BmBmRefFront;
+                Real64 BmBmTransBack;
+                Real64 BmBmRefBack;
+                Real64 BmDfTransFront;
+                Real64 BmDfRefFront;
+                Real64 BmDfTransBack;
+                Real64 BmDfRefBack;
+                Real64 DfDfTransFront;
+                Real64 DfDfRefFront;
+                Real64 DfDfTransBack;
+                Real64 DfDfRefBack;
+                
+                Real64 TransFrontIR;
+                Real64 TransBackIR;
+                Real64 EmissFrontIR;
+                Real64 EmissBackIR;
+        };
+        
         // The calculated blind properties are:
         //      The following are solar or visible properties
         // p(1)    trans front beam-beam
@@ -8748,6 +8783,7 @@ namespace Window {
 
         for (int j = 1; j <= n; ++j) {
             tmp = 0.0;
+            tmp(j) = 1;
             LUsolution(state, a, n, indx, tmp);
             for (int i = 1; i <= n; ++i)
                 y(j, i) = tmp(i);
