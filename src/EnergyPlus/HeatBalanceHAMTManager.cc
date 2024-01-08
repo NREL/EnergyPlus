@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -942,42 +942,42 @@ namespace HeatBalanceHAMTManager {
             state.dataHeatBalHAMTMgr->surfvp(sid) = 0.0;
             SetupOutputVariable(state,
                                 "HAMT Surface Average Water Content Ratio",
-                                OutputProcessor::Unit::kg_kg,
+                                Constant::Units::kg_kg,
                                 state.dataHeatBalHAMTMgr->watertot(sid),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
                                 "HAMT Surface Inside Face Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 state.dataHeatBalHAMTMgr->surftemp(sid),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
                                 "HAMT Surface Inside Face Relative Humidity",
-                                OutputProcessor::Unit::Perc,
+                                Constant::Units::Perc,
                                 state.dataHeatBalHAMTMgr->surfrh(sid),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
                                 "HAMT Surface Inside Face Vapor Pressure",
-                                OutputProcessor::Unit::Pa,
+                                Constant::Units::Pa,
                                 state.dataHeatBalHAMTMgr->surfvp(sid),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
                                 "HAMT Surface Outside Face Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 state.dataHeatBalHAMTMgr->surfexttemp(sid),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
                                 "HAMT Surface Outside Face Relative Humidity",
-                                OutputProcessor::Unit::Perc,
+                                Constant::Units::Perc,
                                 state.dataHeatBalHAMTMgr->surfextrh(sid),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
@@ -1002,7 +1002,7 @@ namespace HeatBalanceHAMTManager {
                  ++cellid, ++concell) {
                 SetupOutputVariable(state,
                                     format("HAMT Surface Temperature Cell {}", concell),
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     cells(cellid).temp,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
@@ -1012,7 +1012,7 @@ namespace HeatBalanceHAMTManager {
                  ++cellid, ++concell) {
                 SetupOutputVariable(state,
                                     format("HAMT Surface Water Content Cell {}", concell),
-                                    OutputProcessor::Unit::kg_kg,
+                                    Constant::Units::kg_kg,
                                     cells(cellid).wreport,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
@@ -1022,7 +1022,7 @@ namespace HeatBalanceHAMTManager {
                  ++cellid, ++concell) {
                 SetupOutputVariable(state,
                                     format("HAMT Surface Relative Humidity Cell {}", concell),
-                                    OutputProcessor::Unit::Perc,
+                                    Constant::Units::Perc,
                                     cells(cellid).rhp,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,

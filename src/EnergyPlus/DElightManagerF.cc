@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -647,7 +647,7 @@ namespace DElightManagerF {
                                     // RJH 2008-03-07: Set up DaylIllumAtRefPt for output for this DElight zone RefPt
                                     SetupOutputVariable(state,
                                                         "Daylighting Reference Point Illuminance",
-                                                        OutputProcessor::Unit::lux,
+                                                        Constant::Units::lux,
                                                         znDayl.DaylIllumAtRefPt(refPt.indexToFracAndIllum),
                                                         OutputProcessor::SOVTimeStepType::Zone,
                                                         OutputProcessor::SOVStoreType::Average,

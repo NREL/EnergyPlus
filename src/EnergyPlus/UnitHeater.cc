@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -674,21 +674,21 @@ namespace UnitHeater {
         for (UnitHeatNum = 1; UnitHeatNum <= state.dataUnitHeaters->NumOfUnitHeats; ++UnitHeatNum) {
             SetupOutputVariable(state,
                                 "Zone Unit Heater Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Heater Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Heater Fan Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -696,14 +696,14 @@ namespace UnitHeater {
             // Note that the unit heater fan electric is NOT metered because this value is already metered through the fan component
             SetupOutputVariable(state,
                                 "Zone Unit Heater Fan Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Heater Fan Availability Status",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -711,7 +711,7 @@ namespace UnitHeater {
             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num == FanType_SimpleOnOff) {
                 SetupOutputVariable(state,
                                     "Zone Unit Heater Fan Part Load Ratio",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanPartLoadRatio,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -461,7 +461,7 @@ namespace SystemAvailabilityManager {
 
                 SetupOutputVariable(state,
                                     "Availability Manager Scheduled Control Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     schedMgr.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -506,7 +506,7 @@ namespace SystemAvailabilityManager {
 
                 SetupOutputVariable(state,
                                     "Availability Manager Scheduled On Control Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     schedOnMgr.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -551,7 +551,7 @@ namespace SystemAvailabilityManager {
 
                 SetupOutputVariable(state,
                                     "Availability Manager Scheduled Off Control Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     schedOffMgr.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -751,7 +751,7 @@ namespace SystemAvailabilityManager {
 
                 SetupOutputVariable(state,
                                     "Availability Manager Night Cycle Control Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     nightCycleMgr.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -868,7 +868,7 @@ namespace SystemAvailabilityManager {
 
                 SetupOutputVariable(state,
                                     "Availability Manager Optimum Start Control Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     optimumStartMgr.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -877,12 +877,22 @@ namespace SystemAvailabilityManager {
                 // add
                 SetupOutputVariable(state,
                                     "Availability Manager Optimum Start Time Before Occupancy",
-                                    OutputProcessor::Unit::hr,
+                                    Constant::Units::hr,
                                     optimumStartMgr.NumHoursBeforeOccupancy,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     optimumStartMgr.Name,
-                                    "Daily");
+                                    Constant::eResource::Invalid,
+                                    OutputProcessor::SOVEndUseCat::Invalid,
+                                    {},
+                                    OutputProcessor::SOVGroup::Invalid,
+                                    {}, // Zone
+                                    1,
+                                    1,
+                                    -999,
+                                    {}, // custom units
+                                    {}, // space type
+                                    OutputProcessor::ReportFreq::Day);
             }
         }
 
@@ -958,7 +968,7 @@ namespace SystemAvailabilityManager {
 
                 SetupOutputVariable(state,
                                     "Availability Manager Differential Thermostat Control Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     diffThermoMgr.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -1012,7 +1022,7 @@ namespace SystemAvailabilityManager {
 
                 SetupOutputVariable(state,
                                     "Availability Manager High Temperature Turn Off Control Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     hiTurnOffMgr.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -1067,7 +1077,7 @@ namespace SystemAvailabilityManager {
 
                 SetupOutputVariable(state,
                                     "Availability Manager High Temperature Turn On Control Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     hiTurnOnMgr.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -1133,7 +1143,7 @@ namespace SystemAvailabilityManager {
 
                 SetupOutputVariable(state,
                                     "Availability Manager Low Temperature Turn Off Control Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     loTurnOffMgr.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -1188,7 +1198,7 @@ namespace SystemAvailabilityManager {
 
                 SetupOutputVariable(state,
                                     "Availability Manager Low Temperature Turn On Control Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     loTurnOnMgr.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -1257,7 +1267,7 @@ namespace SystemAvailabilityManager {
 
                 SetupOutputVariable(state,
                                     "Availability Manager Night Ventilation Control Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     nightVentMgr.AvailStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -4287,14 +4297,14 @@ namespace SystemAvailabilityManager {
             if (state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
                 SetupOutputVariable(state,
                                     "Availability Manager Hybrid Ventilation Control Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).VentilationCtrl,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).AirLoopName);
                 SetupOutputVariable(state,
                                     "Availability Manager Hybrid Ventilation Control Mode",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).ControlMode,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -4302,14 +4312,14 @@ namespace SystemAvailabilityManager {
             } else {
                 SetupOutputVariable(state,
                                     "Availability Manager Hybrid Ventilation Control Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).VentilationCtrl,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).ControlZoneName);
                 SetupOutputVariable(state,
                                     "Availability Manager Hybrid Ventilation Control Mode",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).ControlMode,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -4319,7 +4329,7 @@ namespace SystemAvailabilityManager {
             if (state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).MinOperTime > 0) {
                 SetupOutputVariable(state,
                                     "Hybrid Ventilation Control HVAC System Operation Elapsed Time",
-                                    OutputProcessor::Unit::min,
+                                    Constant::Units::min,
                                     state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).TimeOperDuration,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -4329,7 +4339,7 @@ namespace SystemAvailabilityManager {
             if (state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).MinVentTime > 0) {
                 SetupOutputVariable(state,
                                     "Hybrid Ventilation Control Natural Ventilation Elapsed Time",
-                                    OutputProcessor::Unit::min,
+                                    Constant::Units::min,
                                     state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).TimeVentDuration,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -4342,21 +4352,21 @@ namespace SystemAvailabilityManager {
                     state, state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).ControlModeSchedPtr, HybridVentMode_OperT90)) {
                 SetupOutputVariable(state,
                                     "Hybrid Ventilation Operative Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).OperativeTemp,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).Name);
                 SetupOutputVariable(state,
                                     "Hybrid Ventilation Lower Limit Operative Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).minAdaTem,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).Name);
                 SetupOutputVariable(state,
                                     "Hybrid Ventilation Upper Limit Operative Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).maxAdaTem,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -4366,7 +4376,7 @@ namespace SystemAvailabilityManager {
             if (CheckScheduleValue(state, state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).ControlModeSchedPtr, HybridVentMode_CO2)) {
                 SetupOutputVariable(state,
                                     "Hybrid Ventilation CO2 Concentration",
-                                    OutputProcessor::Unit::ppm,
+                                    Constant::Units::ppm,
                                     state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).CO2,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,

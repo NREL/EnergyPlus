@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1425,8 +1425,6 @@ struct SurfacesData : BaseGlobalStruct
     bool AirflowWindows = false;          // TRUE if one or more airflow windows
     bool ShadingTransmittanceVaries = false;           // overall, shading transmittance varies for the building
     bool UseRepresentativeSurfaceCalculations = false; // Use Representative Surfaces for Calculations
-    bool AnyHeatBalanceInsideSourceTerm = false;       // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
-    bool AnyHeatBalanceOutsideSourceTerm = false;      // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
     bool AnyMovableInsulation = false;                 // True if any movable insulation presents
     bool AnyMovableSlat = false;                       // True if there are any movable slats for window blinds presented
 
@@ -1451,6 +1449,9 @@ struct SurfacesData : BaseGlobalStruct
     std::vector<int> AllHTKivaSurfaceList;             // List of all Kiva foundation surfaces
     std::vector<int> AllSurfaceListReportOrder;        // List of all surfaces - output reporting order
     std::vector<int> AllVaryAbsOpaqSurfaceList;        // List of all opaque exterior surfaces with dynamic coating
+    std::vector<int> allInsideSourceSurfaceList;       // List of all surfaces with SurfaceProperty:HeatBalanceSourceTerm for inside face
+    std::vector<int> allOutsideSourceSurfaceList;      // List of all surfaces with SurfaceProperty:HeatBalanceSourceTerm for outside face
+    std::vector<int> allGetsRadiantHeatSurfaceList;    // List of all surfaces that receive radiant HVAC output
 
     std::array<std::vector<int>, static_cast<int>(DataSurfaces::SurfaceFilter::Num)> SurfaceFilterLists;
 

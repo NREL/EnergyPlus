@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -347,14 +347,14 @@ namespace DualDuct {
                 // CurrentModuleObject='AirTerminal:DualDuct:ConstantVolume'
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Cold Supply Duct Damper Position",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     thisDD.ColdAirDamperPosition,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     thisDD.Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Hot Supply Duct Damper Position",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     thisDD.HotAirDamperPosition,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -502,21 +502,21 @@ namespace DualDuct {
                 // CurrentModuleObject='AirTerminal:DualDuct:VAV'
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Cold Supply Duct Damper Position",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     thisDD.ColdAirDamperPosition,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     thisDD.Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Hot Supply Duct Damper Position",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     thisDD.HotAirDamperPosition,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     thisDD.Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Outdoor Air Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
+                                    Constant::Units::m3_s,
                                     thisDD.OutdoorAirFlowRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -707,21 +707,21 @@ namespace DualDuct {
                 // Setup the Average damper Position output variable
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Outdoor Air Duct Damper Position",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     thisDD.OADamperPosition,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     thisDD.Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Recirculated Air Duct Damper Position",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     thisDD.RecircAirDamperPosition,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     thisDD.Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Outdoor Air Fraction",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     thisDD.OAFraction,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
