@@ -97,6 +97,11 @@ namespace Window {
                                        int ngllayer, // Number of glass layers in construction
                                        Real64 wlbot, // Lowest and highest wavelength considered
                                        Real64 wltop,
+                                       std::array<int, maxGlassLayers> const &numpt,
+                                       std::array<std::array<Real64, maxSpectralDataElements>, maxGlassLayers> const &wlt,  
+                                       std::array<std::array<Real64, maxSpectralDataElements>, maxGlassLayers> const &tPhi,  
+                                       std::array<std::array<Real64, maxSpectralDataElements>, maxGlassLayers> const &rfPhi,  
+                                       std::array<std::array<Real64, maxSpectralDataElements>, maxGlassLayers> const &rbPhi, 
                                        std::array<Real64, nume> &stPhi,
                                        std::array<Real64, nume> &srfPhi,
                                        std::array<Real64, nume> &srbPhi,
@@ -110,12 +115,12 @@ namespace Window {
                                         Array1A<Real64> aft // System absorptance of each glass layer
     );
 
-    Real64 solarSpectrumAverage(EnergyPlusData &state, gsl::span<Real64> p);
+    Real64 solarSpectrumAverage(EnergyPlusData &state, gsl::span<Real64 const> p);
 
-    Real64 visibleSpectrumAverage(EnergyPlusData &state, gsl::span<Real64> p);
+    Real64 visibleSpectrumAverage(EnergyPlusData &state, gsl::span<Real64 const> p);
 
-    Real64 Interpolate(gsl::span<Real64> x, // Array of data points for independent variable
-                       gsl::span<Real64> y, // Array of data points for dependent variable
+    Real64 Interpolate(gsl::span<Real64 const> x, // Array of data points for independent variable
+                       gsl::span<Real64 const> y, // Array of data points for dependent variable
                        int npts,            // Number of data pairs
                        Real64 xin           // Given value of x
     );
@@ -526,17 +531,6 @@ struct WindowManagerData : BaseGlobalStruct
 
     // TEMP MOVED FROM DataHeatBalance.hh -BLB
 
-    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> wlt = {0.0}; // Spectral data wavelengths for each glass layer in a glazing system
-
-    // Following data, Spectral data for each layer for each wavelength in wlt
-    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> t = {0.0};        // normal transmittance
-    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> rff = {0.0};      // normal front reflectance
-    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> rbb = {0.0};      // normal back reflectance
-    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> tPhi = {0.0};     // transmittance at angle of incidence
-    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> rfPhi = {0.0};    // front reflectance at angle of incidence
-    std::array<std::array<Real64, Window::maxSpectralDataElements>, Window::maxGlassLayers> rbPhi = {0.0};    // back reflectance at angle of incidence
-
-    std::array<int, Window::maxGlassLayers> numpt = {0};                    // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
                                                        // for each wavelenth in wle
     std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxGlassLayers> top = {0.0};  // Transmittance matrix for subr. op
     std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxGlassLayers> rfop = {0.0}; // Front reflectance matrix for subr. op
@@ -599,7 +593,6 @@ struct WindowManagerData : BaseGlobalStruct
         this->A23 = 0.0;
         this->A45 = 0.0;
         this->A67 = 0.0;
-        this->numpt = {0};
         this->top = {0.0};
         this->rfop = {0.0};
         this->rbop = {0.0};

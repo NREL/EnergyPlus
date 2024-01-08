@@ -4213,9 +4213,9 @@ namespace HeatBalanceManager {
                     if (thisMaterial->Thickness <= 0.0) {
                     }
                     if (NGlSys == 1) {
-                        thisMaterial->Name = format("W5:{}:GLASS", DesiredConstructionName, NumName(IGlass));
+                        thisMaterial->Name = format("W5:{}:GLASS{}", DesiredConstructionName, NumName(IGlass));
                     } else {
-                        thisMaterial->Name = format("W5:{}:{}:GLASS", DesiredConstructionName, NumName(IGlSys), NumName(IGlass));
+                        thisMaterial->Name = format("W5:{}:{}:GLASS{}", DesiredConstructionName, NumName(IGlSys), NumName(IGlass));
                     }
                     thisMaterial->Roughness = Material::SurfaceRoughness::VerySmooth;
                     thisMaterial->AbsorpThermal = thisMaterial->AbsorpThermalBack;
