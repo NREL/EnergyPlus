@@ -551,7 +551,7 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
                             Constant::Units::None,
                             this->performance->OperatingMode,
 
-            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
@@ -673,13 +673,8 @@ void CoilCoolingDX::size(EnergyPlusData &state)
     this->performance->size(state);
 }
 
-void CoilCoolingDX::simulate(EnergyPlusData &state,
-                             int useAlternateMode,
-                             int speedNum,
-                             Real64 speedRatio,
-                             int const fanOpMode,
-                             bool const singleMode,
-                             Real64 LoadSHR)
+void CoilCoolingDX::simulate(
+    EnergyPlusData &state, int useAlternateMode, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode, Real64 LoadSHR)
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit(state);
@@ -708,17 +703,8 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     // TODO: check the minOATcompressor and reset data/pass through data as needed
     this->performance->OperatingMode = 0;
     this->performance->ModeRatio = 0.0;
-    this->performance->simulate(state,
-                                evapInletNode,
-                                evapOutletNode,
-                                useAlternateMode,
-                                speedNum,
-                                speedRatio,
-                                fanOpMode,
-                                condInletNode,
-                                condOutletNode,
-                                singleMode,
-                                LoadSHR);
+    this->performance->simulate(
+        state, evapInletNode, evapOutletNode, useAlternateMode, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode, LoadSHR);
     CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor

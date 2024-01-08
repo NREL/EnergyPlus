@@ -330,8 +330,8 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     }
 
     // If multispeed, evaluate high speed first using speedRatio as PLR
-    //Real64 plr1 = PLR;
-    //if (speedNum > 1) {
+    // Real64 plr1 = PLR;
+    // if (speedNum > 1) {
     //    plr1 = speedRatio;
     //}
 
