@@ -283,7 +283,6 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
                                   evapInletNode,
                                   evapOutletNode,
                                   useAlternateMode,
-                                  PLR,
                                   speedNum,
                                   speedRatio,
                                   fanOpMode,

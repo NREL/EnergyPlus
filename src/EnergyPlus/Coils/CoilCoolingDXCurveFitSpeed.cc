@@ -427,7 +427,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
 void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &state,
                                                  const DataLoopNode::NodeData &inletNode,
                                                  DataLoopNode::NodeData &outletNode,
-                                                 Real64 &_PLR,
+                                                 Real64 const _PLR,
                                                  int const fanOpMode,
                                                  const Real64 condInletTemp)
 {
