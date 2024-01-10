@@ -73,10 +73,12 @@ namespace IndoorGreen {
         int SchedPtr = 0;
         int SchedLEDPtr = 0;
         int LightRefPtr = 0; //daylight reference point number;
+        int LightControlPtr = 0; //daylight control point number;
         int SchedLEDDaylightTargetPtr = 0; //LED-Daylight PPFD setpoint schedule pointer
-        Real64 LeafArea = 0.0;
+        Real64 LeafArea = 0.0;       // one-sided leaf area 
         Real64 LEDNominalPPFD = 0.0; // nominal PPFD for LED grow light (PPFD)
         Real64 LEDNominalEleP = 0.0; // nominal power for total LED grow light (W)
+        Real64 LEDRadFraction = 0.0; // radiant fraction of LED grow light (0-1)
         Real64 ZPreTemp = 0.0;
         Real64 ZPreHum = 0.0;
         Real64 ZCO2 = 400;
@@ -108,7 +110,7 @@ namespace IndoorGreen {
 
     void ETModel(EnergyPlusData &state);
 
-    Real64 ETPenmanMonteith(EnergyPlusData &state, Real64 &ZonePreTemp, Real64 &ZonePreHum, Real64 &ZoneCO2, Real64 &ZonePPFD);
+    Real64 ETPenmanMonteith(EnergyPlusData &state, Real64 &ZonePreTemp, Real64 &ZonePreHum, Real64 &ZoneCO2, Real64 &ZonePPFD, Real64 &LAI);
     
     Real64 ETStanghellini(EnergyPlusData &state);
 
