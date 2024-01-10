@@ -55,11 +55,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -1039,7 +1039,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
             ShowFatalError(state, "Syntax error, optional arguments Theta and Phi must be present when optional ScreenNumber is used.");
         }
     } else {
-        ScNum = state.dataSurface->SurfWinScreenNumber(SurfaceNum);
+        ScNum = state.dataSurface->SurfaceWindow(SurfaceNum).screenNum;
     }
 
     if (present(Theta)) {
@@ -1053,7 +1053,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         }
         NormalAzimuth = SunAzimuthToScreenNormal;
     } else {
-        SunAzimuth = std::atan2(state.dataEnvrn->SOLCOS(1), state.dataEnvrn->SOLCOS(2));
+        SunAzimuth = std::atan2(state.dataEnvrn->SOLCOS.x, state.dataEnvrn->SOLCOS.y);
         if (SunAzimuth < 0.0) SunAzimuth += 2.0 * Constant::Pi;
         SurfaceAzimuth = state.dataSurface->Surface(SurfaceNum).Azimuth * Constant::DegToRadians;
         NormalAzimuth = SunAzimuth - SurfaceAzimuth;
@@ -1386,7 +1386,7 @@ void AllocateIntGains(EnergyPlusData &state)
     state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
     state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
     state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
-    state.dataDaylightingData->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
+    state.dataDayltg->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
 }
 
 } // namespace EnergyPlus::DataHeatBalance
