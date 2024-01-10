@@ -2411,12 +2411,12 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
     // REFERENCES:
     // (I)BLAST legacy routine QSUN
-
+    using namespace General;
+        
     auto &Surface = state.dataSurface->Surface;
 
     // Using/Aliasing
     using Dayltg::TransTDD;
-    using General::POLYF;
     using SolarShading::CalcInteriorSolarDistribution;
     using namespace DataWindowEquivalentLayer;
     using SolarShading::SurfaceScheduledSolarInc;
@@ -3487,37 +3487,42 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     // Exterior shade, screen or blind
                                 } else if (ShadeFlag == DataSurfaces::WinShadingType::ExtBlind) { // Exterior blind
                                     int BlNum = state.dataSurface->SurfWinBlindNumber(SurfNum);
-                                    int SlatsAngIndexLower = state.dataSurface->SurfWinSlatsAngIndex(SurfNum);
-                                    int SlatsAngIndexUpper = std::min(Material::MaxProfAngs, SlatsAngIndexLower + 1);
-                                    Real64 SlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
+                                    auto const &blind = state.dataMaterial->Blind(BlNum);
+
+                                    Real64 SlatAng = state.dataSurface->SurfWinSlatAngThisTS(SurfNum);
+                                    Real64 ProfAng = state.dataSurface->SurfWinProfileAng(SurfNum);
+
+                                    int isa1, isa2, ipa1, ipa2;
+                                    Material::GetSlatAngIndices(SlatAng, isa1, isa2);
+                                    Material::GetProfAngIndices(ProfAng, ipa1, ipa2);
+                                    
+                                    Real64 saInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
 
                                     Real64 FrontDiffTrans;
                                     Real64 TBlBmDif; // Blind diffuse-diffuse solar transmittance
+
+                                    
+                                    auto const &bs1 = blind.bd[isa1];
+                                    auto const &bs2 = blind.bd[isa2];
+
                                     if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
-                                        FrontDiffTrans = General::Interp(state.dataMaterial->Blind(BlNum).SolFrontDiffDiffTrans(SlatsAngIndexLower),
-                                                                         state.dataMaterial->Blind(BlNum).SolFrontDiffDiffTrans(SlatsAngIndexUpper),
-                                                                         SlatsAngInterpFac);
-                                        TBlBmDif = Window::InterpProfSlat(
-                                            state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(SlatsAngIndexLower,
-                                                                                                   state.dataSurface->SurfWinProfAngIndex(SurfNum)),
-                                            state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(SlatsAngIndexUpper,
-                                                                                                   state.dataSurface->SurfWinProfAngIndex(SurfNum)),
-                                            state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(
-                                                SlatsAngIndexLower,
-                                                std::min(Material::MaxProfAngs, state.dataSurface->SurfWinProfAngIndex(SurfNum) + 1)),
-                                            state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(
-                                                SlatsAngIndexUpper,
-                                                std::min(Material::MaxProfAngs, state.dataSurface->SurfWinProfAngIndex(SurfNum) + 1)),
-                                            SlatsAngInterpFac,
-                                            state.dataSurface->SurfWinProfAngInterpFac(SurfNum));
+                                        FrontDiffTrans = Interp(bs1.Df.Sol.Front.Trans.DfDf, bs2.Df.Sol.Front.Trans.DfDf, saInterpFac);
+
+                                        BiInterpCoeffs coeffs;
+                                        GetBiInterpCoeffs(SlatAng, ProfAng,
+                                                          isa1 * Material::dSlatAng, isa2 * Material::dSlatAng,
+                                                          ipa1 * Material::dProfAng, ipa2 * Material::dProfAng,
+                                                          coeffs);
+                                            
+                                        TBlBmDif = BiInterp(bs1.Bm[ipa1].Sol.Front.Trans.BmDf, bs1.Bm[ipa2].Sol.Front.Trans.BmDf,
+                                                            bs2.Bm[ipa1].Sol.Front.Trans.BmDf, bs2.Bm[ipa2].Sol.Front.Trans.BmDf,
+                                                            coeffs);
                                     } else {
-                                        FrontDiffTrans = state.dataMaterial->Blind(BlNum).SolFrontDiffDiffTrans(1);
-                                        TBlBmDif = General::Interp(
-                                            state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(1,
-                                                                                                   state.dataSurface->SurfWinProfAngIndex(SurfNum)),
-                                            state.dataMaterial->Blind(BlNum).SolFrontBeamDiffTrans(
-                                                1, std::min(Material::MaxProfAngs, state.dataSurface->SurfWinProfAngIndex(SurfNum) + 1)),
-                                            SlatsAngInterpFac);
+                                        auto const &bsa0 = blind.bd[0];
+                                            
+                                        FrontDiffTrans = bsa0.Df.Sol.Front.Trans.DfDf;
+                                        Real64 paInterpFac = GetInterpCoeff(ProfAng, ipa1 * Material::dProfAng, ipa2 * Material::dProfAng);
+                                        TBlBmDif = Interp(bsa0.Bm[ipa1].Sol.Front.Trans.BmDf, bsa0.Bm[ipa2].Sol.Front.Trans.BmDf, paInterpFac);
                                     }
 
                                     // TBlBmBm - Blind beam-beam solar transmittance
@@ -3552,17 +3557,16 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     Real64 phi = phiSun - phiWin; 
                                     Real64 theta = thetaSun - thetaWin;
                                     int ip1, ip2, it1, it2; // hi/lo phi and theta map indices
-                                    General::BilinearInterpCoeffs coeffs;
+                                    BiInterpCoeffs coeffs;
                                     Material::NormalizePhiTheta(phi, theta);
                                     Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
-                                    GetBilinearInterpCoeffs(
-                                        phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
+                                    GetBiInterpCoeffs(phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
                                     auto const &b11 = screen->btars[ip1][it1];
                                     auto const &b12 = screen->btars[ip1][it2];
                                     auto const &b21 = screen->btars[ip2][it1];
                                     auto const &b22 = screen->btars[ip2][it2];
-                                    Real64 BmDfTrans = BilinearInterp(b11.DfTrans, b12.DfTrans, b21.DfTrans, b22.DfTrans, coeffs);
-                                    Real64 BmBmTrans = BilinearInterp(b11.BmTrans, b12.BmTrans, b21.BmTrans, b22.BmTrans, coeffs);
+                                    Real64 BmDfTrans = BiInterp(b11.DfTrans, b12.DfTrans, b21.DfTrans, b22.DfTrans, coeffs);
+                                    Real64 BmBmTrans = BiInterp(b11.BmTrans, b12.BmTrans, b21.BmTrans, b22.BmTrans, coeffs);
                         
                                     state.dataSurface->SurfWinDividerQRadOutAbs(SurfNum) =
                                         DividerAbs * (BmBmTrans + BmDfTrans) * (DivIncSolarOutBm + DivIncSolarOutDif);
@@ -3702,7 +3706,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
 
     // REFERENCES:
     // (I)BLAST legacy routine QSUN
-
+    using namespace General;
+        
     using Dayltg::DistributeTDDAbsorbedSolar;
     using namespace DataWindowEquivalentLayer;
 
@@ -3969,22 +3974,23 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                             DividerThermAbs *= thisMaterialSh->TransThermal;
                         } else if (ShadeFlag == DataSurfaces::WinShadingType::IntBlind) {
                             int BlNum = state.dataSurface->SurfWinBlindNumber(SurfNum);
+                            auto const &blind = state.dataMaterial->Blind(BlNum);
+                            
                             Real64 SolBackDiffDiffTrans;
                             Real64 IRBackTrans;
                             if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
+                                Real64 SlatAng = state.dataSurface->SurfWinSlatAngThisTS(SurfNum);
+                                int isa1, isa2;
+                                Material::GetSlatAngIndices(SlatAng, isa1, isa2);
+                                Real64 saInterpFac = GetInterpCoeff(SlatAng, isa1 * Material::dSlatAng, isa2 * Material::dSlatAng);
+                                    
                                 int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(SurfNum);
                                 Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
-                                SolBackDiffDiffTrans = General::Interp(
-                                    state.dataMaterial->Blind(BlNum).SolBackDiffDiffTrans(SurfWinSlatsAngIndex),
-                                    state.dataMaterial->Blind(BlNum).SolBackDiffDiffTrans(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
-                                    SurfWinSlatsAngInterpFac);
-                                IRBackTrans = General::Interp(
-                                    state.dataMaterial->Blind(BlNum).IRBackTrans(SurfWinSlatsAngIndex),
-                                    state.dataMaterial->Blind(BlNum).IRBackTrans(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
-                                    SurfWinSlatsAngInterpFac);
+                                SolBackDiffDiffTrans = Interp(blind.bd[isa1].Df.Sol.Back.Trans.DfDf, blind.bd[isa2].Df.Sol.Back.Trans.DfDf, saInterpFac);
+                                IRBackTrans = Interp(blind.bd[isa1].IRBackTrans, blind.bd[isa2].IRBackTrans, saInterpFac);
                             } else {
-                                SolBackDiffDiffTrans = state.dataMaterial->Blind(BlNum).SolBackDiffDiffTrans(1);
-                                IRBackTrans = state.dataMaterial->Blind(BlNum).IRBackTrans(1);
+                                SolBackDiffDiffTrans = blind.bd[0].Df.Sol.Back.Trans.DfDf;
+                                IRBackTrans = blind.bd[0].IRBackTrans;
                             }
                             DividerSolAbs *= SolBackDiffDiffTrans;
                             DividerThermAbs *= IRBackTrans;
@@ -4115,6 +4121,7 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
 
     // REFERENCES:
     // BLAST Routine: CITAF - Compute Interior Thermal Absorption Factors
+    using namespace General;
 
     for (auto const &thisEnclosure : state.dataViewFactor->EnclRadInfo) {
         if (!thisEnclosure.radReCalc) continue;
@@ -4198,15 +4205,17 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
                         // Effective emissivity of shade or blind
                         Real64 EffShDevEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[1];
                         if (ShadeFlag == DataSurfaces::WinShadingType::IntBlind) {
-                            TauShIR = state.dataMaterial->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).IRBackTrans(1);
+                            auto const &blind = state.dataMaterial->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum));
+                            TauShIR = blind.bd[0].IRBackTrans;
                             if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
+                                Real64 SlatAng = state.dataSurface->SurfWinSlatAngThisTS(SurfNum);
+                                int isa1, isa2;
+                                Material::GetSlatAngIndices(SlatAng, isa1, isa2);
+                                Real64 saInterpFac = GetInterpCoeff(SlatAng, isa1 * Material::dSlatAng, isa2 * Material::dSlatAng);
+                                
                                 int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(SurfNum);
                                 Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
-                                TauShIR = General::Interp(
-                                    state.dataMaterial->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).IRBackTrans(SurfWinSlatsAngIndex),
-                                    state.dataMaterial->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum))
-                                        .IRBackTrans(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
-                                    SurfWinSlatsAngInterpFac);
+                                TauShIR = Interp(blind.bd[isa1].IRBackTrans, blind.bd[isa2].IRBackTrans, saInterpFac);
                                 EffShDevEmiss = General::Interp(state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[SurfWinSlatsAngIndex],
                                                                 state.dataSurface->SurfaceWindow(SurfNum)
                                                                     .EffShBlindEmiss[std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)],
