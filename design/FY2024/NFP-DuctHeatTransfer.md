@@ -5,6 +5,10 @@ An Improved Duct Model
 
 ** Florida Solar Energy Center**
 
+ - 3rd draft NFP, 1/11/24
+
+	Revise NFP based on the conference call on 1/11/24
+
  - 2nd draft NFP, 1/7/24
 
 	Remove Dynamic losses with thermal mass Phase 3
@@ -96,6 +100,40 @@ Also, I found another description of how ducts are modeled for California here. 
 
 Scott
 
+### EnergyPlus Technicalities on 1/10/24 ###
+
+The NFP was discussed in the EnergyPlus Technicalities call.
+
+#### Comments ####
+Jason DeGraw:
+
+He has different opinion to allow a simple model, since the AFN is able to have a full duct model. He prefers to have compatable approach.
+
+Gu: 
+
+The proposed new object mimics AFN duct model with heat transfer only. The same conduction loss model is used. The model is mainly used by NREL residential group to simplify inputs without using the AFN model.
+
+Jason Glazer:
+
+Since AFN model has all input, is it possible to have a high level object to refer existing AFN object?
+
+Gu:
+
+The proposed object is a simplified object to have more restrictions compared to the full AFN model. It is hard to have a high level object. It addition, the high level object may confuse users.
+
+Rich Raustad:
+
+Suggest to use Inlet and Outlet node connection for the new object.
+
+Gu:
+
+Accept. 
+
+Actions:
+
+1. Use node to replace inlet and outlet name to have a clear picture for node connection
+2. Simplify inputs for exterior film coefficients to mimic inputs of AirflowNetwork:Distribution:Component:Duct
+ 
 
 ## Overview ##
 
@@ -109,11 +147,11 @@ The objective is to design and implement the code changes required to support a 
 
 3. There is a single duct used for SupplyTrunk and ReturnTrunk. 
 
-The connection of SupplyTrunk is between the inlet node (AirloopHVAC Demand Side Inlet Node) of AirLoopHVAC:ZoneSplitter and AirLoopHVAC:ZoneSplitter itself. If AirLoopHVAC:ZoneMixer is available, The connection of ReturnTrunk is between AirLoopHVAC:ZoneMixer itself and the outlet node (AirloopHVAC Demand Side Outlet Node) of AirLoopHVAC:ZoneMixer. 
+The connection of SupplyTrunk is between the inlet node (AirloopHVAC Demand Side Inlet Node) of AirLoopHVAC and the AirLoopHVAC:ZoneSplitter inlet node. If AirLoopHVAC:ZoneMixer is available, The connection of ReturnTrunk is between AirLoopHVAC:ZoneMixer outlet node and the outlet node (AirloopHVAC Demand Side Outlet Node) of AirLoopHVAC. 
 
 4. Each branch has a single duct.
 
-The connection of SupplyBranch is between AirLoopHVAC:ZoneSplitter itself and one of the outlet node (Air terminal inlet node) of AirLoopHVAC:ZoneSplitter. If AirLoopHVAC:ZoneMixer is available, The connection of ReturnBranch is between the inlet node of AirLoopHVAC:ZoneMixer and AirLoopHVAC:ZoneMixer itself.
+The connection of SupplyBranch is between AirLoopHVAC:ZoneSplitter outlet node and one of the Air terminal inlet node. If AirLoopHVAC:ZoneMixer is available, The connection of ReturnBranch is between the zone outlet node and the AirLoopHVAC:ZoneMixer inlet node.
 
 5. Inlet node temperature, humidity, and mass flow rate are known
 
@@ -151,16 +189,9 @@ Due to time and budget limit, we will lay down foundation of structure for duct 
 
 ## Approach ##
 
-A new object simular to Pipe:Indoor is proposed. The main differences are that Fluid Inlet Node Name and Fluid Outlet Node Name are replaced by Inlet Name and Outlet Name. See detailed description in the Section of Input Description.
+A new object simular to Pipe:Indoor is proposed. The main differences are that Fluid Inlet Node Name and Fluid Outlet Node Name are replaced by Inlet Node Name and Outlet Node Name. See detailed description in the Section of Input Description.
 
-NREL suggested "Perhaps that could be a separate input for air film or convection coefficient, or there could be some way to connect the SurfaceProperty:ConvectionCoefficients object to these duct objects".
-
-The SurfaceProperty:ConvectionCoefficients object is mainly used based on a surface. The proposed Duct:Heatransfer object has no connection with any surfaces. More fields extracted from the SurfaceProperty:ConvectionCoefficients object will be added in the proposed object to accommodate user selection for duct exterior surface convective coefficients as shown below:   
-
-	Convection Coefficient Type
-	Convection Coefficient 
-	Convection Coefficient Schedule Name
-	Convection Coefficient User Curve Name 
+In order to make the proposed object compatible with existing 
 
 ## Testing/Validation/Data Sources ##
 
@@ -184,107 +215,49 @@ This alpha field is used as an identifying field for the pipe.
 
 This alpha field is used to identify the this object as a component of the AirLoopHVAC.
 
-\paragraph{Field: Construction Name}\label{field-construction-name-002}
+\paragraph{Field: Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction Name}\label{field-construction-name-002}
 
 This alpha field references a `wall' construction object that gives a layer-by-layer description of the pipe wall and its insulation.~ The construction object follows standard conventions, describing material properties for each layer beginning with the outermost insulation layer and ending with the pipe wall layer.
 
-\paragraph{Field: Duct Type}\label{field-duct-type}
+\paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-000}
 
-This field is used to specify duct type. There are the following 4 key choice to choose from:
+This alpha field contains the name of the duct inlet. 
 
-SupplyTrunk: a main supply trunk duct, only one for each AirLoopHVAC. 
-SupplyBranch: a supply branch duct for a connection between a splitter and a zone terminal
-ReturnTrunk: a main return trunk duct, only one for each AirLoopHVAC
-ReturnBranch: a return branch duct for a connection between a mixer and a zone outlet
+\paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-000}
 
-\paragraph{Field: Fluid Inlet Name}\label{field-fluid-inlet-name-000}
+This alpha field contains the name of the duct outlet. 
 
-This alpha field contains the name of the duct inlet. Here are specific requirements for different duct types:
+paragraph{Field: Duct Length}\label{field-duct-length}
 
-When SupplyTrunk in the Duct Type field is entered, the name of inlet node of AirLoopHVAC:ZoneSplitter is entered.
+This numeric field is used to input duct length {[}m{]}. This value must be greater than zero.
 
-When ReturnTrunk in the Duct Type field is entered, the name of AirLoopHVAC:ZoneMixer is entered. 
+\paragraph{Field: Hydraulic Diameter}\label{field-hydraulic-diameter}
 
-When SupplyBranch in the Duct Type field is entered, the name of AirLoopHVAC:ZoneSplitter is entered.
+This numeric field is used to input hydraulic diameter, which is defined as:
 
-When ReturnBranch in the Duct Type field is entered, the name of inlet node of AirLoopHVAC:ZoneMixer is entered. 
+\begin{equation}
+{D_h} = \frac{{4A}}{P}
+\end{equation}
 
-\paragraph{Field: Fluid Outlet Name}\label{field-fluid-node-name-000}
+where
 
-This alpha field contains the name of the duct outlet. Here are specific requirements for different duct types:
+D\(_{h}\) = Hydraulic diameter {[}m{]}
 
-When SupplyTrunk in the Duct Type field is entered, the name of AirLoopHVAC:ZoneSplitter is entered.
+A = Duct cross sectional area {[}m\(^{2}\){]}
 
-When ReturnTrunk in the Duct Type field is entered, the name of outlet node of AirLoopHVAC:ZoneMixer is entered. 
+P = Perimeter of cross section {[}m{]}
 
-When SupplyBranch in the Duct Type field is entered, the name of outlet node of AirLoopHVAC:ZoneSplitter is entered.
+\paragraph{Field: Outside Convection Coefficient}\label{field-outside-convection-coefficent}
 
-When ReturnBranch in the Duct Type field is entered, the name of AirLoopHVAC:ZoneMixer is entered. 
+This numeric field defines the outside convection coefficient (W/m\(^{2}\)-K). If the field is omitted, the film coefficient is calculated automatically as described in ASTM C1340.
 
-\paragraph{Field: Environment Type}\label{field-environment-type}
+\paragraph{Field: Inside Convection Coefficient}\label{field-inside-convection-coefficent}
 
-Environment type is the environment in which the duct is placed. It can be either \textbf{Zone} or \textbf{Schedule}. If specified as Zone, a zone name must be specified in the next field. If specified as Schedule, the Ambient Temperature Zone can be left blank, while a schedule must be specified for the temperature and air velocity.
-
-\paragraph{Field: Ambient Temperature Zone Name}\label{field-ambient-temperature-zone-name}
-
-If \textbf{Zone} is specified as the environment type, this field is used to specify the name of the zone in which the pipe is located.~ The zone temperature is used to calculate the heat transfer rate from the pipe.
-
-\paragraph{Field: Ambient Temperature Schedule Name}\label{field-ambient-temperature-schedule-name}
-
-If \textbf{Schedule} is specified as the environment type, this field is used to specify the name of the temperature schedule that gives the ambient air temperature surrounding the duct.~ This temperature is used as the outside boundary condition to calculate heat transfer from the pipe.
-
-\paragraph{Field: Ambient Air Velocity Schedule Name}\label{field-ambient-air-velocity-schedule-name}
-
-If \textbf{Schedule} is specified as the environment type, this field is used to specify the name of the velocity schedule that gives the air velocity near the duct.~ This velocity is used to calculate the convection heat transfer coefficient used in the pipe heat transfer calculation.
-
-\paragraph{Field: Duct Length}\label{field-duct-length-000}
-
-This field is used to enter the length of the duct in units of m. Duct length must be a positive number.
-
-\paragraph{Field: Convection Coefficient Type}\label{field-convection-coefficient-type}
-
-The entries can be of several types: Value (simple numeric value), Schedule (name of schedule with the values), the usual key choices for overall models for Outside or Inside (Simple, SimpleCombined, TARP, AdaptiveConvectionAlgorithm etc.), the key choices for individual convection equations used for customizing the adaptive algorithm, or a custom user defined correlation. The field should contain one of the keys listed in the table below along with face they can be applied. T.
-
-\begin{longtable}[c]{p{3.49in}p{2.5in}}
-\toprule
-Key choice & Applies to Inside or Outside \tabularnewline
-\midrule
-\endfirsthead
-
-\toprule
-Key choice & Applies to Inside or Outside \tabularnewline
-\midrule
-\endhead
-
-Value & Both \tabularnewline
-Schedule & Both \tabularnewline
-Simple & Inside \tabularnewline
-SimpleCombined & Outside \tabularnewline
-TARP & Both \tabularnewline
-DOE-2 & Outside \tabularnewline
-MoWitt & Outside \tabularnewline
-McAdams & Outside \tabularnewline
-Mitchell & Outside \tabularnewline
-\bottomrule
-\end{longtable}
-
-\paragraph{Field: Convection Coefficient}\label{field-convection-coefficient}
-
-If the Convection type was ``Value'', then this field is filled and contains the simple value to be used. Otherwise, this can be blank.
-
-\paragraph{Field: Convection Coefficient Schedule Name}\label{field-convection-coefficient-schedule-name}
-
-If the Convection type was ``Schedule'', then this field contains the name of a schedule describing the value to be used during the time intervals for the schedule.
-
-\paragraph{Field: Convection Coefficient User Curve Name}\label{field-convection-coefficient-user-curve-name}
-
-If the Convection type was ``UserCurve'', then this field contains the name of a SurfaceConvectionAlgorithm:UserCurve input object describing the model equations to be used during the time intervals for the schedule.
+This numeric field defines the inside convection coefficient (W/m\(^{2}\)-K). If the field is omitted, the film coefficient is calculated automatically as described in ASTM C1340.
 
 \paragraph{Field: Overall Moisture Transmittance Coefficient from Air to Air}\label{field-overall-moisture-transmittance-coefficient-from-air-to-air-0000}
 
 This numeric field is defined as the overall moisture transmittance coefficient (kg/m\(^{2}\)) from air to air, including film coefficients at both surfaces.
-
-
 
 
 An example of this object in an IDF is:
@@ -295,19 +268,13 @@ An example of this object in an IDF is:
       Main duct,    !- Name
       Main AirLoopHVAC,    !- AirLoopHAVC Name
       Insulated Pipe,         !- Construction name
-      SupplyTrunk,            !- Duct type
-      Equipment outlet node,  !- Inlet Name
-      ZoneSplitter,           !- Outlet Name
+      Equipment outlet node,  !- Inlet Node Name
+      ZoneSplitter Inlet Node,           !- Outlet Node Name
       Zone,                   !- Environment Type
-      Zone 1,                 !- field Ambient Temperature Zone name
+      East Zone,              !- Ambient Temperature Zone Name
       ,                       !- Ambient Temperature Schedule Name
-      ,                       !- Ambient Air Velocity Schedule Name
-      0.05,                   !- Duct Inside Diameter (thickness in construction data)
-      100.0,                  !- Duct length
-	  Value,                  !- Convection Coefficient Type
-      5.0,                    !- Convection Coefficient
-      ,                       !- Convection Coefficient Schedule Name
-      ,                       !- Convection Coefficient User Curve Name
+      10.0,                   !- Outside Convection Coefficient
+      20.0,                   !- Inside Convection Coefficient
       0.001,                  !- Overall Moisture Transmittance Coefficient from Air to Air
 
 \end{lstlisting}
@@ -324,53 +291,26 @@ A new object of Duct:HeatTransfer to cover duct inputs is provided below.
         \required-field
         \type object-list
         \object-list AirPrimaryLoops
-   	A3,  \field Construction Name
+   	A3,  \field Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction
         \required-field
         \type object-list
         \object-list ConstructionNames
-   	A4,  \field Duct Type
+   	A4,  \field Inlet Node Name
         \required-field
-       \type choice
-       \key SupplyTrunk
-       \key SupplyBranch
-       \key ReturnTrunk
-       \key ReturnBranch
-       \default SupplyTrunk
-   	A5,  \field Inlet Name
+   	A5,  \field Outlet Node Name
         \required-field
-        \note When SupplyTrunk in the Duct Type field is entered, the name of inlet node of
-        \note AirLoopHVAC:ZoneSplitter is entered.
-        \note When ReturnTrunk in the Duct Type field is entered, the name of AirLoopHVAC:ZoneMixer
-        \note is entered. 
-        \note When SupplyBranch in the Duct Type field is entered, the name of AirLoopHVAC:ZoneSplitter
-        \note is entered.
-        \note When ReturnBranch in the Duct Type field is entered, the name of inlet node of 
-        \note AirLoopHVAC:ZoneMixer is entered. 
-   	A6,  \field Outlet Name
-        \required-field
-        \note When SupplyTrunk in the Duct Type field is entered, the name of AirLoopHVAC:ZoneSplitter 
-        \note is entered.
-        \note When ReturnTrunk in the Duct Type field is entered, the name of outlet node of 
-        \note AirLoopHVAC:ZoneMixer is entered. 
-        \note When SupplyBranch in the Duct Type field is entered, the name of outlet node of 
-        \note AirLoopHVAC:ZoneSplitter is entered.
-        \note When ReturnBranch in the Duct Type field is entered, the name of AirLoopHVAC:ZoneMixer 
-        \note is entered. 
-  	A7,  \field Environment Type
+  	A6,  \field Environment Type
         \type choice
         \key Zone
         \key Schedule
         \default Zone
-   	A8,  \field Ambient Temperature Zone Name
+   	A7,  \field Ambient Temperature Zone Name
         \type object-list
         \object-list ZoneNames
-   	A9,  \field Ambient Temperature Schedule Name
+   	A8,  \field Ambient Temperature Schedule Name
         \type object-list
         \object-list ScheduleNames
-   	A10,  \field Ambient Air Velocity Schedule Name
-        \type object-list
-        \object-list ScheduleNames
-   	N1,  \field Duct Inside Diameter (or hydronic diameter)
+   	N1,  \field Duct Hydronic Diameter
         \type real
         \units m
         \minimum> 0
@@ -379,33 +319,17 @@ A new object of Duct:HeatTransfer to cover duct inputs is provided below.
         \type real
         \units m
         \minimum> 0.0
-  	A11, \field Convection Coefficient Type
-      \required-field
-      \type choice
-      \key Value
-      \key Schedule
-      \key UserCurve
-      \key Simple
-      \key SimpleCombined
-      \key TARP
-      \key DOE-2
-      \key MoWitt
-      \key McAdams
-      \key Mitchell
-  	N3, \field Convection Coefficient
-      \note used if Convection Type=Value, min and max limits are set in HeatBalanceAlgorithm object.
-      \note Default limits are Minimum >= 0.1 and Maximum <= 1000
+ 	N3 , \field Outside Convection Coefficient
+      \note optional. convection coefficient calculated automatically, unless specified
+      \type real
       \units W/m2-K
-  	A12, \field Convection Coefficient Schedule Name
-      \note used if Convection Type=Schedule,  min and max limits are set in HeatBalanceAlgorithm object.
-      \note Default limits are Minimum >= 0.1 and Maximum <= 1000
-      \type object-list
-      \object-list ScheduleNames
-  	A13, \field Convection Coefficient User Curve Name
-      \note used if Convection Type = UserCurve
-      \type object-list
-      \object-list UserConvectionModels
-   	N4;  \field Overall Moisture Transmittance Coefficient from Air to Air
+      \minimum> 0.0
+ 	N4 , \field Inside Convection Coefficient
+      \note optional. convection coefficient calculated automatically, unless specified
+      \type real
+      \units W/m2-K
+      \minimum> 0.0
+   	N5;  \field Overall Moisture Transmittance Coefficient from Air to Air
       \type real
       \units kg/m2
       \minimum> 0.0
@@ -413,19 +337,17 @@ A new object of Duct:HeatTransfer to cover duct inputs is provided below.
       \note Enter the overall moisture transmittance coefficient
       \note including moisture film coefficients at both surfaces.
 
-Note: There are many convection coefficient types in the SurfaceProperty:ConvectionCoefficients object. However, most types may not be used in duct heat transfer convective coefficient, becuase the new object does not have surface connection and associated properties, like location, geometry and tilt, etc. The available types will be related to air velocity and zone temperatures, or reference temperature.
-
 Future expansion with optional fields
 
 <span style="color:red">
 
-	A14, \field  Heat Transfer Solution Method
+	A9, \field  Heat Transfer Solution Method
         \type choice
         \key SteadyState
         \key SteadStateWithRadiation
         \key Dynamic
         \default SteadyState
-	A15; \field DuctViewFactors Object Name
+	A10; \field DuctViewFactors Object Name
        \type object-list
        \object-list AirflowNetworkComponentNames
        \note The name of the duct view factor specification object used to calculate radiation exchange.
