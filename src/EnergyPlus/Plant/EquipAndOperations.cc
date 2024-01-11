@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,7 +74,7 @@ namespace DataPlant {
 
         SetupOutputVariable(state,
                             "Supervisory Plant Heat Pump Operation Mode",
-                            OutputProcessor::Unit::unknown,
+                            Constant::Units::unknown,
                             this->Report.AirSourcePlant_OpMode,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -82,35 +82,35 @@ namespace DataPlant {
 
         SetupOutputVariable(state,
                             "Supervisory Plant Auxiliary Boiler Mode",
-                            OutputProcessor::Unit::unknown,
+                            Constant::Units::unknown,
                             this->Report.BoilerAux_OpMode,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Supervisory Plant Operation Polled Building Heating Load",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->Report.BuildingPolledHeatingLoad,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Supervisory Plant Operation Polled Building Cooling Load",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->Report.BuildingPolledCoolingLoad,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Supervisory Plant Operation Primary Plant Heating Load",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->Report.PrimaryPlantHeatingLoad,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Supervisory Plant Operation Primary Plant Cooling Load",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->Report.PrimaryPlantCoolingLoad,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -786,21 +786,21 @@ namespace DataPlant {
                 this->PlantOps.DedicatedHR_Present = true;
                 SetupOutputVariable(state,
                                     "Supervisory Plant Heat Recovery Operation Mode",
-                                    OutputProcessor::Unit::unknown,
+                                    Constant::Units::unknown,
                                     this->Report.DedicHR_OpMode,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     this->Name);
                 SetupOutputVariable(state,
                                     "Supervisory Plant Operation Secondary Plant Heating Load",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->Report.SecondaryPlantHeatingLoad,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     this->Name);
                 SetupOutputVariable(state,
                                     "Supervisory Plant Operation Secondary Plant Cooling Load",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->Report.SecondaryPlantCoolingLoad,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,

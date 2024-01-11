@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -191,7 +191,7 @@ namespace ExhaustAirSystemManager {
 
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Mass Flow Rate",
-                                            OutputProcessor::Unit::kg_s,
+                                            Constant::Units::kg_s,
                                             thisExhSys.centralFan_MassFlowRate,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
@@ -199,7 +199,7 @@ namespace ExhaustAirSystemManager {
 
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Volumetric Flow Rate Standard",
-                                            OutputProcessor::Unit::m3_s,
+                                            Constant::Units::m3_s,
                                             thisExhSys.centralFan_VolumeFlowRate_Std,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
@@ -207,7 +207,7 @@ namespace ExhaustAirSystemManager {
 
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Volumetric Flow Rate Current",
-                                            OutputProcessor::Unit::m3_s,
+                                            Constant::Units::m3_s,
                                             thisExhSys.centralFan_VolumeFlowRate_Cur,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
@@ -215,7 +215,7 @@ namespace ExhaustAirSystemManager {
 
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Power",
-                                            OutputProcessor::Unit::W,
+                                            Constant::Units::W,
                                             thisExhSys.centralFan_Power,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
@@ -223,7 +223,7 @@ namespace ExhaustAirSystemManager {
 
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Energy",
-                                            OutputProcessor::Unit::J,
+                                            Constant::Units::J,
                                             thisExhSys.centralFan_Energy,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
@@ -266,7 +266,7 @@ namespace ExhaustAirSystemManager {
 
                             SetupOutputVariable(state,
                                                 "Central Exhaust Fan Mass Flow Rate",
-                                                OutputProcessor::Unit::kg_s,
+                                                Constant::Units::kg_s,
                                                 thisExhSys.centralFan_MassFlowRate,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Average,
@@ -274,7 +274,7 @@ namespace ExhaustAirSystemManager {
 
                             SetupOutputVariable(state,
                                                 "Central Exhaust Fan Volumetric Flow Rate Standard",
-                                                OutputProcessor::Unit::m3_s,
+                                                Constant::Units::m3_s,
                                                 thisExhSys.centralFan_VolumeFlowRate_Std,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Average,
@@ -282,7 +282,7 @@ namespace ExhaustAirSystemManager {
 
                             SetupOutputVariable(state,
                                                 "Central Exhaust Fan Volumetric Flow Rate Current",
-                                                OutputProcessor::Unit::m3_s,
+                                                Constant::Units::m3_s,
                                                 thisExhSys.centralFan_VolumeFlowRate_Cur,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Average,
@@ -290,7 +290,7 @@ namespace ExhaustAirSystemManager {
 
                             SetupOutputVariable(state,
                                                 "Central Exhaust Fan Power",
-                                                OutputProcessor::Unit::W,
+                                                Constant::Units::W,
                                                 thisExhSys.centralFan_Power,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Average,
@@ -298,7 +298,7 @@ namespace ExhaustAirSystemManager {
 
                             SetupOutputVariable(state,
                                                 "Central Exhaust Fan Energy",
-                                                OutputProcessor::Unit::J,
+                                                Constant::Units::J,
                                                 thisExhSys.centralFan_Energy,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Summed,

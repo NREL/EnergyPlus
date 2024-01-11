@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2708,11 +2708,8 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     int VariableNum(0); // temporary
     int RuntimeReportVarNum;
     bool Found;
-    OutputProcessor::SOVTimeStepType FreqString; // temporary
-    OutputProcessor::SOVStoreType VarTypeString; // temporary
-    std::string ResourceTypeString;
-    std::string GroupTypeString;
-    std::string EndUseTypeString;
+    OutputProcessor::SOVTimeStepType sovTimeStepType; // temporary
+    OutputProcessor::SOVStoreType sovStoreType;       // temporary
     std::string EndUseSubCatString;
 
     int TrendNum;
@@ -2735,7 +2732,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     std::string::size_type lbracket;
     std::string UnitsA;
     std::string UnitsB;
-    OutputProcessor::Unit curUnit(OutputProcessor::Unit::None);
+    Constant::Units curUnit(Constant::Units::None);
     std::string::size_type ptr;
 
     if (state.dataRuntimeLangProcessor->GetInput) { // GetInput check is redundant with the InitializeRuntimeLanguage routine
@@ -3306,7 +3303,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                         ShowContinueError(state, format("...Units entered in {} (deprecated use)=\"{}\"", cAlphaFieldNames(1), UnitsA));
                     }
                 }
-                curUnit = OutputProcessor::unitStringToEnum(UnitsB);
+                curUnit = static_cast<Constant::Units>(getEnumValue(Constant::unitNamesUC, Util::makeUPPER(UnitsB)));
 
                 state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Name = cAlphaArgs(1);
 
@@ -3352,58 +3349,49 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).VariableNum = VariableNum;
                 }
 
-                {
-                    std::string const &SELECT_CASE_var = cAlphaArgs(3);
-
-                    if (SELECT_CASE_var == "AVERAGED") {
-                        VarTypeString = OutputProcessor::SOVStoreType::Average;
-                    } else if (SELECT_CASE_var == "SUMMED") {
-                        VarTypeString = OutputProcessor::SOVStoreType::Summed;
-                    } else {
-                        ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                        ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(3), cAlphaArgs(3)));
-                        ShowContinueError(state, "...valid values are Averaged or Summed.");
-                        ErrorsFound = true;
-                    }
+                if (cAlphaArgs(3) == "AVERAGED") {
+                    sovStoreType = OutputProcessor::SOVStoreType::Average;
+                } else if (cAlphaArgs(3) == "SUMMED") {
+                    sovStoreType = OutputProcessor::SOVStoreType::Summed;
+                } else {
+                    ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(3), cAlphaArgs(3)));
+                    ShowContinueError(state, "...valid values are Averaged or Summed.");
+                    ErrorsFound = true;
                 }
 
-                {
-                    std::string const &SELECT_CASE_var = cAlphaArgs(4);
-
-                    if (SELECT_CASE_var == "ZONETIMESTEP") {
-                        FreqString = OutputProcessor::SOVTimeStepType::Zone;
-                    } else if (SELECT_CASE_var == "SYSTEMTIMESTEP") {
-                        FreqString = OutputProcessor::SOVTimeStepType::System;
-                    } else {
-                        ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                        ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(4), cAlphaArgs(4)));
-                        ShowContinueError(state, "...valid values are ZoneTimestep or SystemTimestep.");
-                        ErrorsFound = true;
-                    }
+                if (cAlphaArgs(4) == "ZONETIMESTEP") {
+                    sovTimeStepType = OutputProcessor::SOVTimeStepType::Zone;
+                } else if (cAlphaArgs(4) == "SYSTEMTIMESTEP") {
+                    sovTimeStepType = OutputProcessor::SOVTimeStepType::System;
+                } else {
+                    ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(4), cAlphaArgs(4)));
+                    ShowContinueError(state, "...valid values are ZoneTimestep or SystemTimestep.");
+                    ErrorsFound = true;
                 }
 
-                if (curUnit != OutputProcessor::Unit::unknown) {
+                if (curUnit != Constant::Units::Invalid) {
                     SetupOutputVariable(state,
                                         cAlphaArgs(1),
                                         curUnit,
                                         state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Value,
-                                        FreqString,
-                                        VarTypeString,
+                                        sovTimeStepType,
+                                        sovStoreType,
                                         "EMS");
                 } else {
                     SetupOutputVariable(state,
                                         cAlphaArgs(1),
-                                        OutputProcessor::Unit::customEMS,
+                                        Constant::Units::customEMS,
                                         state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Value,
-                                        FreqString,
-                                        VarTypeString,
+                                        sovTimeStepType,
+                                        sovStoreType,
                                         "EMS",
-                                        {},
-                                        {},
-                                        {},
-                                        {},
-                                        {},
-                                        {},
+                                        Constant::eResource::Invalid,
+                                        OutputProcessor::SOVEndUseCat::Invalid,
+                                        {}, // EndUseSub
+                                        OutputProcessor::SOVGroup::Invalid,
+                                        {}, // Zone
                                         1,
                                         1,
                                         -999,
@@ -3487,7 +3475,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                         ShowContinueError(state, format("...Units entered in {} (deprecated use)=\"{}\"", cAlphaFieldNames(1), UnitsA));
                     }
                 }
-                curUnit = OutputProcessor::unitStringToEnum(UnitsB);
+                curUnit = static_cast<Constant::Units>(getEnumValue(Constant::unitNamesUC, Util::makeUPPER(UnitsB)));
 
                 state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Name = cAlphaArgs(1);
 
@@ -3532,164 +3520,109 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).VariableNum = VariableNum;
                 }
 
-                VarTypeString = OutputProcessor::SOVStoreType::Summed; // all metered vars are sum type
+                sovStoreType = OutputProcessor::SOVStoreType::Summed; // all metered vars are sum type
 
-                {
-                    std::string const &SELECT_CASE_var = cAlphaArgs(3);
-
-                    if (SELECT_CASE_var == "ZONETIMESTEP") {
-                        FreqString = OutputProcessor::SOVTimeStepType::Zone;
-                    } else if (SELECT_CASE_var == "SYSTEMTIMESTEP") {
-                        FreqString = OutputProcessor::SOVTimeStepType::System;
-                    } else {
-                        ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                        ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(4), cAlphaArgs(4)));
-                        ShowContinueError(state, "...valid values are ZoneTimestep or SystemTimestep.");
-                        ErrorsFound = true;
-                    }
+                if (cAlphaArgs(3) == "ZONETIMESTEP") {
+                    sovTimeStepType = OutputProcessor::SOVTimeStepType::Zone;
+                } else if (cAlphaArgs(3) == "SYSTEMTIMESTEP") {
+                    sovTimeStepType = OutputProcessor::SOVTimeStepType::System;
+                } else {
+                    ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(4), cAlphaArgs(4)));
+                    ShowContinueError(state, "...valid values are ZoneTimestep or SystemTimestep.");
+                    ErrorsFound = true;
                 }
 
                 // Resource Type
-                {
-                    std::string const &SELECT_CASE_var = cAlphaArgs(5);
+                Constant::eResource resource =
+                    static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, Util::makeUPPER(cAlphaArgs(5))));
 
-                    if (SELECT_CASE_var == "ELECTRICITY") {
-                        ResourceTypeString = "Electricity";
-                    } else if (SELECT_CASE_var == "NATURALGAS") {
-                        ResourceTypeString = "NaturalGas";
-                    } else if (SELECT_CASE_var == "GASOLINE") {
-                        ResourceTypeString = "Gasoline";
-                    } else if (SELECT_CASE_var == "DIESEL") {
-                        ResourceTypeString = "Diesel";
-                    } else if (SELECT_CASE_var == "COAL") {
-                        ResourceTypeString = "Coal";
-                    } else if (SELECT_CASE_var == "FUELOILNO1") {
-                        ResourceTypeString = "FuelOilNo1";
-                    } else if (SELECT_CASE_var == "FUELOILNO2") {
-                        ResourceTypeString = "FuelOilNo2";
-                    } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                        ResourceTypeString = "OtherFuel1";
-                    } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                        ResourceTypeString = "OtherFuel2";
-                    } else if (SELECT_CASE_var == "PROPANE") {
-                        ResourceTypeString = "Propane";
-                    } else if (SELECT_CASE_var == "WATERUSE") {
-                        ResourceTypeString = "Water";
-                    } else if (SELECT_CASE_var == "ONSITEWATERPRODUCED") {
-                        ResourceTypeString = "OnSiteWater";
-                    } else if (SELECT_CASE_var == "MAINSWATERSUPPLY") {
-                        ResourceTypeString = "MainsWater";
-                    } else if (SELECT_CASE_var == "RAINWATERCOLLECTED") {
-                        ResourceTypeString = "RainWater";
-                    } else if (SELECT_CASE_var == "WELLWATERDRAWN") {
-                        ResourceTypeString = "WellWater";
-                    } else if (SELECT_CASE_var == "CONDENSATEWATERCOLLECTED") {
-                        ResourceTypeString = "Condensate";
-                    } else if (SELECT_CASE_var == "ENERGYTRANSFER") {
-                        ResourceTypeString = "EnergyTransfer";
-                    } else if (SELECT_CASE_var == "STEAM") {
-                        ResourceTypeString = "Steam";
-                    } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
-                        ResourceTypeString = "DistrictCooling";
-                    } else if (SELECT_CASE_var == "DISTRICTHEATINGWATER") {
-                        ResourceTypeString = "DistrictHeatingWater";
-                    } else if (SELECT_CASE_var == "DISTRICTHEATINGSTEAM") {
-                        ResourceTypeString = "DistrictHeatingSteam";
-                    } else if (SELECT_CASE_var == "ELECTRICITYPRODUCEDONSITE") {
-                        ResourceTypeString = "ElectricityProduced";
-                    } else if (SELECT_CASE_var == "SOLARWATERHEATING") {
-                        ResourceTypeString = "SolarWater";
-                    } else if (SELECT_CASE_var == "SOLARAIRHEATING") {
-                        ResourceTypeString = "SolarAir";
-                    } else {
-                        ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                        ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(5), cAlphaArgs(5)));
-                        ErrorsFound = true;
-                    }
+                if (resource == Constant::eResource::Invalid) {
+                    ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(5), cAlphaArgs(5)));
+                    ErrorsFound = true;
                 }
 
                 // Group Type
-                {
-                    std::string const &SELECT_CASE_var = cAlphaArgs(6);
+                OutputProcessor::SOVGroup sovGroup;
 
-                    if (SELECT_CASE_var == "BUILDING") {
-                        GroupTypeString = "Building";
-                    } else if (SELECT_CASE_var == "HVAC") {
-                        GroupTypeString = "HVAC";
-                    } else if (SELECT_CASE_var == "PLANT") {
-                        GroupTypeString = "Plant";
-                    } else if (SELECT_CASE_var == "SYSTEM") {
-                        GroupTypeString = "System";
-                    } else {
-                        ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                        ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(6), cAlphaArgs(6)));
-                        ErrorsFound = true;
-                    }
+                if (cAlphaArgs(6) == "BUILDING") {
+                    sovGroup = OutputProcessor::SOVGroup::Building;
+                } else if (cAlphaArgs(6) == "HVAC") {
+                    sovGroup = OutputProcessor::SOVGroup::HVAC;
+                } else if (cAlphaArgs(6) == "PLANT") {
+                    sovGroup = OutputProcessor::SOVGroup::Plant;
+                } else if (cAlphaArgs(6) == "SYSTEM") {
+                    sovGroup = OutputProcessor::SOVGroup::HVAC;
+                } else {
+                    ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(6), cAlphaArgs(6)));
+                    ErrorsFound = true;
                 }
 
                 // End Use Type
-                {
-                    std::string const &SELECT_CASE_var = cAlphaArgs(7);
+                OutputProcessor::SOVEndUseCat sovEndUseCat;
 
-                    if (SELECT_CASE_var == "HEATING") {
-                        EndUseTypeString = "Heating";
-                    } else if (SELECT_CASE_var == "COOLING") {
-                        EndUseTypeString = "Cooling";
-                    } else if (SELECT_CASE_var == "INTERIORLIGHTS") {
-                        EndUseTypeString = "InteriorLights";
-                    } else if (SELECT_CASE_var == "EXTERIORLIGHTS") {
-                        EndUseTypeString = "ExteriorLights";
-                    } else if (SELECT_CASE_var == "INTERIOREQUIPMENT") {
-                        EndUseTypeString = "InteriorEquipment";
-                    } else if (SELECT_CASE_var == "EXTERIOREQUIPMENT") {
-                        EndUseTypeString = "ExteriorEquipment";
-                    } else if (SELECT_CASE_var == "FANS") {
-                        EndUseTypeString = "Fans";
-                    } else if (SELECT_CASE_var == "PUMPS") {
-                        EndUseTypeString = "Pumps";
-                    } else if (SELECT_CASE_var == "HEATREJECTION") {
-                        EndUseTypeString = "HeatRejection";
-                    } else if (SELECT_CASE_var == "HUMIDIFIER") {
-                        EndUseTypeString = "Humidifier";
-                    } else if (SELECT_CASE_var == "HEATRECOVERY") {
-                        EndUseTypeString = "HeatRecovery";
-                    } else if (SELECT_CASE_var == "WATERSYSTEMS") {
-                        EndUseTypeString = "WaterSystems";
-                    } else if (SELECT_CASE_var == "REFRIGERATION") {
-                        EndUseTypeString = "Refrigeration";
-                    } else if (SELECT_CASE_var == "ONSITEGENERATION") {
-                        EndUseTypeString = "Cogeneration";
-                    } else if (SELECT_CASE_var == "HEATINGCOILS") {
-                        EndUseTypeString = "HeatingCoils";
-                    } else if (SELECT_CASE_var == "COOLINGCOILS") {
-                        EndUseTypeString = "CoolingCoils";
-                    } else if (SELECT_CASE_var == "CHILLERS") {
-                        EndUseTypeString = "Chillers";
-                    } else if (SELECT_CASE_var == "BOILERS") {
-                        EndUseTypeString = "Boilers";
-                    } else if (SELECT_CASE_var == "BASEBOARD") {
-                        EndUseTypeString = "Baseboard";
-                    } else if (SELECT_CASE_var == "HEATRECOVERYFORCOOLING") {
-                        EndUseTypeString = "HeatRecoveryForCooling";
-                    } else if (SELECT_CASE_var == "HEATRECOVERYFORHEATING") {
-                        EndUseTypeString = "HeatRecoveryForHeating";
-                    } else {
-                        ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
-                        ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(7), cAlphaArgs(7)));
-                        ErrorsFound = true;
-                    }
+                if (cAlphaArgs(7) == "HEATING") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Heating;
+                } else if (cAlphaArgs(7) == "COOLING") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Cooling;
+                } else if (cAlphaArgs(7) == "INTERIORLIGHTS") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::InteriorLights;
+                } else if (cAlphaArgs(7) == "EXTERIORLIGHTS") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::ExteriorLights;
+                } else if (cAlphaArgs(7) == "INTERIOREQUIPMENT") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::InteriorEquipment;
+                } else if (cAlphaArgs(7) == "EXTERIOREQUIPMENT") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::ExteriorEquipment;
+                } else if (cAlphaArgs(7) == "FANS") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Fans;
+                } else if (cAlphaArgs(7) == "PUMPS") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Pumps;
+                } else if (cAlphaArgs(7) == "HEATREJECTION") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::HeatRejection;
+                } else if (cAlphaArgs(7) == "HUMIDIFIER") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Humidification;
+                } else if (cAlphaArgs(7) == "HEATRECOVERY") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::HeatRecovery;
+                } else if (cAlphaArgs(7) == "WATERSYSTEMS") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::WaterSystem;
+                } else if (cAlphaArgs(7) == "REFRIGERATION") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Refrigeration;
+                } else if (cAlphaArgs(7) == "ONSITEGENERATION") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Cogeneration;
+                } else if (cAlphaArgs(7) == "HEATINGCOILS") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::HeatingCoils;
+                } else if (cAlphaArgs(7) == "COOLINGCOILS") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::CoolingCoils;
+                } else if (cAlphaArgs(7) == "CHILLERS") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Chillers;
+                } else if (cAlphaArgs(7) == "BOILERS") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Boilers;
+                } else if (cAlphaArgs(7) == "BASEBOARD") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Baseboard;
+                } else if (cAlphaArgs(7) == "HEATRECOVERYFORCOOLING") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::HeatRecoveryForCooling;
+                } else if (cAlphaArgs(7) == "HEATRECOVERYFORHEATING") {
+                    sovEndUseCat = OutputProcessor::SOVEndUseCat::HeatRecoveryForHeating;
+                } else {
+                    ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
+                    ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(7), cAlphaArgs(7)));
+                    ErrorsFound = true;
                 }
 
                 // Additional End Use Types Only Used for EnergyTransfer
-                if ((ResourceTypeString != "EnergyTransfer") &&
-                    (EndUseTypeString == "HeatingCoils" || EndUseTypeString == "CoolingCoils" || EndUseTypeString == "Chillers" ||
-                     EndUseTypeString == "Boilers" || EndUseTypeString == "Baseboard" || EndUseTypeString == "HeatRecoveryForCooling" ||
-                     EndUseTypeString == "HeatRecoveryForHeating")) {
+                if ((resource != Constant::eResource::EnergyTransfer) &&
+                    (sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils || sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils ||
+                     sovEndUseCat == OutputProcessor::SOVEndUseCat::Chillers || sovEndUseCat == OutputProcessor::SOVEndUseCat::Boilers ||
+                     sovEndUseCat == OutputProcessor::SOVEndUseCat::Baseboard ||
+                     sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatRecoveryForCooling ||
+                     sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatRecoveryForHeating)) {
                     ShowWarningError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("Invalid {}={} for {}={}", cAlphaFieldNames(5), cAlphaArgs(5), cAlphaFieldNames(7), cAlphaArgs(7)));
                     ShowContinueError(state, format("Field {} is reset from {} to EnergyTransfer", cAlphaFieldNames(5), cAlphaArgs(5)));
-                    ResourceTypeString = "EnergyTransfer";
+                    resource = Constant::eResource::EnergyTransfer;
                 }
 
                 if (!lAlphaFieldBlanks(8)) {
@@ -3699,27 +3632,25 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         cAlphaArgs(1),
                                         curUnit,
                                         state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Value,
-                                        FreqString,
-                                        VarTypeString,
+                                        sovTimeStepType,
+                                        sovStoreType,
                                         "EMS",
-                                        {},
-                                        ResourceTypeString,
-                                        EndUseTypeString,
+                                        resource,
+                                        sovEndUseCat,
                                         EndUseSubCatString,
-                                        GroupTypeString);
+                                        sovGroup);
                 } else { // no subcat
                     SetupOutputVariable(state,
                                         cAlphaArgs(1),
                                         curUnit,
                                         state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).Value,
-                                        FreqString,
-                                        VarTypeString,
+                                        sovTimeStepType,
+                                        sovStoreType,
                                         "EMS",
+                                        resource,
+                                        sovEndUseCat,
                                         {},
-                                        ResourceTypeString,
-                                        EndUseTypeString,
-                                        {},
-                                        GroupTypeString);
+                                        sovGroup);
                 }
             }
         } // NumEMSMeteredOutputVariables > 0

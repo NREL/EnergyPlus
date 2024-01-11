@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,11 +55,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -202,81 +202,81 @@ void ZoneData::SetWindDirAt(Real64 const fac)
     WindDir = fac;
 }
 
-void AirReportVars::setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name)
+void AirReportVars::setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string const &name)
 {
     SetupOutputVariable(state,
                         format("{} Mean Air Temperature", prefix),
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->MeanAirTemp,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Operative Temperature", prefix),
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->OperativeTemp,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Mean Air Dewpoint Temperature", prefix),
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->MeanAirDewPointTemp,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Mean Air Humidity Ratio", prefix),
-                        OutputProcessor::Unit::kgWater_kgDryAir,
+                        Constant::Units::kgWater_kgDryAir,
                         this->MeanAirHumRat,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Air Heat Balance Internal Convective Heat Gain Rate", prefix),
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->SumIntGains,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Air Heat Balance Surface Convection Rate", prefix),
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->SumHADTsurfs,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Air Heat Balance Interzone Air Transfer Rate", prefix),
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->SumMCpDTzones,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Air Heat Balance Outdoor Air Transfer Rate", prefix),
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->SumMCpDtInfil,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Air Heat Balance System Air Transfer Rate", prefix),
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->SumMCpDTsystem,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Air Heat Balance System Convective Heat Gain Rate", prefix),
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->SumNonAirSystem,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Air Heat Balance Air Energy Storage Rate", prefix),
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->CzdTdt,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -284,7 +284,7 @@ void AirReportVars::setUpOutputVars(EnergyPlusData &state, std::string_view pref
     if (state.dataGlobal->DisplayAdvancedReportVariables) {
         SetupOutputVariable(state,
                             format("{} Air Heat Balance Deviation Rate", prefix),
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->imBalance,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1039,7 +1039,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
             ShowFatalError(state, "Syntax error, optional arguments Theta and Phi must be present when optional ScreenNumber is used.");
         }
     } else {
-        ScNum = state.dataSurface->SurfWinScreenNumber(SurfaceNum);
+        ScNum = state.dataSurface->SurfaceWindow(SurfaceNum).screenNum;
     }
 
     if (present(Theta)) {
@@ -1053,7 +1053,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         }
         NormalAzimuth = SunAzimuthToScreenNormal;
     } else {
-        SunAzimuth = std::atan2(state.dataEnvrn->SOLCOS(1), state.dataEnvrn->SOLCOS(2));
+        SunAzimuth = std::atan2(state.dataEnvrn->SOLCOS.x, state.dataEnvrn->SOLCOS.y);
         if (SunAzimuth < 0.0) SunAzimuth += 2.0 * Constant::Pi;
         SurfaceAzimuth = state.dataSurface->Surface(SurfaceNum).Azimuth * Constant::DegToRadians;
         NormalAzimuth = SunAzimuth - SurfaceAzimuth;
@@ -1386,7 +1386,7 @@ void AllocateIntGains(EnergyPlusData &state)
     state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
     state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
     state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
-    state.dataDaylightingData->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
+    state.dataDayltg->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
 }
 
 } // namespace EnergyPlus::DataHeatBalance

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -411,9 +411,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestTriangularWindowWarning)
     state->dataSurface->Surface(3).Vertex(3).z = 1.0;
 
     SurfaceGeometry::AllocateSurfaceWindows(*state, 3);
-    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->SurfWinOriginalClass(3) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).OriginalClass = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(2).OriginalClass = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(3).OriginalClass = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
@@ -2257,15 +2257,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPolygonalWindows)
     state->dataSurface->Surface(11).Vertex(3).z = 2.4384;
 
     SurfaceGeometry::AllocateSurfaceWindows(*state, 14);
-    state->dataSurface->SurfWinOriginalClass(4) = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->SurfWinOriginalClass(5) = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->SurfWinOriginalClass(6) = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->SurfWinOriginalClass(9) = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->SurfWinOriginalClass(10) = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->SurfWinOriginalClass(11) = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->SurfWinOriginalClass(12) = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->SurfWinOriginalClass(13) = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->SurfWinOriginalClass(14) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(4).OriginalClass = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(5).OriginalClass = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(6).OriginalClass = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(9).OriginalClass = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(10).OriginalClass = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(11).OriginalClass = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(12).OriginalClass = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(13).OriginalClass = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(14).OriginalClass = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
