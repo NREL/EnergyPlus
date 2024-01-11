@@ -89,6 +89,9 @@ struct APIDataEntry
     /// \details This is only used for actuators, and represents the control actuation.
     ///          For a node setpoint actuation, this could be either temperature or humidity, for example.
     char *type; // only used for actuators
+    /// \brief This represents the unit of measurement for this exchange point.
+    /// \details This is only used for non-plugin variables.
+    char *unit; // NOT used for plugin variables
 };
 
 /// \brief Gets available API data for the current simulation

@@ -363,7 +363,7 @@ namespace Constant {
         eResourceNames[(int)eFuel2eResource[(int)eFuel::Water]],
         eResourceNames[(int)eFuel2eResource[(int)eFuel::None]]};
 
-    enum class Units
+    enum class Units : signed int
     {
         Invalid = -1,
         kg_s,
@@ -473,6 +473,19 @@ namespace Constant {
         "unknown",          // unknown
         "customEMS"         // customEMS
     };
+
+    inline std::string unitToString(Units unit) {
+        switch (unit) {
+        case Units::Invalid:
+            return "invalid";
+        default:
+            if (!(0 <= (int)unit 
+                && (int)unit < (int)unitNames.size())) 
+            { return "invalid-out-of-range"; }
+            return std::string{unitNames[(unsigned int)unit]};
+        }
+        return "";
+    }
 
     constexpr std::array<std::string_view, (int)Units::Num> unitNamesUC = {
         "KG/S",             // kg_s
