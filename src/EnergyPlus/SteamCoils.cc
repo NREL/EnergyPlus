@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -391,47 +391,46 @@ namespace SteamCoils {
             // CurrentModuleObject = "Coil:Heating:Steam"
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataSteamCoils->SteamCoil(CoilNum).Name,
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils,
                                 {},
-                                "ENERGYTRANSFER",
-                                "HEATINGCOILS",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataSteamCoils->SteamCoil(CoilNum).Name);
             SetupOutputVariable(state,
                                 "Heating Coil Steam Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamMassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataSteamCoils->SteamCoil(CoilNum).Name);
             SetupOutputVariable(state,
                                 "Heating Coil Steam Inlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 state.dataSteamCoils->SteamCoil(CoilNum).InletSteamTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataSteamCoils->SteamCoil(CoilNum).Name);
             SetupOutputVariable(state,
                                 "Heating Coil Steam Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 state.dataSteamCoils->SteamCoil(CoilNum).OutletSteamTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataSteamCoils->SteamCoil(CoilNum).Name);
             SetupOutputVariable(state,
                                 "Heating Coil Steam Trap Loss Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataSteamCoils->SteamCoil(CoilNum).LoopLoss,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
