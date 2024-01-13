@@ -638,6 +638,7 @@ namespace DataSizing {
         Real64 SpecDesSensHeatingFrac; // Fraction of Design Sensible Heating Load from DesignSpecification:AirTerminal:Sizing
         Real64 SpecDesHeatSATRatio;    // Heating Design Supply Air Temperature Difference Ratio from DesignSpecification:AirTerminal:Sizing
         Real64 SpecMinOAFrac;          // Fraction of Minimum Outdoor Air Flow from DesignSpecification:AirTerminal:Sizing
+        int plenumIndex = 0;           // plenum index for PIU inlet conditions
 
         // Default Constructor
         TermUnitSizingData()

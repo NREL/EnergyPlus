@@ -87,6 +87,41 @@ namespace PoweredInductionUnits {
     static constexpr std::array<std::string_view, static_cast<int>(HtgCoilType::Num)> HCoilNames{
         "Coil:Heating:Fuel", "Coil:Heating:Electric", "Coil:Heating:Water", "Coil:Heating:Steam"};
 
+    enum class FanCntrlType
+    {
+        Invalid = -1,
+        ConstantSpeedFan,
+        VariableSpeedFan,
+        Num
+    };
+    enum class HeatCntrlBehaviorType
+    {
+        Invalid = -1,
+        StagedHeaterBehavior,
+        ModulatedHeaterBehavior,
+        Num
+    };
+    enum class HeatOpModeType
+    {
+        Invalid = -1,
+        HeaterOff,
+        CVfirstStage,
+        StagedHeatFirstStage,
+        StagedHeatSecondStage,
+        StagedHeatThirdStage,
+        ModulatedHeatFirstStage,
+        ModulatedHeatSecondStage,
+        ModulatedHeatThirdStage,
+        Num
+    };
+    enum class CoolOpModeType
+    {
+        Invalid = -1,
+        CoolerOff,
+        PrimaryAirCooling1stStage,
+        Num
+    };
+
     struct PowIndUnitData
     {
         // Members
@@ -147,7 +182,26 @@ namespace PoweredInductionUnits {
         int ctrlZoneInNodeIndex;   // index to the control zone inlet node
         int AirLoopNum;            // index for the air loop that this terminal is connected to.
         Real64 OutdoorAirFlowRate; // zone outdoor air volume flow rate
+        Real64 SecAirMassFlow;
 
+        FanCntrlType fanControlType = FanCntrlType::Invalid; // fan speed control, Constant or VS
+        Real64 MinFanTurnDownRatio = 0.0;                    // VS fan minimum speed as fraction of maximum, to facilitate autosizing
+        Real64 MinTotAirVolFlow = 0.0;                       // m3/s  VS fan on minimum speed
+        Real64 MinTotAirMassFlow = 0.0;                      // kg/s  VS fan on minimum speed
+        Real64 MinSecAirVolFlow = 0.0;                       // m3/s  VS fan on minimum speed
+        Real64 MinSecAirMassFlow = 0.0;                      // kg/s  VS fan on minimum speed
+        HeatCntrlBehaviorType heatingControlType =
+            HeatCntrlBehaviorType::Invalid; // heating control scheme, staged or modulated (physical devices) have different control behavior
+        Real64 designHeatingDAT = 0.0;      // C, target heating discharge air temperature during second stage modulated heating behavior
+        Real64 highLimitDAT = 0.0;          // C, maximum limit on heating discharge air temperature, end of third stage modulated heating behavior
+        Real64 TotMassFlowRate = 0.0;       // currrent operating total air mass flow, for reporting
+        Real64 SecMassFlowRate = 0.0;       // current operating secondary air mass flow rate, for reporting
+        Real64 PriMassFlowRate = 0.0;       // current operating primary air mass flow rate, for reporting
+        Real64 DischargeAirTemp = 0.0;      // current operating discharge air temperature at outlet, for reporting
+        HeatOpModeType heaterOperatingMode = HeatOpModeType::HeaterOff;
+
+        int CurOperationControlStage = -1; // integer reference for what stage of control the unit is in
+        int plenumIndex = 0;
         // Default Constructor
         PowIndUnitData()
             : UnitType_Num(DataDefineEquip::ZnAirLoopEquipType::Invalid), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0),
@@ -198,11 +252,44 @@ namespace PoweredInductionUnits {
 
     void ReportPIU(EnergyPlusData &state, int PIUNum); // number of the current fan coil unit being simulated
 
+    void CalcVariableSpeedPIUModulatedBehavior(EnergyPlusData &state,
+                                               int const PIUNum,   // number of the current PIU being simulated
+                                               int const ZoneNode, // zone node number
+                                               Real64 const zoneLoad,
+                                               bool const Pri,
+                                               Real64 const primaryAirMassFlow);
+
+    void CalcVariableSpeedPIUStagedBehavior(EnergyPlusData &state,
+                                            int const PIUNum,   // number of the current PIU being simulated
+                                            int const ZoneNode, // zone node number
+                                            Real64 const zoneLoad,
+                                            bool const Pri,
+                                            Real64 const primaryAirMassFlow);
+
+    void
+    ReportCurOperatingControlStage(EnergyPlusData &state, int const PIUNum, bool const unitOn, HeatOpModeType heaterMode, CoolOpModeType coolingMode);
+
     // ===================== Utilities =====================================
 
     bool PIUnitHasMixer(EnergyPlusData &state, std::string_view CompName); // component (mixer) name
 
-    void PIUInducesPlenumAir(EnergyPlusData &state, int NodeNum); // induced air node number
+    void PIUInducesPlenumAir(EnergyPlusData &state, int NodeNum, int const plenumNum); // induced air node number
+
+    Real64 CalcVariableSpeedPIUHeatingResidual(EnergyPlusData &state,
+                                               Real64 const fanSignal,
+                                               int const PIUNum,
+                                               Real64 const targetQznReq,
+                                               int const zoneNodeNum,
+                                               Real64 const primaryMassFlow,
+                                               bool const useDAT,
+                                               Real64 const fanTurnDown);
+
+    Real64 CalcVariableSpeedPIUQdotDelivered(EnergyPlusData &state,
+                                             int const PIUNum,   // number of the current PIU being simulated
+                                             int const ZoneNode, // zone node number
+                                             bool const useDAT,
+                                             Real64 const TotAirMassFlow,
+                                             Real64 const fanTurnDown);
 
 } // namespace PoweredInductionUnits
 
