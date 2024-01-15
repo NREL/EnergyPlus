@@ -422,6 +422,23 @@ namespace StandardRatings {
                                 Array1A_int EIRFTempCurveIndex,       // Index for the EIR as a function of temperature modifier curve
                                 Array1A_int const PLFFPLRCurveIndex); // Index for the PLF vs part-load ratio curve
 
+    // NetCoolingCapRatedMaxSpeed2023 --> net cooling capacity at maximum(High) speed
+    // SEER2_User --> seasonal energy efficiency ratio of Two speed DX cooling coil, from user-input PLF curve and C_D value
+    // SEER2_Standard --> seasonal energy efficiency ratio of Two speed DX cooling coil, from AHRI Std 210/240-2023 default PLF
+    // curve and  C_D value
+    std::tuple<Real64, Real64, Real64> TwoSpeedDXCoolingCoilSEER2(
+        EnergyPlusData &state,
+        // int const nsp,                                                  // Number of compressor speeds | 2
+        Array1A_int const CapFFlowCurveIndex,                           // Index for the capacity as a function of flow fraction modifier curve
+        Array1A<Real64> const RatedTotalCapacity,                       // Reference capacity of DX coil [W]
+        Array1A_int const CapFTempCurveIndex,                           // Index for the capacity as a function of temperature modifier curve
+        Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput_2023, // 2023 rated fan power per evap air flow rate [W/(m3/s)]
+        Array1A<Real64> const RatedAirVolFlowRate,                      // Reference air flow rate of DX coil [m3/s]
+        Array1A_int const EIRFFlowCurveIndex,                           // Index for the EIR as a function of flow fraction modifier curve
+        Array1A<Real64> const RatedCOP,                                 // Reference coefficient of performance [W/W]
+        Array1A_int EIRFTempCurveIndex,                                 // Index for the EIR as a function of temperature modifier curve
+        Array1A_int const PLFFPLRCurveIndex);                           // Index for the PLF vs part-load ratio curve
+
     // NetCoolingCapRatedMaxSpeed2023 --> net cooling capacity at maximum speed
     // SEER2_User --> seasonal energy efficiency ratio of multi speed DX cooling coil, from user-input PLF curve and C_D value
     // SEER2_Standard --> seasonal energy efficiency ratio of multi speed DX cooling coil, from AHRI Std 210/240-2023 default PLF
@@ -434,7 +451,7 @@ namespace StandardRatings {
         Array1A_int const CapFTempCurveIndex,                           // Index for the capacity as a function of temperature modifier curve
         Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput_2023, // 2023 rated fan power per evap air flow rate [W/(m3/s)]
         Array1A<Real64> const RatedAirVolFlowRate,                      // Reference air flow rate of DX coil [m3/s]
-        Array1A_int const EIRFFlowCurveIndex,                           // Index for the EIR as a function of flow fraction modifier curve
+        Array1A_int const EIRFFlowCurveIndex,                            // Index for the EIR as a function of flow fraction modifier curve
         Array1A<Real64> const RatedCOP,                                 // Reference coefficient of performance [W/W]
         Array1A_int EIRFTempCurveIndex,                                 // Index for the EIR as a function of temperature modifier curve
         Array1A_int const PLFFPLRCurveIndex);                           // Index for the PLF vs part-load ratio curve
