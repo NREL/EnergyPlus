@@ -5822,6 +5822,601 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoilAir_ExampleARHI_IEER2022ValueTes
     EXPECT_NEAR(11.141, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
 }
 
+TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir18000W_SEER2ValueTest)
+{
+    // Modified from Coil:Cooling:DX:TwoSpeed coil in "DesiccantDehumidifierWithAirToAirCoil.idf"
+    std::string const idf_objects = delimited_string({
+        "Coil:Cooling:DX:TwoSpeed,",
+        "    Main Cooling Coil 1,     !- Name",
+        "    FanAvailSched,           !- Availability Schedule Name",
+        "    18000,                   !- High Speed Gross Rated Total Cooling Capacity {W}",
+        "    0.75,                    !- High Speed Rated Sensible Heat Ratio",
+        "    3.0,                     !- High Speed Gross Rated Cooling COP {W/W}",
+        "    1.0,                     !- High Speed Rated Air Flow Rate {m3/s}",
+        "    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- Unit Internal Static Air Pressure {Pa}",
+        "    Mixed Air Node 1,        !- Air Inlet Node Name",
+        "    Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name",
+        "    VarSpeedCoolCapFT,       !- Total Cooling Capacity Function of Temperature Curve Name",
+        "    PackagedRatedCoolCapFFlow,  !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "    VarSpeedCoolEIRFT,       !- Energy Input Ratio Function of Temperature Curve Name",
+        "    PackagedRatedCoolEIRFFlow,  !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "    VarSpeedCyclingPLFFPLR,  !- Part Load Fraction Correlation Curve Name",
+        "    6000,                    !- Low Speed Gross Rated Total Cooling Capacity {W}",
+        "    0.69,                    !- Low Speed Gross Rated Sensible Heat Ratio",
+        "    4.2,                     !- Low Speed Gross Rated Cooling COP {W/W}",
+        "    0.4,                     !- Low Speed Rated Air Flow Rate {m3/s}",
+        "    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    VarSpeedCoolCapLSFT,     !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
+        "    VarSpeedCoolEIRLSFT,     !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
+        "    Main Cooling Coil 1 Condenser Node;  !- Condenser Air Inlet Node Name",
+        "",
+        "  Curve:Biquadratic,",
+        "    VarSpeedCoolCapFT,       !- Name",
+        "    0.476428E+00,            !- Coefficient1 Constant",
+        "    0.401147E-01,            !- Coefficient2 x",
+        "    0.226411E-03,            !- Coefficient3 x**2",
+        "    -0.827136E-03,           !- Coefficient4 y",
+        "    -0.732240E-05,           !- Coefficient5 y**2",
+        "    -0.446278E-03,           !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    23.88889,                !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+        "",
+        "  Curve:Cubic,",
+        "    PackagedRatedCoolCapFFlow,  !- Name",
+        "    0.47278589,              !- Coefficient1 Constant",
+        "    1.2433415,               !- Coefficient2 x",
+        "    -1.0387055,              !- Coefficient3 x**2",
+        "    0.32257813,              !- Coefficient4 x**3",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+        "",
+        "  Curve:Biquadratic,",
+        "    VarSpeedCoolEIRFT,       !- Name",
+        "    0.632475E+00,            !- Coefficient1 Constant",
+        "    -0.121321E-01,           !- Coefficient2 x",
+        "    0.507773E-03,            !- Coefficient3 x**2",
+        "    0.155377E-01,            !- Coefficient4 y",
+        "    0.272840E-03,            !- Coefficient5 y**2",
+        "    -0.679201E-03,           !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    23.88889,                !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+        "",
+        "  Curve:Cubic,",
+        "    PackagedRatedCoolEIRFFlow,  !- Name",
+        "    1.0079484,               !- Coefficient1 Constant",
+        "    0.34544129,              !- Coefficient2 x",
+        "    -.6922891,               !- Coefficient3 x**2",
+        "    0.33889943,              !- Coefficient4 x**3",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+        "",
+        "  Curve:Quadratic,",
+        "    VarSpeedCyclingPLFFPLR,  !- Name",
+        "    0.85,                    !- Coefficient1 Constant",
+        "    0.15,                    !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.0;                     !- Maximum Value of x",
+        "",
+        "  Curve:Biquadratic,",
+        "    VarSpeedCoolCapLSFT,     !- Name",
+        "    0.476428E+00,            !- Coefficient1 Constant",
+        "    0.401147E-01,            !- Coefficient2 x",
+        "    0.226411E-03,            !- Coefficient3 x**2",
+        "    -0.827136E-03,           !- Coefficient4 y",
+        "    -0.732240E-05,           !- Coefficient5 y**2",
+        "    -0.446278E-03,           !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    23.88889,                !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+        "",
+        "  Curve:Biquadratic,",
+        "    VarSpeedCoolEIRLSFT,     !- Name",
+        "    0.774645E+00,            !- Coefficient1 Constant",
+        "    -0.343731E-01,           !- Coefficient2 x",
+        "    0.783173E-03,            !- Coefficient3 x**2",
+        "    0.146596E-01,            !- Coefficient4 y",
+        "    0.488851E-03,            !- Coefficient5 y**2",
+        "    -0.752036E-03,           !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    23.88889,                !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+        "",
+        "Schedule:Compact,",
+        "    FanAvailSched,           !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 3/31,           !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0,        !- Field 3",
+        "    Through: 9/30,           !- Field 5",
+        "    For: WeekDays,           !- Field 6",
+        "    Until: 7:00,0.0,         !- Field 7",
+        "    Until: 17:00,1.0,        !- Field 9",
+        "    Until: 24:00,0.0,        !- Field 11",
+        "    For: SummerDesignDay WinterDesignDay, !- Field 13",
+        "    Until: 24:00,1.0,        !- Field 14",
+        "    For: AllOtherDays,       !- Field 16",
+        "    Until: 24:00,0.0,        !- Field 17",
+        "    Through: 12/31,          !- Field 19",
+        "    For: AllDays,            !- Field 20",
+        "    Until: 24:00,1.0;        !- Field 21",
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetDXCoils(*state);
+
+    auto &thisCoil(state->dataDXCoils->DXCoil(1));
+    auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(thisCoil.PLFFPLR(1)));
+
+    // ckeck user PLF curve coefficients
+    EXPECT_EQ(0.85, thisCoolPLFfPLR->coeff[0]);
+    EXPECT_EQ(0.15, thisCoolPLFfPLR->coeff[1]);
+    EXPECT_EQ(0.0, thisCoolPLFfPLR->inputLimits[0].min);
+    EXPECT_EQ(1.0, thisCoolPLFfPLR->inputLimits[0].max);
+    Real64 minEIRfLowPLRXInput(0.0);
+    Real64 maxEIRfLowPLRXInput(0.0);
+    // check user PLF curve PLR limits
+    Curve::GetCurveMinMaxValues(*state, thisCoil.PLFFPLR(1), minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    EXPECT_EQ(0.0, minEIRfLowPLRXInput);
+    EXPECT_EQ(1.0, maxEIRfLowPLRXInput);
+
+    // Rated Total Capacity
+    EXPECT_NEAR(18000, thisCoil.RatedTotCap(1), 0.01);
+    EXPECT_NEAR(6000, thisCoil.RatedTotCap2, 0.01);
+
+    // Reated Air Vol Flow Rate
+    EXPECT_NEAR(1.0, thisCoil.RatedAirVolFlowRate(1), 0.01);
+    EXPECT_NEAR(0.40, thisCoil.RatedAirVolFlowRate2, 0.01);
+
+    // Rated COP
+    EXPECT_NEAR(3.0, thisCoil.RatedCOP(1), 0.01);
+    EXPECT_NEAR(4.2, thisCoil.RatedCOP2, 0.01);
+
+    // Rated Fan POwer Per Evap Air Flow Rate 2023
+    EXPECT_NEAR(934.39, thisCoil.FanPowerPerEvapAirFlowRate_2023(1), 0.01);
+    EXPECT_NEAR(934.39, thisCoil.FanPowerPerEvapAirFlowRate_2023_LowSpeed(1), 0.01);
+
+    EXPECT_EQ("Coil:Cooling:DX:TwoSpeed", thisCoil.DXCoilType);
+
+    EXPECT_TRUE(DataHeatBalance::RefrigCondenserType::Air == thisCoil.CondenserType(1));
+    EXPECT_FALSE(DataHeatBalance::RefrigCondenserType::Evap == thisCoil.CondenserType(1));
+
+    // Ckeck user curve coefficients
+
+    // CCapFTemp High Speed
+    auto &thisCCpaFTempHS(state->dataCurveManager->PerfCurve(thisCoil.CCapFTemp(1)));
+    EXPECT_EQ(0.476428E+00, thisCCpaFTempHS->coeff[0]);
+    EXPECT_EQ(0.401147E-01, thisCCpaFTempHS->coeff[1]);
+    // CCapFTemp Low Speed
+    auto &thisCCpaFTempLS(state->dataCurveManager->PerfCurve(thisCoil.CCapFTemp2));
+    EXPECT_EQ(0.476428E+00, thisCCpaFTempLS->coeff[0]);
+    EXPECT_EQ(0.226411E-03, thisCCpaFTempLS->coeff[2]);
+
+    // EIRFTemp High Speed Curve
+    auto &thisEIRFTempHS(state->dataCurveManager->PerfCurve(thisCoil.EIRFTemp(1)));
+    EXPECT_EQ(0.632475E+00, thisEIRFTempHS->coeff[0]);
+    EXPECT_EQ(-0.121321E-01, thisEIRFTempHS->coeff[1]);
+    // EIRFTemp Low Speed Curve
+    auto &thisEIRFTempLS(state->dataCurveManager->PerfCurve(thisCoil.EIRFTemp2));
+    EXPECT_EQ(0.774645E+00, thisEIRFTempLS->coeff[0]);
+    EXPECT_EQ(-0.343731E-01, thisEIRFTempLS->coeff[1]);
+
+    // CapFFlow High Speed
+    auto &thisCapFFlowHs(state->dataCurveManager->PerfCurve(thisCoil.CCapFFlow(1)));
+    EXPECT_EQ(0.47278589, thisCapFFlowHs->coeff[0]);
+    EXPECT_EQ(1.2433415, thisCapFFlowHs->coeff[1]);
+    // Note -- No CapFlow for Low Speed
+
+    // EIRFFlow High Speed
+    auto &thisEIRFFlowHs(state->dataCurveManager->PerfCurve(thisCoil.EIRFFlow(1)));
+    EXPECT_EQ(1.0079484, thisEIRFFlowHs->coeff[0]);
+    EXPECT_EQ(0.34544129, thisEIRFFlowHs->coeff[1]);
+    // Note -- No EIRFlow for Low Speed
+
+    std::map<std::string, Real64> StandardRatingsResult;
+    Real64 NetCoolingCapRatedMaxSpeed(0.0);
+    Real64 SEER2_User(0.0);
+    Real64 SEER2_Standard(0.0);
+    Real64 NetCoolingCapRated2023(0.0);
+
+    Real64 NetCoolingCapRated(0.0);
+    Real64 IEER_2022(0.0);
+    Real64 EER_2022(0.0);
+    Real64 NetCoolingCapRated2022(0.0);
+
+    Array1D_int TSCCapFTemp;
+    TSCCapFTemp.push_back(thisCoil.CCapFTemp(1)); // High Speed
+    TSCCapFTemp.push_back(thisCoil.CCapFTemp2);   // Low Speed
+
+    Array1D<Real64> TSFanPowerPerEvapAirFlowRate2023;
+    TSFanPowerPerEvapAirFlowRate2023.push_back(thisCoil.FanPowerPerEvapAirFlowRate_2023(1));          // High Speed
+    TSFanPowerPerEvapAirFlowRate2023.push_back(thisCoil.FanPowerPerEvapAirFlowRate_2023_LowSpeed(1)); // Low Speed
+
+    Array1D<Real64> TSRatedTotCap;
+    TSRatedTotCap.push_back(thisCoil.RatedTotCap(1)); // High Speed
+    TSRatedTotCap.push_back(thisCoil.RatedTotCap2);   // Low Speed
+
+    Array1D<Real64> TSRatedAirVolFlowRate;
+    TSRatedAirVolFlowRate.push_back(thisCoil.RatedAirVolFlowRate(1)); // High Speed
+    TSRatedAirVolFlowRate.push_back(thisCoil.RatedAirVolFlowRate2);   // Low Speed
+
+    Array1D_int TSEIRFTemp;
+    TSEIRFTemp.push_back(thisCoil.EIRFTemp(1)); // High Speed
+    TSEIRFTemp.push_back(thisCoil.EIRFTemp2);   // Low Speed
+
+    Array1D<Real64> TSRatedCOP;
+    TSRatedCOP.push_back(thisCoil.RatedCOP(1)); // High Speed
+    TSRatedCOP.push_back(thisCoil.RatedCOP2);   // Low Speed
+
+    std::tie(NetCoolingCapRated2023, SEER2_User, SEER2_Standard) =
+        TwoSpeedDXCoolingCoilSEER2(*state,
+                                   // 2, // nsp will always be 2 in case of Two Speed Coil
+                                   thisCoil.CCapFFlow, // CapFFlowCurveIndex, | Only High Speed
+                                   TSRatedTotCap,
+                                   TSCCapFTemp, // CapFTempCurveIndex,
+                                   TSFanPowerPerEvapAirFlowRate2023,
+                                   TSRatedAirVolFlowRate,
+                                   thisCoil.EIRFFlow, // EIRFFlowCurveIndex, | Only High Speed
+                                   TSRatedCOP,
+                                   TSEIRFTemp,      // EIRFTempCurveIndex,
+                                   thisCoil.PLFFPLR // PLFFPLRCurveIndex | Coil Level Decleration
+        );
+    NetCoolingCapRatedMaxSpeed = NetCoolingCapRated2023;
+    EXPECT_TRUE(SEER2_User > 0.0);
+    EXPECT_TRUE(SEER2_Standard > 0.0);
+    EXPECT_TRUE(NetCoolingCapRatedMaxSpeed > 0.0);
+    EXPECT_NEAR(17070.177992104353, NetCoolingCapRatedMaxSpeed, 0.01);
+    EXPECT_NEAR(3.39616, SEER2_User, 0.01);
+    EXPECT_NEAR(3.38201, SEER2_Standard, 0.01);
+    EXPECT_NEAR(11.5882, SEER2_User * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(11.5399, SEER2_Standard * StandardRatings::ConvFromSIToIP, 0.01);
+
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationTwoSpeed(*state,
+                                                                                    thisCoil.DXCoilType,
+                                                                                    thisCoil.CondenserType,
+                                                                                    TSCCapFTemp,
+                                                                                    TSRatedTotCap,
+                                                                                    thisCoil.CCapFFlow,
+                                                                                    TSFanPowerPerEvapAirFlowRate2023,
+                                                                                    TSRatedAirVolFlowRate,
+                                                                                    TSEIRFTemp,
+                                                                                    TSRatedCOP,
+                                                                                    thisCoil.EIRFFlow);
+
+    NetCoolingCapRated = NetCoolingCapRated2022;
+    EXPECT_TRUE(IEER_2022 > 0.0);
+    EXPECT_TRUE(EER_2022 > 0.0);
+    EXPECT_TRUE(NetCoolingCapRated2022 > 0.0);
+    EXPECT_NEAR(3.2614085145212082, IEER_2022, 0.01);
+    EXPECT_NEAR(17070.177992104353, NetCoolingCapRated, 0.01);
+    EXPECT_NEAR(11.128387774618499, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
+
+    EXPECT_NEAR(NetCoolingCapRatedMaxSpeed, NetCoolingCapRated2022, 0.01);
+}
+
+TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir12000W_SEER2ValueTest)
+{
+    // Modified from Coil:Cooling:DX:TwoSpeed coil in "DesiccantDehumidifierWithAirToAirCoil.idf"
+    std::string const idf_objects = delimited_string({
+        "Coil:Cooling:DX:TwoSpeed,",
+        "    Main Cooling Coil 1,     !- Name",
+        "    FanAvailSched,           !- Availability Schedule Name",
+        "    12000,                   !- High Speed Gross Rated Total Cooling Capacity {W}",
+        "    0.75,                    !- High Speed Rated Sensible Heat Ratio",
+        "    3.0,                     !- High Speed Gross Rated Cooling COP {W/W}",
+        "    0.8,                     !- High Speed Rated Air Flow Rate {m3/s}",
+        "    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- Unit Internal Static Air Pressure {Pa}",
+        "    Mixed Air Node 1,        !- Air Inlet Node Name",
+        "    Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name",
+        "    VarSpeedCoolCapFT,       !- Total Cooling Capacity Function of Temperature Curve Name",
+        "    PackagedRatedCoolCapFFlow,  !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "    VarSpeedCoolEIRFT,       !- Energy Input Ratio Function of Temperature Curve Name",
+        "    PackagedRatedCoolEIRFFlow,  !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "    VarSpeedCyclingPLFFPLR,  !- Part Load Fraction Correlation Curve Name",
+        "    4000,                    !- Low Speed Gross Rated Total Cooling Capacity {W}",
+        "    0.69,                    !- Low Speed Gross Rated Sensible Heat Ratio",
+        "    4.2,                     !- Low Speed Gross Rated Cooling COP {W/W}",
+        "    0.4,                     !- Low Speed Rated Air Flow Rate {m3/s}",
+        "    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    VarSpeedCoolCapLSFT,     !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
+        "    VarSpeedCoolEIRLSFT,     !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
+        "    Main Cooling Coil 1 Condenser Node;  !- Condenser Air Inlet Node Name",
+        "",
+        "  Curve:Biquadratic,",
+        "    VarSpeedCoolCapFT,       !- Name",
+        "    0.476428E+00,            !- Coefficient1 Constant",
+        "    0.401147E-01,            !- Coefficient2 x",
+        "    0.226411E-03,            !- Coefficient3 x**2",
+        "    -0.827136E-03,           !- Coefficient4 y",
+        "    -0.732240E-05,           !- Coefficient5 y**2",
+        "    -0.446278E-03,           !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    23.88889,                !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+        "",
+        "  Curve:Cubic,",
+        "    PackagedRatedCoolCapFFlow,  !- Name",
+        "    0.47278589,              !- Coefficient1 Constant",
+        "    1.2433415,               !- Coefficient2 x",
+        "    -1.0387055,              !- Coefficient3 x**2",
+        "    0.32257813,              !- Coefficient4 x**3",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+        "",
+        "  Curve:Biquadratic,",
+        "    VarSpeedCoolEIRFT,       !- Name",
+        "    0.632475E+00,            !- Coefficient1 Constant",
+        "    -0.121321E-01,           !- Coefficient2 x",
+        "    0.507773E-03,            !- Coefficient3 x**2",
+        "    0.155377E-01,            !- Coefficient4 y",
+        "    0.272840E-03,            !- Coefficient5 y**2",
+        "    -0.679201E-03,           !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    23.88889,                !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+        "",
+        "  Curve:Cubic,",
+        "    PackagedRatedCoolEIRFFlow,  !- Name",
+        "    1.0079484,               !- Coefficient1 Constant",
+        "    0.34544129,              !- Coefficient2 x",
+        "    -.6922891,               !- Coefficient3 x**2",
+        "    0.33889943,              !- Coefficient4 x**3",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+        "",
+        "  Curve:Quadratic,",
+        "    VarSpeedCyclingPLFFPLR,  !- Name",
+        "    0.85,                    !- Coefficient1 Constant",
+        "    0.15,                    !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.0;                     !- Maximum Value of x",
+        "",
+        "  Curve:Biquadratic,",
+        "    VarSpeedCoolCapLSFT,     !- Name",
+        "    0.476428E+00,            !- Coefficient1 Constant",
+        "    0.401147E-01,            !- Coefficient2 x",
+        "    0.226411E-03,            !- Coefficient3 x**2",
+        "    -0.827136E-03,           !- Coefficient4 y",
+        "    -0.732240E-05,           !- Coefficient5 y**2",
+        "    -0.446278E-03,           !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    23.88889,                !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+        "",
+        "  Curve:Biquadratic,",
+        "    VarSpeedCoolEIRLSFT,     !- Name",
+        "    0.774645E+00,            !- Coefficient1 Constant",
+        "    -0.343731E-01,           !- Coefficient2 x",
+        "    0.783173E-03,            !- Coefficient3 x**2",
+        "    0.146596E-01,            !- Coefficient4 y",
+        "    0.488851E-03,            !- Coefficient5 y**2",
+        "    -0.752036E-03,           !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    23.88889,                !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+        "",
+        "Schedule:Compact,",
+        "    FanAvailSched,           !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 3/31,           !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0,        !- Field 3",
+        "    Through: 9/30,           !- Field 5",
+        "    For: WeekDays,           !- Field 6",
+        "    Until: 7:00,0.0,         !- Field 7",
+        "    Until: 17:00,1.0,        !- Field 9",
+        "    Until: 24:00,0.0,        !- Field 11",
+        "    For: SummerDesignDay WinterDesignDay, !- Field 13",
+        "    Until: 24:00,1.0,        !- Field 14",
+        "    For: AllOtherDays,       !- Field 16",
+        "    Until: 24:00,0.0,        !- Field 17",
+        "    Through: 12/31,          !- Field 19",
+        "    For: AllDays,            !- Field 20",
+        "    Until: 24:00,1.0;        !- Field 21",
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetDXCoils(*state);
+
+    auto &thisCoil(state->dataDXCoils->DXCoil(1));
+    auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(thisCoil.PLFFPLR(1)));
+    // ckeck user PLF curve coefficients
+    EXPECT_EQ(0.85, thisCoolPLFfPLR->coeff[0]);
+    EXPECT_EQ(0.15, thisCoolPLFfPLR->coeff[1]);
+    EXPECT_EQ(0.0, thisCoolPLFfPLR->inputLimits[0].min);
+    EXPECT_EQ(1.0, thisCoolPLFfPLR->inputLimits[0].max);
+    Real64 minEIRfLowPLRXInput(0.0);
+    Real64 maxEIRfLowPLRXInput(0.0);
+    // check user PLF curve PLR limits
+    Curve::GetCurveMinMaxValues(*state, thisCoil.PLFFPLR(1), minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    EXPECT_EQ(0.0, minEIRfLowPLRXInput);
+    EXPECT_EQ(1.0, maxEIRfLowPLRXInput);
+
+    // Rated Total Capacity
+    EXPECT_NEAR(12000, thisCoil.RatedTotCap(1), 0.01);
+    EXPECT_NEAR(4000, thisCoil.RatedTotCap2, 0.01);
+
+    // Reated Air Vol Flow Rate
+    EXPECT_NEAR(0.80000000000000004, thisCoil.RatedAirVolFlowRate(1), 0.01);
+    EXPECT_NEAR(0.40000000000000002, thisCoil.RatedAirVolFlowRate2, 0.01);
+
+    // Rated COP
+    EXPECT_NEAR(3.0, thisCoil.RatedCOP(1), 0.01);
+    EXPECT_NEAR(4.20, thisCoil.RatedCOP2, 0.01);
+
+    // Rated Fan POwer Per Evap Air Flow Rate 2023
+    EXPECT_NEAR(934.39, thisCoil.FanPowerPerEvapAirFlowRate_2023(1), 0.01);
+    EXPECT_NEAR(934.39, thisCoil.FanPowerPerEvapAirFlowRate_2023_LowSpeed(1), 0.01);
+
+    EXPECT_EQ("Coil:Cooling:DX:TwoSpeed", thisCoil.DXCoilType);
+
+    EXPECT_TRUE(DataHeatBalance::RefrigCondenserType::Air == thisCoil.CondenserType(1));
+    EXPECT_FALSE(DataHeatBalance::RefrigCondenserType::Evap == thisCoil.CondenserType(1));
+
+    // Ckeck user curve coefficients
+
+    // CCapFTemp High Speed
+    auto &thisCCpaFTempHS(state->dataCurveManager->PerfCurve(thisCoil.CCapFTemp(1)));
+    EXPECT_EQ(0.476428E+00, thisCCpaFTempHS->coeff[0]);
+    EXPECT_EQ(0.401147E-01, thisCCpaFTempHS->coeff[1]);
+    // CCapFTemp Low Speed
+    auto &thisCCpaFTempLS(state->dataCurveManager->PerfCurve(thisCoil.CCapFTemp2));
+    EXPECT_EQ(0.476428E+00, thisCCpaFTempLS->coeff[0]);
+    EXPECT_EQ(0.226411E-03, thisCCpaFTempLS->coeff[2]);
+
+    // EIRFTemp High Speed Curve
+    auto &thisEIRFTempHS(state->dataCurveManager->PerfCurve(thisCoil.EIRFTemp(1)));
+    EXPECT_EQ(0.632475E+00, thisEIRFTempHS->coeff[0]);
+    EXPECT_EQ(-0.121321E-01, thisEIRFTempHS->coeff[1]);
+    // EIRFTemp Low Speed Curve
+    auto &thisEIRFTempLS(state->dataCurveManager->PerfCurve(thisCoil.EIRFTemp2));
+    EXPECT_EQ(0.774645E+00, thisEIRFTempLS->coeff[0]);
+    EXPECT_EQ(-0.343731E-01, thisEIRFTempLS->coeff[1]);
+
+    // CapFFlow High Speed
+    auto &thisCapFFlowHs(state->dataCurveManager->PerfCurve(thisCoil.CCapFFlow(1)));
+    EXPECT_EQ(0.47278589, thisCapFFlowHs->coeff[0]);
+    EXPECT_EQ(1.2433415, thisCapFFlowHs->coeff[1]);
+    // Note -- No CapFlow for Low Speed
+
+    // EIRFFlow High Speed
+    auto &thisEIRFFlowHs(state->dataCurveManager->PerfCurve(thisCoil.EIRFFlow(1)));
+    EXPECT_EQ(1.0079484, thisEIRFFlowHs->coeff[0]);
+    EXPECT_EQ(0.34544129, thisEIRFFlowHs->coeff[1]);
+    // Note -- No EIRFlow for Low Speed
+
+    std::map<std::string, Real64> StandardRatingsResult;
+    Real64 NetCoolingCapRatedMaxSpeed(0.0);
+    Real64 SEER2_User(0.0);
+    Real64 SEER2_Standard(0.0);
+    Real64 NetCoolingCapRated2023(0.0);
+
+    Real64 NetCoolingCapRated(0.0);
+    Real64 IEER_2022(0.0);
+    Real64 EER_2022(0.0);
+    Real64 NetCoolingCapRated2022(0.0);
+
+    Array1D_int TSCCapFTemp;
+    TSCCapFTemp.push_back(thisCoil.CCapFTemp(1)); // High Speed
+    TSCCapFTemp.push_back(thisCoil.CCapFTemp2);   // Low Speed
+
+    Array1D<Real64> TSFanPowerPerEvapAirFlowRate2023;
+    TSFanPowerPerEvapAirFlowRate2023.push_back(thisCoil.FanPowerPerEvapAirFlowRate_2023(1));          // High Speed
+    TSFanPowerPerEvapAirFlowRate2023.push_back(thisCoil.FanPowerPerEvapAirFlowRate_2023_LowSpeed(1)); // Low Speed
+
+    Array1D<Real64> TSRatedTotCap;
+    TSRatedTotCap.push_back(thisCoil.RatedTotCap(1)); // High Speed
+    TSRatedTotCap.push_back(thisCoil.RatedTotCap2);   // Low Speed
+
+    Array1D<Real64> TSRatedAirVolFlowRate;
+    TSRatedAirVolFlowRate.push_back(thisCoil.RatedAirVolFlowRate(1)); // High Speed
+    TSRatedAirVolFlowRate.push_back(thisCoil.RatedAirVolFlowRate2);   // Low Speed
+
+    Array1D_int TSEIRFTemp;
+    TSEIRFTemp.push_back(thisCoil.EIRFTemp(1)); // High Speed
+    TSEIRFTemp.push_back(thisCoil.EIRFTemp2);   // Low Speed
+
+    Array1D<Real64> TSRatedCOP;
+    TSRatedCOP.push_back(thisCoil.RatedCOP(1)); // High Speed
+    TSRatedCOP.push_back(thisCoil.RatedCOP2);   // Low Speed
+
+    std::tie(NetCoolingCapRated2023, SEER2_User, SEER2_Standard) =
+        TwoSpeedDXCoolingCoilSEER2(*state,
+                                   // 2, // nsp will always be 2 in case of Two Speed Coil
+                                   thisCoil.CCapFFlow, // CapFFlowCurveIndex, | Only High Speed
+                                   TSRatedTotCap,
+                                   TSCCapFTemp, // CapFTempCurveIndex,
+                                   TSFanPowerPerEvapAirFlowRate2023,
+                                   TSRatedAirVolFlowRate,
+                                   thisCoil.EIRFFlow, // EIRFFlowCurveIndex, | Only High Speed
+                                   TSRatedCOP,
+                                   TSEIRFTemp,      // EIRFTempCurveIndex,
+                                   thisCoil.PLFFPLR // PLFFPLRCurveIndex | Coil Level Decleration
+        );
+    NetCoolingCapRatedMaxSpeed = NetCoolingCapRated2023;
+    EXPECT_TRUE(SEER2_User > 0.0);
+    EXPECT_TRUE(SEER2_Standard > 0.0);
+    EXPECT_TRUE(NetCoolingCapRatedMaxSpeed > 0.0);
+    EXPECT_NEAR(11255.531994736235, NetCoolingCapRatedMaxSpeed, 0.01);
+    EXPECT_NEAR(3.1266048533133741, SEER2_User, 0.01);
+    EXPECT_NEAR(3.11318185145895, SEER2_Standard, 0.01);
+    EXPECT_NEAR(10.668418589930422, SEER2_User * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(10.622617406463105, SEER2_Standard * StandardRatings::ConvFromSIToIP, 0.01);
+}
+
 TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI5_IEER2022ValueTest)
 {
     // Single Speed Two Cycle
@@ -5834,22 +6429,23 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI5_IEER2022ValueTest)
         "    0.8,                                   !- High Speed Rated Sensible Heat Ratio",
         "    3.725,                                 !- High Speed Gross Rated Cooling COP {W/W}",
         "    1.557426585,                           !- High Speed Rated Air Flow Rate {m3/s}", // 3,300 scfm
-        "	 561.8242352,                           !-High Speed 2017 Rated Evaporator Fan Power Per Volume FlowRate[W / (m3 / s)] ",
-        "    674.1890822,                           !-High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate[W / (m3 / s)] ",
+        "	 561.8242352,                           !- High Speed 2017 Rated Evaporator Fan Power Per Volume FlowRate[W / (m3 / s)] ",
+        "    674.1890822,                           !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate[W / (m3 / s)] ",
         "    450,                                   !- Unit Internal Static Air Pressure {Pa}",
         "    Mixed Air Node 1,                      !- Air Inlet Node Name",
         "    Main Cooling Coil 1 Outlet Node,       !- Air Outlet Node Name",
         "    VarSpeedCoolCapFT,                     !- Total Cooling Capacity Function of Temperature Curve Name",   // High Speed CapFTemp
-        "    PackagedRatedCoolCapFFlow,             !- Total Cooling Capacity Function of Flow Fraction Curve Name", // High Speed CapFlow
+        "    PackagedRatedCoolCapFFlow,             !- Total Cooling Capacity Function of Flow Fraction Curve Name", // High Speed CapFlow (No Low
+                                                                                                                     // Speed)
         "    VarSpeedCoolEIRFT,                     !- Energy Input Ratio Function of Temperature Curve Name",       // High Speed EIRFTemp
-        "    PackagedRatedCoolEIRFFlow,             !- Energy Input Ratio Function of Flow Fraction Curve Name",     // High Speed EIRFlow
-        "    VarSpeedCyclingPLFFPLR,                !- Part Load Fraction Correlation Curve Name",
-        "    18463.47741,                           !- Low Speed Gross Rated Total Cooling Capacity {W}", // 63,000 Btu/h
+        "    PackagedRatedCoolEIRFFlow,             !- Energy Input Ratio Function of Flow Fraction Curve Name", // High Speed EIRFlow (No Low Speed)
+        "    VarSpeedCyclingPLFFPLR,                !- Part Load Fraction Correlation Curve Name",               // PLFFPLR Curve
+        "    18463.47741,                           !- Low Speed Gross Rated Total Cooling Capacity {W}",        // 63,000 Btu/h
         "    0.8,                                   !- Low Speed Gross Rated Sensible Heat Ratio",
         "    3.25,                                  !- Low Speed Gross Rated Cooling COP {W/W}",
         "    1.557426585,                           !- Low Speed Rated Air Flow Rate {m3/s}",                                       // 3,300 scfm
         "    561.8242352,                           !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3 /s)}", // 280.3770469
-        "    674.1890822,                           !-Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate{W / (m3 / s)} ",
+        "    674.1890822,                           !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate{W / (m3 / s)} ",
         "    VarSpeedCoolCapLSFT,                   !- Low Speed Total Cooling Capacity Function of Temperature Curve Name", // Low Speed CapFTemp
         "    VarSpeedCoolEIRLSFT,                   !- Low Speed Energy Input Ratio Function of Temperature Curve Name",     // Low Speed  EIRFTemp
         "    Main Cooling Coil 1 Condenser Node,    !- Condenser Air Inlet Node Name",
@@ -6069,6 +6665,332 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI5_IEER2022ValueTest)
     // Note -- No EIRFlow for Low Speed
 
     std::map<std::string, Real64> StandardRatingsResult;
+    Real64 NetCoolingCapRatedMaxSpeed(0.0);
+    Real64 SEER2_User(0.0);
+    Real64 SEER2_Standard(0.0);
+    Real64 NetCoolingCapRated2023(0.0);
+
+    Real64 NetCoolingCapRated(0.0);
+    Real64 IEER_2022(0.0);
+    Real64 EER_2022(0.0);
+    Real64 NetCoolingCapRated2022(0.0);
+
+    Array1D_int TSCCapFTemp;
+    TSCCapFTemp.push_back(thisCoil.CCapFTemp(1)); // High Speed
+    TSCCapFTemp.push_back(thisCoil.CCapFTemp2);   // Low Speed
+
+    Array1D<Real64> TSFanPowerPerEvapAirFlowRate2023;
+    TSFanPowerPerEvapAirFlowRate2023.push_back(thisCoil.FanPowerPerEvapAirFlowRate_2023(1));          // High Speed
+    TSFanPowerPerEvapAirFlowRate2023.push_back(thisCoil.FanPowerPerEvapAirFlowRate_2023_LowSpeed(1)); // Low Speed
+
+    Array1D<Real64> TSRatedTotCap;
+    TSRatedTotCap.push_back(thisCoil.RatedTotCap(1)); // High Speed
+    TSRatedTotCap.push_back(thisCoil.RatedTotCap2);   // Low Speed
+
+    Array1D<Real64> TSRatedAirVolFlowRate;
+    TSRatedAirVolFlowRate.push_back(thisCoil.RatedAirVolFlowRate(1)); // High Speed
+    TSRatedAirVolFlowRate.push_back(thisCoil.RatedAirVolFlowRate2);   // Low Speed
+
+    Array1D_int TSEIRFTemp;
+    TSEIRFTemp.push_back(thisCoil.EIRFTemp(1)); // High Speed
+    TSEIRFTemp.push_back(thisCoil.EIRFTemp2);   // Low Speed
+
+    Array1D<Real64> TSRatedCOP;
+    TSRatedCOP.push_back(thisCoil.RatedCOP(1)); // High Speed
+    TSRatedCOP.push_back(thisCoil.RatedCOP2);   // Low Speed
+
+    std::tie(NetCoolingCapRated2023, SEER2_User, SEER2_Standard) =
+        TwoSpeedDXCoolingCoilSEER2(*state,
+                                   // 2, // nsp will always be 2 in case of Two Speed Coil
+                                   thisCoil.CCapFFlow, // CapFFlowCurveIndex, | Only High Speed
+                                   TSRatedTotCap,
+                                   TSCCapFTemp, // CapFTempCurveIndex,
+                                   TSFanPowerPerEvapAirFlowRate2023,
+                                   TSRatedAirVolFlowRate,
+                                   thisCoil.EIRFFlow, // EIRFFlowCurveIndex, | Only High Speed
+                                   TSRatedCOP,
+                                   TSEIRFTemp,      // EIRFTempCurveIndex,
+                                   thisCoil.PLFFPLR // PLFFPLRCurveIndex | Coil Level Decleration
+        );
+    NetCoolingCapRatedMaxSpeed = NetCoolingCapRated2023;
+    EXPECT_TRUE(SEER2_User > 0.0);
+    EXPECT_TRUE(SEER2_Standard > 0.0);
+    EXPECT_TRUE(NetCoolingCapRatedMaxSpeed > 0.0);
+    EXPECT_NEAR(32661.74487562689, NetCoolingCapRatedMaxSpeed, 0.01);
+    EXPECT_NEAR(3.3259251609228451, SEER2_User, 0.01);
+    EXPECT_NEAR(3.2680058866810624, SEER2_Standard, 0.01);
+    EXPECT_NEAR(11.316530162900053, SEER2_User * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(11.17409383891683, SEER2_Standard * StandardRatings::ConvFromSIToIP, 0.01);
+
+    std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationTwoSpeed(*state,
+                                                                                    thisCoil.DXCoilType,
+                                                                                    thisCoil.CondenserType,
+                                                                                    TSCCapFTemp,
+                                                                                    TSRatedTotCap,
+                                                                                    thisCoil.CCapFFlow,
+                                                                                    TSFanPowerPerEvapAirFlowRate2023,
+                                                                                    TSRatedAirVolFlowRate,
+                                                                                    TSEIRFTemp,
+                                                                                    TSRatedCOP,
+                                                                                    thisCoil.EIRFFlow);
+
+    NetCoolingCapRated = NetCoolingCapRated2022;
+    EXPECT_TRUE(IEER_2022 > 0.0);
+    EXPECT_TRUE(EER_2022 > 0.0);
+    EXPECT_TRUE(NetCoolingCapRated2022 > 0.0);
+    EXPECT_NEAR(3.3550667052349770, IEER_2022, 0.01);
+    EXPECT_NEAR(32661.744875626890, NetCoolingCapRated, 0.01);
+    EXPECT_NEAR(11.448, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
+
+    EXPECT_NEAR(NetCoolingCapRatedMaxSpeed, NetCoolingCapRated2022, 0.01);
+}
+
+TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI6B_IEER2022ValueTest)
+{
+    // Single Speed Two Cycle
+    std::string const idf_objects = delimited_string({
+        "  Coil:Cooling:DX:TwoSpeed,",
+        "    Main Cooling Coil 1,     !- Name",
+        "    CoolingCoilAvailSched,   !- Availability Schedule Name",
+        "    54883.780765317439,                !- High Speed Gross Rated Total Cooling Capacity {W}",
+        "    0.8,                     !- High Speed Rated Sensible Heat Ratio",
+        "    3.0,                     !- High Speed Gross Rated Cooling COP {W/W}",
+        "    3.3155291960328266,                !- High Speed Rated Air Flow Rate {m3/s}",
+        "    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- Unit Internal Static Air Pressure {Pa}",
+        "    Mixed Air Node 1,        !- Air Inlet Node Name",
+        "    Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name",
+        "    VarSpeedCoolCapFT,       !- Total Cooling Capacity Function of Temperature Curve Name",
+        "    PackagedRatedCoolCapFFlow,  !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "    VarSpeedCoolEIRFT,       !- Energy Input Ratio Function of Temperature Curve Name",
+        "    PackagedRatedCoolEIRFFlow,  !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "    VarSpeedCyclingPLFFPLR,  !- Part Load Fraction Correlation Curve Name",
+        "    18292.764129080300,                !- Low Speed Gross Rated Total Cooling Capacity {W}",
+        "    0.8,                     !- Low Speed Gross Rated Sensible Heat Ratio",
+        "    4.2,                     !- Low Speed Gross Rated Cooling COP {W/W}",
+        "    1.1050658810377409,                !- Low Speed Rated Air Flow Rate {m3/s}",
+        "    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    VarSpeedCoolCapLSFT,     !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
+        "    VarSpeedCoolEIRLSFT,     !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
+        "    Main Cooling Coil 1 Condenser Node;  !- Condenser Air Inlet Node Name",
+
+        "  OutdoorAir:Node,",
+        "    Main Cooling Coil 1 Condenser Node,  !- Name",
+        "    -1.0;                    !- Height Above Ground {m}",
+
+        "  Schedule:Compact,",
+        "    CoolingCoilAvailSched,   !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 3/31,           !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,0.0,        !- Field 3",
+        "    Through: 9/30,           !- Field 5",
+        "    For: WeekDays,           !- Field 6",
+        "    Until: 7:00,0.0,         !- Field 7",
+        "    Until: 17:00,1.0,        !- Field 9",
+        "    Until: 24:00,0.0,        !- Field 11",
+        "    For: SummerDesignDay WinterDesignDay, !- Field 13",
+        "    Until: 24:00,1.0,        !- Field 14",
+        "    For: AllOtherDays,       !- Field 16",
+        "    Until: 24:00,0.0,        !- Field 17",
+        "    Through: 12/31,          !- Field 19",
+        "    For: AllDays,            !- Field 20",
+        "	Until: 24:00,0.0;        !- Field 21",
+
+        "  Curve:Biquadratic,",
+        "    VarSpeedCoolCapFT,       !- Name",
+        "    0.476428E+00,            !- Coefficient1 Constant",
+        "    0.401147E-01,            !- Coefficient2 x",
+        "    0.226411E-03,            !- Coefficient3 x**2",
+        "    -0.827136E-03,           !- Coefficient4 y",
+        "    -0.732240E-05,           !- Coefficient5 y**2",
+        "    -0.446278E-03,           !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    23.88889,                !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "	  Curve:Cubic,",
+        "    PackagedRatedCoolCapFFlow,  !- Name",
+        "    0.47278589,              !- Coefficient1 Constant",
+        "    1.2433415,               !- Coefficient2 x",
+        "    -1.0387055,              !- Coefficient3 x**2",
+        "    0.32257813,              !- Coefficient4 x**3",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "	  Curve:Biquadratic,",
+        "    VarSpeedCoolEIRFT,       !- Name",
+        "    0.632475E+00,            !- Coefficient1 Constant",
+        "    -0.121321E-01,           !- Coefficient2 x",
+        "    0.507773E-03,            !- Coefficient3 x**2",
+        "    0.155377E-01,            !- Coefficient4 y",
+        "    0.272840E-03,            !- Coefficient5 y**2",
+        "    -0.679201E-03,           !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    23.88889,                !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "	  Curve:Cubic,",
+        "    PackagedRatedCoolEIRFFlow,  !- Name",
+        "    1.0079484,               !- Coefficient1 Constant",
+        "    0.34544129,              !- Coefficient2 x",
+        "    -.6922891,               !- Coefficient3 x**2",
+        "    0.33889943,              !- Coefficient4 x**3",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "	  Curve:Quadratic,",
+        "    VarSpeedCyclingPLFFPLR,  !- Name",
+        "    0.85,                    !- Coefficient1 Constant",
+        "    0.15,                    !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.0;                     !- Maximum Value of x",
+
+        "	  Curve:Biquadratic,",
+        "    VarSpeedCoolCapLSFT,     !- Name",
+        "    0.476428E+00,            !- Coefficient1 Constant",
+        "    0.401147E-01,            !- Coefficient2 x",
+        "    0.226411E-03,            !- Coefficient3 x**2",
+        "    -0.827136E-03,           !- Coefficient4 y",
+        "    -0.732240E-05,           !- Coefficient5 y**2",
+        "    -0.446278E-03,           !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    23.88889,                !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "	 Curve:Biquadratic,",
+        "    VarSpeedCoolEIRLSFT,     !- Name",
+        "    0.774645E+00,            !- Coefficient1 Constant",
+        "    -0.343731E-01,           !- Coefficient2 x",
+        "    0.783173E-03,            !- Coefficient3 x**2",
+        "    0.146596E-01,            !- Coefficient4 y",
+        "    0.488851E-03,            !- Coefficient5 y**2",
+        "    -0.752036E-03,           !- Coefficient6 x*y",
+        "    12.77778,                !- Minimum Value of x",
+        "    23.88889,                !- Maximum Value of x",
+        "    23.88889,                !- Minimum Value of y",
+        "    46.11111,                !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        " NodeList,",
+        "  Supply Fan Upstream Nodes,  !- Name",
+        "  Mixed Air Node 1,        !- Node 1 Name",
+        "   Main Cooling Coil 1 Outlet Node,  !- Node 2 Name",
+        "   Main Heating Coil 1 Outlet Node;  !- Node 3 Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetDXCoils(*state);
+
+    auto &thisCoil(state->dataDXCoils->DXCoil(1));
+    auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(thisCoil.PLFFPLR(1)));
+    // ckeck user PLF curve coefficients
+    EXPECT_EQ(0.85, thisCoolPLFfPLR->coeff[0]);
+    EXPECT_EQ(0.15, thisCoolPLFfPLR->coeff[1]);
+    EXPECT_EQ(0.0, thisCoolPLFfPLR->inputLimits[0].min);
+    EXPECT_EQ(1.0, thisCoolPLFfPLR->inputLimits[0].max);
+    Real64 minEIRfLowPLRXInput(0.0);
+    Real64 maxEIRfLowPLRXInput(0.0);
+    // check user PLF curve PLR limits
+    Curve::GetCurveMinMaxValues(*state, thisCoil.PLFFPLR(1), minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    EXPECT_EQ(0.0, minEIRfLowPLRXInput);
+    EXPECT_EQ(1.0, maxEIRfLowPLRXInput);
+
+    auto ratedTotcap = thisCoil.RatedTotCap(1);
+    // Rated Total Capacity
+    EXPECT_NEAR(54883.780765317439, thisCoil.RatedTotCap(1), 0.01);
+    EXPECT_NEAR(18292.764129080300, thisCoil.RatedTotCap2, 0.01);
+
+    // Reated Air Vol Flow Rate
+    EXPECT_NEAR(3.3155291960328266, thisCoil.RatedAirVolFlowRate(1), 0.01);
+    EXPECT_NEAR(1.1050658810377409, thisCoil.RatedAirVolFlowRate2, 0.01);
+
+    // Rated COP
+    EXPECT_NEAR(3.0, thisCoil.RatedCOP(1), 0.01);
+    EXPECT_NEAR(4.2, thisCoil.RatedCOP2, 0.01);
+
+    // Rated Fan POwer Per Evap Air Flow Rate 2023
+    EXPECT_NEAR(934.39, thisCoil.FanPowerPerEvapAirFlowRate_2023(1), 0.01);
+    EXPECT_NEAR(934.39, thisCoil.FanPowerPerEvapAirFlowRate_2023_LowSpeed(1), 0.01);
+
+    EXPECT_EQ("Coil:Cooling:DX:TwoSpeed", thisCoil.DXCoilType);
+
+    EXPECT_TRUE(DataHeatBalance::RefrigCondenserType::Air == thisCoil.CondenserType(1));
+    EXPECT_FALSE(DataHeatBalance::RefrigCondenserType::Evap == thisCoil.CondenserType(1));
+
+    // Ckeck user curve coefficients
+
+    // CCapFTemp High Speed
+    auto &thisCCpaFTempHS(state->dataCurveManager->PerfCurve(thisCoil.CCapFTemp(1)));
+    EXPECT_EQ(0.476428E+00, thisCCpaFTempHS->coeff[0]);
+    EXPECT_EQ(0.401147E-01, thisCCpaFTempHS->coeff[1]);
+    // CCapFTemp Low Speed
+    auto &thisCCpaFTempLS(state->dataCurveManager->PerfCurve(thisCoil.CCapFTemp2));
+    EXPECT_EQ(0.476428E+00, thisCCpaFTempLS->coeff[0]);
+    EXPECT_EQ(0.226411E-03, thisCCpaFTempLS->coeff[2]);
+
+    // EIRFTemp High Speed Curve
+    auto &thisEIRFTempHS(state->dataCurveManager->PerfCurve(thisCoil.EIRFTemp(1)));
+    EXPECT_EQ(0.632475E+00, thisEIRFTempHS->coeff[0]);
+    EXPECT_EQ(-0.121321E-01, thisEIRFTempHS->coeff[1]);
+    // EIRFTemp Low Speed Curve
+    auto &thisEIRFTempLS(state->dataCurveManager->PerfCurve(thisCoil.EIRFTemp2));
+    EXPECT_EQ(0.774645E+00, thisEIRFTempLS->coeff[0]);
+    EXPECT_EQ(-0.343731E-01, thisEIRFTempLS->coeff[1]);
+
+    // CapFFlow High Speed
+    auto &thisCapFFlowHs(state->dataCurveManager->PerfCurve(thisCoil.CCapFFlow(1)));
+    EXPECT_EQ(0.47278589, thisCapFFlowHs->coeff[0]);
+    EXPECT_EQ(1.2433415, thisCapFFlowHs->coeff[1]);
+    // Note -- No CapFlow for Low Speed
+
+    // EIRFFlow High Speed
+    auto &thisEIRFFlowHs(state->dataCurveManager->PerfCurve(thisCoil.EIRFFlow(1)));
+    EXPECT_EQ(1.0079484, thisEIRFFlowHs->coeff[0]);
+    EXPECT_EQ(0.34544129, thisEIRFFlowHs->coeff[1]);
+    // Note -- No EIRFlow for Low Speed
+
+    std::map<std::string, Real64> StandardRatingsResult;
+    Real64 NetCoolingCapRatedMaxSpeed(0.0);
+    Real64 SEER2_User(0.0);
+    Real64 SEER2_Standard(0.0);
+    Real64 NetCoolingCapRated2023(0.0);
+
     Real64 NetCoolingCapRated(0.0);
     Real64 IEER_2022(0.0);
     Real64 EER_2022(0.0);
@@ -6098,6 +7020,29 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI5_IEER2022ValueTest)
     TSRatedCOP.push_back(thisCoil.RatedCOP(1));
     TSRatedCOP.push_back(thisCoil.RatedCOP2);
 
+    std::tie(NetCoolingCapRated2023, SEER2_User, SEER2_Standard) =
+        TwoSpeedDXCoolingCoilSEER2(*state,
+                                   // 2, // nsp will always be 2 in case of Two Speed Coil
+                                   thisCoil.CCapFFlow, // CapFFlowCurveIndex, | Only High Speed
+                                   TSRatedTotCap,
+                                   TSCCapFTemp, // CapFTempCurveIndex,
+                                   TSFanPowerPerEvapAirFlowRate2023,
+                                   TSRatedAirVolFlowRate,
+                                   thisCoil.EIRFFlow, // EIRFFlowCurveIndex, | Only High Speed
+                                   TSRatedCOP,
+                                   TSEIRFTemp,      // EIRFTempCurveIndex,
+                                   thisCoil.PLFFPLR // PLFFPLRCurveIndex | Coil Level Decleration
+        );
+    NetCoolingCapRatedMaxSpeed = NetCoolingCapRated2023;
+    EXPECT_TRUE(SEER2_User > 0.0);
+    EXPECT_TRUE(SEER2_Standard > 0.0);
+    EXPECT_TRUE(NetCoolingCapRatedMaxSpeed > 0.0);
+    EXPECT_NEAR(51799.709035377738, NetCoolingCapRatedMaxSpeed, 0.01);
+    EXPECT_NEAR(3.4218875977103935, SEER2_User, 0.01);
+    EXPECT_NEAR(3.4077311940006365, SEER2_Standard, 0.01);
+    EXPECT_NEAR(11.675965135593989, SEER2_User * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(11.627661481122372, SEER2_Standard * StandardRatings::ConvFromSIToIP, 0.01);
+
     std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationTwoSpeed(*state,
                                                                                     thisCoil.DXCoilType,
                                                                                     thisCoil.CondenserType,
@@ -6114,9 +7059,11 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI5_IEER2022ValueTest)
     EXPECT_TRUE(IEER_2022 > 0.0);
     EXPECT_TRUE(EER_2022 > 0.0);
     EXPECT_TRUE(NetCoolingCapRated2022 > 0.0);
-    EXPECT_NEAR(3.3550667052349770, IEER_2022, 0.01);
-    EXPECT_NEAR(32661.744875626890, NetCoolingCapRated, 0.01);
-    EXPECT_NEAR(11.448, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(3.2686976980836082, IEER_2022, 0.01);
+    EXPECT_NEAR(51799.709035377738, NetCoolingCapRated, 0.01);
+    EXPECT_NEAR(11.153259501322344, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
+
+    EXPECT_NEAR(NetCoolingCapRatedMaxSpeed, NetCoolingCapRated2022, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI6_IEER2022ValueTest)
@@ -6130,8 +7077,8 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI6_IEER2022ValueTest)
         "    0.8,                                   !- High Speed Rated Sensible Heat Ratio",
         "    3.9,                                   !- High Speed Gross Rated Cooling COP {W/W}",
         "    1.557426585,                           !- High Speed Rated Air Flow Rate {m3/s}", // 3,300 scfm
-        "	 561.8242352,                           !-High Speed 2017 Rated Evaporator Fan Power Per Volume FlowRate[W / (m3 / s)] ",
-        "    674.1890822,                           !-High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate[W / (m3 / s)] ",
+        "	 561.8242352,                           !- High Speed 2017 Rated Evaporator Fan Power Per Volume FlowRate[W / (m3 / s)] ",
+        "    674.1890822,                           !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate[W / (m3 / s)] ",
         "    450,                                   !- Unit Internal Static Air Pressure {Pa}",
         "    Mixed Air Node 1,                      !- Air Inlet Node Name",
         "    Main Cooling Coil 1 Outlet Node,       !- Air Outlet Node Name",
@@ -6366,6 +7313,11 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI6_IEER2022ValueTest)
     // Note -- No EIRFlow for Low Speed
 
     std::map<std::string, Real64> StandardRatingsResult;
+    Real64 NetCoolingCapRatedMaxSpeed(0.0);
+    Real64 SEER2_User(0.0);
+    Real64 SEER2_Standard(0.0);
+    Real64 NetCoolingCapRated2023(0.0);
+
     Real64 NetCoolingCapRated(0.0);
     Real64 IEER_2022(0.0);
     Real64 EER_2022(0.0);
@@ -6395,6 +7347,28 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI6_IEER2022ValueTest)
     TSRatedCOP.push_back(thisCoil.RatedCOP(1));
     TSRatedCOP.push_back(thisCoil.RatedCOP2);
 
+    std::tie(NetCoolingCapRated2023, SEER2_User, SEER2_Standard) = TwoSpeedDXCoolingCoilSEER2(*state,
+                                                                                              // 2, // nsp will always be 2 in case of Two Speed Coil
+                                                                                              thisCoil.CCapFFlow, // CapFFlowCurveIndex,
+                                                                                              TSRatedTotCap,
+                                                                                              TSCCapFTemp, // CapFTempCurveIndex,
+                                                                                              TSFanPowerPerEvapAirFlowRate2023,
+                                                                                              TSRatedAirVolFlowRate,
+                                                                                              thisCoil.EIRFFlow, // EIRFFlowCurveIndex,
+                                                                                              TSRatedCOP,
+                                                                                              TSEIRFTemp,      // EIRFTempCurveIndex,
+                                                                                              thisCoil.PLFFPLR // PLFFPLRCurveIndex
+    );
+    NetCoolingCapRatedMaxSpeed = NetCoolingCapRated2023;
+    EXPECT_TRUE(SEER2_User > 0.0);
+    EXPECT_TRUE(SEER2_Standard > 0.0);
+    EXPECT_TRUE(NetCoolingCapRatedMaxSpeed > 0.0);
+    EXPECT_NEAR(32661.74487562689, NetCoolingCapRatedMaxSpeed, 0.01);
+    EXPECT_NEAR(3.6466238665904158, SEER2_User, 0.01);
+    EXPECT_NEAR(3.5984413957770194, SEER2_Standard, 0.01);
+    EXPECT_NEAR(12.442797115084597, SEER2_User * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(12.278391700441398, SEER2_Standard * StandardRatings::ConvFromSIToIP, 0.01);
+
     std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationTwoSpeed(*state,
                                                                                     thisCoil.DXCoilType,
                                                                                     thisCoil.CondenserType,
@@ -6414,6 +7388,8 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_ExampleARHI6_IEER2022ValueTest)
     EXPECT_NEAR(3.7132772690788105, IEER_2022, 0.01);
     EXPECT_NEAR(32661.744875626890, NetCoolingCapRated, 0.01);
     EXPECT_NEAR(12.670, IEER_2022 * StandardRatings::ConvFromSIToIP, 0.01);
+
+    EXPECT_NEAR(NetCoolingCapRatedMaxSpeed, NetCoolingCapRated2022, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, CurveFit_alternateMode_IEER2022ValueTest)
