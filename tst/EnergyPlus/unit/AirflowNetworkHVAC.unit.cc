@@ -19538,7 +19538,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_ZoneOrderTest)
         "    activity_sch,            !- Activity Level Schedule Name",
         "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}",
         "    No,                      !- Enable ASHRAE 55 Comfort Warnings",
-        "    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type",
+        "    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type",
 
         "  Schedule:Compact,",
         "    Occupancy,       !- Name",
