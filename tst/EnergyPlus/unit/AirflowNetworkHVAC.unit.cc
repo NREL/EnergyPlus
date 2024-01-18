@@ -19587,7 +19587,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_ZoneOrderTest)
     state->afn->AirflowNetworkNodeData(2).EPlusNodeNum = 4;
     // Attic_Unit1
     state->afn->AirflowNetworkNodeData(3).EPlusNodeNum = 0;
-
 }
 
 } // namespace EnergyPlus
