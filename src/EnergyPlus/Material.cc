@@ -3113,9 +3113,9 @@ void NormalizePhiTheta(Real64 &Phi, Real64 &Theta) {
 void GetPhiThetaIndices(Real64 phi, Real64 theta, Real64 dPhi, Real64 dTheta, int &iPhi1, int &iPhi2, int &iTheta1, int &iTheta2)
 {
     iPhi1 = int(phi / dPhi);
-    iPhi2 = (iPhi1 == maxIPhi) ? iPhi1 : iPhi1 + 1;
+    iPhi2 = (iPhi1 == maxIPhi - 1) ? iPhi1 : iPhi1 + 1;
     iTheta1 = int(theta / dTheta);
-    iTheta2 = (iTheta1 == maxITheta) ? iTheta1 : iTheta1 + 1;
+    iTheta2 = (iTheta1 == maxITheta - 1) ? iTheta1 : iTheta1 + 1;
 } // GetPhiThetaIndices()
                         
 } // namespace EnergyPlus::Material
