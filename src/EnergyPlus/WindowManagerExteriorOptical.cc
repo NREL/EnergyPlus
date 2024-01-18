@@ -257,8 +257,8 @@ namespace Window {
                         state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[1] = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     if (IntBlind) {
-                        Real64 TauShIR = state.dataMaterial->Blind(BlNum).bd[ISlatAng-1].IRFrontTrans;
-                        Real64 EpsShIR = state.dataMaterial->Blind(BlNum).bd[ISlatAng-1].IRBackEmiss;
+                        Real64 TauShIR = state.dataMaterial->Blind(BlNum).IRFrontTrans(ISlatAng);
+                        Real64 EpsShIR = state.dataMaterial->Blind(BlNum).IRBackEmiss(ISlatAng);
                         Real64 RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                         state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[ISlatAng] =
                             EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));

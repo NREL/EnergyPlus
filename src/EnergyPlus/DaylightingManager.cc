@@ -2816,8 +2816,6 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     // METHODOLOGY EMPLOYED:
     // switch as need to serve both reference points and map points based on calledFrom
 
-    using namespace General;
-
     if (state.dataSurface->SurfSunCosHourly(iHour).z < DataEnvironment::SunIsUpValue) return;
 
     auto &dl = state.dataDayltg;
@@ -3225,11 +3223,12 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                         Real64 phi = dl->sunAngles.phi - surfWin.phi;
                         Real64 theta = dl->sunAngles.theta - surfWin.theta;
                         int ip1, ip2, it1, it2;
-                        General::BiInterpCoeffs coeffs;
+                        General::BilinearInterpCoeffs coeffs;
                         Material::NormalizePhiTheta(phi, theta);
                         Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
-                        GetBiInterpCoeffs(phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
-                        transBmBmMult[1] = BiInterp(
+                        GetBilinearInterpCoeffs(
+                            phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
+                        transBmBmMult[1] = BilinearInterp(
                             screen->btars[ip1][it1].BmTrans, screen->btars[ip1][it2].BmTrans,
                             screen->btars[ip2][it1].BmTrans, screen->btars[ip2][it2].BmTrans,
                             coeffs);
@@ -3412,12 +3411,13 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                 Real64 phi = dl->sunAngles.phi - surfWin.phi;
                                 Real64 theta = dl->sunAngles.theta - surfWin.theta;
                                 int ip1, ip2, it1, it2; // lo/hi phi/theta interpolation map indices
-                                BiInterpCoeffs coeffs;
+                                General::BilinearInterpCoeffs coeffs;
                                 Material::NormalizePhiTheta(phi, theta);
                                 Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
-                                GetBiInterpCoeffs(phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
+                                General::GetBilinearInterpCoeffs(
+                                    phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
                                 
-                                TransBmBmMultRefl(1) = BiInterp(
+                                TransBmBmMultRefl(1) = General::BilinearInterp(
                                     screen->btars[ip1][it1].BmTrans, screen->btars[ip1][it2].BmTrans,
                                     screen->btars[ip2][it1].BmTrans, screen->btars[ip2][it2].BmTrans,
                                     coeffs);
@@ -7002,8 +7002,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     // REFERENCES:
     // Based on DOE-2.1E subroutine DREFLT.
 
-    using namespace General;
-        
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     // In the following I,J arrays:
     // I = sky type;
@@ -7493,11 +7491,11 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     Real64 phi = PH - surfWin.phi;
                     Real64 theta = TH - surfWin.theta;
                     int ip1, ip2, it1, it2; // lo/hi phi/theta interpolation map indices
-                    BiInterpCoeffs coeffs;
+                    General::BilinearInterpCoeffs coeffs;
 
                     Material::NormalizePhiTheta(phi, theta);
                     Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
-                    GetBiInterpCoeffs(phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
+                    General::GetBilinearInterpCoeffs(phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
 
                     ReflGlDiffDiffFront = state.dataConstruction->Construct(IConst).ReflectVisDiffFront;
                     ReflScDiffDiffBack = screen->DfRefVis;
@@ -7507,44 +7505,36 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     auto const &b21 = screen->btars[ip2][it1];
                     auto const &b22 = screen->btars[ip2][it2];
                     
-                    TransScBmDiffFront = BiInterp(b11.DfTransVis, b12.DfTransVis, b21.DfTransVis, b22.DfTransVis, coeffs);
+                    TransScBmDiffFront = General::BilinearInterp(b11.DfTransVis, b12.DfTransVis, b21.DfTransVis, b22.DfTransVis, coeffs);
 
                     transMult[1] = TransScBmDiffFront * surfWin.glazedFrac *
                                    state.dataConstruction->Construct(IConst).TransDiffVis / (1 - ReflGlDiffDiffFront * ReflScDiffDiffBack) *
                                    surfWin.lightWellEff;
 
-                    transBmBmMult[1] = BiInterp(b11.BmTransVis, b12.BmTransVis, b21.BmTransVis, b22.BmTransVis, coeffs);
+                    transBmBmMult[1] = General::BilinearInterp(b11.BmTransVis, b12.BmTransVis, b21.BmTransVis, b22.BmTransVis, coeffs);
 
                 } else if (BlindOn) { // Blind: get beam-diffuse and beam-beam vis trans of blind+glazing system
                     // PETER:  As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
                     //         for TDDs because it is based on TVISBR which is correctly calculated for TDDs above.
                     auto const &blind = state.dataMaterial->Blind(BlNum);
                     Real64 ProfAng = ProfileAngle(state, IWin, U, blind.SlatOrientation);
-                    Material::NormalizeProfAng(ProfAng);
-                    int ipa1, ipa2;
-                    Material::GetProfAngIndices(ProfAng, ipa1, ipa2);
-                    Real64 paInterpFac = GetInterpCoeff(ProfAng, ipa1 * Material::dProfAng, ipa2 * Material::dProfAng);
-                    
+
                     for (int JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
                         if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
 
-                        auto const &bsa = blind.bd[JB-1];
-                        auto const &bpa1 = bsa.Bm[ipa1];
-                        auto const &bpa2 = bsa.Bm[ipa2];
-                        
-                        TransBlBmDiffFront = General::Interp(bpa1.Vis.Front.Trans.BmDf, bpa2.Vis.Front.Trans.BmDf, paInterpFac);
+                        TransBlBmDiffFront = Window::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
 
-                        if (ShType == WinShadingType::IntBlind) { // Interior blin
+                        if (ShType == WinShadingType::IntBlind) { // Interior blind
                             ReflGlDiffDiffBack = construct.ReflectVisDiffBack;
-                            ReflBlBmDiffFront = General::Interp(bpa1.Vis.Front.Ref.BmDf, bpa2.Vis.Front.Ref.BmDf, paInterpFac);
-                            ReflBlDiffDiffFront = bsa.Df.Vis.Front.Ref.DfDf;
-                            TransBlDiffDiffFront = bsa.Df.Vis.Front.Trans.DfDf;
+                            ReflBlBmDiffFront = Window::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
+                            ReflBlDiffDiffFront = blind.VisFrontDiffDiffRefl(JB);
+                            TransBlDiffDiffFront = blind.VisFrontDiffDiffTrans(JB);
                             transMult[JB] = TVISBR * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                                                (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
 
                         } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
                             ReflGlDiffDiffFront = construct.ReflectVisDiffFront;
-                            ReflBlDiffDiffBack = bsa.Df.Vis.Back.Ref.DfDf;
+                            ReflBlDiffDiffBack = blind.VisBackDiffDiffRefl(JB);
                             transMult[JB] = TransBlBmDiffFront * surfWin.glazedFrac * construct.TransDiffVis /
                                             (1.0 - ReflGlDiffDiffFront * ReflBlDiffDiffBack) * surfWin.lightWellEff;
 
@@ -7553,10 +7543,10 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                             td2 = construct.tBareVisDiff(2);
                             rbd1 = construct.rbBareVisDiff(1);
                             rfd2 = construct.rfBareVisDiff(2);
-                            Real64 tfshBd = Interp(bpa1.Vis.Front.Trans.BmDf, bpa2.Vis.Front.Trans.BmDf, paInterpFac);
-                            tfshd = bsa.Df.Vis.Front.Trans.DfDf;
-                            Real64 rfshB = Interp(bpa1.Vis.Front.Ref.BmDf, bpa2.Vis.Front.Ref.BmDf, paInterpFac);
-                            rbshd = bsa.Df.Vis.Front.Ref.DfDf;
+                            Real64 tfshBd = Window::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
+                            tfshd = blind.VisFrontDiffDiffTrans(JB);
+                            Real64 rfshB = Window::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
+                            rbshd = blind.VisFrontDiffDiffRefl(JB);
                             if (construct.TotGlassLayers == 2) { // 2 glass layers
                                 transMult[JB] = t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * surfWin.lightWellEff;
                             } else { // 3 glass layers; blind between layers 2 and 3
@@ -7730,15 +7720,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     
                 // TH 7/7/2010 moved from inside the loop: DO JB = 1,MaxSlatAngs
                 Real64 ProfAng;
-                int ipa1, ipa2;
-                Real64 paInterpFac;
-                
                 if (BlindOn) {
                     auto const &blind = state.dataMaterial->Blind(BlNum);
                     ProfAng = ProfileAngle(state, IWin, state.dataSurface->SurfSunCosHourly(IHR), blind.SlatOrientation);
-                    Material::NormalizeProfAng(ProfAng);
-                    Material::GetProfAngIndices(ProfAng, ipa1, ipa2);
-                    paInterpFac = GetInterpCoeff(ProfAng, ipa1 * Material::dProfAng, ipa2 * Material::dProfAng);
                 }
 
                 for (int JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
@@ -7755,11 +7739,12 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                 Real64 phi = dl->sunAngles.phi - surfWin.phi;
                                 Real64 theta = dl->sunAngles.theta - surfWin.theta;
                                 int ip1, ip2, it1, it2;
-                                BiInterpCoeffs coeffs;
+                                General::BilinearInterpCoeffs coeffs;
                                 Material::NormalizePhiTheta(phi, theta);
                                 Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
-                                GetBiInterpCoeffs(phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
-                                Real64 BmBmTransVis = BiInterp(
+                                General::GetBilinearInterpCoeffs(
+                                    phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
+                                Real64 BmBmTransVis = General::BilinearInterp(
                                     screen->btars[ip1][it1].BmTransVis, screen->btars[ip1][it2].BmTransVis,
                                     screen->btars[ip2][it1].BmTransVis, screen->btars[ip2][it2].BmTransVis,
                                     coeffs);
@@ -7778,33 +7763,30 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         // As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
                         // for TDDs because it is based on TVISBSun which is correctly calculated for TDDs above.
                         auto const &blind = state.dataMaterial->Blind(BlNum);
-                        auto const &bsa = blind.bd[JB-1];
-                        auto const &bpa1 = bsa.Bm[ipa1];
-                        auto const &bpa2 = bsa.Bm[ipa2];
-                        
-                        Real64 TransBlBmDiffFront = Interp(bpa1.Vis.Front.Trans.BmDf, bpa2.Vis.Front.Trans.BmDf, paInterpFac);
+
+                        Real64 TransBlBmDiffFront = Window::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
 
                         if (ShType == WinShadingType::IntBlind) { // Interior blind
                             // TH CR 8121, 7/7/2010
                             // ReflBlBmDiffFront = WindowManager::InterpProfAng(ProfAng,Blind(BlNum)%VisFrontBeamDiffRefl)
-                            Real64 ReflBlBmDiffFront = Interp(bpa1.Vis.Front.Ref.BmDf, bpa2.Vis.Front.Ref.BmDf, paInterpFac);
+                            Real64 ReflBlBmDiffFront = Window::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
 
                             // TH added 7/12/2010 for CR 8121
-                            Real64 ReflBlDiffDiffFront = bsa.Df.Vis.Front.Ref.DfDf;
-                            Real64 TransBlDiffDiffFront = bsa.Df.Vis.Front.Trans.DfDf;
+                            Real64 ReflBlDiffDiffFront = blind.VisFrontDiffDiffRefl(JB);
+                            Real64 TransBlDiffDiffFront = blind.VisFrontDiffDiffTrans(JB);
 
                             transMult[JB] = TVISBSun * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                         (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
                             
                         } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
                             transMult[JB] = TransBlBmDiffFront *
-                                            (construct.TransDiffVis / (1.0 - ReflGlDiffDiffFront * bsa.Df.Vis.Back.Ref.DfDf)) *
+                                            (construct.TransDiffVis / (1.0 - ReflGlDiffDiffFront * blind.VisBackDiffDiffRefl(JB))) *
                                             surfWin.glazedFrac * surfWin.lightWellEff;
 
                         } else { // Between-glass blind
-                            Real64 t1 = POLYF(COSBSun, construct.tBareVisCoef(1));
-                            Real64 tfshBd = Interp(bpa1.Vis.Front.Trans.BmDf, bpa2.Vis.Front.Trans.BmDf, paInterpFac);
-                            Real64 rfshB = Interp(bpa1.Vis.Front.Ref.BmDf, bpa2.Vis.Front.Ref.BmDf, paInterpFac);
+                            Real64 t1 = General::POLYF(COSBSun, construct.tBareVisCoef(1));
+                            Real64 tfshBd = Window::InterpProfAng(ProfAng, blind.VisFrontBeamDiffTrans(JB, {1, 37}));
+                            Real64 rfshB = Window::InterpProfAng(ProfAng, blind.VisFrontBeamDiffRefl(JB, {1, 37}));
                             if (construct.TotGlassLayers == 2) { // 2 glass layers
                                 transMult[JB] = t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * surfWin.lightWellEff;
                             } else { // 3 glass layers; blind between layers 2 and 3
@@ -7888,22 +7870,21 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     } else { // Blind on
 
                         auto const &blind = state.dataMaterial->Blind(BlNum);
-                        auto const &bsa = blind.bd[JB-1];
-                        TransBlDiffDiffFront = bsa.Df.Vis.Front.Trans.DfDf;
+                        TransBlDiffDiffFront = state.dataMaterial->Blind(BlNum).VisFrontDiffDiffTrans(JB);
                         if (ShType == WinShadingType::IntBlind) { // Interior blind
-                            ReflBlDiffDiffFront = bsa.Df.Vis.Front.Ref.DfDf;
+                            ReflBlDiffDiffFront = blind.VisFrontDiffDiffRefl(JB);
                             transMult[JB] = TVisSunRefl * (TransBlDiffDiffFront + ReflBlDiffDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                                                       (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
 
                         } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
                             transMult[JB] = TransBlDiffDiffFront *
-                                            (construct.TransDiffVis / (1.0 - ReflGlDiffDiffFront * bsa.Df.Vis.Back.Ref.DfDf)) *
+                                            (construct.TransDiffVis / (1.0 - ReflGlDiffDiffFront * blind.VisBackDiffDiffRefl(JB))) *
                                             surfWin.glazedFrac * surfWin.lightWellEff;
 
                         } else { // Between-glass blind
                             Real64 t1 = construct.tBareVisDiff(1);
-                            Real64 tfshBd = bsa.Df.Vis.Front.Trans.DfDf;
-                            Real64 rfshB = bsa.Df.Vis.Front.Ref.DfDf;
+                            Real64 tfshBd = blind.VisFrontDiffDiffTrans(JB);
+                            Real64 rfshB = blind.VisFrontDiffDiffRefl(JB);
                             if (construct.TotGlassLayers == 2) { // 2 glass layers
                                 transMult[JB] = t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * surfWin.lightWellEff;
                             } else { // 3 glass layers; blind between layers 2 and 3

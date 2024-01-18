@@ -61,13 +61,9 @@ namespace EnergyPlus {
 
 namespace Material {
 
-    constexpr int MaxSlatAngs = 19;
-    constexpr Real64 dSlatAng = Constant::Pi / (double(MaxSlatAngs) - 1.0);
-    constexpr Real64 dSlatAngInv = 1.0 / dSlatAng;
-        
-    constexpr int MaxProfAngs = 37;
-    constexpr Real64 dProfAng = Constant::Pi / 36.0;
-        
+    constexpr int MaxSlatAngs(19);
+    constexpr int MaxProfAngs(37);
+
     // Parameters to indicate material group type for use with the Material
     // derived type (see below):
     enum class Group
@@ -396,59 +392,6 @@ namespace Material {
         virtual bool dummy() { return true; }
     };
 
-    struct Bm {
-        Real64 BmBm;
-        Real64 BmDf;
-    };
-
-    struct BmTransRefAbs {
-        Bm Trans;
-        Bm Ref;
-        Real64 Abs;
-    };
-
-    struct BmFrontBack {
-        BmTransRefAbs Front;
-        BmTransRefAbs Back;
-    };
-
-    struct BmSolVis {
-        BmFrontBack Sol;
-        BmFrontBack Vis;
-    };
-                
-    struct Df {
-        Real64 DfDf;
-        Real64 DfDfSky;
-        Real64 DfDfGnd;
-    };
-
-    struct DfTransRefAbs {
-        Df Trans;
-        Df Ref;
-        Df Abs;
-    };
-        
-    struct DfFrontBack {
-        DfTransRefAbs Front;
-        DfTransRefAbs Back;
-    };
-
-    struct DfSolVis {
-        DfFrontBack Sol;
-        DfFrontBack Vis;
-    };
-
-    struct BmDfSolVis {
-        std::array<BmSolVis, MaxProfAngs> Bm;
-        DfSolVis Df;
-
-        Real64 IRFrontEmiss = 0.0;
-        Real64 IRFrontTrans = 0.0;
-        Real64 IRBackEmiss = 0.0;
-        Real64 IRBackTrans = 0.0;
-    };
-
     struct WindowBlindProperties
     {
         // Members
@@ -493,9 +436,8 @@ namespace Material {
         //  of the blind-to-glass opening area at the left side of the blind
         Real64 BlindRightOpeningMult = 0.0; // Area of air-flow opening at right side of blind, expressed as a fraction
         //  of the blind-to-glass opening area at the right side of the blind
-
-        std::array<BmDfSolVis, MaxSlatAngs> bd;
-#ifdef GET_OUT
+        // Calculated blind properties
+        // Blind solar properties
         Array2D<Real64> SolFrontBeamBeamTrans; // Blind solar front beam-beam transmittance vs.
         // profile angle, slat angle
         Array2D<Real64> SolFrontBeamBeamRefl; // Blind solar front beam-beam reflectance vs. profile angle,
@@ -559,18 +501,15 @@ namespace Material {
         // vs. slat angle
         Array1D<Real64> VisBackDiffDiffRefl; // Blind visible back diffuse-diffuse reflectance
         // vs. slat angle
-
         // Long-wave (IR) blind properties
         Array1D<Real64> IRFrontTrans; // Blind IR front transmittance vs. slat angle
         Array1D<Real64> IRFrontEmiss; // Blind IR front emissivity vs. slat angle
         Array1D<Real64> IRBackTrans;  // Blind IR back transmittance vs. slat angle
         Array1D<Real64> IRBackEmiss;  // Blind IR back emissivity vs. slat angle
-#endif // GET_OUT            
-            
+
         // Default Constructor
-        WindowBlindProperties() 
-#ifdef GET_OUT
-          : SolFrontBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0), SolBackBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0),
+        WindowBlindProperties()
+            : SolFrontBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0), SolBackBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0),
               SolBackBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontBeamDiffTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontBeamDiffRefl(MaxSlatAngs, MaxProfAngs, 0.0),
               SolBackBeamDiffTrans(MaxSlatAngs, MaxProfAngs, 0.0), SolBackBeamDiffRefl(MaxSlatAngs, MaxProfAngs, 0.0), SolFrontDiffDiffTrans(MaxSlatAngs, 0.0),
               SolFrontDiffDiffTransGnd(MaxSlatAngs, 0.0), SolFrontDiffDiffTransSky(MaxSlatAngs, 0.0), SolFrontDiffDiffRefl(MaxSlatAngs, 0.0),
@@ -581,10 +520,9 @@ namespace Material {
               VisBackBeamBeamTrans(MaxSlatAngs, MaxProfAngs, 0.0), VisBackBeamBeamRefl(MaxSlatAngs, MaxProfAngs, 0.0), VisFrontBeamDiffTrans(MaxSlatAngs, MaxProfAngs, 0.0),
               VisFrontBeamDiffRefl(MaxSlatAngs, MaxProfAngs, 0.0), VisBackBeamDiffTrans(MaxSlatAngs, MaxProfAngs, 0.0), VisBackBeamDiffRefl(MaxSlatAngs, MaxProfAngs, 0.0),
               VisFrontDiffDiffTrans(MaxSlatAngs, 0.0), VisFrontDiffDiffRefl(MaxSlatAngs, 0.0), VisBackDiffDiffTrans(MaxSlatAngs, 0.0),
-              VisBackDiffDiffRefl(MaxSlatAngs, 0.0),
-                IRFrontTrans(MaxSlatAngs, 0.0), IRFrontEmiss(MaxSlatAngs, 0.0), IRBackTrans(MaxSlatAngs, 0.0), IRBackEmiss(MaxSlatAngs, 0.0)
-#endif // GET_OUT                 
-       {
+              VisBackDiffDiffRefl(MaxSlatAngs, 0.0), IRFrontTrans(MaxSlatAngs, 0.0), IRFrontEmiss(MaxSlatAngs, 0.0), IRBackTrans(MaxSlatAngs, 0.0),
+              IRBackEmiss(MaxSlatAngs, 0.0)
+        {
         }
     };
 
@@ -738,14 +676,6 @@ namespace Material {
                                  Real64 phi,     // Sun altitude relative to surface outward normal (rad)
                                  Real64 theta,   // Sun azimuth relative to surface outward normal (rad)
                                  ScreenBmTransAbsRef &tar);
-
-    void NormalizeSlatAng(Real64 &slatAng);
-
-    void GetSlatAngIndices(Real64 slatAng, int &is1, int &is2);
-
-    void NormalizeProfAng(Real64 &profAng);
-
-    void GetProfAngIndices(Real64 profAng, int &ip1, int &ip2);
 
 } // namespace Material
 

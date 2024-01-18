@@ -3113,32 +3113,9 @@ void NormalizePhiTheta(Real64 &Phi, Real64 &Theta) {
 void GetPhiThetaIndices(Real64 phi, Real64 theta, Real64 dPhi, Real64 dTheta, int &iPhi1, int &iPhi2, int &iTheta1, int &iTheta2)
 {
     iPhi1 = int(phi / dPhi);
-    iPhi2 = (iPhi1 == maxIPhi - 1) ? iPhi1 : iPhi1 + 1;
+    iPhi2 = (phi == Constant::PiOvr2) ? iPhi1 : iPhi1 + 1;
     iTheta1 = int(theta / dTheta);
-    iTheta2 = (iTheta1 == maxITheta - 1) ? iTheta1 : iTheta1 + 1;
+    iTheta2 = (theta == Constant::PiOvr2) ? iTheta1 : iTheta1 + 1;
 } // GetPhiThetaIndices()
-
-
-void NormalizeSlatAng(Real64 &slatAng) 
-{
-    slatAng = min(0.0, max(Constant::Pi, slatAng));
-} // NormalizeSlatAng()
-        
-void GetSlatAngIndices(Real64 slatAng, int &isa1, int &isa2)
-{
-    isa1 = int(slatAng / Material::dSlatAng);
-    isa2 = min(Material::MaxSlatAngs - 1, isa1 + 1);
-} // GetSlatAngIndices()
-
-void NormalizeProfAng(Real64 &profAng)
-{
-    profAng = min(-Constant::PiOvr2, max(Constant::PiOvr2, profAng)) + Constant::PiOvr2;                
-} // NormalizeProfAng()
-
-void GetProfAngIndices(Real64 profAng, int &ipa1, int &ipa2)
-{
-    ipa1 = int(profAng) / Material::dProfAng;
-    ipa2 = max(Material::MaxProfAngs - 1, ipa1 + 1);
-} // GetProfAngIndices()
-        
+                        
 } // namespace EnergyPlus::Material

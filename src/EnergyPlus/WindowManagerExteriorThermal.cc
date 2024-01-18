@@ -573,26 +573,14 @@ namespace Window {
             Aleft = blind.BlindLeftOpeningMult;
             Aright = blind.BlindRightOpeningMult;
             Afront = state.dataSurface->SurfWinBlindAirFlowPermeability(m_SurfNum);
-
-            if (state.dataSurface->SurfWinMovableSlats(m_SurfNum)) {
-                Real64 SlatAng = state.dataSurface->SurfWinSlatAngThisTS(m_SurfNum);
-                int isa1, isa2;
-                Material::GetSlatAngIndices(SlatAng, isa1, isa2);
-                Real64 saInterpFac = GetInterpCoeff(SlatAng, isa1 * Material::dSlatAng, isa2 * Material::dSlatAng);
-                auto const &bs1 = blind.bd[isa1];
-                auto const &bs2 = blind.bd[isa2];
-                
-                emissFront = Interp(bs1.IRFrontEmiss, bs2.IRFrontEmiss, saInterpFac);
-                emissBack = Interp(bs1.IRBackEmiss, bs2.IRBackEmiss, saInterpFac);
-                transThermalFront = Interp(bs1.IRFrontTrans, bs2.IRFrontTrans, saInterpFac);
-                transThermalBack = Interp(bs1.IRBackTrans, bs2.IRBackTrans, saInterpFac);
-            } else {
-                auto const &bs0 = blind.bd[0];
-                emissFront = bs0.IRFrontEmiss;
-                emissBack = bs0.IRBackEmiss;
-                transThermalFront = bs0.IRFrontTrans;
-                transThermalBack = bs0.IRBackTrans;
-            }
+            emissFront = InterpSlatAng(
+                state.dataSurface->SurfWinSlatAngThisTS(m_SurfNum), state.dataSurface->SurfWinMovableSlats(m_SurfNum), blind.IRFrontEmiss);
+            emissBack = InterpSlatAng(
+                state.dataSurface->SurfWinSlatAngThisTS(m_SurfNum), state.dataSurface->SurfWinMovableSlats(m_SurfNum), blind.IRBackEmiss);
+            transThermalFront = InterpSlatAng(
+                state.dataSurface->SurfWinSlatAngThisTS(m_SurfNum), state.dataSurface->SurfWinMovableSlats(m_SurfNum), blind.IRFrontTrans);
+            transThermalBack = InterpSlatAng(
+                state.dataSurface->SurfWinSlatAngThisTS(m_SurfNum), state.dataSurface->SurfWinMovableSlats(m_SurfNum), blind.IRBackTrans);
             if (t_Index == 1) {
                 m_ExteriorShade = true;
             }
