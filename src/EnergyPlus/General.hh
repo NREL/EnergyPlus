@@ -106,11 +106,26 @@ namespace General {
                                         Real64 const Y2,
                                         BilinearInterpCoeffs &coeffs)
     {
-        coeffs.denom = (X2 - X1) * (Y2 - Y1);
-        coeffs.x1y1 = (X2 - X) * (Y2 - Y);
-        coeffs.x2y1 = (X - X1) * (Y2 - Y);
-        coeffs.x1y2 = (X2 - X) * (Y - Y1);
-        coeffs.x2y2 = (X - X1) * (Y - Y1);
+        if (X1 == X2 && Y1 == Y2) {
+            coeffs.denom = coeffs.x1y1 = 1.0;
+            coeffs.x1y2 = coeffs.x2y1 = coeffs.x2y2 = 0.0;
+        } else if (X1 == X2) {
+            coeffs.denom = (Y2 - Y1);
+            coeffs.x1y1 = (Y2 - Y);
+            coeffs.x1y2 = (Y - Y1);
+            coeffs.x2y1 = coeffs.x2y2 = 0.0;
+        } else if (Y1 == Y2) {
+            coeffs.denom = (X2 - X1);
+            coeffs.x1y1 = (X2 - X);
+            coeffs.x2y1 = (X - X1);
+            coeffs.x1y2 = coeffs.x2y2 = 0.0;
+        } else {
+            coeffs.denom = (X2 - X1) * (Y2 - Y1);
+            coeffs.x1y1 = (X2 - X) * (Y2 - Y);
+            coeffs.x2y1 = (X - X1) * (Y2 - Y);
+            coeffs.x1y2 = (X2 - X) * (Y - Y1);
+            coeffs.x2y2 = (X - X1) * (Y - Y1);
+        }
     }
 
     inline Real64 BilinearInterp(Real64 const Fx1y1,
