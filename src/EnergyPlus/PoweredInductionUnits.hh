@@ -199,6 +199,7 @@ namespace PoweredInductionUnits {
         Real64 PriMassFlowRate = 0.0;       // current operating primary air mass flow rate, for reporting
         Real64 DischargeAirTemp = 0.0;      // current operating discharge air temperature at outlet, for reporting
         HeatOpModeType heaterOperatingMode = HeatOpModeType::HeaterOff;
+        CoolOpModeType coolingOperatingMode = CoolOpModeType::CoolerOff;
 
         int CurOperationControlStage = -1; // integer reference for what stage of control the unit is in
         int plenumIndex = 0;
