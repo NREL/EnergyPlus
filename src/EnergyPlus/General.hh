@@ -82,11 +82,6 @@ namespace General {
                    Real64 X_0,  // 1st bound of interval that contains the solution
                    Real64 X_1); // 2nd bound of interval that contains the solution
 
-    constexpr Real64 GetInterpCoeff(Real64 x, Real64 x1, Real64 x2)
-    {
-        return (x - x1) / (x2 - x1);
-    }
-
     constexpr Real64 Interp(Real64 const Lower, Real64 const Upper, Real64 const InterpFac)
     {
         return Lower + InterpFac * (Upper - Lower);
@@ -94,7 +89,7 @@ namespace General {
 
 
     // Disaggregated implementation of bilinear interpolation so that coefficients can be used with multiple variables
-    struct BiInterpCoeffs
+    struct BilinearInterpCoeffs
     {
         Real64 denom;
         Real64 x1y1;
@@ -102,6 +97,7 @@ namespace General {
         Real64 x2y1;
         Real64 x2y2;
     };
+
 
     inline void GetBiInterpCoeffs(Real64 const X,
                                   Real64 const Y,

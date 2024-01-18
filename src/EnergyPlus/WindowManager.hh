@@ -78,13 +78,6 @@ namespace Window {
     int constexpr maxIncidentAngles = 20;
     int constexpr maxSpectralDataElements = 800; // Maximum number in Spectral Data arrays.
 
-    struct WindowGap {
-        int numGases = 0;
-        std::array<Material::Gas, Material::maxMixGases> gases = {Material::Gas()};
-        std::array<Real64, Material::maxMixGases> gasFracts = {0.0};
-        Real64 width = 0.0;
-    };
-        
     class CWindowModel;
     class CWindowOpticalModel;
     class CWindowConstructionsSimplified;
@@ -116,9 +109,6 @@ namespace Window {
 
     void SystemPropertiesAtLambdaAndPhi(EnergyPlusData &state,
                                         int n,       // Number of glass layers
-                                        std::array<std::array<Real64, maxGlassLayers>, maxGlassLayers> &top,
-                                        std::array<std::array<Real64, maxGlassLayers>, maxGlassLayers> &rfop,
-                                        std::array<std::array<Real64, maxGlassLayers>, maxGlassLayers> &rbop,
                                         Real64 &tt,  // System transmittance
                                         Real64 &rft, // System front and back reflectance
                                         Real64 &rbt,
@@ -240,7 +230,7 @@ namespace Window {
     void WindowGasConductance(EnergyPlusData &state,
                               Real64 tleft,  // Temperature of gap surface closest to outside (K)
                               Real64 tright, // Temperature of gap surface closest to zone (K)
-                              Window::WindowGap const &gap,// Gap object
+                              int IGap,      // Gap number
                               Real64 &con,   // Gap gas conductance (W/m2-K)
                               Real64 &pr,    // Gap gas Prandtl number
                               Real64 &gr     // Gap gas Grashof number
@@ -248,7 +238,7 @@ namespace Window {
 
     void WindowGasPropertiesAtTemp(EnergyPlusData &state,
                                    Real64 tmean, // Temperature of gas in gap (K)
-                                   Window::WindowGap const &gap,     // Gap object
+                                   int IGap,     // Gap number
                                    Real64 &dens, // Gap gas density at tmean (kg/m3)
                                    Real64 &visc  // Gap gas dynamic viscosity at tmean (g/m-s)
     );
@@ -262,7 +252,7 @@ namespace Window {
                        int SurfNum, // Surface number
                        Real64 tso,  // Temperature of gap surface closest to outside (K)
                        Real64 tsi,  // Temperature of gap surface closest to zone (K)
-                       WindowGap const &gap, // Gap object
+                       int IGap,    // Gap number
                        Real64 gr,   // Gap gas Grashof number
                        Real64 pr,   // Gap gas Prandtl number
                        Real64 &gnu  // Gap gas Nusselt number
@@ -350,55 +340,22 @@ namespace Window {
 
     void CalcWindowScreenProperties(EnergyPlusData &state);
 
-    struct BlindOpticsInputs {
-        Real64 width;
-        Real64 separation;
-        Real64 BmDfTrans;
-        Real64 BmDfRefFront;
-        Real64 BmDfRefBack;
-        Real64 DfDfTrans;
-        Real64 DfDfRefFront;
-        Real64 DfDfRefBack;
-        Real64 TransIR;
-        Real64 EmissFrontIR;
-        Real64 EmissBackIR;
-    };
-        
-    struct BlindOpticsBmDfOutputs {
-        Real64 BmBmTrans;
-        Real64 BmBmRef;
-        Real64 BmDfTrans;
-        Real64 BmDfRef;
-        Real64 DfDfTrans;
-        Real64 DfDfRef;
-    };
-        
-    struct BlindOpticsOutputs {
-        BlindOpticsBmDfOutputs Front;
-        BlindOpticsBmDfOutputs Back;
-                
-        Real64 TransFrontIR;
-        Real64 TransBackIR;
-        Real64 EmissFrontIR;
-        Real64 EmissBackIR;
-    };
-
     void BlindOpticsDiffuse(EnergyPlusData &state,
                             int BlindNum,      // Blind number
                             int ISolVis,       // 1 = solar and IR calculation; 2 = visible calculation
-                            BlindOpticsInputs const &c, // Slat properties
+                            Array1A<Real64> c, // Slat properties
                             Real64 b_el,       // Slat elevation (radians)
-                            BlindOpticsOutputs &p  // Blind properties
+                            Array1A<Real64> p  // Blind properties
     );
 
     void BlindOpticsBeam(EnergyPlusData &state,
                          int BlindNum,      // Blind number
-                         BlindOpticsInputs const &c, // Slat properties (equivalent to BLD_PR)
+                         Array1A<Real64> c, // Slat properties (equivalent to BLD_PR)
                          Real64 b_el,       // Slat elevation (radians)
                          Real64 s_el,       // Solar profile angle (radians)
-                         BlindOpticsOutputs &p  // Blind properties (equivalent to ST_LAY)
+                         Array1A<Real64> p  // Blind properties (equivalent to ST_LAY)
     );
-#ifdef GET_OUT
+
     Real64 InterpProfAng(Real64 ProfAng,           // Profile angle (rad)
                          Array1S<Real64> PropArray // Array of blind properties
     );
@@ -413,15 +370,14 @@ namespace Window {
                              bool VarSlats,            // True if variable-angle slats
                              Array2A<Real64> PropArray // Array of blind properties
     );
-#endif // GET_OUT
-        
+
     Real64 BlindBeamBeamTrans(Real64 ProfAng,        // Solar profile angle (rad)
                               Real64 SlatAng,        // Slat angle (rad)
                               Real64 SlatWidth,      // Slat width (m)
                               Real64 SlatSeparation, // Slat separation (distance between surfaces of adjacent slats) (m)
                               Real64 SlatThickness   // Slat thickness (m)
     );
-#ifdef GET_OUT
+
     constexpr Real64 InterpProfSlat(Real64 const SlatLower,
                                     Real64 const SlatUpper,
                                     Real64 const ProfLower,
@@ -433,8 +389,7 @@ namespace Window {
         Real64 ValB = ProfLower + SlatInterpFac * (ProfUpper - ProfLower);
         return ValA + ProfInterpFac * (ValB - ValA);
     }
-#endif // GET_OUT
-        
+
     inline Real64 InterpSw(Real64 const SwitchFac, // Switching factor: 0.0 if glazing is unswitched, = 1.0 if fully switched
                            Real64 const A,         // Glazing property in unswitched state
                            Real64 const B          // Glazing property in fully switched state
@@ -471,6 +426,13 @@ namespace Window {
 
     void initWindowModel(EnergyPlusData &state);
 
+    struct WindowGap {
+        int numGases = 0;
+        std::array<Material::Gas, Material::maxMixGases> gases = {Material::Gas()};
+        std::array<Real64, Material::maxMixGases> gasFracts = {0.0};
+        Real64 width = 0.0;
+    };
+        
 } // namespace Window
 
 struct WindowManagerData : BaseGlobalStruct
@@ -543,7 +505,7 @@ struct WindowManagerData : BaseGlobalStruct
     Real64 Rmir = 0.0;                                                // IR radiance of window's interior surround (W/m2)
     Real64 Rtot = 0.0;                                                // Total thermal resistance of window (m2-K/W)
     std::array<Window::WindowGap, Window::maxGlassLayers> gaps = {Window::WindowGap()}; // Gas thermal conductivity coefficients for each gap
-    // std::array<Real64, Window::maxGlassLayers> thick = {0.0};                              // Glass layer thickness (m)
+    std::array<Real64, Window::maxGlassLayers> thick = {0.0};                              // Glass layer thickness (m)
     std::array<Real64, Window::maxGlassLayers> scon = {0.0};                               // Glass layer conductance--conductivity/thickness (W/m2-K)
 
     std::array<Real64, 2 * Window::maxGlassLayers> tir = {0.0};             // Front and back IR transmittance for each glass layer
@@ -553,10 +515,8 @@ struct WindowManagerData : BaseGlobalStruct
     std::array<Real64, 2 * Window::maxGlassLayers> AbsRadGlassFace = {0.0}; // Solar radiation and IR radiation from internal gains absorbed by glass face
     std::array<Real64, 2 * Window::maxGlassLayers> thetas = {0.0};          // Glass surface temperatures (K)
     std::array<Real64, 2 * Window::maxGlassLayers> thetasPrev = {0.0};      // Previous-iteration glass surface temperatures (K)
-#ifdef GET_OUT
     std::array<Real64, 2 * Window::maxGlassLayers> fvec = {0.0};            // Glass face heat balance function
-#endif // GET_OUT
-        
+
     std::array<Real64, Window::maxGlassLayers> hrgap = {0.0}; // Radiative gap conductance
 
     Real64 A23P = 0.0; // Intermediate variables in glass face
@@ -570,6 +530,11 @@ struct WindowManagerData : BaseGlobalStruct
     Real64 A67 = 0.0;
 
     // TEMP MOVED FROM DataHeatBalance.hh -BLB
+
+                                                       // for each wavelenth in wle
+    std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxGlassLayers> top = {0.0};  // Transmittance matrix for subr. op
+    std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxGlassLayers> rfop = {0.0}; // Front reflectance matrix for subr. op
+    std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxGlassLayers> rbop = {0.0}; // Back transmittance matrix for subr. op
 
     std::unique_ptr<Window::CWindowModel> inExtWindowModel;       // Information about windows model (interior or exterior)
     std::unique_ptr<Window::CWindowOpticalModel> winOpticalModel; // Information about windows optical model (Simplified or BSDF)
@@ -609,7 +574,7 @@ struct WindowManagerData : BaseGlobalStruct
         this->Rmir = 0.0;
         this->Rtot = 0.0;
         this->gaps = {Window::WindowGap()};
-        // this->thick = {0.0};
+        this->thick = {0.0};
         this->scon = {0.0};
         this->tir = {0.0};
         this->emis = {0.0};
@@ -617,9 +582,7 @@ struct WindowManagerData : BaseGlobalStruct
         this->AbsRadGlassFace = {0.0};
         this->thetas = {0.0};
         this->thetasPrev = {0.0};
-#ifdef GET_OUT
         this->fvec = {0.0};
-#endif // GET_OUT
         this->hrgap = {0.0};
         this->A23P = 0.0;
         this->A32P = 0.0;
@@ -630,6 +593,9 @@ struct WindowManagerData : BaseGlobalStruct
         this->A23 = 0.0;
         this->A45 = 0.0;
         this->A67 = 0.0;
+        this->top = {0.0};
+        this->rfop = {0.0};
+        this->rbop = {0.0};
         Window::CWindowConstructionsSimplified::clearState();
         this->RunMeOnceFlag = false;
         this->lSimpleGlazingSystem = false; // true if using simple glazing system block model
