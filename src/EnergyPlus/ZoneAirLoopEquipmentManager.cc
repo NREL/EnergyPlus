@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -154,7 +154,7 @@ namespace ZoneAirLoopEquipmentManager {
 
         // Find the correct Zone Air Distribution Unit Equipment
         if (CompIndex == 0) {
-            AirDistUnitNum = UtilityRoutines::FindItemInList(ZoneAirLoopEquipName, state.dataDefineEquipment->AirDistUnit);
+            AirDistUnitNum = Util::FindItemInList(ZoneAirLoopEquipName, state.dataDefineEquipment->AirDistUnit);
             if (AirDistUnitNum == 0) {
                 ShowFatalError(state, format("ManageZoneAirLoopEquipment: Unit not found={}", ZoneAirLoopEquipName));
             }
@@ -252,7 +252,7 @@ namespace ZoneAirLoopEquipmentManager {
                                                                          lAlphaBlanks,
                                                                          cAlphaFields,
                                                                          cNumericFields); //  data for one zone
-                UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
+                Util::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
                 airDistUnit.Name = AlphArray(1);
                 // Input Outlet Node Num
@@ -301,7 +301,7 @@ namespace ZoneAirLoopEquipmentManager {
                 // DesignSpecification:AirTerminal:Sizing name
                 airDistUnit.AirTerminalSizingSpecIndex = 0;
                 if (!lAlphaBlanks(5)) {
-                    airDistUnit.AirTerminalSizingSpecIndex = UtilityRoutines::FindItemInList(AlphArray(5), state.dataSize->AirTerminalSizingSpec);
+                    airDistUnit.AirTerminalSizingSpecIndex = Util::FindItemInList(AlphArray(5), state.dataSize->AirTerminalSizingSpec);
                     if (airDistUnit.AirTerminalSizingSpecIndex == 0) {
                         ShowSevereError(state, format("{} = {} not found.", cAlphaFields(5), AlphArray(5)));
                         ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, airDistUnit.Name));
@@ -309,7 +309,7 @@ namespace ZoneAirLoopEquipmentManager {
                     }
                 }
 
-                const std::string typeNameUC = UtilityRoutines::makeUPPER(airDistUnit.EquipType(AirDistCompUnitNum));
+                const std::string typeNameUC = Util::makeUPPER(airDistUnit.EquipType(AirDistCompUnitNum));
                 airDistUnit.EquipTypeEnum(AirDistCompUnitNum) = static_cast<ZnAirLoopEquipType>(getEnumValue(ZnAirLoopEquipTypeNamesUC, typeNameUC));
                 // Validate EquipType for Air Distribution Unit
                 switch (airDistUnit.EquipTypeEnum(AirDistCompUnitNum)) {
@@ -413,28 +413,28 @@ namespace ZoneAirLoopEquipmentManager {
                 auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(AirDistUnitNum);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Heating Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     airDistUnit.HeatGain,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     airDistUnit.Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Cooling Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     airDistUnit.CoolGain,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     airDistUnit.Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Heating Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     airDistUnit.HeatRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     airDistUnit.Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Cooling Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     airDistUnit.CoolRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,

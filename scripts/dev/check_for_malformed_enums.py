@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -110,6 +110,7 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
             "CsvParser.hh:Token",
             "IdfParser.hh:Token",
             "OutputProcessor.hh:ReportingFrequency",
+            "OutputProcessor.hh:ReportFreqSOV",
             "HVACInterfaceManager.cc:UpdateType",
             "DataHeatBalance.hh:PERptVars",
         ]
@@ -142,14 +143,17 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
     # check for "unknown" in names
     if "UNKNOWN" in keys_uc:
         # exceptions listed by <FILE>:<ENUM NAME>
-        exceptions = ["OutputProcessor.hh:Unit"]
+        exceptions = ["DataGlobalConstants.hh:Units"]
         if f"{file_name}:{name}" not in exceptions:
             error_str += "\tUNKNOWN in enum names\n"
 
     # check for proper casing
     if str(name[0]).islower():
         # exceptions listed by <FILE>:<ENUM NAME>
-        exceptions = ["DataGlobalConstants.hh:eResource", "DataGlobalConstants.hh:eFuel", "DataGlobalConstants.hh:ePollutant"]
+        exceptions = [
+            "DataGlobalConstants.hh:eResource", "DataGlobalConstants.hh:eFuel",
+            "DataGlobalConstants.hh:ePollutant", "OutputProcessor.hh:eResourceSOV"
+        ]
         if f"{file_name}:{name}" not in exceptions:
             error_str += "\tenum name must begin with upper case letter\n"
 
@@ -158,12 +162,14 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
 
     if any([str(x[0]).islower() for x in keys]):
         # exceptions listed by <FILE>:<ENUM NAME>
-        exceptions = ["FileSystem.hh:FileTypes", "OutputProcessor.hh:Unit"]
+        exceptions = ["FileSystem.hh:FileTypes", "DataGlobalConstants.hh:Units"]
         if f"{file_name}:{name}" not in exceptions:
             error_str += "\tenum keys must begin with upper case letter\n"
 
     if difflib.get_close_matches(name, keys, cutoff=0.7):
-        error_str += "\tenum keys are too similar to enum name\n"
+        exceptions = ["DataGlobalConstants.hh:HeatOrCool"]
+        if f"{file_name}:{name}" not in exceptions:
+            error_str += "\tenum keys are too similar to enum name\n"
 
     # # check for non-allowed enum values
     # if any([x != -1 for x in values if type(x) == int]):

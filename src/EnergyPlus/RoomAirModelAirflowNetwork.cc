@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -196,28 +196,28 @@ namespace RoomAir {
 
                     SetupOutputVariable(state,
                                         "RoomAirflowNetwork Node NonAirSystemResponse",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         afnNode.NonAirSystemResponse,
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::Average,
                                         afnNode.Name);
                     SetupOutputVariable(state,
                                         "RoomAirflowNetwork Node SysDepZoneLoadsLagged",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         afnNode.SysDepZoneLoadsLagged,
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::Average,
                                         afnNode.Name);
                     SetupOutputVariable(state,
                                         "RoomAirflowNetwork Node SumIntSensibleGain",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         afnNode.SumIntSensibleGain,
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::Average,
                                         afnNode.Name);
                     SetupOutputVariable(state,
                                         "RoomAirflowNetwork Node SumIntLatentGain",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         afnNode.SumIntLatentGain,
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::Average,
@@ -291,7 +291,7 @@ namespace RoomAir {
                                             }
                                         }
                                     }
-                                } else if (UtilityRoutines::SameString(zoneEquipList.EquipName(I), afnHVAC.Name)) {
+                                } else if (Util::SameString(zoneEquipList.EquipName(I), afnHVAC.Name)) {
                                     if (afnHVAC.EquipConfigIndex == 0) {
                                         afnHVAC.EquipConfigIndex = I;
                                     }
@@ -300,9 +300,8 @@ namespace RoomAir {
                                     ReturnFrac(I) += afnHVAC.ReturnFraction;
                                 }
                             }
-
                             for (int iNode = 1; iNode <= state.dataLoopNodes->NumOfNodes; ++iNode) { // loop over all nodes to find supply node ID
-                                if (UtilityRoutines::SameString(state.dataLoopNodes->NodeID(iNode), afnHVAC.SupplyNodeName)) {
+                                if (Util::SameString(state.dataLoopNodes->NodeID(iNode), afnHVAC.SupplyNodeName)) {
                                     afnHVAC.SupNodeNum = iNode;
                                     break;
                                 }
@@ -332,7 +331,7 @@ namespace RoomAir {
 
                             if (afnHVAC.RetNodeNum == 0) {
                                 for (int iNode = 1; iNode <= state.dataLoopNodes->NumOfNodes; ++iNode) { // loop over all nodes to find return node ID
-                                    if (UtilityRoutines::SameString(state.dataLoopNodes->NodeID(iNode), afnHVAC.ReturnNodeName)) {
+                                    if (Util::SameString(state.dataLoopNodes->NodeID(iNode), afnHVAC.ReturnNodeName)) {
                                         afnHVAC.RetNodeNum = iNode;
                                         break;
                                     }
@@ -340,14 +339,14 @@ namespace RoomAir {
                             }
                             SetupOutputVariable(state,
                                                 "RoomAirflowNetwork Node HVAC Supply Fraction",
-                                                OutputProcessor::Unit::None,
+                                                Constant::Units::None,
                                                 afnHVAC.SupplyFraction,
                                                 OutputProcessor::SOVTimeStepType::HVAC,
                                                 OutputProcessor::SOVStoreType::Average,
                                                 afnHVAC.Name);
                             SetupOutputVariable(state,
                                                 "RoomAirflowNetwork Node HVAC Return Fraction",
-                                                OutputProcessor::Unit::None,
+                                                Constant::Units::None,
                                                 afnHVAC.ReturnFraction,
                                                 OutputProcessor::SOVTimeStepType::HVAC,
                                                 OutputProcessor::SOVStoreType::Average,

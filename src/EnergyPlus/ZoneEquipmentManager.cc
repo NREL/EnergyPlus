@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -99,7 +99,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SteamBaseboardRadiator.hh>
-#include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/ThermalChimney.hh>
 #include <EnergyPlus/UnitHeater.hh>
@@ -264,74 +263,14 @@ void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // 
                 }
             }
         }
-        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-            if (!state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
-
-            auto &zoneNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode);
-            zoneNode.Temp = 20.0;
-            zoneNode.MassFlowRate = 0.0;
-            zoneNode.Quality = 1.0;
-            zoneNode.Press = state.dataEnvrn->OutBaroPress;
-            zoneNode.HumRat = state.dataEnvrn->OutHumRat;
-            zoneNode.Enthalpy = PsyHFnTdbW(zoneNode.Temp, zoneNode.HumRat);
-            if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                zoneNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
-            }
-            if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                zoneNode.GenContam = state.dataContaminantBalance->OutdoorGC;
-            }
-
-            for (int ZoneInNode = 1; ZoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++ZoneInNode) {
-                auto &inNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInNode));
-                inNode.Temp = 20.0;
-                inNode.MassFlowRate = 0.0;
-                inNode.Quality = 1.0;
-                inNode.Press = state.dataEnvrn->OutBaroPress;
-                inNode.HumRat = state.dataEnvrn->OutHumRat;
-                inNode.Enthalpy = PsyHFnTdbW(inNode.Temp, inNode.HumRat);
-                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    inNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
-                }
-                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    inNode.GenContam = state.dataContaminantBalance->OutdoorGC;
-                }
-            }
-
-            for (int ZoneExhNode = 1; ZoneExhNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNode) {
-
-                auto &exhNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNode));
-                exhNode.Temp = 20.0;
-                exhNode.MassFlowRate = 0.0;
-                exhNode.Quality = 1.0;
-                exhNode.Press = state.dataEnvrn->OutBaroPress;
-                exhNode.HumRat = state.dataEnvrn->OutHumRat;
-                exhNode.Enthalpy = PsyHFnTdbW(exhNode.Temp, exhNode.HumRat);
-                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    exhNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
-                }
-                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    exhNode.GenContam = state.dataContaminantBalance->OutdoorGC;
-                }
-            }
-
-            // BG CR 7122 following resets return air node.
-            int NumRetNodes = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumReturnNodes;
-            if (NumRetNodes > 0) {
-                for (int nodeCount = 1; nodeCount <= NumRetNodes; ++nodeCount) {
-                    auto &returnNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(nodeCount));
-                    returnNode.Temp = 20.0;
-                    returnNode.MassFlowRate = 0.0;
-                    returnNode.Quality = 1.0;
-                    returnNode.Press = state.dataEnvrn->OutBaroPress;
-                    returnNode.HumRat = state.dataEnvrn->OutHumRat;
-                    returnNode.Enthalpy = PsyHFnTdbW(returnNode.Temp, returnNode.HumRat);
-                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                        returnNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
-                    }
-                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                        returnNode.GenContam = state.dataContaminantBalance->OutdoorGC;
-                    }
-                }
+        for (auto &thisZoneEquipConfig : state.dataZoneEquip->ZoneEquipConfig) {
+            if (!thisZoneEquipConfig.IsControlled) continue;
+            thisZoneEquipConfig.beginEnvirnInit(state);
+        }
+        if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+            for (auto &thisSpaceEquipConfig : state.dataZoneEquip->spaceEquipConfig) {
+                if (!thisSpaceEquipConfig.IsControlled) continue;
+                thisSpaceEquipConfig.beginEnvirnInit(state);
             }
         }
 
@@ -344,29 +283,14 @@ void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // 
 
     // do the  HVAC time step initializations
 
-    for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-        if (!state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
-        auto &zoneNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode);
-        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExcessZoneExh = 0.0;
-
-        if (FirstHVACIteration) {
-            for (int ZoneExhNode = 1; ZoneExhNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNode) {
-                auto &exhNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNode));
-                exhNode.Temp = zoneNode.Temp;
-                exhNode.HumRat = zoneNode.HumRat;
-                exhNode.Enthalpy = zoneNode.Enthalpy;
-                exhNode.Press = zoneNode.Press;
-                exhNode.Quality = zoneNode.Quality;
-                exhNode.MassFlowRate = 0.0;
-                exhNode.MassFlowRateMaxAvail = 0.0;
-                exhNode.MassFlowRateMinAvail = 0.0;
-                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    exhNode.CO2 = zoneNode.CO2;
-                }
-                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    exhNode.GenContam = zoneNode.GenContam;
-                }
-            }
+    for (auto &thisZoneEquipConfig : state.dataZoneEquip->ZoneEquipConfig) {
+        if (!thisZoneEquipConfig.IsControlled) continue;
+        thisZoneEquipConfig.hvacTimeStepInit(state, FirstHVACIteration);
+    }
+    if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+        for (auto &thisSpaceEquipConfig : state.dataZoneEquip->spaceEquipConfig) {
+            if (!thisSpaceEquipConfig.IsControlled) continue;
+            thisSpaceEquipConfig.hvacTimeStepInit(state, FirstHVACIteration);
         }
     }
 
@@ -837,7 +761,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     }
 
     for (int ZoneSizIndex = 1; ZoneSizIndex <= state.dataSize->NumZoneSizingInput; ++ZoneSizIndex) {
-        int ZoneIndex = UtilityRoutines::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName, state.dataHeatBal->Zone);
+        int ZoneIndex = Util::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName, state.dataHeatBal->Zone);
         if (ZoneIndex == 0) {
             ShowSevereError(
                 state,
@@ -847,7 +771,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         if (std::any_of(state.dataZoneEquip->ZoneEquipConfig.begin(), state.dataZoneEquip->ZoneEquipConfig.end(), [](EquipConfiguration const &e) {
                 return e.IsControlled;
             })) {
-            ZoneIndex = UtilityRoutines::FindItemInList(
+            ZoneIndex = Util::FindItemInList(
                 state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
             if (ZoneIndex == 0) {
                 if (!state.dataGlobal->isPulseZoneSizing) {
@@ -910,7 +834,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         if (!zoneEquipConfig.IsControlled) continue;
 
         // For each Zone Sizing object, find the corresponding controlled zone
-        int ZoneSizNum = UtilityRoutines::FindItemInList(zoneEquipConfig.ZoneName, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+        int ZoneSizNum = Util::FindItemInList(zoneEquipConfig.ZoneName, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
         auto &zoneSizingInput = (ZoneSizNum > 0) ? state.dataSize->ZoneSizingInput(ZoneSizNum) : state.dataSize->ZoneSizingInput(1);
         if (ZoneSizNum == 0) { // LKL I think this is sufficient for warning -- no need for array
             if (!state.dataGlobal->isPulseZoneSizing) {
@@ -1045,7 +969,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         if (thisOAReq.numDSOA > 0) {
             for (int spaceCounter = 1; spaceCounter <= thisOAReq.numDSOA; ++spaceCounter) {
                 std::string thisSpaceName = thisOAReq.dsoaSpaceNames(spaceCounter);
-                int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
+                int thisSpaceNum = Util::FindItemInList(thisSpaceName, state.dataHeatBal->space);
                 if (thisSpaceNum > 0) {
                     thisOAReq.dsoaSpaceIndexes.emplace_back(thisSpaceNum);
                 } else {
@@ -3173,10 +3097,6 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
     }
 
     FirstCall = false;
-
-    // Simulate all of the pools. These have a potential impact on surface heat balances, zone air heat balances, and moisture balances.
-    // These should be simulated first so that any systems or zone equipment devices deal with the effects of the pool properly.
-    SwimmingPool::SimSwimmingPool(state, FirstHVACIteration);
 
     // Loop over all the primary air loop; simulate their components (equipment)
     // and controllers

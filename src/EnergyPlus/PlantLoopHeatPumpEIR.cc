@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -95,13 +95,13 @@ void EIRPlantLoopHeatPump::simulate(
 
     if (this->waterSource) {
         this->setOperatingFlowRatesWSHP(state, FirstHVACIteration);
-        if (calledFromLocation.loopNum == this->sourceSidePlantLoc.loopNum) {                           // condenser side
-            Real64 sourceQdotArg = 0.0;                                                                 // TRANE, pass negative if heat pump heating
-            if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {                 // TRANE
-                sourceQdotArg = this->sourceSideHeatTransfer * DataPrecisionGlobals::constant_minusone; // TRANE
-            } else {                                                                                    // TRANE
-                sourceQdotArg = this->sourceSideHeatTransfer;                                           // TRANE
-            }                                                                                           // TRANE
+        if (calledFromLocation.loopNum == this->sourceSidePlantLoc.loopNum) { // condenser side
+            Real64 sourceQdotArg = 0.0;                                       // pass negative if heat pump heating
+            if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
+                sourceQdotArg = this->sourceSideHeatTransfer * DataPrecisionGlobals::constant_minusone;
+            } else {
+                sourceQdotArg = this->sourceSideHeatTransfer;
+            }
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->sourceSidePlantLoc.loopNum,
                                                                 this->sourceSidePlantLoc.loopSideNum,
@@ -584,6 +584,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     } else {
         CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     }
+    // this->sourceSideCp = CpSrc; // debuging variable
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
 
@@ -1173,7 +1174,7 @@ PlantComponent *EIRPlantLoopHeatPump::factory(EnergyPlusData &state, DataPlant::
     }
 
     for (auto &plhp : state.dataEIRPlantLoopHeatPump->heatPumps) {
-        if (plhp.name == UtilityRoutines::makeUPPER(hp_name) && plhp.EIRHPType == hp_type) {
+        if (plhp.name == Util::makeUPPER(hp_name) && plhp.EIRHPType == hp_type) {
             return &plhp;
         }
     }
@@ -1186,12 +1187,12 @@ void EIRPlantLoopHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
 {
     for (auto &thisHP : state.dataEIRPlantLoopHeatPump->heatPumps) {
         if (!thisHP.companionCoilName.empty()) {
-            std::string const thisCoilName = UtilityRoutines::makeUPPER(thisHP.name);
+            std::string const thisCoilName = Util::makeUPPER(thisHP.name);
             DataPlant::PlantEquipmentType thisCoilType = thisHP.EIRHPType;
-            std::string const targetCompanionName = UtilityRoutines::makeUPPER(thisHP.companionCoilName);
+            std::string const targetCompanionName = Util::makeUPPER(thisHP.companionCoilName);
             for (auto &potentialCompanionCoil : state.dataEIRPlantLoopHeatPump->heatPumps) {
                 DataPlant::PlantEquipmentType potentialCompanionType = potentialCompanionCoil.EIRHPType;
-                std::string potentialCompanionName = UtilityRoutines::makeUPPER(potentialCompanionCoil.name);
+                std::string potentialCompanionName = Util::makeUPPER(potentialCompanionCoil.name);
                 if (potentialCompanionName == thisCoilName) {
                     // skip the current coil
                     continue;
@@ -1253,7 +1254,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
     for (auto const &classToInput : classesToInput) {
         cCurrentModuleObject = DataPlant::PlantEquipTypeNames[static_cast<int>(classToInput.thisType)];
         DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
-            getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::makeUPPER(cCurrentModuleObject)));
+            getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, Util::makeUPPER(cCurrentModuleObject)));
         int numPLHP = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (numPLHP > 0) {
             auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -1267,14 +1268,14 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
                 EIRPlantLoopHeatPump thisPLHP;
                 thisPLHP.EIRHPType = classToInput.thisType;
-                thisPLHP.name = UtilityRoutines::makeUPPER(thisObjectName);
-                std::string loadSideInletNodeName = UtilityRoutines::makeUPPER(fields.at("load_side_inlet_node_name").get<std::string>());
-                std::string loadSideOutletNodeName = UtilityRoutines::makeUPPER(fields.at("load_side_outlet_node_name").get<std::string>());
-                std::string condenserType = UtilityRoutines::makeUPPER(fields.at("condenser_type").get<std::string>());
-                std::string sourceSideInletNodeName = UtilityRoutines::makeUPPER(fields.at("source_side_inlet_node_name").get<std::string>());
-                std::string sourceSideOutletNodeName = UtilityRoutines::makeUPPER(fields.at("source_side_outlet_node_name").get<std::string>());
-                thisPLHP.companionCoilName = UtilityRoutines::makeUPPER(
-                    state.dataInputProcessing->inputProcessor->getAlphaFieldValue(fields, schemaProps, "companion_heat_pump_name"));
+                thisPLHP.name = Util::makeUPPER(thisObjectName);
+                std::string loadSideInletNodeName = Util::makeUPPER(fields.at("load_side_inlet_node_name").get<std::string>());
+                std::string loadSideOutletNodeName = Util::makeUPPER(fields.at("load_side_outlet_node_name").get<std::string>());
+                std::string condenserType = Util::makeUPPER(fields.at("condenser_type").get<std::string>());
+                std::string sourceSideInletNodeName = Util::makeUPPER(fields.at("source_side_inlet_node_name").get<std::string>());
+                std::string sourceSideOutletNodeName = Util::makeUPPER(fields.at("source_side_outlet_node_name").get<std::string>());
+                thisPLHP.companionCoilName =
+                    Util::makeUPPER(state.dataInputProcessing->inputProcessor->getAlphaFieldValue(fields, schemaProps, "companion_heat_pump_name"));
 
                 thisPLHP.loadSideDesignVolFlowRate =
                     state.dataInputProcessing->inputProcessor->getRealFieldValue(fields, schemaProps, "load_side_reference_flow_rate");
@@ -1298,24 +1299,23 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
                 thisPLHP.sizingFactor = state.dataInputProcessing->inputProcessor->getRealFieldValue(fields, schemaProps, "sizing_factor");
 
-                std::string const capFtName =
-                    UtilityRoutines::makeUPPER(fields.at("capacity_modifier_function_of_temperature_curve_name").get<std::string>());
+                std::string const capFtName = Util::makeUPPER(fields.at("capacity_modifier_function_of_temperature_curve_name").get<std::string>());
                 thisPLHP.capFuncTempCurveIndex = Curve::GetCurveIndex(state, capFtName);
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(state, format("Invalid curve name for EIR PLHP (name={}; entered curve name: {}", thisPLHP.name, capFtName));
                     errorsFound = true;
                 }
 
-                std::string const eirFtName = UtilityRoutines::makeUPPER(
-                    fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name").get<std::string>());
+                std::string const eirFtName =
+                    Util::makeUPPER(fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name").get<std::string>());
                 thisPLHP.powerRatioFuncTempCurveIndex = Curve::GetCurveIndex(state, eirFtName);
                 if (thisPLHP.powerRatioFuncTempCurveIndex == 0) {
                     ShowSevereError(state, format("Invalid curve name for EIR PLHP (name={}; entered curve name: {}", thisPLHP.name, eirFtName));
                     errorsFound = true;
                 }
 
-                std::string const eirFplrName = UtilityRoutines::makeUPPER(
-                    fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name").get<std::string>());
+                std::string const eirFplrName =
+                    Util::makeUPPER(fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name").get<std::string>());
                 thisPLHP.powerRatioFuncPLRCurveIndex = Curve::GetCurveIndex(state, eirFplrName);
                 if (thisPLHP.powerRatioFuncPLRCurveIndex == 0) {
                     ShowSevereError(state, format("Invalid curve name for EIR PLHP (name={}; entered curve name: {}", thisPLHP.name, eirFplrName));
@@ -1333,17 +1333,17 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 auto const minimumSupplyWaterTempCurveName = fields.find("minimum_supply_water_temperature_curve_name");
                 if (minimumSupplyWaterTempCurveName != fields.end()) {
                     thisPLHP.minSupplyWaterTempCurveIndex =
-                        Curve::GetCurveIndex(state, UtilityRoutines::makeUPPER(minimumSupplyWaterTempCurveName.value().get<std::string>()));
+                        Curve::GetCurveIndex(state, Util::makeUPPER(minimumSupplyWaterTempCurveName.value().get<std::string>()));
                 }
 
                 auto const maximumSupplyWaterTempCurveName = fields.find("maximum_supply_water_temperature_curve_name");
                 if (maximumSupplyWaterTempCurveName != fields.end()) {
                     thisPLHP.maxSupplyWaterTempCurveIndex =
-                        Curve::GetCurveIndex(state, UtilityRoutines::makeUPPER(maximumSupplyWaterTempCurveName.value().get<std::string>()));
+                        Curve::GetCurveIndex(state, Util::makeUPPER(maximumSupplyWaterTempCurveName.value().get<std::string>()));
                 }
 
                 std::string flowControlTypeName =
-                    UtilityRoutines::makeUPPER(state.dataInputProcessing->inputProcessor->getAlphaFieldValue(fields, schemaProps, "flow_mode"));
+                    Util::makeUPPER(state.dataInputProcessing->inputProcessor->getAlphaFieldValue(fields, schemaProps, "flow_mode"));
                 thisPLHP.flowControl = static_cast<DataPlant::FlowMode>(getEnumValue(DataPlant::FlowModeNamesUC, flowControlTypeName));
 
                 // fields only in heating object
@@ -1358,8 +1358,8 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     "HEATINGCAPACITY", "COOLINGCAPACITY", "GREATEROFHEATINGORCOOLING"};
                 auto const heatSizingType = fields.find("heat_pump_sizing_method");
                 if (heatSizingType != fields.end()) {
-                    thisPLHP.heatSizingMethod = static_cast<HeatSizingType>(
-                        getEnumValue(PLHPHeatSizTypeNamesUC, UtilityRoutines::makeUPPER(heatSizingType.value().get<std::string>())));
+                    thisPLHP.heatSizingMethod =
+                        static_cast<HeatSizingType>(getEnumValue(PLHPHeatSizTypeNamesUC, Util::makeUPPER(heatSizingType.value().get<std::string>())));
                 } else {
                     // revert to legacy sizing method, if no companion coil and this coil type is heating, set to heating
                     if (thisPLHP.companionCoilName.empty() && thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
@@ -1372,15 +1372,15 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 constexpr std::array<std::string_view, static_cast<int>(ControlType::Num)> PLHPCtrlTypeNamesUC = {"SETPOINT", "LOAD"};
                 auto const controlType = fields.find("control_type");
                 if (controlType != fields.end()) {
-                    thisPLHP.sysControlType = static_cast<ControlType>(
-                        getEnumValue(PLHPCtrlTypeNamesUC, UtilityRoutines::makeUPPER(controlType.value().get<std::string>())));
+                    thisPLHP.sysControlType =
+                        static_cast<ControlType>(getEnumValue(PLHPCtrlTypeNamesUC, Util::makeUPPER(controlType.value().get<std::string>())));
                 } else {
                     thisPLHP.sysControlType = ControlType::Load;
                 }
                 auto const capacityDryAirCurveName = fields.find("dry_outdoor_correction_factor_curve_name");
                 if (capacityDryAirCurveName != fields.end()) {
                     thisPLHP.capacityDryAirCurveIndex =
-                        Curve::GetCurveIndex(state, UtilityRoutines::makeUPPER(capacityDryAirCurveName.value().get<std::string>()));
+                        Curve::GetCurveIndex(state, Util::makeUPPER(capacityDryAirCurveName.value().get<std::string>()));
                 }
 
                 constexpr std::array<std::string_view, static_cast<int>(DefrostControl::Num)> PLHPDefrostTypeNamesUC = {
@@ -1388,7 +1388,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 auto const defrostControlStrategy = fields.find("heat_pump_defrost_control");
                 if (defrostControlStrategy != fields.end()) {
                     thisPLHP.defrostStrategy = static_cast<DefrostControl>(
-                        getEnumValue(PLHPDefrostTypeNamesUC, UtilityRoutines::makeUPPER(defrostControlStrategy.value().get<std::string>())));
+                        getEnumValue(PLHPDefrostTypeNamesUC, Util::makeUPPER(defrostControlStrategy.value().get<std::string>())));
                 } else {
                     thisPLHP.defrostStrategy = DefrostControl::None;
                 }
@@ -1417,25 +1417,24 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     auto const timedEmpiricalDefFreqStratCurveName = fields.find("timed_empirical_defrost_frequency_curve_name");
                     if (timedEmpiricalDefFreqStratCurveName != fields.end()) {
                         thisPLHP.defrostFreqCurveIndex =
-                            Curve::GetCurveIndex(state, UtilityRoutines::makeUPPER(timedEmpiricalDefFreqStratCurveName.value().get<std::string>()));
+                            Curve::GetCurveIndex(state, Util::makeUPPER(timedEmpiricalDefFreqStratCurveName.value().get<std::string>()));
                     }
                     auto const timedEmpiricalDefHeatLoadPenaltyCurveName = fields.find("timed_empirical_defrost_heat_load_penalty_curve_name");
                     if (timedEmpiricalDefHeatLoadPenaltyCurveName != fields.end()) {
-                        thisPLHP.defrostHeatLoadCurveIndex = Curve::GetCurveIndex(
-                            state, UtilityRoutines::makeUPPER(timedEmpiricalDefHeatLoadPenaltyCurveName.value().get<std::string>()));
+                        thisPLHP.defrostHeatLoadCurveIndex =
+                            Curve::GetCurveIndex(state, Util::makeUPPER(timedEmpiricalDefHeatLoadPenaltyCurveName.value().get<std::string>()));
                         thisPLHP.defrostLoadCurveDims = state.dataCurveManager->PerfCurve(thisPLHP.defrostHeatLoadCurveIndex)->numDims;
                     }
                     auto const defrostHeatEnergyCurveIndexCurveName = fields.find("timed_empirical_defrost_heat_input_energy_fraction_curve_name");
                     if (defrostHeatEnergyCurveIndexCurveName != fields.end()) {
                         thisPLHP.defrostHeatEnergyCurveIndex =
-                            Curve::GetCurveIndex(state, UtilityRoutines::makeUPPER(defrostHeatEnergyCurveIndexCurveName.value().get<std::string>()));
+                            Curve::GetCurveIndex(state, Util::makeUPPER(defrostHeatEnergyCurveIndexCurveName.value().get<std::string>()));
                         thisPLHP.defrostEnergyCurveDims = state.dataCurveManager->PerfCurve(thisPLHP.defrostHeatEnergyCurveIndex)->numDims;
                     }
                 } else if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) { // used for Timed or OnDemand
                     auto const defEIRFTCurveName = fields.find("defrost_energy_input_ratio_function_of_temperature_curve_name");
                     if (defEIRFTCurveName != fields.end()) {
-                        thisPLHP.defrostEIRFTIndex =
-                            Curve::GetCurveIndex(state, UtilityRoutines::makeUPPER(defEIRFTCurveName.value().get<std::string>()));
+                        thisPLHP.defrostEIRFTIndex = Curve::GetCurveIndex(state, Util::makeUPPER(defEIRFTCurveName.value().get<std::string>()));
                     }
                 }
 
@@ -1591,82 +1590,81 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
         // setup output variables
         SetupOutputVariable(state,
                             "Heat Pump Part Load Ratio",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             this->partLoadRatio,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Heat Pump Cycling Ratio",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             this->cyclingRatio,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->loadSideHeatTransfer,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->loadSideEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
+                            Constant::eResource::EnergyTransfer,
+                            OutputProcessor::SOVEndUseCat::Invalid, // a {} parameter turns into 0 which is SOVEndUseCat::Heating
                             {},
-                            "ENERGYTRANSFER",
-                            {},
-                            {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->sourceSideHeatTransfer,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->sourceSideEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->loadSideInletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->loadSideOutletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->sourceSideInletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->sourceSideOutletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Heat Pump Electricity Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->powerUsage,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1674,79 +1672,85 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
         if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) { // energy from HeatPump:PlantLoop:EIR:Cooling object
             SetupOutputVariable(state,
                                 "Heat Pump Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->powerEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
-                                {},
-                                "Electricity",
-                                "Cooling",
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 "Heat Pump",
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
         } else if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) { // energy from HeatPump:PlantLoop:EIR:Heating object
             SetupOutputVariable(state,
                                 "Heat Pump Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->powerEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
-                                {},
-                                "Electricity",
-                                "Heating",
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Heating,
                                 "Heat Pump",
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
             if (this->defrostAvailable) {
                 SetupOutputVariable(state,
                                     "Heat Pump Load Due To Defrost",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->loadDueToDefrost,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     this->name);
                 SetupOutputVariable(state,
                                     "Heat Pump Fractioal Defrost Time",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->fractionalDefrostTime,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     this->name);
                 SetupOutputVariable(state,
                                     "Heat Pump Defrost Electricity Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->defrostEnergyRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     this->name);
                 SetupOutputVariable(state,
                                     "Heat Pump Defrost Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     this->defrostEnergy,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->name,
-                                    {},
-                                    "Electricity",
-                                    "HEATING",
+                                    Constant::eResource::Electricity,
+                                    OutputProcessor::SOVEndUseCat::Heating,
                                     "Heat Pump",
-                                    "Plant");
+                                    OutputProcessor::SOVGroup::Plant);
             }
         }
         SetupOutputVariable(state,
                             "Heat Pump Load Side Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             this->loadSideMassFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             this->sourceSideMassFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
+        // report variable used for debugging, System Node Specific Heat can also report the node Cp
+        // added spaces to SetupOutputVariable to avoid issue with variable parsing script
+        // Setup Output Variable(state,
+        //                   "Heat Pump Source Side Specific Heat",
+        //                   Constant::Units::J_kgK,
+        //                   this->sourceSideCp,
+        //                   OutputProcessor::SOVTimeStepType::System,
+        //                   OutputProcessor::SOVStoreType::Average,
+        //                   this->name);
 
         // find this component on the plant
         bool thisErrFlag = false;
@@ -2246,11 +2250,13 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // calculate source side outlet conditions
     Real64 CpSrc = 0.0;
     if (this->waterSource) {
+        auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
         CpSrc = FluidProperties::GetSpecificHeatGlycol(
-            state, thisLoadPlantLoop.FluidName, thisInletNode.Temp, thisLoadPlantLoop.FluidIndex, "PLFFHPEIR::simulate()");
+            state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "PLFFHPEIR::simulate()");
     } else if (this->airSource) {
         CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     }
+    // this->sourceSideCp = CpSrc; // debuging variable
     // Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     Real64 const sourceMCp = (this->sourceSideMassFlowRate < 1e-6 ? 1.0 : this->sourceSideMassFlowRate) * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
@@ -2341,7 +2347,7 @@ PlantComponent *EIRFuelFiredHeatPump::factory(EnergyPlusData &state, DataPlant::
     }
 
     for (auto &plhp : state.dataEIRFuelFiredHeatPump->heatPumps) {
-        if (plhp.name == UtilityRoutines::makeUPPER(hp_name) && plhp.EIRHPType == hp_type) {
+        if (plhp.name == Util::makeUPPER(hp_name) && plhp.EIRHPType == hp_type) {
             return &plhp;
         }
     }
@@ -2354,12 +2360,12 @@ void EIRFuelFiredHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
 {
     for (auto &thisHP : state.dataEIRFuelFiredHeatPump->heatPumps) {
         if (!thisHP.companionCoilName.empty()) {
-            std::string thisCoilName = UtilityRoutines::makeUPPER(thisHP.name);
+            std::string thisCoilName = Util::makeUPPER(thisHP.name);
             DataPlant::PlantEquipmentType thisCoilType = thisHP.EIRHPType;
-            std::string targetCompanionName = UtilityRoutines::makeUPPER(thisHP.companionCoilName);
+            std::string targetCompanionName = Util::makeUPPER(thisHP.companionCoilName);
             for (auto &potentialCompanionCoil : state.dataEIRFuelFiredHeatPump->heatPumps) {
                 DataPlant::PlantEquipmentType potentialCompanionType = potentialCompanionCoil.EIRHPType;
-                std::string potentialCompanionName = UtilityRoutines::makeUPPER(potentialCompanionCoil.name);
+                std::string potentialCompanionName = Util::makeUPPER(potentialCompanionCoil.name);
                 if (potentialCompanionName == thisCoilName) {
                     // skip the current coil
                     continue;
@@ -2424,7 +2430,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
         cCurrentModuleObject = DataPlant::PlantEquipTypeNames[static_cast<int>(classToInput.thisType)];
 
         DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
-            getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::makeUPPER(cCurrentModuleObject)));
+            getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, Util::makeUPPER(cCurrentModuleObject)));
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end()) continue;
@@ -2445,27 +2451,27 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             }
 
             // A1-A3
-            thisPLHP.name = UtilityRoutines::makeUPPER(thisObjectName);
-            std::string loadSideInletNodeName = UtilityRoutines::makeUPPER(fields.at("water_inlet_node_name").get<std::string>());
-            std::string loadSideOutletNodeName = UtilityRoutines::makeUPPER(fields.at("water_outlet_node_name").get<std::string>());
+            thisPLHP.name = Util::makeUPPER(thisObjectName);
+            std::string loadSideInletNodeName = Util::makeUPPER(fields.at("water_inlet_node_name").get<std::string>());
+            std::string loadSideOutletNodeName = Util::makeUPPER(fields.at("water_outlet_node_name").get<std::string>());
             // Implicit
-            // std::string condenserType = "AIRSOURCE"; // UtilityRoutines::makeUPPER(fields.at("condenser_type").get<std::string>());
+            // std::string condenserType = "AIRSOURCE"; // Util::makeUPPER(fields.at("condenser_type").get<std::string>());
             thisPLHP.airSource = true;
             thisPLHP.waterSource = false;
 
             // A4
-            std::string sourceSideInletNodeName = UtilityRoutines::makeUPPER(fields.at("air_source_node_name").get<std::string>());
-            // UtilityRoutines::makeUPPER(fields.at("source_side_outlet_node_name").get<std::string>());
+            std::string sourceSideInletNodeName = Util::makeUPPER(fields.at("air_source_node_name").get<std::string>());
+            // Util::makeUPPER(fields.at("source_side_outlet_node_name").get<std::string>());
             std::string sourceSideOutletNodeName = format("{}_SOURCE_SIDE_OUTLET_NODE", thisPLHP.name);
 
             // A5
             auto compCoilFound = fields.find(companionCoilFieldTag);
             if (compCoilFound != fields.end()) { // optional field
-                thisPLHP.companionCoilName = UtilityRoutines::makeUPPER(compCoilFound.value().get<std::string>());
+                thisPLHP.companionCoilName = Util::makeUPPER(compCoilFound.value().get<std::string>());
             }
 
             // A6 Fuel Type
-            std::string tempRsrStr = UtilityRoutines::makeUPPER(fields.at("fuel_type").get<std::string>());
+            std::string tempRsrStr = Util::makeUPPER(fields.at("fuel_type").get<std::string>());
             thisPLHP.fuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, tempRsrStr));
             // Validate fuel type input
             static constexpr std::string_view RoutineName("processInputForEIRPLHP: ");
@@ -2478,7 +2484,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             }
 
             // A7 End use category
-            thisPLHP.endUseSubcat = UtilityRoutines::makeUPPER(fields.at("end_use_subcategory").get<std::string>());
+            thisPLHP.endUseSubcat = Util::makeUPPER(fields.at("end_use_subcategory").get<std::string>());
             if (thisPLHP.endUseSubcat == "") {
                 thisPLHP.endUseSubcat = "Heat Pump Fuel Fired"; // or "General"?
             }
@@ -2544,20 +2550,19 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
             // A8 flow mode
             thisPLHP.flowMode = static_cast<DataPlant::FlowMode>(
-                getEnumValue(DataPlant::FlowModeNamesUC, UtilityRoutines::makeUPPER(fields.at("flow_mode").get<std::string>())));
+                getEnumValue(DataPlant::FlowModeNamesUC, Util::makeUPPER(fields.at("flow_mode").get<std::string>())));
 
             // A9 outdoor_air_temperature_curve_input_variable
-            std::string oaTempCurveInputVar =
-                UtilityRoutines::makeUPPER(fields.at("outdoor_air_temperature_curve_input_variable").get<std::string>());
+            std::string oaTempCurveInputVar = Util::makeUPPER(fields.at("outdoor_air_temperature_curve_input_variable").get<std::string>());
             thisPLHP.oaTempCurveInputVar = static_cast<OATempCurveVar>(getEnumValue(OATempCurveVarNamesUC, oaTempCurveInputVar));
 
             // A10 water_temperature_curve_input_variable
-            std::string waterTempCurveInputVar = UtilityRoutines::makeUPPER(fields.at("water_temperature_curve_input_variable").get<std::string>());
+            std::string waterTempCurveInputVar = Util::makeUPPER(fields.at("water_temperature_curve_input_variable").get<std::string>());
             thisPLHP.waterTempCurveInputVar = static_cast<WaterTempCurveVar>(getEnumValue(WaterTempCurveVarNamesUC, waterTempCurveInputVar));
 
             // A11 normalized_capacity_function_of_temperature_curve_name
-            std::string const &capFtName =
-                UtilityRoutines::makeUPPER(fields.at("normalized_capacity_function_of_temperature_curve_name").get<std::string>());
+            std::string const &capFtName = Util::makeUPPER(fields.at("normalized_capacity_function_of_temperature_curve_name").get<std::string>());
+
             thisPLHP.capFuncTempCurveIndex = Curve::GetCurveIndex(state, capFtName);
             if (thisPLHP.capFuncTempCurveIndex == 0) {
                 ShowSevereError(state, format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, capFtName));
@@ -2566,15 +2571,14 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
             // A12 fuel_energy_input_ratio_function_of_temperature_curve_name
             std::string const &eirFtName =
-                UtilityRoutines::makeUPPER(fields.at("fuel_energy_input_ratio_function_of_temperature_curve_name").get<std::string>());
+                Util::makeUPPER(fields.at("fuel_energy_input_ratio_function_of_temperature_curve_name").get<std::string>());
             thisPLHP.powerRatioFuncTempCurveIndex = Curve::GetCurveIndex(state, eirFtName);
             if (thisPLHP.capFuncTempCurveIndex == 0) {
                 ShowSevereError(state, format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, eirFtName));
                 errorsFound = true;
             }
             // A13 fuel_energy_input_ratio_function_of_plr_curve_name
-            std::string const &eirFplrName =
-                UtilityRoutines::makeUPPER(fields.at("fuel_energy_input_ratio_function_of_plr_curve_name").get<std::string>());
+            std::string const &eirFplrName = Util::makeUPPER(fields.at("fuel_energy_input_ratio_function_of_plr_curve_name").get<std::string>());
             thisPLHP.powerRatioFuncPLRCurveIndex = Curve::GetCurveIndex(state, eirFplrName);
             if (thisPLHP.capFuncTempCurveIndex == 0) {
                 ShowSevereError(state, format("Invalid curve name for EIR PLFFHP (name={}; entered curve name: {}", thisPLHP.name, eirFplrName));
@@ -2615,7 +2619,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             } else {
                 auto eirDefrostCurveFound = fields.find("fuel_energy_input_ratio_defrost_adjustment_curve_name");
                 if (eirDefrostCurveFound != fields.end()) {
-                    std::string const eirDefrostCurveName = UtilityRoutines::makeUPPER(eirDefrostCurveFound.value().get<std::string>());
+                    std::string const eirDefrostCurveName = Util::makeUPPER(eirDefrostCurveFound.value().get<std::string>());
                     thisPLHP.defrostEIRCurveIndex = Curve::GetCurveIndex(state, eirDefrostCurveName);
                     if (thisPLHP.defrostEIRCurveIndex == 0) {
                         ShowSevereError(
@@ -2631,8 +2635,8 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) {
                 thisPLHP.defrostType = DefrostType::Invalid;
             } else {
-                thisPLHP.defrostType = static_cast<DefrostType>(
-                    getEnumValue(DefrostTypeNamesUC, UtilityRoutines::makeUPPER(fields.at("defrost_control_type").get<std::string>())));
+                thisPLHP.defrostType =
+                    static_cast<DefrostType>(getEnumValue(DefrostTypeNamesUC, Util::makeUPPER(fields.at("defrost_control_type").get<std::string>())));
                 if (thisPLHP.defrostType == DefrostType::Invalid) {
                     thisPLHP.defrostType = DefrostType::OnDemand; // set to default
                     thisPLHP.defrostOpTimeFrac = 0.0;
@@ -2702,7 +2706,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             // A16 cycling_ratio_factor_curve_name
             auto crfCurveFound = fields.find("cycling_ratio_factor_curve_name");
             if (crfCurveFound != fields.end()) {
-                std::string const cycRatioCurveName = UtilityRoutines::makeUPPER(crfCurveFound.value().get<std::string>());
+                std::string const cycRatioCurveName = Util::makeUPPER(crfCurveFound.value().get<std::string>());
                 thisPLHP.cycRatioCurveIndex = Curve::GetCurveIndex(state, cycRatioCurveName);
                 if (thisPLHP.cycRatioCurveIndex == 0) {
                     ShowSevereError(state,
@@ -2731,7 +2735,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             // A17 auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name
             auto auxElecEIRFTCurveFound = fields.find("auxiliary_electric_energy_input_ratio_function_of_temperature_curve_name");
             if (auxElecEIRFTCurveFound != fields.end()) {
-                std::string const &auxEIRFTName = UtilityRoutines::makeUPPER(auxElecEIRFTCurveFound.value().get<std::string>());
+                std::string const &auxEIRFTName = Util::makeUPPER(auxElecEIRFTCurveFound.value().get<std::string>());
                 thisPLHP.auxElecEIRFoTempCurveIndex = Curve::GetCurveIndex(state, auxEIRFTName);
                 if (thisPLHP.auxElecEIRFoTempCurveIndex == 0) {
                     ShowSevereError(state, format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}", thisPLHP.name, auxEIRFTName));
@@ -2744,7 +2748,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             // A18 auxiliary_electric_energy_input_ratio_function_of_plr_curve_name
             auto auxElecEIRFPLRCurveFound = fields.find("auxiliary_electric_energy_input_ratio_function_of_plr_curve_name");
             if (auxElecEIRFPLRCurveFound != fields.end()) {
-                std::string const &auxEIRFPLRName = UtilityRoutines::makeUPPER(auxElecEIRFPLRCurveFound.value().get<std::string>());
+                std::string const &auxEIRFPLRName = Util::makeUPPER(auxElecEIRFPLRCurveFound.value().get<std::string>());
                 thisPLHP.auxElecEIRFoPLRCurveIndex = Curve::GetCurveIndex(state, auxEIRFPLRName);
                 if (thisPLHP.auxElecEIRFoPLRCurveIndex == 0) {
                     ShowSevereError(state, format("Invalid curve name for EIR FFHP (name={}; entered curve name: {}", thisPLHP.name, auxEIRFPLRName));
@@ -2839,75 +2843,74 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
         // setup output variables
         SetupOutputVariable(state,
                             "Fuel-fired Absorption HeatPump Load Side Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->loadSideHeatTransfer,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Fuel-fired Absorption HeatPump Load Side Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->loadSideEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
+                            Constant::eResource::EnergyTransfer,
+                            OutputProcessor::SOVEndUseCat::Invalid, // a {} parameter turns into 0 which is SOVEndUseCat::Heating
                             {},
-                            "ENERGYTRANSFER",
-                            {},
-                            {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
         // Setup Output Variable(state,
         //                    "Fuel-fired Absorption Heat Pump Source Side Heat Transfer Rate",
-        //                    OutputProcessor::Unit::W,
+        //                    Constant::Units::W,
         //                    this->sourceSideHeatTransfer,
         //                    OutputProcessor::SOVTimeStepType::System,
         //                    OutputProcessor::SOVStoreType::Average,
         //                    this->name);
         // Setup Output Variable(state,
         //                    "Fuel-fired Absorption Heat Pump Source Side Heat Transfer Energy",
-        //                    OutputProcessor::Unit::J,
+        //                    Constant::Units::J,
         //                    this->sourceSideEnergy,
         //                    OutputProcessor::SOVTimeStepType::System,
         //                    OutputProcessor::SOVStoreType::Summed,
         //                    this->name);
         SetupOutputVariable(state,
                             "Fuel-fired Absorption HeatPump Inlet Temperature", // "Heat Pump Load Side Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->loadSideInletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Fuel-fired Absorption HeatPump Outlet Temperature", // "Heat Pump Load Side Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->loadSideOutletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         // Setup Output Variable(state,
         //                    "Fuel-fired Absorption Heat Pump Source Side Inlet Temperature",
-        //                    OutputProcessor::Unit::C,
+        //                    Constant::Units::C,
         //                    this->sourceSideInletTemp,
         //                    OutputProcessor::SOVTimeStepType::System,
         //                    OutputProcessor::SOVStoreType::Average,
         //                    this->name);
         // Setup Output Variable(state,
         //                    "Heat Pump Source Side Outlet Temperature",
-        //                    OutputProcessor::Unit::C,
+        //                    Constant::Units::C,
         //                    this->sourceSideOutletTemp,
         //                    OutputProcessor::SOVTimeStepType::System,
         //                    OutputProcessor::SOVStoreType::Average,
         //                    this->name);
         SetupOutputVariable(state,
                             "Fuel-fired Absorption HeatPump Fuel Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->fuelRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Fuel-fired Absorption HeatPump Electricity Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->powerUsage,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -2915,65 +2918,61 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
         if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredCooling) { // energy from HeatPump:AirToWater:FuelFired:Cooling object
             SetupOutputVariable(state,
                                 "Fuel-fired Absorption HeatPump Fuel Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->fuelEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
-                                {},
-                                Constant::eFuelNames[static_cast<int>(this->fuelType)],
-                                "Cooling",
+                                Constant::eFuel2eResource[(int)this->fuelType],
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 this->endUseSubcat, //"Heat Pump",
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
             SetupOutputVariable(state,
                                 "Fuel-fired Absorption HeatPump Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->powerEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
-                                {},
-                                "Electricity",
-                                "Cooling",
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 this->endUseSubcat, // "Heat Pump",
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
         } else if (this->EIRHPType ==
                    DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating) { // energy from HeatPump:AirToWater:FuelFired:Heating object
             SetupOutputVariable(state,
                                 "Fuel-fired Absorption HeatPump Fuel Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->fuelEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
-                                {},
-                                Constant::eFuelNames[static_cast<int>(this->fuelType)],
-                                "Heating",
+                                Constant::eFuel2eResource[(int)this->fuelType],
+                                OutputProcessor::SOVEndUseCat::Heating,
                                 this->endUseSubcat, // "Heat Pump",
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
             SetupOutputVariable(state,
                                 "Fuel-fired Absorption HeatPump Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->powerEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
-                                {},
-                                "Electricity",
-                                "Heating",
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Heating,
                                 this->endUseSubcat, // "Heat Pump",
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
         }
         SetupOutputVariable(state,
                             "Fuel-fired Absorption HeatPump Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             this->loadSideMassFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
                             "Fuel-fired Absorption HeatPump Volumetric Flow Rate",
-                            OutputProcessor::Unit::m3_s,
+                            Constant::Units::m3_s,
                             this->loadSideVolumeFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,

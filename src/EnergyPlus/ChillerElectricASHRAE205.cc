@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,6 +58,7 @@
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChillerElectricASHRAE205.hh>
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -68,6 +69,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EnergyPlusLogger.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -94,26 +96,8 @@ constexpr std::array<std::string_view, static_cast<int>(AmbientTempIndicator::Nu
     "OUTDOORS",
 };
 
-std::map<std::string, Btwxt::Method> InterpMethods = // NOLINT(cert-err58-cpp)
-    {{"LINEAR", Btwxt::Method::LINEAR}, {"CUBIC", Btwxt::Method::CUBIC}};
-
-void tk205ErrCallback(tk205::MsgSeverity message_type, const std::string &message, void *context_ptr)
-{
-    std::pair<EnergyPlusData *, std::string> contextPair = *(std::pair<EnergyPlusData *, std::string> *)context_ptr;
-    std::string fullMessage = contextPair.second + ": " + message;
-    if (message_type == tk205::MsgSeverity::ERR_205) {
-        ShowSevereError(*contextPair.first, fullMessage);
-        ShowFatalError(*contextPair.first, "libtk205: Errors discovered, program terminates.");
-    } else {
-        if (message_type == tk205::MsgSeverity::WARN_205) {
-            ShowWarningError(*contextPair.first, fullMessage);
-        } else if (message_type == tk205::MsgSeverity::INFO_205) {
-            ShowMessage(*contextPair.first, fullMessage);
-        } else {
-            ShowMessage(*contextPair.first, fullMessage);
-        }
-    }
-}
+std::map<std::string, Btwxt::InterpolationMethod> InterpMethods = // NOLINT(cert-err58-cpp)
+    {{"LINEAR", Btwxt::InterpolationMethod::linear}, {"CUBIC", Btwxt::InterpolationMethod::cubic}};
 
 void getChillerASHRAE205Input(EnergyPlusData &state)
 {
@@ -146,7 +130,8 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
 
         ++ChillerNum;
         auto &thisChiller = state.dataChillerElectricASHRAE205->Electric205Chiller(ChillerNum);
-        thisChiller.Name = UtilityRoutines::makeUPPER(thisObjectName);
+        thisChiller.Name = Util::makeUPPER(thisObjectName);
+
         ip->markObjectAsUsed(state.dataIPShortCut->cCurrentModuleObject, thisObjectName);
 
         std::string const rep_file_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "representation_file_name");
@@ -158,18 +143,18 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
             // be set The CheckForActualFilePath function emits some nice information to the ERR file, so we just need a simple fatal here
             ShowFatalError(state, "Program terminates due to the missing ASHRAE 205 RS0001 representation file.");
         }
-        std::pair<EnergyPlusData *, std::string> callbackPair{&state,
-                                                              format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisObjectName)};
-        tk205::set_error_handler(tk205ErrCallback, &callbackPair);
-        Btwxt::LOG_LEVEL = static_cast<int>(Btwxt::MsgLevel::MSG_WARN);
-        thisChiller.Representation =
-            std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(RSInstanceFactory::create("RS0001", rep_file_path.string().c_str()));
+        // Since logger context must persist across all calls to libtk205/btwxt, it must be a member
+        thisChiller.LoggerContext = {&state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisObjectName)};
+        thisChiller.Representation = std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(
+            RSInstanceFactory::create("RS0001", rep_file_path.string().c_str(), std::make_shared<EnergyPlusLogger>()));
         if (nullptr == thisChiller.Representation) {
             ShowSevereError(state, format("{} is not an instance of an ASHRAE205 Chiller.", rep_file_path.string()));
             ErrorsFound = true;
         }
+        thisChiller.Representation->performance.performance_map_cooling.get_logger()->set_message_context(&thisChiller.LoggerContext);
+        thisChiller.Representation->performance.performance_map_standby.get_logger()->set_message_context(&thisChiller.LoggerContext);
         thisChiller.InterpolationType =
-            InterpMethods[UtilityRoutines::makeUPPER(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))];
+            InterpMethods[Util::makeUPPER(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))];
 
         const auto &compressorSequence = thisChiller.Representation->performance.performance_map_cooling.grid_variables.compressor_sequence_number;
         // minmax_element is sound but perhaps overkill; as sequence numbers are required by A205 to be in ascending order
@@ -294,8 +279,8 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
             }
         }
 
-        thisChiller.AmbientTempType = static_cast<AmbientTempIndicator>(getEnumValue(
-            AmbientTempNamesUC, UtilityRoutines::makeUPPER(ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_indicator"))));
+        thisChiller.AmbientTempType = static_cast<AmbientTempIndicator>(
+            getEnumValue(AmbientTempNamesUC, Util::makeUPPER(ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_indicator"))));
         switch (thisChiller.AmbientTempType) {
         case AmbientTempIndicator::Schedule: {
             std::string const ambient_temp_schedule = ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_schedule");
@@ -313,7 +298,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         }
         case AmbientTempIndicator::TempZone: {
             std::string const ambient_temp_zone_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_zone_name");
-            thisChiller.AmbientTempZone = UtilityRoutines::FindItemInList(ambient_temp_zone_name, state.dataHeatBal->Zone);
+            thisChiller.AmbientTempZone = Util::FindItemInList(ambient_temp_zone_name, state.dataHeatBal->Zone);
             if (thisChiller.AmbientTempZone == 0) {
                 ShowSevereError(state,
                                 format("{} = {}:  Ambient Temperature Zone not found = {}",
@@ -885,9 +870,9 @@ void ASHRAE205ChillerSpecs::size([[maybe_unused]] EnergyPlusData &state)
     // TODO: Determine actual rated flow rates instead of design flow rates
     this->RefCap = this->Representation->performance.performance_map_cooling
                        .calculate_performance(this->EvapVolFlowRate,
-                                              this->TempRefEvapOut + Constant::KelvinConv,
+                                              this->TempRefEvapOut + Constant::Kelvin,
                                               this->CondVolFlowRate,
-                                              this->TempRefCondIn + Constant::KelvinConv,
+                                              this->TempRefCondIn + Constant::Kelvin,
                                               this->MaxSequenceNumber,
                                               this->InterpolationType)
                        .net_evaporator_capacity;
@@ -978,7 +963,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 {
     SetupOutputVariable(state,
                         "Chiller Part Load Ratio",
-                        OutputProcessor::Unit::None,
+                        Constant::Units::None,
                         this->ChillerPartLoadRatio,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -986,7 +971,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Cycling Ratio",
-                        OutputProcessor::Unit::None,
+                        Constant::Units::None,
                         this->ChillerCyclingRatio,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -994,7 +979,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Minimum Part Load Ratio",
-                        OutputProcessor::Unit::None,
+                        Constant::Units::None,
                         this->MinPartLoadRat,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -1002,7 +987,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Electricity Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->Power,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -1010,20 +995,19 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->Energy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        {},
-                        "ELECTRICITY",
-                        "Cooling",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::Cooling,
                         this->EndUseSubcategory,
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Cooling Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->QEvaporator,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -1031,20 +1015,19 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Cooling Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->EvapEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
+                        Constant::eResource::EnergyTransfer,
+                        OutputProcessor::SOVEndUseCat::Chillers,
                         {},
-                        "ENERGYTRANSFER",
-                        "CHILLERS",
-                        {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->EvapInletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -1052,7 +1035,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->EvapOutletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -1060,7 +1043,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->EvapMassFlowRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -1068,7 +1051,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Condenser Heat Transfer Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->QCondenser,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -1076,20 +1059,19 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Condenser Heat Transfer Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->CondEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
+                        Constant::eResource::EnergyTransfer,
+                        OutputProcessor::SOVEndUseCat::HeatRejection,
                         {},
-                        "ENERGYTRANSFER",
-                        "HEATREJECTION",
-                        {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller COP",
-                        OutputProcessor::Unit::W_W,
+                        Constant::Units::W_W,
                         this->ActualCOP,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -1097,7 +1079,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Condenser Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->CondInletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -1105,7 +1087,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Condenser Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->CondOutletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -1113,7 +1095,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Condenser Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->CondMassFlowRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -1121,7 +1103,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Effective Heat Rejection Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->ChillerCondAvgTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -1129,7 +1111,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Zone Heat Gain Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->AmbientZoneGain,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -1137,7 +1119,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Zone Heat Gain Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->AmbientZoneGainEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
@@ -1145,7 +1127,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Oil Cooler Heat Transfer Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->QOilCooler,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -1153,7 +1135,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Oil Cooler Heat Transfer Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->OilCoolerEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
@@ -1161,7 +1143,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Auxiliary Heat Transfer Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->QAuxiliary,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -1169,7 +1151,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Auxiliary Heat Transfer Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->AuxiliaryEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
@@ -1424,17 +1406,17 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     // Available chiller capacity is capacity at the highest sequence number; i.e. max chiller capacity
     const Real64 maximumChillerCap = this->Representation->performance.performance_map_cooling
                                          .calculate_performance(this->EvapVolFlowRate,
-                                                                this->EvapOutletTemp + Constant::KelvinConv,
+                                                                this->EvapOutletTemp + Constant::Kelvin,
                                                                 this->CondVolFlowRate,
-                                                                this->CondInletTemp + Constant::KelvinConv,
+                                                                this->CondInletTemp + Constant::Kelvin,
                                                                 this->MaxSequenceNumber,
                                                                 this->InterpolationType)
                                          .net_evaporator_capacity;
     const Real64 minimumChillerCap = this->Representation->performance.performance_map_cooling
                                          .calculate_performance(this->EvapVolFlowRate,
-                                                                this->EvapOutletTemp + Constant::KelvinConv,
+                                                                this->EvapOutletTemp + Constant::Kelvin,
                                                                 this->CondVolFlowRate,
-                                                                this->CondInletTemp + Constant::KelvinConv,
+                                                                this->CondInletTemp + Constant::Kelvin,
                                                                 this->MinSequenceNumber,
                                                                 this->InterpolationType)
                                          .net_evaporator_capacity;
@@ -1458,9 +1440,9 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
         auto f = [MyLoad, this](Real64 partLoadSeqNum) {
             this->QEvaporator = this->Representation->performance.performance_map_cooling
                                     .calculate_performance(this->EvapVolFlowRate,
-                                                           this->EvapOutletTemp + Constant::KelvinConv,
+                                                           this->EvapOutletTemp + Constant::Kelvin,
                                                            this->CondVolFlowRate,
-                                                           this->CondInletTemp + Constant::KelvinConv,
+                                                           this->CondInletTemp + Constant::Kelvin,
                                                            partLoadSeqNum,
                                                            this->InterpolationType)
                                     .net_evaporator_capacity;
@@ -1482,9 +1464,9 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     // Use performance map to get the rest of results at new sequence number
     auto lookupVariablesCooling = // This is a struct returned by value, relying on RVO (THIS_AUTO_OK)
         this->Representation->performance.performance_map_cooling.calculate_performance(this->EvapVolFlowRate,
-                                                                                        this->EvapOutletTemp + Constant::KelvinConv,
+                                                                                        this->EvapOutletTemp + Constant::Kelvin,
                                                                                         this->CondVolFlowRate,
-                                                                                        this->CondInletTemp + Constant::KelvinConv,
+                                                                                        this->CondInletTemp + Constant::Kelvin,
                                                                                         partLoadSeqNum,
                                                                                         this->InterpolationType);
     this->QEvaporator = lookupVariablesCooling.net_evaporator_capacity * this->ChillerCyclingRatio;
@@ -1662,9 +1644,9 @@ void ASHRAE205ChillerSpecs::getDesignCapacities(
     if (calledFromLocation.loopNum == this->CWPlantLoc.loopNum) {
         MinLoad = this->Representation->performance.performance_map_cooling
                       .calculate_performance(this->EvapVolFlowRate,
-                                             this->TempRefEvapOut + Constant::KelvinConv,
+                                             this->TempRefEvapOut + Constant::Kelvin,
                                              this->CondVolFlowRate,
-                                             this->TempRefCondIn + Constant::KelvinConv,
+                                             this->TempRefCondIn + Constant::Kelvin,
                                              this->MinSequenceNumber,
                                              this->InterpolationType)
                       .net_evaporator_capacity;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -4372,17 +4372,14 @@ SetpointManager:Scheduled,
                       sensOut,
                       latOut);
 
-    int unitarySystemAirInletNodeIndex = UtilityRoutines::FindItemInList("ZONE EXHAUST NODE", state->dataLoopNodes->NodeID); // was Node 1
-    int coolingCoilAirInletNodeIndex =
-        UtilityRoutines::FindItemInList("WATER COOLING COIL AIR INLET NODE", state->dataLoopNodes->NodeID); // was Node 3
-    int coolingCoilAirOutletNodeIndex =
-        UtilityRoutines::FindItemInList("WATER HEATING COIL AIR INLET NODE", state->dataLoopNodes->NodeID); // was Node 6
-    int heatingCoilAirOutletNodeIndex =
-        UtilityRoutines::FindItemInList("WATER HEATING COIL AIR OUTLET NODE", state->dataLoopNodes->NodeID);                   // was Node 7
-    int suppHeatingAirOutletNodeIndex = UtilityRoutines::FindItemInList("ZONE 2 INLET NODE", state->dataLoopNodes->NodeID);    // was Node 2
-    int coolingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("CHWINLETNODE", state->dataLoopNodes->NodeID);        // was Node 10
-    int heatingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("HWINLETNODE", state->dataLoopNodes->NodeID);         // was Node 4
-    int suppHeatingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("SUPPHWINLETNODE", state->dataLoopNodes->NodeID); // was Node 8
+    int unitarySystemAirInletNodeIndex = Util::FindItemInList("ZONE EXHAUST NODE", state->dataLoopNodes->NodeID);                 // was Node 1
+    int coolingCoilAirInletNodeIndex = Util::FindItemInList("WATER COOLING COIL AIR INLET NODE", state->dataLoopNodes->NodeID);   // was Node 3
+    int coolingCoilAirOutletNodeIndex = Util::FindItemInList("WATER HEATING COIL AIR INLET NODE", state->dataLoopNodes->NodeID);  // was Node 6
+    int heatingCoilAirOutletNodeIndex = Util::FindItemInList("WATER HEATING COIL AIR OUTLET NODE", state->dataLoopNodes->NodeID); // was Node 7
+    int suppHeatingAirOutletNodeIndex = Util::FindItemInList("ZONE 2 INLET NODE", state->dataLoopNodes->NodeID);                  // was Node 2
+    int coolingCoilWaterInletNodeIndex = Util::FindItemInList("CHWINLETNODE", state->dataLoopNodes->NodeID);                      // was Node 10
+    int heatingCoilWaterInletNodeIndex = Util::FindItemInList("HWINLETNODE", state->dataLoopNodes->NodeID);                       // was Node 4
+    int suppHeatingCoilWaterInletNodeIndex = Util::FindItemInList("SUPPHWINLETNODE", state->dataLoopNodes->NodeID);               // was Node 8
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 1
@@ -4705,14 +4702,11 @@ SetpointManager:Scheduled,
     thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                           // expect no errors
 
-    auto unitarySystemAirInletNodeIndex =
-        UtilityRoutines::FindItemInList("WATER COOLING COIL AIR INLET NODE", state->dataLoopNodes->NodeID); // was Node 1
-    auto coolingCoilAirInletNodeIndex =
-        UtilityRoutines::FindItemInList("WATER COOLING COIL AIR INLET NODE", state->dataLoopNodes->NodeID); // was Node 3
-    auto coolingCoilAirOutletNodeIndex =
-        UtilityRoutines::FindItemInList("WATER COOLING COIL AIR OUTLET NODE", state->dataLoopNodes->NodeID);               // was Node 6
-    auto coolingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("CHWINLETNODE", state->dataLoopNodes->NodeID);   // was Node 10
-    auto coolingCoilWaterOutletNodeIndex = UtilityRoutines::FindItemInList("CHWOUTLETNODE", state->dataLoopNodes->NodeID); // was Node 10
+    auto unitarySystemAirInletNodeIndex = Util::FindItemInList("WATER COOLING COIL AIR INLET NODE", state->dataLoopNodes->NodeID); // was Node 1
+    auto coolingCoilAirInletNodeIndex = Util::FindItemInList("WATER COOLING COIL AIR INLET NODE", state->dataLoopNodes->NodeID);   // was Node 3
+    auto coolingCoilAirOutletNodeIndex = Util::FindItemInList("WATER COOLING COIL AIR OUTLET NODE", state->dataLoopNodes->NodeID); // was Node 6
+    auto coolingCoilWaterInletNodeIndex = Util::FindItemInList("CHWINLETNODE", state->dataLoopNodes->NodeID);                      // was Node 10
+    auto coolingCoilWaterOutletNodeIndex = Util::FindItemInList("CHWOUTLETNODE", state->dataLoopNodes->NodeID);                    // was Node 10
 
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "WATER COOLING COIL";
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
@@ -14260,16 +14254,16 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                           // expect no errors
     // check each input fields of unitary system
-    EXPECT_EQ("UNITARY SYSTEM MODEL", thisSys->Name);                                               // checks object name
-    EXPECT_TRUE(compare_enums(UnitarySys::UnitarySysCtrlType::Load, thisSys->m_ControlType));       // checks control type
-    EXPECT_TRUE(compare_enums(UnitarySys::DehumCtrlType::None, thisSys->m_DehumidControlType_Num)); // checks Dehumidification Control type
-    EXPECT_EQ(UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone), thisSys->ControlZoneNum); // checks zone ID
-    EXPECT_EQ(ScheduleManager::ScheduleAlwaysOn, thisSys->m_SysAvailSchedPtr);                                  // checks availability schedule name
-    EXPECT_EQ("NODE 29", state->dataLoopNodes->NodeID(thisSys->AirInNode));                                     // checks air inlet node name
-    EXPECT_EQ("NODE 30", state->dataLoopNodes->NodeID(thisSys->AirOutNode));                                    // checks air outlet node name
-    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, thisSys->m_FanType_Num);                                    // checks fan object type "FAN:ONOFF"
-    EXPECT_EQ("SUPPLY FAN", thisSys->m_FanName);                                                                // checks fan object name
-    EXPECT_TRUE(compare_enums(UnitarySys::FanPlace::DrawThru, thisSys->m_FanPlace));                            // checks fan placement, "DrawThrough"
+    EXPECT_EQ("UNITARY SYSTEM MODEL", thisSys->Name);                                                // checks object name
+    EXPECT_TRUE(compare_enums(UnitarySys::UnitarySysCtrlType::Load, thisSys->m_ControlType));        // checks control type
+    EXPECT_TRUE(compare_enums(UnitarySys::DehumCtrlType::None, thisSys->m_DehumidControlType_Num));  // checks Dehumidification Control type
+    EXPECT_EQ(Util::FindItemInList("EAST ZONE", state->dataHeatBal->Zone), thisSys->ControlZoneNum); // checks zone ID
+    EXPECT_EQ(ScheduleManager::ScheduleAlwaysOn, thisSys->m_SysAvailSchedPtr);                       // checks availability schedule name
+    EXPECT_EQ("NODE 29", state->dataLoopNodes->NodeID(thisSys->AirInNode));                          // checks air inlet node name
+    EXPECT_EQ("NODE 30", state->dataLoopNodes->NodeID(thisSys->AirOutNode));                         // checks air outlet node name
+    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, thisSys->m_FanType_Num);                         // checks fan object type "FAN:ONOFF"
+    EXPECT_EQ("SUPPLY FAN", thisSys->m_FanName);                                                     // checks fan object name
+    EXPECT_TRUE(compare_enums(UnitarySys::FanPlace::DrawThru, thisSys->m_FanPlace));                 // checks fan placement, "DrawThrough"
     EXPECT_EQ(0, thisSys->m_FanOpModeSchedPtr);                                    // checks Supply Air Fan Operating Mode Schedule Name
     EXPECT_EQ("COIL:HEATING:WATER", thisSys->m_HeatingCoilTypeName);               // checks heating coil object type
     EXPECT_EQ("WATER HEATING COIL", thisSys->m_HeatingCoilName);                   // checks heating coil object type
@@ -23690,7 +23684,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
                      latOut);
     // first speed heating
     EXPECT_NEAR(thisSys.m_SpeedRatio, 0.0, 0.0001);
-    EXPECT_NEAR(thisSys.m_CycRatio, 0.81485929, 0.0001);
+    EXPECT_NEAR(thisSys.m_CycRatio, 0.81485980, 0.0001);
     EXPECT_EQ(thisSys.m_SpeedNum, 1);
     EXPECT_NEAR(sensOut, 2000.0, 0.5);
 
@@ -23709,7 +23703,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
                      ZoneEquipment,
                      sensOut,
                      latOut);
-    EXPECT_NEAR(thisSys.m_SpeedRatio, 0.691837, 0.0001);
+    EXPECT_NEAR(thisSys.m_SpeedRatio, 0.691942, 0.0001);
     EXPECT_NEAR(thisSys.m_CycRatio, 1.0, 0.0001);
     EXPECT_EQ(thisSys.m_SpeedNum, 2);
     EXPECT_NEAR(sensOut, 3000.0, 2);
@@ -23734,7 +23728,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
                      sensOut,
                      latOut);
     EXPECT_NEAR(thisSys.m_SpeedRatio, 0.0, 0.0001);
-    EXPECT_NEAR(thisSys.m_CycRatio, 0.801813, 0.0001);
+    EXPECT_NEAR(thisSys.m_CycRatio, 0.809727, 0.0001);
     EXPECT_EQ(thisSys.m_SpeedNum, 1);
     EXPECT_NEAR(sensOut, -800.0, 2);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand[0].RemainingOutputRequired = -1500.0;
@@ -23753,10 +23747,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
                      ZoneEquipment,
                      sensOut,
                      latOut);
-    EXPECT_NEAR(thisSys.m_SpeedRatio, 0.27708, 0.0001);
+    EXPECT_NEAR(thisSys.m_SpeedRatio, 0.27929, 0.0001);
     EXPECT_NEAR(thisSys.m_CycRatio, 1.0, 0.0001);
     EXPECT_EQ(thisSys.m_SpeedNum, 2);
-    EXPECT_NEAR(sensOut, -1500.0, 2);
+    EXPECT_NEAR(sensOut, -1501.3, 2);
 
     // Variable speed water coil
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand[1].RemainingOutputRequired = -100.0;
@@ -23780,7 +23774,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
                       latOut);
     // first speed cooling
     EXPECT_NEAR(thisSys1.m_SpeedRatio, 0.0, 0.0001);
-    EXPECT_NEAR(thisSys1.m_CycRatio, 0.507924, 0.0001);
+    EXPECT_NEAR(thisSys1.m_CycRatio, 0.510465, 0.0001);
     EXPECT_EQ(thisSys1.m_SpeedNum, 1);
     EXPECT_NEAR(sensOut, -100.0, 2);
 
@@ -23800,7 +23794,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
                       sensOut,
                       latOut);
     // Sixth speed cooling
-    EXPECT_NEAR(thisSys1.m_SpeedRatio, 0.361666, 0.0001);
+    EXPECT_NEAR(thisSys1.m_SpeedRatio, 0.392999, 0.0001);
     EXPECT_NEAR(thisSys1.m_CycRatio, 1.0, 0.0001);
     EXPECT_EQ(thisSys1.m_SpeedNum, 6);
     EXPECT_NEAR(sensOut, -500.0, 2);
@@ -23826,7 +23820,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
                       latOut);
     // First speed heating
     EXPECT_NEAR(thisSys1.m_SpeedRatio, 0.0, 0.0001);
-    EXPECT_NEAR(thisSys1.m_CycRatio, 0.244636, 0.0001);
+    EXPECT_NEAR(thisSys1.m_CycRatio, 0.245589, 0.0001);
     EXPECT_EQ(thisSys1.m_SpeedNum, 1);
     EXPECT_NEAR(sensOut, 100.0, 2);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand[1].RemainingOutputRequired = 500.0;
@@ -23845,7 +23839,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
                       sensOut,
                       latOut);
     // Second speed heating
-    EXPECT_NEAR(thisSys1.m_SpeedRatio, 0.926240, 0.0001);
+    EXPECT_NEAR(thisSys1.m_SpeedRatio, 0.945581, 0.0001);
     EXPECT_NEAR(thisSys1.m_CycRatio, 1.0, 0.0001);
     EXPECT_EQ(thisSys1.m_SpeedNum, 2);
     EXPECT_NEAR(sensOut, 500.0, 2);

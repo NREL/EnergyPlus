@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1144,13 +1144,13 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     state->dataHeatBalSurf->SurfHConvInt.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBalSurf->SurfHConvInt = 0.1;
     state->dataHeatBalSurf->SurfTempIn = 25.00;
-    int surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001", state->dataSurface->Surface);
+    int surfNum = Util::FindItemInList("ZN002:WALL001", state->dataSurface->Surface);
     state->dataHeatBalSurf->SurfTempIn(surfNum) = 25.92;
-    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001:WIN001", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("ZN002:WALL001:WIN001", state->dataSurface->Surface);
     state->dataHeatBalSurf->SurfTempIn(surfNum) = 25.92;
-    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL004", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("ZN002:WALL004", state->dataSurface->Surface);
     state->dataHeatBalSurf->SurfTempIn(surfNum) = 26.99;
-    surfNum = UtilityRoutines::FindItemInList("ZN004:WALL001:WIN001", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("ZN004:WALL001:WIN001", state->dataSurface->Surface);
     state->dataHeatBalSurf->SurfTempIn(surfNum) = 22.99;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     for (auto &thisZoneHB : state->dataZoneTempPredictorCorrector->zoneHeatBalance) {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -149,7 +149,7 @@ void SimPumps(EnergyPlusData &state,
 
     // Setup pump component index if needed
     if (PumpIndex == 0) {
-        PumpNum = UtilityRoutines::FindItemInList(PumpName, state.dataPumps->PumpEquip); // Determine which pump to simulate
+        PumpNum = Util::FindItemInList(PumpName, state.dataPumps->PumpEquip); // Determine which pump to simulate
         if (PumpNum == 0) {
             ShowFatalError(state, format("ManagePumps: Pump requested not found ={}", PumpName)); // Catch any bad names before crashing
         }
@@ -319,8 +319,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                    ObjectIsNotParent);
         TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
-        thisPump.PumpControl =
-            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
+        thisPump.PumpControl = static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
                              format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
@@ -408,7 +407,7 @@ void GetPumpInput(EnergyPlusData &state)
         } else {
             thisPump.HasVFD = true;
             thisPump.VFD.VFDControlType =
-                static_cast<ControlTypeVFD>(getEnumValue(controlTypeVFDNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(7))));
+                static_cast<ControlTypeVFD>(getEnumValue(controlTypeVFDNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(7))));
             switch (thisPump.VFD.VFDControlType) {
             case ControlTypeVFD::VFDManual: {
                 thisPump.VFD.ManualRPMSchedIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(8));
@@ -468,7 +467,7 @@ void GetPumpInput(EnergyPlusData &state)
         }
 
         if (!thisInput->lAlphaFieldBlanks(13)) { // zone named for pump skin losses
-            thisPump.ZoneNum = UtilityRoutines::FindItemInList(thisInput->cAlphaArgs(13), state.dataHeatBal->Zone);
+            thisPump.ZoneNum = Util::FindItemInList(thisInput->cAlphaArgs(13), state.dataHeatBal->Zone);
             if (thisPump.ZoneNum > 0) {
                 thisPump.HeatLossesToZone = true;
                 if (!thisInput->lNumericFieldBlanks(12)) {
@@ -486,8 +485,8 @@ void GetPumpInput(EnergyPlusData &state)
         }
 
         if (!thisInput->lAlphaFieldBlanks(14)) {
-            thisPump.powerSizingMethod = static_cast<PowerSizingMethod>(
-                getEnumValue(powerSizingMethodNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(14))));
+            thisPump.powerSizingMethod =
+                static_cast<PowerSizingMethod>(getEnumValue(powerSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(14))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
@@ -587,8 +586,8 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.Energy = 0.0;
         thisPump.Power = 0.0;
 
-        thisPump.PumpControl =
-            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
+        thisPump.PumpControl = static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
+
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
                              format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
@@ -637,7 +636,7 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.RotSpeed = thisPump.RotSpeed_RPM / 60.0;   // convert input[rpm] to calculation units[rps]
 
         if (!thisInput->lAlphaFieldBlanks(7)) { // zone named for pump skin losses
-            thisPump.ZoneNum = UtilityRoutines::FindItemInList(thisInput->cAlphaArgs(7), state.dataHeatBal->Zone);
+            thisPump.ZoneNum = Util::FindItemInList(thisInput->cAlphaArgs(7), state.dataHeatBal->Zone);
             if (thisPump.ZoneNum > 0) {
                 thisPump.HeatLossesToZone = true;
                 if (!thisInput->lNumericFieldBlanks(8)) {
@@ -655,8 +654,8 @@ void GetPumpInput(EnergyPlusData &state)
         }
 
         if (!thisInput->lAlphaFieldBlanks(8)) {
-            thisPump.powerSizingMethod = static_cast<PowerSizingMethod>(
-                getEnumValue(powerSizingMethodNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
+            thisPump.powerSizingMethod =
+                static_cast<PowerSizingMethod>(getEnumValue(powerSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
@@ -756,7 +755,7 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.PartLoadCoef[3] = thisInput->rNumericArgs(9);
 
         if (!thisInput->lAlphaFieldBlanks(5)) { // zone named for pump skin losses
-            thisPump.ZoneNum = UtilityRoutines::FindItemInList(thisInput->cAlphaArgs(5), state.dataHeatBal->Zone);
+            thisPump.ZoneNum = Util::FindItemInList(thisInput->cAlphaArgs(5), state.dataHeatBal->Zone);
             if (thisPump.ZoneNum > 0) {
                 thisPump.HeatLossesToZone = true;
                 if (!thisInput->lNumericFieldBlanks(10)) {
@@ -788,8 +787,8 @@ void GetPumpInput(EnergyPlusData &state)
         }
 
         if (!thisInput->lAlphaFieldBlanks(6)) {
-            thisPump.powerSizingMethod = static_cast<PowerSizingMethod>(
-                getEnumValue(powerSizingMethodNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(6))));
+            thisPump.powerSizingMethod =
+                static_cast<PowerSizingMethod>(getEnumValue(powerSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(6))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
@@ -860,11 +859,11 @@ void GetPumpInput(EnergyPlusData &state)
                                                    ObjectIsNotParent);
         TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
-        if (UtilityRoutines::SameString(thisInput->cAlphaArgs(4), "Optimal")) {
+        if (Util::SameString(thisInput->cAlphaArgs(4), "Optimal")) {
             thisPump.SequencingScheme = PumpBankControlSeq::OptimalScheme;
-        } else if (UtilityRoutines::SameString(thisInput->cAlphaArgs(4), "Sequential")) {
+        } else if (Util::SameString(thisInput->cAlphaArgs(4), "Sequential")) {
             thisPump.SequencingScheme = PumpBankControlSeq::SequentialScheme;
-        } else if (UtilityRoutines::SameString(thisInput->cAlphaArgs(4), "SupplyEquipmentAssigned")) {
+        } else if (Util::SameString(thisInput->cAlphaArgs(4), "SupplyEquipmentAssigned")) {
             thisPump.SequencingScheme = PumpBankControlSeq::UserDefined;
         } else {
             ShowWarningError(state,
@@ -875,8 +874,7 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.SequencingScheme = PumpBankControlSeq::SequentialScheme;
         }
 
-        thisPump.PumpControl =
-            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
+        thisPump.PumpControl = static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
                              format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(5)));
@@ -916,7 +914,7 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.MinVolFlowRate = thisPump.NomVolFlowRate * thisPump.MinVolFlowRateFrac;
 
         if (!thisInput->lAlphaFieldBlanks(7)) { // zone named for pump skin losses
-            thisPump.ZoneNum = UtilityRoutines::FindItemInList(thisInput->cAlphaArgs(7), state.dataHeatBal->Zone);
+            thisPump.ZoneNum = Util::FindItemInList(thisInput->cAlphaArgs(7), state.dataHeatBal->Zone);
             if (thisPump.ZoneNum > 0) {
                 thisPump.HeatLossesToZone = true;
                 if (!thisInput->lNumericFieldBlanks(12)) {
@@ -934,8 +932,8 @@ void GetPumpInput(EnergyPlusData &state)
         }
 
         if (!thisInput->lAlphaFieldBlanks(8)) {
-            thisPump.powerSizingMethod = static_cast<PowerSizingMethod>(
-                getEnumValue(powerSizingMethodNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
+            thisPump.powerSizingMethod =
+                static_cast<PowerSizingMethod>(getEnumValue(powerSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
@@ -1008,9 +1006,9 @@ void GetPumpInput(EnergyPlusData &state)
                                                    ObjectIsNotParent);
         TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
-        if (UtilityRoutines::SameString(thisInput->cAlphaArgs(4), "Optimal")) {
+        if (Util::SameString(thisInput->cAlphaArgs(4), "Optimal")) {
             thisPump.SequencingScheme = PumpBankControlSeq::OptimalScheme;
-        } else if (UtilityRoutines::SameString(thisInput->cAlphaArgs(4), "Sequential")) {
+        } else if (Util::SameString(thisInput->cAlphaArgs(4), "Sequential")) {
             thisPump.SequencingScheme = PumpBankControlSeq::SequentialScheme;
         } else {
             ShowWarningError(state,
@@ -1021,8 +1019,7 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.SequencingScheme = PumpBankControlSeq::SequentialScheme;
         }
 
-        thisPump.PumpControl =
-            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
+        thisPump.PumpControl = static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
 
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
@@ -1061,7 +1058,7 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.PartLoadCoef[3] = 0.0;
 
         if (!thisInput->lAlphaFieldBlanks(7)) { // zone named for pump skin losses
-            thisPump.ZoneNum = UtilityRoutines::FindItemInList(thisInput->cAlphaArgs(7), state.dataHeatBal->Zone);
+            thisPump.ZoneNum = Util::FindItemInList(thisInput->cAlphaArgs(7), state.dataHeatBal->Zone);
             if (thisPump.ZoneNum > 0) {
                 thisPump.HeatLossesToZone = true;
                 if (!thisInput->lNumericFieldBlanks(7)) {
@@ -1078,8 +1075,8 @@ void GetPumpInput(EnergyPlusData &state)
             }
         }
         if (!thisInput->lAlphaFieldBlanks(8)) {
-            thisPump.powerSizingMethod = static_cast<PowerSizingMethod>(
-                getEnumValue(powerSizingMethodNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
+            thisPump.powerSizingMethod =
+                static_cast<PowerSizingMethod>(getEnumValue(powerSizingMethodNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
@@ -1123,54 +1120,53 @@ void GetPumpInput(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 "Pump Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisPump.Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisPump.Name,
-                                {},
-                                "Electricity",
-                                "Pumps",
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Pumps,
                                 thisPump.EndUseSubcategoryName,
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
             SetupOutputVariable(state,
                                 "Pump Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisPump.Power,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Shaft Power",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisPumpRep.ShaftPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Fluid Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisPumpRep.PumpHeattoFluid,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Fluid Heat Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisPumpRep.PumpHeattoFluidEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisPumpRep.OutletTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisPumpRep.PumpMassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1182,61 +1178,60 @@ void GetPumpInput(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 "Pump Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisPump.Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisPump.Name,
-                                {},
-                                "Electricity",
-                                "Pumps",
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Pumps,
                                 thisPump.EndUseSubcategoryName,
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
             SetupOutputVariable(state,
                                 "Pump Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisPump.Power,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Shaft Power",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisPumpRep.ShaftPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Fluid Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisPumpRep.PumpHeattoFluid,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Fluid Heat Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisPumpRep.PumpHeattoFluidEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisPumpRep.OutletTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisPumpRep.PumpMassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Operating Pumps Count",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisPumpRep.NumPumpsOperating,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1259,28 +1254,28 @@ void GetPumpInput(EnergyPlusData &state)
             // setup skin loss output vars
             SetupOutputVariable(state,
                                 "Pump Zone Total Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisPumpRep.ZoneTotalGainRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Zone Total Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisPumpRep.ZoneTotalGainEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Zone Convective Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisPumpRep.ZoneConvGainRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisPump.Name);
             SetupOutputVariable(state,
                                 "Pump Zone Radiative Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisPumpRep.ZoneRadGainRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,

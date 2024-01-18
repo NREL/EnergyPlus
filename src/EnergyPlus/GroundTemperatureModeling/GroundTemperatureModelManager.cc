@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -96,8 +96,7 @@ namespace GroundTemperatureManager {
         // Called by objects requiring ground temperature models. Determines type and calls appropriate factory method.
 
         // Set object type
-        GroundTempObjType objectType =
-            static_cast<GroundTempObjType>(getEnumValue(groundTempModelNamesUC, UtilityRoutines::makeUPPER(objectType_str)));
+        GroundTempObjType objectType = static_cast<GroundTempObjType>(getEnumValue(groundTempModelNamesUC, Util::makeUPPER(objectType_str)));
 
         assert(objectType != GroundTempObjType::Invalid);
 

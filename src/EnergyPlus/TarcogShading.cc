@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -706,7 +706,7 @@ namespace TarcogShading {
         TGapOld1 = 0.0;
         TGapOld2 = 0.0;
         tilt = Constant::Pi / 180 * (angle - 90);
-        T0 = 0.0 + Constant::KelvinConv;
+        T0 = 0.0 + Constant::Kelvin;
         A1eqin = 0.0;
         A2eqout = 0.0;
         A1eqout = 0.0;
@@ -1028,7 +1028,7 @@ namespace TarcogShading {
         bool converged;
 
         tilt = Constant::Pi / 180.0 * (angle - 90.0);
-        T0 = 0.0 + Constant::KelvinConv;
+        T0 = 0.0 + Constant::Kelvin;
 
         GASSES90(state,
                  T0,

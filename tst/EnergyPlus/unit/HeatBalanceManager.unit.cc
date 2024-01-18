@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,7 +56,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -66,6 +65,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
@@ -682,10 +682,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
     EXPECT_FALSE(ErrorsFound);
 
     // first 2 have indexes swapped now since they are in lexicigraphical order now according to the new input processor
-    EXPECT_EQ("WEST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", state->dataOutputProcessor->RVariableTypes(1).VarName);
-    EXPECT_EQ("EAST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", state->dataOutputProcessor->RVariableTypes(2).VarName);
-    EXPECT_EQ(1, state->dataOutputProcessor->RVariableTypes(1).ReportID);
-    EXPECT_EQ(2, state->dataOutputProcessor->RVariableTypes(2).ReportID);
+    EXPECT_EQ("WEST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", state->dataOutputProcessor->outVars[0]->keyColonName);
+    EXPECT_EQ("EAST ZONE:Zone Air Mass Balance Exhaust Mass Flow Rate", state->dataOutputProcessor->outVars[1]->keyColonName);
+    EXPECT_EQ(1, state->dataOutputProcessor->outVars[0]->ReportID);
+    EXPECT_EQ(2, state->dataOutputProcessor->outVars[1]->ReportID);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
@@ -1580,38 +1580,38 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation(*state);
     state->dataGlobal->DayOfSim = 2; // avoid array bounds problem in RecKeepHeatBalance
-    state->dataWeatherManager->Envrn = 1;
+    state->dataWeather->Envrn = 1;
 
     // Test 1 - Set time of day to morning - should use high transmittance window
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 11;
     state->dataGlobal->CurrentTime = 11.0;
-    WeatherManager::SetCurrentWeather(*state);
+    Weather::SetCurrentWeather(*state);
     HeatBalanceManager::ManageHeatBalance(*state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
     HeatBalanceManager::ManageHeatBalance(*state);
     // Find the fenestration surface
-    int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
-    int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", state->dataConstruction->Construct);
+    int winSurfNum = Util::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    int win1ConstNum = Util::FindItemInList("WINDOWCONSTRUCTION1", state->dataConstruction->Construct);
     EXPECT_EQ(state->dataSurface->Surface(winSurfNum).Construction, win1ConstNum);
     Real64 transSol = state->dataSurface->SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_GT(transSol, 0.8);
-    Real64 refPtIllum = state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt(1);
+    Real64 refPtIllum = state->dataDayltg->daylightControl(1).refPts(1).lums[(int)DataSurfaces::Lum::Illum];
     EXPECT_GT(refPtIllum, 3000.0);
 
     // Test 2 - Set time of day to afternoon - should use low transmittance window
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 14;
     state->dataGlobal->CurrentTime = 14.0;
-    WeatherManager::SetCurrentWeather(*state);
+    Weather::SetCurrentWeather(*state);
     HeatBalanceManager::ManageHeatBalance(*state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
     HeatBalanceManager::ManageHeatBalance(*state);
-    int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", state->dataConstruction->Construct);
+    int win2ConstNum = Util::FindItemInList("WINDOWCONSTRUCTION2", state->dataConstruction->Construct);
     EXPECT_EQ(state->dataSurface->Surface(winSurfNum).Construction, win2ConstNum);
     transSol = state->dataSurface->SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_LT(transSol, 0.2);
-    refPtIllum = state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt(1);
+    refPtIllum = state->dataDayltg->daylightControl(1).refPts(1).lums[(int)DataSurfaces::Lum::Illum];
     EXPECT_LT(refPtIllum, 1000.0);
 }
 
@@ -1814,8 +1814,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
 
     EXPECT_EQ(state->dataHeatBal->TotConstructs, 2);
 
-    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Grouped Air Boundary"), state->dataConstruction->Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Grouped Air Boundary"));
+    int constrNum = Util::FindItemInList(Util::makeUPPER("Grouped Air Boundary"), state->dataConstruction->Construct);
+    EXPECT_TRUE(Util::SameString(state->dataConstruction->Construct(constrNum).Name, "Grouped Air Boundary"));
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
     EXPECT_FALSE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
     EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
@@ -1824,9 +1824,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryMixingSched, 0);
     EXPECT_EQ(state->dataHeatBal->NominalRforNominalUCalculation(constrNum), 0.0);
 
-    constrNum =
-        UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Air Boundary with Good Mixing Schedule"), state->dataConstruction->Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
+    constrNum = Util::FindItemInList(Util::makeUPPER("Air Boundary with Good Mixing Schedule"), state->dataConstruction->Construct);
+    EXPECT_TRUE(Util::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
     EXPECT_FALSE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
@@ -1875,9 +1874,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
 
     EXPECT_EQ(state->dataHeatBal->TotConstructs, 1);
 
-    int constrNum =
-        UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Air Boundary with Bad Mixing Schedule"), state->dataConstruction->Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Bad Mixing Schedule"));
+    int constrNum = Util::FindItemInList(Util::makeUPPER("Air Boundary with Bad Mixing Schedule"), state->dataConstruction->Construct);
+    EXPECT_TRUE(Util::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Bad Mixing Schedule"));
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
     EXPECT_FALSE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
@@ -2176,7 +2174,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
 
     SimulationManager::ManageSimulation(*state);
 
-    int surfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    int surfNum = Util::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
     EXPECT_EQ(state->dataSurface->Surface(surfNum).Construction, state->dataSurface->SurfEMSConstructionOverrideValue(surfNum));
     EXPECT_TRUE(state->dataSurface->SurfEMSConstructionOverrideON(surfNum));
 }

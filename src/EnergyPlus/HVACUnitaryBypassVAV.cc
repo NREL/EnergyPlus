@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -155,7 +155,7 @@ namespace HVACUnitaryBypassVAV {
 
         // Find the correct changeover-bypass VAV unit
         if (CompIndex == 0) {
-            CBVAVNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACUnitaryBypassVAV->CBVAV);
+            CBVAVNum = Util::FindItemInList(CompName, state.dataHVACUnitaryBypassVAV->CBVAV);
             if (CBVAVNum == 0) {
                 ShowFatalError(state, format("SimUnitaryBypassVAV: Unit not found={}", CompName));
             }
@@ -616,8 +616,8 @@ namespace HVACUnitaryBypassVAV {
                 thisCBVAV.FanVolFlow = 9999.0;
             } else {
                 if (thisCBVAV.FanType == DataHVACGlobals::FanType::System) {
-                    thisCBVAV.FanIndex = HVACFan::getFanObjectVectorIndex(state, thisCBVAV.FanName);
                     state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisCBVAV.FanName)); // call constructor
+                    thisCBVAV.FanIndex = HVACFan::getFanObjectVectorIndex(state, thisCBVAV.FanName);
                     thisCBVAV.FanInletNodeNum = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->inletNodeNum;
                     fanOutletNode = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->outletNodeNum;
                     thisCBVAV.FanVolFlow = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->designAirVolFlowRate;
@@ -739,8 +739,12 @@ namespace HVACUnitaryBypassVAV {
                             ShowContinueError(state, format("...occurs in {} \"{}\"", thisCBVAV.UnitType, thisCBVAV.Name));
                             ErrorsFound = true;
                         } else {
-                            thisCBVAV.DXCoilInletNode = state.dataDXCoils->DXCoil(thisCBVAV.DXCoolCoilIndexNum).AirInNode;
-                            thisCBVAV.DXCoilOutletNode = state.dataDXCoils->DXCoil(thisCBVAV.DXCoolCoilIndexNum).AirOutNode;
+                            // the "coil" nodes are actually the parent nodes of the wrapped HX
+                            thisCBVAV.DXCoilInletNode =
+                                HVACHXAssistedCoolingCoil::GetCoilInletNode(state, thisCoolCoilType, thisCBVAV.DXCoolCoilName, DXErrorsFound);
+                            thisCBVAV.DXCoilOutletNode =
+                                HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, thisCoolCoilType, thisCBVAV.DXCoolCoilName, DXErrorsFound);
+                            // the DX coil holds the condenser inlet node number
                             thisCBVAV.CondenserNodeNum = state.dataDXCoils->DXCoil(thisCBVAV.DXCoolCoilIndexNum).CondenserInletNodeNum(1);
                         }
                     } else if (ActualCoolCoilType == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
@@ -966,13 +970,13 @@ namespace HVACUnitaryBypassVAV {
                 }
             }
 
-            if (UtilityRoutines::SameString(Alphas(18), "CoolingPriority")) {
+            if (Util::SameString(Alphas(18), "CoolingPriority")) {
                 thisCBVAV.PriorityControl = PriorityCtrlMode::CoolingPriority;
-            } else if (UtilityRoutines::SameString(Alphas(18), "HeatingPriority")) {
+            } else if (Util::SameString(Alphas(18), "HeatingPriority")) {
                 thisCBVAV.PriorityControl = PriorityCtrlMode::HeatingPriority;
-            } else if (UtilityRoutines::SameString(Alphas(18), "ZonePriority")) {
+            } else if (Util::SameString(Alphas(18), "ZonePriority")) {
                 thisCBVAV.PriorityControl = PriorityCtrlMode::ZonePriority;
-            } else if (UtilityRoutines::SameString(Alphas(18), "LoadPriority")) {
+            } else if (Util::SameString(Alphas(18), "LoadPriority")) {
                 thisCBVAV.PriorityControl = PriorityCtrlMode::LoadPriority;
             } else {
                 ShowSevereError(state, format("{} illegal {} = {}", CurrentModuleObject, cAlphaFields(18), Alphas(18)));
@@ -1001,11 +1005,11 @@ namespace HVACUnitaryBypassVAV {
             }
 
             // Dehumidification control mode
-            if (UtilityRoutines::SameString(Alphas(19), "None")) {
+            if (Util::SameString(Alphas(19), "None")) {
                 thisCBVAV.DehumidControlType = DehumidControl::None;
-            } else if (UtilityRoutines::SameString(Alphas(19), "")) {
+            } else if (Util::SameString(Alphas(19), "")) {
                 thisCBVAV.DehumidControlType = DehumidControl::None;
-            } else if (UtilityRoutines::SameString(Alphas(19), "Multimode")) {
+            } else if (Util::SameString(Alphas(19), "Multimode")) {
                 if (thisCBVAV.CoolCoilType == DataHVACGlobals::CoilType::DXCoolingTwoStageWHumControl) {
                     thisCBVAV.DehumidControlType = DehumidControl::Multimode;
                 } else {
@@ -1015,7 +1019,7 @@ namespace HVACUnitaryBypassVAV {
                     ShowContinueError(state, format("Setting {} to \"None\" and the simulation continues.", cAlphaFields(19)));
                     thisCBVAV.DehumidControlType = DehumidControl::None;
                 }
-            } else if (UtilityRoutines::SameString(Alphas(19), "CoolReheat")) {
+            } else if (Util::SameString(Alphas(19), "CoolReheat")) {
                 if (thisCBVAV.CoolCoilType == DataHVACGlobals::CoilType::DXCoolingTwoStageWHumControl) {
                     thisCBVAV.DehumidControlType = DehumidControl::CoolReheat;
                 } else {
@@ -1038,7 +1042,7 @@ namespace HVACUnitaryBypassVAV {
             thisCBVAV.LastMode = HeatingMode;
 
             if (thisCBVAV.FanType == DataHVACGlobals::FanType::OnOff || thisCBVAV.FanType == DataHVACGlobals::FanType::Constant) {
-                if (thisCBVAV.FanType == DataHVACGlobals::FanType::OnOff && !UtilityRoutines::SameString(fanTypeString, "Fan:OnOff")) {
+                if (thisCBVAV.FanType == DataHVACGlobals::FanType::OnOff && !Util::SameString(fanTypeString, "Fan:OnOff")) {
                     ShowWarningError(
                         state,
                         format("{} has {} = {} which is inconsistent with the fan object.", CurrentModuleObject, cAlphaFields(10), fanTypeString));
@@ -1047,7 +1051,7 @@ namespace HVACUnitaryBypassVAV {
                                       format(" The fan object ({}) is actually a valid fan type and the simulation continues.", thisCBVAV.FanName));
                     ShowContinueError(state, " Node connections errors may result due to the inconsistent fan type.");
                 }
-                if (thisCBVAV.FanType == DataHVACGlobals::FanType::Constant && !UtilityRoutines::SameString(fanTypeString, "Fan:ConstantVolume")) {
+                if (thisCBVAV.FanType == DataHVACGlobals::FanType::Constant && !Util::SameString(fanTypeString, "Fan:ConstantVolume")) {
                     ShowWarningError(
                         state, format("{} has {} = {} which is inconsistent with fan object.", CurrentModuleObject, cAlphaFields(10), fanTypeString));
                     ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisCBVAV.Name));
@@ -1111,10 +1115,10 @@ namespace HVACUnitaryBypassVAV {
                 for (int BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                     for (int CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
                          ++CompNum) {
-                        if (!UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
-                                                         thisCBVAV.Name) ||
-                            !UtilityRoutines::SameString(
-                                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf, thisCBVAV.UnitType))
+                        if (!Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                              thisCBVAV.Name) ||
+                            !Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                              thisCBVAV.UnitType))
                             continue;
                         thisCBVAV.AirLoopNumber = AirLoopNum;
                         //         Should EXIT here or do other checking?
@@ -1194,133 +1198,133 @@ namespace HVACUnitaryBypassVAV {
             auto &thisCBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
             SetupOutputVariable(state,
                                 "Unitary System Total Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisCBVAV.TotHeatEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Total Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisCBVAV.TotHeatEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Total Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisCBVAV.TotCoolEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Total Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisCBVAV.TotCoolEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Sensible Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisCBVAV.SensHeatEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Sensible Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisCBVAV.SensHeatEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Sensible Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisCBVAV.SensCoolEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Sensible Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisCBVAV.SensCoolEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Latent Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisCBVAV.LatHeatEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Latent Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisCBVAV.LatHeatEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Latent Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisCBVAV.LatCoolEnergyRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Latent Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisCBVAV.LatCoolEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisCBVAV.ElecPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisCBVAV.ElecConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Fan Part Load Ratio",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisCBVAV.FanPartLoadRatio,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Compressor Part Load Ratio",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisCBVAV.CompPartLoadRatio,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Bypass Air Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisCBVAV.BypassMassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Air Outlet Setpoint Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisCBVAV.OutletTempSetPoint,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisCBVAV.Name);
             SetupOutputVariable(state,
                                 "Unitary System Operating Mode Index",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisCBVAV.HeatCoolMode,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,

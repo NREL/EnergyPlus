@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -111,7 +111,7 @@ void SimIHP(EnergyPlusData &state,
     }
 
     if (CompIndex == 0) {
-        DXCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataIntegratedHP->IntegratedHeatPumps);
+        DXCoilNum = Util::FindItemInList(CompName, state.dataIntegratedHP->IntegratedHeatPumps);
         if (DXCoilNum == 0) {
             ShowFatalError(state, format("Integrated Heat Pump not found={}", CompName));
         }
@@ -1086,105 +1086,105 @@ void GetIHPInput(EnergyPlusData &state)
         // set up output variables, not reported in the individual coil models
         SetupOutputVariable(state,
                             "Integrated Heat Pump Air Loop Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             ihp.AirLoopFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Condenser Water Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             ihp.TankSourceWaterMassFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Air Total Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             ihp.TotalCoolingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Air Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             ihp.TotalSpaceHeatingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Water Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             ihp.TotalWaterHeatingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Electricity Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             ihp.TotalPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Air Latent Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             ihp.TotalLatentLoad,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Source Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             ihp.Qsource,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump COP",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             ihp.TotalCOP,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Electricity Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             ihp.Energy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Air Total Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             ihp.EnergyLoadTotalCooling,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Air Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             ihp.EnergyLoadTotalHeating,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Water Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             ihp.EnergyLoadTotalWaterHeating,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Air Latent Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             ihp.EnergyLatent,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Source Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             ihp.EnergySource,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
@@ -1704,7 +1704,7 @@ int GetCoilIndexIHP(EnergyPlusData &state,
         state.dataIntegratedHP->GetCoilsInputFlag = false;
     }
 
-    IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
+    IndexNum = Util::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
 
     if (IndexNum == 0) {
         ShowSevereError(state, format(R"(GetCoilIndexIHP: Could not find CoilType="{}" with Name="{}")", CoilType, CoilName));
@@ -1743,7 +1743,7 @@ int GetCoilInletNodeIHP(EnergyPlusData &state,
         state.dataIntegratedHP->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
     if (WhichCoil != 0) {
         NodeNumber = state.dataIntegratedHP->IntegratedHeatPumps(WhichCoil).AirCoolInletNodeNum;
     }
@@ -1786,7 +1786,7 @@ int GetDWHCoilInletNodeIHP(EnergyPlusData &state,
         state.dataIntegratedHP->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
     if (WhichCoil != 0) {
         NodeNumber = state.dataIntegratedHP->IntegratedHeatPumps(WhichCoil).ODAirInletNodeNum;
     }
@@ -1829,7 +1829,7 @@ int GetDWHCoilOutletNodeIHP(EnergyPlusData &state,
         state.dataIntegratedHP->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
     if (WhichCoil != 0) {
         NodeNumber = state.dataIntegratedHP->IntegratedHeatPumps(WhichCoil).ODAirOutletNodeNum;
     }
@@ -1873,7 +1873,7 @@ int GetIHPDWHCoilPLFFPLR(EnergyPlusData &state,
         state.dataIntegratedHP->GetCoilsInputFlag = false;
     }
 
-    int WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
+    int WhichCoil = Util::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
     if (WhichCoil != 0) {
 
         auto &ihp = state.dataIntegratedHP->IntegratedHeatPumps(WhichCoil);
@@ -1927,7 +1927,7 @@ Real64 GetDWHCoilCapacityIHP(EnergyPlusData &state,
         state.dataIntegratedHP->GetCoilsInputFlag = false;
     }
 
-    int WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
+    int WhichCoil = Util::FindItemInList(CoilName, state.dataIntegratedHP->IntegratedHeatPumps);
     if (WhichCoil != 0) {
 
         auto &ihp = state.dataIntegratedHP->IntegratedHeatPumps(WhichCoil);

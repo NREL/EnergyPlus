@@ -254,6 +254,8 @@ set(SRC
     ElectricPowerServiceManager.cc
     ElectricPowerServiceManager.hh
     EnergyPlus.hh
+    EnergyPlusLogger.cc 
+    EnergyPlusLogger.hh
     EvaporativeCoolers.cc
     EvaporativeCoolers.hh
     EvaporativeFluidCoolers.cc
@@ -563,8 +565,6 @@ set(SRC
     SolarReflectionManager.hh
     SolarShading.cc
     SolarShading.hh
-    SortAndStringUtilities.cc
-    SortAndStringUtilities.hh
     SplitterComponent.cc
     SplitterComponent.hh
     StandardRatings.cc
@@ -729,7 +729,7 @@ if(LINK_WITH_PYTHON)
 endif()
 
 add_library(energyplusparser STATIC ${INPUTPARSING_SRC})
-target_link_libraries(energyplusparser PUBLIC embedded_epjson_source ModernJSON re2 fmt::fmt ${CMAKE_DL_LIBS})
+target_link_libraries(energyplusparser PUBLIC embedded_epjson_source nlohmann_json re2 fmt::fmt ${CMAKE_DL_LIBS})
 target_link_libraries(energyplusparser PRIVATE project_options project_fp_options project_warnings)
 if(WIN32)
   target_link_libraries(energyplusparser PUBLIC Shlwapi)
@@ -755,7 +755,7 @@ target_link_libraries(
   energypluslib
   PUBLIC embedded_epjson_source
          fmt::fmt
-         ModernJSON
+         nlohmann_json
          objexx
          sqlite
          bcvtb
@@ -1111,16 +1111,17 @@ if(BUILD_TESTING)
   set(PY_FILE "${EXAMPLES_FILES_DIR}/${TEST_CASE}.py")
   configure_file(${PY_FILE} "${INPUT_TEST_DIR}/${TEST_CASE}.py" COPYONLY)
 
-  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromWithin
-    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromWithin/out-${NON_ASCII_DIRNAME}" ${TEST_CASE}.idf
-    WORKING_DIRECTORY  "${CLI_TEST_DIR}/${NON_ASCII_DIRNAME}"
-  )
+  if(LINK_WITH_PYTHON)
+    add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromWithin
+      COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromWithin/out-${NON_ASCII_DIRNAME}" ${TEST_CASE}.idf
+      WORKING_DIRECTORY  "${CLI_TEST_DIR}/${NON_ASCII_DIRNAME}"
+    )
 
-  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromOutside
-    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromOutside/out-${NON_ASCII_DIRNAME}" ${NON_ASCII_DIRNAME}/${TEST_CASE}.idf
-    WORKING_DIRECTORY  "${CLI_TEST_DIR}"
-  )
-
+    add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromOutside
+      COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromOutside/out-${NON_ASCII_DIRNAME}" ${NON_ASCII_DIRNAME}/${TEST_CASE}.idf
+      WORKING_DIRECTORY  "${CLI_TEST_DIR}"
+    )
+  endif()
 endif()
 
 if(UNIX AND NOT APPLE)

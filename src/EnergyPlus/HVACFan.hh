@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -142,6 +142,7 @@ namespace HVACFan {
         bool AirPathFlag;                       // Yes, this fan is a part of airpath
         int m_numSpeeds;                        // input for how many speed levels for discrete fan
         std::vector<Real64> m_massFlowAtSpeed;
+        std::vector<Real64> m_flowFractionAtSpeed; // array of flow fractions for speed levels
 
         // Mass Flow Rate Control Variables
         bool fanIsSecondaryDriver; // true if this fan is used to augment flow and may pass air when off.
@@ -207,7 +208,6 @@ namespace HVACFan {
         Real64 m_qdotConvZone;                          // fan power lost to surrounding zone by convection to air (W)
         Real64 m_qdotRadZone;                           // fan power lost to surrounding zone by radiation to zone surfaces(W)
         std::string m_endUseSubcategoryName;
-        std::vector<Real64> m_flowFractionAtSpeed;  // array of flow fractions for speed levels
         std::vector<Real64> m_powerFractionAtSpeed; // array of power fractions for speed levels
         std::vector<bool> m_powerFractionInputAtSpeed;
         // calculation variables

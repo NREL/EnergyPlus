@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -124,7 +124,7 @@ namespace HVACSingleDuctInduc {
 
         // Get the induction unit index
         if (CompIndex == 0) {
-            IUNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACSingleDuctInduc->IndUnit);
+            IUNum = Util::FindItemInList(CompName, state.dataHVACSingleDuctInduc->IndUnit);
             if (IUNum == 0) {
                 ShowFatalError(state, format("SimIndUnit: Induction Unit not found={}", CompName));
             }
@@ -244,7 +244,7 @@ namespace HVACSingleDuctInduc {
                                                                      cNumericFields);
 
             int IUNum = IUIndex;
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name = Alphas(1);
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType = CurrentModuleObject;
@@ -306,7 +306,7 @@ namespace HVACSingleDuctInduc {
                                   cAlphaFields(5));
 
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType = Alphas(6); // type (key) of heating coil
-            if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
+            if (Util::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).HeatingCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
             }
 
@@ -325,9 +325,9 @@ namespace HVACSingleDuctInduc {
 
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType = Alphas(8); // type (key) of cooling coil
 
-            if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, "Coil:Cooling:Water")) {
+            if (Util::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, "Coil:Cooling:Water")) {
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).CoolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
-            } else if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
+            } else if (Util::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).CoolingCoilType = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
             }
 
@@ -443,7 +443,7 @@ namespace HVACSingleDuctInduc {
             // report variable for all single duct air terminals
             SetupOutputVariable(state,
                                 "Zone Air Terminal Outdoor Air Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
+                                Constant::Units::m3_s,
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutdoorAirFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -603,8 +603,7 @@ namespace HVACSingleDuctInduc {
             int OutletNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode;
             IndRat = state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio;
             // set the mass flow rates from the input volume flow rates
-            if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
-                                            "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
+            if (Util::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType, "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirMassFlow =
                     RhoAir * state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow;
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxPriAirMassFlow =
@@ -676,8 +675,8 @@ namespace HVACSingleDuctInduc {
             // check for upstream zero flow. If nonzero and schedule ON, set primary flow to max
             if (ScheduleManager::GetCurrentScheduleValue(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr) > 0.0 &&
                 state.dataLoopNodes->Node(PriNode).MassFlowRate > 0.0) {
-                if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
-                                                "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
+                if (Util::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
+                                     "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
                     state.dataLoopNodes->Node(PriNode).MassFlowRate = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxPriAirMassFlow;
                     state.dataLoopNodes->Node(SecNode).MassFlowRate = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxSecAirMassFlow;
                 }
@@ -688,8 +687,8 @@ namespace HVACSingleDuctInduc {
             // reset the max and min avail flows
             if (ScheduleManager::GetCurrentScheduleValue(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr) > 0.0 &&
                 state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail > 0.0) {
-                if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
-                                                "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
+                if (Util::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
+                                     "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction")) {
                     state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxPriAirMassFlow;
                     state.dataLoopNodes->Node(PriNode).MassFlowRateMinAvail = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxPriAirMassFlow;
                     state.dataLoopNodes->Node(SecNode).MassFlowRateMaxAvail = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxSecAirMassFlow;
@@ -816,7 +815,7 @@ namespace HVACSingleDuctInduc {
             } else {
                 CheckZoneSizing(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType, state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
 
-                if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
+                if (Util::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
 
                     int CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(
                         state, "Coil:Heating:Water", state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil, ErrorsFound);
@@ -946,8 +945,8 @@ namespace HVACSingleDuctInduc {
             } else {
                 CheckZoneSizing(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType, state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
 
-                if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, "Coil:Cooling:Water") ||
-                    UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
+                if (Util::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, "Coil:Cooling:Water") ||
+                    Util::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
 
                     int CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(state,
                                                                                state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType,
@@ -1068,14 +1067,14 @@ namespace HVACSingleDuctInduc {
             termUnitSizing.DesHeatingLoad = state.dataHVACSingleDuctInduc->IndUnit(IUNum).DesHeatingLoad;
             // save the induction ratio for use in subsequent sizing calcs
             termUnitSizing.InducRat = state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio;
-            if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
+            if (Util::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
                 WaterCoils::SetCoilDesFlow(state,
                                            state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoilType,
                                            state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil,
                                            termUnitSizing.AirVolFlow,
                                            ErrorsFound);
             }
-            if (UtilityRoutines::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
+            if (Util::SameString(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
                 WaterCoils::SetCoilDesFlow(state,
                                            state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoilType,
                                            state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil,
@@ -1367,7 +1366,7 @@ namespace HVACSingleDuctInduc {
         }
 
         if (state.dataHVACSingleDuctInduc->NumIndUnits > 0) {
-            int ItemNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACSingleDuctInduc->IndUnit, &IndUnitData::MixerName);
+            int ItemNum = Util::FindItemInList(CompName, state.dataHVACSingleDuctInduc->IndUnit, &IndUnitData::MixerName);
             if (ItemNum > 0) return true;
         }
 
