@@ -471,9 +471,8 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             "Site",
                             Constant::eResource::Source,
-                            fuel2sovEndUseCat[(int)fuel],
-                            {},
-                            OutputProcessor::SOVGroup::Invalid);
+                            OutputProcessor::SOVGroup::Invalid,
+                            fuel2sovEndUseCat[(int)fuel]);
 
         for (int iPollutant = 0; iPollutant < (int)Pollutant::Num; ++iPollutant) {
             SetupOutputVariable(state,
@@ -484,9 +483,8 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 "Site",
                                 poll2Resource[iPollutant],
-                                fuel2sovEndUseCat[(int)fuel],
-                                {},
-                                OutputProcessor::SOVGroup::Invalid);
+                                OutputProcessor::SOVGroup::Invalid,
+                                fuel2sovEndUseCat[(int)fuel]);
         }
 
         if (fuel == Constant::eFuel::Electricity) {
@@ -500,9 +498,8 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 "Site",
                                 Constant::eResource::Source,
-                                OutputProcessor::SOVEndUseCat::PurchasedElectricityEmissions,
-                                {},
-                                OutputProcessor::SOVGroup::Invalid);
+                                OutputProcessor::SOVGroup::Invalid,
+                                OutputProcessor::SOVEndUseCat::PurchasedElectricityEmissions);
             SetupOutputVariable(state,
                                 "Environmental Impact Surplus Sold Electricity Source",
                                 Constant::Units::J,
@@ -511,9 +508,8 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 "Site",
                                 Constant::eResource::Source,
-                                OutputProcessor::SOVEndUseCat::SoldElectricityEmissions,
-                                {},
-                                OutputProcessor::SOVGroup::Invalid);
+                                OutputProcessor::SOVGroup::Invalid,
+                                OutputProcessor::SOVEndUseCat::SoldElectricityEmissions);
         }
 
     } // End of the NumEnergyTypes Do Loop
@@ -527,9 +523,8 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         "Site",
                         Constant::eResource::CarbonEquivalent,
-                        OutputProcessor::SOVEndUseCat::CarbonEquivalentEmissions,
-                        {},
-                        OutputProcessor::SOVGroup::Invalid);
+                        OutputProcessor::SOVGroup::Invalid,
+                        OutputProcessor::SOVEndUseCat::CarbonEquivalentEmissions);
     SetupOutputVariable(state,
                         "Environmental Impact Total CH4 Emissions Carbon Equivalent Mass",
                         Constant::Units::kg,
@@ -538,9 +533,8 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         "Site",
                         Constant::eResource::CarbonEquivalent,
-                        OutputProcessor::SOVEndUseCat::CarbonEquivalentEmissions,
-                        {},
-                        OutputProcessor::SOVGroup::Invalid);
+                        OutputProcessor::SOVGroup::Invalid,
+                        OutputProcessor::SOVEndUseCat::CarbonEquivalentEmissions);
     SetupOutputVariable(state,
                         "Environmental Impact Total CO2 Emissions Carbon Equivalent Mass",
                         Constant::Units::kg,
@@ -549,9 +543,8 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         "Site",
                         Constant::eResource::CarbonEquivalent,
-                        OutputProcessor::SOVEndUseCat::CarbonEquivalentEmissions,
-                        {},
-                        OutputProcessor::SOVGroup::Invalid);
+                        OutputProcessor::SOVGroup::Invalid,
+                        OutputProcessor::SOVEndUseCat::CarbonEquivalentEmissions);
 
     // Connect pollution meters to energy meters
     for (int iMeter = 0; iMeter < (int)PollFacilityMeter::Num; ++iMeter) {

@@ -1446,9 +1446,8 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisHydrSys.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Fluid Energy",
                                 Constant::Units::J,
@@ -1457,9 +1456,8 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisHydrSys.Name,
                                 Constant::eResource::PlantLoopHeatingDemand,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Cooling Rate",
                                 Constant::Units::W,
@@ -1476,9 +1474,8 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisHydrSys.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::CoolingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::CoolingCoils);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Cooling Fluid Energy",
                                 Constant::Units::J,
@@ -1487,9 +1484,8 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisHydrSys.Name,
                                 Constant::eResource::PlantLoopCoolingDemand,
-                                OutputProcessor::SOVEndUseCat::CoolingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::CoolingCoils);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Mass Flow Rate",
                                 Constant::Units::kg_s,
@@ -1567,9 +1563,8 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Fluid Heat Transfer Energy",
                                 Constant::Units::J,
@@ -1578,9 +1573,8 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name,
                                 Constant::eResource::PlantLoopHeatingDemand,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Cooling Rate",
                                 Constant::Units::W,
@@ -1596,9 +1590,8 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::CoolingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::CoolingCoils);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Cooling Fluid Heat Transfer Energy",
                                 Constant::Units::J,
@@ -1607,9 +1600,8 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name,
                                 Constant::eResource::PlantLoopCoolingDemand,
-                                OutputProcessor::SOVEndUseCat::CoolingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::CoolingCoils);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Mass Flow Rate",
                                 Constant::Units::kg_s,
@@ -1667,9 +1659,8 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Pumps,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::Pumps);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Pump Mass Flow Rate",
                                 Constant::Units::kg_s,
@@ -1762,9 +1753,8 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisElecSys.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Heating);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Rate",
                                 Constant::Units::W,
@@ -1780,9 +1770,8 @@ namespace LowTempRadiantSystem {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisElecSys.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils);
         }
     }
 

@@ -424,9 +424,8 @@ namespace BoilerSteam {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::Boilers,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Boilers);
         SetupOutputVariable(state,
                             format("Boiler {} Rate", sFuelType),
                             Constant::Units::W,
@@ -442,9 +441,9 @@ namespace BoilerSteam {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eFuel2eResource[(int)this->FuelType],
+                            OutputProcessor::SOVGroup::Plant,
                             OutputProcessor::SOVEndUseCat::Heating,
-                            this->EndUseSubcategory,
-                            OutputProcessor::SOVGroup::Plant);
+                            this->EndUseSubcategory);
         SetupOutputVariable(state,
                             "Boiler Steam Efficiency",
                             Constant::Units::None,

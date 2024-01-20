@@ -177,21 +177,21 @@ namespace ThermalComfort {
                                     Constant::Units::None,
                                     state.dataThermalComforts->ThermalComfortData(Loop).FangerPMV,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Fanger Model PPD",
                                     Constant::Units::Perc,
                                     state.dataThermalComforts->ThermalComfortData(Loop).FangerPPD,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Clothing Surface Temperature",
                                     Constant::Units::C,
                                     state.dataThermalComforts->ThermalComfortData(Loop).CloSurfTemp,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
             }
 
@@ -201,35 +201,35 @@ namespace ThermalComfort {
                                     Constant::Units::None,
                                     state.dataThermalComforts->ThermalComfortData(Loop).PiercePMVET,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Pierce Model Standard Effective Temperature PMV",
                                     Constant::Units::None,
                                     state.dataThermalComforts->ThermalComfortData(Loop).PiercePMVSET,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Pierce Model Discomfort Index",
                                     Constant::Units::None,
                                     state.dataThermalComforts->ThermalComfortData(Loop).PierceDISC,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Pierce Model Thermal Sensation Index",
                                     Constant::Units::None,
                                     state.dataThermalComforts->ThermalComfortData(Loop).PierceTSENS,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Pierce Model Standard Effective Temperature",
                                     Constant::Units::C,
                                     state.dataThermalComforts->ThermalComfortData(Loop).PierceSET,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
             }
 
@@ -239,7 +239,7 @@ namespace ThermalComfort {
                                     Constant::Units::None,
                                     state.dataThermalComforts->ThermalComfortData(Loop).KsuTSV,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
             }
 
@@ -249,21 +249,21 @@ namespace ThermalComfort {
                                     Constant::Units::C,
                                     state.dataThermalComforts->ThermalComfortData(Loop).ThermalComfortMRT,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Operative Temperature",
                                     Constant::Units::C,
                                     state.dataThermalComforts->ThermalComfortData(Loop).ThermalComfortOpTemp,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Clothing Value",
                                     Constant::Units::clo,
                                     state.dataThermalComforts->ThermalComfortData(Loop).ClothingValue,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
             }
 
@@ -273,28 +273,28 @@ namespace ThermalComfort {
                                     Constant::Units::None,
                                     state.dataThermalComforts->ThermalComfortData(Loop).ThermalComfortAdaptiveASH5590,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort ASHRAE 55 Adaptive Model 80% Acceptability Status",
                                     Constant::Units::None,
                                     state.dataThermalComforts->ThermalComfortData(Loop).ThermalComfortAdaptiveASH5580,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort ASHRAE 55 Adaptive Model Running Average Outdoor Air Temperature",
                                     Constant::Units::C,
                                     state.dataThermalComforts->ThermalComfortData(Loop).ASHRAE55RunningMeanOutdoorTemp,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort ASHRAE 55 Adaptive Model Temperature",
                                     Constant::Units::C,
                                     state.dataThermalComforts->ThermalComfortData(Loop).TComfASH55,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
             }
 
@@ -304,35 +304,35 @@ namespace ThermalComfort {
                                     Constant::Units::None,
                                     state.dataThermalComforts->ThermalComfortData(Loop).ThermalComfortAdaptiveCEN15251CatI,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort CEN 15251 Adaptive Model Category II Status",
                                     Constant::Units::None,
                                     state.dataThermalComforts->ThermalComfortData(Loop).ThermalComfortAdaptiveCEN15251CatII,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort CEN 15251 Adaptive Model Category III Status",
                                     Constant::Units::None,
                                     state.dataThermalComforts->ThermalComfortData(Loop).ThermalComfortAdaptiveCEN15251CatIII,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort CEN 15251 Adaptive Model Running Average Outdoor Air Temperature",
                                     Constant::Units::C,
                                     state.dataThermalComforts->ThermalComfortData(Loop).CEN15251RunningMeanOutdoorTemp,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort CEN 15251 Adaptive Model Temperature",
                                     Constant::Units::C,
                                     state.dataThermalComforts->ThermalComfortData(Loop).TComfCEN15251,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
             }
             if (state.dataHeatBal->People(Loop).CoolingEffectASH55) {
@@ -341,21 +341,21 @@ namespace ThermalComfort {
                                     Constant::Units::C,
                                     state.dataThermalComforts->ThermalComfortData(Loop).CoolingEffectASH55,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect Adjusted PMV",
                                     Constant::Units::None,
                                     state.dataThermalComforts->ThermalComfortData(Loop).CoolingEffectAdjustedPMVASH55,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect Adjusted PPD",
                                     Constant::Units::None,
                                     state.dataThermalComforts->ThermalComfortData(Loop).CoolingEffectAdjustedPPDASH55,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
             }
             if (state.dataHeatBal->People(Loop).AnkleDraftASH55) {
@@ -364,7 +364,7 @@ namespace ThermalComfort {
                                     Constant::Units::None,
                                     state.dataThermalComforts->ThermalComfortData(Loop).AnkleDraftPPDASH55,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->People(Loop).Name);
             }
         }

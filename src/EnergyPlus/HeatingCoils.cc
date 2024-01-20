@@ -417,9 +417,8 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
                                 Constant::Units::W,
@@ -435,9 +434,8 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Heating);
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Rate",
                                 Constant::Units::W,
@@ -557,9 +555,8 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
                                 Constant::Units::W,
@@ -575,9 +572,8 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Heating);
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Rate",
                                 Constant::Units::W,
@@ -714,9 +710,8 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
                                 Constant::Units::W,
@@ -732,9 +727,8 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 Constant::eFuel2eResource[(int)heatingCoil.FuelType],
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Heating);
             SetupOutputVariable(state,
                                 format("Heating Coil {} Rate", sFuelType),
                                 Constant::Units::W,
@@ -750,9 +744,8 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Heating);
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Rate",
                                 Constant::Units::W,
@@ -782,9 +775,8 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 Constant::eFuel2eResource[(int)heatingCoil.FuelType],
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Heating);
         }
 
         // Get the data for for gas multistage heating coils
@@ -908,9 +900,8 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
                                 Constant::Units::W,
@@ -926,9 +917,8 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 Constant::eResource::NaturalGas,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Heating);
             SetupOutputVariable(state,
                                 "Heating Coil NaturalGas Rate",
                                 Constant::Units::W,
@@ -944,9 +934,8 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Heating);
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Rate",
                                 Constant::Units::W,
@@ -976,9 +965,8 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 Constant::eResource::NaturalGas,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Heating);
         }
 
         // Get the data for for desuperheater heating coils
@@ -1318,9 +1306,8 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Rate",
                                 Constant::Units::W,
@@ -1336,9 +1323,8 @@ namespace HeatingCoils {
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Heating);
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Rate",
                                 Constant::Units::W,

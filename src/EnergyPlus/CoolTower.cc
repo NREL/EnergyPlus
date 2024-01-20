@@ -540,9 +540,8 @@ namespace CoolTower {
                                 OutputProcessor::SOVStoreType::Summed,
                                 Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Cooling,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC); //"System");
+                                OutputProcessor::SOVGroup::HVAC, // System
+                                OutputProcessor::SOVEndUseCat::Cooling);
             if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromMains) {
                 SetupOutputVariable(state,
                                     "Zone Cooltower Water Volume",
@@ -559,9 +558,8 @@ namespace CoolTower {
                                     OutputProcessor::SOVStoreType::Summed,
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name,
                                     Constant::eResource::MainsWater,
-                                    OutputProcessor::SOVEndUseCat::Cooling,
-                                    {},
-                                    OutputProcessor::SOVGroup::HVAC); // "System");
+                                    OutputProcessor::SOVGroup::HVAC, // System
+                                    OutputProcessor::SOVEndUseCat::Cooling);
             } else if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterSupplyMode == WaterSupplyMode::FromTank) {
                 SetupOutputVariable(state,
                                     "Zone Cooltower Water Volume",
@@ -585,9 +583,8 @@ namespace CoolTower {
                                     OutputProcessor::SOVStoreType::Summed,
                                     Zone(state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr).Name,
                                     Constant::eResource::MainsWater,
-                                    OutputProcessor::SOVEndUseCat::Cooling,
-                                    {},
-                                    OutputProcessor::SOVGroup::HVAC); // "System");
+                                    OutputProcessor::SOVGroup::HVAC, // System
+                                    OutputProcessor::SOVEndUseCat::Cooling);
             }
         }
     }

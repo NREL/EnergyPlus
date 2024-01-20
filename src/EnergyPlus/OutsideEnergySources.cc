@@ -561,9 +561,8 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         meterTypeKey,
-                        heatingOrCooling,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        heatingOrCooling);
     SetupOutputVariable(state,
                         format("{}Rate", reportVarPrefix),
                         Constant::Units::W,

@@ -1617,8 +1617,6 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::Invalid, // a {} parameter turns into 0 which is SOVEndUseCat::Heating
-                            {},
                             OutputProcessor::SOVGroup::Plant);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Heat Transfer Rate",
@@ -1678,9 +1676,9 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
                                 Constant::eResource::Electricity,
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::Cooling,
-                                "Heat Pump",
-                                OutputProcessor::SOVGroup::Plant);
+                                "Heat Pump");
         } else if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) { // energy from HeatPump:PlantLoop:EIR:Heating object
             SetupOutputVariable(state,
                                 "Heat Pump Electricity Energy",
@@ -1690,9 +1688,9 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
                                 Constant::eResource::Electricity,
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::Heating,
-                                "Heat Pump",
-                                OutputProcessor::SOVGroup::Plant);
+                                "Heat Pump");
             if (this->defrostAvailable) {
                 SetupOutputVariable(state,
                                     "Heat Pump Load Due To Defrost",
@@ -1723,9 +1721,9 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Plant,
                                     OutputProcessor::SOVEndUseCat::Heating,
-                                    "Heat Pump",
-                                    OutputProcessor::SOVGroup::Plant);
+                                    "Heat Pump");
             }
         }
         SetupOutputVariable(state,
@@ -2856,8 +2854,6 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::Invalid, // a {} parameter turns into 0 which is SOVEndUseCat::Heating
-                            {},
                             OutputProcessor::SOVGroup::Plant);
         // Setup Output Variable(state,
         //                    "Fuel-fired Absorption Heat Pump Source Side Heat Transfer Rate",
@@ -2924,9 +2920,9 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
                                 Constant::eFuel2eResource[(int)this->fuelType],
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::Cooling,
-                                this->endUseSubcat, //"Heat Pump",
-                                OutputProcessor::SOVGroup::Plant);
+                                this->endUseSubcat); //"Heat Pump",
             SetupOutputVariable(state,
                                 "Fuel-fired Absorption HeatPump Electricity Energy",
                                 Constant::Units::J,
@@ -2935,9 +2931,9 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
                                 Constant::eResource::Electricity,
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::Cooling,
-                                this->endUseSubcat, // "Heat Pump",
-                                OutputProcessor::SOVGroup::Plant);
+                                this->endUseSubcat); // "Heat Pump",
         } else if (this->EIRHPType ==
                    DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating) { // energy from HeatPump:AirToWater:FuelFired:Heating object
             SetupOutputVariable(state,
@@ -2948,9 +2944,9 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
                                 Constant::eFuel2eResource[(int)this->fuelType],
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::Heating,
-                                this->endUseSubcat, // "Heat Pump",
-                                OutputProcessor::SOVGroup::Plant);
+                                this->endUseSubcat); // "Heat Pump",
             SetupOutputVariable(state,
                                 "Fuel-fired Absorption HeatPump Electricity Energy",
                                 Constant::Units::J,
@@ -2959,9 +2955,9 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->name,
                                 Constant::eResource::Electricity,
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::Heating,
-                                this->endUseSubcat, // "Heat Pump",
-                                OutputProcessor::SOVGroup::Plant);
+                                this->endUseSubcat); // "Heat Pump",
         }
         SetupOutputVariable(state,
                             "Fuel-fired Absorption HeatPump Mass Flow Rate",

@@ -697,9 +697,8 @@ void GetPurchasedAir(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             PurchAir(PurchAirNum).Name,
                             Constant::eResource::DistrictHeatingWater,
-                            OutputProcessor::SOVEndUseCat::Heating,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::Heating);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Supply Air Sensible Cooling Energy",
                             Constant::Units::J,
@@ -722,9 +721,8 @@ void GetPurchasedAir(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             PurchAir(PurchAirNum).Name,
                             Constant::eResource::DistrictCooling,
-                            OutputProcessor::SOVEndUseCat::Cooling,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::Cooling);
         SetupOutputVariable(state,
                             "Zone Ideal Loads Zone Sensible Heating Energy",
                             Constant::Units::J,

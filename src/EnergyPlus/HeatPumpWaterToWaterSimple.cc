@@ -383,9 +383,8 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             thisGSHP.Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::Cooling,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Cooling);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Energy",
                             Constant::Units::J,
@@ -547,9 +546,8 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             thisGSHP.Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::Heating,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Heating);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Energy",
                             Constant::Units::J,

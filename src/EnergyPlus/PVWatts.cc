@@ -188,9 +188,8 @@ namespace PVWatts {
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
                             Constant::eResource::ElectricityProduced,
-                            OutputProcessor::SOVEndUseCat::Photovoltaic,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Photovoltaic);
         SetupOutputVariable(state,
                             "Generator PV Cell Temperature",
                             Constant::Units::C,

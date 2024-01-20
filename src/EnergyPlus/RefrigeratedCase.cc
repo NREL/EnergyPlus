@@ -7461,9 +7461,9 @@ void SetupReportInput(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     thisCase.Name,
                                     Constant::eResource::EnergyTransfer,
-                                    OutputProcessor::SOVEndUseCat::Refrigeration,
-                                    {},
                                     OutputProcessor::SOVGroup::Building,
+                                    OutputProcessor::SOVEndUseCat::Refrigeration,
+                                    "", // End-use sub category
                                     thisCase.ZoneName);
                 SetupOutputVariable(state,
                                     "Refrigeration Case Evaporator Sensible Cooling Rate",
@@ -7597,9 +7597,9 @@ void SetupReportInput(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     thisCase.Name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Building,
                                     OutputProcessor::SOVEndUseCat::Refrigeration,
                                     "General",
-                                    OutputProcessor::SOVGroup::Building,
                                     thisCase.ZoneName);
                 SetupOutputVariable(state,
                                     "Refrigeration Case Lighting Electricity Rate",
@@ -7616,9 +7616,9 @@ void SetupReportInput(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     thisCase.Name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Building,
                                     OutputProcessor::SOVEndUseCat::Refrigeration,
                                     "General",
-                                    OutputProcessor::SOVGroup::Building,
                                     thisCase.ZoneName);
 
                 // Report defrost energy curve value only for cases having electric or hot-gas defrost with temperature termination
@@ -7657,9 +7657,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         thisCase.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Building,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
                                         "General",
-                                        OutputProcessor::SOVGroup::Building,
                                         thisCase.ZoneName);
                 }
 
@@ -7682,9 +7682,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         thisCase.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Building,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
                                         "General",
-                                        OutputProcessor::SOVGroup::Building,
                                         thisCase.ZoneName);
                 }
 
@@ -7784,9 +7784,9 @@ void SetupReportInput(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     walkin.Name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Building,
                                     OutputProcessor::SOVEndUseCat::Refrigeration,
-                                    "General",
-                                    OutputProcessor::SOVGroup::Building);
+                                    "General");
                 SetupOutputVariable(state,
                                     "Refrigeration Walk In Lighting Electricity Rate",
                                     Constant::Units::W,
@@ -7802,9 +7802,9 @@ void SetupReportInput(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     walkin.Name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Building,
                                     OutputProcessor::SOVEndUseCat::Refrigeration,
-                                    "General",
-                                    OutputProcessor::SOVGroup::Building);
+                                    "General");
                 SetupOutputVariable(state,
                                     "Refrigeration Walk In Heater Electricity Rate",
                                     Constant::Units::W,
@@ -7820,9 +7820,9 @@ void SetupReportInput(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     walkin.Name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Building,
                                     OutputProcessor::SOVEndUseCat::Refrigeration,
-                                    "General",
-                                    OutputProcessor::SOVGroup::Building);
+                                    "General");
 
                 // Report only for WalkIns using electric defrost
                 if (walkin.defrostType == WalkinClrDefrostType::Elec) {
@@ -7841,9 +7841,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         walkin.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Building,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        "General",
-                                        OutputProcessor::SOVGroup::Building);
+                                        "General");
                 }
 
                 // Report walkin variables that are specified for each zone exposed to the walkin
@@ -7996,9 +7996,9 @@ void SetupReportInput(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     coil.Name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Building,
                                     OutputProcessor::SOVEndUseCat::Refrigeration,
-                                    "General",
-                                    OutputProcessor::SOVGroup::Building);
+                                    "General");
                 SetupOutputVariable(state,
                                     "Refrigeration Zone Air Chiller Heater Electricity Rate",
                                     Constant::Units::W,
@@ -8014,9 +8014,9 @@ void SetupReportInput(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     coil.Name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Building,
                                     OutputProcessor::SOVEndUseCat::Refrigeration,
-                                    "General",
-                                    OutputProcessor::SOVGroup::Building);
+                                    "General");
                 SetupOutputVariable(state,
                                     "Refrigeration Zone Air Chiller Sensible Heat Ratio",
                                     Constant::Units::None,
@@ -8091,9 +8091,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         coil.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Building,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        "General",
-                                        OutputProcessor::SOVGroup::Building);
+                                        "General");
                 } // electric defrost coil
             }     //(.NOT.  coil%unusedWarehouseCoil)
         }         // NumSimulationWarehouseCoils
@@ -8297,9 +8297,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         secondary.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        secondary.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        secondary.EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration Air Chiller Secondary Loop Load Heat Transfer Rate",
                                         Constant::Units::W,
@@ -8386,9 +8386,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         secondary.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        secondary.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        secondary.EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration Secondary Loop Load Heat Transfer Rate",
                                         Constant::Units::W,
@@ -8499,9 +8499,9 @@ void SetupReportInput(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     rack.Name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Plant,
                                     OutputProcessor::SOVEndUseCat::Refrigeration,
-                                    rack.EndUseSubcategory,
-                                    OutputProcessor::SOVGroup::Plant);
+                                    rack.EndUseSubcategory);
                 SetupOutputVariable(state,
                                     "Refrigeration Air Chiller Compressor Rack Condenser Fan Electricity Rate",
                                     Constant::Units::W,
@@ -8517,9 +8517,9 @@ void SetupReportInput(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     rack.Name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Plant,
                                     OutputProcessor::SOVEndUseCat::Refrigeration,
-                                    rack.EndUseSubcategory,
-                                    OutputProcessor::SOVGroup::Plant);
+                                    rack.EndUseSubcategory);
                 SetupOutputVariable(state,
                                     "Refrigeration Air Chiller Compressor Rack Total Heat Transfer Rate",
                                     Constant::Units::W,
@@ -8535,9 +8535,9 @@ void SetupReportInput(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     rack.Name,
                                     Constant::eResource::EnergyTransfer,
+                                    OutputProcessor::SOVGroup::Plant,
                                     OutputProcessor::SOVEndUseCat::Refrigeration,
-                                    rack.EndUseSubcategory,
-                                    OutputProcessor::SOVGroup::Plant);
+                                    rack.EndUseSubcategory);
                 SetupOutputVariable(state,
                                     "Refrigeration Air Chiller Compressor Rack COP",
                                     Constant::Units::W_W,
@@ -8562,9 +8562,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         rack.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        rack.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        rack.EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration Air Chiller Compressor Rack Evaporative Condenser Basin Heater Electricity Rate",
                                         Constant::Units::W,
@@ -8580,9 +8580,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         rack.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        rack.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        rack.EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration Air Chiller Compressor Rack Evaporative Condenser Water Volume Flow Rate",
                                         Constant::Units::m3_s,
@@ -8598,9 +8598,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         rack.Name,
                                         Constant::eResource::Water,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        rack.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        rack.EndUseSubcategory);
                 } // Evap condenser
 
                 if (rack.HeatRejectionLocation == HeatRejLocation::Zone) {
@@ -8660,9 +8660,9 @@ void SetupReportInput(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     rack.Name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Plant,
                                     OutputProcessor::SOVEndUseCat::Refrigeration,
-                                    rack.EndUseSubcategory,
-                                    OutputProcessor::SOVGroup::Plant);
+                                    rack.EndUseSubcategory);
                 SetupOutputVariable(state,
                                     "Refrigeration Compressor Rack Condenser Fan Electricity Rate",
                                     Constant::Units::W,
@@ -8678,9 +8678,9 @@ void SetupReportInput(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     rack.Name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Plant,
                                     OutputProcessor::SOVEndUseCat::Refrigeration,
-                                    rack.EndUseSubcategory,
-                                    OutputProcessor::SOVGroup::Plant);
+                                    rack.EndUseSubcategory);
                 SetupOutputVariable(state,
                                     "Refrigeration Compressor Rack Total Heat Transfer Rate",
                                     Constant::Units::W,
@@ -8696,9 +8696,9 @@ void SetupReportInput(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     rack.Name,
                                     Constant::eResource::EnergyTransfer,
+                                    OutputProcessor::SOVGroup::Plant,
                                     OutputProcessor::SOVEndUseCat::Refrigeration,
-                                    rack.EndUseSubcategory,
-                                    OutputProcessor::SOVGroup::Plant);
+                                    rack.EndUseSubcategory);
                 SetupOutputVariable(state,
                                     "Refrigeration Compressor Rack COP",
                                     Constant::Units::W_W,
@@ -8723,9 +8723,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         rack.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        rack.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        rack.EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration Compressor Rack Evaporative Condenser Basin Heater Electricity Rate",
                                         Constant::Units::W,
@@ -8741,9 +8741,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         rack.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        rack.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        rack.EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration Compressor Rack Evaporative Condenser Water Volume Flow Rate",
                                         Constant::Units::m3_s,
@@ -8759,9 +8759,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         rack.Name,
                                         Constant::eResource::Water,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        rack.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        rack.EndUseSubcategory);
                 } // condenser evap
 
                 if (rack.HeatRejectionLocation == HeatRejLocation::Zone) {
@@ -8829,9 +8829,8 @@ void SetupReportInput(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Summed,
                                     rack.Name,
                                     Constant::eResource::EnergyTransfer,
-                                    OutputProcessor::SOVEndUseCat::Heating,
-                                    {},
-                                    OutputProcessor::SOVGroup::Plant);
+                                    OutputProcessor::SOVGroup::Plant,
+                                    OutputProcessor::SOVEndUseCat::Heating);
 
             } // Condenser cooling water
         }     // Refrigerated Racks
@@ -9381,9 +9380,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         comp.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        comp.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        comp.EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration Air Chiller System Compressor Heat Transfer Rate",
                                         Constant::Units::W,
@@ -9421,9 +9420,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         comp.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        comp.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        comp.EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration Compressor Heat Transfer Rate",
                                         Constant::Units::W,
@@ -9530,9 +9529,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         cond.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        cond.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        cond.EndUseSubcategory);
                 } // Air cooled
 
                 if (cond.CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
@@ -9551,9 +9550,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         cond.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        cond.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        cond.EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration Air Chiller System Condenser Pump Electricity Rate",
                                         Constant::Units::W,
@@ -9569,9 +9568,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         cond.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        cond.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        cond.EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration Air Chiller System Condenser Basin Heater Electricity Rate",
                                         Constant::Units::W,
@@ -9587,9 +9586,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         cond.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        cond.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        cond.EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration Air Chiller System Condenser Evaporated Water Volume Flow Rate",
                                         Constant::Units::m3_s,
@@ -9605,9 +9604,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         cond.Name,
                                         Constant::eResource::Water,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        cond.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        cond.EndUseSubcategory);
                 } // Evaporative Condenser Variables
 
                 if (cond.CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
@@ -9699,9 +9698,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         cond.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        cond.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        cond.EndUseSubcategory);
                 } // Air cooled
 
                 if (cond.CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
@@ -9720,9 +9719,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         cond.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        cond.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        cond.EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration System Condenser Pump Electricity Rate",
                                         Constant::Units::W,
@@ -9738,9 +9737,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         cond.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        cond.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        cond.EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration System Condenser Basin Heater Electricity Rate",
                                         Constant::Units::W,
@@ -9756,9 +9755,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         cond.Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        cond.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        cond.EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration System Condenser Evaporated Water Volume Flow Rate",
                                         Constant::Units::m3_s,
@@ -9774,9 +9773,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         cond.Name,
                                         Constant::eResource::Water,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        cond.EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        cond.EndUseSubcategory);
                 } // Evaporative Condenser Variables
 
                 if (cond.CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
@@ -10077,9 +10076,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         Compressor(compNum).Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        Compressor(compNum).EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        Compressor(compNum).EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration Compressor Heat Transfer Rate",
                                         Constant::Units::W,
@@ -10124,9 +10123,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::SOVStoreType::Summed,
                                         Compressor(compNum).Name,
                                         Constant::eResource::Electricity,
+                                        OutputProcessor::SOVGroup::Plant,
                                         OutputProcessor::SOVEndUseCat::Refrigeration,
-                                        Compressor(compNum).EndUseSubcategory,
-                                        OutputProcessor::SOVGroup::Plant);
+                                        Compressor(compNum).EndUseSubcategory);
                     SetupOutputVariable(state,
                                         "Refrigeration Compressor Heat Transfer Rate",
                                         Constant::Units::W,
@@ -10187,9 +10186,9 @@ void SetupReportInput(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 cooler.Name,
                                 Constant::eResource::Electricity,
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::Refrigeration,
-                                cooler.EndUseSubcategory,
-                                OutputProcessor::SOVGroup::Plant);
+                                cooler.EndUseSubcategory);
             SetupOutputVariable(state,
                                 "Refrigeration Transcritical System Gas Cooler Outlet Temperature",
                                 Constant::Units::C,

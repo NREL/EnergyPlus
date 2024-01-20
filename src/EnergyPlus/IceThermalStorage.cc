@@ -1282,9 +1282,8 @@ namespace IceThermalStorage {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::Invalid,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::Invalid);
     }
 
     void DetailedIceStorageData::oneTimeInit(EnergyPlusData &state)

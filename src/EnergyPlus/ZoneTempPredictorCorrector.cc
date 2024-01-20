@@ -3280,7 +3280,7 @@ void ZoneSpaceHeatBalanceData::setUpOutputVars(EnergyPlusData &state, std::strin
                         Constant::Units::C,
                         this->MRT,
                         OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::State,
+                        OutputProcessor::SOVStoreType::Average,
                         name);
 }
 

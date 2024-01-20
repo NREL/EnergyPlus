@@ -141,6 +141,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -151,6 +152,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -161,6 +163,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -230,6 +233,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -240,6 +244,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -250,6 +255,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -381,6 +387,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::InteriorLights, // Was "Facility"
                         "General");                                    // create an electric meter
 
@@ -444,6 +451,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::InteriorLights, // Was "Facility"
                         "General");                                    // create an electric meter
 

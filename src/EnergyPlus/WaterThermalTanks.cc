@@ -5292,9 +5292,9 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::PlantLoopHeatingDemand,
-                        OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                        this->EndUseSubcategoryName,
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::WaterSystem, // DHW
+                        this->EndUseSubcategoryName);
 
     SetupOutputVariable(state,
                         "Water Heater Off Cycle Parasitic Tank Heat Transfer Rate",
@@ -5438,9 +5438,9 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eFuel2eResource[(int)this->FuelType],
-                        OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                        this->EndUseSubcategoryName,
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::WaterSystem, // DHW
+                        this->EndUseSubcategoryName);
 
     SetupOutputVariable(state,
                         format("Water Heater Off Cycle Parasitic {} Rate", Constant::eFuelNames[static_cast<int>(this->OffCycParaFuelType)]),
@@ -5457,9 +5457,9 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eFuel2eResource[(int)this->OffCycParaFuelType],
-                        OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                        this->EndUseSubcategoryName,
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::WaterSystem, // DHW
+                        this->EndUseSubcategoryName);
 
     SetupOutputVariable(state,
                         format("Water Heater On Cycle Parasitic {} Rate", Constant::eFuelNames[static_cast<int>(this->OnCycParaFuelType)]),
@@ -5476,10 +5476,10 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eFuel2eResource[(int)this->OnCycParaFuelType],
-                        OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                        this->EndUseSubcategoryName,
-                        OutputProcessor::SOVGroup::Plant);
-
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::WaterSystem, // DHW
+                        this->EndUseSubcategoryName);
+    
     SetupOutputVariable(state,
                         "Water Heater Water Volume Flow Rate",
                         Constant::Units::m3_s,
@@ -5495,9 +5495,9 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::Water,
-                        OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                        this->EndUseSubcategoryName,
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::WaterSystem, // DHW
+                        this->EndUseSubcategoryName);
     SetupOutputVariable(state,
                         "Water Heater Mains Water Volume",
                         Constant::Units::m3,
@@ -5506,9 +5506,9 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::MainsWater,
-                        OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                        this->EndUseSubcategoryName,
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::WaterSystem, // DHW
+                        this->EndUseSubcategoryName);
 
     if (this->HeatPumpNum > 0) {
         // CurrentModuleObject='WaterHeater:HeatPump:PumpedCondenser'
@@ -5535,9 +5535,9 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             HPWH.Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                            "Water Heater Parasitic",
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::WaterSystem, // DHW
+                            "Water Heater Parasitic");
         SetupOutputVariable(state,
                             "Water Heater On Cycle Ancillary Electricity Rate",
                             Constant::Units::W,
@@ -5553,9 +5553,9 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             HPWH.Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                            "Water Heater Parasitic",
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::WaterSystem, // DHW
+                            "Water Heater Parasitic");
         SetupOutputVariable(state,
                             "Water Heater Heat Pump Control Tank Temperature",
                             Constant::Units::C,
@@ -5596,9 +5596,9 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                            "Water Heater Parasitic",
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::WaterSystem, // DHW
+                            "Water Heater Parasitic");
         SetupOutputVariable(state,
                             "Water Heater Off Cycle Parasitic Electricity Rate",
                             Constant::Units::W,
@@ -5614,9 +5614,9 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                            "Water Heater Parasitic",
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::WaterSystem, // DHW
+                            "Water Heater Parasitic");
         SetupOutputVariable(state,
                             "Water Heater Heat Reclaim Efficiency Modifier Multiplier",
                             Constant::Units::None,
@@ -5639,9 +5639,9 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                            "Desuperheater Pump",
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::WaterSystem, // DHW
+                            "Desuperheater Pump");
         SetupOutputVariable(state,
                             "Water Heater Heating Rate",
                             Constant::Units::W,
@@ -5657,9 +5657,9 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::WaterSystem, // "DHW",
-                            "Water Heater",
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::WaterSystem, // DHW
+                            "Water Heater");
     }
 
     // Setup report variables for WaterHeater:Stratified

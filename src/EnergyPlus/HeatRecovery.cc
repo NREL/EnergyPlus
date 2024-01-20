@@ -1100,9 +1100,8 @@ namespace HeatRecovery {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatRecoveryForHeating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatRecoveryForHeating);
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Cooling Rate",
                                 Constant::Units::W,
@@ -1146,9 +1145,8 @@ namespace HeatRecovery {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatRecoveryForCooling,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatRecoveryForCooling);
 
             SetupOutputVariable(state,
                                 "Heat Exchanger Electricity Rate",
@@ -1165,9 +1163,8 @@ namespace HeatRecovery {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::HeatRecovery,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatRecovery);
         }
 
         // setup additional report variables for generic heat exchangers

@@ -455,9 +455,8 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::ElectricityProduced,
-                        OutputProcessor::SOVEndUseCat::Cogeneration,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Cogeneration);
 
     SetupOutputVariable(state,
                         "Generator Produced Thermal Rate",
@@ -475,9 +474,8 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::Cogeneration,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Cogeneration);
 
     SetupOutputVariable(state,
                         "Generator Electric Efficiency",
@@ -577,9 +575,8 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::NaturalGas,
-                        OutputProcessor::SOVEndUseCat::Cogeneration,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Cogeneration);
 
     SetupOutputVariable(state,
                         "Generator Fuel HHV Basis Rate",

@@ -8508,7 +8508,7 @@ namespace SurfaceGeometry {
                                             Constant::Units::C,
                                             thisGndSurfsObj.SurfsTempAvg,
                                             OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::State,
+                                            OutputProcessor::SOVStoreType::Average,
                                             thisGndSurfsObj.Name);
                         SetTempSchReportVar = false;
                     }
@@ -8518,7 +8518,7 @@ namespace SurfaceGeometry {
                                             Constant::Units::None,
                                             thisGndSurfsObj.SurfsReflAvg,
                                             OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::State,
+                                            OutputProcessor::SOVStoreType::Average,
                                             thisGndSurfsObj.Name);
                         SetReflSchReportVar = false;
                     }
@@ -15557,7 +15557,7 @@ namespace SurfaceGeometry {
                                 Constant::Units::C,
                                 thisEnclosure.MRT,
                                 OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisEnclosure.Name);
         }
 

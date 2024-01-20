@@ -665,9 +665,9 @@ namespace WaterUse {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::Water,
+                            OutputProcessor::SOVGroup::Plant,
                             OutputProcessor::SOVEndUseCat::WaterSystem,
-                            this->EndUseSubcatName,
-                            OutputProcessor::SOVGroup::Plant);
+                            this->EndUseSubcatName);
         SetupOutputVariable(state,
                             "Water Use Equipment Mains Water Volume",
                             Constant::Units::m3,
@@ -676,9 +676,9 @@ namespace WaterUse {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::MainsWater,
+                            OutputProcessor::SOVGroup::Plant,
                             OutputProcessor::SOVEndUseCat::WaterSystem,
-                            this->EndUseSubcatName,
-                            OutputProcessor::SOVGroup::Plant);
+                            this->EndUseSubcatName);
 
         SetupOutputVariable(state,
                             "Water Use Equipment Hot Water Temperature",
@@ -737,9 +737,9 @@ namespace WaterUse {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::DistrictHeatingWater,
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::WaterSystem,
-                                this->EndUseSubcatName,
-                                OutputProcessor::SOVGroup::Plant);
+                                this->EndUseSubcatName);
 
         } else if (state.dataWaterUse->WaterConnections(this->Connections).StandAlone) {
             SetupOutputVariable(state,
@@ -750,9 +750,9 @@ namespace WaterUse {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::DistrictHeatingWater,
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::WaterSystem,
-                                this->EndUseSubcatName,
-                                OutputProcessor::SOVGroup::Plant);
+                                this->EndUseSubcatName);
 
         } else { // The EQUIPMENT is coupled to a plant loop via a CONNECTIONS object
             SetupOutputVariable(state,
@@ -763,9 +763,9 @@ namespace WaterUse {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::EnergyTransfer,
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::WaterSystem,
-                                this->EndUseSubcatName,
-                                OutputProcessor::SOVGroup::Plant);
+                                this->EndUseSubcatName);
         }
 
         if (this->Zone > 0) {
@@ -1000,9 +1000,8 @@ namespace WaterUse {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::PlantLoopHeatingDemand,
-                                OutputProcessor::SOVEndUseCat::WaterSystem,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::WaterSystem);
         }
     }
 

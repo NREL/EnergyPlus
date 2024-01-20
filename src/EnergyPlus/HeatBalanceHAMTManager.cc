@@ -945,42 +945,42 @@ namespace HeatBalanceHAMTManager {
                                 Constant::Units::kg_kg,
                                 state.dataHeatBalHAMTMgr->watertot(sid),
                                 OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
                                 "HAMT Surface Inside Face Temperature",
                                 Constant::Units::C,
                                 state.dataHeatBalHAMTMgr->surftemp(sid),
                                 OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
                                 "HAMT Surface Inside Face Relative Humidity",
                                 Constant::Units::Perc,
                                 state.dataHeatBalHAMTMgr->surfrh(sid),
                                 OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
                                 "HAMT Surface Inside Face Vapor Pressure",
                                 Constant::Units::Pa,
                                 state.dataHeatBalHAMTMgr->surfvp(sid),
                                 OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
                                 "HAMT Surface Outside Face Temperature",
                                 Constant::Units::C,
                                 state.dataHeatBalHAMTMgr->surfexttemp(sid),
                                 OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
                                 "HAMT Surface Outside Face Relative Humidity",
                                 Constant::Units::Perc,
                                 state.dataHeatBalHAMTMgr->surfextrh(sid),
                                 OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataSurface->Surface(sid).Name);
 
             // write cell origins to initialization output file
@@ -1005,7 +1005,7 @@ namespace HeatBalanceHAMTManager {
                                     Constant::Units::C,
                                     cells(cellid).temp,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataSurface->Surface(sid).Name);
             }
             for (int cellid = state.dataHeatBalHAMTMgr->Extcell(sid), concell = 1; cellid <= state.dataHeatBalHAMTMgr->Intcell(sid);
@@ -1015,7 +1015,7 @@ namespace HeatBalanceHAMTManager {
                                     Constant::Units::kg_kg,
                                     cells(cellid).wreport,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataSurface->Surface(sid).Name);
             }
             for (int cellid = state.dataHeatBalHAMTMgr->Extcell(sid), concell = 1; cellid <= state.dataHeatBalHAMTMgr->Intcell(sid);
@@ -1025,7 +1025,7 @@ namespace HeatBalanceHAMTManager {
                                     Constant::Units::Perc,
                                     cells(cellid).rhp,
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataSurface->Surface(sid).Name);
             }
         }

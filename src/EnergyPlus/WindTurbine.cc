@@ -690,9 +690,8 @@ namespace WindTurbine {
                                 OutputProcessor::SOVStoreType::Summed,
                                 windTurbine.Name,
                                 Constant::eResource::ElectricityProduced,
-                                OutputProcessor::SOVEndUseCat::WindTurbine,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::WindTurbine);
             SetupOutputVariable(state,
                                 "Generator Turbine Local Wind Speed",
                                 Constant::Units::m_s,

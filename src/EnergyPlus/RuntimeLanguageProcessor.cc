@@ -3388,13 +3388,14 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         sovStoreType,
                                         "EMS",
                                         Constant::eResource::Invalid,
-                                        OutputProcessor::SOVEndUseCat::Invalid,
-                                        {}, // EndUseSub
                                         OutputProcessor::SOVGroup::Invalid,
-                                        {}, // Zone
-                                        1,
-                                        1,
-                                        -999,
+                                        OutputProcessor::SOVEndUseCat::Invalid,
+                                        "", // EndUseSubCat
+                                        "", // ZoneName
+                                        1, // ZoneMult
+                                        1, // ZoneListMult
+                                        "", // SpaceType
+                                        -999, // indexGroupKey
                                         UnitsB);
                 }
                 // Last field is index key, no indexing here so mimic weather output data
@@ -3636,9 +3637,9 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         sovStoreType,
                                         "EMS",
                                         resource,
+                                        sovGroup,
                                         sovEndUseCat,
-                                        EndUseSubCatString,
-                                        sovGroup);
+                                        EndUseSubCatString);
                 } else { // no subcat
                     SetupOutputVariable(state,
                                         cAlphaArgs(1),
@@ -3648,9 +3649,8 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         sovStoreType,
                                         "EMS",
                                         resource,
-                                        sovEndUseCat,
-                                        {},
-                                        sovGroup);
+                                        sovGroup,
+                                        sovEndUseCat);
                 }
             }
         } // NumEMSMeteredOutputVariables > 0

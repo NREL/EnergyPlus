@@ -830,9 +830,8 @@ namespace SteamBaseboardRadiator {
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::Baseboard,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Baseboard);
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Energy",
                                 Constant::Units::J,
@@ -855,9 +854,8 @@ namespace SteamBaseboardRadiator {
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
                                 Constant::eResource::PlantLoopHeatingDemand,
-                                OutputProcessor::SOVEndUseCat::Baseboard,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Baseboard);
             SetupOutputVariable(state,
                                 "Baseboard Steam Rate",
                                 Constant::Units::W,

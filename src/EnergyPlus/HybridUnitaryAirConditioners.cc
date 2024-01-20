@@ -762,9 +762,8 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             OutputProcessor::SOVStoreType::Summed,
                             hybridUnitaryAC.Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::CoolingCoils,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::CoolingCoils);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Sensible Cooling Rate",
                             Constant::Units::W,
@@ -852,9 +851,8 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             OutputProcessor::SOVStoreType::Summed,
                             hybridUnitaryAC.Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::HeatingCoils,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::HeatingCoils);
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Sensible Heating Rate",
                             Constant::Units::W,
@@ -1093,9 +1091,9 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             OutputProcessor::SOVStoreType::Summed,
                             hybridUnitaryAC.Name,
                             Constant::eResource::Electricity,
+                            OutputProcessor::SOVGroup::HVAC,
                             OutputProcessor::SOVEndUseCat::Cooling,
-                            "Hybrid HVAC Cooling",
-                            OutputProcessor::SOVGroup::HVAC);
+                            "Hybrid HVAC Cooling");
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate",
@@ -1185,9 +1183,9 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             OutputProcessor::SOVStoreType::Summed,
                             hybridUnitaryAC.Name,
                             Constant::eResource::Electricity,
+                            OutputProcessor::SOVGroup::HVAC,
                             OutputProcessor::SOVEndUseCat::Fans,
-                            "Hybrid HVAC Fans",
-                            OutputProcessor::SOVGroup::HVAC);
+                            "Hybrid HVAC Fans");
         if (hybridUnitaryAC.secondFuel != Constant::eFuel::Invalid) {
             SetupOutputVariable(state,
                                 "Zone Hybrid Unitary HVAC Secondary Fuel Consumption Rate",
@@ -1204,9 +1202,9 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                 OutputProcessor::SOVStoreType::Summed,
                                 hybridUnitaryAC.Name,
                                 Constant::eFuel2eResource[(int)hybridUnitaryAC.secondFuel],
+                                OutputProcessor::SOVGroup::HVAC,
                                 OutputProcessor::SOVEndUseCat::Cooling,
-                                "Hybrid HVAC Cooling",
-                                OutputProcessor::SOVGroup::HVAC);
+                                "Hybrid HVAC Cooling");
         }
         if (hybridUnitaryAC.thirdFuel != Constant::eFuel::Invalid) {
             SetupOutputVariable(state,
@@ -1224,9 +1222,9 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                 OutputProcessor::SOVStoreType::Summed,
                                 hybridUnitaryAC.Name,
                                 Constant::eFuel2eResource[(int)hybridUnitaryAC.thirdFuel],
+                                OutputProcessor::SOVGroup::HVAC,
                                 OutputProcessor::SOVEndUseCat::Cooling,
-                                "Hybrid HVAC Cooling",
-                                OutputProcessor::SOVGroup::HVAC);
+                                "Hybrid HVAC Cooling");
         }
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC Water Consumption Rate",
@@ -1243,9 +1241,9 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                             OutputProcessor::SOVStoreType::Summed,
                             hybridUnitaryAC.Name,
                             Constant::eResource::Water,
+                            OutputProcessor::SOVGroup::HVAC,
                             OutputProcessor::SOVEndUseCat::Cooling,
-                            "Hybrid HVAC Cooling",
-                            OutputProcessor::SOVGroup::HVAC);
+                            "Hybrid HVAC Cooling");
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC External Static Pressure",
                             Constant::Units::Pa,

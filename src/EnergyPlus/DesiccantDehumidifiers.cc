@@ -1482,9 +1482,8 @@ namespace DesiccantDehumidifiers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 desicDehum.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Cooling,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Cooling);
             SetupOutputVariable(state,
                                 "Dehumidifier Regeneration Specific Energy",
                                 Constant::Units::J_kgWater,
@@ -1572,9 +1571,8 @@ namespace DesiccantDehumidifiers {
                                     OutputProcessor::SOVStoreType::Summed,
                                     desicDehum.Name,
                                     Constant::eResource::Electricity,
-                                    OutputProcessor::SOVEndUseCat::Cooling,
-                                    {},
-                                    OutputProcessor::SOVGroup::HVAC);
+                                    OutputProcessor::SOVGroup::HVAC,
+                                    OutputProcessor::SOVEndUseCat::Cooling);
             }
         }
 

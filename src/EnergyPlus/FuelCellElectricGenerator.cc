@@ -1112,9 +1112,8 @@ namespace FuelCellElectricGenerator {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::ElectricityProduced,
-                            OutputProcessor::SOVEndUseCat::Cogeneration,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Cogeneration);
 
         SetupOutputVariable(state,
                             "Generator Produced Thermal Rate",
@@ -1132,9 +1131,8 @@ namespace FuelCellElectricGenerator {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::Cogeneration,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Cogeneration);
 
         SetupOutputVariable(state,
                             "Generator Fuel HHV Basis Energy",
@@ -1144,9 +1142,8 @@ namespace FuelCellElectricGenerator {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::NaturalGas,
-                            OutputProcessor::SOVEndUseCat::Cogeneration,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Cogeneration);
 
         SetupOutputVariable(state,
                             "Generator Fuel HHV Basis Rate",

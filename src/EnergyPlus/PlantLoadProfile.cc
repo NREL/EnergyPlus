@@ -537,9 +537,8 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::Plant); // is EndUseKey right?
+                                OutputProcessor::SOVGroup::Plant, 
+                                OutputProcessor::SOVEndUseCat::Heating); // is EndUseKey right?
 
             SetupOutputVariable(state,
                                 "Plant Load Profile Heating Energy",
@@ -549,9 +548,8 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
                                 Constant::eResource::PlantLoopHeatingDemand,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::Heating);
 
             SetupOutputVariable(state,
                                 "Plant Load Profile Cooling Energy",
@@ -561,9 +559,8 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
                                 Constant::eResource::PlantLoopCoolingDemand,
-                                OutputProcessor::SOVEndUseCat::Cooling,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::Cooling);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator(state,

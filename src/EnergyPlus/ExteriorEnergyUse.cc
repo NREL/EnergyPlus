@@ -254,6 +254,7 @@ namespace ExteriorEnergyUse {
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataExteriorEnergyUse->ExteriorLights(Item).Name,
                                 Constant::eResource::Electricity,
+                                OutputProcessor::SOVGroup::Invalid,
                                 OutputProcessor::SOVEndUseCat::ExteriorLights,
                                 EndUseSubcategoryName);
 
@@ -340,6 +341,7 @@ namespace ExteriorEnergyUse {
                                     OutputProcessor::SOVStoreType::Summed,
                                     exteriorEquip.Name,
                                     Constant::eFuel2eResource[(int)exteriorEquip.FuelType],
+                                    OutputProcessor::SOVGroup::Invalid,
                                     OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                                     EndUseSubcategoryName);
             } else {
@@ -358,6 +360,7 @@ namespace ExteriorEnergyUse {
                                     OutputProcessor::SOVStoreType::Summed,
                                     exteriorEquip.Name,
                                     Constant::eFuel2eResource[(int)exteriorEquip.FuelType],
+                                    OutputProcessor::SOVGroup::Invalid,
                                     OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                                     EndUseSubcategoryName);
             }
@@ -516,6 +519,7 @@ namespace ExteriorEnergyUse {
                                 OutputProcessor::SOVStoreType::Summed,
                                 exteriorEquip.Name,
                                 Constant::eResource::Water,
+                                OutputProcessor::SOVGroup::Invalid,
                                 OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                                 EndUseSubcategoryName);
             SetupOutputVariable(state,
@@ -526,6 +530,7 @@ namespace ExteriorEnergyUse {
                                 OutputProcessor::SOVStoreType::Summed,
                                 exteriorEquip.Name,
                                 Constant::eResource::MainsWater,
+                                OutputProcessor::SOVGroup::Invalid,
                                 OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                                 EndUseSubcategoryName);
         }

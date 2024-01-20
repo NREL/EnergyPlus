@@ -3523,6 +3523,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -3533,6 +3534,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -3543,6 +3545,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
@@ -3588,6 +3591,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -3598,6 +3602,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -3608,6 +3613,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
@@ -6565,6 +6571,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -6575,6 +6582,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -6585,6 +6593,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
@@ -8048,6 +8057,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -8058,6 +8068,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "AnotherEndUseSubCat");
     SetupOutputVariable(*state,
@@ -8068,6 +8079,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -8078,6 +8090,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite4",
                         Constant::eResource::Coal,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
@@ -8088,6 +8101,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite5",
                         Constant::eResource::Gasoline,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
@@ -8098,6 +8112,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite6",
                         Constant::eResource::Propane,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     state->dataGlobal->DoWeathSim = true;
@@ -8600,6 +8615,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -8610,6 +8626,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
@@ -9573,6 +9590,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -9583,6 +9601,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "AnotherEndUseSubCat");
     SetupOutputVariable(*state,
@@ -9593,6 +9612,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
@@ -9603,6 +9623,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite4",
                         Constant::eResource::Coal,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
@@ -9613,6 +9634,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite5",
                         Constant::eResource::Gasoline,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
@@ -9623,6 +9645,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite6",
                         Constant::eResource::Propane,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     state->dataGlobal->DoWeathSim = true;
@@ -12621,6 +12644,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthly)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
@@ -12685,6 +12709,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthly_AlwaysIfWeather
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
@@ -12736,6 +12761,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthlyDisplayExtraWarn
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
@@ -12747,6 +12773,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthlyDisplayExtraWarn
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
@@ -12798,6 +12825,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthlyBlankVariable)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
@@ -12809,6 +12837,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthlyBlankVariable)
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
@@ -12858,6 +12887,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_NoWarnMonthlIfNoWeatherFile
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
@@ -12869,6 +12899,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_NoWarnMonthlIfNoWeatherFile
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
@@ -12912,6 +12943,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_DontWarnMonthlyIfOnlyNamedR
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
@@ -12960,6 +12992,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_DistrictHeating)
                         OutputProcessor::SOVStoreType::Summed,
                         "DHWaterExtEq",
                         Constant::eResource::DistrictHeatingWater,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                         "General");
 
@@ -12972,6 +13005,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_DistrictHeating)
                         OutputProcessor::SOVStoreType::Summed,
                         "DHSteamExtEq",
                         Constant::eResource::DistrictHeatingSteam,
+                        OutputProcessor::SOVGroup::Invalid,
                         OutputProcessor::SOVEndUseCat::ExteriorEquipment,
                         "General");
 

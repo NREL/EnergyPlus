@@ -570,9 +570,8 @@ namespace HighTempRadiantSystem {
                                 OutputProcessor::SOVStoreType::Summed,
                                 highTempRadSys.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils);
             if (highTempRadSys.HeaterType == Constant::eResource::NaturalGas) {
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC NaturalGas Rate",
@@ -589,9 +588,8 @@ namespace HighTempRadiantSystem {
                                     OutputProcessor::SOVStoreType::Summed,
                                     highTempRadSys.Name,
                                     Constant::eResource::NaturalGas,
-                                    OutputProcessor::SOVEndUseCat::Heating,
-                                    {},
-                                    OutputProcessor::SOVGroup::HVAC);
+                                    OutputProcessor::SOVGroup::HVAC,
+                                    OutputProcessor::SOVEndUseCat::Heating);
             } else if (highTempRadSys.HeaterType == Constant::eResource::Electricity) {
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC Electricity Rate",
@@ -608,9 +606,8 @@ namespace HighTempRadiantSystem {
                                     OutputProcessor::SOVStoreType::Summed,
                                     highTempRadSys.Name,
                                     Constant::eResource::Electricity,
-                                    OutputProcessor::SOVEndUseCat::Heating,
-                                    {},
-                                    OutputProcessor::SOVGroup::HVAC);
+                                    OutputProcessor::SOVGroup::HVAC,
+                                    OutputProcessor::SOVEndUseCat::Heating);
             }
         }
     }

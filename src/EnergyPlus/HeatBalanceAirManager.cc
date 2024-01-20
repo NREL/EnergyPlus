@@ -650,9 +650,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name,
                                 Constant::eResource::Electricity,
+                                OutputProcessor::SOVGroup::Building,
                                 OutputProcessor::SOVEndUseCat::Fans,
                                 "Ventilation (simple)",
-                                OutputProcessor::SOVGroup::Building,
                                 state.dataHeatBal->Zone(thisZoneAirBalance.ZonePtr).Name);
         }
     }
@@ -2002,9 +2002,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                             OutputProcessor::SOVStoreType::Summed,
                                             thisZone.Name,
                                             Constant::eResource::Electricity,
+                                            OutputProcessor::SOVGroup::Building,
                                             OutputProcessor::SOVEndUseCat::Fans,
                                             "Ventilation (simple)",
-                                            OutputProcessor::SOVGroup::Building,
                                             thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Air Inlet Temperature",
@@ -2485,9 +2485,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                             OutputProcessor::SOVStoreType::Summed,
                                             thisZone.Name,
                                             Constant::eResource::Electricity,
+                                            OutputProcessor::SOVGroup::Building,
                                             OutputProcessor::SOVEndUseCat::Fans,
                                             "Ventilation (simple)",
-                                            OutputProcessor::SOVGroup::Building,
                                             thisZone.Name);
                         SetupOutputVariable(state,
                                             "Zone Ventilation Air Inlet Temperature",

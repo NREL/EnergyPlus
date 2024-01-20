@@ -379,9 +379,8 @@ namespace HVACCooledBeam {
                                 OutputProcessor::SOVStoreType::Summed,
                                 CoolBeam(CBNum).Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::CoolingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::CoolingCoils);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Beam Chilled Water Energy",
                                 Constant::Units::J,
@@ -390,9 +389,8 @@ namespace HVACCooledBeam {
                                 OutputProcessor::SOVStoreType::Summed,
                                 CoolBeam(CBNum).Name,
                                 Constant::eResource::PlantLoopCoolingDemand,
-                                OutputProcessor::SOVEndUseCat::CoolingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::CoolingCoils);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Beam Sensible Cooling Rate",
                                 Constant::Units::W,

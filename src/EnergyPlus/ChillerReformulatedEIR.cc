@@ -669,9 +669,9 @@ void ReformulatedEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Plant,
                         OutputProcessor::SOVEndUseCat::Cooling,
-                        this->EndUseSubcategory,
-                        OutputProcessor::SOVGroup::Plant);
+                        this->EndUseSubcategory);
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Cooling Rate",
@@ -689,9 +689,8 @@ void ReformulatedEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::Chillers,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Chillers);
 
     SetupOutputVariable(state,
                         "Chiller False Load Heat Transfer Rate",
@@ -749,9 +748,8 @@ void ReformulatedEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::HeatRejection,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::HeatRejection);
 
     SetupOutputVariable(state,
                         "Chiller COP",
@@ -827,9 +825,8 @@ void ReformulatedEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::HeatRejection,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::HeatRejection);
 
         SetupOutputVariable(state,
                             "Chiller Heat Recovery Inlet Temperature",

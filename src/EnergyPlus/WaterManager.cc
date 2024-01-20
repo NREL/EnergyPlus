@@ -789,9 +789,9 @@ namespace WaterManager {
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataWaterData->WaterStorage(Item).Name,
                                     Constant::eResource::MainsWater,
+                                    OutputProcessor::SOVGroup::HVAC,
                                     OutputProcessor::SOVEndUseCat::WaterSystem,
-                                    state.dataWaterData->WaterStorage(Item).QualitySubCategoryName,
-                                    OutputProcessor::SOVGroup::HVAC);
+                                    state.dataWaterData->WaterStorage(Item).QualitySubCategoryName);
                 SetupOutputVariable(state,
                                     "Water System Storage Tank Mains Water Volume Flow Rate",
                                     Constant::Units::m3_s,
@@ -872,9 +872,8 @@ namespace WaterManager {
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataWaterData->RainCollector(Item).Name,
                                     Constant::eResource::OnSiteWater,
-                                    OutputProcessor::SOVEndUseCat::RainWater,
-                                    {},
-                                    OutputProcessor::SOVGroup::HVAC);
+                                    OutputProcessor::SOVGroup::HVAC,
+                                    OutputProcessor::SOVEndUseCat::RainWater);
             }
 
             for (Item = 1; Item <= state.dataWaterData->NumGroundWaterWells; ++Item) { // CurrentModuleObject='WaterUse:Well'
@@ -900,9 +899,8 @@ namespace WaterManager {
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataWaterData->GroundwaterWell(Item).Name,
                                     Constant::eResource::OnSiteWater,
-                                    OutputProcessor::SOVEndUseCat::WellWater,
-                                    {},
-                                    OutputProcessor::SOVGroup::HVAC);
+                                    OutputProcessor::SOVGroup::HVAC,
+                                    OutputProcessor::SOVEndUseCat::WellWater);
                 SetupOutputVariable(state,
                                     "Water System Groundwater Well Pump Electricity Rate",
                                     Constant::Units::W,
@@ -918,9 +916,8 @@ namespace WaterManager {
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataWaterData->GroundwaterWell(Item).Name,
                                     Constant::eResource::Electricity,
-                                    OutputProcessor::SOVEndUseCat::WaterSystem,
-                                    {},
-                                    OutputProcessor::SOVGroup::HVAC);
+                                    OutputProcessor::SOVGroup::HVAC,
+                                    OutputProcessor::SOVEndUseCat::WaterSystem);
             }
 
         } // my one time flag block

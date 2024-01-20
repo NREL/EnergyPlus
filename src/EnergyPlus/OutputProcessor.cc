@@ -3149,15 +3149,15 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVStoreType sovStore,       // State, Average=1, NonState, Sum=2
                          std::string const &key,                       // Associated Key for this variable
                          Constant::eResource resource,                 // Meter Resource Type (Electricity, Gas, etc)
+                         OutputProcessor::SOVGroup sovGroup,           // Meter Super Group Key (Building, System, Plant)
                          OutputProcessor::SOVEndUseCat sovEndUseCat,   // Meter End Use Key (Lights, Heating, Cooling, etc)
                          std::string_view const EndUseSub,             // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                         OutputProcessor::SOVGroup sovGroup,           // Meter Super Group Key (Building, System, Plant)
                          std::string const &zone,                      // Meter Zone Key (zone name)
                          int const ZoneMult,                           // Zone Multiplier, defaults to 1
                          int const ZoneListMult,                       // Zone List Multiplier, defaults to 1
+                         std::string const &spaceType,                 // Space type (applicable for Building group only)
                          int const indexGroupKey,                      // Group identifier for SQL output
                          std::string_view const customUnitName,        // the custom name for the units from EMS definition of units
-                         std::string const &spaceType,                 // Space type (applicable for Building group only)
                          OutputProcessor::ReportFreq freq              // Internal use -- causes reporting at this frequency
 )
 {

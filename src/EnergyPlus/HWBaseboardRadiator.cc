@@ -726,9 +726,8 @@ namespace HWBaseboardRadiator {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisHWBaseboard.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::Baseboard,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Baseboard);
 
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Energy",
@@ -752,9 +751,8 @@ namespace HWBaseboardRadiator {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisHWBaseboard.Name,
                                 Constant::eResource::PlantLoopHeatingDemand,
-                                OutputProcessor::SOVEndUseCat::Baseboard,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Baseboard);
             SetupOutputVariable(state,
                                 "Baseboard Hot Water Mass Flow Rate",
                                 Constant::Units::kg_s,

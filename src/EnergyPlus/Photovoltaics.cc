@@ -696,9 +696,8 @@ namespace Photovoltaics {
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPhotovoltaic->PVarray(PVnum).Name,
                                 Constant::eResource::ElectricityProduced,
-                                OutputProcessor::SOVEndUseCat::Photovoltaic,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::Photovoltaic);
             SetupOutputVariable(state,
                                 "Generator PV Array Efficiency",
                                 Constant::Units::None,

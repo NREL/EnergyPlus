@@ -613,14 +613,14 @@ namespace Weather {
                                 Constant::Units::None,
                                 state.dataEnvrn->DSTIndicator,
                                 OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Day Type Index",
                                 Constant::Units::None,
                                 state.dataWeather->RptDayType,
                                 OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::SOVStoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Mains Water Temperature",

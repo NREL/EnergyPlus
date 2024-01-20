@@ -947,9 +947,8 @@ void GetEvapInput(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             thisEvapCooler.Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::Cooling,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::Cooling);
         SetupOutputVariable(state,
                             "Evaporative Cooler Electricity Rate",
                             Constant::Units::W,
@@ -967,9 +966,8 @@ void GetEvapInput(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
                                 Constant::eResource::Water,
-                                OutputProcessor::SOVEndUseCat::Cooling,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Cooling);
             SetupOutputVariable(state,
                                 "Evaporative Cooler Mains Water Volume",
                                 Constant::Units::m3,
@@ -978,9 +976,8 @@ void GetEvapInput(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
                                 Constant::eResource::MainsWater,
-                                OutputProcessor::SOVEndUseCat::Cooling,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Cooling);
 
         } else if (thisEvapCooler.EvapWaterSupplyMode == WaterSupply::FromTank) {
             SetupOutputVariable(state,
@@ -991,9 +988,8 @@ void GetEvapInput(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
                                 Constant::eResource::Water,
-                                OutputProcessor::SOVEndUseCat::Cooling,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Cooling);
             SetupOutputVariable(state,
                                 "Evaporative Cooler Starved Water Volume",
                                 Constant::Units::m3,
@@ -1002,9 +998,8 @@ void GetEvapInput(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
                                 Constant::eResource::Water,
-                                OutputProcessor::SOVEndUseCat::Cooling,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Cooling);
             SetupOutputVariable(state,
                                 "Evaporative Cooler Starved Mains Water Volume",
                                 Constant::Units::m3,
@@ -1013,9 +1008,8 @@ void GetEvapInput(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
                                 Constant::eResource::MainsWater,
-                                OutputProcessor::SOVEndUseCat::Cooling,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Cooling);
         }
     }
 }
@@ -3680,9 +3674,8 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             thisZoneEvapUnit.Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::CoolingCoils,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::CoolingCoils);
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Sensible Cooling Rate",
                             Constant::Units::W,

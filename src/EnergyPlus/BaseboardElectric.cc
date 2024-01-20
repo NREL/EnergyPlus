@@ -352,9 +352,8 @@ namespace BaseboardElectric {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipName,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::Baseboard,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC); // "System");
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Baseboard); 
 
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Rate",
@@ -372,9 +371,8 @@ namespace BaseboardElectric {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipName,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC); // "System");
+                                OutputProcessor::SOVGroup::HVAC, 
+                                OutputProcessor::SOVEndUseCat::Heating);
 
             SetupOutputVariable(state,
                                 "Baseboard Electricity Rate",

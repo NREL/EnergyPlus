@@ -468,9 +468,8 @@ namespace ElectricBaseboardRadiator {
                                 OutputProcessor::SOVStoreType::Summed,
                                 elecBaseboard.EquipName,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Heating);
             SetupOutputVariable(state,
                                 "Baseboard Electricity Rate",
                                 Constant::Units::W,
@@ -486,9 +485,8 @@ namespace ElectricBaseboardRadiator {
                                 OutputProcessor::SOVStoreType::Summed,
                                 elecBaseboard.EquipName,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::Baseboard,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Baseboard);
 
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Energy",

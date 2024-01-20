@@ -1126,9 +1126,9 @@ void GetPumpInput(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisPump.Name,
                                 Constant::eResource::Electricity,
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::Pumps,
-                                thisPump.EndUseSubcategoryName,
-                                OutputProcessor::SOVGroup::Plant);
+                                thisPump.EndUseSubcategoryName);
             SetupOutputVariable(state,
                                 "Pump Electricity Rate",
                                 Constant::Units::W,
@@ -1184,9 +1184,9 @@ void GetPumpInput(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisPump.Name,
                                 Constant::eResource::Electricity,
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::Pumps,
-                                thisPump.EndUseSubcategoryName,
-                                OutputProcessor::SOVGroup::Plant);
+                                thisPump.EndUseSubcategoryName);
             SetupOutputVariable(state,
                                 "Pump Electricity Rate",
                                 Constant::Units::W,

@@ -370,7 +370,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
                             Constant::Units::K_m,
                             patternZoneInfo.Gradient,
                             OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::State,
+                            OutputProcessor::SOVStoreType::Average,
                             patternZoneInfo.ZoneName);
 
         state.dataRoomAirModelTempPattern->SetupOutputFlag(ZoneNum) = false;

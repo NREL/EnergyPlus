@@ -808,9 +808,8 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVEndUseCat::Cooling,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Cooling);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Electricity Energy",
@@ -820,9 +819,8 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVEndUseCat::Heating,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Heating);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Electricity Rate",
@@ -848,9 +846,8 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::Chillers,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Chillers);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Energy",
@@ -860,9 +857,8 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::Boilers,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Boilers);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Source Heat Transfer Energy",
@@ -872,9 +868,8 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::HeatRejection,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::HeatRejection);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Rate",

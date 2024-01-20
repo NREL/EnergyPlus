@@ -971,9 +971,9 @@ void GetFanInput(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             thisFan.FanName,
                             Constant::eResource::Electricity,
+                            OutputProcessor::SOVGroup::HVAC,
                             OutputProcessor::SOVEndUseCat::Fans,
-                            thisFan.EndUseSubcategoryName,
-                            OutputProcessor::SOVGroup::HVAC);
+                            thisFan.EndUseSubcategoryName);
         SetupOutputVariable(state,
                             "Fan Air Mass Flow Rate",
                             Constant::Units::kg_s,

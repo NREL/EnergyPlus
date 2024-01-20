@@ -883,15 +883,15 @@ namespace SystemAvailabilityManager {
                                     OutputProcessor::SOVStoreType::Average,
                                     optimumStartMgr.Name,
                                     Constant::eResource::Invalid,
-                                    OutputProcessor::SOVEndUseCat::Invalid,
-                                    {},
                                     OutputProcessor::SOVGroup::Invalid,
-                                    {}, // Zone
-                                    1,
-                                    1,
-                                    -999,
-                                    {}, // custom units
-                                    {}, // space type
+                                    OutputProcessor::SOVEndUseCat::Invalid,
+                                    "", // End-use SubCat
+                                    "", // Zone
+                                    1, // ZoneMult
+                                    1, // ZoneListMult
+                                    "", // space type
+                                    -999, // indexGroupKey
+                                    "", // custom units
                                     OutputProcessor::ReportFreq::Day);
             }
         }

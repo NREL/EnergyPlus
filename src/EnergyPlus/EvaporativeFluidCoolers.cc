@@ -1026,9 +1026,8 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::Water,
-                                OutputProcessor::SOVEndUseCat::HeatRejection,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatRejection);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Starved Storage Tank Water Volume Flow Rate",
@@ -1046,9 +1045,8 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::Water,
-                                OutputProcessor::SOVEndUseCat::HeatRejection,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatRejection);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Mains Water Volume",
@@ -1058,9 +1056,8 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::MainsWater,
-                                OutputProcessor::SOVEndUseCat::HeatRejection,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatRejection);
 
         } else { // Evaporative fluid cooler water from mains and gets metered
             SetupOutputVariable(state,
@@ -1079,9 +1076,8 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::Water,
-                                OutputProcessor::SOVEndUseCat::HeatRejection,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatRejection);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Mains Water Volume",
@@ -1091,9 +1087,8 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::MainsWater,
-                                OutputProcessor::SOVEndUseCat::HeatRejection,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatRejection);
         }
 
         SetupOutputVariable(state,
@@ -1144,9 +1139,8 @@ namespace EvaporativeFluidCoolers {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::HeatRejection,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::HeatRejection);
 
         SetupOutputVariable(state,
                             "Cooling Tower Water Evaporation Volume Flow Rate",

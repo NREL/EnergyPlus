@@ -794,9 +794,8 @@ namespace TranspiredCollector {
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataTranspiredCollector->UTSC(Item).Name,
                                 Constant::eResource::SolarAir,
-                                OutputProcessor::SOVEndUseCat::HeatProduced,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatProduced);
 
             SetupOutputVariable(state,
                                 "Solar Collector Natural Ventilation Air Change Rate",

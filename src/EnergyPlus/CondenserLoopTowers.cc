@@ -1907,9 +1907,9 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::Electricity,
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::HeatRejection,
-                                this->EndUseSubcategory,
-                                OutputProcessor::SOVGroup::Plant);
+                                this->EndUseSubcategory);
             // Added for fluid bypass
             SetupOutputVariable(state,
                                 "Cooling Tower Bypass Fraction",
@@ -1948,9 +1948,9 @@ namespace CondenserLoopTowers {
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Plant,
                                     OutputProcessor::SOVEndUseCat::HeatRejection,
-                                    "BasinHeater",
-                                    OutputProcessor::SOVGroup::Plant);
+                                    "BasinHeater");
             }
         }
 
@@ -1999,9 +1999,9 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::Electricity,
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::HeatRejection,
-                                this->EndUseSubcategory,
-                                OutputProcessor::SOVGroup::Plant);
+                                this->EndUseSubcategory);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Cycling Ratio",
                                 Constant::Units::None,
@@ -2039,9 +2039,9 @@ namespace CondenserLoopTowers {
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Plant,
                                     OutputProcessor::SOVEndUseCat::HeatRejection,
-                                    "BasinHeater",
-                                    OutputProcessor::SOVGroup::Plant);
+                                    "BasinHeater");
             }
         }
 
@@ -2090,9 +2090,9 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::Electricity,
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::HeatRejection,
-                                this->EndUseSubcategory,
-                                OutputProcessor::SOVGroup::Plant);
+                                this->EndUseSubcategory);
             SetupOutputVariable(state,
                                 "Cooling Tower Air Flow Rate Ratio",
                                 Constant::Units::None,
@@ -2130,9 +2130,9 @@ namespace CondenserLoopTowers {
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Plant,
                                     OutputProcessor::SOVEndUseCat::HeatRejection,
-                                    "BasinHeater",
-                                    OutputProcessor::SOVGroup::Plant);
+                                    "BasinHeater");
             }
         }
 
@@ -2181,9 +2181,9 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::Electricity,
+                                OutputProcessor::SOVGroup::Plant,
                                 OutputProcessor::SOVEndUseCat::HeatRejection,
-                                this->EndUseSubcategory,
-                                OutputProcessor::SOVGroup::Plant);
+                                this->EndUseSubcategory);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Speed Ratio",
                                 Constant::Units::None,
@@ -2215,9 +2215,9 @@ namespace CondenserLoopTowers {
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
                                     Constant::eResource::Electricity,
+                                    OutputProcessor::SOVGroup::Plant,
                                     OutputProcessor::SOVEndUseCat::HeatRejection,
-                                    "BasinHeater",
-                                    OutputProcessor::SOVGroup::Plant);
+                                    "BasinHeater");
             }
         }
         // setup common water reporting for all types of towers.
@@ -2251,9 +2251,8 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::Water,
-                                OutputProcessor::SOVEndUseCat::HeatRejection,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatRejection);
             SetupOutputVariable(state,
                                 "Cooling Tower Starved Storage Tank Water Volume Flow Rate",
                                 Constant::Units::m3_s,
@@ -2276,9 +2275,8 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::MainsWater,
-                                OutputProcessor::SOVEndUseCat::HeatRejection,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatRejection);
         } else { // tower water from mains and gets metered
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Water Volume Flow Rate",
@@ -2295,9 +2293,8 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::Water,
-                                OutputProcessor::SOVEndUseCat::HeatRejection,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatRejection);
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Mains Water Volume",
                                 Constant::Units::m3,
@@ -2306,9 +2303,8 @@ namespace CondenserLoopTowers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::MainsWater,
-                                OutputProcessor::SOVEndUseCat::HeatRejection,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatRejection);
         }
 
         SetupOutputVariable(state,

@@ -547,9 +547,8 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::Chillers,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Chillers);
 
     SetupOutputVariable(state,
                         "Chiller Heater Heating Rate",
@@ -566,9 +565,8 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::Boilers,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Boilers);
 
     SetupOutputVariable(state,
                         "Chiller Heater Condenser Heat Transfer Rate",
@@ -585,9 +583,8 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::HeatRejection,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::HeatRejection);
 
     SetupOutputVariable(state,
                         "Chiller Heater Cooling Source Heat COP",
@@ -628,9 +625,8 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVEndUseCat::Cooling,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Cooling);
 
     SetupOutputVariable(state,
                         "Chiller Heater Heating Electricity Rate",
@@ -647,9 +643,8 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVEndUseCat::Heating,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Heating);
 
     SetupOutputVariable(state,
                         "Chiller Heater Evaporator Inlet Temperature",

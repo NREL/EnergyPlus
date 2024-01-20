@@ -17039,9 +17039,8 @@ namespace UnitarySystems {
                                             OutputProcessor::SOVStoreType::Summed,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name,
                                             Constant::eResource::Electricity,
-                                            OutputProcessor::SOVEndUseCat::Cooling,
-                                            {},
-                                            OutputProcessor::SOVGroup::HVAC);
+                                            OutputProcessor::SOVGroup::HVAC,
+                                            OutputProcessor::SOVEndUseCat::Cooling);
                     }
                     if (state.dataUnitarySystems->unitarySys[sysNum].m_HeatCoilExists ||
                         state.dataUnitarySystems->unitarySys[sysNum].m_SuppCoilExists) {
@@ -17053,9 +17052,8 @@ namespace UnitarySystems {
                                             OutputProcessor::SOVStoreType::Summed,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name,
                                             Constant::eResource::Electricity,
-                                            OutputProcessor::SOVEndUseCat::Heating,
-                                            {},
-                                            OutputProcessor::SOVGroup::HVAC);
+                                            OutputProcessor::SOVGroup::HVAC,
+                                            OutputProcessor::SOVEndUseCat::Heating);
                     }
 
                     SetupOutputVariable(state,

@@ -632,9 +632,9 @@ namespace PlantChillers {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::Electricity,
+                            OutputProcessor::SOVGroup::Plant,
                             OutputProcessor::SOVEndUseCat::Cooling,
-                            this->EndUseSubcategory,
-                            OutputProcessor::SOVGroup::Plant);
+                            this->EndUseSubcategory);
 
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Rate",
@@ -651,9 +651,8 @@ namespace PlantChillers {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::Chillers,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Chillers);
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
                             Constant::Units::C,
@@ -690,9 +689,8 @@ namespace PlantChillers {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::HeatRejection,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::HeatRejection);
         SetupOutputVariable(state,
                             "Chiller COP",
                             Constant::Units::W_W,
@@ -742,9 +740,8 @@ namespace PlantChillers {
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
                                     Constant::eResource::Electricity,
-                                    OutputProcessor::SOVEndUseCat::Chillers,
-                                    {},
-                                    OutputProcessor::SOVGroup::Plant);
+                                    OutputProcessor::SOVGroup::Plant,
+                                    OutputProcessor::SOVEndUseCat::Chillers);
             }
         }
 
@@ -765,9 +762,8 @@ namespace PlantChillers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatRecovery,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatRecovery);
             SetupOutputVariable(state,
                                 "Chiller Heat Recovery Inlet Temperature",
                                 Constant::Units::C,
@@ -2674,9 +2670,8 @@ namespace PlantChillers {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::Chillers,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Chillers);
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
                             Constant::Units::C,
@@ -2713,9 +2708,8 @@ namespace PlantChillers {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::HeatRejection,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::HeatRejection);
 
         SetupOutputVariable(state,
                             "Chiller Condenser Inlet Temperature",
@@ -2759,9 +2753,8 @@ namespace PlantChillers {
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
                                     Constant::eResource::Electricity,
-                                    OutputProcessor::SOVEndUseCat::Chillers,
-                                    {},
-                                    OutputProcessor::SOVGroup::Plant);
+                                    OutputProcessor::SOVGroup::Plant,
+                                    OutputProcessor::SOVEndUseCat::Chillers);
             }
         }
 
@@ -2781,9 +2774,8 @@ namespace PlantChillers {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eFuel2eResource[(int)this->FuelType],
-                            OutputProcessor::SOVEndUseCat::Cooling,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Cooling);
 
         SetupOutputVariable(state,
                             "Chiller COP",
@@ -2831,9 +2823,8 @@ namespace PlantChillers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatRecovery,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatRecovery);
 
             SetupOutputVariable(state,
                                 "Chiller Lube Recovered Heat Rate",
@@ -2850,9 +2841,8 @@ namespace PlantChillers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatRecovery,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatRecovery);
 
             SetupOutputVariable(state,
                                 "Chiller Exhaust Recovered Heat Rate",
@@ -2869,9 +2859,8 @@ namespace PlantChillers {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatRecovery,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatRecovery);
 
             SetupOutputVariable(state,
                                 "Chiller Total Recovered Heat Rate",
@@ -4713,9 +4702,8 @@ namespace PlantChillers {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::Chillers,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Chillers);
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
                             Constant::Units::C,
@@ -4752,9 +4740,8 @@ namespace PlantChillers {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::HeatRejection,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::HeatRejection);
 
         SetupOutputVariable(state,
                             "Chiller Condenser Inlet Temperature",
@@ -4798,9 +4785,8 @@ namespace PlantChillers {
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
                                     Constant::eResource::Electricity,
-                                    OutputProcessor::SOVEndUseCat::Chillers,
-                                    {},
-                                    OutputProcessor::SOVGroup::Plant);
+                                    OutputProcessor::SOVGroup::Plant,
+                                    OutputProcessor::SOVEndUseCat::Chillers);
             }
         }
 
@@ -4819,9 +4805,8 @@ namespace PlantChillers {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::HeatRecovery,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::HeatRecovery);
 
         std::string_view const sFuelType = Constant::eFuelNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
@@ -4840,9 +4825,8 @@ namespace PlantChillers {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eFuel2eResource[(int)this->FuelType],
-                            OutputProcessor::SOVEndUseCat::Cooling,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Cooling);
 
         SetupOutputVariable(state,
                             format("Chiller {} Mass Flow Rate", sFuelType),
@@ -6559,9 +6543,8 @@ namespace PlantChillers {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::Cooling,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Cooling);
         SetupOutputVariable(state,
                             "Chiller Evaporator Cooling Rate",
                             Constant::Units::W,
@@ -6577,9 +6560,8 @@ namespace PlantChillers {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::Chillers,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Chillers);
         SetupOutputVariable(state,
                             "Chiller Evaporator Inlet Temperature",
                             Constant::Units::C,
@@ -6623,9 +6605,8 @@ namespace PlantChillers {
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::HeatRejection,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::HeatRejection);
 
         SetupOutputVariable(state,
                             "Chiller Condenser Inlet Temperature",
@@ -6669,9 +6650,8 @@ namespace PlantChillers {
                                     OutputProcessor::SOVStoreType::Summed,
                                     this->Name,
                                     Constant::eResource::Electricity,
-                                    OutputProcessor::SOVEndUseCat::Chillers,
-                                    {},
-                                    OutputProcessor::SOVGroup::Plant);
+                                    OutputProcessor::SOVGroup::Plant,
+                                    OutputProcessor::SOVEndUseCat::Chillers);
             }
         }
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {

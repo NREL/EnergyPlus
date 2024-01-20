@@ -545,9 +545,8 @@ namespace PhotovoltaicThermalCollectors {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::SolarWater,
-                                OutputProcessor::SOVEndUseCat::HeatProduced,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatProduced);
 
         } else if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
             SetupOutputVariable(state,
@@ -558,9 +557,8 @@ namespace PhotovoltaicThermalCollectors {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::SolarAir,
-                                OutputProcessor::SOVEndUseCat::HeatProduced,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::HeatProduced);
 
             SetupOutputVariable(state,
                                 "Generator PVT Fluid Bypass Status",

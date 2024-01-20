@@ -899,7 +899,7 @@ namespace HeatBalFiniteDiffManager {
                                     Constant::Units::W,
                                     SurfaceFD(SurfNum).heatSourceInternalFluxLayerReport(lay),
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Internal Heat Source Energy After Layer {}", lay),
@@ -943,7 +943,7 @@ namespace HeatBalFiniteDiffManager {
                                         Constant::Units::W,
                                         SurfaceFD(SurfNum).heatSourceEMSFluxLayerReport(lay),
                                         OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataSurface->Surface(SurfNum).Name);
                     SetupOutputVariable(state,
                                         format("CondFD EMS Heat Source Energy After Layer {}", lay),
@@ -953,9 +953,8 @@ namespace HeatBalFiniteDiffManager {
                                         OutputProcessor::SOVStoreType::Summed,
                                         state.dataSurface->Surface(SurfNum).Name,
                                         Constant::eResource::Electricity,
-                                        OutputProcessor::SOVEndUseCat::Heating,
-                                        {},
-                                        OutputProcessor::SOVGroup::Building);
+                                        OutputProcessor::SOVGroup::Building,
+                                        OutputProcessor::SOVEndUseCat::Heating);
                 }
             }
 
@@ -966,49 +965,49 @@ namespace HeatBalFiniteDiffManager {
                                     Constant::Units::C,
                                     SurfaceFD(SurfNum).TDreport(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Surface Heat Flux Node {}", node),
                                     Constant::Units::W_m2,
                                     SurfaceFD(SurfNum).QDreport(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change State {}", node),
                                     Constant::Units::None,
                                     SurfaceFD(SurfNum).PhaseChangeState(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Previous State {}", node),
                                     Constant::Units::None,
                                     SurfaceFD(SurfNum).PhaseChangeStateOld(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Node Temperature {}", node),
                                     Constant::Units::C,
                                     SurfaceFD(SurfNum).TDT(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Node Conductivity {}", node),
                                     Constant::Units::W_mK,
                                     SurfaceFD(SurfNum).condNodeReport(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Node Specific Heat {}", node),
                                     Constant::Units::J_kgK,
                                     SurfaceFD(SurfNum).specHeatNodeReport(node),
                                     OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     SetupOutputVariable(state,
@@ -1016,14 +1015,14 @@ namespace HeatBalFiniteDiffManager {
                                         Constant::Units::W_m2K,
                                         SurfaceFD(SurfNum).CpDelXRhoS1(node),
                                         OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataSurface->Surface(SurfNum).Name);
                     SetupOutputVariable(state,
                                         format("CondFD Surface Heat Capacitance Inner Half Node {}", node),
                                         Constant::Units::W_m2K,
                                         SurfaceFD(SurfNum).CpDelXRhoS2(node),
                                         OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataSurface->Surface(SurfNum).Name);
                 }
             }

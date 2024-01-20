@@ -1001,9 +1001,9 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Plant,
                         OutputProcessor::SOVEndUseCat::Cooling,
-                        this->EndUseSubcategory,
-                        OutputProcessor::SOVGroup::Plant);
+                        this->EndUseSubcategory);
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Cooling Rate",
@@ -1021,9 +1021,8 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::Chillers,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Chillers);
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Inlet Temperature",
@@ -1065,9 +1064,8 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::HeatRejection,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::HeatRejection);
 
     SetupOutputVariable(state,
                         "Chiller COP",

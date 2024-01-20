@@ -1601,9 +1601,8 @@ namespace HVACMultiSpeedHeatPump {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisMSHeatPump.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Cooling,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Cooling);
             SetupOutputVariable(state,
                                 "Unitary System Heating Ancillary Electricity Energy",
                                 Constant::Units::J,
@@ -1612,9 +1611,8 @@ namespace HVACMultiSpeedHeatPump {
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisMSHeatPump.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Heating);
             SetupOutputVariable(state,
                                 "Unitary System Fan Part Load Ratio",
                                 Constant::Units::None,

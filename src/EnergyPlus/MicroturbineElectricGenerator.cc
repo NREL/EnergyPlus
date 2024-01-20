@@ -916,9 +916,8 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::ElectricityProduced,
-                        OutputProcessor::SOVEndUseCat::Cogeneration,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Cogeneration);
 
     SetupOutputVariable(state,
                         "Generator LHV Basis Electric Efficiency",
@@ -945,9 +944,8 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eFuel2eResource[(int)this->FuelType],
-                        OutputProcessor::SOVEndUseCat::Cogeneration,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Cogeneration);
 
     SetupOutputVariable(state,
                         format("Generator {} Mass Flow Rate", sFuelType),
@@ -993,9 +991,8 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::HeatRecovery,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::HeatRecovery);
 
         SetupOutputVariable(state,
                             "Generator Thermal Efficiency LHV Basis",
@@ -1047,9 +1044,8 @@ void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::Cogeneration,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Cogeneration);
     }
 
     if (this->AncillaryPower > 0.0) { // Report Ancillary Power if entered by user

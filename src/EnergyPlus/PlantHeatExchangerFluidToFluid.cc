@@ -562,9 +562,8 @@ void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::EnergyTransfer,
-                        this->HeatTransferMeteringEndUse,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        this->HeatTransferMeteringEndUse);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Supply Side Mass Flow Rate",

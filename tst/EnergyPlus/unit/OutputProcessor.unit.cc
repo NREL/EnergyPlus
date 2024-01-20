@@ -1189,18 +1189,6 @@ namespace OutputProcessor {
         // EXPECT_EQ("UNKW", StandardTimeStepTypeKey(3));
     }
 
-    TEST_F(SQLiteFixture, OutputProcessor_validateVariableType)
-    {
-        std::map<SOVStoreType, StoreType> const resource_map = {{SOVStoreType::State, StoreType::Averaged},
-                                                                {SOVStoreType::Average, StoreType::Averaged},
-                                                                {SOVStoreType::NonState, StoreType::Summed},
-                                                                {SOVStoreType::Summed, StoreType::Summed}};
-
-        for (auto const &variableType : resource_map) {
-            EXPECT_EQ((int)variableType.second, (int)sovStoreType2StoreType[(int)variableType.first]);
-        }
-    }
-
     TEST_F(SQLiteFixture, OutputProcessor_standardVariableTypeKey)
     {
         EXPECT_EQ("Average", storeTypeNames[(int)StoreType::Averaged]);
@@ -3129,9 +3117,8 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "Cool-1",
                             Constant::eResource::Electricity,
-                            SOVEndUseCat::Cooling,
-                            {}, // EndUseSubKey
-                            SOVGroup::Plant);
+                            SOVGroup::Plant,
+                            SOVEndUseCat::Cooling);
 
         Real64 light_consumption = 0.;
         SetupOutputVariable(*state,
@@ -3142,10 +3129,10 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "RailroadCrossing", // EndUseSubKey
-                            SOVGroup::Building,
-                            "SPACE1-1",
+                            "SPACE1-1", // Zone
                             1,
                             1);
 
@@ -3158,9 +3145,8 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "Site",
                             Constant::eResource::CO2,
-                            SOVEndUseCat::FuelOilNo2Emissions,
-                            {}, // EndUseSubKey
-                            SOVGroup::Invalid);
+                            SOVGroup::Invalid,
+                            SOVEndUseCat::FuelOilNo2Emissions);
 
         // Cooling
         // testing an ABUPS end use with no sub end use specified
@@ -3531,9 +3517,9 @@ namespace OutputProcessor {
                                 SOVStoreType::Summed,
                                 format("SPACE {} LIGHTS", i),
                                 Constant::eResource::Electricity,
+                                SOVGroup::Building,
                                 SOVEndUseCat::InteriorLights,
                                 "GeneralLights",
-                                SOVGroup::Building,
                                 "SPACE" + std::to_string(i),
                                 1,
                                 1);
@@ -3596,9 +3582,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE1-1",
                             1,
                             1);
@@ -3610,9 +3596,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE2-1",
                             1,
                             1);
@@ -3624,9 +3610,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE3-1",
                             1,
                             1);
@@ -3638,9 +3624,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE4-1",
                             1,
                             1);
@@ -3652,9 +3638,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE5-1",
                             1,
                             1);
@@ -4050,9 +4036,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE1-1",
                             1,
                             1);
@@ -4064,9 +4050,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE2-1",
                             1,
                             1);
@@ -4078,9 +4064,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE3-1",
                             1,
                             1);
@@ -4092,9 +4078,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE4-1",
                             1,
                             1);
@@ -4106,9 +4092,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE5-1",
                             1,
                             1);
@@ -4339,9 +4325,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE1-1",
                             1,
                             1);
@@ -4353,9 +4339,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE2-1",
                             1,
                             1);
@@ -4367,9 +4353,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE3-1",
                             1,
                             1);
@@ -4381,9 +4367,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE4-1",
                             1,
                             1);
@@ -4395,9 +4381,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE5-1",
                             1,
                             1);
@@ -4642,9 +4628,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE1-1",
                             1,
                             1);
@@ -4656,9 +4642,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE2-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE2-1",
                             1,
                             1);
@@ -4670,9 +4656,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE3-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE3-1",
                             1,
                             1);
@@ -4684,9 +4670,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE4-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE4-1",
                             1,
                             1);
@@ -4698,9 +4684,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE5-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE5-1",
                             1,
                             1);
@@ -4878,9 +4864,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE1-1",
                             1,
                             1);
@@ -4972,9 +4958,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE1-1",
                             1,
                             1);
@@ -5073,9 +5059,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "SPACE1-1 LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "GeneralLights",
-                            SOVGroup::Building,
                             "SPACE1-1",
                             1,
                             1);
@@ -5536,9 +5522,8 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "Cool-1",
                             Constant::eResource::Electricity,
-                            SOVEndUseCat::Cooling,
-                            {}, // EndUseSubKey
-                            SOVGroup::Plant);
+                            SOVGroup::Plant,
+                            SOVEndUseCat::Cooling);
 
         Real64 light_consumption = 0.;
         SetupOutputVariable(*state,
@@ -5549,9 +5534,9 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "LIGHTS 1",
                             Constant::eResource::Electricity,
+                            SOVGroup::Building,
                             SOVEndUseCat::InteriorLights,
                             "RailroadCrossing", // EndUseSubKey
-                            SOVGroup::Building,
                             "SPACE1-1",
                             1,
                             1);
@@ -5565,9 +5550,8 @@ namespace OutputProcessor {
                             SOVStoreType::Summed,
                             "Site",
                             Constant::eResource::CO2,
-                            SOVEndUseCat::FuelOilNo2Emissions,
-                            {}, // EndUseSubKey
-                            SOVGroup::Invalid);
+                            SOVGroup::Invalid,
+                            SOVEndUseCat::FuelOilNo2Emissions);
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 

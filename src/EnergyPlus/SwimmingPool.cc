@@ -656,9 +656,8 @@ void SwimmingPoolData::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::MainsWater,
-                        OutputProcessor::SOVEndUseCat::Heating,
-                        {},
-                        OutputProcessor::SOVGroup::HVAC);
+                        OutputProcessor::SOVGroup::HVAC,
+                        OutputProcessor::SOVEndUseCat::Heating);
     SetupOutputVariable(state,
                         "Indoor Pool Makeup Water Temperature",
                         Constant::Units::C,
@@ -716,9 +715,8 @@ void SwimmingPoolData::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::HeatingCoils,
-                        {},
-                        OutputProcessor::SOVGroup::HVAC);
+                        OutputProcessor::SOVGroup::HVAC,
+                        OutputProcessor::SOVEndUseCat::HeatingCoils);
     SetupOutputVariable(state,
                         "Indoor Pool Radiant to Convection by Cover",
                         Constant::Units::W,

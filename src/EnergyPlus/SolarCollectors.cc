@@ -782,9 +782,8 @@ namespace SolarCollectors {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::SolarWater,
-                                OutputProcessor::SOVEndUseCat::HeatProduced,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatProduced);
         } else if (this->Type == DataPlant::PlantEquipmentType::SolarCollectorICS) {
 
             SetupOutputVariable(state,
@@ -843,9 +842,8 @@ namespace SolarCollectors {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::SolarWater,
-                                OutputProcessor::SOVEndUseCat::HeatProduced,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatProduced);
 
             SetupOutputVariable(state,
                                 "Solar Collector Skin Heat Transfer Rate",
@@ -863,9 +861,8 @@ namespace SolarCollectors {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::SolarWater,
-                                OutputProcessor::SOVEndUseCat::HeatProduced,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatProduced);
 
             SetupOutputVariable(state,
                                 "Solar Collector Heat Transfer Rate",
@@ -883,9 +880,8 @@ namespace SolarCollectors {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::SolarWater,
-                                OutputProcessor::SOVEndUseCat::HeatProduced,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::HeatProduced);
         }
     }
 

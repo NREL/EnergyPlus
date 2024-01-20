@@ -328,9 +328,8 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
                             Constant::eResource::ElectricityPurchased,
-                            OutputProcessor::SOVEndUseCat::Cogeneration,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Cogeneration);
 
         SetupOutputVariable(state,
                             "Facility Total Surplus Electricity Rate",
@@ -347,9 +346,8 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
                             Constant::eResource::ElectricitySurplusSold,
-                            OutputProcessor::SOVEndUseCat::Cogeneration,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Cogeneration);
 
         SetupOutputVariable(state,
                             "Facility Net Purchased Electricity Rate",
@@ -366,9 +364,8 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
                             Constant::eResource::ElectricityNet,
-                            OutputProcessor::SOVEndUseCat::Cogeneration,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Cogeneration);
 
         SetupOutputVariable(state,
                             "Facility Total Building Electricity Demand Rate",
@@ -2678,9 +2675,8 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
                             Constant::eResource::ElectricityProduced,
-                            OutputProcessor::SOVEndUseCat::PowerConversion,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::PowerConversion);
         SetupOutputVariable(state,
                             "Inverter Thermal Loss Rate",
                             Constant::Units::W,
@@ -2710,9 +2706,9 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
                             Constant::eResource::Electricity,
+                            OutputProcessor::SOVGroup::Plant, // called cogeneration for end use table
                             OutputProcessor::SOVEndUseCat::Cogeneration,
-                            "DCtoACInverter Ancillary",
-                            OutputProcessor::SOVGroup::Plant); // called cogeneration for end use table
+                            "DCtoACInverter Ancillary");
         if (zoneNum_ > 0) {
             switch (modelType_) {
             case InverterModelType::SimpleConstantEff: {
@@ -3136,9 +3132,8 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
                             Constant::eResource::ElectricityProduced,
-                            OutputProcessor::SOVEndUseCat::PowerConversion,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::PowerConversion);
         SetupOutputVariable(state,
                             "Converter Thermal Loss Rate",
                             Constant::Units::W,
@@ -3168,9 +3163,9 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
                             Constant::eResource::Electricity,
+                            OutputProcessor::SOVGroup::Plant, // called cogeneration for end use table
                             OutputProcessor::SOVEndUseCat::Cogeneration,
-                            "ACtoDCConverter Ancillary",
-                            OutputProcessor::SOVGroup::Plant); // called cogeneration for end use table
+                            "ACtoDCConverter Ancillary");
         if (zoneNum_ > 0) {
             SetupZoneInternalGain(
                 state, zoneNum_, name_, DataHeatBalance::IntGainType::ElectricLoadCenterConverter, &qdotConvZone_, nullptr, &qdotRadZone_);
@@ -3714,9 +3709,8 @@ ElectricStorage::ElectricStorage( // main constructor
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
                             Constant::eResource::ElectricityProduced,
-                            OutputProcessor::SOVEndUseCat::ElectricStorage,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::ElectricStorage);
         SetupOutputVariable(state,
                             "Electric Storage Discharge Power",
                             Constant::Units::W,
@@ -3732,9 +3726,8 @@ ElectricStorage::ElectricStorage( // main constructor
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
                             Constant::eResource::ElectricityProduced,
-                            OutputProcessor::SOVEndUseCat::ElectricStorage,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::ElectricStorage);
         SetupOutputVariable(state,
                             "Electric Storage Thermal Loss Rate",
                             Constant::Units::W,
@@ -4944,9 +4937,9 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 OutputProcessor::SOVStoreType::Summed,
                                 name_,
                                 Constant::eResource::Electricity,
+                                OutputProcessor::SOVGroup::HVAC, // Is this correct?
                                 OutputProcessor::SOVEndUseCat::ExteriorEquipment,
-                                "Transformer",
-                                OutputProcessor::SOVGroup::HVAC); // Is this correct?
+                                "Transformer");
         }
         if (usageMode_ == TransformerUse::PowerOutFromBldgToGrid) {
             SetupOutputVariable(state,
@@ -4957,9 +4950,8 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 OutputProcessor::SOVStoreType::Summed,
                                 name_,
                                 Constant::eResource::ElectricityProduced,
-                                OutputProcessor::SOVEndUseCat::PowerConversion,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC); // Is this correct?
+                                OutputProcessor::SOVGroup::HVAC, // Is this correct?
+                                OutputProcessor::SOVEndUseCat::PowerConversion);
         }
         if (usageMode_ == TransformerUse::PowerBetweenLoadCenterAndBldg) {
             SetupOutputVariable(state,
@@ -4970,9 +4962,8 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 OutputProcessor::SOVStoreType::Summed,
                                 name_,
                                 Constant::eResource::ElectricityProduced,
-                                OutputProcessor::SOVEndUseCat::PowerConversion,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC); // Is this correct?
+                                OutputProcessor::SOVGroup::HVAC, // Is this correct?
+                                OutputProcessor::SOVEndUseCat::PowerConversion);
         }
 
         if (zoneNum_ > 0) {

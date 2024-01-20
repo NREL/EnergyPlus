@@ -257,9 +257,8 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->name,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::CoolingCoils,
-                        {},
-                        OutputProcessor::SOVGroup::HVAC);
+                        OutputProcessor::SOVGroup::HVAC,
+                        OutputProcessor::SOVEndUseCat::CoolingCoils);
     SetupOutputVariable(state,
                         "Cooling Coil Sensible Cooling Rate",
                         Constant::Units::W,
@@ -303,9 +302,8 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->name,
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVEndUseCat::Cooling,
-                        {},
-                        OutputProcessor::SOVGroup::HVAC);
+                        OutputProcessor::SOVGroup::HVAC,
+                        OutputProcessor::SOVEndUseCat::Cooling);
 
     if (this->performance.compressorFuelType != Constant::eFuel::Electricity) {
         std::string_view const sFuelType = Constant::eFuelNames[(int)this->performance.compressorFuelType];
@@ -324,9 +322,8 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             Constant::eFuel2eResource[(int)this->performance.compressorFuelType],
-                            OutputProcessor::SOVEndUseCat::Cooling,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::Cooling);
     }
 
     SetupOutputVariable(state,
@@ -351,9 +348,8 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->name,
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVEndUseCat::Cooling,
-                        {},
-                        OutputProcessor::SOVGroup::HVAC);
+                        OutputProcessor::SOVGroup::HVAC,
+                        OutputProcessor::SOVEndUseCat::Cooling);
     // Ported from variable speed coil
     SetupOutputVariable(state,
                         "Cooling Coil Air Mass Flow Rate",
@@ -456,9 +452,8 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::Cooling,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::Cooling);
     }
     if (this->condensateTankIndex > 0) {
         SetupOutputVariable(state,
@@ -476,9 +471,8 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             Constant::eResource::OnSiteWater,
-                            OutputProcessor::SOVEndUseCat::Condensate,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::Condensate);
     }
     if (this->evaporativeCondSupplyTankIndex > 0) {
         SetupOutputVariable(state,
@@ -496,9 +490,8 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::Condensate,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::Condensate);
         SetupOutputVariable(state,
                             "Cooling Coil Evaporative Condenser Water Volume Flow Rate",
                             Constant::Units::m3_s,
@@ -514,9 +507,8 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             Constant::eResource::Water,
-                            OutputProcessor::SOVEndUseCat::Condensate,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::Condensate);
         SetupOutputVariable(state,
                             "Cooling Coil Evaporative Condenser Mains Supply Water Volume",
                             Constant::Units::m3,
@@ -525,9 +517,8 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             Constant::eResource::MainsWater,
-                            OutputProcessor::SOVEndUseCat::Cooling,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::Cooling);
     }
     if (this->SubcoolReheatFlag) {
         SetupOutputVariable(state,
@@ -559,9 +550,8 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::HeatRecovery,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::HeatRecovery);
     }
 
     if (this->isSecondaryDXCoilInZone) {

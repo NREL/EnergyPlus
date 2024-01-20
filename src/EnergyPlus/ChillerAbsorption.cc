@@ -507,9 +507,8 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVEndUseCat::Cooling,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Cooling);
     SetupOutputVariable(state,
                         "Chiller Evaporator Cooling Rate",
                         Constant::Units::W,
@@ -525,9 +524,8 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::Chillers,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Chillers);
     SetupOutputVariable(state,
                         "Chiller Evaporator Inlet Temperature",
                         Constant::Units::C,
@@ -565,9 +563,8 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::HeatRejection,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::HeatRejection);
     SetupOutputVariable(state,
                         "Chiller Condenser Inlet Temperature",
                         Constant::Units::C,
@@ -606,9 +603,8 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eResource::PlantLoopHeatingDemand,
-                            OutputProcessor::SOVEndUseCat::Chillers,
-                            {},
-                            OutputProcessor::SOVGroup::Plant);
+                            OutputProcessor::SOVGroup::Plant,
+                            OutputProcessor::SOVEndUseCat::Chillers);
     } else {
         if (this->GenInputOutputNodesUsed) {
             SetupOutputVariable(state,
@@ -626,9 +622,8 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::PlantLoopHeatingDemand,
-                                OutputProcessor::SOVEndUseCat::Chillers,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::Chillers);
         } else {
             SetupOutputVariable(state,
                                 "Chiller Source Steam Rate",
@@ -645,9 +640,8 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 Constant::eResource::DistrictHeatingSteam,
-                                OutputProcessor::SOVEndUseCat::Cooling,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::SOVGroup::Plant,
+                                OutputProcessor::SOVEndUseCat::Cooling);
         }
     }
 

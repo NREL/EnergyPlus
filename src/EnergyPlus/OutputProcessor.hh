@@ -90,13 +90,15 @@ namespace OutputProcessor {
     enum class SOVStoreType
     {
         Invalid = -1,
-        State,
-        NonState,
+        // State,
+        // NonState,
         Summed,
         Average,
         Num
     };
-    static constexpr std::array<std::string_view, (int)SOVStoreType::Num> sovStoreTypeStrings = {"State", "NonState", "Summed", "Average"};
+    static constexpr std::array<std::string_view, (int)SOVStoreType::Num> sovStoreTypeStrings = {
+            // "State", "NonState",
+            "Summed", "Average"};
 
     enum class ReportVDD
     {
@@ -135,9 +137,9 @@ namespace OutputProcessor {
 
     constexpr int N_WriteTimeStampFormatData(100);
 
-    constexpr int RVarAllocInc(1000);
-    constexpr int LVarAllocInc(1000);
-    constexpr int IVarAllocInc(10);
+    // constexpr int RVarAllocInc(1000);
+    // constexpr int LVarAllocInc(1000);
+    // constexpr int IVarAllocInc(10);
 
     //  For IP Units (tabular reports) certain resources will be put in sub-tables
     enum class RT_IPUnits
@@ -204,8 +206,8 @@ namespace OutputProcessor {
         "Sum"      // Summed
     };
 
-    constexpr std::array<StoreType, (int)SOVStoreType::Num> sovStoreType2StoreType = {StoreType::Averaged,  // State
-                                                                                      StoreType::Summed,    // Non-state
+        constexpr std::array<StoreType, (int)SOVStoreType::Num> sovStoreType2StoreType = {// StoreType::Average,  // State
+                // StoreType::Summed,    // Non-state
                                                                                       StoreType::Summed,    // Sum
                                                                                       StoreType::Averaged}; // Average
 
@@ -871,15 +873,15 @@ void SetupOutputVariable(
     OutputProcessor::SOVStoreType variableType,                                          // State, Average=1, NonState, Sum=2
     std::string const &key,                                                              // Associated Key for this variable
     Constant::eResource resource = Constant::eResource::Invalid,                         // Meter Resource Type (Electricity, Gas, etc)
+    OutputProcessor::SOVGroup sovGroup = OutputProcessor::SOVGroup::Invalid,             // Meter Super Group Key (Building, System, Plant)
     OutputProcessor::SOVEndUseCat sovEndUseCat = OutputProcessor::SOVEndUseCat::Invalid, // Meter End Use Key (Lights, Heating, etc)
     std::string_view const endUseSub = {},                                               // Meter End Use Sub Key (General Lights, Task Lights, etc)
-    OutputProcessor::SOVGroup sovGroup = OutputProcessor::SOVGroup::Invalid,             // Meter Super Group Key (Building, System, Plant)
     std::string const &zone = {},                                                        // Meter Zone Key (zone name)
     int const zoneMult = 1,                                                              // Zone Multiplier, defaults to 1
     int const zoneListMult = 1,                                                          // Zone List Multiplier, defaults to 1
+    std::string const &spaceType = {},                                                   // Space type (applicable for Building group only)
     int const indexGroupKey = -999,                                                      // Group identifier for SQL output
     std::string_view const customUnitName = {},                                          // the custom name for the units from EMS definition of units
-    std::string const &spaceType = {},                                                   // Space type (applicable for Building group only)
     OutputProcessor::ReportFreq reportFreq = OutputProcessor::ReportFreq::Hour           // Internal use -- causes reporting at this freqency
 );
 

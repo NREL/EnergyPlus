@@ -447,9 +447,8 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             waterCoil.Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::HeatingCoils,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::HeatingCoils);
         SetupOutputVariable(state,
                             "Heating Coil Source Side Heat Transfer Energy",
                             Constant::Units::J,
@@ -458,9 +457,8 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             waterCoil.Name,
                             Constant::eResource::PlantLoopHeatingDemand,
-                            OutputProcessor::SOVEndUseCat::HeatingCoils,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::HeatingCoils);
         SetupOutputVariable(state,
                             "Heating Coil Heating Rate",
                             Constant::Units::W,
@@ -634,9 +632,8 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             waterCoil.Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::CoolingCoils,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::CoolingCoils);
         SetupOutputVariable(state,
                             "Cooling Coil Source Side Heat Transfer Energy",
                             Constant::Units::J,
@@ -645,9 +642,8 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             waterCoil.Name,
                             Constant::eResource::PlantLoopCoolingDemand,
-                            OutputProcessor::SOVEndUseCat::CoolingCoils,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::CoolingCoils);
         SetupOutputVariable(state,
                             "Cooling Coil Sensible Cooling Energy",
                             Constant::Units::J,
@@ -687,9 +683,8 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 waterCoil.Name,
                                 Constant::eResource::OnSiteWater,
-                                OutputProcessor::SOVEndUseCat::Condensate,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Condensate);
         }
     }
 
@@ -842,9 +837,8 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             waterCoil.Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::CoolingCoils,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::CoolingCoils);
         SetupOutputVariable(state,
                             "Cooling Coil Source Side Heat Transfer Energy",
                             Constant::Units::J,
@@ -853,9 +847,8 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             waterCoil.Name,
                             Constant::eResource::PlantLoopCoolingDemand,
-                            OutputProcessor::SOVEndUseCat::CoolingCoils,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::CoolingCoils);
         SetupOutputVariable(state,
                             "Cooling Coil Sensible Cooling Energy",
                             Constant::Units::J,
@@ -902,9 +895,8 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 waterCoil.Name,
                                 Constant::eResource::OnSiteWater,
-                                OutputProcessor::SOVEndUseCat::Condensate,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::SOVGroup::HVAC,
+                                OutputProcessor::SOVEndUseCat::Condensate);
         }
     }
 

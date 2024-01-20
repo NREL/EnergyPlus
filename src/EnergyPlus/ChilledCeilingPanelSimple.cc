@@ -721,9 +721,8 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             thisCP.Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::CoolingPanel,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::CoolingPanel);
         SetupOutputVariable(state,
                             "Cooling Panel Total System Cooling Energy",
                             Constant::Units::J,
@@ -732,9 +731,8 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             thisCP.Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVEndUseCat::CoolingPanel,
-                            {},
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::SOVGroup::HVAC,
+                            OutputProcessor::SOVEndUseCat::CoolingPanel);
         SetupOutputVariable(state,
                             "Cooling Panel Convective Cooling Energy",
                             Constant::Units::J,

@@ -383,9 +383,8 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::EnergyTransfer,
-                        OutputProcessor::SOVEndUseCat::Boilers,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::SOVGroup::Plant,
+                        OutputProcessor::SOVEndUseCat::Boilers);
     SetupOutputVariable(state,
                         format("Boiler {} Rate", sFuelType),
                         Constant::Units::W,
@@ -401,9 +400,9 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eFuel2eResource[(int)this->FuelType],
+                        OutputProcessor::SOVGroup::Plant,
                         OutputProcessor::SOVEndUseCat::Heating,
-                        this->EndUseSubcategory,
-                        OutputProcessor::SOVGroup::Plant);
+                        this->EndUseSubcategory);
     SetupOutputVariable(state,
                         "Boiler Inlet Temperature",
                         Constant::Units::C,
@@ -440,9 +439,9 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         Constant::eResource::Electricity,
+                        OutputProcessor::SOVGroup::Plant,
                         OutputProcessor::SOVEndUseCat::Heating,
-                        "Boiler Parasitic",
-                        OutputProcessor::SOVGroup::Plant);
+                        "Boiler Parasitic");
     if (this->FuelType != Constant::eFuel::Electricity) {
         SetupOutputVariable(state,
                             format("Boiler Ancillary {} Rate", sFuelType),
@@ -459,9 +458,9 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             Constant::eFuel2eResource[(int)this->FuelType],
+                            OutputProcessor::SOVGroup::Plant,
                             OutputProcessor::SOVEndUseCat::Heating,
-                            "Boiler Parasitic",
-                            OutputProcessor::SOVGroup::Plant);
+                            "Boiler Parasitic");
     }
     SetupOutputVariable(state,
                         "Boiler Part Load Ratio",
