@@ -166,13 +166,13 @@ namespace OutputProcessor {
     enum class StoreType
     {
         Invalid = -1,
-        Average = 1, // Type value for "averaged" variables // TODO: is this just for printing annual tables
+        Average, // Type value for "averaged" variables // TODO: is this just for printing annual tables
         Sum,         // Type value for "summed" variables
         Num
     };
 
     constexpr std::array<std::string_view, (int)StoreType::Num> storeTypeNames = {
-        "UNUSED",
+            //        "UNUSED",
         "Average", // Averaged
         "Sum"      // Summed
     };
@@ -180,13 +180,13 @@ namespace OutputProcessor {
     enum class TimeStepType
     {
         Invalid = -1,
-        Zone = 1, // Type value for "zone" timestep variables // TODO: is this just for printing Annual tables?
+        Zone, // Type value for "zone" timestep variables // TODO: is this just for printing Annual tables?
         System,   // Type value for "system" timestep variables
         Num
     };
 
     constexpr std::array<std::string_view, (int)TimeStepType::Num> timeStepTypeNames = {
-        "UNUSED",
+            //        "UNUSED",
         "Zone", // Zone
         "System"  // System
     };

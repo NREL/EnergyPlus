@@ -200,8 +200,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
     EXPECT_EQ(fieldSetParams[2], "J"); // m_varUnits
     EXPECT_EQ(fieldSetParams[4], "2"); // m_typeOfVar
     EXPECT_EQ(fieldSetParams[5], "3"); // m_keyCount
-    EXPECT_EQ(fieldSetParams[6], "2"); // m_varAvgSum
-    EXPECT_EQ(fieldSetParams[7], "1"); // m_varStepType
+    EXPECT_EQ(fieldSetParams[6], "1"); // m_varAvgSum
+    EXPECT_EQ(fieldSetParams[7], "0"); // m_varStepType
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
