@@ -3519,34 +3519,34 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite1",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite2",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite3",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -3587,34 +3587,34 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite1",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite2",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite3",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -3626,8 +3626,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     auto timeStep = 1.0;
 
-    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
-    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
+    SetupTimePointers(*state, OutputProcessor::TimeStepType::Zone, timeStep);
+    SetupTimePointers(*state, OutputProcessor::TimeStepType::System, timeStep);
 
     *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::Zone].TimeStep = 60;
     *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep = 60;
@@ -6567,34 +6567,34 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite1",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite2",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite3",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -7416,37 +7416,37 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
                             "Zone Mean Air Temperature",
                             Constant::Units::C,
                             zoneTemp,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             ZoneNames[i]);
 
         SetupOutputVariable(*state,
                             "Zone Heating Setpoint Not Met Time",
                             Constant::Units::hr,
                             timeNotMet,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             ZoneNames[i]);
         SetupOutputVariable(*state,
                             "Zone Heating Setpoint Not Met While Occupied Time",
                             Constant::Units::hr,
                             timeNotMet,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             ZoneNames[i]);
         SetupOutputVariable(*state,
                             "Zone Cooling Setpoint Not Met Time",
                             Constant::Units::hr,
                             timeNotMet,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             ZoneNames[i]);
         SetupOutputVariable(*state,
                             "Zone Cooling Setpoint Not Met While Occupied Time",
                             Constant::Units::hr,
                             timeNotMet,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             ZoneNames[i]);
     }
 
@@ -8053,67 +8053,67 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite1",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite2",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "AnotherEndUseSubCat");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite3",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Coal Energy",
                         Constant::Units::J,
                         CoalHeating,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite4",
                         Constant::eResource::Coal,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::Heating,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Gasoline Energy",
                         Constant::Units::J,
                         GasolineHeating,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite5",
                         Constant::eResource::Gasoline,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::Heating,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Propane Energy",
                         Constant::Units::J,
                         PropaneHeating,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite6",
                         Constant::eResource::Propane,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::Heating,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::Heating,
                         "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
@@ -8124,8 +8124,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
     auto timeStep = 1.0;
 
-    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
-    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
+    SetupTimePointers(*state, OutputProcessor::TimeStepType::Zone, timeStep);
+    SetupTimePointers(*state, OutputProcessor::TimeStepType::System, timeStep);
 
     *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::Zone].TimeStep = 60;
     *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep = 60;
@@ -8611,23 +8611,23 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite1",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Rate",
                         Constant::Units::W,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite2",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -8644,13 +8644,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
     // AttachMeters(*state, Constant::Units::J, resource, sovEndUseCat, endUseSub, sovGroup, zoneName, spaceType, -1);
     Meter *meter1 = new Meter("NATURALGAS:FACILITY");
     meter1->resource = Constant::eResource::NaturalGas;
-    meter1->sovEndUseCat = OutputProcessor::SOVEndUseCat::Invalid;
+    meter1->endUseCat = OutputProcessor::EndUseCat::Invalid;
     state->dataOutputProcessor->meters.push_back(meter1);
     state->dataOutputProcessor->meterMap.insert_or_assign("NATURALGAS:FACILITY", state->dataOutputProcessor->meters.size() - 1);
 
     Meter *meter2 = new Meter("HEATING:NATURALGAS");
     meter2->resource = Constant::eResource::NaturalGas;
-    meter2->sovEndUseCat = OutputProcessor::SOVEndUseCat::Heating;
+    meter2->endUseCat = OutputProcessor::EndUseCat::Heating;
     state->dataOutputProcessor->meters.push_back(meter2);
     state->dataOutputProcessor->meterMap.insert_or_assign("HEATING:NATURALGAS", state->dataOutputProcessor->meters.size() - 1);
 
@@ -9586,67 +9586,67 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite1",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite2",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "AnotherEndUseSubCat");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite3",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Coal Energy",
                         Constant::Units::J,
                         CoalHeating,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite4",
                         Constant::eResource::Coal,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::Heating,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Gasoline Energy",
                         Constant::Units::J,
                         GasolineHeating,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite5",
                         Constant::eResource::Gasoline,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::Heating,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Propane Energy",
                         Constant::Units::J,
                         PropaneHeating,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite6",
                         Constant::eResource::Propane,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::Heating,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::Heating,
                         "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
@@ -9657,8 +9657,8 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
 
     auto timeStep = 1.0;
 
-    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
-    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
+    SetupTimePointers(*state, OutputProcessor::TimeStepType::Zone, timeStep);
+    SetupTimePointers(*state, OutputProcessor::TimeStepType::System, timeStep);
 
     *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::Zone].TimeStep = 60;
     *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep = 60;
@@ -12640,12 +12640,12 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthly)
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite1",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -12705,12 +12705,12 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthly_AlwaysIfWeather
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite1",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
 
     // In a regular simulation with the above SimulationControl, when InitializeTabularMonthly is called it's DesignDay
@@ -12757,24 +12757,24 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthlyDisplayExtraWarn
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite1",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
 
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite2",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -12821,24 +12821,24 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthlyBlankVariable)
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite1",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
 
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite2",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -12883,24 +12883,24 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_NoWarnMonthlIfNoWeatherFile
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite1",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
 
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite2",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = false; // <- here
@@ -12939,12 +12939,12 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_DontWarnMonthlyIfOnlyNamedR
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite1",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -12988,12 +12988,12 @@ TEST_F(SQLiteFixture, OutputReportTabular_DistrictHeating)
                         "Exterior Equipment DistrictHeatingWater Energy",
                         Constant::Units::J,
                         DistrictHeatingWater,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "DHWaterExtEq",
                         Constant::eResource::DistrictHeatingWater,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorEquipment,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorEquipment,
                         "General");
 
     Real64 DistrictHeatingSteam = 5e8;
@@ -13001,12 +13001,12 @@ TEST_F(SQLiteFixture, OutputReportTabular_DistrictHeating)
                         "Exterior Equipment DistrictHeatingSteam Energy",
                         Constant::Units::J,
                         DistrictHeatingSteam,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "DHSteamExtEq",
                         Constant::eResource::DistrictHeatingSteam,
-                        OutputProcessor::SOVGroup::Invalid,
-                        OutputProcessor::SOVEndUseCat::ExteriorEquipment,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorEquipment,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -13018,8 +13018,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_DistrictHeating)
 
     auto timeStep = 1.0;
 
-    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
-    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
+    SetupTimePointers(*state, OutputProcessor::TimeStepType::Zone, timeStep);
+    SetupTimePointers(*state, OutputProcessor::TimeStepType::System, timeStep);
 
     *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::Zone].TimeStep = 60;
     *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep = 60;

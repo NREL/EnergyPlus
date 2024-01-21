@@ -986,8 +986,8 @@ namespace EvaporativeFluidCoolers {
                                 "Cooling Tower Bypass Fraction",
                                 Constant::Units::None,
                                 this->BypassFraction,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
         }
 
@@ -998,196 +998,196 @@ namespace EvaporativeFluidCoolers {
                                 "Cooling Tower Make Up Water Volume Flow Rate",
                                 Constant::Units::m3_s,
                                 this->MakeUpVdot,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Water Volume",
                                 Constant::Units::m3,
                                 this->MakeUpVol,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Storage Tank Water Volume Flow Rate",
                                 Constant::Units::m3_s,
                                 this->TankSupplyVdot,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Storage Tank Water Volume",
                                 Constant::Units::m3,
                                 this->TankSupplyVol,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
                                 Constant::eResource::Water,
-                                OutputProcessor::SOVGroup::Plant,
-                                OutputProcessor::SOVEndUseCat::HeatRejection);
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRejection);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Starved Storage Tank Water Volume Flow Rate",
                                 Constant::Units::m3_s,
                                 this->StarvedMakeUpVdot,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Starved Storage Tank Water Volume",
                                 Constant::Units::m3,
                                 this->StarvedMakeUpVol,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
                                 Constant::eResource::Water,
-                                OutputProcessor::SOVGroup::Plant,
-                                OutputProcessor::SOVEndUseCat::HeatRejection);
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRejection);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Mains Water Volume",
                                 Constant::Units::m3,
                                 this->StarvedMakeUpVol,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
                                 Constant::eResource::MainsWater,
-                                OutputProcessor::SOVGroup::Plant,
-                                OutputProcessor::SOVEndUseCat::HeatRejection);
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRejection);
 
         } else { // Evaporative fluid cooler water from mains and gets metered
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Water Volume Flow Rate",
                                 Constant::Units::m3_s,
                                 this->MakeUpVdot,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Water Volume",
                                 Constant::Units::m3,
                                 this->MakeUpVol,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
                                 Constant::eResource::Water,
-                                OutputProcessor::SOVGroup::Plant,
-                                OutputProcessor::SOVEndUseCat::HeatRejection);
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRejection);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Mains Water Volume",
                                 Constant::Units::m3,
                                 this->MakeUpVol,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
                                 Constant::eResource::MainsWater,
-                                OutputProcessor::SOVGroup::Plant,
-                                OutputProcessor::SOVEndUseCat::HeatRejection);
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRejection);
         }
 
         SetupOutputVariable(state,
                             "Cooling Tower Inlet Temperature",
                             Constant::Units::C,
                             this->fluidCoolerInletWaterTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Cooling Tower Outlet Temperature",
                             Constant::Units::C,
                             this->fluidCoolerOutletWaterTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Cooling Tower Mass Flow Rate",
                             Constant::Units::kg_s,
                             this->WaterMassFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Cooling Tower Heat Transfer Rate",
                             Constant::Units::W,
                             this->Qactual,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Cooling Tower Fan Electricity Rate",
                             Constant::Units::W,
                             this->FanPower,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Cooling Tower Fan Electricity Energy",
                             Constant::Units::J,
                             this->FanEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVGroup::Plant,
-                            OutputProcessor::SOVEndUseCat::HeatRejection);
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::HeatRejection);
 
         SetupOutputVariable(state,
                             "Cooling Tower Water Evaporation Volume Flow Rate",
                             Constant::Units::m3_s,
                             this->EvaporationVdot,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Cooling Tower Water Evaporation Volume",
                             Constant::Units::m3,
                             this->EvaporationVol,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Cooling Tower Water Drift Volume Flow Rate",
                             Constant::Units::m3_s,
                             this->DriftVdot,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Cooling Tower Water Drift Volume",
                             Constant::Units::m3,
                             this->DriftVol,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Cooling Tower Water Blowdown Volume Flow Rate",
                             Constant::Units::m3_s,
                             this->BlowdownVdot,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Cooling Tower Water Blowdown Volume",
                             Constant::Units::m3,
                             this->BlowdownVol,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name);
     }
 

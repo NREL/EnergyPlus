@@ -883,8 +883,8 @@ namespace HeatBalFiniteDiffManager {
                                 "CondFD Inner Solver Loop Iteration Count",
                                 Constant::Units::None,
                                 SurfaceFD(SurfNum).GSloopCounter,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 state.dataSurface->Surface(SurfNum).Name);
 
             // Setup EMS Material Actuators for Conductivity and Specific Heat
@@ -898,15 +898,15 @@ namespace HeatBalFiniteDiffManager {
                                     format("CondFD Internal Heat Source Power After Layer {}", lay),
                                     Constant::Units::W,
                                     SurfaceFD(SurfNum).heatSourceInternalFluxLayerReport(lay),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Internal Heat Source Energy After Layer {}", lay),
                                     Constant::Units::J,
                                     SurfaceFD(SurfNum).heatSourceInternalFluxEnergyLayerReport(lay),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     state.dataSurface->Surface(SurfNum).Name);
             }
 
@@ -942,19 +942,19 @@ namespace HeatBalFiniteDiffManager {
                                         format("CondFD EMS Heat Source Power After Layer {}", lay),
                                         Constant::Units::W,
                                         SurfaceFD(SurfNum).heatSourceEMSFluxLayerReport(lay),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         state.dataSurface->Surface(SurfNum).Name);
                     SetupOutputVariable(state,
                                         format("CondFD EMS Heat Source Energy After Layer {}", lay),
                                         Constant::Units::J,
                                         SurfaceFD(SurfNum).heatSourceEMSFluxEnergyLayerReport(lay),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Sum,
                                         state.dataSurface->Surface(SurfNum).Name,
                                         Constant::eResource::Electricity,
-                                        OutputProcessor::SOVGroup::Building,
-                                        OutputProcessor::SOVEndUseCat::Heating);
+                                        OutputProcessor::Group::Building,
+                                        OutputProcessor::EndUseCat::Heating);
                 }
             }
 
@@ -964,65 +964,65 @@ namespace HeatBalFiniteDiffManager {
                                     format("CondFD Surface Temperature Node {}", node),
                                     Constant::Units::C,
                                     SurfaceFD(SurfNum).TDreport(node),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Surface Heat Flux Node {}", node),
                                     Constant::Units::W_m2,
                                     SurfaceFD(SurfNum).QDreport(node),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change State {}", node),
                                     Constant::Units::None,
                                     SurfaceFD(SurfNum).PhaseChangeState(node),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Previous State {}", node),
                                     Constant::Units::None,
                                     SurfaceFD(SurfNum).PhaseChangeStateOld(node),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Node Temperature {}", node),
                                     Constant::Units::C,
                                     SurfaceFD(SurfNum).TDT(node),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Node Conductivity {}", node),
                                     Constant::Units::W_mK,
                                     SurfaceFD(SurfNum).condNodeReport(node),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Node Specific Heat {}", node),
                                     Constant::Units::J_kgK,
                                     SurfaceFD(SurfNum).specHeatNodeReport(node),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataSurface->Surface(SurfNum).Name);
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     SetupOutputVariable(state,
                                         format("CondFD Surface Heat Capacitance Outer Half Node {}", node),
                                         Constant::Units::W_m2K,
                                         SurfaceFD(SurfNum).CpDelXRhoS1(node),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         state.dataSurface->Surface(SurfNum).Name);
                     SetupOutputVariable(state,
                                         format("CondFD Surface Heat Capacitance Inner Half Node {}", node),
                                         Constant::Units::W_m2K,
                                         SurfaceFD(SurfNum).CpDelXRhoS2(node),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         state.dataSurface->Surface(SurfNum).Name);
                 }
             }

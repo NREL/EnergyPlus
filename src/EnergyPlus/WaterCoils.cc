@@ -443,35 +443,35 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "Heating Coil Heating Energy",
                             Constant::Units::J,
                             waterCoil.TotWaterHeatingCoilEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             waterCoil.Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVGroup::HVAC,
-                            OutputProcessor::SOVEndUseCat::HeatingCoils);
+                            OutputProcessor::Group::HVAC,
+                            OutputProcessor::EndUseCat::HeatingCoils);
         SetupOutputVariable(state,
                             "Heating Coil Source Side Heat Transfer Energy",
                             Constant::Units::J,
                             waterCoil.TotWaterHeatingCoilEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             waterCoil.Name,
                             Constant::eResource::PlantLoopHeatingDemand,
-                            OutputProcessor::SOVGroup::HVAC,
-                            OutputProcessor::SOVEndUseCat::HeatingCoils);
+                            OutputProcessor::Group::HVAC,
+                            OutputProcessor::EndUseCat::HeatingCoils);
         SetupOutputVariable(state,
                             "Heating Coil Heating Rate",
                             Constant::Units::W,
                             waterCoil.TotWaterHeatingCoilRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             waterCoil.Name);
         SetupOutputVariable(state,
                             "Heating Coil U Factor Times Area Value",
                             Constant::Units::W_K,
                             waterCoil.UACoilVariable,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             waterCoil.Name);
     }
 
@@ -628,42 +628,42 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "Cooling Coil Total Cooling Energy",
                             Constant::Units::J,
                             waterCoil.TotWaterCoolingCoilEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             waterCoil.Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVGroup::HVAC,
-                            OutputProcessor::SOVEndUseCat::CoolingCoils);
+                            OutputProcessor::Group::HVAC,
+                            OutputProcessor::EndUseCat::CoolingCoils);
         SetupOutputVariable(state,
                             "Cooling Coil Source Side Heat Transfer Energy",
                             Constant::Units::J,
                             waterCoil.TotWaterCoolingCoilEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             waterCoil.Name,
                             Constant::eResource::PlantLoopCoolingDemand,
-                            OutputProcessor::SOVGroup::HVAC,
-                            OutputProcessor::SOVEndUseCat::CoolingCoils);
+                            OutputProcessor::Group::HVAC,
+                            OutputProcessor::EndUseCat::CoolingCoils);
         SetupOutputVariable(state,
                             "Cooling Coil Sensible Cooling Energy",
                             Constant::Units::J,
                             waterCoil.SenWaterCoolingCoilEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             waterCoil.Name);
         SetupOutputVariable(state,
                             "Cooling Coil Total Cooling Rate",
                             Constant::Units::W,
                             waterCoil.TotWaterCoolingCoilRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             waterCoil.Name);
         SetupOutputVariable(state,
                             "Cooling Coil Sensible Cooling Rate",
                             Constant::Units::W,
                             waterCoil.SenWaterCoolingCoilRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             waterCoil.Name);
 
         if (waterCoil.CondensateCollectMode == state.dataWaterCoils->CondensateToTank) {
@@ -672,19 +672,19 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                 "Cooling Coil Condensate Volume Flow Rate",
                                 Constant::Units::m3_s,
                                 waterCoil.CondensateVdot,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 waterCoil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Condensate Volume",
                                 Constant::Units::m3,
                                 waterCoil.CondensateVol,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 waterCoil.Name,
                                 Constant::eResource::OnSiteWater,
-                                OutputProcessor::SOVGroup::HVAC,
-                                OutputProcessor::SOVEndUseCat::Condensate);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::Condensate);
         }
     }
 
@@ -833,49 +833,49 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "Cooling Coil Total Cooling Energy",
                             Constant::Units::J,
                             waterCoil.TotWaterCoolingCoilEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             waterCoil.Name,
                             Constant::eResource::EnergyTransfer,
-                            OutputProcessor::SOVGroup::HVAC,
-                            OutputProcessor::SOVEndUseCat::CoolingCoils);
+                            OutputProcessor::Group::HVAC,
+                            OutputProcessor::EndUseCat::CoolingCoils);
         SetupOutputVariable(state,
                             "Cooling Coil Source Side Heat Transfer Energy",
                             Constant::Units::J,
                             waterCoil.TotWaterCoolingCoilEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             waterCoil.Name,
                             Constant::eResource::PlantLoopCoolingDemand,
-                            OutputProcessor::SOVGroup::HVAC,
-                            OutputProcessor::SOVEndUseCat::CoolingCoils);
+                            OutputProcessor::Group::HVAC,
+                            OutputProcessor::EndUseCat::CoolingCoils);
         SetupOutputVariable(state,
                             "Cooling Coil Sensible Cooling Energy",
                             Constant::Units::J,
                             waterCoil.SenWaterCoolingCoilEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             waterCoil.Name);
         SetupOutputVariable(state,
                             "Cooling Coil Total Cooling Rate",
                             Constant::Units::W,
                             waterCoil.TotWaterCoolingCoilRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             waterCoil.Name);
         SetupOutputVariable(state,
                             "Cooling Coil Sensible Cooling Rate",
                             Constant::Units::W,
                             waterCoil.SenWaterCoolingCoilRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             waterCoil.Name);
         SetupOutputVariable(state,
                             "Cooling Coil Wetted Area Fraction",
                             Constant::Units::None,
                             waterCoil.SurfAreaWetFraction,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             waterCoil.Name);
 
         if (waterCoil.CondensateCollectMode == state.dataWaterCoils->CondensateToTank) {
@@ -884,19 +884,19 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                 "Cooling Coil Condensate Volume Flow Rate",
                                 Constant::Units::m3_s,
                                 waterCoil.CondensateVdot,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 waterCoil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Condensate Volume",
                                 Constant::Units::m3,
                                 waterCoil.CondensateVol,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 waterCoil.Name,
                                 Constant::eResource::OnSiteWater,
-                                OutputProcessor::SOVGroup::HVAC,
-                                OutputProcessor::SOVEndUseCat::Condensate);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::Condensate);
         }
     }
 

@@ -679,39 +679,39 @@ namespace WindTurbine {
                                 "Generator Produced AC Electricity Rate",
                                 Constant::Units::W,
                                 windTurbine.Power,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 windTurbine.Name);
             SetupOutputVariable(state,
                                 "Generator Produced AC Electricity Energy",
                                 Constant::Units::J,
                                 windTurbine.Energy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 windTurbine.Name,
                                 Constant::eResource::ElectricityProduced,
-                                OutputProcessor::SOVGroup::Plant,
-                                OutputProcessor::SOVEndUseCat::WindTurbine);
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::WindTurbine);
             SetupOutputVariable(state,
                                 "Generator Turbine Local Wind Speed",
                                 Constant::Units::m_s,
                                 windTurbine.LocalWindSpeed,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 windTurbine.Name);
             SetupOutputVariable(state,
                                 "Generator Turbine Local Air Density",
                                 Constant::Units::kg_m3,
                                 windTurbine.LocalAirDensity,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 windTurbine.Name);
             SetupOutputVariable(state,
                                 "Generator Turbine Tip Speed Ratio",
                                 Constant::Units::None,
                                 windTurbine.TipSpeedRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 windTurbine.Name);
             switch (windTurbine.rotorType) {
             case RotorType::HorizontalAxis: {
@@ -719,8 +719,8 @@ namespace WindTurbine {
                                     "Generator Turbine Power Coefficient",
                                     Constant::Units::None,
                                     windTurbine.PowerCoeff,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     windTurbine.Name);
             } break;
             case RotorType::VerticalAxis: {
@@ -728,29 +728,29 @@ namespace WindTurbine {
                                     "Generator Turbine Chordal Component Velocity",
                                     Constant::Units::m_s,
                                     windTurbine.ChordalVel,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     windTurbine.Name);
                 SetupOutputVariable(state,
                                     "Generator Turbine Normal Component Velocity",
                                     Constant::Units::m_s,
                                     windTurbine.NormalVel,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     windTurbine.Name);
                 SetupOutputVariable(state,
                                     "Generator Turbine Relative Flow Velocity",
                                     Constant::Units::m_s,
                                     windTurbine.RelFlowVel,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     windTurbine.Name);
                 SetupOutputVariable(state,
                                     "Generator Turbine Attack Angle",
                                     Constant::Units::deg,
                                     windTurbine.AngOfAttack,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     windTurbine.Name);
             } break;
             default:

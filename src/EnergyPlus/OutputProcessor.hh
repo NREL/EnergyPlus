@@ -75,31 +75,6 @@ struct EnergyPlusData;
 
 namespace OutputProcessor {
 
-    // enumerations for SetupOutputVariable calls -- for now these are direct mappings from the original strings, no change in functionality
-    enum class SOVTimeStepType
-    {
-        Invalid = -1,
-        System,
-        HVAC,
-        Zone,
-        Plant,
-        Num
-    };
-    static constexpr std::array<std::string_view, (int)SOVTimeStepType::Num> sovTimeStepTypeStrings = {"System", "HVAC", "Zone", "Plant"};
-
-    enum class SOVStoreType
-    {
-        Invalid = -1,
-        // State,
-        // NonState,
-        Summed,
-        Average,
-        Num
-    };
-    static constexpr std::array<std::string_view, (int)SOVStoreType::Num> sovStoreTypeStrings = {
-            // "State", "NonState",
-            "Summed", "Average"};
-
     enum class ReportVDD
     {
         Invalid = -1,
@@ -136,10 +111,6 @@ namespace OutputProcessor {
     };
 
     constexpr int N_WriteTimeStampFormatData(100);
-
-    // constexpr int RVarAllocInc(1000);
-    // constexpr int LVarAllocInc(1000);
-    // constexpr int IVarAllocInc(10);
 
     //  For IP Units (tabular reports) certain resources will be put in sub-tables
     enum class RT_IPUnits
@@ -195,8 +166,8 @@ namespace OutputProcessor {
     enum class StoreType
     {
         Invalid = -1,
-        Averaged = 1, // Type value for "averaged" variables // TODO: is this just for printing annual tables
-        Summed,       // Type value for "summed" variables
+        Average = 1, // Type value for "averaged" variables // TODO: is this just for printing annual tables
+        Sum,         // Type value for "summed" variables
         Num
     };
 
@@ -206,11 +177,6 @@ namespace OutputProcessor {
         "Sum"      // Summed
     };
 
-        constexpr std::array<StoreType, (int)SOVStoreType::Num> sovStoreType2StoreType = {// StoreType::Average,  // State
-                // StoreType::Summed,    // Non-state
-                                                                                      StoreType::Summed,    // Sum
-                                                                                      StoreType::Averaged}; // Average
-
     enum class TimeStepType
     {
         Invalid = -1,
@@ -219,18 +185,13 @@ namespace OutputProcessor {
         Num
     };
 
-    constexpr std::array<std::string_view, (int)TimeStepType::Num> timeStepNames = {
+    constexpr std::array<std::string_view, (int)TimeStepType::Num> timeStepTypeNames = {
         "UNUSED",
         "Zone", // Zone
-        "HVAC"  // System
+        "System"  // System
     };
 
-    static constexpr std::array<TimeStepType, (int)SOVTimeStepType::Num> sovTimeStep2TimeStep = {TimeStepType::System,  // System
-                                                                                                 TimeStepType::System,  // HVAC
-                                                                                                 TimeStepType::Zone,    // Zone
-                                                                                                 TimeStepType::System}; // Plant
-
-    enum class SOVEndUseCat
+    enum class EndUseCat
     {
         Invalid = -1,
         Heating,
@@ -286,109 +247,111 @@ namespace OutputProcessor {
         Num
     };
 
-    static constexpr std::array<std::string_view, (int)SOVEndUseCat::Num> sovEndUseCatNames = {"Heating",
-                                                                                               "Cooling",
-                                                                                               "InteriorLights",
-                                                                                               "ExteriorLights",
-                                                                                               "InteriorEquipment",
-                                                                                               "ExteriorEquipment",
-                                                                                               "Fans",
-                                                                                               "Pumps",
-                                                                                               "HeatRejection",
-                                                                                               "Humidifier",
-                                                                                               "HeatRecovery",
-                                                                                               "WaterSystems",
-                                                                                               "Refrigeration",
-                                                                                               "Cogeneration",
-                                                                                               "Baseboard",
-                                                                                               "Boilers",
-                                                                                               "CarbonEquivalentEmissions",
-                                                                                               "Chillers",
-                                                                                               "CoalEmissions",
-                                                                                               "ColdStorageCharge",
-                                                                                               "ColdStorageDischarge",
-                                                                                               "Condensate",
-                                                                                               "CoolingCoils",
-                                                                                               "CoolingPanel",
-                                                                                               "DieselEmissions",
-                                                                                               "DistrictChilledWater",
-                                                                                               "DistrictHotWater",
-                                                                                               "ElectricityEmissions",
-                                                                                               "ElectricStorage",
-                                                                                               "FreeCooling",
-                                                                                               "FuelOilNo1Emissions",
-                                                                                               "FuelOilNo2Emissions",
-                                                                                               "GasolineEmissions",
-                                                                                               "HeatingCoils",
-                                                                                               "HeatProduced",
-                                                                                               "HeatRecoveryForCooling",
-                                                                                               "HeatRecoveryForHeating",
-                                                                                               "LoopToLoop",
-                                                                                               "MainsWater",
-                                                                                               "NaturalGasEmissions",
-                                                                                               "OtherFuel1Emissions",
-                                                                                               "OtherFuel2Emissions",
-                                                                                               "Photovoltaic",
-                                                                                               "PowerConversion",
-                                                                                               "PropaneEmissions",
-                                                                                               "PurchasedElectricityEmissions",
-                                                                                               "RainWater",
-                                                                                               "SoldElectricityEmissions",
-                                                                                               "WellWater",
-                                                                                               "WindTurbine"};
+    static constexpr std::array<std::string_view, (int)EndUseCat::Num> endUseCatNames = {
+        "Heating",
+        "Cooling",
+        "InteriorLights",
+        "ExteriorLights",
+        "InteriorEquipment",
+        "ExteriorEquipment",
+        "Fans",
+        "Pumps",
+        "HeatRejection",
+        "Humidifier",
+        "HeatRecovery",
+        "WaterSystems",
+        "Refrigeration",
+        "Cogeneration",
+        "Baseboard",
+        "Boilers",
+        "CarbonEquivalentEmissions",
+        "Chillers",
+        "CoalEmissions",
+        "ColdStorageCharge",
+        "ColdStorageDischarge",
+        "Condensate",
+        "CoolingCoils",
+        "CoolingPanel",
+        "DieselEmissions",
+        "DistrictChilledWater",
+        "DistrictHotWater",
+        "ElectricityEmissions",
+        "ElectricStorage",
+        "FreeCooling",
+        "FuelOilNo1Emissions",
+        "FuelOilNo2Emissions",
+        "GasolineEmissions",
+        "HeatingCoils",
+        "HeatProduced",
+        "HeatRecoveryForCooling",
+        "HeatRecoveryForHeating",
+        "LoopToLoop",
+        "MainsWater",
+        "NaturalGasEmissions",
+        "OtherFuel1Emissions",
+        "OtherFuel2Emissions",
+        "Photovoltaic",
+        "PowerConversion",
+        "PropaneEmissions",
+        "PurchasedElectricityEmissions",
+        "RainWater",
+        "SoldElectricityEmissions",
+        "WellWater",
+        "WindTurbine"};
+        
+    static constexpr std::array<std::string_view, (int)EndUseCat::Num> endUseCatNamesUC = {
+        "HEATING",
+        "COOLING",
+        "INTERIORLIGHTS",
+        "EXTERIORLIGHTS",
+        "INTERIOREQUIPMENT",
+        "EXTERIOREQUIPMENT",
+        "FANS",
+        "PUMPS",
+        "HEATREJECTION",
+        "HUMIDIFIER",
+        "HEATRECOVERY",
+        "WATERSYSTEMS",
+        "REFRIGERATION",
+        "COGENERATION",
+        "BASEBOARD",
+        "BOILERS",
+        "CARBONEQUIVALENTEMISSIONS",
+        "CHILLERS",
+        "COALEMISSIONS",
+        "COLDSTORAGECHARGE",
+        "COLDSTORAGEDISCHARGE",
+        "CONDENSATE",
+        "COOLINGCOILS",
+        "COOLINGPANEL",
+        "DIESELEMISSIONS",
+        "DISTRICTCHILLEDWATER",
+        "DISTRICTHOTWATER",
+        "ELECTRICITYEMISSIONS",
+        "ELECTRICSTORAGE",
+        "FREECOOLING",
+        "FUELOILNO1EMISSIONS",
+        "FUELOILNO2EMISSIONS",
+        "GASOLINEEMISSIONS",
+        "HEATINGCOILS",
+        "HEATPRODUCED",
+        "HEATRECOVERYFORCOOLING",
+        "HEATRECOVERYFORHEATING",
+        "LOOPTOLOOP",
+        "MAINSWATER",
+        "NATURALGASEMISSIONS",
+        "OTHERFUEL1EMISSIONS",
+        "OTHERFUEL2EMISSIONS",
+        "PHOTOVOLTAIC",
+        "POWERCONVERSION",
+        "PROPANEEMISSIONS",
+        "PURCHASEDELECTRICITYEMISSIONS",
+        "RAINWATER",
+        "SOLDELECTRICITYEMISSIONS",
+        "WELLWATER",
+        "WINDTURBINE"};
 
-    static constexpr std::array<std::string_view, (int)SOVEndUseCat::Num> sovEndUseCatNamesUC = {"HEATING",
-                                                                                                 "COOLING",
-                                                                                                 "INTERIORLIGHTS",
-                                                                                                 "EXTERIORLIGHTS",
-                                                                                                 "INTERIOREQUIPMENT",
-                                                                                                 "EXTERIOREQUIPMENT",
-                                                                                                 "FANS",
-                                                                                                 "PUMPS",
-                                                                                                 "HEATREJECTION",
-                                                                                                 "HUMIDIFIER",
-                                                                                                 "HEATRECOVERY",
-                                                                                                 "WATERSYSTEMS",
-                                                                                                 "REFRIGERATION",
-                                                                                                 "COGENERATION",
-                                                                                                 "BASEBOARD",
-                                                                                                 "BOILERS",
-                                                                                                 "CARBONEQUIVALENTEMISSIONS",
-                                                                                                 "CHILLERS",
-                                                                                                 "COALEMISSIONS",
-                                                                                                 "COLDSTORAGECHARGE",
-                                                                                                 "COLDSTORAGEDISCHARGE",
-                                                                                                 "CONDENSATE",
-                                                                                                 "COOLINGCOILS",
-                                                                                                 "COOLINGPANEL",
-                                                                                                 "DIESELEMISSIONS",
-                                                                                                 "DISTRICTCHILLEDWATER",
-                                                                                                 "DISTRICTHOTWATER",
-                                                                                                 "ELECTRICITYEMISSIONS",
-                                                                                                 "ELECTRICSTORAGE",
-                                                                                                 "FREECOOLING",
-                                                                                                 "FUELOILNO1EMISSIONS",
-                                                                                                 "FUELOILNO2EMISSIONS",
-                                                                                                 "GASOLINEEMISSIONS",
-                                                                                                 "HEATINGCOILS",
-                                                                                                 "HEATPRODUCED",
-                                                                                                 "HEATRECOVERYFORCOOLING",
-                                                                                                 "HEATRECOVERYFORHEATING",
-                                                                                                 "LOOPTOLOOP",
-                                                                                                 "MAINSWATER",
-                                                                                                 "NATURALGASEMISSIONS",
-                                                                                                 "OTHERFUEL1EMISSIONS",
-                                                                                                 "OTHERFUEL2EMISSIONS",
-                                                                                                 "PHOTOVOLTAIC",
-                                                                                                 "POWERCONVERSION",
-                                                                                                 "PROPANEEMISSIONS",
-                                                                                                 "PURCHASEDELECTRICITYEMISSIONS",
-                                                                                                 "RAINWATER",
-                                                                                                 "SOLDELECTRICITYEMISSIONS",
-                                                                                                 "WELLWATER",
-                                                                                                 "WINDTURBINE"};
-
-    static constexpr std::array<Constant::EndUse, (int)SOVEndUseCat::Num> sovEndUseCat2endUse = {
+    static constexpr std::array<Constant::EndUse, (int)EndUseCat::Num> endUseCat2endUse = {
         Constant::EndUse::Heating,           // Heating
         Constant::EndUse::Cooling,           // Cooling
         Constant::EndUse::InteriorLights,    // InteriorLights
@@ -441,7 +404,7 @@ namespace OutputProcessor {
         Constant::EndUse::Invalid,           // WindTurbine,
     };
 
-    enum class SOVGroup
+    enum class Group
     {
         Invalid = -1,
         Building,
@@ -452,8 +415,8 @@ namespace OutputProcessor {
         Num
     };
 
-    static constexpr std::array<std::string_view, (int)SOVGroup::Num> sovGroupNames = {"Building", "HVAC", "Plant", "Zone", "SpaceType"};
-    static constexpr std::array<std::string_view, (int)SOVGroup::Num> sovGroupNamesUC = {"BUILDING", "HVAC", "PLANT", "ZONE", "SPACETYPE"};
+    static constexpr std::array<std::string_view, (int)Group::Num> groupNames = {"Building", "HVAC", "Plant", "Zone", "SpaceType"};
+    static constexpr std::array<std::string_view, (int)Group::Num> groupNamesUC = {"BUILDING", "HVAC", "PLANT", "ZONE", "SPACETYPE"};
 
     struct TimeSteps
     {
@@ -466,7 +429,7 @@ namespace OutputProcessor {
         int ddVarNum = -1;
         VariableType varType = VariableType::Invalid;
         TimeStepType timeStepType = TimeStepType::Zone; // Zone or System
-        StoreType storeType = StoreType::Averaged;      // Variable Type (Summed/Non-Static or Average/Static)
+        StoreType storeType = StoreType::Average;      // Variable Type (Summed/Non-Static or Average/Static)
         Real64 Value = 0.0;                             // Current Value of the variable (to resolution of Zone Time Step)
         Real64 TSValue = 0.0;                           // Value of this variable at the Zone Time Step
         Real64 EITSValue = 0.0;                         // Value of this variable at the Zone Time Step for external interface
@@ -586,9 +549,9 @@ namespace OutputProcessor {
         std::string Name = "";                                       // Name of the meter
         MeterType type = MeterType::Invalid;                         // type of meter
         Constant::eResource resource = Constant::eResource::Invalid; // Resource Type of the meter
-        SOVEndUseCat sovEndUseCat = SOVEndUseCat::Invalid;           // End Use of the meter
+        EndUseCat endUseCat = EndUseCat::Invalid;           // End Use of the meter
         std::string EndUseSub = "";                                  // End Use subcategory of the meter
-        SOVGroup sovGroup = SOVGroup::Invalid;                       // Group of the meter
+        Group group = Group::Invalid;                       // Group of the meter
         Constant::Units units = Constant::Units::Invalid;            // Units for the Meter
         RT_IPUnits RT_forIPUnits;                                    // Resource type number for IP Units (tabular) reporting
 
@@ -619,8 +582,8 @@ namespace OutputProcessor {
         Constant::Units units = Constant::Units::Invalid;
         VariableType varType = VariableType::Invalid;
         TimeStepType timeStepType = TimeStepType::Invalid;
-        SOVEndUseCat sovEndUseCat = SOVEndUseCat::Invalid;
-        SOVGroup sovGroup = SOVGroup::Invalid;
+        EndUseCat endUseCat = EndUseCat::Invalid;
+        Group group = Group::Invalid;
         int rptNum = -1;
     };
 
@@ -653,8 +616,8 @@ namespace OutputProcessor {
     void InitializeOutput(EnergyPlusData &state);
 
     void SetupTimePointers(EnergyPlusData &state,
-                           OutputProcessor::SOVTimeStepType IndexKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
-                           Real64 &TimeStep                           // The timestep variable.  Used to get the address
+                           OutputProcessor::TimeStepType timeStepType, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
+                           Real64 &TimeStep                            // The timestep variable.  Used to get the address
     );
 
     void CheckReportVariable(EnergyPlusData &state,
@@ -681,17 +644,17 @@ namespace OutputProcessor {
                  std::string const &Name,          // Name for the meter
                  Constant::Units units,            // Units for the meter
                  Constant::eResource resource,     // ResourceType for the meter
-                 SOVEndUseCat sovEndUseCat,        // EndUse for the meter
+                 EndUseCat endUseCat,        // EndUse for the meter
                  std::string_view const EndUseSub, // EndUse subcategory for the meter
-                 SOVGroup sovGroup,                // Group for the meter
+                 Group group,                // Group for the meter
                  int outVarNum);
 
     void AttachMeters(EnergyPlusData &state,
                       Constant::Units units,            // Units for this meter
                       Constant::eResource resource,     // Electricity, Gas, etc.
-                      SOVEndUseCat sovEndUseCat,        // End-use category (Lights, Heating, etc.)
+                      EndUseCat endUseCat,        // End-use category (Lights, Heating, etc.)
                       std::string_view const EndUseSub, // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
-                      SOVGroup sovGroup,                // Group key (Facility, Zone, Building, etc.)
+                      Group group,                // Group key (Facility, Zone, Building, etc.)
                       std::string const &ZoneName,      // Zone key only applicable for Building group
                       std::string const &SpaceTypeName, // Space Type key only applicable for Building group
                       int RepVarNum                     // Number of this report variable
@@ -851,9 +814,9 @@ namespace OutputProcessor {
         std::string varKey;
     };
 
-    std::string standardizeEndUseSub(SOVEndUseCat sovEndUseCat, std::string_view const endUseSub);
-    void addEndUseSubcategory(EnergyPlusData &state, SOVEndUseCat sovEndUseCat, std::string_view const endUseSubName);
-    void addEndUseSpaceType(EnergyPlusData &state, SOVEndUseCat sovEndUseCat, std::string_view const endUseSpTypeName);
+    std::string standardizeEndUseSub(EndUseCat endUseCat, std::string_view const endUseSubCat);
+    void addEndUseSubcategory(EnergyPlusData &state, EndUseCat endUseCat, std::string_view const endUseSubCat);
+    void addEndUseSpaceType(EnergyPlusData &state, EndUseCat endUseCat, std::string_view const endUseSpTypeName);
 } // namespace OutputProcessor
 
 //==============================================================================================
@@ -869,12 +832,12 @@ void SetupOutputVariable(
     std::string_view const name,                                                         // String Name of variable (with units)
     Constant::Units units,                                                               // Actual units corresponding to the actual variable
     Real64 &ActualVariable,                                                              // Actual Variable, used to set up pointer
-    OutputProcessor::SOVTimeStepType timeStepType,                                       // Zone, HeatBalance=1, HVAC, System, Plant=2
-    OutputProcessor::SOVStoreType variableType,                                          // State, Average=1, NonState, Sum=2
+    OutputProcessor::TimeStepType timeStepType,                                       // Zone, HeatBalance=1, HVAC, System, Plant=2
+    OutputProcessor::StoreType variableType,                                          // State, Average=1, NonState, Sum=2
     std::string const &key,                                                              // Associated Key for this variable
     Constant::eResource resource = Constant::eResource::Invalid,                         // Meter Resource Type (Electricity, Gas, etc)
-    OutputProcessor::SOVGroup sovGroup = OutputProcessor::SOVGroup::Invalid,             // Meter Super Group Key (Building, System, Plant)
-    OutputProcessor::SOVEndUseCat sovEndUseCat = OutputProcessor::SOVEndUseCat::Invalid, // Meter End Use Key (Lights, Heating, etc)
+    OutputProcessor::Group group = OutputProcessor::Group::Invalid,             // Meter Super Group Key (Building, System, Plant)
+    OutputProcessor::EndUseCat endUseCat = OutputProcessor::EndUseCat::Invalid, // Meter End Use Key (Lights, Heating, etc)
     std::string_view const endUseSub = {},                                               // Meter End Use Sub Key (General Lights, Task Lights, etc)
     std::string const &zone = {},                                                        // Meter Zone Key (zone name)
     int const zoneMult = 1,                                                              // Zone Multiplier, defaults to 1
@@ -889,8 +852,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string_view const VariableName,                                 // String Name of variable
                          Constant::Units VariableUnit,                                        // Actual units corresponding to the actual variable
                          int &ActualVariable,                                                 // Actual Variable, used to set up pointer
-                         OutputProcessor::SOVTimeStepType TimeStepTypeKey,                    // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         OutputProcessor::SOVStoreType VariableTypeKey,                       // State, Average=1, NonState, Sum=2
+                         OutputProcessor::TimeStepType TimeStepType,                       // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::StoreType VariableType,                          // State, Average=1, NonState, Sum=2
                          std::string const &KeyedValue,                                       // Associated Key for this variable
                          int const indexGroupKey = -999,                                      // Group identifier for SQL output
                          OutputProcessor::ReportFreq freq = OutputProcessor::ReportFreq::Hour // Internal use -- causes reporting at this freqency

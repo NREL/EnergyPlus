@@ -738,150 +738,150 @@ namespace SolarCollectors {
                                 "Solar Collector Incident Angle Modifier",
                                 Constant::Units::None,
                                 this->IncidentAngleModifier,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Efficiency",
                                 Constant::Units::None,
                                 this->Efficiency,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Heat Transfer Rate",
                                 Constant::Units::W,
                                 this->Power,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Heat Gain Rate",
                                 Constant::Units::W,
                                 this->HeatGain,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Heat Loss Rate",
                                 Constant::Units::W,
                                 this->HeatLoss,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Heat Transfer Energy",
                                 Constant::Units::J,
                                 this->Energy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
                                 Constant::eResource::SolarWater,
-                                OutputProcessor::SOVGroup::Plant,
-                                OutputProcessor::SOVEndUseCat::HeatProduced);
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatProduced);
         } else if (this->Type == DataPlant::PlantEquipmentType::SolarCollectorICS) {
 
             SetupOutputVariable(state,
                                 "Solar Collector Transmittance Absorptance Product",
                                 Constant::Units::None,
                                 this->TauAlpha,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Overall Top Heat Loss Coefficient",
                                 Constant::Units::W_m2C,
                                 this->UTopLoss,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Absorber Plate Temperature",
                                 Constant::Units::C,
                                 this->TempOfAbsPlate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Storage Water Temperature",
                                 Constant::Units::C,
                                 this->TempOfWater,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Thermal Efficiency",
                                 Constant::Units::None,
                                 this->Efficiency,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Storage Heat Transfer Rate",
                                 Constant::Units::W,
                                 this->StoredHeatRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Storage Heat Transfer Energy",
                                 Constant::Units::J,
                                 this->StoredHeatEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
                                 Constant::eResource::SolarWater,
-                                OutputProcessor::SOVGroup::Plant,
-                                OutputProcessor::SOVEndUseCat::HeatProduced);
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatProduced);
 
             SetupOutputVariable(state,
                                 "Solar Collector Skin Heat Transfer Rate",
                                 Constant::Units::W,
                                 this->SkinHeatLossRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Skin Heat Transfer Energy",
                                 Constant::Units::J,
                                 this->CollHeatLossEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
                                 Constant::eResource::SolarWater,
-                                OutputProcessor::SOVGroup::Plant,
-                                OutputProcessor::SOVEndUseCat::HeatProduced);
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatProduced);
 
             SetupOutputVariable(state,
                                 "Solar Collector Heat Transfer Rate",
                                 Constant::Units::W,
                                 this->HeatRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Solar Collector Heat Transfer Energy",
                                 Constant::Units::J,
                                 this->HeatEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
                                 Constant::eResource::SolarWater,
-                                OutputProcessor::SOVGroup::Plant,
-                                OutputProcessor::SOVEndUseCat::HeatProduced);
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatProduced);
         }
     }
 

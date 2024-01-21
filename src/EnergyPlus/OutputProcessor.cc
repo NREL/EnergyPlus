@@ -187,7 +187,7 @@ namespace OutputProcessor {
         state.files.mtd.ensure_open(state, "InitializeMeters", state.files.outputControl.mtd);
     } // InitializeOutput()
 
-    void addEndUseSubcategory(EnergyPlusData &state, SOVEndUseCat sovEndUseCat, std::string_view const endUseSubName)
+    void addEndUseSubcategory(EnergyPlusData &state, EndUseCat endUseCat, std::string_view const endUseSubName)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -199,37 +199,37 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &op = state.dataOutputProcessor;
 
-        Constant::EndUse endUse = sovEndUseCat2endUse[(int)sovEndUseCat];
+        Constant::EndUse endUse = endUseCat2endUse[(int)endUseCat];
         if (endUse == Constant::EndUse::Invalid) {
-            ShowSevereError(state, format("Nonexistent end use passed to addEndUseSpaceType={}", sovEndUseCatNames[(int)sovEndUseCat]));
+            ShowSevereError(state, format("Nonexistent end use passed to addEndUseSpaceType={}", endUseCatNames[(int)endUseCat]));
             return;
         }
 
-        auto &endUseCat = op->EndUseCategory((int)endUse + 1);
+        auto &endUseCategory = op->EndUseCategory((int)endUse + 1);
 
-        for (int EndUseSubNum = 1; EndUseSubNum <= endUseCat.NumSubcategories; ++EndUseSubNum) {
-            if (Util::SameString(endUseCat.SubcategoryName(EndUseSubNum), endUseSubName)) {
+        for (int EndUseSubNum = 1; EndUseSubNum <= endUseCategory.NumSubcategories; ++EndUseSubNum) {
+            if (Util::SameString(endUseCategory.SubcategoryName(EndUseSubNum), endUseSubName)) {
                 return; // Subcategory already exists, no further action required
             }
         }
 
         // Add the subcategory by reallocating the array
-        endUseCat.SubcategoryName.redimension(++endUseCat.NumSubcategories);
-        endUseCat.SubcategoryName(endUseCat.NumSubcategories) = endUseSubName;
+        endUseCategory.SubcategoryName.redimension(++endUseCategory.NumSubcategories);
+        endUseCategory.SubcategoryName(endUseCategory.NumSubcategories) = endUseSubName;
 
-        if (endUseCat.NumSubcategories > op->MaxNumSubcategories) {
-            op->MaxNumSubcategories = endUseCat.NumSubcategories;
+        if (endUseCategory.NumSubcategories > op->MaxNumSubcategories) {
+            op->MaxNumSubcategories = endUseCategory.NumSubcategories;
         }
     } // addEndUseSubcategory()
 
-    void addEndUseSpaceType(EnergyPlusData &state, OutputProcessor::SOVEndUseCat sovEndUseCat, std::string_view const EndUseSpaceTypeName)
+    void addEndUseSpaceType(EnergyPlusData &state, OutputProcessor::EndUseCat sovEndUseCat, std::string_view const EndUseSpaceTypeName)
     {
         auto &op = state.dataOutputProcessor;
 
-        Constant::EndUse endUse = sovEndUseCat2endUse[(int)sovEndUseCat];
+        Constant::EndUse endUse = endUseCat2endUse[(int)sovEndUseCat];
 
         if (endUse == Constant::EndUse::Invalid) {
-            ShowSevereError(state, format("Nonexistent end use passed to addEndUseSpaceType={}", sovEndUseCatNames[(int)sovEndUseCat]));
+            ShowSevereError(state, format("Nonexistent end use passed to addEndUseSpaceType={}", endUseCatNames[(int)sovEndUseCat]));
             return;
         }
 
@@ -251,7 +251,7 @@ namespace OutputProcessor {
     } // addEndUseSpaceType()
 
     void SetupTimePointers(EnergyPlusData &state,
-                           SOVTimeStepType const sovTimeStep, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
+                           TimeStepType const timeStep, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
                            Real64 &TimeStep                   // The timestep variable.  Used to get the address
     )
     {
@@ -272,10 +272,8 @@ namespace OutputProcessor {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // ValidateTimeStepType will throw a Fatal if not valid
-        TimeStepType timeStep = sovTimeStep2TimeStep[(int)sovTimeStep];
-
         if (state.dataOutputProcessor->TimeValue[(int)timeStep].TimeStep != nullptr) {
-            ShowFatalError(state, format("SetupTimePointers was already called for {}", sovTimeStepTypeStrings[(int)sovTimeStep]));
+            ShowFatalError(state, format("SetupTimePointers was already called for {}", timeStepTypeNames[(int)timeStep]));
         }
         state.dataOutputProcessor->TimeValue[(int)timeStep].TimeStep = &TimeStep;
     }
@@ -813,7 +811,7 @@ namespace OutputProcessor {
                     auto *srcDDVar = op->ddOutVars[srcDDVarNum];
 
                     // Has to be a summed variable
-                    if (srcDDVar->storeType != StoreType::Summed) {
+                    if (srcDDVar->storeType != StoreType::Sum) {
                         ShowWarningCustomMessage(state,
                                                  eoh,
                                                  format(R"(Meter:Custom="{}", variable not summed variable {}="{}".)",
@@ -1135,7 +1133,7 @@ namespace OutputProcessor {
                     auto *srcDDVar = op->ddOutVars[srcDDVarNum];
 
                     // Has to be a summed variable
-                    if (srcDDVar->storeType != StoreType::Summed) {
+                    if (srcDDVar->storeType != StoreType::Sum) {
                         ShowWarningCustomMessage(state,
                                                  eoh,
                                                  format(R"(Meter:Custom="{}", variable not summed variable {}="{}".)",
@@ -1347,9 +1345,9 @@ namespace OutputProcessor {
                  std::string const &Name,          // Name for the meter
                  Constant::Units const units,      // Units for the meter
                  Constant::eResource resource,     // ResourceType for the meter
-                 SOVEndUseCat sovEndUseCat,        // EndUse for the meter
+                 EndUseCat endUseCat,        // EndUse for the meter
                  std::string_view const EndUseSub, // EndUse subcategory for the meter
-                 SOVGroup sovGroup,
+                 Group group,
                  int outVarNum) // Variable index
     {
 
@@ -1382,9 +1380,9 @@ namespace OutputProcessor {
 
             meter->type = MeterType::Normal;
             meter->resource = resource;
-            meter->sovEndUseCat = sovEndUseCat;
+            meter->endUseCat = endUseCat;
             meter->EndUseSub = EndUseSub;
-            meter->sovGroup = sovGroup;
+            meter->group = group;
             meter->units = units;
             meter->CurTSValue = 0.0;
 
@@ -1421,9 +1419,9 @@ namespace OutputProcessor {
     void AttachMeters(EnergyPlusData &state,
                       Constant::Units const units,      // Units for this meter
                       Constant::eResource resource,     // Electricity, Gas, etc.
-                      SOVEndUseCat sovEndUseCat,        // End-use category (Lights, Heating, etc.)
+                      EndUseCat endUseCat,        // End-use category (Lights, Heating, etc.)
                       std::string_view const EndUseSub, // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
-                      SOVGroup sovGroup,                // Group key (Facility, Zone, Building, etc.)
+                      Group group,                // Group key (Facility, Zone, Building, etc.)
                       std::string const &ZoneName,      // Zone key only applicable for Building group
                       std::string const &SpaceType,     // Space Type key only applicable for Building group
                       int const outVarNum               // Number of this report variable
@@ -1440,74 +1438,74 @@ namespace OutputProcessor {
 
         std::string_view resourceName = Constant::eResourceNames[(int)resource];
 
-        std::string endUseSub = standardizeEndUseSub(sovEndUseCat, EndUseSub);
+        std::string endUseSub = standardizeEndUseSub(endUseCat, EndUseSub);
 
-        if (!endUseSub.empty()) addEndUseSubcategory(state, sovEndUseCat, endUseSub);
+        if (!endUseSub.empty()) addEndUseSubcategory(state, endUseCat, endUseSub);
 
-        if (!SpaceType.empty()) addEndUseSpaceType(state, sovEndUseCat, SpaceType);
+        if (!SpaceType.empty()) addEndUseSpaceType(state, endUseCat, SpaceType);
 
         std::string meterName = format("{}:Facility", resourceName);
-        AddMeter(state, meterName, units, resource, SOVEndUseCat::Invalid, "", SOVGroup::Invalid, outVarNum);
+        AddMeter(state, meterName, units, resource, EndUseCat::Invalid, "", Group::Invalid, outVarNum);
 
-        if (sovGroup != SOVGroup::Invalid) {
-            std::string groupMeterName = format("{}:{}", resourceName, sovGroupNames[(int)sovGroup]);
-            AddMeter(state, groupMeterName, units, resource, SOVEndUseCat::Invalid, "", sovGroup, outVarNum);
+        if (group != Group::Invalid) {
+            std::string groupMeterName = format("{}:{}", resourceName, groupNames[(int)group]);
+            AddMeter(state, groupMeterName, units, resource, EndUseCat::Invalid, "", group, outVarNum);
 
-            if (sovGroup == SOVGroup::Building) {
+            if (group == Group::Building) {
                 if (!ZoneName.empty()) {
                     std::string zoneMeterName = format("{}:Zone:{}", resourceName, ZoneName);
-                    AddMeter(state, zoneMeterName, units, resource, SOVEndUseCat::Invalid, "", SOVGroup::Zone, outVarNum);
+                    AddMeter(state, zoneMeterName, units, resource, EndUseCat::Invalid, "", Group::Zone, outVarNum);
                 }
                 if (!SpaceType.empty()) {
                     std::string spaceMeterName = format("{}:SpaceType:{}", resourceName, SpaceType);
-                    AddMeter(state, spaceMeterName, units, resource, SOVEndUseCat::Invalid, "", SOVGroup::SpaceType, outVarNum);
+                    AddMeter(state, spaceMeterName, units, resource, EndUseCat::Invalid, "", Group::SpaceType, outVarNum);
                 }
             } // if (Group == "Building")
         }
 
         //!! Following if we do EndUse by ResourceType
-        if (sovEndUseCat != SOVEndUseCat::Invalid) {
-            std::string_view sovEndUseCatName = sovEndUseCatNames[(int)sovEndUseCat];
-            std::string enduseMeterName = format("{}:{}", sovEndUseCatName, resourceName);
-            AddMeter(state, enduseMeterName, units, resource, sovEndUseCat, "", SOVGroup::Invalid, outVarNum);
+        if (endUseCat != EndUseCat::Invalid) {
+            std::string_view endUseCatName = endUseCatNames[(int)endUseCat];
+            std::string enduseMeterName = format("{}:{}", endUseCatName, resourceName);
+            AddMeter(state, enduseMeterName, units, resource, endUseCat, "", Group::Invalid, outVarNum);
 
-            if (sovGroup == SOVGroup::Building) { // Match to Zone and Space
+            if (group == Group::Building) { // Match to Zone and Space
                 if (!ZoneName.empty()) {
-                    std::string enduseZoneMeterName = format("{}:{}:Zone:{}", sovEndUseCatName, resourceName, ZoneName);
-                    AddMeter(state, enduseZoneMeterName, units, resource, sovEndUseCat, "", SOVGroup::Zone, outVarNum);
+                    std::string enduseZoneMeterName = format("{}:{}:Zone:{}", endUseCatName, resourceName, ZoneName);
+                    AddMeter(state, enduseZoneMeterName, units, resource, endUseCat, "", Group::Zone, outVarNum);
                 }
                 if (!SpaceType.empty()) {
-                    std::string enduseSpaceMeterName = format("{}:{}:SpaceType:{}", sovEndUseCatName, resourceName, SpaceType);
-                    AddMeter(state, enduseSpaceMeterName, units, resource, sovEndUseCat, "", SOVGroup::SpaceType, outVarNum);
+                    std::string enduseSpaceMeterName = format("{}:{}:SpaceType:{}", endUseCatName, resourceName, SpaceType);
+                    AddMeter(state, enduseSpaceMeterName, units, resource, endUseCat, "", Group::SpaceType, outVarNum);
                 }
             }
 
             // End-Use Subcategories
             if (!endUseSub.empty()) {
-                std::string subEnduseMeterName = format("{}:{}:{}", endUseSub, sovEndUseCatNames[(int)sovEndUseCat], resourceName);
-                AddMeter(state, subEnduseMeterName, units, resource, sovEndUseCat, endUseSub, SOVGroup::Invalid, outVarNum);
+                std::string subEnduseMeterName = format("{}:{}:{}", endUseSub, endUseCatNames[(int)endUseCat], resourceName);
+                AddMeter(state, subEnduseMeterName, units, resource, endUseCat, endUseSub, Group::Invalid, outVarNum);
 
-                if (sovGroup == SOVGroup::Building) { // Match to Zone and Space
+                if (group == Group::Building) { // Match to Zone and Space
                     if (!ZoneName.empty()) {
-                        std::string subEnduseZoneMeterName = format("{}:{}:{}:Zone:{}", endUseSub, sovEndUseCatName, resourceName, ZoneName);
-                        AddMeter(state, subEnduseZoneMeterName, units, resource, sovEndUseCat, endUseSub, SOVGroup::Zone, outVarNum);
+                        std::string subEnduseZoneMeterName = format("{}:{}:{}:Zone:{}", endUseSub, endUseCatName, resourceName, ZoneName);
+                        AddMeter(state, subEnduseZoneMeterName, units, resource, endUseCat, endUseSub, Group::Zone, outVarNum);
                     }
                     if (!SpaceType.empty()) {
-                        std::string subEnduseSpaceMeterName = format("{}:{}:{}:SpaceType:{}", endUseSub, sovEndUseCatName, resourceName, SpaceType);
-                        AddMeter(state, subEnduseSpaceMeterName, units, resource, sovEndUseCat, endUseSub, SOVGroup::SpaceType, outVarNum);
+                        std::string subEnduseSpaceMeterName = format("{}:{}:{}:SpaceType:{}", endUseSub, endUseCatName, resourceName, SpaceType);
+                        AddMeter(state, subEnduseSpaceMeterName, units, resource, endUseCat, endUseSub, Group::SpaceType, outVarNum);
                     }
                 } // if (sovGroup == Building)
             }     // if (!endUseSub.empty())
         }         // if (sovEndUseCat != Invalid)
     }             // AttachMeters()
 
-    std::string standardizeEndUseSub(SOVEndUseCat sovEndUseCat, std::string_view endUseSubName)
+    std::string standardizeEndUseSub(EndUseCat endUseCat, std::string_view endUseSubName)
     {
         if (!endUseSubName.empty()) {
             return std::string(endUseSubName);
-        } else if (sovEndUseCat == SOVEndUseCat::Invalid) {
+        } else if (endUseCat == EndUseCat::Invalid) {
             return "";
-        } else if (sovEndUseCat2endUse[(int)sovEndUseCat] != Constant::EndUse::Invalid) {
+        } else if (endUseCat2endUse[(int)endUseCat] != Constant::EndUse::Invalid) {
             return "General";
         } else {
             return "";
@@ -2233,11 +2231,11 @@ namespace OutputProcessor {
             if (meter->resource != Constant::eResource::Invalid) {
                 print(state.files.mtd, ", ResourceType={}", Constant::eResourceNames[(int)meter->resource]);
             }
-            if (meter->sovEndUseCat != SOVEndUseCat::Invalid) {
-                print(state.files.mtd, ", EndUse={}", sovEndUseCatNames[(int)meter->sovEndUseCat]);
+            if (meter->endUseCat != EndUseCat::Invalid) {
+                print(state.files.mtd, ", EndUse={}", endUseCatNames[(int)meter->endUseCat]);
             }
-            if (meter->sovGroup != SOVGroup::Invalid) {
-                print(state.files.mtd, ", Group={}", sovGroupNames[(int)meter->sovGroup]);
+            if (meter->group != Group::Invalid) {
+                print(state.files.mtd, ", Group={}", groupNames[(int)meter->group]);
             }
             print(state.files.mtd, ", contents are:\n");
 
@@ -2636,7 +2634,7 @@ namespace OutputProcessor {
         auto &rf = state.dataResultsFramework->resultsFramework;
         auto &sql = state.dataSQLiteProcedures->sqlite;
 
-        if (storeType == StoreType::Averaged) {
+        if (storeType == StoreType::Average) {
             repVal /= numOfItemsStored;
         }
         if (repVal == 0.0) {
@@ -2965,7 +2963,7 @@ namespace OutputProcessor {
         auto &sql = state.dataSQLiteProcedures->sqlite;
 
         repVal = repValue;
-        if (storeType == StoreType::Averaged) {
+        if (storeType == StoreType::Average) {
             repVal /= numOfItemsStored;
         }
         if (repValue == 0.0) {
@@ -3070,8 +3068,8 @@ namespace OutputProcessor {
         // Return value
         std::string indexGroup;
 
-        if (meter->sovGroup != SOVGroup::Invalid) {
-            indexGroup = sovGroupNames[(int)meter->sovGroup];
+        if (meter->group != Group::Invalid) {
+            indexGroup = groupNames[(int)meter->group];
         } else {
             indexGroup = "Facility";
         }
@@ -3080,8 +3078,8 @@ namespace OutputProcessor {
             indexGroup += format(":{}", Constant::eResourceNames[(int)meter->resource]);
         }
 
-        if (meter->sovEndUseCat != SOVEndUseCat::Invalid) {
-            indexGroup += format(":{}", sovEndUseCatNames[(int)meter->sovEndUseCat]);
+        if (meter->endUseCat != EndUseCat::Invalid) {
+            indexGroup += format(":{}", endUseCatNames[(int)meter->endUseCat]);
         }
 
         if (len(meter->EndUseSub) > 0) {
@@ -3145,12 +3143,12 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string_view const name,                  // String Name of variable (with units)
                          Constant::Units const units,                  // Actual units corresponding to the actual variable
                          Real64 &ActualVariable,                       // Actual Variable, used to set up pointer
-                         OutputProcessor::SOVTimeStepType sovTimeStep, // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         OutputProcessor::SOVStoreType sovStore,       // State, Average=1, NonState, Sum=2
+                         OutputProcessor::TimeStepType timeStep,       // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::StoreType store,             // State, Average=1, NonState, Sum=2
                          std::string const &key,                       // Associated Key for this variable
                          Constant::eResource resource,                 // Meter Resource Type (Electricity, Gas, etc)
-                         OutputProcessor::SOVGroup sovGroup,           // Meter Super Group Key (Building, System, Plant)
-                         OutputProcessor::SOVEndUseCat sovEndUseCat,   // Meter End Use Key (Lights, Heating, Cooling, etc)
+                         OutputProcessor::Group group,                 // Meter Super Group Key (Building, System, Plant)
+                         OutputProcessor::EndUseCat endUseCat,         // Meter End Use Key (Lights, Heating, Cooling, etc)
                          std::string_view const EndUseSub,             // Meter End Use Sub Key (General Lights, Task Lights, etc)
                          std::string const &zone,                      // Meter Zone Key (zone name)
                          int const ZoneMult,                           // Zone Multiplier, defaults to 1
@@ -3193,13 +3191,10 @@ void SetupOutputVariable(EnergyPlusData &state,
     // Is this redundant with CheckReportVariable?
     bool const ThisOneOnTheList = DataOutputs::FindItemInVariableList(state, key, name);
 
-    TimeStepType timeStep = sovTimeStep2TimeStep[(int)sovTimeStep];
-    StoreType store = sovStoreType2StoreType[(int)sovStore];
+    bool OnMeter = (resource != Constant::eResource::Invalid) || (endUseCat != EndUseCat::Invalid) || (!EndUseSub.empty()) ||
+                   (group != Group::Invalid) || (!zone.empty()) || (!spaceType.empty());
 
-    bool OnMeter = (resource != Constant::eResource::Invalid) || (sovEndUseCat != SOVEndUseCat::Invalid) || (!EndUseSub.empty()) ||
-                   (sovGroup != SOVGroup::Invalid) || (!zone.empty()) || (!spaceType.empty());
-
-    if (OnMeter && store == StoreType::Averaged) {
+    if (OnMeter && store == StoreType::Average) {
         ShowSevereError(state, "Meters can only be \"Summed\" variables");
         ShowContinueError(state, fmt::format("..reference variable={}:{}", key, name));
         OnMeter = false;
@@ -3217,7 +3212,7 @@ void SetupOutputVariable(EnergyPlusData &state,
 
     if (!OnMeter && !ThisOneOnTheList) return;
 
-    if (store == StoreType::Summed) ++op->NumOfRVariable_Sum;
+    if (store == StoreType::Sum) ++op->NumOfRVariable_Sum;
     if (OnMeter) ++op->NumOfRVariable_Meter;
 
     for (int reqVarNum : reqVarNums) {
@@ -3252,7 +3247,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         // could be moved out of this loop entirely but then some
         // numberings in unit tests would not line up
         if (OnMeter) {
-            AttachMeters(state, units, resource, sovEndUseCat, EndUseSub, sovGroup, zone, spaceType, firstAddedOutVarNum);
+            AttachMeters(state, units, resource, endUseCat, EndUseSub, group, zone, spaceType, firstAddedOutVarNum);
             OnMeter = false;
         }
 
@@ -3272,7 +3267,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                                           var->storeType,
                                           var->ReportID,
                                           indexGroupKey,
-                                          std::string(sovTimeStepTypeStrings[(int)sovTimeStep]),
+                                          std::string(timeStepTypeNames[(int)timeStep]),
                                           key,
                                           name,
                                           var->timeStepType,
@@ -3287,8 +3282,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string_view const name,                      // String Name of variable
                          Constant::Units const units,                      // Actual units corresponding to the actual variable
                          int &ActualVariable,                              // Actual Variable, used to set up pointer
-                         OutputProcessor::SOVTimeStepType sovTimeStepType, // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         OutputProcessor::SOVStoreType sovStoreType,       // State, Average=1, NonState, Sum=2
+                         OutputProcessor::TimeStepType timeStepType,       // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::StoreType storeType,             // State, Average=1, NonState, Sum=2
                          std::string const &key,                           // Associated Key for this variable
                          int const indexGroupKey,                          // Group identifier for SQL output
                          OutputProcessor::ReportFreq freq                  // Internal use -- causes reporting at this freqency
@@ -3323,9 +3318,6 @@ void SetupOutputVariable(EnergyPlusData &state,
         reqVarNums.push_back(-1);
     }
 
-    TimeStepType timeStepType = sovTimeStep2TimeStep[(int)sovTimeStepType];
-    StoreType storeType = sovStoreType2StoreType[(int)sovStoreType];
-
     // DataOutputs::OutputVariablesForSimulation is case-insentitive
     int ddOutVarNum = AddDDOutVar(state, name, timeStepType, storeType, VariableType::Integer, units);
     auto *ddOutVar = op->ddOutVars[ddOutVarNum];
@@ -3336,7 +3328,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     bool ThisOneOnTheList = DataOutputs::FindItemInVariableList(state, key, name);
     if (!ThisOneOnTheList) return;
 
-    if (storeType == StoreType::Summed) {
+    if (storeType == StoreType::Sum) {
         ++op->NumOfIVariable_Sum;
     }
 
@@ -3378,7 +3370,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                                           var->storeType,
                                           var->ReportID,
                                           indexGroupKey,
-                                          std::string(sovTimeStepTypeStrings[(int)sovTimeStepType]),
+                                          std::string(timeStepTypeNames[(int)timeStepType]),
                                           key,
                                           name,
                                           var->timeStepType,
@@ -3460,7 +3452,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
         assert(rVar != nullptr);
 
         rVar->Stored = true;
-        if (rVar->storeType == StoreType::Averaged) {
+        if (rVar->storeType == StoreType::Average) {
             Real64 CurVal = (*rVar->Which) * rxTime;
             //        CALL SetMinMax(RVar%Which,MDHM,RVar%MaxValue,RVar%maxValueDate,RVar%MinValue,RVar%minValueDate)
             if ((*rVar->Which) > rVar->MaxValue) {
@@ -3544,7 +3536,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
         iVar->Stored = true;
         //      ICurVal=IVar%Which
-        if (iVar->storeType == StoreType::Averaged) {
+        if (iVar->storeType == StoreType::Average) {
             Real64 ICurVal = (*iVar->Which) * rxTime;
             iVar->TSValue += ICurVal;
             iVar->EITSValue = iVar->TSValue; // CR - 8481 fix - 09/06/2011
@@ -3831,7 +3823,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
             //        IF (ReportNow) THEN
             if (var->tsStored) {
-                if (var->storeType == StoreType::Averaged) {
+                if (var->storeType == StoreType::Average) {
                     var->Value /= double(var->thisTSCount);
                 }
                 if (var->Report && var->freq == ReportFreq::Hour && var->Stored) {
@@ -3862,7 +3854,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
             //        IF (ReportNow) THEN
             if (var->tsStored) {
-                if (var->storeType == StoreType::Averaged) {
+                if (var->storeType == StoreType::Average) {
                     var->Value /= double(var->thisTSCount);
                 }
                 if (var->Report && var->freq == ReportFreq::Hour && var->Stored) {
@@ -4364,7 +4356,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
             int indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, meter->Name);
             std::string indexGroup = DetermineIndexGroupFromMeterGroup(meter);
             WriteMeterDictionaryItem(
-                state, freq, StoreType::Summed, period.RptNum, indexGroupKey, indexGroup, meter->Name, meter->units, false, MeterFileOnlyIndicator);
+                state, freq, StoreType::Sum, period.RptNum, indexGroupKey, indexGroup, meter->Name, meter->units, false, MeterFileOnlyIndicator);
         }
     } else { // !CumulativeIndicator
         if (MeterFileOnlyIndicator && period.accRpt) {
@@ -4382,7 +4374,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
             int indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, meter->Name);
             std::string indexGroup = DetermineIndexGroupFromMeterGroup(op->meters[WhichMeter]);
             WriteMeterDictionaryItem(
-                state, freq, StoreType::Summed, period.accRptNum, indexGroupKey, indexGroup, meter->Name, meter->units, true, MeterFileOnlyIndicator);
+                state, freq, StoreType::Sum, period.accRptNum, indexGroupKey, indexGroup, meter->Name, meter->units, true, MeterFileOnlyIndicator);
         }
     } // if (CumulativeIndicator)
 } // SetInitialMeterReportingAndOutputNames()
@@ -4669,13 +4661,13 @@ int GetMeteredVariables(EnergyPlusData &state,
         bool foundGroup = false;
         for (int meterNum : var->meterNums) {
             auto *meter = op->meters[meterNum];
-            if (!foundEndUse && meter->sovEndUseCat != SOVEndUseCat::Invalid) {
-                meteredVar.sovEndUseCat = meter->sovEndUseCat;
+            if (!foundEndUse && meter->endUseCat != EndUseCat::Invalid) {
+                meteredVar.endUseCat = meter->endUseCat;
                 foundEndUse = true;
             }
 
-            if (!foundGroup && meter->sovGroup != SOVGroup::Invalid) {
-                meteredVar.sovGroup = meter->sovGroup;
+            if (!foundGroup && meter->group != Group::Invalid) {
+                meteredVar.group = meter->group;
                 foundGroup = true;
             }
 
@@ -4730,7 +4722,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
 
     varType = VariableType::NotFound;
     numKeys = 0;
-    storeType = StoreType::Averaged;
+    storeType = StoreType::Average;
     timeStepType = TimeStepType::Zone;
     units = Constant::Units::None; // Why is this None and not Invalid?
 
@@ -4753,7 +4745,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
         numKeys = 1;
         varType = VariableType::Meter;
         units = op->meters[meterNum]->units;
-        storeType = StoreType::Summed;
+        storeType = StoreType::Sum;
         timeStepType = TimeStepType::Zone;
 
     } else {
@@ -4765,7 +4757,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
             numKeys = 1;
             varType = VariableType::Schedule;
             units = static_cast<Constant::Units>(getEnumValue(Constant::unitNamesUC, Util::makeUPPER(GetScheduleType(state, schedNum))));
-            storeType = StoreType::Averaged;
+            storeType = StoreType::Average;
             timeStepType = TimeStepType::Zone;
         }
     }
@@ -4948,7 +4940,7 @@ void InitPollutionMeterReporting(EnergyPlusData &state, OutputProcessor::ReportF
         if (!period.Rpt) {
             period.Rpt = true;
             WriteMeterDictionaryItem(
-                state, freq, StoreType::Summed, period.RptNum, indexGroupKey, indexGroup, meter->Name, meter->units, false, false);
+                state, freq, StoreType::Sum, period.RptNum, indexGroupKey, indexGroup, meter->Name, meter->units, false, false);
             op->freqTrackingVariables[(int)freq] = true;
         }
     }
@@ -5031,7 +5023,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
 
             if (ddVar->ReportedOnDDFile) continue;
 
-            std::string_view timeStepName = timeStepNames[(int)ddVar->timeStepType];
+            std::string_view timeStepName = timeStepTypeNames[(int)ddVar->timeStepType];
             std::string_view storeTypeName = storeTypeNames[(int)ddVar->storeType];
             std::string_view varName = ddVar->name;
             std::string_view unitName =
@@ -5049,7 +5041,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
                 while (ddVar->Next != -1) {
                     ddVar = op->ddOutVars[ddVar->Next];
 
-                    std::string_view timeStepName = timeStepNames[(int)ddVar->timeStepType];
+                    std::string_view timeStepName = timeStepTypeNames[(int)ddVar->timeStepType];
                     std::string_view storeTypeName = storeTypeNames[(int)ddVar->storeType];
                     std::string_view varName = ddVar->name;
                     std::string_view unitName =
