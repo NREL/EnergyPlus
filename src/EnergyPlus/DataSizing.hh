@@ -654,6 +654,10 @@ namespace DataSizing {
         Real64 applyTermUnitSizingHeatFlow(Real64 heatFlowWithOA, // Heating flow rate with MinOA limit applied
                                            Real64 heatFlowNoOA    // Heating flow rate without MinOA limit applied
         );
+
+        Real64 applyTermUnitSizingCoolLoad(Real64 coolFLoad); // Cooling load
+
+        Real64 applyTermUnitSizingHeatLoad(Real64 heatLoad); // Heating load
     };
 
     struct ZoneEqSizingData // data saved from zone eq component sizing and passed to subcomponents
