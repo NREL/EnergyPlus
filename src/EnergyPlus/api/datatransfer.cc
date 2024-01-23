@@ -232,11 +232,13 @@ char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned in
     }
     auto &instancesValue = instances.value();
     *resultingSize = instancesValue.size();
-    auto *data = new const char *[*resultingSize];
+    char **data = new char *[*resultingSize];
     unsigned int i = -1;
     for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
         i++;
-        data[i] = instance.key().data();
+        std::string s = std::string(instance.key().data());
+        data[i] = new char[std::strlen(instance.key().data()) + 1];
+        std::strcpy(data[i], instance.key().data());
     }
     return data;
 }
