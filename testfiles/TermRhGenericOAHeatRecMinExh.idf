@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.2;
+  Version,24.1;
 
   Timestep,6;
 
@@ -524,7 +524,7 @@
     Activity Sch,            !- Activity Level Schedule Name
     3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    zoneaveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     Work Eff Sch,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -558,7 +558,7 @@
     Activity Sch,            !- Activity Level Schedule Name
     3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    zoneaveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     Work Eff Sch,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -606,7 +606,7 @@
     Activity Sch,            !- Activity Level Schedule Name
     3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}
     ,                        !- Enable ASHRAE 55 Comfort Warnings
-    zoneaveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     Work Eff Sch,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -1835,7 +1835,7 @@
   Branch,
     Heating Purchased Hot Water Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
-    DistrictHeating,         !- Component 1 Object Type
+    DistrictHeating:Water,         !- Component 1 Object Type
     Purchased Heating,       !- Component 1 Name
     Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name
     Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name
@@ -1987,7 +1987,7 @@
 
   PlantEquipmentList,
     heating plant,           !- Name
-    DistrictHeating,         !- Equipment 1 Object Type
+    DistrictHeating:Water,         !- Equipment 1 Object Type
     Purchased Heating;       !- Equipment 1 Name
 
   Pump:VariableSpeed,
@@ -2006,7 +2006,7 @@
     0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
-  DistrictHeating,
+  DistrictHeating:Water,
     Purchased Heating,       !- Name
     Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name
     Purchased Heat Outlet Node,  !- Hot Water Outlet Node Name
@@ -2395,7 +2395,7 @@
 
   Output:Variable,*,Heat Exchanger Exhaust Air Bypass Mass Flow Rate,hourly;
 
-  Output:Variable,*,District Heating Rate,hourly;
+  Output:Variable,*,District Heating Water Rate,hourly;
 
   Output:Variable,*,Heat Exchanger Defrost Time Fraction,hourly;
 

@@ -105,13 +105,13 @@ The following blocks of outputs are for steam and fuel-driven chillers
 
 \begin{itemize}
     \item
-    HVAC,Average,Chiller Gas Rate {[}W{]}
+    HVAC,Average,Chiller NaturalGas Rate {[}W{]}
     \item
-    HVAC,Sum,Chiller Gas Energy {[}J{]}
+    HVAC,Sum,Chiller NaturalGas Energy {[}J{]}
     \item
-    HVAC,Average,Chiller Gas Mass Flow Rate {[}kg/s{]}
+    HVAC,Average,Chiller NaturalGas Mass Flow Rate {[}kg/s{]}
     \item
-    HVAC,Sum,Chiller Gas Mass {[}kg{]}
+    HVAC,Sum,Chiller NaturalGas Mass {[}kg{]}
 \end{itemize}
 
 For steam absorption chillers:
@@ -193,7 +193,7 @@ The following output is applicable only for indirect absorption chillersHVAC,Ave
 
 \subsubsection{Chiller Electricity Energy {[}J{]}}\label{chiller-electric-energy-j}
 
-These outputs are the electric power input to the chiller. In the case of steam or fuel-powered chillers, this repesents the internal chiller pumps and other electric power consumption. Consumption is metered on Cooling:Electricity, Electricity:Plant, and Electricity:Facility.
+These outputs are the electric power input to the chiller. In the case of steam or fuel-powered chillers, this represents the internal chiller pumps and other electric power consumption. Consumption is metered on Cooling:Electricity, Electricity:Plant, and Electricity:Facility.
 
 \subsubsection{Chiller Evaporator Cooling Rate {[}W{]}}\label{chiller-evaporator-cooling-rate-w}
 
@@ -605,11 +605,11 @@ This choice field determines how the chiller operates with respect to the intend
 
 \paragraph{Field: Generator Heat Input Function of Part Load Ratio Curve Name}\label{field-generator-heat-input-function-of-part-load-ratio-curve-name}
 
-This required alpha field specifies the name of the curve used to determine the heat input to the chiller. The curve is a quadratic or cubic curve which characterizes the heat input as a function of chiller part-load ratio. The curve output is multiplied by the chiller's nominal capacity and operating part-load ratio or minimum part-load ratio, whichever is greater, to determine the amount of heat input required for the given operating conditons.
+This required alpha field specifies the name of the curve used to determine the heat input to the chiller. The curve is a quadratic or cubic curve which characterizes the heat input as a function of chiller part-load ratio. The curve output is multiplied by the chiller's nominal capacity and operating part-load ratio or minimum part-load ratio, whichever is greater, to determine the amount of heat input required for the given operating conditions.
 
 \paragraph{Field: Pump Electric Input Function of Part Load Ratio Curve Name}\label{field-pump-electric-input-function-of-part-load-ratio-curve-name}
 
-This alpha field specifies the name of the curve used to determine the pump electrical input to the chiller. The curve is a quadratic or cubic curve which characterizes the pump electrical power as a function of chiller part-load ratio. The curve output is multiplied by the chiller's nominal pumping power and operating part-load ratio or minimum part-load ratio, whichever is greater, to determine the amount of pumping power required for the given operating conditons.
+This alpha field specifies the name of the curve used to determine the pump electrical input to the chiller. The curve is a quadratic or cubic curve which characterizes the pump electrical power as a function of chiller part-load ratio. The curve output is multiplied by the chiller's nominal pumping power and operating part-load ratio or minimum part-load ratio, whichever is greater, to determine the amount of pumping power required for the given operating conditions.
 
 \paragraph{Field: Generator Inlet Node Name}\label{field-generator-inlet-node-name-1}
 
@@ -649,7 +649,7 @@ This numeric field specifies the chiller's design generator \emph{fluid} flow ra
 
 \paragraph{Field: Temperature Lower Limit Generator Inlet}\label{field-temperature-lower-limit-generator-inlet}
 
-This numeric field specifies the lower limit of the generator's entering water temperature. This field is not used iif the Generator Fluid Type is specified as steam.
+This numeric field specifies the lower limit of the generator's entering water temperature. This field is not used if the Generator Fluid Type is specified as steam.
 
 \paragraph{Field: Degree of Subcooling in Steam Generator}\label{field-degree-of-subcooling-in-steam-generator-1}
 
@@ -1131,7 +1131,7 @@ This choice field determines how the chiller operates with respect to the intend
 
 \paragraph{Field: Design Heat Recovery Water Flow Rate}\label{field-design-heat-recovery-water-flow-rate-000}
 
-This is the design flow rate used if the heat recovery option is being simulated. If this value is greater than 0.0 then a heat recovery loop must be specified and attached to the chiller using the next 2 node fields. To determine how the heat recovery algorithm works look at the Engineering Manual at the Chiller:Electric with Heat Recovery section. The units are in cubic meters per second. This field is autosizable.~ When autosizing, the flow rate is simply the product of the design condenser flow rate and the condenser heat recovery relative capacity fraction set in the field below. Note that heat recovery is only available with Condenser Type = WaterCooled.
+This is the design flow rate used if the heat recovery option is being simulated. If this value is greater than 0.0 then a heat recovery loop must be specified and attached to the chiller using the next 2 node fields. To determine how the heat recovery algorithm works look at the Engineering Manual at the Chiller:Electric with Heat Recovery section. The units are in cubic meters per second. This field is autosizable.~ When autosizing, the flow rate is simply the product of the design condenser flow rate and the condenser heat recovery relative capacity fraction set in the field below.
 
 \paragraph{Field: Heat Recovery Inlet Node Name}\label{field-heat-recovery-inlet-node-name-000}
 
@@ -1567,7 +1567,7 @@ Most of these chiller output variables are defined above under ``Generic Chiller
 
 \paragraph{Minimum Part Load Ratio {[]}}\label{chiller205-minimum-plr}
 
-This is the raio of minimum capacity to maximum capacity, under which the chiller cycling (where the amount of power remains constant to produce smaller loads than this fraction) occurs.
+This is the ratio of minimum capacity to maximum capacity, under which the chiller cycling (where the amount of power remains constant to produce smaller loads than this fraction) occurs.
 
 \paragraph{Chiller Condenser Inlet Temperature ~{[}C{]}}\label{chiller205-condenser-inlet-temperature-c}
 
@@ -1685,7 +1685,7 @@ This alpha field determines what type of condenser will be modeled with this chi
 
 \paragraph{Field: Condenser Fan Power Ratio}\label{field-condenser-fan-power-ratio}
 
-This field is used to model condenser fan power associated with air-cooled or evaporatively-cooled condensers (for cooling towers, refer to Group - Condenser Equipment). Enter the ratio of the condenser fan power to the reference chiller cooling capacity in W/W. If this input is greater than 0, the condenser fan power is modeled seperatly from compressor power. In addition, if condenser fan power is modeled using this input, the reference COP and ``Electric Input to Cooling Output Ratio Function of'' performance curves should not include condenser fan power.
+This field is used to model condenser fan power associated with air-cooled or evaporatively-cooled condensers (for cooling towers, refer to Group - Condenser Equipment). Enter the ratio of the condenser fan power to the reference chiller cooling capacity in W/W. If this input is greater than 0, the condenser fan power is modeled separately from compressor power. In addition, if condenser fan power is modeled using this input, the reference COP and ``Electric Input to Cooling Output Ratio Function of'' performance curves should not include condenser fan power.
 
 \paragraph{Field: Fraction of Compressor Electric Power Rejected by Condenser}\label{field-fraction-of-compressor-electric-power-rejected-by-condenser}
 
@@ -1737,7 +1737,7 @@ This field is optional.~ It can be used to control heat recovery operation of th
 
 \paragraph{Field: Heat Recovery Leaving Temperature Setpoint Node Name}\label{field-heat-recovery-leaving-temperature-setpoint-node-name-1}
 
-This field is optional.~ It can be used to refine the model and controls for heat recovery operation of the chiller.~ The node named here should have a setpoint placed on it by a setpoint manager.~ If the plant loop's demand calculation scheme is set to SingleSetpoint, then a single setpoint manager should be used.~ If the plant loop's demand calculation is set to DualSetpointDeadband then a dual setpoint manager should be used and the upper setpoint is used for control.~ When this field is used, a different model is used for determining the distribution of rejected heat between the two bundles that is more appropriate for series bundle arrangements and for chiller's that are able to produce relatively higher temperature heated fluilds.
+This field is optional.~ It can be used to refine the model and controls for heat recovery operation of the chiller.~ The node named here should have a setpoint placed on it by a setpoint manager.~ If the plant loop's demand calculation scheme is set to SingleSetpoint, then a single setpoint manager should be used.~ If the plant loop's demand calculation is set to DualSetpointDeadband then a dual setpoint manager should be used and the upper setpoint is used for control.~ When this field is used, a different model is used for determining the distribution of rejected heat between the two bundles that is more appropriate for series bundle arrangements and for chiller's that are able to produce relatively higher temperature heated fluids.
 
 \paragraph{Field: End-Use Subcategory}
 
@@ -2105,11 +2105,11 @@ This is the design heat recovery water flow rate if the heat recovery option is 
 
 \paragraph{Field: Heat Recovery Inlet Node Name}\label{field-heat-recovery-inlet-node-name-2}
 
-This alpha field contains the identifying name for the chiller heat recovery side inlet node. If the user wants to model chiller heat recovery, a heat recovery loop must be specified and it can only be used with a water-cooled condenser.
+This alpha field contains the identifying name for the chiller heat recovery side inlet node. If the user wants to model chiller heat recovery, a heat recovery loop must be specified.
 
 \paragraph{Field: Heat Recovery Outlet Node Name}\label{field-heat-recovery-outlet-node-name-2}
 
-This alpha field contains the identifying name for the chiller heat recovery side outlet node. If the user wants to model chiller heat recovery, a heat recovery loop must be specified and it can only be used with a water-cooled condenser.
+This alpha field contains the identifying name for the chiller heat recovery side outlet node. If the user wants to model chiller heat recovery, a heat recovery loop must be specifiedr.
 
 \paragraph{Field: Sizing Factor}\label{field-sizing-factor-5}
 
@@ -2125,7 +2125,7 @@ This field is optional.~ It can be used to control heat recovery operation of th
 
 \paragraph{Field: Heat Recovery Leaving Temperature Setpoint Node Name}\label{field-heat-recovery-leaving-temperature-setpoint-node-name-2}
 
-This field is optional.~ It can be used to refine the model and controls for heat recovery operation of the chiller.~ The node named here should have a setpoint placed on it by a setpoint manager.~ If the plant loop's demand calculation scheme is set to SingleSetpoint, then a single setpoint manager should be used.~ If the plant loop's demand calculation is set to DualSetpointDeadband then a dual setpoint manager should be used and the upper setpoint is used for control.~ When this field is used, a different model is used for determining the distribution of rejected heat between the two bundles that is more appropriate for series bundle arrangements and for chiller's that are able to produce relatively higher temperature heated fluilds.
+This field is optional.~ It can be used to refine the model and controls for heat recovery operation of the chiller.~ The node named here should have a setpoint placed on it by a setpoint manager.~ If the plant loop's demand calculation scheme is set to SingleSetpoint, then a single setpoint manager should be used.~ If the plant loop's demand calculation is set to DualSetpointDeadband then a dual setpoint manager should be used and the upper setpoint is used for control.~ When this field is used, a different model is used for determining the distribution of rejected heat between the two bundles that is more appropriate for series bundle arrangements and for chiller's that are able to produce relatively higher temperature heated fluids.
 
 \paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-12}
 
@@ -2649,11 +2649,11 @@ One of the following blocks will be applicable based on fuel type:
 
 \begin{itemize}
     \item
-    HVAC,Average,Chiller Gas Rate {[}W{]}
+    HVAC,Average,Chiller NaturalGas Rate {[}W{]}
     \item
-    HVAC,Sum,Chiller Gas Energy {[}J{]}
+    HVAC,Sum,Chiller NaturalGas Energy {[}J{]}
     \item
-    HVAC,Average,Chiller Gas Mass Flow Rate {[}kg/s{]}
+    HVAC,Average,Chiller NaturalGas Mass Flow Rate {[}kg/s{]}
     \item
     HVAC,Average,Chiller Propane Rate {[}W{]}
     \item
@@ -3004,7 +3004,7 @@ This numeric field contains the second (exponential) coefficient for the overall
 
 \paragraph{Field: Gas Turbine Engine Capacity}\label{field-gas-turbine-engine-capacity}
 
-This numeric field contains the capacity of the gas turbine engine in watts. This field is autosizable. When autosized the field below called Turbine Engine Effciency can be used to scale the resulting size.
+This numeric field contains the capacity of the gas turbine engine in watts. This field is autosizable. When autosized the field below called Turbine Engine Efficiency can be used to scale the resulting size.
 
 \paragraph{Field: Maximum Exhaust Flow per Unit of Power Output}\label{field-maximum-exhaust-flow-per-unit-of-power-output-1-000}
 
@@ -3256,7 +3256,7 @@ A positive fraction that represents the ratio of the instantaneous electricity u
 
 \paragraph{Field: Electric Input to Heating Output Ratio}\label{field-electric-input-to-heating-output-ratio}
 
-A positive fraction that represents the ratio of the instantaneous electricity used divided by the nominal heating capacity. If the chiller is both heating and cooling, the greater of the cooling electricity and heating eletricity is used. The default is 0.0.
+A positive fraction that represents the ratio of the instantaneous electricity used divided by the nominal heating capacity. If the chiller is both heating and cooling, the greater of the cooling electricity and heating electricity is used. The default is 0.0.
 
 \paragraph{Field: Chilled Water Inlet Node Name}\label{field-chilled-water-inlet-node-name-7}
 
@@ -3354,7 +3354,7 @@ The ElecCoolFPLR curve represents the fraction of the electricity to the chiller
 
 \paragraph{Field: Heating Capacity Function of Cooling Capacity Curve Name}\label{field-heating-capacity-function-of-cooling-capacity-curve-name}
 
-The HeatCapFCool curve represents how the heating capacity of the chiller varies with cooling capacity when the chiller is simultaeous heating and cooling. The curve is normalized so an input of 1.0 represents the nominal cooling capacity and an output of 1.0 represents the full heating capacity (see the Heating to Cooling Capacity Ratio input)~ The curve is usually linear or quadratic. The available heating capacity is computed as follows:
+The HeatCapFCool curve represents how the heating capacity of the chiller varies with cooling capacity when the chiller is simultaneous heating and cooling. The curve is normalized so an input of 1.0 represents the nominal cooling capacity and an output of 1.0 represents the full heating capacity (see the Heating to Cooling Capacity Ratio input)~ The curve is usually linear or quadratic. The available heating capacity is computed as follows:
 
 \begin{equation}
     HeatFuelInput = AvailHeatCap \cdot HFIR \cdot HFIRfHPLR(HPLR)
@@ -3655,7 +3655,7 @@ A positive fraction that represents the ratio of the instantaneous electricity u
 
 \paragraph{Field: Electric Input to Heating Output Ratio}\label{field-electric-input-to-heating-output-ratio-1}
 
-A positive fraction that represents the ratio of the instantaneous electricity used divided by the nominal heating capacity. If the chiller is both heating and cooling, the greater of the cooling electricity and heating eletricity is used. The default is 0.0.
+A positive fraction that represents the ratio of the instantaneous electricity used divided by the nominal heating capacity. If the chiller is both heating and cooling, the greater of the cooling electricity and heating electricity is used. The default is 0.0.
 
 \paragraph{Field: Chilled Water Inlet Node Name}\label{field-chilled-water-inlet-node-name-8}
 
@@ -4059,7 +4059,7 @@ The exhaust temperature from~ the Micro Turbine
 
 \subsection{Boiler:HotWater}\label{boilerhotwater}
 
-The boiler model calculates the performance of fuel oil, gas and electric boilers. Boiler performance is based on nominal thermal efficiency. A normailized efficiency performance curve may be used to more accurately represent the performance of non-electric boilers but is not considered a required input. When using the normalized efficiency performance curve, if all coefficients are not required simply set the unused coefficients to 0. For example, an electric boiler could be modeled by setting the nominal thermal efficiency to a value in the range of 0.96 to 1.0. Coefficient A0 in the normalized efficiency performance curve would equal 1 and all other coefficients would be set to 0. Coefficients for other types of non-electric boilers would set a combination of the available coefficents to non-zero values.
+The boiler model calculates the performance of fuel oil, gas and electric boilers. Boiler performance is based on nominal thermal efficiency. A normalized efficiency performance curve may be used to more accurately represent the performance of non-electric boilers but is not considered a required input. When using the normalized efficiency performance curve, if all coefficients are not required simply set the unused coefficients to 0. For example, an electric boiler could be modeled by setting the nominal thermal efficiency to a value in the range of 0.96 to 1.0. Coefficient A0 in the normalized efficiency performance curve would equal 1 and all other coefficients would be set to 0. Coefficients for other types of non-electric boilers would set a combination of the available coefficients to non-zero values.
 
 \subsubsection{Inputs}\label{inputs-10-013}
 
@@ -4089,7 +4089,7 @@ The model is based the following two equations:
 
 \paragraph{Field: Nominal Thermal Efficiency}\label{field-nominal-thermal-efficiency}
 
-This required numeric field contains the heating efficiency (as a fraction between 0 and 1) of the boiler's burner.~ This is the efficiency relative to the higher heating value (HHV) of fuel at a part load ratio of 1.0. Manufacturers typically specify the efficiency of a boiler using the higher heating value of the fuel. For the rare occurences when a manufacturers (or particular data set) thermal efficiency is based on the lower heating value (LHV) of the fuel, multiply the thermal efficiency by the lower-to-higher heating value ratio. For example, assume a fuel's lower and higher heating values are approximately 45,450 and 50,000 kJ/kg, respectively. For a manuracturers thermal effiency rating of 0.90 (based on the LHV), the nominal thermal efficiency entered here is 0.82 (i.e.~0.9 multiplied by 45,450/50,000).
+This required numeric field contains the heating efficiency (as a fraction between 0 and 1) of the boiler's burner.~ This is the efficiency relative to the higher heating value (HHV) of fuel at a part load ratio of 1.0. Manufacturers typically specify the efficiency of a boiler using the higher heating value of the fuel. For the rare occurrences when a manufacturers (or particular data set) thermal efficiency is based on the lower heating value (LHV) of the fuel, multiply the thermal efficiency by the lower-to-higher heating value ratio. For example, assume a fuel's lower and higher heating values are approximately 45,450 and 50,000 kJ/kg, respectively. For a manufacturers thermal efficiency rating of 0.90 (based on the LHV), the nominal thermal efficiency entered here is 0.82 (i.e.~0.9 multiplied by 45,450/50,000).
 
 \paragraph{Field: Efficiency Curve Temperature Evaluation Variable}\label{field-efficiency-curve-temperature-evaluation-variable}
 
@@ -4166,7 +4166,7 @@ This numeric field contains the outlet temperature upper limit. If this field is
 
 This choice field determines how the boiler operates with respect to the intended fluid flow through the device.~ There are three different choices for specifying operating modes for the intended flow behavior:~ ``NotModulated,'' ``ConstantFlow,'' and ``LeavingSetpointModulated.''~ NotModulated is useful for either variable or constant speed pumping arrangements where the boiler is passive in the sense that although it makes a nominal request for its design flow rate it can operate at varying flow rates.~ ConstantFlow is useful for constant speed pumping arrangements where the boiler's request for flow is more strict and can increase the overall loop flow.~ LeavingSetpointModulated changes the boiler model to internally vary the flow rate so that the temperature leaving the boiler matches a setpoint.~ In all cases the operation of the external plant system can also impact the flow through the boiler -- for example if the relative sizes and operation are such that flow is restricted and the requests cannot be met.~~ The default, if not specified, is NotModulated.
 
-\paragraph{Field: Parasitic Electric Load}\label{field-parasitic-electric-load-000}
+\paragraph{Field: On Cycle Parasitic Electric Load}\label{field-parasitic-electric-load-000}
 
 This optional numeric field contains the parasitic electric power (W) consumed by a forced draft fan or other electrical device associated with the boiler. This parasitic electric load is consumed whenever the boiler is operating, and the model assumes that this parasitic power does not contribute to heating the water. The minimum value for this field is 0.0, and the default value is also 0.0 if the field is left blank.
 
@@ -4177,6 +4177,10 @@ This optional numeric field allows the user to specify a sizing factor for this 
 \paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-10}
 
 This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the boiler will be assigned to the ``General'' end-use subcategory.
+
+\paragraph{Field: Off Cycle Parasitic Fuel Load}\label{field-boiler-parasitic-fuel-load}
+
+This optional field is the parasitic fuel load associated with the boiler's operation (Watts), such as a standing pilot light. The model assumes that this parasitic load is consumed only for the portion of the simulation timestep where the boiler is not operating.
 
 An example of this statement in an IDF is:
 
@@ -4197,7 +4201,7 @@ An example of this statement in an IDF is:
       Boiler Outlet Node,  !- Boiler Water Outlet Node
       80,                  !- Temp Upper Limit Water Outlet {C}
       ConstantFlow,        !- Boiler Flow Mode
-      25.0;                !- Parasitic Electric Load {W}
+      25.0;                !- On Cycle Parasitic Electric Load {W}
 
 
     Curve:Biquadratic,
@@ -4252,13 +4256,17 @@ Electric:
     HVAC,Sum,Boiler Electricity Energy {[}J{]}
 \end{itemize}
 
-Gas:
+NaturalGas:
 
 \begin{itemize}
     \item
-    HVAC,Average,Boiler Gas Rate {[}W{]}
+    HVAC,Average,Boiler NaturalGas Rate {[}W{]}
     \item
-    HVAC,Sum,Boiler Gas Energy {[}J{]}
+    HVAC,Sum,Boiler NaturalGas Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary NaturalGas Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary NaturalGas Energy {[}J{]}
 \end{itemize}
 
 Propane:
@@ -4268,6 +4276,10 @@ Propane:
     HVAC,Average,Boiler Propane Rate {[}W{]}
     \item
     HVAC,Sum,Boiler Propane Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary Propane Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary Propane Energy {[}J{]}
 \end{itemize}
 
 FuelOilNo1:
@@ -4277,6 +4289,10 @@ FuelOilNo1:
     HVAC,Average,Boiler FuelOilNo1 Rate {[}W{]}
     \item
     HVAC,Sum,Boiler FuelOilNo1 Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary FuelOilNo1 Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary FuelOilNo1 Energy {[}J{]}
 \end{itemize}
 
 FuelOilNo2:
@@ -4286,6 +4302,10 @@ FuelOilNo2:
     HVAC,Average,Boiler FuelOilNo2 Rate {[}W{]}
     \item
     HVAC,Sum,Boiler FuelOilNo2 Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary FuelOilNo2 Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary FuelOilNo2 Energy {[}J{]}
 \end{itemize}
 
 Coal:
@@ -4295,6 +4315,10 @@ Coal:
     HVAC,Average,Boiler Coal Rate {[}W{]}
     \item
     HVAC,Sum,Boiler Coal Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary Coal Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary Coal Energy {[}J{]}
 \end{itemize}
 
 Diesel:
@@ -4304,6 +4328,10 @@ Diesel:
     HVAC,Average,Boiler Diesel Rate {[}W{]}
     \item
     HVAC,Sum,Boiler Diesel Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary Diesel Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary Diesel Energy {[}J{]}
 \end{itemize}
 
 Gasoline:
@@ -4313,6 +4341,10 @@ Gasoline:
     HVAC,Average,Boiler Gasoline Rate {[}W{]}
     \item
     HVAC,Sum,Boiler Gasoline Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary Gasoline Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary Gasoline Energy {[}J{]}
 \end{itemize}
 
 OtherFuel1:
@@ -4322,6 +4354,10 @@ OtherFuel1:
     HVAC,Average,Boiler OtherFuel1 Rate {[}W{]}
     \item
     HVAC,Sum,Boiler OtherFuel1 Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary OtherFuel1 Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary OtherFuel1 Energy {[}J{]}
 \end{itemize}
 
 OtherFuel2:
@@ -4331,6 +4367,10 @@ OtherFuel2:
     HVAC,Average,Boiler OtherFuel2 Rate {[}W{]}
     \item
     HVAC,Sum,Boiler OtherFuel2 Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary OtherFuel2 Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary OtherFuel2 Energy {[}J{]}
 \end{itemize}
 
 \paragraph{Boiler Heating Rate {[}W{]}}\label{boiler-heating-rate-w}
@@ -4514,13 +4554,13 @@ Electric:
     HVAC,Sum,Boiler Electricity Energy {[}J{]}
 \end{itemize}
 
-Gas:
+NaturalGas:
 
 \begin{itemize}
     \item
-    HVAC,Average,Boiler Gas Rate {[}W{]}
+    HVAC,Average,Boiler NaturalGas Rate {[}W{]}
     \item
-    HVAC,Sum,Boiler Gas Energy {[}J{]}
+    HVAC,Sum,Boiler NaturalGas Energy {[}J{]}
 \end{itemize}
 
 Propane:
@@ -4647,9 +4687,9 @@ Jin, Hui. 2002. Parameter Estimation Based Models of Water Source Heat Pumps. Ph
 
 Tang,C. C. 2005. Modeling Packaged Heat Pumps in Quasi-Steady State Energy Simulation Program. M.S. Thesis. Department of Mechanical and Aerospace Engineering, Oklahoma State University. (downloadable from \href{http://www.hvac.okstate.edu}{http://www.hvac.okstate.edu/})
 
-\textbf{\hyperref[plhp_eir]{HeatPump:PlantLoop:EIR:Cooling}}
+\textbf{\hyperref[plhp_eir_cooling]{HeatPump:PlantLoop:EIR:Cooling}}
 
-\textbf{\hyperref[plhp_eir]{HeatPump:PlantLoop:EIR:Heating}}
+\textbf{\hyperref[plhp_eir_heating]{HeatPump:PlantLoop:EIR:Heating}}
 
 Beginning with version 9.1, an EIR-formulated heat pump model was added. This heat pump can be operated as a water-source object with the source-side connected to another plant loop, or as an air-source object with the source-side interacting with the outdoor air. This formulation allows the user to enter curves for specifying the capacity and energy usage in a more generic way, allowing the curves to be applicable to a wide variety of components. With the original equation fit model, the curve form was locked in to a specific set of linear coefficients. With the new form, the curve can be a quadratic function of temperatures, or an even more generic lookup table.
 
@@ -4710,7 +4750,7 @@ This numeric field contains the design cooling capacity of the heat pump in W. T
 
 \paragraph{Field: Reference Cooling Power Consumption}\label{field-rated-cooling-power-consumption}
 
-This numeric field is the design electric power consumption for cooling, in W. This corresponds to the electic power use at the Reference Cooling Capacity. This field is autosizable. When autosized, the field called Reference Coefficient of Performance must be used.
+This numeric field is the design electric power consumption for cooling, in W. This corresponds to the electric power use at the Reference Cooling Capacity. This field is autosizable. When autosized, the field called Reference Coefficient of Performance must be used.
 
 \paragraph{Fields: Cooling Capacity Curve Name}\label{fields-cooling-capacity-curve-name}
 
@@ -4910,7 +4950,7 @@ This numeric field contains the design heating capacity of the heat pump in W. T
 
 \paragraph{Field: Reference Heating Power Consumption}\label{field-rated-heating-power-consumption}
 
-This numeric field contains the design electric power consumption for heating, in W. This corresponds to the electic power use at the Reference Heating Capacity. This field is autosizable. When autosized, the field called Reference Coefficient of Performance must be used.
+This numeric field contains the design electric power consumption for heating, in W. This corresponds to the electric power use at the Reference Heating Capacity. This field is autosizable. When autosized, the field called Reference Coefficient of Performance must be used.
 
 \paragraph{Fields: Heating Capacity Curve Name}\label{fields-heating-capacity-curve-name}
 
@@ -5230,7 +5270,7 @@ HeatPump:WaterToWater:ParameterEstimation:Heating,
       3998,                    !- Source Side Heat Transfer Coefficient {W/K}
       .012544,                 !- Piston Displacement {m3/s}
       .05469,                  !- Compressor Clearance Factor %
-      92156.2,                 !- Compressor Suction And Dischrage Pressure Drop {Pa}
+      92156.2,                 !- Compressor Suction And Discharge Pressure Drop {Pa}
       4.8907,                  !- Superheating {C}
       2803.9,                  !- Constant Part Of Electro Mechanical Power Losses {W}
       .699,                    !- Loss Factor
@@ -5317,21 +5357,115 @@ This output variable represents the average fluid flow rate through the load sid
 
 This output variable represents the average fluid flow rate through the source side coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\subsection{HeatPump:PlantLoop:EIR:Cooling (and Heating)}\label{plhp_eir}
+\subsection{HeatPump:PlantLoop:EIR:Cooling}\label{plhp_eir_cooling}
 
-Next, the EIR-formulated model objects are described. Although the model follows the pattern of having a separate input object for cooling and heating, the inputs are essentially identical, so they are described together. Note that this component is currently a constant flow device (it will always request its full design flow from the plant), with a future addition to make it respond to outlet setpoint in order to vary the flow request.
+The EIR-formulated cooling model objects are described.
 
-\subsubsection{Inputs}\label{plhp_eir_inputs}
+\subsubsection{Inputs}\label{plhp_eir_cooling_inputs}
 
-\paragraph{Field: Name}\label{plhp_eir_inputs_name}
+\paragraph{Field: Name}\label{plhp_eir_cooling_inputs_name}
 
-This alpha field contains the identifying name for the ground source heat pump.
+This alpha field contains the identifying name for the cooling side of the heat pump.
 
-\paragraph{Field: Load Side Inlet Node Name}\label{plhp_eir_inputs_load_inlet_node}
+\paragraph{Field: Load Side Inlet Node Name}\label{plhp_eir_cooling_inputs_load_inlet_node}
 
 This alpha field contains the heat pump's load side inlet node name.
 
-\paragraph{Field: Load Side Outlet Node Name}\label{plhp_eir_inputs_load_outlet_node}
+\paragraph{Field: Load Side Outlet Node Name}\label{plhp_eir_cooling_inputs_load_outlet_node}
+
+This alpha field contains the heat pump's load side outlet node name.
+
+\paragraph{Field: Condenser Type}\label{plhp_eir_cooling_condenser_type}
+
+This alpha field contains the heat pump's condenser type. Acceptable inputs are ``WaterSource'' or ``AirSource''.
+
+\paragraph{Field: Source Side Inlet Node Name}\label{plhp_eir_cooling_inputs_source_inlet_node}
+
+This alpha field contains the heat pump's source side inlet node name.
+
+\paragraph{Field: Source Side Outlet Node Name}\label{plhp_eir_cooling_inputs_source_outlet_node}
+
+This alpha field contains the heat pump's source side outlet node name.
+
+\paragraph{Field: Companion Heat Pump Name}\label{plhp_eir_cooling_inputs_companion_name}
+
+This optional alpha field contains the name of a companion heat pump object. The current coolling object is expected to include the paired heating object. The companion is used for sizing if plant sizing data is unavailable, and during the simulation to ensure that any unexpected simultaneous operation of the two objects provides a warning to the user.
+
+\paragraph{Field: Load Side Reference Flow Rate}\label{plhp_eir_cooling_inputs_load_side_flow}
+
+This autosizable field defines the reference load side flow rate for the heat pump. This field is used as the nominal flow request for this heat pump unit during the simulation. The units for this field are [m3/s].
+
+\paragraph{Field: Source Side Reference Flow Rate}\label{plhp_eir_cooling_inputs_source_side_flow}
+
+This autosizable field defines the reference source side side flow rate for the heat pump. This field is used as the nominal flow request for this heat pump unit during the simulation. The units for this field are [m3/s].
+
+\paragraph{Field: Reference Capacity}\label{plhp_eir_cooling_inputs_reference_capacity}
+
+This autosizable field defines the reference load side cooling capacity for the heat pump. The units for this field are [W].
+
+\paragraph{Field: Reference Coefficient of Performance}\label{plhp_eir_cooling_inputs_reference_cop}
+
+This field contains the reference COP for this unit, which is used when calculating the power required for the heat pump under simulation conditions. The COP is defined as the load side energy transfer divided by the power input, with dimensionless units of [W/W].
+
+\paragraph{Field: Sizing Factor}\label{plhp_eir_cooling_inputs_sizing_factor}
+
+This field allows the user to scale the sizing of this unit compared to the plant-determined autosized flow and capacity.
+
+\paragraph{Field: Capacity Modifier Function of Temperature Curve Name}\label{plhp_eir_cooling_inputs_capft}
+
+This field is the name of a bivariate curve or table that defines an available capacity modifier of the unit as a function of the load side outlet temperature and the source side inlet temperature. The temperatures are in degrees Celsius when used in the function and the output of the function is multiplied by the reference capacity to get a current available capacity.
+
+\paragraph{Field: Electric Input to Output Ratio Modifier Function of Temperature Curve Name}\label{plhp_eir_cooling_inputs_eirft}
+
+This field is the name of a bivariate curve or table that defines an EIR (1/COP) modifier as a function of the load side outlet temperature and the source side inlet temperature. The temperatures are in degrees Celsius when used in the function. The output of this function and the output of the EIR Modifier Function of PLR are multiplied by the reference EIR to get a current EIR .
+
+\paragraph{Field: Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name}\label{plhp_eir_cooling_inputs_eirfplr}
+
+This field is the name of a univariate curve or table that defines an EIR modifier as a function of the current part load ratio. The output of this function and the output of the EIR Modifier Function of Temperature are multiplied by the reference EIR to get a current EIR .
+
+\paragraph{Field: Control Type}\label{plhp_eir_cooling_inputs_control_type}
+
+This optional choice field allows the user to choose between Load and Setpoint control. The default value is Load control.
+
+\paragraph{Field: Flow Mode}\label{plhp_eir_cooling_inputs_flow_mode}
+
+This optional choice field allows the user to choose between ConstantFlow and VariableSpeedPumping. The default value is ConstantFlow. When the plant is served by variable speed pumps the water flow through this equipment will vary.
+
+\paragraph{Field: Minimum Part Load Ratio}\label{plhp_eir_cooling_inputs_minimum_part_load_ratio}
+
+This optional numeric field specifies the minimum operating part load ratio. Below this value the compressor will cycle proportionally to the load. The default value is 0.
+
+\paragraph{Field: Minimum Source Inlet Temperature}\label{plhp_eir_cooling_inputs_minimum_source_inlet_temperature}
+
+This optional numeric field specifies the minimum entering air or water temperature at the source inlet node. Below this value the compressor will be off. The default value is -100.
+
+\paragraph{Field: Maximum Source Inlet Temperature}\label{plhp_eir_cooling_inputs_maximum_source_inlet_temperature}
+
+This optional numeric field specifies the maximum entering air or water temperature at the source inlet node. Above this value the compressor will be off. The default value is 100.
+
+\paragraph{Field: Minimum Supply Water Temperature Curve Name}\label{plhp_eir_cooling_inputs_minimum_supply_water_temperature_curve_name}
+
+This optional alpha field specifies the name of a univariate curve or table that defines the minimum supply water temperature.
+
+\paragraph{Field: Maximum Supply Water Temperature Curve Name}\label{plhp_eir_cooling_inputs_maximum_supply_water_temperature_curve_name}
+
+This optional alpha field specifies the name of a univariate curve or table that defines the maximum supply water temperature.
+
+\subsection{HeatPump:PlantLoop:EIR:Heating}\label{plhp_eir_heating}
+
+The EIR-formulated heating model objects are described.
+
+\subsubsection{Inputs}\label{plhp_eir_heating_inputs}
+
+\paragraph{Field: Name}\label{plhp_eir_heating_inputs_name}
+
+This alpha field contains the identifying name for the heating side of the heat pump.
+
+\paragraph{Field: Load Side Inlet Node Name}\label{plhp_eir_heating_inputs_load_inlet_node}
+
+This alpha field contains the heat pump's load side inlet node name.
+
+\paragraph{Field: Load Side Outlet Node Name}\label{plhp_eir_heating_inputs_load_outlet_node}
 
 This alpha field contains the heat pump's load side outlet node name.
 
@@ -5339,49 +5473,117 @@ This alpha field contains the heat pump's load side outlet node name.
 
 This alpha field contains the heat pump's condenser type. Acceptable inputs are ``WaterSource'' or ``AirSource''.
 
-\paragraph{Field: Source Side Inlet Node Name}\label{plhp_eir_inputs_source_inlet_node}
+\paragraph{Field: Source Side Inlet Node Name}\label{plhp_eir_heating_inputs_source_inlet_node}
 
 This alpha field contains the heat pump's source side inlet node name.
 
-\paragraph{Field: Source Side Outlet Node Name}\label{plhp_eir_inputs_source_outlet_node}
+\paragraph{Field: Source Side Outlet Node Name}\label{plhp_eir_heating_inputs_source_outlet_node}
 
 This alpha field contains the heat pump's source side outlet node name.
 
-\paragraph{Field: Companion Heat Pump Name}\label{plhp_eir_inputs_companion_name}
+\paragraph{Field: Companion Heat Pump Name}\label{plhp_eir_heating_inputs_companion_name}
 
-This optional alpha field contains the name of a companion heat pump object. If the current object is heating type then this is expected to include the paired cooling object, and vice-versa. The companion is used for sizing if plant sizing data is unavailable, and during the simulation to ensure that any unexpected simultaneous operation of the two objects provides a warning to the user.
+This optional alpha field contains the name of a companion heat pump object. The current heatling object is expected to include the paired cooling object. The companion is used for sizing if plant sizing data is unavailable, and during the simulation to ensure that any unexpected simultaneous operation of the two objects provides a warning to the user.
 
-\paragraph{Field: Load Side Reference Flow Rate}\label{plhp_eir_inputs_load_side_flow}
+\paragraph{Field: Load Side Reference Flow Rate}\label{plhp_eir_heating_inputs_load_side_flow}
 
 This autosizable field defines the reference load side flow rate for the heat pump. This field is used as the nominal flow request for this heat pump unit during the simulation. The units for this field are [m3/s].
 
-\paragraph{Field: Source Side Reference Flow Rate}\label{plhp_eir_inputs_source_side_flow}
+\paragraph{Field: Source Side Reference Flow Rate}\label{plhp_eir_heating_inputs_source_side_flow}
 
 This autosizable field defines the reference source side side flow rate for the heat pump. This field is used as the nominal flow request for this heat pump unit during the simulation. The units for this field are [m3/s].
 
-\paragraph{Field: Reference Capacity}\label{plhp_eir_inputs_reference_capacity}
+\paragraph{Field: Reference Capacity}\label{plhp_eir_heating_inputs_reference_capacity}
 
-This autosizable field defines the reference load side heat capacity for the heat pump. Cooling capacity for a cooling companion heat pump and heating capacity for a heating companion heat pump. The units for this field are [W].
+This autosizable field defines the reference load side heating capacity for the heat pump. The units for this field are [W].
 
-\paragraph{Field: Reference Coefficient of Performance}\label{plhp_eir_inputs_reference_cop}
+\paragraph{Field: Reference Coefficient of Performance}\label{plhp_eir_heating_inputs_reference_cop}
 
 This field contains the reference COP for this unit, which is used when calculating the power required for the heat pump under simulation conditions. The COP is defined as the load side energy transfer divided by the power input, with dimensionless units of [W/W].
 
-\paragraph{Field: Sizing Factor}\label{plhp_eir_inputs_sizing_factor}
+\paragraph{Field: Sizing Factor}\label{plhp_eir_heating_inputs_sizing_factor}
 
 This field allows the user to scale the sizing of this unit compared to the plant-determined autosized flow and heat capacity.
 
-\paragraph{Field: Capacity Modifier Function of Temperature Curve Name}\label{plhp_eir_inputs_capft}
+\paragraph{Field: Capacity Modifier Function of Temperature Curve Name}\label{plhp_eir_heating_inputs_capft}
 
 This field is the name of a bivariate curve or table that defines an available capacity modifier of the unit as a function of the load side outlet temperature and the source side inlet temperature. The temperatures are in degrees Celsius when used in the function and the output of the function is multiplied by the reference capacity to get a current available capacity.
 
-\paragraph{Field: Electric Input to Output Ratio Modifier Function of Temperature Curve Name}\label{plhp_eir_inputs_eirft}
+\paragraph{Field: Electric Input to Output Ratio Modifier Function of Temperature Curve Name}\label{plhp_eir_heating_inputs_eirft}
 
 This field is the name of a bivariate curve or table that defines an EIR (1/COP) modifier as a function of the load side outlet temperature and the source side inlet temperature. The temperatures are in degrees Celsius when used in the function. The output of this function and the output of the EIR Modifier Function of PLR are multiplied by the reference EIR to get a current EIR .
 
-\paragraph{Field: Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name}\label{plhp_eir_inputs_eirfplr}
+\paragraph{Field: Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name}\label{plhp_eir_heating_inputs_eirfplr}
 
 This field is the name of a univariate curve or table that defines an EIR modifier as a function of the current part load ratio. The output of this function and the output of the EIR Modifier Function of Temperature are multiplied by the reference EIR to get a current EIR .
+
+\paragraph{Field: Heating To Cooling Capacity Sizing Ratio}\label{plhp_eir_heating_inputs_heating_to_cooling_capacity_sizing_ratio}
+
+This optional numeric field allows the user to choose a multiplier to size the Heating version of this object. The default value is 1.0. 
+
+\paragraph{Field: Heat Pump Sizing Method}\label{plhp_eir_heating_inputs_heat_pump_sizing_method}
+
+This optional choice field specifies whether the heat pump is sized based on the cooling plant load, the heating plant load, or the larger of these values. Valid choices are CoolingCapacity, HeatingCapacity or GreaterOfHeatingOrCooling. The default value is CoolingCapacity.
+
+\paragraph{Field: Control Type}\label{plhp_eir_heating_inputs_control_type}
+
+This optional choice field allows the user to choose between Load and Setpoint control. The default value is Load control.
+
+\paragraph{Field: Flow Mode}\label{plhp_eir_heating_inputs_flow_mode}
+
+This optional choice field allows the user to choose between ConstantFlow and VariableSpeedPumping. The default value is ConstantFlow. When the plant is served by variable speed pumps the water flow through this equipment will vary.
+
+\paragraph{Field: Minimum Part Load Ratio}\label{plhp_eir_heating_inputs_minimum_part_load_ratio}
+
+This optional numeric field specifies the minimum operating part load ratio. Below this value the compressor will cycle proportionally to the load. The default value is 0.
+
+\paragraph{Field: Minimum Source Inlet Temperature}\label{plhp_eir_heating_inputs_minimum_source_inlet_temperature}
+
+This optional numeric field specifies the minimum entering air or water temperature at the source inlet node. Below this value the compressor will be off. The default value is -100.
+
+\paragraph{Field: Maximum Source Inlet Temperature}\label{plhp_eir_heating_inputs_maximum_source_inlet_temperature}
+
+This optional numeric field specifies the maximum entering air or water temperature at the source inlet node. Above this value the compressor will be off. The default value is 100.
+
+\paragraph{Field: Minimum Supply Water Temperature Curve Name}\label{plhp_eir_heating_inputs_minimum_supply_water_temperature_curve_name}
+
+This optional alpha field specifies the name of a univariate curve or table that defines the minimum supply water temperature.
+
+\paragraph{Field: Maximum Supply Water Temperature Curve Name}\label{plhp_eir_heating_inputs_maximum_supply_water_temperature_curve_name}
+
+This optional alpha field specifies the name of a univariate curve or table that defines the maximum supply water temperature.
+
+\paragraph{Field: Dry Outdoor Correction Factor Curve Name}\label{plhp_eir_heating_inputs_dry_outdoor_correction_factor_curve_name}
+
+This optional alpha field specifies the name of a univariate curve or table that defines the heating capacity adjustment when outdoor air moisture content is low. Since latent load at the condenser will increase heating capacity, this curve allows modeling of that specific performance impact.
+
+\paragraph{Field: Maximum Outdoor Dry Bulb Temperature For Defrost Operation}\label{plhp_eir_heating_inputs_max_oat_for_defrost_operation}
+
+This optional numeric field allows the user to choose the maximum temperature where defrost will occur. The default value is 10.0. Defrost operation will not be active above this outdoor temperature.
+
+\paragraph{Field: Heat Pump Defrost Control}\label{plhp_eir_heating_inputs_heat_pump_defrost_control}
+
+This optional choice field specifies the defrost model as None, Timed, OnDemand, or TimedEmpirical. A blank field defaults to None.
+
+\paragraph{Field: Heat Pump Defrost Time Period Fraction}\label{plhp_eir_heating_inputs_heat_pump_defrost_time_period_fraction}
+
+This optional numeric field allows the user to specify the nominal defrost time in hours when Timed or TimedEmpirical defrost control methods are chosen in the previous input field. The default value is 0.058333 (5 minutes). The time that defrost operation is active will be adjusted based on outdoor weather.
+
+\paragraph{Field: Defrost Energy Input Ratio Function of Temperature Curve Name}\label{plhp_eir_heating_inputs_defrost_eir_function_temp_curve_name}
+
+This optional alpha field specifies the name of a bivariate curve or table that defines the defrost energy based on outdoor air moisture content. This curve is used only when Timed or OnDemand defrost control is selected.
+
+\paragraph{Field: Timed Empirical Defrost Frequency Curve Name}\label{plhp_eir_heating_inputs_timed_empirical_defrost_frequency_curve_name}
+
+This optional alpha field specifies the name of a univariate curve or table that defines the frequency of defrost based on outdoor temperature. This curve is used only when TimedEmpirical defrost control is selected.
+
+\paragraph{Field: Timed Empirical Defrost Heat Load Penalty Curve Name}\label{plhp_eir_heating_inputs_timed_empirical_defrost_heat_load_curve_name}
+
+This optional alpha field specifies the name of a univariate or bivariant curve or table that defines the heating penalty of defrost based on outdoor conditions. This curve is used only when TimedEmpirical defrost control is selected.
+
+\paragraph{Field: Timed Empirical Defrost Heat Input Energy Fraction Curve Name}\label{plhp_eir_heating_inputs_timed_empirical_defrost_heat_energy_fraction_curve_name}
+
+This optional alpha field specifies the name of a univariate or bivariant curve or table that defines the heating energy fraction of defrost based on outdoor conditions. This curve is used only when TimedEmpirical defrost control is selected.
 
 An idf example for a water-source application:
 
@@ -5402,6 +5604,7 @@ An idf example for a water-source application:
     CapCurveFuncTemp,        !- Heating Capacity Modifier Function of Temperature Curve Name
     EIRCurveFuncTemp,        !- Electric Input to Heating Output Ratio Modifier Function of Temperature Curve Name
     EIRCurveFuncPLR;         !- Electric Input to Heating Output Ratio Modifier Function of Part Load Ratio Curve Name
+
   HeatPump:WaterToWater:EIR:Cooling,
     Cooling Coil,            !- Name
     Cooling Coil Load Loop Intermediate Node, !- Load Side Inlet Node Name
@@ -5420,7 +5623,7 @@ An idf example for a water-source application:
     EIRCurveFuncPLR2;        !- Electric Input to Heating Output Ratio Modifier Function of Part Load Ratio Curve Name
 \end{lstlisting}
 
-An idf example for an air-source applicaiton:
+An idf example for an air-source application:
 
 \begin{lstlisting}
 HeatPump:PlantLoop:EIR:Heating,
@@ -5439,6 +5642,7 @@ Cooling Coil,            !- Companion Heat Pump Name
 CapCurveFuncTemp,        !- Heating Capacity Modifier Function of Temperature Curve Name
 EIRCurveFuncTemp,        !- Electric Input to Heating Output Ratio Modifier Function of Temperature Curve Name
 EIRCurveFuncPLR;         !- Electric Input to Heating Output Ratio Modifier Function of Part Load Ratio Curve Name
+
 HeatPump:WaterToWater:EIR:Cooling,
 Cooling Coil,            !- Name
 Cooling Coil Load Loop Intermediate Node, !- Load Side Inlet Node Name
@@ -5462,6 +5666,10 @@ EIRCurveFuncPLR2;        !- Electric Input to Heating Output Ratio Modifier Func
 This section describes the outputs available for the water to water heat pump, equation fit model; both cooling and heating.
 
 \begin{itemize}
+    \item
+    HVAC,Average,Heat Pump Part Load Ratio  {[}{]}
+    \item
+    HVAC,Average,Heat Pump Cycling Ratio  {[}{]}
     \item
     HVAC,Average,Heat Pump Electricity Rate {[}W{]}
     \item
@@ -5487,6 +5695,28 @@ This section describes the outputs available for the water to water heat pump, e
     \item
     HVAC,Average,Heat Pump Source Side Mass Flow Rate {[}kg/s{]}
 \end{itemize}
+
+Outputs specific to HeatPump:PlantLoop:EIR:Heating
+
+\begin{itemize}
+    \item
+    HVAC,Average,Heat Pump Load Due To Defrost  {[}W{]}
+    \item
+    HVAC,Average,Heat Pump Fractional Defrost Time  {[}hr{]}
+    \item
+    HVAC,Average,Heat Pump Defrost Electricity Rate  {[}W{]}
+    \item
+    HVAC,Average,Heat Pump Defrost Electricity Energy  {[}J{]}
+\end{itemize}
+
+
+\paragraph{Heat Pump Part Load Ratio {[}{]}}\label{plhp_eir_outputs_part_load_ratio}
+
+This output variable represents the average load ratio of load met to heat pump operating capacity during the specified reporting window.
+
+\paragraph{Heat Pump Cycling Ratio {[}{]}}\label{plhp_eir_outputs_cycling_ratio}
+
+This output variable represents the average cycling ratio of heat pump below the minimum operating part load ratio during the specified reporting window. When operating below the minimum part load ratio the heat pump will cycle on and off to meet the load.
 
 \paragraph{Heat Pump Electricity Rate {[}W{]}}\label{plhp_eir_outputs_power_usage}
 
@@ -5536,6 +5766,22 @@ This output variable represents the average load side mass flow rate during the 
 
 This output variable represents the average source side mass flow rate during the specified reporting window.
 
+\paragraph{Heat Pump Load Due To Defrost {[}W{]}}\label{plhp_eir_outputs_load_due_to_defrost}
+
+This output variable represents the average defrost load in watts during the specified reporting window.
+
+\paragraph{Heat Pump Fractional Defrost Time {[}hr{]}}\label{plhp_eir_outputs_fractional_defrost_time}
+
+This output variable represents the average defrost time in hours during the specified reporting window.
+
+\paragraph{Heat Pump Defrost Electricity Rate {[}W{]}}\label{plhp_eir_outputs_defrost_electric_rate}
+
+This output variable represents the average defrost electricity rate in watts during the specified reporting window.
+
+\paragraph{Heat Pump Defrost Electricity Energy {[}J{]}}\label{plhp_eir_outputs_defrost_electric_energy}
+
+This output variable represents the average defrost electricity energy in joules during the specified reporting window.
+
 \subsection{HeatPump:AirToWater:FuelFired:Heating (and Cooling)}\label{plhp_fuelfired}
 
 HeatPump:AirToWater:FuelFired:Heating is a gas-fired (or fuel fired) air-to-water absorption heat pump that can be used for space heating and domestic hot water. 
@@ -5581,9 +5827,9 @@ For the HeatPump:AirToWater:FuelFired:Cooling object, this field name is ``Nomin
 
 \paragraph{Field: Nominal COP}
 
-The nominal COP (Coefficient of Performance) in [W/W], which is the fuel based COP of the heat pump in the rating conditions. This is a require-field. The default value is set to 1.0 in case the input filed is accidently left blank.
+The nominal COP (Coefficient of Performance) in [W/W], which is the fuel based COP of the heat pump in the rating conditions. This is a require-field. The default value is set to 1.0 in case the input filed is accidentally left blank.
 
-For the HeatPump:AirToWater:FuelFired:Heating object, this is the fuel based nominal heatinging COP; and for the HeatPump:AirToWater:FuelFired:Cooling object, this is the fuel based nominal cooling COP.
+For the HeatPump:AirToWater:FuelFired:Heating object, this is the fuel based nominal heating COP; and for the HeatPump:AirToWater:FuelFired:Cooling object, this is the fuel based nominal cooling COP.
 
 \paragraph{Field: Design Flow Rate}
 
@@ -5617,7 +5863,7 @@ For HeatPump:AirToWater:FuelFired:Cooling object, the choices for this field sho
 
 \paragraph{Field: Normalized Capacity Function of Temperature Curve Name}
 
-This field is the curve name of the normalized capacity function of the two independent temperature variables. The maximum capacity is adjusted from the rated conditions, and represents what the actual capacity the heat pump can achieve under the outdoor air temperature (either drybulb or wetbuld depending on the previous input field choice), and the water temperature (either leaving condenser/evaporator or entering condenser/evaporator depending on the previous input field choice).
+This field is the curve name of the normalized capacity function of the two independent temperature variables. The maximum capacity is adjusted from the rated conditions, and represents what the actual capacity the heat pump can achieve under the outdoor air temperature (either drybulb or wetbulb depending on the previous input field choice), and the water temperature (either leaving condenser/evaporator or entering condenser/evaporator depending on the previous input field choice).
 
 \paragraph{Field: Fuel Energy Input Ratio Function of Temperature Curve name}
 
@@ -5736,7 +5982,7 @@ The output variables for the fuel-fired (or gas-fired) absorption heat pump syst
 This is the load side heat transfer rate for the fuel-fired absorption heat pump. The value will be positive for the heating mode, and negative for the cooling mode.
 
 \paragraph{Fuel-fired Absorption HeatPump Load Side Heating Transfer Energy [J]}
-This is the accumulated value fo the load side heat transfer energy for the fuel-fired absorption heat pump. The value will be positive for the heating mode, and negative for the cooling mode.
+This is the accumulated value for the load side heat transfer energy for the fuel-fired absorption heat pump. The value will be positive for the heating mode, and negative for the cooling mode.
 
 \paragraph{Fuel-fired Absorption HeatPump Fuel Rate [W]}
 This is the fuel consumption rate in [W] of the fuel-fired absorption heat pump. 
@@ -5883,44 +6129,40 @@ DistrictCooling, Purchased Cooling,
 
 \begin{itemize}
     \item
-    HVAC,Average, District Cooling Chilled Water Rate {[}W{]}
+    HVAC,Average, District Cooling Water Rate {[}W{]}
     \item
-    HVAC,Sum, District Cooling Chilled Water Energy {[}J{]}
+    HVAC,Sum, District Cooling Water Energy {[}J{]}
     \item
     Zone,Meter, DistrictCooling:Plant {[}J{]}
     \item
     Zone,Meter,Cooling: DistrictCooling {[}J{]}
     \item
-    HVAC,Average,District Cooling Rate {[}W{]}
+    HVAC,Average,District Cooling Water Inlet Temperature {[}C{]}
     \item
-    HVAC,Average,District Cooling Inlet Temperature {[}C{]}
+    HVAC,Average,District Cooling Water Outlet Temperature {[}C{]}
     \item
-    HVAC,Average,District Cooling Outlet Temperature {[}C{]}
-    \item
-    HVAC,Average,District Cooling Mass Flow Rate {[}kg/s{]}
+    HVAC,Average,District Cooling Water Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{District Cooling Chilled Water Rate {[}W{]}}\label{district-cooling-chilled-water-rate-w}
+\paragraph{District Cooling Water Rate {[}W{]}}\label{district-cooling-chilled-water-rate-w}
 
-\paragraph{District Cooling Chilled Water Energy {[}J{]}}\label{district-cooling-chilled-water-energy-j}
+This is the useful rate of cooling energy from purchased chilled water. 
+
+\paragraph{District Cooling Water Energy {[}J{]}}\label{district-cooling-chilled-water-energy-j}
 
 These outputs are the energy taken from purchased chilled water. Consumption is metered on Cooling:DistrictCooling, DistrictCooling:Plant, and DistrictCooling:Facility.
 
-\paragraph{District Cooling Rate {[}W{]}}\label{district-cooling-rate-w}
+\paragraph{District Cooling Water Inlet Temperature {[}C{]}}\label{district-cooling-inlet-temperature-c}
 
-This is the useful rate of cooling energy from purchased chilled water. For the current algorithm, this is the same as District Cooling Chilled Water Rate.
+\paragraph{District Cooling WaterOutlet Temperature {[}C{]}}\label{district-cooling-outlet-temperature-c}
 
-\paragraph{District Cooling Inlet Temperature {[}C{]}}\label{district-cooling-inlet-temperature-c}
-
-\paragraph{District Cooling Outlet Temperature {[}C{]}}\label{district-cooling-outlet-temperature-c}
-
-\paragraph{District Cooling Mass Flow Rate {[}kg/s{]}}\label{district-cooling-mass-flow-rate-kgs}
+\paragraph{District Cooling Water Mass Flow Rate {[}kg/s{]}}\label{district-cooling-mass-flow-rate-kgs}
 
 These outputs are the supply-side plant loop chilled water inlet and outlet temperatures and mass flow rate.
 
-\subsection{DistrictHeating}\label{districtheating}
+\subsection{DistrictHeating:Water}\label{districtheating}
 
-When the user is not interested in a plant simulation or there is some centralized source of hot water (district heating), the following object can be used in the input.
+When the user is not interested in a plant simulation or there is some centralized source of hot water (district heating water), the following object can be used in the input.
 
 \subsubsection{Inputs}\label{inputs-17-006}
 
@@ -5948,7 +6190,7 @@ An example of this statement in an IDF is:
 
 \begin{lstlisting}
 
-DistrictHeating,Purchased Heating,
+DistrictHeatingWater,Purchased Heating,
           NODE_30,NODE_29,
           1000000;
 \end{lstlisting}
@@ -5957,40 +6199,95 @@ DistrictHeating,Purchased Heating,
 
 \begin{itemize}
     \item
-    HVAC,Average,District Heating Hot Water Rate {[}W{]}
+    HVAC,Average,District Heating Water Rate {[}W{]}
     \item
-    HVAC,Sum,District Heating Hot Water Energy {[}J{]}
+    HVAC,Sum,District Heating Water Energy {[}J{]}
     \item
-    Zone,Meter,DistrictHeating:Plant {[}J{]}
+    Zone,Meter,DistrictHeatingWater:Plant {[}J{]}
     \item
-    Zone,Meter,Heating:DistrictHeating {[}J{]}
+    Zone,Meter,Heating:DistrictHeatingWater {[}J{]}
     \item
-    HVAC,Average,District Heating Rate {[}W{]}
+    HVAC,Average,District Heating Water Inlet Temperature {[}C{]}
     \item
-    HVAC,Average,District Heating Inlet Temperature {[}C{]}
+    HVAC,Average,District Heating Water Outlet Temperature {[}C{]}
     \item
-    HVAC,Average,District Heating Outlet Temperature {[}C{]}
-    \item
-    HVAC,Average,District Heating Mass Flow Rate {[}kg/s{]}
+    HVAC,Average,District Heating Water Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{District Heating Hot Water Rate {[}W{]}}\label{district-heating-hot-water-rate-w}
+\paragraph{District Heating Water Rate {[}W{]}}\label{district-heating-hot-water-rate-w}
 
-\paragraph{District Heating Hot Water Energy {[}J{]}}\label{district-heating-hot-water-energy-j}
+This is the useful rate of heating energy from purchased hot water.
 
-These outputs are the energy taken from purchased hot water. Consumption is metered on Heating:DistrictHeating, DistrictHeating:Plant, and DistrictHeating:Facility.
+\paragraph{District Heating Water Energy {[}J{]}}\label{district-heating-hot-water-energy-j}
 
-\paragraph{District Heating Rate {[}W{]}}\label{district-heating-rate-w}
+These outputs are the energy taken from purchased hot water. Consumption is metered on Heating:DistrictHeatingWater, DistrictHeatingWater:Plant, and DistrictHeatingWater:Facility.
 
-This is the useful rate of heating energy from purchased hot water. For the current algorithm, this is the same as District Heating Hot Water Rate.
+\paragraph{District Heating Water Inlet Temperature {[}C{]}}\label{district-heating-inlet-temperature-c}
 
-\paragraph{District Heating Inlet Temperature {[}C{]}}\label{district-heating-inlet-temperature-c}
+\paragraph{District Heating Water Outlet Temperature {[}C{]}}\label{district-heating-outlet-temperature-c}
 
-\paragraph{District Heating Outlet Temperature {[}C{]}}\label{district-heating-outlet-temperature-c}
-
-\paragraph{District Heating Mass Flow Rate {[}kg/s{]}}\label{district-heating-mass-flow-rate-kgs}
+\paragraph{District Heating Water Mass Flow Rate {[}kg/s{]}}\label{district-heating-mass-flow-rate-kgs}
 
 These outputs are the supply-side plant loop hot water inlet and outlet temperatures and mass flow rate.
+
+\subsection{DistrictHeating:Steam}\label{districtheatingsteam}
+
+When the user is not interested in a plant simulation or there is some centralized source of steam (district heating steam), the following object can be used in the input.
+
+\subsubsection{Inputs}\label{inputs-17-006-1}
+
+\paragraph{Field: Name}\label{field-name-16-006-1}
+
+This alpha field contains the identifying name for the district heating steam (i.e., purchased steam).
+
+\paragraph{Field: Steam Inlet Node Name}\label{field-steam-inlet-node-name-2}
+
+This alpha field contains the identifying name for the district heating inlet node.
+
+\paragraph{Field: Steam Outlet Node Name}\label{field-steam-outlet-node-name-2}
+
+This alpha field contains the identifying name for the district heating outlet node.
+
+\paragraph{Field: Nominal Capacity}\label{field-nominal-capacity-12}
+
+This numeric field contains the nominal demand (W) that the district heating will meet. This field is autosizable.
+
+\paragraph{Field: Capacity Fraction Schedule Name}\label{field-capacity-fraction-schedule-name-2}
+
+This alpha field contains the name of a schedule that describes how the nominal capacity varies over time.~ Values must non-negative. The capacity at a given point in time is determined by the product of the previous field and the value in this schedule. If the field is omitted or left blank, then the program assumes a schedule value of 1.0 all the time.
+
+\subsubsection{Outputs}\label{outputs-15-003}
+
+\begin{itemize}
+    \item
+    HVAC,Average,District Heating Steam Rate {[}W{]}
+    \item
+    HVAC,Sum,District Heating Steam Energy {[}J{]}
+    \item
+    Zone,Meter,DistrictHeatingSteam:Plant {[}J{]}
+    \item
+    Zone,Meter,Heating:DistrictHeatingSteam {[}J{]}
+    \item
+    HVAC,Average,District Heating Steam Inlet Temperature {[}C{]}
+    \item
+    HVAC,Average,District Heating Steam Outlet Temperature {[}C{]}
+    \item
+    HVAC,Average,District Heating Steam Mass Flow Rate {[}kg/s{]}
+\end{itemize}
+
+\paragraph{District Heating Steam Energy {[}J{]}}\label{district-heating-Steam-energy-j}
+
+These outputs are the energy taken from purchased steam. Consumption is metered on Heating:DistrictHeatingSteam, DistrictHeatingSteam:Plant, and DistrictHeatingSteam:Facility.
+
+\paragraph{District Heating Steam Rate {[}W{]}}\label{district-heating-steam-rate-w}
+
+This is the useful rate of heating energy from purchased steam.
+
+\paragraph{District Heating Steam Inlet Temperature {[}C{]}}\label{district-heating-steam-inlet-temperature-c}
+
+\paragraph{District Heating Steam Outlet Temperature {[}C{]}}\label{district-heating-steam-outlet-temperature-c}
+
+\paragraph{District Heating Steam Mass Flow Rate {[}kg/s{]}}\label{district-heating-steam-mass-flow-rate-kgs}
 
 \subsection{PlantComponent:TemperatureSource}\label{plantcomponenttemperaturesource}
 
@@ -6353,7 +6650,7 @@ This numeric field contains the compressor power during simultaneous cooling-hea
     Ratio = \frac{{Powe{r_{@Tchw,l = 6.67C,Tcond,l = 51.67C}}}}{{Powe{r_{@Tchw,l = 6.67C,Tcond,l = 35.0C}}}}
 \end{equation}
 
-The default value is 1.5. This field is used to determine full load compressor power at the simultaneous cooling-heating mode's reference chilled water leaving and condenser water leaving temperatures. Note: In heating-only mode, the chilled water leaving temperature floats so the EIRFT curve is used to modify the simultaneouos cooling-heating full load compressor power value.
+The default value is 1.5. This field is used to determine full load compressor power at the simultaneous cooling-heating mode's reference chilled water leaving and condenser water leaving temperatures. Note: In heating-only mode, the chilled water leaving temperature floats so the EIRFT curve is used to modify the simultaneous cooling-heating full load compressor power value.
 
 \subsubsection{Field: Reference Heating Mode Leaving Chilled Water Temperature}\label{field-reference-heating-mode-leaving-chilled-water-temperature}
 

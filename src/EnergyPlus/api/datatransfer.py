@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -168,6 +168,8 @@ class DataExchange:
         # some simulation data values are available for plugins or regular runtime calls
         self.api.year.argtypes = [c_void_p]
         self.api.year.restype = c_int
+        self.api.calendarYear.argtypes = [c_void_p]
+        self.api.calendarYear.restype = c_int
         self.api.month.argtypes = [c_void_p]
         self.api.month.restype = c_int
         self.api.dayOfMonth.argtypes = [c_void_p]
@@ -1020,13 +1022,27 @@ class DataExchange:
 
     def year(self, state: c_void_p) -> int:
         """
-        Get the "current" calendar year of the simulation.  All simulations operate at a real year, either user
+        Get the "current" year of the simulation, read from the EPW. All simulations operate at a real year, either user
         specified or automatically selected by EnergyPlus based on other data (start day of week + leap year option).
 
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: An integer year (2020, for example)
         """
         return self.api.year(state)
+
+    def calendar_year(self, state: c_void_p) -> int:
+        """
+        Get the "current" calendar year of the simulation.
+
+        Only valid for weather file run periods.
+
+        All simulations operate at a real year, either user
+        specified or automatically selected by EnergyPlus based on other data (start day of week + leap year option).
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :return: An integer year (2020, for example)
+        """
+        return self.api.calendarYear(state)
 
     def month(self, state: c_void_p) -> int:
         """

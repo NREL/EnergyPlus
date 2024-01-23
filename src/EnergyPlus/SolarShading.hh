@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -98,6 +98,8 @@ namespace SolarShading {
     void checkShadingSurfaceSchedules(EnergyPlusData &state);
 
     void GetShadowingInput(EnergyPlusData &state);
+
+    void checkScheduledSurfacePresent(EnergyPlusData &state);
 
     void AllocateModuleArrays(EnergyPlusData &state);
 
@@ -428,7 +430,8 @@ struct SolarShadingData : BaseGlobalStruct
 #ifdef EP_NO_OPENGL
     bool penumbra = false;
 #else
-    std::unique_ptr<Pumbra::Penumbra> penumbra = nullptr;
+    std::unique_ptr<Penumbra::Penumbra> penumbra = nullptr;
+    std::pair<EnergyPlusData *, std::string> LoggerContext;
 #endif
 
     bool GetInputFlag = true;
@@ -640,6 +643,6 @@ struct SolarShadingData : BaseGlobalStruct
     {
     }
 };
-} // namespace EnergyPlus
 
+} // namespace EnergyPlus
 #endif

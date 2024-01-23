@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -81,7 +81,7 @@ namespace FuelCellElectricGenerator {
         int EffCurveID;                        // pointer to curve for efficiency
         Real64 NomEff;                         // nominal efficiency
         Real64 NomPel;                         // nominal power rate at rating point
-        int NumCyclesAtStart;                  // number of start stop cycles at beggining of simulation (user input)
+        int NumCyclesAtStart = 0.0;            // number of start stop cycles at beggining of simulation (user input)
         int NumCycles;                         // number of start stop cycles
         Real64 CyclingDegradRat;               // rate of degradation from cycles
         Real64 NumRunHours;                    // number of hours of operation

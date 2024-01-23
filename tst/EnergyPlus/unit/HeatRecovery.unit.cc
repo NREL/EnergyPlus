@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3329,7 +3329,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "Branch,",
         "    Main Boiler HW Branch,   !- Name",
         "    ,                        !- Pressure Drop Curve Name",
-        "    DistrictHeating,         !- Component 1 Object Type",
+        "    DistrictHeating:Water,         !- Component 1 Object Type",
         "    Purchased Heating,         !- Component 1 Name",
         "    Purchased Heat Inlet Node, !- Component 1 Inlet Node Name",
         "    Purchased Heat Outlet Node;   !- Component 1 Outlet Node Name",
@@ -3705,7 +3705,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    0,                       !- Fraction of Motor Inefficiencies to Fluid Stream",
         "    INTERMITTENT;            !- Pump Control Type",
 
-        "  DistrictHeating,",
+        "  DistrictHeating:Water,",
         "    Purchased Heating,          !- Name",
         "    Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name",
         "    Purchased Heat Outlet Node, !- Hot Water Outlet Node Name",
@@ -3771,7 +3771,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
 
         "PlantEquipmentList,",
         "    Hot Water Loop All Equipment,           !- Name",
-        "    DistrictHeating,          !- Equipment 1 Object Type",
+        "    DistrictHeating:Water,          !- Equipment 1 Object Type",
         "    Purchased Heating;        !- Equipment 1 Name",
 
         "PlantEquipmentList,",

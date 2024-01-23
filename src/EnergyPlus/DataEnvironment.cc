@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -220,7 +220,7 @@ Real64 OutBaroPressAt(EnergyPlusData &state, Real64 const Z) // Height above gro
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 BaseTemp; // Base temperature at Z
 
-    BaseTemp = OutDryBulbTempAt(state, Z) + Constant::KelvinConv;
+    BaseTemp = OutDryBulbTempAt(state, Z) + Constant::Kelvin;
 
     if (Z <= 0.0) {
         LocalAirPressure = 0.0;

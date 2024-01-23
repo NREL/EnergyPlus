@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -105,6 +105,7 @@ protected:
         ss->str(std::string());
     }
 
+#ifdef GET_OUT
     std::string storageType(const int storageTypeIndex)
     {
         return state->dataSQLiteProcedures->sqlite->storageType(storageTypeIndex);
@@ -119,7 +120,7 @@ protected:
     {
         return state->dataSQLiteProcedures->sqlite->reportingFreqName(reportingFreqIndex);
     }
-
+#endif // GET_OUT
     std::string columnText(const unsigned char *column)
     {
         return std::string(reinterpret_cast<const char *>(column));

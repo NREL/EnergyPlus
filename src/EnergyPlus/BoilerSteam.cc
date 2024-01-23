@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -410,66 +410,65 @@ namespace BoilerSteam {
         std::string_view sFuelType = Constant::eFuelNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             "Boiler Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->BoilerLoad,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
+
         SetupOutputVariable(state,
                             "Boiler Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->BoilerEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
+                            Constant::eResource::EnergyTransfer,
+                            OutputProcessor::SOVEndUseCat::Boilers,
                             {},
-                            "ENERGYTRANSFER",
-                            "BOILERS",
-                            {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
         SetupOutputVariable(state,
                             format("Boiler {} Rate", sFuelType),
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->FuelUsed,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             format("Boiler {} Energy", sFuelType),
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->FuelConsumed,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            {},
-                            sFuelType,
-                            "Heating",
+                            Constant::eFuel2eResource[(int)this->FuelType],
+                            OutputProcessor::SOVEndUseCat::Heating,
                             this->EndUseSubcategory,
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
         SetupOutputVariable(state,
                             "Boiler Steam Efficiency",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             this->BoilerEff,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Boiler Steam Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->BoilerInletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Boiler Steam Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->BoilerOutletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Boiler Steam Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             this->BoilerMassFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -519,6 +518,34 @@ namespace BoilerSteam {
                     this->NomCap = tmpNomCap;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state, "Boiler:Steam", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+
+                        // Std 229 Boilers new report table
+                        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchBoilerType, this->Name, "Boiler:Steam");
+                        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchBoilerRefCap, this->Name, this->NomCap);
+                        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchBoilerRefEff, this->Name, this->NomEffic);
+                        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchBoilerRatedCap, this->Name, this->NomCap);
+                        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchBoilerRatedEff, this->Name, this->NomEffic);
+                        OutputReportPredefined::PreDefTableEntry(state,
+                                                                 state.dataOutRptPredefined->pdchBoilerPlantloopName,
+                                                                 this->Name,
+                                                                 this->plantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->plantLoc.loopNum).Name
+                                                                                            : "N/A");
+                        OutputReportPredefined::PreDefTableEntry(state,
+                                                                 state.dataOutRptPredefined->pdchBoilerPlantloopBranchName,
+                                                                 this->Name,
+                                                                 this->plantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->plantLoc.loopNum)
+                                                                                                  .LoopSide(this->plantLoc.loopSideNum)
+                                                                                                  .Branch(this->plantLoc.branchNum)
+                                                                                                  .Name
+                                                                                            : "N/A");
+                        OutputReportPredefined::PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchBoilerMinPLR, this->Name, this->MinPartLoadRat);
+                        OutputReportPredefined::PreDefTableEntry(state,
+                                                                 state.dataOutRptPredefined->pdchBoilerFuelType,
+                                                                 this->Name,
+                                                                 Constant::eFuelNames[static_cast<int>(this->FuelType)]);
+                        OutputReportPredefined::PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchBoilerParaElecLoad, this->Name, "Not Applicable");
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state, "Boiler:Steam", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
@@ -534,6 +561,36 @@ namespace BoilerSteam {
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
+
+                            // Std 229 Boilers new report table
+                            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchBoilerType, this->Name, "Boiler:Steam");
+                            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchBoilerRefCap, this->Name, this->NomCap);
+                            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchBoilerRefEff, this->Name, this->NomEffic);
+                            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchBoilerRatedCap, this->Name, this->NomCap);
+                            OutputReportPredefined::PreDefTableEntry(
+                                state, state.dataOutRptPredefined->pdchBoilerRatedEff, this->Name, this->NomEffic);
+                            OutputReportPredefined::PreDefTableEntry(
+                                state,
+                                state.dataOutRptPredefined->pdchBoilerPlantloopName,
+                                this->Name,
+                                this->plantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->plantLoc.loopNum).Name : "N/A");
+                            OutputReportPredefined::PreDefTableEntry(state,
+                                                                     state.dataOutRptPredefined->pdchBoilerPlantloopBranchName,
+                                                                     this->Name,
+                                                                     this->plantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->plantLoc.loopNum)
+                                                                                                      .LoopSide(this->plantLoc.loopSideNum)
+                                                                                                      .Branch(this->plantLoc.branchNum)
+                                                                                                      .Name
+                                                                                                : "N/A");
+                            OutputReportPredefined::PreDefTableEntry(
+                                state, state.dataOutRptPredefined->pdchBoilerMinPLR, this->Name, this->MinPartLoadRat);
+                            OutputReportPredefined::PreDefTableEntry(state,
+                                                                     state.dataOutRptPredefined->pdchBoilerFuelType,
+                                                                     this->Name,
+                                                                     Constant::eFuelNames[static_cast<int>(this->FuelType)]);
+                            OutputReportPredefined::PreDefTableEntry(
+                                state, state.dataOutRptPredefined->pdchBoilerParaElecLoad, this->Name, "Not Applicable");
+
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, format("SizePump: Potential issue with equipment sizing for {}", this->Name));

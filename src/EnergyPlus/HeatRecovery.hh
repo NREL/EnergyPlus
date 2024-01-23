@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -227,6 +227,7 @@ namespace HeatRecovery {
                                       int FanOpMode,           // Supply air fan operating mode (1=cycling, 2=constant)
                                       Real64 PartLoadRatio,    // Part load ratio requested of DX compressor
                                       int CompanionCoilIndex,  // index of companion cooling coil
+                                      int CompanionCoilType,   // type of cooling coil
                                       bool RegenInletIsOANode, // Flag to determine if regen side inlet is OANode, if so this air stream cycles
                                       ObjexxFCL::Optional_bool_const EconomizerFlag = _, // economizer flag pass by air loop or OA sys
                                       ObjexxFCL::Optional_bool_const HighHumCtrlFlag = _ // high humidity control flag passed by airloop or OA sys

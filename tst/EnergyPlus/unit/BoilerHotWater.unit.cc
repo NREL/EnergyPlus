@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -179,7 +179,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BlankDesignWaterFlowRate)
         "  Node boiler 1 outlet,    !- Boiler Water Outlet Node Name",
         "  99.9,                    !- Water Outlet Upper Temperature Limit {C}",
         "  NotModulated,            !- Boiler Flow Mode",
-        "  ,                        !- Parasitic Electric Load {W}",
+        "  ,                        !- On Cycle Parasitic Electric Load {W}",
         "  1;                       !- Sizing Factor",
     });
 
@@ -224,7 +224,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
         "  Node boiler 1 outlet,    !- Boiler Water Outlet Node Name",
         "  99.9,                    !- Water Outlet Upper Temperature Limit {C}",
         "  NotModulated,            !- Boiler Flow Mode",
-        "  ,                        !- Parasitic Electric Load {W}",
+        "  ,                        !- On Cycle Parasitic Electric Load {W}",
         "  1;                       !- Sizing Factor",
 
         "Curve:Quadratic,",

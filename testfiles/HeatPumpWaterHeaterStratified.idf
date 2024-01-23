@@ -128,7 +128,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.2;
+  Version,24.1;
 
   Building,
     Building,                !- Name
@@ -2292,6 +2292,7 @@
     HPWHWaterInletNode,      !- Condenser Water Inlet Node Name
     HPWHWaterOutletNode,     !- Condenser Water Outlet Node Name
     100.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
@@ -2527,6 +2528,7 @@
     Zone4WaterInletNode,     !- Condenser Water Inlet Node Name
     Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name
     100.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
@@ -2664,6 +2666,7 @@
     Zone4bWaterInletNode,    !- Condenser Water Inlet Node Name
     Zone4bWaterOutletNode,   !- Condenser Water Outlet Node Name
     100.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
@@ -2804,6 +2807,7 @@
     HPOutdoorWaterInletNode, !- Condenser Water Inlet Node Name
     HPOutdoorWaterOutletNode,!- Condenser Water Outlet Node Name
     100.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
@@ -2969,6 +2973,7 @@
     HPScheduledWaterInletNode,  !- Condenser Water Inlet Node Name
     HPScheduledWaterOutletNode,  !- Condenser Water Outlet Node Name
     120.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name
@@ -4085,6 +4090,7 @@
     HPPlantWaterInletNode,   !- Condenser Water Inlet Node Name
     HPPlantWaterOutletNode,  !- Condenser Water Outlet Node Name
     100.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name

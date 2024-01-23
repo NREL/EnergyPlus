@@ -34,6 +34,7 @@ jobs:
           echo CMAKE_GENERATOR_PLATFORM=x64 >> $GITHUB_ENV
           choco install ninja
         fi;
+        pip install pytest pytest-timeout
 
     - name: Configure CMake
       working-directory: ./build
@@ -107,3 +108,8 @@ jobs:
 
         lines = build()
         ensure_target_built(lines, "Failed after IDD change revert")
+
+    - name: Run idd_schema pytests
+      working-directory: ./build
+      run: |
+        pytest --verbose ../idd

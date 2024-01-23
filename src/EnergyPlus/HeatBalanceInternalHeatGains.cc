@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,7 +74,7 @@ void SetupZoneInternalGain(EnergyPlusData &state,
     Real64 gainFrac = 1.0;
     for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
         if (state.dataHeatBal->Zone(ZoneNum).numSpaces > 1) {
-            gainFrac = state.dataHeatBal->space(spaceNum).floorArea / state.dataHeatBal->Zone(ZoneNum).FloorArea;
+            gainFrac = state.dataHeatBal->space(spaceNum).FloorArea / state.dataHeatBal->Zone(ZoneNum).FloorArea;
         }
         SetupSpaceInternalGain(state,
                                spaceNum,
@@ -122,7 +122,7 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     int constexpr DeviceAllocInc(100);
 
     bool FoundDuplicate = false;
-    std::string UpperCaseObjectName = UtilityRoutines::makeUPPER(cComponentName);
+    std::string UpperCaseObjectName = Util::makeUPPER(cComponentName);
 
     auto &thisIntGain = state.dataHeatBal->spaceIntGainDevices(spaceNum);
     for (int IntGainsNum = 1; IntGainsNum <= thisIntGain.numberOfDevices; ++IntGainsNum) {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,11 +59,12 @@
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataDaylighting.hh>
+// #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/PlantChillers.hh>
@@ -303,7 +304,7 @@ namespace CostEstimateManager {
                 }
 
                 ThisConstructStr = state.dataCostEstimateManager->CostLineItem(Item).ParentObjName;
-                ThisConstructID = UtilityRoutines::FindItem(ThisConstructStr, state.dataConstruction->Construct);
+                ThisConstructID = Util::FindItem(ThisConstructStr, state.dataConstruction->Construct);
                 if (ThisConstructID == 0) { // do any surfaces have the specified construction? If not issue warning.
                     ShowWarningError(state,
                                      format("ComponentCost:LineItem: \"{}\" Construction=\"{}\", no surfaces have the Construction specified",
@@ -357,7 +358,7 @@ namespace CostEstimateManager {
                     auto &parentObjName = state.dataCostEstimateManager->CostLineItem(Item).ParentObjName;
                     if ((state.dataCostEstimateManager->CostLineItem(Item).ParentObjType == ParentObject::CoilDX) ||
                         (state.dataCostEstimateManager->CostLineItem(Item).ParentObjType == ParentObject::CoilCoolingDXSingleSpeed)) {
-                        if (UtilityRoutines::FindItem(parentObjName, state.dataDXCoils->DXCoil) > 0) coilFound = true;
+                        if (Util::FindItem(parentObjName, state.dataDXCoils->DXCoil) > 0) coilFound = true;
                     } else if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjType == ParentObject::CoilCoolingDX) {
                         if (CoilCoolingDX::factory(state, parentObjName) != -1) {
                             coilFound = true;
@@ -408,8 +409,7 @@ namespace CostEstimateManager {
                     ErrorsFound = true;
 
                 } else { // assume name is probably useful
-                    thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName,
-                                                         state.dataHeatingCoils->HeatingCoil);
+                    thisCoil = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataHeatingCoils->HeatingCoil);
                     if (thisCoil == 0) {
                         ShowWarningError(state,
                                          format("ComponentCost:LineItem: \"{}\", Coil:Heating:Fuel, invalid coil specified",
@@ -452,9 +452,9 @@ namespace CostEstimateManager {
                                            state.dataCostEstimateManager->CostLineItem(Item).LineName));
                     ErrorsFound = true;
                 } else {
-                    ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
+                    ThisZoneID = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                     if (ThisZoneID > 0) {
-                        state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDaylightingData->ZoneDaylight(ThisZoneID).totRefPts;
+                        state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDayltg->ZoneDaylight(ThisZoneID).totRefPts;
                     } else {
                         ShowSevereError(state,
                                         format("ComponentCost:LineItem: \"{}\", Daylighting:Controls, need to specify a valid zone name",
@@ -466,10 +466,9 @@ namespace CostEstimateManager {
             } break;
             case ParentObject::ShadingZoneDetailed: {
                 if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                    ThisSurfID =
-                        UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataSurface->Surface);
+                    ThisSurfID = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataSurface->Surface);
                     if (ThisSurfID > 0) {
-                        ThisZoneID = UtilityRoutines::FindItem(state.dataSurface->Surface(ThisSurfID).ZoneName, Zone);
+                        ThisZoneID = Util::FindItem(state.dataSurface->Surface(ThisSurfID).ZoneName, Zone);
                         if (ThisZoneID == 0) {
                             ShowSevereError(state,
                                             format("ComponentCost:LineItem: \"{}\", Shading:Zone:Detailed, need to specify a valid zone name",
@@ -502,7 +501,7 @@ namespace CostEstimateManager {
                 }
                 if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap != 0.0) {
                     if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                        ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
+                        ThisZoneID = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                         if (ThisZoneID == 0) {
                             ShowSevereError(state,
                                             format("ComponentCost:LineItem: \"{}\", Lights, need to specify a valid zone name",
@@ -522,8 +521,7 @@ namespace CostEstimateManager {
             case ParentObject::GeneratorPhotovoltaic: {
                 if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap != 0.0) {
                     if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                        thisPV = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName,
-                                                           state.dataPhotovoltaic->PVarray);
+                        thisPV = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataPhotovoltaic->PVarray);
                         if (thisPV > 0) {
                             if (state.dataPhotovoltaic->PVarray(thisPV).PVModelType != DataPhotovoltaics::PVModel::Simple) {
                                 ShowSevereError(state,
@@ -611,7 +609,7 @@ namespace CostEstimateManager {
             } break;
             case ParentObject::Construction: {
                 ThisConstructStr = state.dataCostEstimateManager->CostLineItem(Item).ParentObjName;
-                ThisConstructID = UtilityRoutines::FindItem(ThisConstructStr, state.dataConstruction->Construct);
+                ThisConstructID = Util::FindItem(ThisConstructStr, state.dataConstruction->Construct);
                 // need to determine unique surfaces... some surfaces are shared by zones and hence doubled
                 uniqueSurfMask.dimension(state.dataSurface->TotSurfaces, true); // init to true and change duplicates to false
                 SurfMultipleARR.dimension(state.dataSurface->TotSurfaces, 1.0);
@@ -652,7 +650,7 @@ namespace CostEstimateManager {
                 if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
                     WildcardObjNames = true;
                 } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                    thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataDXCoils->DXCoil);
+                    thisCoil = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataDXCoils->DXCoil);
                 }
 
                 if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) {
@@ -793,8 +791,7 @@ namespace CostEstimateManager {
                 if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
                     WildcardObjNames = true;
                 } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                    thisCoil = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName,
-                                                         state.dataHeatingCoils->HeatingCoil);
+                    thisCoil = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataHeatingCoils->HeatingCoil);
                 }
 
                 if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap > 0.0) {
@@ -883,12 +880,11 @@ namespace CostEstimateManager {
             } break;
             case ParentObject::DaylightingControls: {
                 if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
-                    state.dataCostEstimateManager->CostLineItem(Item).Qty =
-                        sum(state.dataDaylightingData->ZoneDaylight, &Dayltg::ZoneDaylightCalc::totRefPts);
+                    state.dataCostEstimateManager->CostLineItem(Item).Qty = sum(state.dataDayltg->ZoneDaylight, &Dayltg::ZoneDaylightCalc::totRefPts);
                 } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                    ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
+                    ThisZoneID = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                     if (ThisZoneID > 0) {
-                        state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDaylightingData->ZoneDaylight(ThisZoneID).totRefPts;
+                        state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDayltg->ZoneDaylight(ThisZoneID).totRefPts;
                     }
                 }
 
@@ -899,10 +895,9 @@ namespace CostEstimateManager {
             } break;
             case ParentObject::ShadingZoneDetailed: {
                 if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                    ThisSurfID =
-                        UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataSurface->Surface);
+                    ThisSurfID = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataSurface->Surface);
                     if (ThisSurfID > 0) {
-                        ThisZoneID = UtilityRoutines::FindItem(state.dataSurface->Surface(ThisSurfID).ZoneName, Zone);
+                        ThisZoneID = Util::FindItem(state.dataSurface->Surface(ThisSurfID).ZoneName, Zone);
                         if (ThisZoneID > 0) {
                             state.dataCostEstimateManager->CostLineItem(Item).Qty =
                                 state.dataSurface->Surface(ThisSurfID).Area * Zone(ThisZoneID).Multiplier * Zone(ThisZoneID).ListMultiplier;
@@ -926,7 +921,7 @@ namespace CostEstimateManager {
 
                 if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap != 0.0) {
                     if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                        ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
+                        ThisZoneID = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                         if (ThisZoneID > 0) {
                             Real64 Qty(0.0);
                             for (auto const &e : state.dataHeatBal->Lights)
@@ -946,11 +941,10 @@ namespace CostEstimateManager {
             case ParentObject::GeneratorPhotovoltaic: {
                 if (state.dataCostEstimateManager->CostLineItem(Item).PerKiloWattCap != 0.0) {
                     if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
-                        thisPV = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName,
-                                                           state.dataPhotovoltaic->PVarray);
+                        thisPV = Util::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, state.dataPhotovoltaic->PVarray);
                         if (thisPV > 0) {
-                            ThisZoneID = UtilityRoutines::FindItem(
-                                state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(thisPV).SurfacePtr).ZoneName, Zone);
+                            ThisZoneID =
+                                Util::FindItem(state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(thisPV).SurfacePtr).ZoneName, Zone);
                             if (ThisZoneID == 0) {
                                 Multipliers = 1.0;
                             } else {

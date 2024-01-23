@@ -14,7 +14,7 @@ One of the most important outputs for EnergyPlus is the Variable Dictionary repo
 
 \paragraph{Field: Key Field}\label{field-key-field}
 
-For this field there are two choices: \textbf{IDF} and \textbf{regular}. The regular option is the default and produces a listing that shows the type of variable: Zone or HVAC, Average or Sum. ``\textbf{Zone}'' variables are calculated and can be reported after each Zone/Heat Balance timestep (ref: Timesteps input object). ``\textbf{HVAC}'' variables are calculated and can be reported with each variable HVAC timestep. ``\textbf{Average}'' variables will be averaged over the time interval being reported whereas ``\textbf{Sum}'' variables are summed over that time interval. (Meter variables are always summed.) Units for the variable are shown in ``{[}\}''.
+For this field there are two choices: \textbf{IDF} and \textbf{regular}. The regular option is the default and produces a listing that shows the type of variable: Zone or HVAC, Average or Sum. ``\textbf{Zone}'' variables are calculated and can be reported after each Zone/Heat Balance timestep (ref: Timesteps input object). ``\textbf{HVAC}'' variables are calculated and can be reported with each variable HVAC timestep. ``\textbf{Average}'' variables will be averaged over the time interval being reported whereas ``\textbf{Sum}'' variables are summed over that time interval. (Meter variables are always summed.) Units for the variable are shown in ``{[} {]}''.
 
 \paragraph{Field: Sort Option}\label{field-sort-option}
 
@@ -64,7 +64,7 @@ An example input object for this report follows.
 Output:Surfaces:List, Lines;
 \end{lstlisting}
 
-The above IDF line will produce a simple file of line segments that constitute the surfaces in the IDF file. This file is the~ ``lines'' report (\textbf{eplusout.sln}) and is decribed in more detail in the Output Details and Examples document.
+The above IDF line will produce a simple file of line segments that constitute the surfaces in the IDF file. This file is the~ ``lines'' report (\textbf{eplusout.sln}) and is described in more detail in the Output Details and Examples document.
 
 \paragraph{Field: Report Specifications}\label{field-report-specifications}
 
@@ -348,7 +348,7 @@ OutputControl:ReportingTolerances,.21,.21;
 
 \subsection{Output:Variable}\label{outputvariable}
 
-This input object is used request results reporting.~ As shown above in the Variable Dictionary Report section, there are many different output variables available for reporting results from EnergyPlus.~ The Output:Variable object is primarily used for reporting time series data at various frequencys.
+This input object is used request results reporting.~ As shown above in the Variable Dictionary Report section, there are many different output variables available for reporting results from EnergyPlus.~ The Output:Variable object is primarily used for reporting time series data at various frequencies.
 
 Each Output:Variable object causes a specific number assignment for outputs. For example, you could request separate reporting for the outside temperature:
 
@@ -474,51 +474,98 @@ Current resource types are shown in the table below:
 
 % table 38
 \begin{longtable}[c]{@{}l@{}}
-\caption{Table of Metered Resource  Types \label{table:table-of-metered-resource-types}} \tabularnewline
-\toprule
-Utility/Fuel Types \tabularnewline
-\midrule
-\endfirsthead
-
-\caption[]{Table of Metered Resource  Types} \tabularnewline
-\toprule
-Utility/Fuel Types \tabularnewline
-\midrule
-\endhead
-
-Electricity \tabularnewline
-NaturalGas \tabularnewline
-Gasoline \tabularnewline
-Diesel \tabularnewline
-Coal \tabularnewline
-FuelOilNo1 \tabularnewline
-FuelOilNo2 \tabularnewline
-Propane \tabularnewline
-OtherFuel1 \tabularnewline
-OtherFuel2 \tabularnewline
-Water \tabularnewline
-Steam \tabularnewline
-DistrictCooling \tabularnewline
-DistrictHeating \tabularnewline
-ElectricityPurchased \tabularnewline
-ElectricitySurplusSold \tabularnewline
-ElectricityNet \tabularnewline
-\bottomrule
+	\caption{Table of Metered Resource Types---Fuels \label{table:table-of-metered-resource-types}} \tabularnewline
+	\toprule
+	Utility/Fuel Resource Types \tabularnewline
+	\midrule
+	\endfirsthead
+	
+	\caption[]{Table of Metered Resource Types---Fuels \label{table:table-of-metered-resource-types-Fuels}} \tabularnewline
+	\toprule
+	Utility/Fuel Resource Types \tabularnewline
+	\midrule
+	\endhead
+	
+	Electricity \tabularnewline
+	NaturalGas \tabularnewline
+	Gasoline \tabularnewline
+	Diesel \tabularnewline
+	Coal \tabularnewline
+	FuelOilNo1 \tabularnewline
+	FuelOilNo2 \tabularnewline
+	Propane \tabularnewline
+	OtherFuel1 \tabularnewline
+	OtherFuel2 \tabularnewline
+	DistrictCooling \tabularnewline
+	DistrictHeatingWater \tabularnewline
+	DistrictHeatingSteam \tabularnewline
+	Water \tabularnewline
+	\bottomrule
 \end{longtable}
 
 \begin{longtable}[c]{@{}l@{}}
-\toprule
-Other Resource Types \tabularnewline
-\midrule
-\endfirsthead
+	\caption{Table of Metered Resource Types---Pollutants \label{table:table-of-metered-resource-types-pollutants}} \tabularnewline
+	\toprule
+	Pollutant Resource Types \tabularnewline
+	\midrule
+	\endfirsthead
+	
+	\caption[]{Table of Metered Resource Types---Pollutants} \tabularnewline
+	\toprule
+	Pollutant Resource Types \tabularnewline
+	\midrule
+	\endhead
+	
+	SO2 \tabularnewline
+	NOx \tabularnewline
+	N2O \tabularnewline
+	PM \tabularnewline
+	PM2{\textunderscore}5 \tabularnewline
+	PM10 \tabularnewline
+	CO \tabularnewline
+	CO2 \tabularnewline
+	CH4 \tabularnewline
+	NH3 \tabularnewline
+	NMVOC \tabularnewline
+	Hg \tabularnewline
+	Pb \tabularnewline
+	NuclearHigh \tabularnewline
+	NuclearLow \tabularnewline
+	\bottomrule
+\end{longtable}
+	
+\begin{longtable}[c]{@{}l@{}}
+	\caption{Table of Metered Resource Types---Others \label{table:table-of-metered-resource-types-others}} \tabularnewline
+	\toprule
+	Other Resource Types \tabularnewline
+	\midrule
+	\endfirsthead
 
-\toprule
-Other Resource Types \tabularnewline
-\midrule
-\endhead
-
-EnergyTransfer \tabularnewline
-\bottomrule
+	\caption[]{Table of Metered Resource Types---Others} \tabularnewline
+	\toprule
+	Other Resource Types \tabularnewline
+	\midrule
+	\endhead
+	
+	EnergyTransfer \tabularnewline
+	ElectricityProduced \tabularnewline
+	ElectricityPurchased \tabularnewline
+	ElectricitySurplusSold \tabularnewline
+	ElectricityNet \tabularnewline
+	SolarWater \tabularnewline
+	SolarAir \tabularnewline
+	CarbonEquivalent \tabularnewline
+	PlantLoopHeatingDemand \tabularnewline
+	PlantLoopCoolingDemand \tabularnewline
+	OnSiteWater \tabularnewline
+	MainsWater \tabularnewline
+	RainWater \tabularnewline
+	WellWater \tabularnewline
+	Condensate \tabularnewline
+	WaterEnvironmentalFactors \tabularnewline
+	Source \tabularnewline
+	Generic \tabularnewline
+	\bottomrule
 \end{longtable}
 
 The end use types are shown in the following table (note that certain end use types apply only to the EnergyTransfer resource):
@@ -537,21 +584,20 @@ Utility/Fuel End Use Types \tabularnewline
 \midrule
 \endhead
 
-InteriorLights \tabularnewline
-ExteriorLights \tabularnewline
-InteriorEquipment \tabularnewline
-ExteriorEquipment \tabularnewline
-Fans \tabularnewline
-Pumps \tabularnewline
 Heating \tabularnewline
 Cooling \tabularnewline
-HeatRejection \tabularnewline
-Humidifier \tabularnewline
-HeatRecovery \tabularnewline
-DHW \tabularnewline
-Cogeneration \tabularnewline
-Refrigeration \tabularnewline
+Interior Lights \tabularnewline
+Exterior Lights \tabularnewline
+Interior Equipment \tabularnewline
+Exterior Equipment \tabularnewline
+Fans \tabularnewline
+Pumps \tabularnewline
+Heat Rejection \tabularnewline
+Humidification \tabularnewline
+Heat Recovery \tabularnewline
 WaterSystems \tabularnewline
+Refrigeration \tabularnewline
+Generators \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -613,7 +659,7 @@ Facility = \sum {\left( {Building + HVAC + Plant + Exterior} \right)}
 Building = \sum\limits_1^{NumberOfZones} {Zone} = \sum\limits_1^{NumberOfSpaceTypes} {SpaceType}
 \end{equation}
 
-There are also some special purpose meters used to describe electricity resource flows in greater detail.~ Electricity metering is tracked in more detail to accommodate the complexities of onsite electricity generation.~ There are three variations on the electricity resource type including:~ (1) ``ElectrictyPurchased'' which is the quantity of electricity purchased and is always positive, (2) ``ElectricitySold'' which is the quantity of electricity exported by the building, that which is typically ``sold'' back to the power company, and is always positive, and (3) ``ElectricityNet'' which is the net electricity demand considering all sources of onsite generation and demand and can be either positive or negative.
+There are also some special purpose meters used to describe electricity resource flows in greater detail.~ Electricity metering is tracked in more detail to accommodate the complexities of onsite electricity generation.~ There are three variations on the electricity resource type including:~ (1) ``ElectrictyProduced'' which is the quantity of electricity generated onsite and is always non-negative (zero or positive), (2) ``ElectrictyPurchased'' which is the quantity of electricity purchased and is always non-negative (zero or positive), (3) ``ElectricitySold'' which is the quantity of electricity exported by the building, that which is typically ``sold'' back to the power company, and is always non-negative (zero or positive), and (4) ``ElectricityNet'' which is the net electricity demand considering all sources of onsite generation and demand and can be either positive or negative (or zero).
 
 \subsubsection{Field: Reporting Frequency}\label{field-reporting-frequency-1}
 
@@ -655,24 +701,28 @@ Users will enter environmental impact factors for each Fuel Type or FuelFactor. 
 The energy is obtained internally from the following facility meters:
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule
-%Electricity:Facility & Diesel:Facility \tabularnewline
-%\midrule
-%\endfirsthead
-%
-%\toprule
-%Electricity:Facility & Diesel:Facility \tabularnewline
-%\midrule
-%\endhead
-%
-Electricity:Facility & Diesel:Facility \tabularnewline
-DistrictCooling:Facility & DistrictHeating:Facility \tabularnewline
-NaturalGas:Facility & Gasoline:Facility \tabularnewline
-Coal:Facility & FuelOilNo1:Facility \tabularnewline
-FuelOilNo2:Facility & Propane:Facility \tabularnewline
-ElectricityProduced:Facility & Steam:Facility \tabularnewline
-OtherFuel1:Facility & OtherFuel2:Facility \tabularnewline
-\bottomrule
+	\caption{Facility Meters \label{table:facility-meters}} \tabularnewline
+	\toprule
+	%Electricity:Facility & Diesel:Facility \tabularnewline
+	Facility Meters & \tabularnewline
+	\midrule
+	\endfirsthead
+
+	\caption[]{Facility Meters} \tabularnewline
+	\toprule
+	%Electricity:Facility & Diesel:Facility \tabularnewline
+	Facility Meters & \tabularnewline
+	\midrule
+	\endhead
+
+	Electricity:Facility & Diesel:Facility \tabularnewline
+	DistrictCooling:Facility & DistrictHeatingWater:Facility \tabularnewline
+	NaturalGas:Facility & Gasoline:Facility \tabularnewline
+	Coal:Facility & FuelOilNo1:Facility \tabularnewline
+	FuelOilNo2:Facility & Propane:Facility \tabularnewline
+	ElectricityProduced:Facility & DistrictHeatingSteam:Facility \tabularnewline
+	OtherFuel1:Facility & OtherFuel2:Facility \tabularnewline
+	\bottomrule
 \end{longtable}
 
 For the pollutant calculation only the total off-site or purchased electric energy is calculated using Electricity Factors. Off-Site Electricity = Electricity:Facility - ElectricityProduced:Facility, pollutants for the fuel type used by the on-site generator will be calculated, for example Diesel, in these cases.
@@ -712,7 +762,7 @@ The Steam Conversion Efficiency is used to convert the Steam usage to Natural Ga
 
 \paragraph{Field: Total Carbon Equivalent Emission Factor From N2O}\label{field-total-carbon-equivalent-emission-factor-from-n2o}
 
-The Intergovernmental Panel on Climate Change has studied the effects on the relative radiative forcing effects of various greenhouse gases. This effect, called Global Warming Potential (GWP), is described in terms of the Carbon Equivalent of a particular greenhouse gase. N\(_{2}\)O (nitrous oxide) can be produced by some Fuel Types and has a default of carbon equivalent emission factor of 80.7272 kg C/kg N\(_{2}\)O.
+The Intergovernmental Panel on Climate Change has studied the effects on the relative radiative forcing effects of various greenhouse gases. This effect, called Global Warming Potential (GWP), is described in terms of the Carbon Equivalent of a particular greenhouse gas. N\(_{2}\)O (nitrous oxide) can be produced by some Fuel Types and has a default of carbon equivalent emission factor of 80.7272 kg C/kg N\(_{2}\)O.
 
 \paragraph{Field: Total Carbon Equivalent Emission Factor From CH4}\label{field-total-carbon-equivalent-emission-factor-from-ch4}
 
@@ -806,7 +856,7 @@ Similar to the source energy calculation, this field contains the name of a sche
 
 \paragraph{Field: CO Emission Factor}\label{field-co-emission-factor}
 
-The environmental impact coefficient for the Fuel for calculating the mass of carbon monoxide (CO) released into the atmosphere. The units are grams per MegaJoule. Carbon monoxide is a colorless, odorless and poisonous gas produced by incomplete fossil fuel combustion. Carbon monoxide combines with the haemoglobin of human beings, reducing its oxygen carrying capacity, with effects harmful to human beings.
+The environmental impact coefficient for the Fuel for calculating the mass of carbon monoxide (CO) released into the atmosphere. The units are grams per MegaJoule. Carbon monoxide is a colorless, odorless and poisonous gas produced by incomplete fossil fuel combustion. Carbon monoxide combines with the hemoglobin of human beings, reducing its oxygen carrying capacity, with effects harmful to human beings.
 
 \paragraph{Field: CO Emission Factor Schedule Name}\label{field-co-emission-factor-schedule-name}
 
@@ -894,7 +944,7 @@ Similar to the source energy calculation, this field contains the name of a sche
 
 \paragraph{Field: Pb Emission Factor}\label{field-pb-emission-factor}
 
-The Environmental impact coefficient for the Fuel for calculating the masss of lead (Pb) released into the atmosphere. The units are grams per MegaJoule. A heavy metal that is hazardous to health if breathed or swallowed. Its use in gasoline, paints, and plumbing compounds has been sharply restricted or eliminated by federal laws and regulations.
+The Environmental impact coefficient for the Fuel for calculating the mass of lead (Pb) released into the atmosphere. The units are grams per MegaJoule. A heavy metal that is hazardous to health if breathed or swallowed. Its use in gasoline, paints, and plumbing compounds has been sharply restricted or eliminated by federal laws and regulations.
 
 \paragraph{Field: Pb Emission Factor Schedule Name}\label{field-pb-emission-factor-schedule-name}
 
@@ -1369,7 +1419,7 @@ These outputs provide results for the source energy embodied in each type of fue
 
 \paragraph{Environmental Impact OtherFuel2 CO2 Emissions Mass {[}kg{]}}\label{environmental-impact-otherfuel2-co2-emissions-mass-kg}
 
-These outputs provide results for the carbon dioxide reelases associated with consumption of each type of fuel that might be used at the site.~ The units are kg.
+These outputs provide results for the carbon dioxide releases associated with consumption of each type of fuel that might be used at the site.~ The units are kg.
 
 \paragraph{Environmental Impact Electricity CO Emissions Mass {[}kg{]}}\label{environmental-impact-electricity-co-emissions-mass-kg}
 
@@ -1479,7 +1529,7 @@ These outputs provide results for the nitrous oxide releases associated with con
 
 \paragraph{Environmental Impact OtherFuel2 SO2 Emissions Mass {[}kg{]}}\label{environmental-impact-otherfuel2-so2-emissions-mass-kg}
 
-These outputs provide results for the sulphur dioxide releases associated with consumption of each type of fuel that might be used at the site.~ The units are kg.
+These outputs provide results for the sulfur dioxide releases associated with consumption of each type of fuel that might be used at the site.~ The units are kg.
 
 \paragraph{Environmental Impact Electricity PM Emissions Mass {[}kg{]}}\label{environmental-impact-electricity-pm-emissions-mass-kg}
 

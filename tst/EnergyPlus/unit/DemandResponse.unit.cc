@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -166,7 +166,7 @@ TEST_F(EnergyPlusFixture, DemandManagerAssignmentListGetInputTest)
     int dMgrIndex = 0;
     auto &DemandMgr(state->dataDemandManager->DemandMgr);
     // check lights demand manager name
-    dMgrIndex = UtilityRoutines::FindItemInList("EXT LIGHTS MANAGER", DemandMgr);
+    dMgrIndex = Util::FindItemInList("EXT LIGHTS MANAGER", DemandMgr);
     auto &lightsDmndMgr = state->dataDemandManager->DemandMgr(dMgrIndex);
     EXPECT_EQ("EXT LIGHTS MANAGER", lightsDmndMgr.Name);
     // test expected fatal error due to wrong demand manager objet name

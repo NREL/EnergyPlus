@@ -222,7 +222,7 @@ The ``TRNSYS PV model'' uses an iterative search routine in these four equations
 
 The PV model uses one of five methods for determining cell temperature data. The cell temperature of a PV module is important because the hotter the temperature of the panel, the lower its electrical output. The cell temperature calculation method is chosen by the user in the EnergyPlus IDF file through a parameter choice in the IDD entry called Integration and Cell Temperature Mode.
 
-If the value of this parameter is ``\textbf{Decoupled NOCT Conditions}'' then the cell temperature of the PV is modeled using the method from the Duffie and Beckman (1991) for estimating cell temperature. This is based upon the standard NOCT (Nominal Operating Cell Temperature) measurements to compute the module temperature \(T_c\) at each timestep. The NOCT temperature (\(T_c\),NOCT) is the operating temperature of the module with a wind speed of 1 m/s, no electrical load, and a certain specified insolation and ambient temperature {[}Beckman and Duffie, 1991{]}. The values for insolation GT,NOCT ~and ambient temperature \(T_{a,NOCT}\) are usually 800 W/m\(^{2}\) and 20\(^{\circ}\)C. \(\eta_{c}\) is the convesion efficiency of the module, which varies with ambient conditions. \({\tau \alpha}\) is a user-defined constant.
+If the value of this parameter is ``\textbf{Decoupled NOCT Conditions}'' then the cell temperature of the PV is modeled using the method from the Duffie and Beckman (1991) for estimating cell temperature. This is based upon the standard NOCT (Nominal Operating Cell Temperature) measurements to compute the module temperature \(T_c\) at each timestep. The NOCT temperature (\(T_c\),NOCT) is the operating temperature of the module with a wind speed of 1 m/s, no electrical load, and a certain specified insolation and ambient temperature {[}Beckman and Duffie, 1991{]}. The values for insolation GT,NOCT ~and ambient temperature \(T_{a,NOCT}\) are usually 800 W/m\(^{2}\) and 20\(^{\circ}\)C. \(\eta_{c}\) is the conversion efficiency of the module, which varies with ambient conditions. \({\tau \alpha}\) is a user-defined constant.
 
 The equation is:
 
@@ -236,7 +236,7 @@ If the user specifies the ``\textbf{Decoupled Ulleberg Dynamic''} mode for calcu
 {\left. {{T_{cell}}} \right|_t} = {T_{ambient}} + \left( {{{\left. {{T_{cell}}} \right|}_{t - 1}} - {T_{ambient}}} \right)*{e^{\frac{{ - UL}}{{Cap}}\Delta t}}
 \end{equation}
 
-In other words, the cell temperature is a function of the privious cell temperature and the thermal capacity of the PV module material.
+In other words, the cell temperature is a function of the previous cell temperature and the thermal capacity of the PV module material.
 
 If the user specifies ``\textbf{Integrated Surface Outside Face''} for this parameter, then the temperature result from EnergyPlus's modeling of surfaces is used for the cell temperature. Also the energy exported from the surface as electricity becomes a sink in the internal source modeling for the heat transfer surface.
 
@@ -326,8 +326,8 @@ $\beta$\(_{Voco}\) & Temperature coefficient for module open-circuit-voltage at 
 m\(_{\beta}\)\(_{Voco}\) & Coefficient for irradiance dependence of open-circuit-voltage-temperature coefficient, often zero (V/\(^{\circ}\)C) \tabularnewline
 $\beta$\(_{Vmp}\)(E\(_{e}\)) & Temperature coefficient for module maximum-power-voltage as a function of E \tabularnewline
 $\beta$\(_{Vmpo}\) & Temperature coefficient for module maximum-power-voltage at reference conditions \tabularnewline
-m\(_{\beta}\)\(_{Voco}\) & Cofficient for irradiance dependence of maximum-power-voltage-temperature coefficient, often zero (V/\(^{\circ}\)C) \tabularnewline
-T\(_{m}\) & PV module temperature at back suface (\(^{\circ}\)C) \tabularnewline
+m\(_{\beta}\)\(_{Voco}\) & Coefficient for irradiance dependence of maximum-power-voltage-temperature coefficient, often zero (V/\(^{\circ}\)C) \tabularnewline
+T\(_{m}\) & PV module temperature at back surface (\(^{\circ}\)C) \tabularnewline
 T\(_{a}\) & Ambient outdoor drybulb temperature (\(^{\circ}\)C) \tabularnewline
 E & Solar irradiance incident on module surface (W/m\(^{2}\)) \tabularnewline
 WS & Wind speed at standard 10-m height (m/s) \tabularnewline

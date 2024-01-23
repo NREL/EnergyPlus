@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -462,7 +462,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
         "    Activity Sch,            !- Activity Level Schedule Name",
         "    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}",
         "    ,                        !- Enable ASHRAE 55 Comfort Warnings",
-        "    zoneaveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "    ,                        !- Surface Name/Angle Factor List Name",
         "    Work Eff Sch,            !- Work Efficiency Schedule Name",
         "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -852,7 +852,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_EQ(state->dataConstruction->Construct(4).LayerPoint(2), 5); // air gap
     EXPECT_EQ(state->dataConstruction->Construct(4).LayerPoint(3), 4); // glass, inner layer
 
-    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", state->dataSurface->Surface);
+    int windowSurfNum = Util::FindItemInList("ZN001:WALL001:WIN001", state->dataSurface->Surface);
 
     EXPECT_FALSE(state->dataSurface->SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
     // check if the construction has a blind material layer
