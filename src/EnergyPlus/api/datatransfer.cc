@@ -275,8 +275,8 @@ constexpr std::array<std::string_view, (int)Beatles::Num> beatlesUC = {"RINGO", 
 int getEnergyPlusEnumValue(EnergyPlusState state, const char *enumClass, const char *enumKey)
 {
     (void)state; // not currently used -- probably never, but future-proofing just in case
-    std::string className = EnergyPlus::UtilityRoutines::makeUPPER(enumClass);
-    std::string controlType = EnergyPlus::UtilityRoutines::makeUPPER(enumKey);
+    std::string className = EnergyPlus::Util::makeUPPER(enumClass);
+    std::string controlType = EnergyPlus::Util::makeUPPER(enumKey);
     if (className == "AIRLOOPHVAC_AVAILABILITYSTATUS") {
         return EnergyPlus::getEnumValue(AirLoopHVAC_AvailabilityStatus_UC, controlType);
     } else if (className == "BEATLES") {
