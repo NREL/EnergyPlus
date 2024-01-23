@@ -75,6 +75,12 @@ void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledF
     state.dataPluginManager->callbacks[iCalledFrom].push_back(f);
 }
 
+void registerUserDefinedCallback(EnergyPlusData &state, const std::function<void(void *)> &f, std::string programNameInInputFile)
+{
+    state.dataPluginManager->userDefinedCallbackNames.push_back(programNameInInputFile);
+    state.dataPluginManager->userDefinedCallbacks.push_back(f);
+}
+
 void onBeginEnvironment(EnergyPlusData &state)
 {
     // reset vars and trends -- sensors and actuators are reset by EMS
@@ -89,7 +95,7 @@ void onBeginEnvironment(EnergyPlusData &state)
 
 int PluginManager::numActiveCallbacks(EnergyPlusData &state)
 {
-    return (int)state.dataPluginManager->callbacks.size();
+    return (int)state.dataPluginManager->callbacks.size() + (int)state.dataPluginManager->userDefinedCallbacks.size();
 }
 
 void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan)
@@ -1445,6 +1451,26 @@ void PluginManager::runSingleUserDefinedPlugin([[maybe_unused]] EnergyPlusData &
 {
 }
 #endif
+
+
+int PluginManager::getUserDefinedCallbackIndex(EnergyPlusData &state, std::string callbackProgramName)
+{
+    int i = -1;
+    for (auto & knownName : state.dataPluginManager->userDefinedCallbackNames) {
+        i++;
+        // Use UtilityRoutines::MakeUPPERCase() ?  Probably not.
+        if (knownName == callbackProgramName) {
+            return i; 
+        }
+    }
+    return -1;
+}
+
+void PluginManager::runSingleUserDefinedCallback(EnergyPlusData &state, int index)
+{
+    if (state.dataGlobal->KickOffSimulation) return;  // Maybe?
+    state.dataPluginManager->userDefinedCallbacks[index]((void *)&state);  // Check Index first
+}
 
 #if LINK_WITH_PYTHON
 bool PluginManager::anyUnexpectedPluginObjects(EnergyPlusData &state)
