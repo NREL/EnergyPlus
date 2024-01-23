@@ -14265,6 +14265,8 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                 MinOutdoorUnitPe = max(P_discharge - this->CompMaxDeltaP, MinRefriPe);
                 MinOutdoorUnitTe = GetSatTemperatureRefrig(
                     state, this->RefrigerantName, max(min(MinOutdoorUnitPe, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
+                // yujie: Te can't be smaller than user input lower bound
+                MinOutdoorUnitTe = max(this->IUEvapTempLow, MinOutdoorUnitTe);
 
                 auto f = [&state, T_discharge_new, CondHeat, CAPFT](Real64 const T_suc) {
                     return CompResidual_FluidTCtrl(state, T_discharge_new, CondHeat, CAPFT, T_suc);
@@ -14426,13 +14428,17 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                     goto Label13;
                 }
 
-                if (CapDiff > (Tolerance * Cap_Eva0)) NumIteCcap = 999;
+                if (CapDiff > (Tolerance * Cap_Eva0)) {
+                    NumIteCcap = 999;
+                    CyclingRatio = (TU_load + Pipe_Q) * C_cap_operation / Cap_Eva1;
+                }
 
                 Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction);
 
                 this->CondensingTemp = T_discharge; // OU Tc' is updated due to OUCondHeatRelease updates, which is caused by IU Te' updates
                                                     // during low load conditions
-                CyclingRatio = (TU_load + Pipe_Q) * C_cap_operation / Cap_Eva1;
+                this->EvaporatingTemp = T_suction;
+                this->IUEvaporatingTemp = T_suction;
 
                 break; // EXIT DoName1
 
