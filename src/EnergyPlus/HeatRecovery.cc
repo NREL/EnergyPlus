@@ -298,7 +298,7 @@ namespace HeatRecovery {
 
             constexpr std::array<std::string_view, static_cast<int>(HXConfiguration::Num)> hxConfigurationNamesUC = {
                 "COUNTERFLOW", "PARALLELFLOW", "CROSSFLOWBOTHUNMIXED", "CROSS_FLOW_OTHER_NOT_USED"};
-            thisExchanger.FlowArr = static_cast<HXConfiguration>(getEnumerationValue(hxConfigurationNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
+            thisExchanger.FlowArr = static_cast<HXConfiguration>(getEnumValue(hxConfigurationNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
             if (thisExchanger.FlowArr == HXConfiguration::Invalid) {
                 ShowSevereError(state, format("{}: incorrect flow arrangement: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(3)));
                 ErrorsFound = true;
@@ -509,8 +509,7 @@ namespace HeatRecovery {
             }
 
             // Added additional inputs for frost control
-            thisExchanger.FrostControlType =
-                static_cast<FrostControlOption>(getEnumerationValue(frostControlNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
+            thisExchanger.FrostControlType = static_cast<FrostControlOption>(getEnumValue(frostControlNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
             if (thisExchanger.FrostControlType == FrostControlOption::Invalid) {
                 ShowSevereError(state, format("Invalid Frost Control method for {} =  {}", thisExchanger.Name, state.dataIPShortCut->cAlphaArgs(9)));
                 ErrorsFound = true;

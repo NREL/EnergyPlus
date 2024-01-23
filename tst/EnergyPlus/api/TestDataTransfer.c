@@ -70,7 +70,7 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
 
         unsigned int arraySize;
         struct APIDataEntry *data = getAPIData(state, &arraySize); // inspect this to see what's available to exchange
-        const char **surfaceNames = getObjectNames(state, "BuildingSurface:Detailed", &arraySize);
+        char **surfaceNames = getObjectNames(state, "BuildingSurface:Detailed", &arraySize);
 
         if (arraySize == 0) {
             printf("Encountered a file with no BuildingSurface:Detailed, can't run this script on that file! Aborting!");
@@ -119,6 +119,36 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
     }
 }
 
+int testDataTransferGetEnumValueFunction(EnergyPlusState s)
+{
+    int errors = 0;
+
+    // check invalid class type
+    if (-1 != getEnergyPlusEnumValue(s, "MissingEnumClass", "OK")) ++errors;
+
+    // check DummyEnum1
+    if (0 != getEnergyPlusEnumValue(s, "AirLoopHVAC_AvailabilityStatus", "No_Action")) ++errors;
+    if (1 != getEnergyPlusEnumValue(s, "AirLoopHVAC_AvailabilityStatus", "Force_Off")) ++errors;
+    if (2 != getEnergyPlusEnumValue(s, "AirLoopHVAC_AvailabilityStatus", "Cycle_On")) ++errors;
+    if (3 != getEnergyPlusEnumValue(s, "AirLoopHVAC_AvailabilityStatus", "Cycle_On_Zone_Fans_Only")) ++errors;
+    if (-1 != getEnergyPlusEnumValue(s, "AirLoopHVAC_AvailabilityStatus", "Foo")) ++errors;
+
+    // check Beatles
+    if (0 != getEnergyPlusEnumValue(s, "Beatles", "Ringo")) ++errors;
+    if (1 != getEnergyPlusEnumValue(s, "Beatles", "Paul")) ++errors;
+    if (2 != getEnergyPlusEnumValue(s, "Beatles", "John")) ++errors;
+    if (3 != getEnergyPlusEnumValue(s, "Beatles", "George")) ++errors;
+    if (-1 != getEnergyPlusEnumValue(s, "Beatles", "Jimi")) ++errors;
+
+    // test the worker functions for users to get the list of data available
+    unsigned int size;
+    char ** keys = getAllEnumKeys(s, &size);
+    if (size != 8) ++errors;
+    freeEnumKeys(keys, size);
+
+    return errors;
+}
+
 int main(int argc, const char *argv[])
 {
     EnergyPlusState state = stateNew();
@@ -128,6 +158,10 @@ int main(int argc, const char *argv[])
     energyplus(state, argc, argv);
     if (handlesRetrieved == 0) {
         fprintf(stderr, "We never got ANY handles\n");
+        return 1;
+    }
+    if (testDataTransferGetEnumValueFunction(state) > 0) {
+        fprintf(stderr, "DataTransfer::getEnergyPlusEnumValue tests failed in TestDataTransfer.c, did an enum change?\n");
         return 1;
     }
     return 0;

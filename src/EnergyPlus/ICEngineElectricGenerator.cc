@@ -292,7 +292,7 @@ namespace ICEngineElectricGenerator {
 
             // Validate fuel type input
             state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType =
-                static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, AlphArray(10)));
+                static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, AlphArray(10)));
             if (state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType == Constant::eFuel::Invalid) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(10), AlphArray(10)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));

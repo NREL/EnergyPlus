@@ -259,19 +259,19 @@ protected:
         thisZoneEqList.Name = "ZONE1EQUIPMENT";
         int maxEquipCount1 = 1;
         thisZoneEqList.NumOfEquipTypes = maxEquipCount1;
+        thisZoneEqList.EquipTypeName.allocate(maxEquipCount1);
         thisZoneEqList.EquipType.allocate(maxEquipCount1);
-        thisZoneEqList.EquipTypeEnum.allocate(maxEquipCount1);
         thisZoneEqList.EquipName.allocate(maxEquipCount1);
         thisZoneEqList.EquipIndex.allocate(maxEquipCount1);
         thisZoneEqList.EquipIndex = 1;
         thisZoneEqList.EquipData.allocate(maxEquipCount1);
         thisZoneEqList.CoolingPriority.allocate(maxEquipCount1);
         thisZoneEqList.HeatingPriority.allocate(maxEquipCount1);
-        thisZoneEqList.EquipType(1) = "NOT A VRF TU";
+        thisZoneEqList.EquipTypeName(1) = "NOT A VRF TU";
         thisZoneEqList.EquipName(1) = "NO NAME";
         thisZoneEqList.CoolingPriority(1) = 1;
         thisZoneEqList.HeatingPriority(1) = 1;
-        thisZoneEqList.EquipTypeEnum(1) = DataZoneEquipment::ZoneEquip::ZoneUnitarySys;
+        thisZoneEqList.EquipType(1) = DataZoneEquipment::ZoneEquipType::UnitarySystem;
 
         auto &finalZoneSizing(state->dataSize->FinalZoneSizing(zoneNum));
         finalZoneSizing.DesCoolVolFlow = 1.5;

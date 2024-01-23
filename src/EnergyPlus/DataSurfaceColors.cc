@@ -101,7 +101,7 @@ bool MatchAndSetColorTextString(EnergyPlusData &state,
     if (ColorType != "DXF") return false;
 
     // try to find enum value
-    int foundIdx = getEnumerationValue(colorkeys, UtilityRoutines::MakeUPPERCase(String));
+    int foundIdx = getEnumValue(colorkeys, UtilityRoutines::makeUPPER(String));
     if (foundIdx == -1) return false;
 
     // if we've made it here, we found the value

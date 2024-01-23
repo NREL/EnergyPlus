@@ -226,8 +226,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataRetAirPathMrg = std::make_unique<ReturnAirPathMgr>();
     this->dataExhAirSystemMrg = std::make_unique<ExhaustAirSystemMgr>();
     this->dataExhCtrlSystemMrg = std::make_unique<ExhaustControlSystemMgr>();
-    this->dataRoomAirMod = std::make_unique<RoomAirModelData>();
-    this->dataRoomAirModelMgr = std::make_unique<RoomAirModelManagerData>();
+    this->dataRoomAir = std::make_unique<RoomAirModelData>();
     this->dataRoomAirModelTempPattern = std::make_unique<RoomAirModelUserTempPatternData>();
     this->dataRoomAirflowNetModel = std::make_unique<RoomAirModelAirflowNetworkData>();
     this->dataRootFinder = std::make_unique<RootFindingData>();
@@ -270,7 +269,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataTarcogShading = std::make_unique<TarcogShadingData>();
     this->dataTimingsData = std::make_unique<DataTimingsData>();
     this->dataTranspiredCollector = std::make_unique<TranspiredCollectorData>();
-    this->dataUCSDShared = std::make_unique<UCSDSharedData>();
     this->dataUFADManager = std::make_unique<UFADManagerData>();
     this->dataUnitHeaters = std::make_unique<UnitHeatersData>();
     this->dataUnitVentilators = std::make_unique<UnitVentilatorsData>();
@@ -484,8 +482,7 @@ void EnergyPlusData::clear_state()
     this->dataRetAirPathMrg->clear_state();
     this->dataExhAirSystemMrg->clear_state();
     this->dataExhCtrlSystemMrg->clear_state();
-    this->dataRoomAirMod->clear_state();
-    this->dataRoomAirModelMgr->clear_state();
+    this->dataRoomAir->clear_state();
     this->dataRoomAirModelTempPattern->clear_state();
     this->dataRoomAirflowNetModel->clear_state();
     this->dataRootFinder->clear_state();
@@ -528,7 +525,6 @@ void EnergyPlusData::clear_state()
     this->dataTarcogShading->clear_state();
     this->dataTimingsData->clear_state();
     this->dataTranspiredCollector->clear_state();
-    this->dataUCSDShared->clear_state();
     this->dataUFADManager->clear_state();
     this->dataUnitHeaters->clear_state();
     this->dataUnitVentilators->clear_state();

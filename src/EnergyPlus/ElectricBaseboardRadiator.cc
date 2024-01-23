@@ -340,15 +340,14 @@ namespace ElectricBaseboardRadiator {
             }
 
             // Remaining fraction is added to the zone as convective heat transfer
-            Real64 AllFracsSummed = elecBaseboard.FracRadiant;
-            if (AllFracsSummed > MaxFraction) {
+            if (elecBaseboard.FracRadiant > MaxFraction) {
                 ShowWarningError(state,
                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                      "\", Fraction Radiant was higher than the allowable maximum.");
                 elecBaseboard.FracRadiant = MaxFraction;
                 elecBaseboard.FracConvect = 0.0;
             } else {
-                elecBaseboard.FracConvect = 1.0 - AllFracsSummed;
+                elecBaseboard.FracConvect = 1.0 - elecBaseboard.FracRadiant;
             }
 
             elecBaseboard.FracDistribPerson = state.dataIPShortCut->rNumericArgs(6);
@@ -386,9 +385,9 @@ namespace ElectricBaseboardRadiator {
             elecBaseboard.FracDistribToSurf = 0.0;
 
             elecBaseboard.ZonePtr =
-                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::BBElectric, elecBaseboard.EquipName);
+                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::BaseboardElectric, elecBaseboard.EquipName);
 
-            AllFracsSummed = elecBaseboard.FracDistribPerson;
+            Real64 AllFracsSummed = elecBaseboard.FracDistribPerson;
             for (int SurfNum = 1; SurfNum <= elecBaseboard.TotSurfToDistrib; ++SurfNum) {
                 elecBaseboard.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 3);
                 elecBaseboard.SurfacePtr(SurfNum) = HeatBalanceIntRadExchange::GetRadiantSystemSurface(

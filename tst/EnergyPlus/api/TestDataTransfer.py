@@ -86,6 +86,8 @@ def time_step_handler(state):
             if len(surfaces) == 0:
                 print("Called TestDataTransfer.py with an input file that has no BuildingSurface:Detailed, aborting")
                 raise RuntimeError("Bad input file for TestDataTransfer.py")
+            all_enum_keys = api.exchange.get_enum_list(state)
+            enum_value = api.exchange.get_enum_value(state, "Beatles", "George")
             outdoor_temp_sensor = api.exchange.get_variable_handle(
                 state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT"
             )

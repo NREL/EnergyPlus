@@ -2463,11 +2463,11 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
 
     EXPECT_EQ(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes, 2);
     // first priority zone equipment is zone ADU
-    EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(1).EquipType, "ZONEHVAC:AIRDISTRIBUTIONUNIT");
+    EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(1).EquipTypeName, "ZONEHVAC:AIRDISTRIBUTIONUNIT");
     EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(1).EquipName, "MAIN ZONE ATU");
     EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(1).Name, "MAIN ZONE REHEAT COIL");
     // second priority zone equipment is unit heater
-    EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(2).EquipType, "ZONEHVAC:UNITHEATER");
+    EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(2).EquipTypeName, "ZONEHVAC:UNITHEATER");
     EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(2).EquipName, "UNITHEATER");
     EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(2).Name, "UNITHEATER_ELECTRICHEATER");
     // check the reheat coil output

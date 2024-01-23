@@ -23,7 +23,7 @@ Every commit and every release of EnergyPlus undergoes rigorous testing.
 The testing consists of building EnergyPlus, of course, then there are unit tests, integration tests, API tests, and regression tests.
 Since 2014, most of the testing has been performed by our bots ([Tik-Tok](https://github.com/nrel-bot), [Gort](https://github.com/nrel-bot-2), and [Marvin](https://github.com/nrel-bot-3)), using a fork of the [Decent CI](https://github.com/lefticus/decent_ci) continuous integration system.
 We are now adapting our efforts to use the Github Actions system to handle more of our testing processes.
-In the meantime, while Decent CI is still handling the regression and bulkier testing, results from Decent CI are still available on the testing [dashboard](http://nrel.github.io/EnergyPlusBuildResults/).
+In the meantime, while Decent CI is still handling the regression and bulkier testing, results from Decent CI are still available on the testing [dashboard](https://myoldmopar.github.io/EnergyPlusBuildResults/).
 
 ## Releases
 

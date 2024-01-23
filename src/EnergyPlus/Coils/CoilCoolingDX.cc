@@ -84,7 +84,7 @@ int CoilCoolingDX::factory(EnergyPlus::EnergyPlusData &state, std::string const 
     int handle = -1;
     for (auto const &thisCoil : state.dataCoilCooingDX->coilCoolingDXs) {
         handle++;
-        if (EnergyPlus::UtilityRoutines::MakeUPPERCase(coilName) == EnergyPlus::UtilityRoutines::MakeUPPERCase(thisCoil.name)) {
+        if (EnergyPlus::UtilityRoutines::makeUPPER(coilName) == EnergyPlus::UtilityRoutines::makeUPPER(thisCoil.name)) {
             return handle;
         }
     }

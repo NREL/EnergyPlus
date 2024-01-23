@@ -1677,8 +1677,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
 
         // setup program flow control integers.
-        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = static_cast<CtrlVarType>(getEnumerationValue(
-            controlTypeNameUC, UtilityRoutines::MakeUPPERCase(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType)));
+        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = static_cast<CtrlVarType>(
+            getEnumValue(controlTypeNameUC, UtilityRoutines::makeUPPER(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType)));
         if (state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == CtrlVarType::Invalid) {
             // should not come here if idd type choice and key list is working
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -1872,7 +1872,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                      state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).MinSetTemp));
         }
 
-        if (UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)) == controlTypeNameUC[static_cast<int>(CtrlVarType::MaxTemp)]) {
+        if (UtilityRoutines::makeUPPER(cAlphaArgs(4)) == controlTypeNameUC[static_cast<int>(CtrlVarType::MaxTemp)]) {
             state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).Strategy = SupplyFlowTempStrategy::MaxTemp;
         } else {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -1972,7 +1972,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                      state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).MinSetTemp));
         }
 
-        if (UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)) == controlTypeNameUC[static_cast<int>(CtrlVarType::MinTemp)]) {
+        if (UtilityRoutines::makeUPPER(cAlphaArgs(4)) == controlTypeNameUC[static_cast<int>(CtrlVarType::MinTemp)]) {
             state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).Strategy = SupplyFlowTempStrategy::MinTemp;
         } else {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -2084,7 +2084,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy =
-            static_cast<ControlStrategy>(getEnumerationValue(strategyNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
+            static_cast<ControlStrategy>(getEnumValue(strategyNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(4))));
         if (state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy == ControlStrategy::Invalid) {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state, format("..invalid {}=\"{}\".", cAlphaFieldNames(4), cAlphaArgs(4)));
@@ -3813,7 +3813,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         setpointManager.Name = cAlphaArgs(1);
         setpointManager.ctrlVarType = cAlphaArgs(2);
 
-        int typeNum = getEnumerationValue(SetPointManager::controlTypeNameUC, cAlphaArgs(2));
+        int typeNum = getEnumValue(SetPointManager::controlTypeNameUC, cAlphaArgs(2));
         setpointManager.CtrlTypeMode = static_cast<SetPointManager::CtrlVarType>(typeNum);
         if (setpointManager.CtrlTypeMode == SetPointManager::CtrlVarType::Invalid) {
             // should not come here if idd type choice and key list is working
@@ -3935,7 +3935,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         setpointManager.Name = cAlphaArgs(1);
         setpointManager.ctrlVarType = cAlphaArgs(2);
 
-        int typeNum = getEnumerationValue(SetPointManager::controlTypeNameUC, cAlphaArgs(2));
+        int typeNum = getEnumValue(SetPointManager::controlTypeNameUC, cAlphaArgs(2));
         setpointManager.CtrlTypeMode = static_cast<SetPointManager::CtrlVarType>(typeNum);
         if (setpointManager.CtrlTypeMode == SetPointManager::CtrlVarType::Invalid) {
             // should not come here if idd type choice and key list is working

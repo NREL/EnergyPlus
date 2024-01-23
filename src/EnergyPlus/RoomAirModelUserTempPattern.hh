@@ -57,7 +57,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace RoomAirModelUserTempPattern {
+namespace RoomAir {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
@@ -114,7 +114,7 @@ namespace RoomAirModelUserTempPattern {
 
     //*****************************************************************************************
 
-} // namespace RoomAirModelUserTempPattern
+} // namespace RoomAir
 
 struct RoomAirModelUserTempPatternData : BaseGlobalStruct
 {

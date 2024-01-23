@@ -182,7 +182,7 @@ namespace CostEstimateManager {
                                                                      IOStatus);
             state.dataCostEstimateManager->CostLineItem(Item).LineName = state.dataIPShortCut->cAlphaArgs(1);
             state.dataCostEstimateManager->CostLineItem(Item).ParentObjType =
-                static_cast<ParentObject>(getEnumerationValue(ParentObjectNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
+                static_cast<ParentObject>(getEnumValue(ParentObjectNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
             state.dataCostEstimateManager->CostLineItem(Item).ParentObjName = state.dataIPShortCut->cAlphaArgs(4);
             state.dataCostEstimateManager->CostLineItem(Item).PerEach = state.dataIPShortCut->rNumericArgs(1);
             state.dataCostEstimateManager->CostLineItem(Item).PerSquareMeter = state.dataIPShortCut->rNumericArgs(2);
@@ -884,7 +884,7 @@ namespace CostEstimateManager {
             case ParentObject::DaylightingControls: {
                 if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
                     state.dataCostEstimateManager->CostLineItem(Item).Qty =
-                        sum(state.dataDaylightingData->ZoneDaylight, &DataDaylighting::ZoneDaylightCalc::totRefPts);
+                        sum(state.dataDaylightingData->ZoneDaylight, &Dayltg::ZoneDaylightCalc::totRefPts);
                 } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                     ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                     if (ThisZoneID > 0) {

@@ -2156,8 +2156,9 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     QZnCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToCoolSP;
 
     if (allocated(ZoneComp)) {
-        ZoneComp(DataZoneEquipment::ZoneEquip::PurchasedAir).ZoneCompAvailMgrs(PurchAirNum).ZoneNum = ControlledZoneNum;
-        PurchAir(PurchAirNum).AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::PurchasedAir).ZoneCompAvailMgrs(PurchAirNum).AvailStatus;
+        auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::PurchasedAir).ZoneCompAvailMgrs(PurchAirNum);
+        availMgr.ZoneNum = ControlledZoneNum;
+        PurchAir(PurchAirNum).AvailStatus = availMgr.AvailStatus;
         // Check if the hybrid ventilation availability manager is turning the unit off
         if (PurchAir(PurchAirNum).AvailStatus == ForceOff) {
             UnitOn = false;

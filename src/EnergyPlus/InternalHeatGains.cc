@@ -878,7 +878,7 @@ namespace InternalHeatGains {
                             }
 
                             if (!IHGAlphaFieldBlanks(10) || !IHGAlphas(10).empty()) {
-                                thisPeople.clothingType = static_cast<ClothingType>(getEnumerationValue(clothingTypeNamesUC, IHGAlphas(10)));
+                                thisPeople.clothingType = static_cast<ClothingType>(getEnumValue(clothingTypeNamesUC, IHGAlphas(10)));
                                 if (thisPeople.clothingType == ClothingType::Invalid) {
                                     ShowSevereError(state,
                                                     format("{}{}=\"{}\", invalid {}, value  ={}",
@@ -3196,13 +3196,12 @@ namespace InternalHeatGains {
                         }
 
                         // Environmental class
-                        thisZoneITEq.Class =
-                            static_cast<ITEClass>(getEnumerationValue(ITEClassNamesUC, UtilityRoutines::MakeUPPERCase(IHGAlphas(10))));
+                        thisZoneITEq.Class = static_cast<ITEClass>(getEnumValue(ITEClassNamesUC, UtilityRoutines::makeUPPER(IHGAlphas(10))));
                         ErrorsFound = ErrorsFound || (thisZoneITEq.Class == ITEClass::Invalid);
 
                         // Air and supply inlet connections
-                        thisZoneITEq.AirConnectionType = static_cast<ITEInletConnection>(
-                            getEnumerationValue(ITEInletConnectionNamesUC, UtilityRoutines::MakeUPPERCase(IHGAlphas(11))));
+                        thisZoneITEq.AirConnectionType =
+                            static_cast<ITEInletConnection>(getEnumValue(ITEInletConnectionNamesUC, UtilityRoutines::makeUPPER(IHGAlphas(11))));
                         if (thisZoneITEq.AirConnectionType == ITEInletConnection::RoomAirModel) {
                             // ZoneITEq(Loop).AirConnectionType = ITEInletConnection::RoomAirModel;
                             ShowWarningError(state,
@@ -4161,7 +4160,7 @@ namespace InternalHeatGains {
             int counter = 0;
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &objectFields = instance.value();
-                std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const &thisObjectName = UtilityRoutines::makeUPPER(instance.key());
                 ip->markObjectAsUsed(objectType, instance.key());
 
                 // For incoming idf, maintain object order
@@ -7180,7 +7179,7 @@ namespace InternalHeatGains {
 
         // Using/Aliasing
         using namespace ScheduleManager;
-        using DaylightingDevices::FigureTDDZoneGains;
+        using Dayltg::FigureTDDZoneGains;
         using FuelCellElectricGenerator::FigureFuelCellZoneGains;
         using MicroCHPElectricGenerator::FigureMicroCHPZoneGains;
         using OutputReportTabular::AllocateLoadComponentArrays;
@@ -7341,9 +7340,9 @@ namespace InternalHeatGains {
                 // if the user did not specify a sensible fraction, calculate the sensible heat gain
                 if (state.dataHeatBal->People(Loop).UserSpecSensFrac == Constant::AutoCalculate) {
                     Real64 airTemp = thisZoneHB.MAT;
-                    if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
-                        if (state.dataRoomAirMod->IsZoneDV(NZ) || state.dataRoomAirMod->IsZoneUI(NZ)) {
-                            airTemp = state.dataRoomAirMod->TCMF(NZ);
+                    if (state.dataRoomAir->anyNonMixingRoomAirModel) {
+                        if (state.dataRoomAir->IsZoneDispVent3Node(NZ) || state.dataRoomAir->IsZoneUFAD(NZ)) {
+                            airTemp = state.dataRoomAir->TCMF(NZ);
                         }
                     }
                     SensiblePeopleGain =

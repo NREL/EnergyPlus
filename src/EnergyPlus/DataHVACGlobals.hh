@@ -373,54 +373,12 @@ namespace DataHVACGlobals {
     // Parameters for HVACSystemRootFindingAlgorithm
     int constexpr Bisection(2);
 
-    int constexpr NumZoneHVACTerminalTypes = 38;
-    int constexpr ZoneEquipTypeOf_VariableRefrigerantFlow(1);
-    int constexpr ZoneEquipTypeOf_EnergyRecoveryVentilator(2);
-    int constexpr ZoneEquipTypeOf_FourPipeFanCoil(3);
-    int constexpr ZoneEquipTypeOf_OutdoorAirUnit(4);
-    int constexpr ZoneEquipTypeOf_PackagedTerminalAirConditioner(5);
-    int constexpr ZoneEquipTypeOf_PackagedTerminalHeatPump(6);
-    int constexpr ZoneEquipTypeOf_UnitHeater(7);
-    int constexpr ZoneEquipTypeOf_UnitVentilator(8);
-    int constexpr ZoneEquipTypeOf_VentilatedSlab(9);
-    int constexpr ZoneEquipTypeOf_WaterToAirHeatPump(10);
-    int constexpr ZoneEquipTypeOf_WindowAirConditioner(11);
-    int constexpr ZoneEquipTypeOf_BaseboardRadiantConvectiveElectric(12);
-    int constexpr ZoneEquipTypeOf_BaseboardRadiantConvectiveWater(13);
-    int constexpr ZoneEquipTypeOf_BaseboardRadiantConvectiveSteam(14);
-    int constexpr ZoneEquipTypeOf_BaseboardConvectiveElectric(15);
-    int constexpr ZoneEquipTypeOf_BaseboardConvectiveWater(16);
-    int constexpr ZoneEquipTypeOf_HighTemperatureRadiant(17);
-    int constexpr ZoneEquipTypeOf_DehumidifierDX(18);
-    int constexpr ZoneEquipTypeOf_IdealLoadsAirSystem(19);
-    int constexpr ZoneEquipTypeOf_RefrigerationChillerSet(20);
-    int constexpr ZoneEquipTypeOf_HybridUnitaryAirConditioners(21);
-    int constexpr ZoneEquipTypeOf_FanZoneExhaust(22);
-    int constexpr ZoneEquipTypeOf_WaterHeaterHeatPump(23);
-    int constexpr ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume(24);
-    int constexpr ZoneEquipTypeOf_AirTerminalDualDuctVAV(25);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat(26);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeNoReheat(27);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat(28);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat(29);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat(30);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctParallelPIUReheat(31);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctCAVFourPipeInduction(32);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan(33);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolReheat(34);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolNoReheat(35);
-    int constexpr ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeCooledBeam(36);
-    int constexpr ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir(37);
-    int constexpr ZoneEquipTypeOf_AirLoopHVACReturnAir(38);
-
     int constexpr MaxSpeedLevels = 10;
 
     extern Array1D_string const cFanTypes;
     extern Array1D_string const cAllCoilTypes;
     extern Array1D_string const cCoolingCoilTypes;
     extern Array1D_string const cHeatingCoilTypes;
-    extern Array1D_string const ccZoneHVACTerminalTypes;
-    extern Array1D_string const ZoneHVACTerminalTypes;
     extern Array1D_string const cATMixerTypes;
     extern Array1D_string const cVRFTUTypes;
     extern Array1D_string const cVRFHeatingPerformanceOATTypes;
@@ -575,7 +533,7 @@ struct HVACGlobalsData : BaseGlobalStruct
 
     void clear_state() override
     {
-        *this = HVACGlobalsData();
+        new (this) HVACGlobalsData();
     }
 };
 

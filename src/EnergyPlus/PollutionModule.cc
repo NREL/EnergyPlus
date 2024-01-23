@@ -50,6 +50,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -275,1804 +276,1820 @@ void GetPollutionFactorInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
-        FuelType.FuelTypeNames(Loop) = state.dataIPShortCut->cAlphaArgs(1);
+        FuelType.FuelTypeNames(Loop) =
+            static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(1))));
 
-        {
-            std::string const &SELECT_CASE_var = FuelType.FuelTypeNames(Loop);
-            if (SELECT_CASE_var == "NATURALGAS") {
-                if (Pollution.NatGasCoef.FuelFactorUsed) {
-                    ShowWarningError(
-                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
-                    continue;
-                }
-                Pollution.NatGasCoef.FuelFactorUsed = true;
-                // Natural Gas Coeffs
-                Pollution.NatGasCoef.Source = state.dataIPShortCut->rNumericArgs(1);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(2),
-                                    state.dataIPShortCut->cAlphaArgs(2),
-                                    Pollution.NatGasCoef.SourceSched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.CO2 = state.dataIPShortCut->rNumericArgs(2);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(3),
-                                    state.dataIPShortCut->cAlphaArgs(3),
-                                    Pollution.NatGasCoef.CO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.CO = state.dataIPShortCut->rNumericArgs(3);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(4),
-                                    state.dataIPShortCut->cAlphaArgs(4),
-                                    Pollution.NatGasCoef.COSched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.CH4 = state.dataIPShortCut->rNumericArgs(4);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(5),
-                                    state.dataIPShortCut->cAlphaArgs(5),
-                                    Pollution.NatGasCoef.CH4Sched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.NOx = state.dataIPShortCut->rNumericArgs(5);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(6),
-                                    state.dataIPShortCut->cAlphaArgs(6),
-                                    Pollution.NatGasCoef.NOxSched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.N2O = state.dataIPShortCut->rNumericArgs(6);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(7),
-                                    state.dataIPShortCut->cAlphaArgs(7),
-                                    Pollution.NatGasCoef.N2OSched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.SO2 = state.dataIPShortCut->rNumericArgs(7);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(8),
-                                    state.dataIPShortCut->cAlphaArgs(8),
-                                    Pollution.NatGasCoef.SO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.PM = state.dataIPShortCut->rNumericArgs(8);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(9),
-                                    state.dataIPShortCut->cAlphaArgs(9),
-                                    Pollution.NatGasCoef.PMSched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.PM10 = state.dataIPShortCut->rNumericArgs(9);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(10),
-                                    state.dataIPShortCut->cAlphaArgs(10),
-                                    Pollution.NatGasCoef.PM10Sched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.PM25 = state.dataIPShortCut->rNumericArgs(10);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(11),
-                                    state.dataIPShortCut->cAlphaArgs(11),
-                                    Pollution.NatGasCoef.PM25Sched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.NH3 = state.dataIPShortCut->rNumericArgs(11);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(12),
-                                    state.dataIPShortCut->cAlphaArgs(12),
-                                    Pollution.NatGasCoef.NH3Sched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(13),
-                                    state.dataIPShortCut->cAlphaArgs(13),
-                                    Pollution.NatGasCoef.NMVOCSched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.Hg = state.dataIPShortCut->rNumericArgs(13);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(14),
-                                    state.dataIPShortCut->cAlphaArgs(14),
-                                    Pollution.NatGasCoef.HgSched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.Pb = state.dataIPShortCut->rNumericArgs(14);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(15),
-                                    state.dataIPShortCut->cAlphaArgs(15),
-                                    Pollution.NatGasCoef.PbSched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.Water = state.dataIPShortCut->rNumericArgs(15);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(16),
-                                    state.dataIPShortCut->cAlphaArgs(16),
-                                    Pollution.NatGasCoef.WaterSched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.NucHi = state.dataIPShortCut->rNumericArgs(16);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(17),
-                                    state.dataIPShortCut->cAlphaArgs(17),
-                                    Pollution.NatGasCoef.NucHiSched,
-                                    ErrorsFound);
-                }
-                Pollution.NatGasCoef.NucLo = state.dataIPShortCut->rNumericArgs(17);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "NaturalGas",
-                                    state.dataIPShortCut->cAlphaFieldNames(18),
-                                    state.dataIPShortCut->cAlphaArgs(18),
-                                    Pollution.NatGasCoef.NucLoSched,
-                                    ErrorsFound);
-                }
-
-            } else if (SELECT_CASE_var == "FUELOILNO2") {
-                if (Pollution.FuelOil2Coef.FuelFactorUsed) {
-                    ShowWarningError(
-                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
-                    continue;
-                }
-                Pollution.FuelOil2Coef.FuelFactorUsed = true;
-                // FuelOilNo2 Coeffs
-                Pollution.FuelOil2Coef.Source = state.dataIPShortCut->rNumericArgs(1);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(2),
-                                    state.dataIPShortCut->cAlphaArgs(2),
-                                    Pollution.FuelOil2Coef.SourceSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.CO2 = state.dataIPShortCut->rNumericArgs(2);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(3),
-                                    state.dataIPShortCut->cAlphaArgs(3),
-                                    Pollution.FuelOil2Coef.CO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.CO = state.dataIPShortCut->rNumericArgs(3);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(4),
-                                    state.dataIPShortCut->cAlphaArgs(4),
-                                    Pollution.FuelOil2Coef.COSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.CH4 = state.dataIPShortCut->rNumericArgs(4);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(5),
-                                    state.dataIPShortCut->cAlphaArgs(5),
-                                    Pollution.FuelOil2Coef.CH4Sched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.NOx = state.dataIPShortCut->rNumericArgs(5);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(6),
-                                    state.dataIPShortCut->cAlphaArgs(6),
-                                    Pollution.FuelOil2Coef.NOxSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.N2O = state.dataIPShortCut->rNumericArgs(6);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(7),
-                                    state.dataIPShortCut->cAlphaArgs(7),
-                                    Pollution.FuelOil2Coef.N2OSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.SO2 = state.dataIPShortCut->rNumericArgs(7);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(8),
-                                    state.dataIPShortCut->cAlphaArgs(8),
-                                    Pollution.FuelOil2Coef.SO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.PM = state.dataIPShortCut->rNumericArgs(8);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(9),
-                                    state.dataIPShortCut->cAlphaArgs(9),
-                                    Pollution.FuelOil2Coef.PMSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.PM10 = state.dataIPShortCut->rNumericArgs(9);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(10),
-                                    state.dataIPShortCut->cAlphaArgs(10),
-                                    Pollution.FuelOil2Coef.PM10Sched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.PM25 = state.dataIPShortCut->rNumericArgs(10);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(11),
-                                    state.dataIPShortCut->cAlphaArgs(11),
-                                    Pollution.FuelOil2Coef.PM25Sched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.NH3 = state.dataIPShortCut->rNumericArgs(11);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(12),
-                                    state.dataIPShortCut->cAlphaArgs(12),
-                                    Pollution.FuelOil2Coef.NH3Sched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(13),
-                                    state.dataIPShortCut->cAlphaArgs(13),
-                                    Pollution.FuelOil2Coef.NMVOCSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.Hg = state.dataIPShortCut->rNumericArgs(13);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(14),
-                                    state.dataIPShortCut->cAlphaArgs(14),
-                                    Pollution.FuelOil2Coef.HgSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.Pb = state.dataIPShortCut->rNumericArgs(14);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(15),
-                                    state.dataIPShortCut->cAlphaArgs(15),
-                                    Pollution.FuelOil2Coef.PbSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.Water = state.dataIPShortCut->rNumericArgs(15);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(16),
-                                    state.dataIPShortCut->cAlphaArgs(16),
-                                    Pollution.FuelOil2Coef.WaterSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.NucHi = state.dataIPShortCut->rNumericArgs(16);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(17),
-                                    state.dataIPShortCut->cAlphaArgs(17),
-                                    Pollution.FuelOil2Coef.NucHiSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil2Coef.NucLo = state.dataIPShortCut->rNumericArgs(17);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#2",
-                                    state.dataIPShortCut->cAlphaFieldNames(18),
-                                    state.dataIPShortCut->cAlphaArgs(18),
-                                    Pollution.FuelOil2Coef.NucLoSched,
-                                    ErrorsFound);
-                }
-
-            } else if (SELECT_CASE_var == "FUELOILNO1") {
-                if (Pollution.FuelOil1Coef.FuelFactorUsed) {
-                    ShowWarningError(
-                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
-                    continue;
-                }
-                Pollution.FuelOil1Coef.FuelFactorUsed = true;
-                // FuelOilNo1 Coeffs
-                Pollution.FuelOil1Coef.Source = state.dataIPShortCut->rNumericArgs(1);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(2),
-                                    state.dataIPShortCut->cAlphaArgs(2),
-                                    Pollution.FuelOil1Coef.SourceSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.CO2 = state.dataIPShortCut->rNumericArgs(2);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(3),
-                                    state.dataIPShortCut->cAlphaArgs(3),
-                                    Pollution.FuelOil1Coef.CO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.CO = state.dataIPShortCut->rNumericArgs(3);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(4),
-                                    state.dataIPShortCut->cAlphaArgs(4),
-                                    Pollution.FuelOil1Coef.COSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.CH4 = state.dataIPShortCut->rNumericArgs(4);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(5),
-                                    state.dataIPShortCut->cAlphaArgs(5),
-                                    Pollution.FuelOil1Coef.CH4Sched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.NOx = state.dataIPShortCut->rNumericArgs(5);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(6),
-                                    state.dataIPShortCut->cAlphaArgs(6),
-                                    Pollution.FuelOil1Coef.NOxSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.N2O = state.dataIPShortCut->rNumericArgs(6);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(7),
-                                    state.dataIPShortCut->cAlphaArgs(7),
-                                    Pollution.FuelOil1Coef.N2OSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.SO2 = state.dataIPShortCut->rNumericArgs(7);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(8),
-                                    state.dataIPShortCut->cAlphaArgs(8),
-                                    Pollution.FuelOil1Coef.SO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.PM = state.dataIPShortCut->rNumericArgs(8);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(9),
-                                    state.dataIPShortCut->cAlphaArgs(9),
-                                    Pollution.FuelOil1Coef.PMSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.PM10 = state.dataIPShortCut->rNumericArgs(9);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(10),
-                                    state.dataIPShortCut->cAlphaArgs(10),
-                                    Pollution.FuelOil1Coef.PM10Sched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.PM25 = state.dataIPShortCut->rNumericArgs(10);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(11),
-                                    state.dataIPShortCut->cAlphaArgs(11),
-                                    Pollution.FuelOil1Coef.PM25Sched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.NH3 = state.dataIPShortCut->rNumericArgs(11);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(12),
-                                    state.dataIPShortCut->cAlphaArgs(12),
-                                    Pollution.FuelOil1Coef.NH3Sched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(13),
-                                    state.dataIPShortCut->cAlphaArgs(13),
-                                    Pollution.FuelOil1Coef.NMVOCSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.Hg = state.dataIPShortCut->rNumericArgs(13);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(14),
-                                    state.dataIPShortCut->cAlphaArgs(14),
-                                    Pollution.FuelOil1Coef.HgSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.Pb = state.dataIPShortCut->rNumericArgs(14);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(15),
-                                    state.dataIPShortCut->cAlphaArgs(15),
-                                    Pollution.FuelOil1Coef.PbSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.Water = state.dataIPShortCut->rNumericArgs(15);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(16),
-                                    state.dataIPShortCut->cAlphaArgs(16),
-                                    Pollution.FuelOil1Coef.WaterSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.NucHi = state.dataIPShortCut->rNumericArgs(16);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(17),
-                                    state.dataIPShortCut->cAlphaArgs(17),
-                                    Pollution.FuelOil1Coef.NucHiSched,
-                                    ErrorsFound);
-                }
-                Pollution.FuelOil1Coef.NucLo = state.dataIPShortCut->rNumericArgs(17);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Fuel Oil#1",
-                                    state.dataIPShortCut->cAlphaFieldNames(18),
-                                    state.dataIPShortCut->cAlphaArgs(18),
-                                    Pollution.FuelOil1Coef.NucLoSched,
-                                    ErrorsFound);
-                }
-
-            } else if (SELECT_CASE_var == "COAL") {
-                if (Pollution.CoalCoef.FuelFactorUsed) {
-                    ShowWarningError(
-                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
-                    continue;
-                }
-                Pollution.CoalCoef.FuelFactorUsed = true;
-                // Coal
-                Pollution.CoalCoef.Source = state.dataIPShortCut->rNumericArgs(1);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(2),
-                                    state.dataIPShortCut->cAlphaArgs(2),
-                                    Pollution.CoalCoef.SourceSched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.CO2 = state.dataIPShortCut->rNumericArgs(2);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(3),
-                                    state.dataIPShortCut->cAlphaArgs(3),
-                                    Pollution.CoalCoef.CO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.CO = state.dataIPShortCut->rNumericArgs(3);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(4),
-                                    state.dataIPShortCut->cAlphaArgs(4),
-                                    Pollution.CoalCoef.COSched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.CH4 = state.dataIPShortCut->rNumericArgs(4);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(5),
-                                    state.dataIPShortCut->cAlphaArgs(5),
-                                    Pollution.CoalCoef.CH4Sched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.NOx = state.dataIPShortCut->rNumericArgs(5);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(6),
-                                    state.dataIPShortCut->cAlphaArgs(6),
-                                    Pollution.CoalCoef.NOxSched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.N2O = state.dataIPShortCut->rNumericArgs(6);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(7),
-                                    state.dataIPShortCut->cAlphaArgs(7),
-                                    Pollution.CoalCoef.N2OSched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.SO2 = state.dataIPShortCut->rNumericArgs(7);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(8),
-                                    state.dataIPShortCut->cAlphaArgs(8),
-                                    Pollution.CoalCoef.SO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.PM = state.dataIPShortCut->rNumericArgs(8);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(9),
-                                    state.dataIPShortCut->cAlphaArgs(9),
-                                    Pollution.CoalCoef.PMSched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.PM10 = state.dataIPShortCut->rNumericArgs(9);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(10),
-                                    state.dataIPShortCut->cAlphaArgs(10),
-                                    Pollution.CoalCoef.PM10Sched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.PM25 = state.dataIPShortCut->rNumericArgs(10);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(11),
-                                    state.dataIPShortCut->cAlphaArgs(11),
-                                    Pollution.CoalCoef.PM25Sched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.NH3 = state.dataIPShortCut->rNumericArgs(11);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(12),
-                                    state.dataIPShortCut->cAlphaArgs(12),
-                                    Pollution.CoalCoef.NH3Sched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(13),
-                                    state.dataIPShortCut->cAlphaArgs(13),
-                                    Pollution.CoalCoef.NMVOCSched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.Hg = state.dataIPShortCut->rNumericArgs(13);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(14),
-                                    state.dataIPShortCut->cAlphaArgs(14),
-                                    Pollution.CoalCoef.HgSched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.Pb = state.dataIPShortCut->rNumericArgs(14);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(15),
-                                    state.dataIPShortCut->cAlphaArgs(15),
-                                    Pollution.CoalCoef.PbSched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.Water = state.dataIPShortCut->rNumericArgs(15);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(16),
-                                    state.dataIPShortCut->cAlphaArgs(16),
-                                    Pollution.CoalCoef.WaterSched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.NucHi = state.dataIPShortCut->rNumericArgs(16);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(17),
-                                    state.dataIPShortCut->cAlphaArgs(17),
-                                    Pollution.CoalCoef.NucHiSched,
-                                    ErrorsFound);
-                }
-                Pollution.CoalCoef.NucLo = state.dataIPShortCut->rNumericArgs(17);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Coal",
-                                    state.dataIPShortCut->cAlphaFieldNames(18),
-                                    state.dataIPShortCut->cAlphaArgs(18),
-                                    Pollution.CoalCoef.NucLoSched,
-                                    ErrorsFound);
-                }
-
-            } else if (SELECT_CASE_var == "ELECTRICITY") {
-                if (Pollution.ElecCoef.FuelFactorUsed) {
-                    ShowWarningError(
-                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
-                    continue;
-                }
-                Pollution.ElecCoef.FuelFactorUsed = true;
-                // Electric Coeffs
-                Pollution.ElecCoef.Source = state.dataIPShortCut->rNumericArgs(1);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(2),
-                                    state.dataIPShortCut->cAlphaArgs(2),
-                                    Pollution.ElecCoef.SourceSched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.CO2 = state.dataIPShortCut->rNumericArgs(2);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(3),
-                                    state.dataIPShortCut->cAlphaArgs(3),
-                                    Pollution.ElecCoef.CO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.CO = state.dataIPShortCut->rNumericArgs(3);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(4),
-                                    state.dataIPShortCut->cAlphaArgs(4),
-                                    Pollution.ElecCoef.COSched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.CH4 = state.dataIPShortCut->rNumericArgs(4);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(5),
-                                    state.dataIPShortCut->cAlphaArgs(5),
-                                    Pollution.ElecCoef.CH4Sched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.NOx = state.dataIPShortCut->rNumericArgs(5);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(6),
-                                    state.dataIPShortCut->cAlphaArgs(6),
-                                    Pollution.ElecCoef.NOxSched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.N2O = state.dataIPShortCut->rNumericArgs(6);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(7),
-                                    state.dataIPShortCut->cAlphaArgs(7),
-                                    Pollution.ElecCoef.N2OSched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.SO2 = state.dataIPShortCut->rNumericArgs(7);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(8),
-                                    state.dataIPShortCut->cAlphaArgs(8),
-                                    Pollution.ElecCoef.SO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.PM = state.dataIPShortCut->rNumericArgs(8);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(9),
-                                    state.dataIPShortCut->cAlphaArgs(9),
-                                    Pollution.ElecCoef.PMSched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.PM10 = state.dataIPShortCut->rNumericArgs(9);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(10),
-                                    state.dataIPShortCut->cAlphaArgs(10),
-                                    Pollution.ElecCoef.PM10Sched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.PM25 = state.dataIPShortCut->rNumericArgs(10);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(11),
-                                    state.dataIPShortCut->cAlphaArgs(11),
-                                    Pollution.ElecCoef.PM25Sched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.NH3 = state.dataIPShortCut->rNumericArgs(11);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(12),
-                                    state.dataIPShortCut->cAlphaArgs(12),
-                                    Pollution.ElecCoef.NH3Sched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(13),
-                                    state.dataIPShortCut->cAlphaArgs(13),
-                                    Pollution.ElecCoef.NMVOCSched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.Hg = state.dataIPShortCut->rNumericArgs(13);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(14),
-                                    state.dataIPShortCut->cAlphaArgs(14),
-                                    Pollution.ElecCoef.HgSched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.Pb = state.dataIPShortCut->rNumericArgs(14);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(15),
-                                    state.dataIPShortCut->cAlphaArgs(15),
-                                    Pollution.ElecCoef.PbSched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.Water = state.dataIPShortCut->rNumericArgs(15);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(16),
-                                    state.dataIPShortCut->cAlphaArgs(16),
-                                    Pollution.ElecCoef.WaterSched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.NucHi = state.dataIPShortCut->rNumericArgs(16);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(17),
-                                    state.dataIPShortCut->cAlphaArgs(17),
-                                    Pollution.ElecCoef.NucHiSched,
-                                    ErrorsFound);
-                }
-                Pollution.ElecCoef.NucLo = state.dataIPShortCut->rNumericArgs(17);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Electricity",
-                                    state.dataIPShortCut->cAlphaFieldNames(18),
-                                    state.dataIPShortCut->cAlphaArgs(18),
-                                    Pollution.ElecCoef.NucLoSched,
-                                    ErrorsFound);
-                }
-
-            } else if (SELECT_CASE_var == "GASOLINE") {
-                if (Pollution.GasolineCoef.FuelFactorUsed) {
-                    ShowWarningError(
-                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
-                    continue;
-                }
-                Pollution.GasolineCoef.FuelFactorUsed = true;
-                // Gasoline Coeffs
-                Pollution.GasolineCoef.Source = state.dataIPShortCut->rNumericArgs(1);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(2),
-                                    state.dataIPShortCut->cAlphaArgs(2),
-                                    Pollution.GasolineCoef.SourceSched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.CO2 = state.dataIPShortCut->rNumericArgs(2);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(3),
-                                    state.dataIPShortCut->cAlphaArgs(3),
-                                    Pollution.GasolineCoef.CO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.CO = state.dataIPShortCut->rNumericArgs(3);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(4),
-                                    state.dataIPShortCut->cAlphaArgs(4),
-                                    Pollution.GasolineCoef.COSched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.CH4 = state.dataIPShortCut->rNumericArgs(4);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(5),
-                                    state.dataIPShortCut->cAlphaArgs(5),
-                                    Pollution.GasolineCoef.CH4Sched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.NOx = state.dataIPShortCut->rNumericArgs(5);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(6),
-                                    state.dataIPShortCut->cAlphaArgs(6),
-                                    Pollution.GasolineCoef.NOxSched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.N2O = state.dataIPShortCut->rNumericArgs(6);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(7),
-                                    state.dataIPShortCut->cAlphaArgs(7),
-                                    Pollution.GasolineCoef.N2OSched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.SO2 = state.dataIPShortCut->rNumericArgs(7);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(8),
-                                    state.dataIPShortCut->cAlphaArgs(8),
-                                    Pollution.GasolineCoef.SO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.PM = state.dataIPShortCut->rNumericArgs(8);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(9),
-                                    state.dataIPShortCut->cAlphaArgs(9),
-                                    Pollution.GasolineCoef.PMSched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.PM10 = state.dataIPShortCut->rNumericArgs(9);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(10),
-                                    state.dataIPShortCut->cAlphaArgs(10),
-                                    Pollution.GasolineCoef.PM10Sched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.PM25 = state.dataIPShortCut->rNumericArgs(10);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(11),
-                                    state.dataIPShortCut->cAlphaArgs(11),
-                                    Pollution.GasolineCoef.PM25Sched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.NH3 = state.dataIPShortCut->rNumericArgs(11);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(12),
-                                    state.dataIPShortCut->cAlphaArgs(12),
-                                    Pollution.GasolineCoef.NH3Sched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(13),
-                                    state.dataIPShortCut->cAlphaArgs(13),
-                                    Pollution.GasolineCoef.NMVOCSched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.Hg = state.dataIPShortCut->rNumericArgs(13);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(14),
-                                    state.dataIPShortCut->cAlphaArgs(14),
-                                    Pollution.GasolineCoef.HgSched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.Pb = state.dataIPShortCut->rNumericArgs(14);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(15),
-                                    state.dataIPShortCut->cAlphaArgs(15),
-                                    Pollution.GasolineCoef.PbSched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.Water = state.dataIPShortCut->rNumericArgs(15);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(16),
-                                    state.dataIPShortCut->cAlphaArgs(16),
-                                    Pollution.GasolineCoef.WaterSched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.NucHi = state.dataIPShortCut->rNumericArgs(16);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(17),
-                                    state.dataIPShortCut->cAlphaArgs(17),
-                                    Pollution.GasolineCoef.NucHiSched,
-                                    ErrorsFound);
-                }
-                Pollution.GasolineCoef.NucLo = state.dataIPShortCut->rNumericArgs(17);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Gasoline",
-                                    state.dataIPShortCut->cAlphaFieldNames(18),
-                                    state.dataIPShortCut->cAlphaArgs(18),
-                                    Pollution.GasolineCoef.NucLoSched,
-                                    ErrorsFound);
-                }
-
-            } else if (SELECT_CASE_var == "PROPANE") {
-                if (Pollution.PropaneCoef.FuelFactorUsed) {
-                    ShowWarningError(
-                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
-                    continue;
-                }
-                Pollution.PropaneCoef.FuelFactorUsed = true;
-                // Propane Coeffs
-                Pollution.PropaneCoef.Source = state.dataIPShortCut->rNumericArgs(1);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(2),
-                                    state.dataIPShortCut->cAlphaArgs(2),
-                                    Pollution.PropaneCoef.SourceSched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.CO2 = state.dataIPShortCut->rNumericArgs(2);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(3),
-                                    state.dataIPShortCut->cAlphaArgs(3),
-                                    Pollution.PropaneCoef.CO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.CO = state.dataIPShortCut->rNumericArgs(3);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(4),
-                                    state.dataIPShortCut->cAlphaArgs(4),
-                                    Pollution.PropaneCoef.COSched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.CH4 = state.dataIPShortCut->rNumericArgs(4);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(5),
-                                    state.dataIPShortCut->cAlphaArgs(5),
-                                    Pollution.PropaneCoef.CH4Sched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.NOx = state.dataIPShortCut->rNumericArgs(5);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(6),
-                                    state.dataIPShortCut->cAlphaArgs(6),
-                                    Pollution.PropaneCoef.NOxSched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.N2O = state.dataIPShortCut->rNumericArgs(6);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(7),
-                                    state.dataIPShortCut->cAlphaArgs(7),
-                                    Pollution.PropaneCoef.N2OSched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.SO2 = state.dataIPShortCut->rNumericArgs(7);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(8),
-                                    state.dataIPShortCut->cAlphaArgs(8),
-                                    Pollution.PropaneCoef.SO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.PM = state.dataIPShortCut->rNumericArgs(8);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(9),
-                                    state.dataIPShortCut->cAlphaArgs(9),
-                                    Pollution.PropaneCoef.PMSched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.PM10 = state.dataIPShortCut->rNumericArgs(9);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(10),
-                                    state.dataIPShortCut->cAlphaArgs(10),
-                                    Pollution.PropaneCoef.PM10Sched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.PM25 = state.dataIPShortCut->rNumericArgs(10);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(11),
-                                    state.dataIPShortCut->cAlphaArgs(11),
-                                    Pollution.PropaneCoef.PM25Sched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.NH3 = state.dataIPShortCut->rNumericArgs(11);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(12),
-                                    state.dataIPShortCut->cAlphaArgs(12),
-                                    Pollution.PropaneCoef.NH3Sched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(13),
-                                    state.dataIPShortCut->cAlphaArgs(13),
-                                    Pollution.PropaneCoef.NMVOCSched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.Hg = state.dataIPShortCut->rNumericArgs(13);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(14),
-                                    state.dataIPShortCut->cAlphaArgs(14),
-                                    Pollution.PropaneCoef.HgSched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.Pb = state.dataIPShortCut->rNumericArgs(14);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(15),
-                                    state.dataIPShortCut->cAlphaArgs(15),
-                                    Pollution.PropaneCoef.PbSched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.Water = state.dataIPShortCut->rNumericArgs(15);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(16),
-                                    state.dataIPShortCut->cAlphaArgs(16),
-                                    Pollution.PropaneCoef.WaterSched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.NucHi = state.dataIPShortCut->rNumericArgs(16);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(17),
-                                    state.dataIPShortCut->cAlphaArgs(17),
-                                    Pollution.PropaneCoef.NucHiSched,
-                                    ErrorsFound);
-                }
-                Pollution.PropaneCoef.NucLo = state.dataIPShortCut->rNumericArgs(17);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Propane",
-                                    state.dataIPShortCut->cAlphaFieldNames(18),
-                                    state.dataIPShortCut->cAlphaArgs(18),
-                                    Pollution.PropaneCoef.NucLoSched,
-                                    ErrorsFound);
-                }
-
-            } else if (SELECT_CASE_var == "DIESEL") {
-                if (Pollution.DieselCoef.FuelFactorUsed) {
-                    ShowWarningError(
-                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
-                    continue;
-                }
-                Pollution.DieselCoef.FuelFactorUsed = true;
-                // Diesel Coeffs
-                Pollution.DieselCoef.Source = state.dataIPShortCut->rNumericArgs(1);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(2),
-                                    state.dataIPShortCut->cAlphaArgs(2),
-                                    Pollution.DieselCoef.SourceSched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.CO2 = state.dataIPShortCut->rNumericArgs(2);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(3),
-                                    state.dataIPShortCut->cAlphaArgs(3),
-                                    Pollution.DieselCoef.CO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.CO = state.dataIPShortCut->rNumericArgs(3);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(4),
-                                    state.dataIPShortCut->cAlphaArgs(4),
-                                    Pollution.DieselCoef.COSched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.CH4 = state.dataIPShortCut->rNumericArgs(4);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(5),
-                                    state.dataIPShortCut->cAlphaArgs(5),
-                                    Pollution.DieselCoef.CH4Sched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.NOx = state.dataIPShortCut->rNumericArgs(5);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(6),
-                                    state.dataIPShortCut->cAlphaArgs(6),
-                                    Pollution.DieselCoef.NOxSched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.N2O = state.dataIPShortCut->rNumericArgs(6);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(7),
-                                    state.dataIPShortCut->cAlphaArgs(7),
-                                    Pollution.DieselCoef.N2OSched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.SO2 = state.dataIPShortCut->rNumericArgs(7);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(8),
-                                    state.dataIPShortCut->cAlphaArgs(8),
-                                    Pollution.DieselCoef.SO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.PM = state.dataIPShortCut->rNumericArgs(8);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(9),
-                                    state.dataIPShortCut->cAlphaArgs(9),
-                                    Pollution.DieselCoef.PMSched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.PM10 = state.dataIPShortCut->rNumericArgs(9);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(10),
-                                    state.dataIPShortCut->cAlphaArgs(10),
-                                    Pollution.DieselCoef.PM10Sched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.PM25 = state.dataIPShortCut->rNumericArgs(10);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(11),
-                                    state.dataIPShortCut->cAlphaArgs(11),
-                                    Pollution.DieselCoef.PM25Sched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.NH3 = state.dataIPShortCut->rNumericArgs(11);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(12),
-                                    state.dataIPShortCut->cAlphaArgs(12),
-                                    Pollution.DieselCoef.NH3Sched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(13),
-                                    state.dataIPShortCut->cAlphaArgs(13),
-                                    Pollution.DieselCoef.NMVOCSched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.Hg = state.dataIPShortCut->rNumericArgs(13);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(14),
-                                    state.dataIPShortCut->cAlphaArgs(14),
-                                    Pollution.DieselCoef.HgSched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.Pb = state.dataIPShortCut->rNumericArgs(14);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(15),
-                                    state.dataIPShortCut->cAlphaArgs(15),
-                                    Pollution.DieselCoef.PbSched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.Water = state.dataIPShortCut->rNumericArgs(15);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(16),
-                                    state.dataIPShortCut->cAlphaArgs(16),
-                                    Pollution.DieselCoef.WaterSched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.NucHi = state.dataIPShortCut->rNumericArgs(16);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(17),
-                                    state.dataIPShortCut->cAlphaArgs(17),
-                                    Pollution.DieselCoef.NucHiSched,
-                                    ErrorsFound);
-                }
-                Pollution.DieselCoef.NucLo = state.dataIPShortCut->rNumericArgs(17);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "Diesel",
-                                    state.dataIPShortCut->cAlphaFieldNames(18),
-                                    state.dataIPShortCut->cAlphaArgs(18),
-                                    Pollution.DieselCoef.NucLoSched,
-                                    ErrorsFound);
-                }
-
-            } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                if (Pollution.OtherFuel1Coef.FuelFactorUsed) {
-                    ShowWarningError(
-                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
-                    continue;
-                }
-                Pollution.OtherFuel1Coef.FuelFactorUsed = true;
-                // OtherFuel1 Coeffs
-                Pollution.OtherFuel1Coef.Source = state.dataIPShortCut->rNumericArgs(1);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(2),
-                                    state.dataIPShortCut->cAlphaArgs(2),
-                                    Pollution.OtherFuel1Coef.SourceSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.CO2 = state.dataIPShortCut->rNumericArgs(2);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(3),
-                                    state.dataIPShortCut->cAlphaArgs(3),
-                                    Pollution.OtherFuel1Coef.CO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.CO = state.dataIPShortCut->rNumericArgs(3);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(4),
-                                    state.dataIPShortCut->cAlphaArgs(4),
-                                    Pollution.OtherFuel1Coef.COSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.CH4 = state.dataIPShortCut->rNumericArgs(4);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(5),
-                                    state.dataIPShortCut->cAlphaArgs(5),
-                                    Pollution.OtherFuel1Coef.CH4Sched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.NOx = state.dataIPShortCut->rNumericArgs(5);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(6),
-                                    state.dataIPShortCut->cAlphaArgs(6),
-                                    Pollution.OtherFuel1Coef.NOxSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.N2O = state.dataIPShortCut->rNumericArgs(6);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(7),
-                                    state.dataIPShortCut->cAlphaArgs(7),
-                                    Pollution.OtherFuel1Coef.N2OSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.SO2 = state.dataIPShortCut->rNumericArgs(7);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(8),
-                                    state.dataIPShortCut->cAlphaArgs(8),
-                                    Pollution.OtherFuel1Coef.SO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.PM = state.dataIPShortCut->rNumericArgs(8);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(9),
-                                    state.dataIPShortCut->cAlphaArgs(9),
-                                    Pollution.OtherFuel1Coef.PMSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.PM10 = state.dataIPShortCut->rNumericArgs(9);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(10),
-                                    state.dataIPShortCut->cAlphaArgs(10),
-                                    Pollution.OtherFuel1Coef.PM10Sched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.PM25 = state.dataIPShortCut->rNumericArgs(10);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(11),
-                                    state.dataIPShortCut->cAlphaArgs(11),
-                                    Pollution.OtherFuel1Coef.PM25Sched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.NH3 = state.dataIPShortCut->rNumericArgs(11);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(12),
-                                    state.dataIPShortCut->cAlphaArgs(12),
-                                    Pollution.OtherFuel1Coef.NH3Sched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(13),
-                                    state.dataIPShortCut->cAlphaArgs(13),
-                                    Pollution.OtherFuel1Coef.NMVOCSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.Hg = state.dataIPShortCut->rNumericArgs(13);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(14),
-                                    state.dataIPShortCut->cAlphaArgs(14),
-                                    Pollution.OtherFuel1Coef.HgSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.Pb = state.dataIPShortCut->rNumericArgs(14);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(15),
-                                    state.dataIPShortCut->cAlphaArgs(15),
-                                    Pollution.OtherFuel1Coef.PbSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.Water = state.dataIPShortCut->rNumericArgs(15);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(16),
-                                    state.dataIPShortCut->cAlphaArgs(16),
-                                    Pollution.OtherFuel1Coef.WaterSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.NucHi = state.dataIPShortCut->rNumericArgs(16);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(17),
-                                    state.dataIPShortCut->cAlphaArgs(17),
-                                    Pollution.OtherFuel1Coef.NucHiSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel1Coef.NucLo = state.dataIPShortCut->rNumericArgs(17);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel1",
-                                    state.dataIPShortCut->cAlphaFieldNames(18),
-                                    state.dataIPShortCut->cAlphaArgs(18),
-                                    Pollution.OtherFuel1Coef.NucLoSched,
-                                    ErrorsFound);
-                }
-
-            } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                if (Pollution.OtherFuel2Coef.FuelFactorUsed) {
-                    ShowWarningError(
-                        state, format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
-                    continue;
-                }
-                Pollution.OtherFuel2Coef.FuelFactorUsed = true;
-                // OtherFuel2 Coeffs
-                Pollution.OtherFuel2Coef.Source = state.dataIPShortCut->rNumericArgs(1);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(2),
-                                    state.dataIPShortCut->cAlphaArgs(2),
-                                    Pollution.OtherFuel2Coef.SourceSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.CO2 = state.dataIPShortCut->rNumericArgs(2);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(3),
-                                    state.dataIPShortCut->cAlphaArgs(3),
-                                    Pollution.OtherFuel2Coef.CO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.CO = state.dataIPShortCut->rNumericArgs(3);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(4),
-                                    state.dataIPShortCut->cAlphaArgs(4),
-                                    Pollution.OtherFuel2Coef.COSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.CH4 = state.dataIPShortCut->rNumericArgs(4);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(5),
-                                    state.dataIPShortCut->cAlphaArgs(5),
-                                    Pollution.OtherFuel2Coef.CH4Sched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.NOx = state.dataIPShortCut->rNumericArgs(5);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(6),
-                                    state.dataIPShortCut->cAlphaArgs(6),
-                                    Pollution.OtherFuel2Coef.NOxSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.N2O = state.dataIPShortCut->rNumericArgs(6);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(7),
-                                    state.dataIPShortCut->cAlphaArgs(7),
-                                    Pollution.OtherFuel2Coef.N2OSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.SO2 = state.dataIPShortCut->rNumericArgs(7);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(8),
-                                    state.dataIPShortCut->cAlphaArgs(8),
-                                    Pollution.OtherFuel2Coef.SO2Sched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.PM = state.dataIPShortCut->rNumericArgs(8);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(9),
-                                    state.dataIPShortCut->cAlphaArgs(9),
-                                    Pollution.OtherFuel2Coef.PMSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.PM10 = state.dataIPShortCut->rNumericArgs(9);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(10),
-                                    state.dataIPShortCut->cAlphaArgs(10),
-                                    Pollution.OtherFuel2Coef.PM10Sched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.PM25 = state.dataIPShortCut->rNumericArgs(10);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(11),
-                                    state.dataIPShortCut->cAlphaArgs(11),
-                                    Pollution.OtherFuel2Coef.PM25Sched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.NH3 = state.dataIPShortCut->rNumericArgs(11);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(12),
-                                    state.dataIPShortCut->cAlphaArgs(12),
-                                    Pollution.OtherFuel2Coef.NH3Sched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(13),
-                                    state.dataIPShortCut->cAlphaArgs(13),
-                                    Pollution.OtherFuel2Coef.NMVOCSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.Hg = state.dataIPShortCut->rNumericArgs(13);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(14),
-                                    state.dataIPShortCut->cAlphaArgs(14),
-                                    Pollution.OtherFuel2Coef.HgSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.Pb = state.dataIPShortCut->rNumericArgs(14);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(15),
-                                    state.dataIPShortCut->cAlphaArgs(15),
-                                    Pollution.OtherFuel2Coef.PbSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.Water = state.dataIPShortCut->rNumericArgs(15);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(16),
-                                    state.dataIPShortCut->cAlphaArgs(16),
-                                    Pollution.OtherFuel2Coef.WaterSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.NucHi = state.dataIPShortCut->rNumericArgs(16);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(17),
-                                    state.dataIPShortCut->cAlphaArgs(17),
-                                    Pollution.OtherFuel2Coef.NucHiSched,
-                                    ErrorsFound);
-                }
-                Pollution.OtherFuel2Coef.NucLo = state.dataIPShortCut->rNumericArgs(17);
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
-                    CheckFFSchedule(state,
-                                    cCurrentModuleObject,
-                                    "OtherFuel2",
-                                    state.dataIPShortCut->cAlphaFieldNames(18),
-                                    state.dataIPShortCut->cAlphaArgs(18),
-                                    Pollution.OtherFuel2Coef.NucLoSched,
-                                    ErrorsFound);
-                }
-
-            } else {
-                ShowSevereError(state, format("Illegal FuelType for Pollution Calc Entered={}", FuelType.FuelTypeNames(Loop)));
-                ErrorsFound = true;
+        switch (FuelType.FuelTypeNames(Loop)) {
+        case Constant::eFuel::NaturalGas: {
+            if (Pollution.NatGasCoef.FuelFactorUsed) {
+                ShowWarningError(state,
+                                 format("{}: {} already entered. Previous entry will be used.",
+                                        cCurrentModuleObject,
+                                        Constant::eFuelNames[static_cast<int>(FuelType.FuelTypeNames(Loop))]));
+                continue;
             }
+            Pollution.NatGasCoef.FuelFactorUsed = true;
+            // Natural Gas Coeffs
+            Pollution.NatGasCoef.Source = state.dataIPShortCut->rNumericArgs(1);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(2),
+                                state.dataIPShortCut->cAlphaArgs(2),
+                                Pollution.NatGasCoef.SourceSched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.CO2 = state.dataIPShortCut->rNumericArgs(2);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(3),
+                                state.dataIPShortCut->cAlphaArgs(3),
+                                Pollution.NatGasCoef.CO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.CO = state.dataIPShortCut->rNumericArgs(3);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(4),
+                                state.dataIPShortCut->cAlphaArgs(4),
+                                Pollution.NatGasCoef.COSched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.CH4 = state.dataIPShortCut->rNumericArgs(4);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(5),
+                                state.dataIPShortCut->cAlphaArgs(5),
+                                Pollution.NatGasCoef.CH4Sched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.NOx = state.dataIPShortCut->rNumericArgs(5);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(6),
+                                state.dataIPShortCut->cAlphaArgs(6),
+                                Pollution.NatGasCoef.NOxSched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.N2O = state.dataIPShortCut->rNumericArgs(6);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(7),
+                                state.dataIPShortCut->cAlphaArgs(7),
+                                Pollution.NatGasCoef.N2OSched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.SO2 = state.dataIPShortCut->rNumericArgs(7);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(8),
+                                state.dataIPShortCut->cAlphaArgs(8),
+                                Pollution.NatGasCoef.SO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.PM = state.dataIPShortCut->rNumericArgs(8);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(9),
+                                state.dataIPShortCut->cAlphaArgs(9),
+                                Pollution.NatGasCoef.PMSched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.PM10 = state.dataIPShortCut->rNumericArgs(9);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(10),
+                                state.dataIPShortCut->cAlphaArgs(10),
+                                Pollution.NatGasCoef.PM10Sched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.PM25 = state.dataIPShortCut->rNumericArgs(10);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(11),
+                                state.dataIPShortCut->cAlphaArgs(11),
+                                Pollution.NatGasCoef.PM25Sched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.NH3 = state.dataIPShortCut->rNumericArgs(11);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(12),
+                                state.dataIPShortCut->cAlphaArgs(12),
+                                Pollution.NatGasCoef.NH3Sched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(13),
+                                state.dataIPShortCut->cAlphaArgs(13),
+                                Pollution.NatGasCoef.NMVOCSched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.Hg = state.dataIPShortCut->rNumericArgs(13);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(14),
+                                state.dataIPShortCut->cAlphaArgs(14),
+                                Pollution.NatGasCoef.HgSched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.Pb = state.dataIPShortCut->rNumericArgs(14);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(15),
+                                state.dataIPShortCut->cAlphaArgs(15),
+                                Pollution.NatGasCoef.PbSched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.Water = state.dataIPShortCut->rNumericArgs(15);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(16),
+                                state.dataIPShortCut->cAlphaArgs(16),
+                                Pollution.NatGasCoef.WaterSched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.NucHi = state.dataIPShortCut->rNumericArgs(16);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(17),
+                                state.dataIPShortCut->cAlphaArgs(17),
+                                Pollution.NatGasCoef.NucHiSched,
+                                ErrorsFound);
+            }
+            Pollution.NatGasCoef.NucLo = state.dataIPShortCut->rNumericArgs(17);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "NaturalGas",
+                                state.dataIPShortCut->cAlphaFieldNames(18),
+                                state.dataIPShortCut->cAlphaArgs(18),
+                                Pollution.NatGasCoef.NucLoSched,
+                                ErrorsFound);
+            }
+        } break;
+        case Constant::eFuel::FuelOilNo2: {
+            if (Pollution.FuelOil2Coef.FuelFactorUsed) {
+                ShowWarningError(state,
+                                 format("{}: {} already entered. Previous entry will be used.",
+                                        cCurrentModuleObject,
+                                        Constant::eFuelNames[static_cast<int>(FuelType.FuelTypeNames(Loop))]));
+                continue;
+            }
+            Pollution.FuelOil2Coef.FuelFactorUsed = true;
+            // FuelOilNo2 Coeffs
+            Pollution.FuelOil2Coef.Source = state.dataIPShortCut->rNumericArgs(1);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(2),
+                                state.dataIPShortCut->cAlphaArgs(2),
+                                Pollution.FuelOil2Coef.SourceSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.CO2 = state.dataIPShortCut->rNumericArgs(2);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(3),
+                                state.dataIPShortCut->cAlphaArgs(3),
+                                Pollution.FuelOil2Coef.CO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.CO = state.dataIPShortCut->rNumericArgs(3);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(4),
+                                state.dataIPShortCut->cAlphaArgs(4),
+                                Pollution.FuelOil2Coef.COSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.CH4 = state.dataIPShortCut->rNumericArgs(4);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(5),
+                                state.dataIPShortCut->cAlphaArgs(5),
+                                Pollution.FuelOil2Coef.CH4Sched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.NOx = state.dataIPShortCut->rNumericArgs(5);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(6),
+                                state.dataIPShortCut->cAlphaArgs(6),
+                                Pollution.FuelOil2Coef.NOxSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.N2O = state.dataIPShortCut->rNumericArgs(6);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(7),
+                                state.dataIPShortCut->cAlphaArgs(7),
+                                Pollution.FuelOil2Coef.N2OSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.SO2 = state.dataIPShortCut->rNumericArgs(7);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(8),
+                                state.dataIPShortCut->cAlphaArgs(8),
+                                Pollution.FuelOil2Coef.SO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.PM = state.dataIPShortCut->rNumericArgs(8);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(9),
+                                state.dataIPShortCut->cAlphaArgs(9),
+                                Pollution.FuelOil2Coef.PMSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.PM10 = state.dataIPShortCut->rNumericArgs(9);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(10),
+                                state.dataIPShortCut->cAlphaArgs(10),
+                                Pollution.FuelOil2Coef.PM10Sched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.PM25 = state.dataIPShortCut->rNumericArgs(10);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(11),
+                                state.dataIPShortCut->cAlphaArgs(11),
+                                Pollution.FuelOil2Coef.PM25Sched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.NH3 = state.dataIPShortCut->rNumericArgs(11);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(12),
+                                state.dataIPShortCut->cAlphaArgs(12),
+                                Pollution.FuelOil2Coef.NH3Sched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(13),
+                                state.dataIPShortCut->cAlphaArgs(13),
+                                Pollution.FuelOil2Coef.NMVOCSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.Hg = state.dataIPShortCut->rNumericArgs(13);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(14),
+                                state.dataIPShortCut->cAlphaArgs(14),
+                                Pollution.FuelOil2Coef.HgSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.Pb = state.dataIPShortCut->rNumericArgs(14);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(15),
+                                state.dataIPShortCut->cAlphaArgs(15),
+                                Pollution.FuelOil2Coef.PbSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.Water = state.dataIPShortCut->rNumericArgs(15);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(16),
+                                state.dataIPShortCut->cAlphaArgs(16),
+                                Pollution.FuelOil2Coef.WaterSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.NucHi = state.dataIPShortCut->rNumericArgs(16);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(17),
+                                state.dataIPShortCut->cAlphaArgs(17),
+                                Pollution.FuelOil2Coef.NucHiSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil2Coef.NucLo = state.dataIPShortCut->rNumericArgs(17);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#2",
+                                state.dataIPShortCut->cAlphaFieldNames(18),
+                                state.dataIPShortCut->cAlphaArgs(18),
+                                Pollution.FuelOil2Coef.NucLoSched,
+                                ErrorsFound);
+            }
+        } break;
+        case Constant::eFuel::FuelOilNo1: {
+            if (Pollution.FuelOil1Coef.FuelFactorUsed) {
+                ShowWarningError(state,
+                                 format("{}: {} already entered. Previous entry will be used.",
+                                        cCurrentModuleObject,
+                                        Constant::eFuelNames[static_cast<int>(FuelType.FuelTypeNames(Loop))]));
+                continue;
+            }
+            Pollution.FuelOil1Coef.FuelFactorUsed = true;
+            // FuelOilNo1 Coeffs
+            Pollution.FuelOil1Coef.Source = state.dataIPShortCut->rNumericArgs(1);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(2),
+                                state.dataIPShortCut->cAlphaArgs(2),
+                                Pollution.FuelOil1Coef.SourceSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.CO2 = state.dataIPShortCut->rNumericArgs(2);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(3),
+                                state.dataIPShortCut->cAlphaArgs(3),
+                                Pollution.FuelOil1Coef.CO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.CO = state.dataIPShortCut->rNumericArgs(3);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(4),
+                                state.dataIPShortCut->cAlphaArgs(4),
+                                Pollution.FuelOil1Coef.COSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.CH4 = state.dataIPShortCut->rNumericArgs(4);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(5),
+                                state.dataIPShortCut->cAlphaArgs(5),
+                                Pollution.FuelOil1Coef.CH4Sched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.NOx = state.dataIPShortCut->rNumericArgs(5);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(6),
+                                state.dataIPShortCut->cAlphaArgs(6),
+                                Pollution.FuelOil1Coef.NOxSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.N2O = state.dataIPShortCut->rNumericArgs(6);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(7),
+                                state.dataIPShortCut->cAlphaArgs(7),
+                                Pollution.FuelOil1Coef.N2OSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.SO2 = state.dataIPShortCut->rNumericArgs(7);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(8),
+                                state.dataIPShortCut->cAlphaArgs(8),
+                                Pollution.FuelOil1Coef.SO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.PM = state.dataIPShortCut->rNumericArgs(8);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(9),
+                                state.dataIPShortCut->cAlphaArgs(9),
+                                Pollution.FuelOil1Coef.PMSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.PM10 = state.dataIPShortCut->rNumericArgs(9);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(10),
+                                state.dataIPShortCut->cAlphaArgs(10),
+                                Pollution.FuelOil1Coef.PM10Sched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.PM25 = state.dataIPShortCut->rNumericArgs(10);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(11),
+                                state.dataIPShortCut->cAlphaArgs(11),
+                                Pollution.FuelOil1Coef.PM25Sched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.NH3 = state.dataIPShortCut->rNumericArgs(11);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(12),
+                                state.dataIPShortCut->cAlphaArgs(12),
+                                Pollution.FuelOil1Coef.NH3Sched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(13),
+                                state.dataIPShortCut->cAlphaArgs(13),
+                                Pollution.FuelOil1Coef.NMVOCSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.Hg = state.dataIPShortCut->rNumericArgs(13);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(14),
+                                state.dataIPShortCut->cAlphaArgs(14),
+                                Pollution.FuelOil1Coef.HgSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.Pb = state.dataIPShortCut->rNumericArgs(14);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(15),
+                                state.dataIPShortCut->cAlphaArgs(15),
+                                Pollution.FuelOil1Coef.PbSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.Water = state.dataIPShortCut->rNumericArgs(15);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(16),
+                                state.dataIPShortCut->cAlphaArgs(16),
+                                Pollution.FuelOil1Coef.WaterSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.NucHi = state.dataIPShortCut->rNumericArgs(16);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(17),
+                                state.dataIPShortCut->cAlphaArgs(17),
+                                Pollution.FuelOil1Coef.NucHiSched,
+                                ErrorsFound);
+            }
+            Pollution.FuelOil1Coef.NucLo = state.dataIPShortCut->rNumericArgs(17);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Fuel Oil#1",
+                                state.dataIPShortCut->cAlphaFieldNames(18),
+                                state.dataIPShortCut->cAlphaArgs(18),
+                                Pollution.FuelOil1Coef.NucLoSched,
+                                ErrorsFound);
+            }
+        } break;
+        case Constant::eFuel::Coal: {
+            if (Pollution.CoalCoef.FuelFactorUsed) {
+                ShowWarningError(state,
+                                 format("{}: {} already entered. Previous entry will be used.",
+                                        cCurrentModuleObject,
+                                        Constant::eFuelNames[static_cast<int>(FuelType.FuelTypeNames(Loop))]));
+                continue;
+            }
+            Pollution.CoalCoef.FuelFactorUsed = true;
+            // Coal
+            Pollution.CoalCoef.Source = state.dataIPShortCut->rNumericArgs(1);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(2),
+                                state.dataIPShortCut->cAlphaArgs(2),
+                                Pollution.CoalCoef.SourceSched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.CO2 = state.dataIPShortCut->rNumericArgs(2);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(3),
+                                state.dataIPShortCut->cAlphaArgs(3),
+                                Pollution.CoalCoef.CO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.CO = state.dataIPShortCut->rNumericArgs(3);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(4),
+                                state.dataIPShortCut->cAlphaArgs(4),
+                                Pollution.CoalCoef.COSched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.CH4 = state.dataIPShortCut->rNumericArgs(4);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(5),
+                                state.dataIPShortCut->cAlphaArgs(5),
+                                Pollution.CoalCoef.CH4Sched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.NOx = state.dataIPShortCut->rNumericArgs(5);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(6),
+                                state.dataIPShortCut->cAlphaArgs(6),
+                                Pollution.CoalCoef.NOxSched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.N2O = state.dataIPShortCut->rNumericArgs(6);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(7),
+                                state.dataIPShortCut->cAlphaArgs(7),
+                                Pollution.CoalCoef.N2OSched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.SO2 = state.dataIPShortCut->rNumericArgs(7);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(8),
+                                state.dataIPShortCut->cAlphaArgs(8),
+                                Pollution.CoalCoef.SO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.PM = state.dataIPShortCut->rNumericArgs(8);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(9),
+                                state.dataIPShortCut->cAlphaArgs(9),
+                                Pollution.CoalCoef.PMSched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.PM10 = state.dataIPShortCut->rNumericArgs(9);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(10),
+                                state.dataIPShortCut->cAlphaArgs(10),
+                                Pollution.CoalCoef.PM10Sched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.PM25 = state.dataIPShortCut->rNumericArgs(10);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(11),
+                                state.dataIPShortCut->cAlphaArgs(11),
+                                Pollution.CoalCoef.PM25Sched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.NH3 = state.dataIPShortCut->rNumericArgs(11);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(12),
+                                state.dataIPShortCut->cAlphaArgs(12),
+                                Pollution.CoalCoef.NH3Sched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(13),
+                                state.dataIPShortCut->cAlphaArgs(13),
+                                Pollution.CoalCoef.NMVOCSched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.Hg = state.dataIPShortCut->rNumericArgs(13);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(14),
+                                state.dataIPShortCut->cAlphaArgs(14),
+                                Pollution.CoalCoef.HgSched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.Pb = state.dataIPShortCut->rNumericArgs(14);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(15),
+                                state.dataIPShortCut->cAlphaArgs(15),
+                                Pollution.CoalCoef.PbSched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.Water = state.dataIPShortCut->rNumericArgs(15);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(16),
+                                state.dataIPShortCut->cAlphaArgs(16),
+                                Pollution.CoalCoef.WaterSched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.NucHi = state.dataIPShortCut->rNumericArgs(16);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(17),
+                                state.dataIPShortCut->cAlphaArgs(17),
+                                Pollution.CoalCoef.NucHiSched,
+                                ErrorsFound);
+            }
+            Pollution.CoalCoef.NucLo = state.dataIPShortCut->rNumericArgs(17);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Coal",
+                                state.dataIPShortCut->cAlphaFieldNames(18),
+                                state.dataIPShortCut->cAlphaArgs(18),
+                                Pollution.CoalCoef.NucLoSched,
+                                ErrorsFound);
+            }
+        } break;
+        case Constant::eFuel::Electricity: {
+            if (Pollution.ElecCoef.FuelFactorUsed) {
+                ShowWarningError(state,
+                                 format("{}: {} already entered. Previous entry will be used.",
+                                        cCurrentModuleObject,
+                                        Constant::eFuelNames[static_cast<int>(FuelType.FuelTypeNames(Loop))]));
+                continue;
+            }
+            Pollution.ElecCoef.FuelFactorUsed = true;
+            // Electric Coeffs
+            Pollution.ElecCoef.Source = state.dataIPShortCut->rNumericArgs(1);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(2),
+                                state.dataIPShortCut->cAlphaArgs(2),
+                                Pollution.ElecCoef.SourceSched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.CO2 = state.dataIPShortCut->rNumericArgs(2);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(3),
+                                state.dataIPShortCut->cAlphaArgs(3),
+                                Pollution.ElecCoef.CO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.CO = state.dataIPShortCut->rNumericArgs(3);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(4),
+                                state.dataIPShortCut->cAlphaArgs(4),
+                                Pollution.ElecCoef.COSched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.CH4 = state.dataIPShortCut->rNumericArgs(4);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(5),
+                                state.dataIPShortCut->cAlphaArgs(5),
+                                Pollution.ElecCoef.CH4Sched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.NOx = state.dataIPShortCut->rNumericArgs(5);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(6),
+                                state.dataIPShortCut->cAlphaArgs(6),
+                                Pollution.ElecCoef.NOxSched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.N2O = state.dataIPShortCut->rNumericArgs(6);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(7),
+                                state.dataIPShortCut->cAlphaArgs(7),
+                                Pollution.ElecCoef.N2OSched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.SO2 = state.dataIPShortCut->rNumericArgs(7);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(8),
+                                state.dataIPShortCut->cAlphaArgs(8),
+                                Pollution.ElecCoef.SO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.PM = state.dataIPShortCut->rNumericArgs(8);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(9),
+                                state.dataIPShortCut->cAlphaArgs(9),
+                                Pollution.ElecCoef.PMSched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.PM10 = state.dataIPShortCut->rNumericArgs(9);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(10),
+                                state.dataIPShortCut->cAlphaArgs(10),
+                                Pollution.ElecCoef.PM10Sched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.PM25 = state.dataIPShortCut->rNumericArgs(10);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(11),
+                                state.dataIPShortCut->cAlphaArgs(11),
+                                Pollution.ElecCoef.PM25Sched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.NH3 = state.dataIPShortCut->rNumericArgs(11);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(12),
+                                state.dataIPShortCut->cAlphaArgs(12),
+                                Pollution.ElecCoef.NH3Sched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(13),
+                                state.dataIPShortCut->cAlphaArgs(13),
+                                Pollution.ElecCoef.NMVOCSched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.Hg = state.dataIPShortCut->rNumericArgs(13);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(14),
+                                state.dataIPShortCut->cAlphaArgs(14),
+                                Pollution.ElecCoef.HgSched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.Pb = state.dataIPShortCut->rNumericArgs(14);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(15),
+                                state.dataIPShortCut->cAlphaArgs(15),
+                                Pollution.ElecCoef.PbSched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.Water = state.dataIPShortCut->rNumericArgs(15);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(16),
+                                state.dataIPShortCut->cAlphaArgs(16),
+                                Pollution.ElecCoef.WaterSched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.NucHi = state.dataIPShortCut->rNumericArgs(16);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(17),
+                                state.dataIPShortCut->cAlphaArgs(17),
+                                Pollution.ElecCoef.NucHiSched,
+                                ErrorsFound);
+            }
+            Pollution.ElecCoef.NucLo = state.dataIPShortCut->rNumericArgs(17);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Electricity",
+                                state.dataIPShortCut->cAlphaFieldNames(18),
+                                state.dataIPShortCut->cAlphaArgs(18),
+                                Pollution.ElecCoef.NucLoSched,
+                                ErrorsFound);
+            }
+        } break;
+        case Constant::eFuel::Gasoline: {
+            if (Pollution.GasolineCoef.FuelFactorUsed) {
+                ShowWarningError(state,
+                                 format("{}: {} already entered. Previous entry will be used.",
+                                        cCurrentModuleObject,
+                                        Constant::eFuelNames[static_cast<int>(FuelType.FuelTypeNames(Loop))]));
+                continue;
+            }
+            Pollution.GasolineCoef.FuelFactorUsed = true;
+            // Gasoline Coeffs
+            Pollution.GasolineCoef.Source = state.dataIPShortCut->rNumericArgs(1);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(2),
+                                state.dataIPShortCut->cAlphaArgs(2),
+                                Pollution.GasolineCoef.SourceSched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.CO2 = state.dataIPShortCut->rNumericArgs(2);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(3),
+                                state.dataIPShortCut->cAlphaArgs(3),
+                                Pollution.GasolineCoef.CO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.CO = state.dataIPShortCut->rNumericArgs(3);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(4),
+                                state.dataIPShortCut->cAlphaArgs(4),
+                                Pollution.GasolineCoef.COSched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.CH4 = state.dataIPShortCut->rNumericArgs(4);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(5),
+                                state.dataIPShortCut->cAlphaArgs(5),
+                                Pollution.GasolineCoef.CH4Sched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.NOx = state.dataIPShortCut->rNumericArgs(5);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(6),
+                                state.dataIPShortCut->cAlphaArgs(6),
+                                Pollution.GasolineCoef.NOxSched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.N2O = state.dataIPShortCut->rNumericArgs(6);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(7),
+                                state.dataIPShortCut->cAlphaArgs(7),
+                                Pollution.GasolineCoef.N2OSched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.SO2 = state.dataIPShortCut->rNumericArgs(7);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(8),
+                                state.dataIPShortCut->cAlphaArgs(8),
+                                Pollution.GasolineCoef.SO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.PM = state.dataIPShortCut->rNumericArgs(8);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(9),
+                                state.dataIPShortCut->cAlphaArgs(9),
+                                Pollution.GasolineCoef.PMSched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.PM10 = state.dataIPShortCut->rNumericArgs(9);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(10),
+                                state.dataIPShortCut->cAlphaArgs(10),
+                                Pollution.GasolineCoef.PM10Sched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.PM25 = state.dataIPShortCut->rNumericArgs(10);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(11),
+                                state.dataIPShortCut->cAlphaArgs(11),
+                                Pollution.GasolineCoef.PM25Sched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.NH3 = state.dataIPShortCut->rNumericArgs(11);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(12),
+                                state.dataIPShortCut->cAlphaArgs(12),
+                                Pollution.GasolineCoef.NH3Sched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(13),
+                                state.dataIPShortCut->cAlphaArgs(13),
+                                Pollution.GasolineCoef.NMVOCSched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.Hg = state.dataIPShortCut->rNumericArgs(13);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(14),
+                                state.dataIPShortCut->cAlphaArgs(14),
+                                Pollution.GasolineCoef.HgSched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.Pb = state.dataIPShortCut->rNumericArgs(14);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(15),
+                                state.dataIPShortCut->cAlphaArgs(15),
+                                Pollution.GasolineCoef.PbSched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.Water = state.dataIPShortCut->rNumericArgs(15);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(16),
+                                state.dataIPShortCut->cAlphaArgs(16),
+                                Pollution.GasolineCoef.WaterSched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.NucHi = state.dataIPShortCut->rNumericArgs(16);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(17),
+                                state.dataIPShortCut->cAlphaArgs(17),
+                                Pollution.GasolineCoef.NucHiSched,
+                                ErrorsFound);
+            }
+            Pollution.GasolineCoef.NucLo = state.dataIPShortCut->rNumericArgs(17);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Gasoline",
+                                state.dataIPShortCut->cAlphaFieldNames(18),
+                                state.dataIPShortCut->cAlphaArgs(18),
+                                Pollution.GasolineCoef.NucLoSched,
+                                ErrorsFound);
+            }
+        } break;
+        case Constant::eFuel::Propane: {
+            if (Pollution.PropaneCoef.FuelFactorUsed) {
+                ShowWarningError(state,
+                                 format("{}: {} already entered. Previous entry will be used.",
+                                        cCurrentModuleObject,
+                                        Constant::eFuelNames[static_cast<int>(FuelType.FuelTypeNames(Loop))]));
+                continue;
+            }
+            Pollution.PropaneCoef.FuelFactorUsed = true;
+            // Propane Coeffs
+            Pollution.PropaneCoef.Source = state.dataIPShortCut->rNumericArgs(1);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(2),
+                                state.dataIPShortCut->cAlphaArgs(2),
+                                Pollution.PropaneCoef.SourceSched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.CO2 = state.dataIPShortCut->rNumericArgs(2);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(3),
+                                state.dataIPShortCut->cAlphaArgs(3),
+                                Pollution.PropaneCoef.CO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.CO = state.dataIPShortCut->rNumericArgs(3);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(4),
+                                state.dataIPShortCut->cAlphaArgs(4),
+                                Pollution.PropaneCoef.COSched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.CH4 = state.dataIPShortCut->rNumericArgs(4);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(5),
+                                state.dataIPShortCut->cAlphaArgs(5),
+                                Pollution.PropaneCoef.CH4Sched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.NOx = state.dataIPShortCut->rNumericArgs(5);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(6),
+                                state.dataIPShortCut->cAlphaArgs(6),
+                                Pollution.PropaneCoef.NOxSched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.N2O = state.dataIPShortCut->rNumericArgs(6);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(7),
+                                state.dataIPShortCut->cAlphaArgs(7),
+                                Pollution.PropaneCoef.N2OSched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.SO2 = state.dataIPShortCut->rNumericArgs(7);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(8),
+                                state.dataIPShortCut->cAlphaArgs(8),
+                                Pollution.PropaneCoef.SO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.PM = state.dataIPShortCut->rNumericArgs(8);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(9),
+                                state.dataIPShortCut->cAlphaArgs(9),
+                                Pollution.PropaneCoef.PMSched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.PM10 = state.dataIPShortCut->rNumericArgs(9);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(10),
+                                state.dataIPShortCut->cAlphaArgs(10),
+                                Pollution.PropaneCoef.PM10Sched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.PM25 = state.dataIPShortCut->rNumericArgs(10);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(11),
+                                state.dataIPShortCut->cAlphaArgs(11),
+                                Pollution.PropaneCoef.PM25Sched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.NH3 = state.dataIPShortCut->rNumericArgs(11);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(12),
+                                state.dataIPShortCut->cAlphaArgs(12),
+                                Pollution.PropaneCoef.NH3Sched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(13),
+                                state.dataIPShortCut->cAlphaArgs(13),
+                                Pollution.PropaneCoef.NMVOCSched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.Hg = state.dataIPShortCut->rNumericArgs(13);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(14),
+                                state.dataIPShortCut->cAlphaArgs(14),
+                                Pollution.PropaneCoef.HgSched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.Pb = state.dataIPShortCut->rNumericArgs(14);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(15),
+                                state.dataIPShortCut->cAlphaArgs(15),
+                                Pollution.PropaneCoef.PbSched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.Water = state.dataIPShortCut->rNumericArgs(15);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(16),
+                                state.dataIPShortCut->cAlphaArgs(16),
+                                Pollution.PropaneCoef.WaterSched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.NucHi = state.dataIPShortCut->rNumericArgs(16);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(17),
+                                state.dataIPShortCut->cAlphaArgs(17),
+                                Pollution.PropaneCoef.NucHiSched,
+                                ErrorsFound);
+            }
+            Pollution.PropaneCoef.NucLo = state.dataIPShortCut->rNumericArgs(17);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Propane",
+                                state.dataIPShortCut->cAlphaFieldNames(18),
+                                state.dataIPShortCut->cAlphaArgs(18),
+                                Pollution.PropaneCoef.NucLoSched,
+                                ErrorsFound);
+            }
+        } break;
+        case Constant::eFuel::Diesel: {
+            if (Pollution.DieselCoef.FuelFactorUsed) {
+                ShowWarningError(state,
+                                 format("{}: {} already entered. Previous entry will be used.",
+                                        cCurrentModuleObject,
+                                        Constant::eFuelNames[static_cast<int>(FuelType.FuelTypeNames(Loop))]));
+                continue;
+            }
+            Pollution.DieselCoef.FuelFactorUsed = true;
+            // Diesel Coeffs
+            Pollution.DieselCoef.Source = state.dataIPShortCut->rNumericArgs(1);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(2),
+                                state.dataIPShortCut->cAlphaArgs(2),
+                                Pollution.DieselCoef.SourceSched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.CO2 = state.dataIPShortCut->rNumericArgs(2);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(3),
+                                state.dataIPShortCut->cAlphaArgs(3),
+                                Pollution.DieselCoef.CO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.CO = state.dataIPShortCut->rNumericArgs(3);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(4),
+                                state.dataIPShortCut->cAlphaArgs(4),
+                                Pollution.DieselCoef.COSched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.CH4 = state.dataIPShortCut->rNumericArgs(4);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(5),
+                                state.dataIPShortCut->cAlphaArgs(5),
+                                Pollution.DieselCoef.CH4Sched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.NOx = state.dataIPShortCut->rNumericArgs(5);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(6),
+                                state.dataIPShortCut->cAlphaArgs(6),
+                                Pollution.DieselCoef.NOxSched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.N2O = state.dataIPShortCut->rNumericArgs(6);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(7),
+                                state.dataIPShortCut->cAlphaArgs(7),
+                                Pollution.DieselCoef.N2OSched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.SO2 = state.dataIPShortCut->rNumericArgs(7);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(8),
+                                state.dataIPShortCut->cAlphaArgs(8),
+                                Pollution.DieselCoef.SO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.PM = state.dataIPShortCut->rNumericArgs(8);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(9),
+                                state.dataIPShortCut->cAlphaArgs(9),
+                                Pollution.DieselCoef.PMSched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.PM10 = state.dataIPShortCut->rNumericArgs(9);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(10),
+                                state.dataIPShortCut->cAlphaArgs(10),
+                                Pollution.DieselCoef.PM10Sched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.PM25 = state.dataIPShortCut->rNumericArgs(10);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(11),
+                                state.dataIPShortCut->cAlphaArgs(11),
+                                Pollution.DieselCoef.PM25Sched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.NH3 = state.dataIPShortCut->rNumericArgs(11);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(12),
+                                state.dataIPShortCut->cAlphaArgs(12),
+                                Pollution.DieselCoef.NH3Sched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(13),
+                                state.dataIPShortCut->cAlphaArgs(13),
+                                Pollution.DieselCoef.NMVOCSched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.Hg = state.dataIPShortCut->rNumericArgs(13);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(14),
+                                state.dataIPShortCut->cAlphaArgs(14),
+                                Pollution.DieselCoef.HgSched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.Pb = state.dataIPShortCut->rNumericArgs(14);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(15),
+                                state.dataIPShortCut->cAlphaArgs(15),
+                                Pollution.DieselCoef.PbSched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.Water = state.dataIPShortCut->rNumericArgs(15);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(16),
+                                state.dataIPShortCut->cAlphaArgs(16),
+                                Pollution.DieselCoef.WaterSched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.NucHi = state.dataIPShortCut->rNumericArgs(16);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(17),
+                                state.dataIPShortCut->cAlphaArgs(17),
+                                Pollution.DieselCoef.NucHiSched,
+                                ErrorsFound);
+            }
+            Pollution.DieselCoef.NucLo = state.dataIPShortCut->rNumericArgs(17);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "Diesel",
+                                state.dataIPShortCut->cAlphaFieldNames(18),
+                                state.dataIPShortCut->cAlphaArgs(18),
+                                Pollution.DieselCoef.NucLoSched,
+                                ErrorsFound);
+            }
+        } break;
+        case Constant::eFuel::OtherFuel1: {
+            if (Pollution.OtherFuel1Coef.FuelFactorUsed) {
+                ShowWarningError(state,
+                                 format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
+                continue;
+            }
+            Pollution.OtherFuel1Coef.FuelFactorUsed = true;
+            // OtherFuel1 Coeffs
+            Pollution.OtherFuel1Coef.Source = state.dataIPShortCut->rNumericArgs(1);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(2),
+                                state.dataIPShortCut->cAlphaArgs(2),
+                                Pollution.OtherFuel1Coef.SourceSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.CO2 = state.dataIPShortCut->rNumericArgs(2);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(3),
+                                state.dataIPShortCut->cAlphaArgs(3),
+                                Pollution.OtherFuel1Coef.CO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.CO = state.dataIPShortCut->rNumericArgs(3);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(4),
+                                state.dataIPShortCut->cAlphaArgs(4),
+                                Pollution.OtherFuel1Coef.COSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.CH4 = state.dataIPShortCut->rNumericArgs(4);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(5),
+                                state.dataIPShortCut->cAlphaArgs(5),
+                                Pollution.OtherFuel1Coef.CH4Sched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.NOx = state.dataIPShortCut->rNumericArgs(5);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(6),
+                                state.dataIPShortCut->cAlphaArgs(6),
+                                Pollution.OtherFuel1Coef.NOxSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.N2O = state.dataIPShortCut->rNumericArgs(6);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(7),
+                                state.dataIPShortCut->cAlphaArgs(7),
+                                Pollution.OtherFuel1Coef.N2OSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.SO2 = state.dataIPShortCut->rNumericArgs(7);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(8),
+                                state.dataIPShortCut->cAlphaArgs(8),
+                                Pollution.OtherFuel1Coef.SO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.PM = state.dataIPShortCut->rNumericArgs(8);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(9),
+                                state.dataIPShortCut->cAlphaArgs(9),
+                                Pollution.OtherFuel1Coef.PMSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.PM10 = state.dataIPShortCut->rNumericArgs(9);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(10),
+                                state.dataIPShortCut->cAlphaArgs(10),
+                                Pollution.OtherFuel1Coef.PM10Sched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.PM25 = state.dataIPShortCut->rNumericArgs(10);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(11),
+                                state.dataIPShortCut->cAlphaArgs(11),
+                                Pollution.OtherFuel1Coef.PM25Sched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.NH3 = state.dataIPShortCut->rNumericArgs(11);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(12),
+                                state.dataIPShortCut->cAlphaArgs(12),
+                                Pollution.OtherFuel1Coef.NH3Sched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(13),
+                                state.dataIPShortCut->cAlphaArgs(13),
+                                Pollution.OtherFuel1Coef.NMVOCSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.Hg = state.dataIPShortCut->rNumericArgs(13);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(14),
+                                state.dataIPShortCut->cAlphaArgs(14),
+                                Pollution.OtherFuel1Coef.HgSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.Pb = state.dataIPShortCut->rNumericArgs(14);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(15),
+                                state.dataIPShortCut->cAlphaArgs(15),
+                                Pollution.OtherFuel1Coef.PbSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.Water = state.dataIPShortCut->rNumericArgs(15);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(16),
+                                state.dataIPShortCut->cAlphaArgs(16),
+                                Pollution.OtherFuel1Coef.WaterSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.NucHi = state.dataIPShortCut->rNumericArgs(16);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(17),
+                                state.dataIPShortCut->cAlphaArgs(17),
+                                Pollution.OtherFuel1Coef.NucHiSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel1Coef.NucLo = state.dataIPShortCut->rNumericArgs(17);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel1",
+                                state.dataIPShortCut->cAlphaFieldNames(18),
+                                state.dataIPShortCut->cAlphaArgs(18),
+                                Pollution.OtherFuel1Coef.NucLoSched,
+                                ErrorsFound);
+            }
+        } break;
+        case Constant::eFuel::OtherFuel2: {
+            if (Pollution.OtherFuel2Coef.FuelFactorUsed) {
+                ShowWarningError(state,
+                                 format("{}: {} already entered. Previous entry will be used.", cCurrentModuleObject, FuelType.FuelTypeNames(Loop)));
+                continue;
+            }
+            Pollution.OtherFuel2Coef.FuelFactorUsed = true;
+            // OtherFuel2 Coeffs
+            Pollution.OtherFuel2Coef.Source = state.dataIPShortCut->rNumericArgs(1);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(2),
+                                state.dataIPShortCut->cAlphaArgs(2),
+                                Pollution.OtherFuel2Coef.SourceSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.CO2 = state.dataIPShortCut->rNumericArgs(2);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(3),
+                                state.dataIPShortCut->cAlphaArgs(3),
+                                Pollution.OtherFuel2Coef.CO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.CO = state.dataIPShortCut->rNumericArgs(3);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(4),
+                                state.dataIPShortCut->cAlphaArgs(4),
+                                Pollution.OtherFuel2Coef.COSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.CH4 = state.dataIPShortCut->rNumericArgs(4);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(5),
+                                state.dataIPShortCut->cAlphaArgs(5),
+                                Pollution.OtherFuel2Coef.CH4Sched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.NOx = state.dataIPShortCut->rNumericArgs(5);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(6),
+                                state.dataIPShortCut->cAlphaArgs(6),
+                                Pollution.OtherFuel2Coef.NOxSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.N2O = state.dataIPShortCut->rNumericArgs(6);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(7),
+                                state.dataIPShortCut->cAlphaArgs(7),
+                                Pollution.OtherFuel2Coef.N2OSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.SO2 = state.dataIPShortCut->rNumericArgs(7);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(8),
+                                state.dataIPShortCut->cAlphaArgs(8),
+                                Pollution.OtherFuel2Coef.SO2Sched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.PM = state.dataIPShortCut->rNumericArgs(8);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(9),
+                                state.dataIPShortCut->cAlphaArgs(9),
+                                Pollution.OtherFuel2Coef.PMSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.PM10 = state.dataIPShortCut->rNumericArgs(9);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(10),
+                                state.dataIPShortCut->cAlphaArgs(10),
+                                Pollution.OtherFuel2Coef.PM10Sched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.PM25 = state.dataIPShortCut->rNumericArgs(10);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(11),
+                                state.dataIPShortCut->cAlphaArgs(11),
+                                Pollution.OtherFuel2Coef.PM25Sched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.NH3 = state.dataIPShortCut->rNumericArgs(11);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(12),
+                                state.dataIPShortCut->cAlphaArgs(12),
+                                Pollution.OtherFuel2Coef.NH3Sched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.NMVOC = state.dataIPShortCut->rNumericArgs(12);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(13),
+                                state.dataIPShortCut->cAlphaArgs(13),
+                                Pollution.OtherFuel2Coef.NMVOCSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.Hg = state.dataIPShortCut->rNumericArgs(13);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(14),
+                                state.dataIPShortCut->cAlphaArgs(14),
+                                Pollution.OtherFuel2Coef.HgSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.Pb = state.dataIPShortCut->rNumericArgs(14);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(15),
+                                state.dataIPShortCut->cAlphaArgs(15),
+                                Pollution.OtherFuel2Coef.PbSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.Water = state.dataIPShortCut->rNumericArgs(15);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(16),
+                                state.dataIPShortCut->cAlphaArgs(16),
+                                Pollution.OtherFuel2Coef.WaterSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.NucHi = state.dataIPShortCut->rNumericArgs(16);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(17),
+                                state.dataIPShortCut->cAlphaArgs(17),
+                                Pollution.OtherFuel2Coef.NucHiSched,
+                                ErrorsFound);
+            }
+            Pollution.OtherFuel2Coef.NucLo = state.dataIPShortCut->rNumericArgs(17);
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
+                CheckFFSchedule(state,
+                                cCurrentModuleObject,
+                                "OtherFuel2",
+                                state.dataIPShortCut->cAlphaFieldNames(18),
+                                state.dataIPShortCut->cAlphaArgs(18),
+                                Pollution.OtherFuel2Coef.NucLoSched,
+                                ErrorsFound);
+            }
+        } break;
+        default: {
+            ShowSevereError(state, format("Illegal FuelType for Pollution Calc Entered={}", FuelType.FuelTypeNames(Loop)));
+            ErrorsFound = true;
+        } break;
         }
 
     } // End of the NumEnergyTypes Do Loop
@@ -2181,2103 +2198,2095 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
     auto &FuelType = state.dataPollutionModule->FuelType;
     for (Loop = 1; Loop <= static_cast<int>(PollFactor::Num); ++Loop) {
 
-        if (FuelType.FuelTypeNames(Loop).empty()) continue;
+        // if (FuelType.FuelTypeNames(Loop).empty()) continue;
 
-        {
-            std::string const &SELECT_CASE_var = FuelType.FuelTypeNames(Loop);
-            if (SELECT_CASE_var == "NATURALGAS") {
-                // Pollutants from Natural Gas
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas Source Energy",
-                                    OutputProcessor::Unit::J,
-                                    Pollution.NatGasComp.Source,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Source",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas CO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.NatGasComp.CO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO2",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas CO Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.NatGasComp.COPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas CH4 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.NatGasComp.CH4Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CH4",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas NOx Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.NatGasComp.NOxPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NOx",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas N2O Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.NatGasComp.N2OPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "N2O",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas SO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.NatGasComp.SO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "SO2",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas PM Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.NatGasComp.PMPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas PM10 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.NatGasComp.PM10Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM10",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas PM2.5 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.NatGasComp.PM25Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM2.5",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas NH3 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.NatGasComp.NH3Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NH3",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas NMVOC Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.NatGasComp.NMVOCPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NMVOC",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas Hg Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.NatGasComp.HgPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Hg",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas Pb Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.NatGasComp.PbPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Pb",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas Water Consumption Volume",
-                                    OutputProcessor::Unit::L,
-                                    Pollution.NatGasComp.WaterPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "WaterEnvironmentalFactors",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas Nuclear High Level Waste Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.NatGasComp.NucHiPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear High",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact NaturalGas Nuclear Low Level Waste Volume",
-                                    OutputProcessor::Unit::m3,
-                                    Pollution.NatGasComp.NucLoPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear Low",
-                                    "NaturalGasEmissions",
-                                    {},
-                                    "");
-
-            } else if (SELECT_CASE_var == "FUELOILNO2") {
-                // Pollutants from FuelOilNo2
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 Source Energy",
-                                    OutputProcessor::Unit::J,
-                                    Pollution.FuelOil2Comp.Source,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Source",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 CO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil2Comp.CO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO2",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 CO Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil2Comp.COPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 CH4 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil2Comp.CH4Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CH4",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 NOx Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil2Comp.NOxPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NOx",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 N2O Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil2Comp.N2OPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "N2O",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 SO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil2Comp.SO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "SO2",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 PM Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil2Comp.PMPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 PM10 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil2Comp.PM10Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM10",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 PM2.5 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil2Comp.PM25Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM2.5",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 NH3 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil2Comp.NH3Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NH3",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 NMVOC Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil2Comp.NMVOCPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NMVOC",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 Hg Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil2Comp.HgPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Hg",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 Pb Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil2Comp.PbPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Pb",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 Water Consumption Volume",
-                                    OutputProcessor::Unit::L,
-                                    Pollution.FuelOil2Comp.WaterPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "WaterEnvironmentalFactors",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 Nuclear High Level Waste Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil2Comp.NucHiPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear High",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo2 Nuclear Low Level Waste Volume",
-                                    OutputProcessor::Unit::m3,
-                                    Pollution.FuelOil2Comp.NucLoPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear Low",
-                                    "FuelOilNo2Emissions",
-                                    {},
-                                    "");
-
-            } else if (SELECT_CASE_var == "FUELOILNO1") {
-                // Pollutants from FuelOilNo1
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 Source Energy",
-                                    OutputProcessor::Unit::J,
-                                    Pollution.FuelOil1Comp.Source,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Source",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 CO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil1Comp.CO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO2",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 CO Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil1Comp.COPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 CH4 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil1Comp.CH4Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CH4",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 NOx Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil1Comp.NOxPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NOx",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 N2O Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil1Comp.N2OPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "N2O",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 SO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil1Comp.SO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "SO2",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 PM Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil1Comp.PMPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 PM10 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil1Comp.PM10Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM10",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 PM2.5 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil1Comp.PM25Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM2.5",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 NH3 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil1Comp.NH3Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NH3",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 NMVOC Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil1Comp.NMVOCPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NMVOC",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 Hg Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil1Comp.HgPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Hg",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 Pb Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil1Comp.PbPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Pb",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 Water Consumption Volume",
-                                    OutputProcessor::Unit::L,
-                                    Pollution.FuelOil1Comp.WaterPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "WaterEnvironmentalFactors",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 Nuclear High Level Waste Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.FuelOil1Comp.NucHiPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear High",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact FuelOilNo1 Nuclear Low Level Waste Volume",
-                                    OutputProcessor::Unit::m3,
-                                    Pollution.FuelOil1Comp.NucLoPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear Low",
-                                    "FuelOilNo1Emissions",
-                                    {},
-                                    "");
-
-            } else if (SELECT_CASE_var == "COAL") {
-                // Pollutants from Coal
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal Source Energy",
-                                    OutputProcessor::Unit::J,
-                                    Pollution.CoalComp.Source,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Source",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal CO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.CoalComp.CO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO2",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal CO Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.CoalComp.COPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal CH4 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.CoalComp.CH4Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CH4",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal NOx Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.CoalComp.NOxPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NOx",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal N2O Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.CoalComp.N2OPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "N2O",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal SO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.CoalComp.SO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "SO2",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal PM Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.CoalComp.PMPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal PM10 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.CoalComp.PM10Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM10",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal PM2.5 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.CoalComp.PM25Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM2.5",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal NH3 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.CoalComp.NH3Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NH3",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal NMVOC Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.CoalComp.NMVOCPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NMVOC",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal Hg Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.CoalComp.HgPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Hg",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal Pb Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.CoalComp.PbPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Pb",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal Water Consumption Volume",
-                                    OutputProcessor::Unit::L,
-                                    Pollution.CoalComp.WaterPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "WaterEnvironmentalFactors",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal Nuclear High Level Waste Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.CoalComp.NucHiPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear High",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Coal Nuclear Low Level Waste Volume",
-                                    OutputProcessor::Unit::m3,
-                                    Pollution.CoalComp.NucLoPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear Low",
-                                    "CoalEmissions",
-                                    {},
-                                    "");
-
-            } else if (SELECT_CASE_var == "ELECTRICITY") {
-                // Pollutants from Electricity
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity Source Energy",
-                                    OutputProcessor::Unit::J,
-                                    Pollution.ElecComp.Source,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Source",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity CO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.ElecComp.CO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO2",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity CO Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.ElecComp.COPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity CH4 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.ElecComp.CH4Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CH4",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity NOx Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.ElecComp.NOxPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NOx",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity N2O Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.ElecComp.N2OPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "N2O",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity SO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.ElecComp.SO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "SO2",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity PM Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.ElecComp.PMPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity PM10 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.ElecComp.PM10Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM10",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity PM2.5 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.ElecComp.PM25Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM2.5",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity NH3 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.ElecComp.NH3Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NH3",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity NMVOC Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.ElecComp.NMVOCPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NMVOC",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity Hg Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.ElecComp.HgPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Hg",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity Pb Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.ElecComp.PbPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Pb",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity Water Consumption Volume",
-                                    OutputProcessor::Unit::L,
-                                    Pollution.ElecComp.WaterPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "WaterEnvironmentalFactors",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity Nuclear High Level Waste Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.ElecComp.NucHiPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear High",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Electricity Nuclear Low Level Waste Volume",
-                                    OutputProcessor::Unit::m3,
-                                    Pollution.ElecComp.NucLoPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear Low",
-                                    "ElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Purchased Electricity Source Energy",
-                                    OutputProcessor::Unit::J,
-                                    Pollution.ElecPurchComp.Source,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Source",
-                                    "PurchasedElectricityEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Surplus Sold Electricity Source",
-                                    OutputProcessor::Unit::J,
-                                    Pollution.ElecSurplusSoldComp.Source,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Source",
-                                    "SoldElectricityEmissions",
-                                    {},
-                                    "");
-            } else if (SELECT_CASE_var == "GASOLINE") {
-                // Pollutants from Gasoline
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline Source Energy",
-                                    OutputProcessor::Unit::J,
-                                    Pollution.GasolineComp.Source,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Source",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline CO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.GasolineComp.CO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO2",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline CO Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.GasolineComp.COPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline CH4 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.GasolineComp.CH4Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CH4",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline NOx Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.GasolineComp.NOxPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NOx",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline N2O Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.GasolineComp.N2OPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "N2O",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline SO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.GasolineComp.SO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "SO2",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline PM Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.GasolineComp.PMPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline PM10 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.GasolineComp.PM10Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM10",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline PM2.5 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.GasolineComp.PM25Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM2.5",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline NH3 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.GasolineComp.NH3Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NH3",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline NMVOC Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.GasolineComp.NMVOCPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NMVOC",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline Hg Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.GasolineComp.HgPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Hg",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline Pb Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.GasolineComp.PbPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Pb",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline Water Consumption Volume",
-                                    OutputProcessor::Unit::L,
-                                    Pollution.GasolineComp.WaterPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "WaterEnvironmentalFactors",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline Nuclear High Level Waste Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.GasolineComp.NucHiPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear High",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Gasoline Nuclear Low Level Waste Volume",
-                                    OutputProcessor::Unit::m3,
-                                    Pollution.GasolineComp.NucLoPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear Low",
-                                    "GasolineEmissions",
-                                    {},
-                                    "");
-
-            } else if (SELECT_CASE_var == "PROPANE") {
-                // Pollutants from Propane
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane Source Energy",
-                                    OutputProcessor::Unit::J,
-                                    Pollution.PropaneComp.Source,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Source",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane CO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.PropaneComp.CO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO2",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane CO Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.PropaneComp.COPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane CH4 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.PropaneComp.CH4Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CH4",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane NOx Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.PropaneComp.NOxPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NOx",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane N2O Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.PropaneComp.N2OPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "N2O",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane SO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.PropaneComp.SO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "SO2",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane PM Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.PropaneComp.PMPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane PM10 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.PropaneComp.PM10Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM10",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane PM2.5 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.PropaneComp.PM25Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM2.5",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane NH3 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.PropaneComp.NH3Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NH3",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane NMVOC Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.PropaneComp.NMVOCPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NMVOC",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane Hg Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.PropaneComp.HgPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Hg",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane Pb Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.PropaneComp.PbPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Pb",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane Water Consumption Volume",
-                                    OutputProcessor::Unit::L,
-                                    Pollution.PropaneComp.WaterPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "WaterEnvironmentalFactors",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane Nuclear High Level Waste Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.PropaneComp.NucHiPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear High",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Propane Nuclear Low Level Waste Volume",
-                                    OutputProcessor::Unit::m3,
-                                    Pollution.PropaneComp.NucLoPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear Low",
-                                    "PropaneEmissions",
-                                    {},
-                                    "");
-
-            } else if (SELECT_CASE_var == "DIESEL") {
-                // Pollutants from Diesel
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel Source Energy",
-                                    OutputProcessor::Unit::J,
-                                    Pollution.DieselComp.Source,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Source",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel CO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.DieselComp.CO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO2",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel CO Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.DieselComp.COPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel CH4 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.DieselComp.CH4Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CH4",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel NOx Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.DieselComp.NOxPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NOx",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel N2O Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.DieselComp.N2OPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "N2O",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel SO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.DieselComp.SO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "SO2",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel PM Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.DieselComp.PMPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel PM10 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.DieselComp.PM10Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM10",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel PM2.5 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.DieselComp.PM25Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM2.5",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel NH3 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.DieselComp.NH3Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NH3",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel NMVOC Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.DieselComp.NMVOCPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NMVOC",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel Hg Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.DieselComp.HgPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Hg",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel Pb Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.DieselComp.PbPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Pb",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel Water Consumption Volume",
-                                    OutputProcessor::Unit::L,
-                                    Pollution.DieselComp.WaterPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "WaterEnvironmentalFactors",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel Nuclear High Level Waste Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.DieselComp.NucHiPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear High",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact Diesel Nuclear Low Level Waste Volume",
-                                    OutputProcessor::Unit::m3,
-                                    Pollution.DieselComp.NucLoPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear Low",
-                                    "DieselEmissions",
-                                    {},
-                                    "");
-
-            } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                // Pollutants from OtherFuel1
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 Source Energy",
-                                    OutputProcessor::Unit::J,
-                                    Pollution.OtherFuel1Comp.Source,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Source",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 CO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel1Comp.CO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO2",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 CO Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel1Comp.COPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 CH4 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel1Comp.CH4Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CH4",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 NOx Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel1Comp.NOxPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NOx",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 N2O Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel1Comp.N2OPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "N2O",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 SO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel1Comp.SO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "SO2",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 PM Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel1Comp.PMPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 PM10 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel1Comp.PM10Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM10",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 PM2.5 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel1Comp.PM25Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM2.5",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 NH3 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel1Comp.NH3Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NH3",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 NMVOC Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel1Comp.NMVOCPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NMVOC",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 Hg Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel1Comp.HgPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Hg",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 Pb Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel1Comp.PbPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Pb",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 Water Consumption Volume",
-                                    OutputProcessor::Unit::L,
-                                    Pollution.OtherFuel1Comp.WaterPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "WaterEnvironmentalFactors",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 Nuclear High Level Waste Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel1Comp.NucHiPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear High",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 Nuclear Low Level Waste Volume",
-                                    OutputProcessor::Unit::m3,
-                                    Pollution.OtherFuel1Comp.NucLoPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear Low",
-                                    "OtherFuel1Emissions",
-                                    {},
-                                    "");
-
-            } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                // Pollutants from OtherFuel2
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 Source Energy",
-                                    OutputProcessor::Unit::J,
-                                    Pollution.OtherFuel2Comp.Source,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Source",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 CO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel2Comp.CO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO2",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 CO Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel2Comp.COPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CO",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 CH4 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel2Comp.CH4Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "CH4",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 NOx Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel2Comp.NOxPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NOx",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 N2O Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel2Comp.N2OPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "N2O",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 SO2 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel2Comp.SO2Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "SO2",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 PM Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel2Comp.PMPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 PM10 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel2Comp.PM10Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM10",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 PM2.5 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel2Comp.PM25Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "PM2.5",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 NH3 Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel2Comp.NH3Pollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NH3",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 NMVOC Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel2Comp.NMVOCPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "NMVOC",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 Hg Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel2Comp.HgPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Hg",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 Pb Emissions Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel2Comp.PbPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Pb",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 Water Consumption Volume",
-                                    OutputProcessor::Unit::L,
-                                    Pollution.OtherFuel2Comp.WaterPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "WaterEnvironmentalFactors",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 Nuclear High Level Waste Mass",
-                                    OutputProcessor::Unit::kg,
-                                    Pollution.OtherFuel2Comp.NucHiPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear High",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-                SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 Nuclear Low Level Waste Volume",
-                                    OutputProcessor::Unit::m3,
-                                    Pollution.OtherFuel2Comp.NucLoPollution,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    "Site",
-                                    {},
-                                    "Nuclear Low",
-                                    "OtherFuel2Emissions",
-                                    {},
-                                    "");
-            }
+        switch (FuelType.FuelTypeNames(Loop)) {
+        case Constant::eFuel::NaturalGas: { // Pollutants from Natural Gas
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas Source Energy",
+                                OutputProcessor::Unit::J,
+                                Pollution.NatGasComp.Source,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Source",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas CO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.NatGasComp.CO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO2",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas CO Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.NatGasComp.COPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas CH4 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.NatGasComp.CH4Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CH4",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas NOx Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.NatGasComp.NOxPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NOx",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas N2O Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.NatGasComp.N2OPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "N2O",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas SO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.NatGasComp.SO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "SO2",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas PM Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.NatGasComp.PMPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas PM10 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.NatGasComp.PM10Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM10",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas PM2.5 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.NatGasComp.PM25Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM2.5",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas NH3 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.NatGasComp.NH3Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NH3",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas NMVOC Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.NatGasComp.NMVOCPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NMVOC",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas Hg Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.NatGasComp.HgPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Hg",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas Pb Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.NatGasComp.PbPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Pb",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas Water Consumption Volume",
+                                OutputProcessor::Unit::L,
+                                Pollution.NatGasComp.WaterPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "WaterEnvironmentalFactors",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas Nuclear High Level Waste Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.NatGasComp.NucHiPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear High",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact NaturalGas Nuclear Low Level Waste Volume",
+                                OutputProcessor::Unit::m3,
+                                Pollution.NatGasComp.NucLoPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear Low",
+                                "NaturalGasEmissions",
+                                {},
+                                "");
+        } break;
+        case Constant::eFuel::FuelOilNo2: { // Pollutants from FuelOilNo2
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 Source Energy",
+                                OutputProcessor::Unit::J,
+                                Pollution.FuelOil2Comp.Source,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Source",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 CO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil2Comp.CO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO2",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 CO Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil2Comp.COPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 CH4 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil2Comp.CH4Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CH4",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 NOx Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil2Comp.NOxPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NOx",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 N2O Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil2Comp.N2OPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "N2O",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 SO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil2Comp.SO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "SO2",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 PM Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil2Comp.PMPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 PM10 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil2Comp.PM10Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM10",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 PM2.5 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil2Comp.PM25Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM2.5",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 NH3 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil2Comp.NH3Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NH3",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 NMVOC Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil2Comp.NMVOCPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NMVOC",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 Hg Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil2Comp.HgPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Hg",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 Pb Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil2Comp.PbPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Pb",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 Water Consumption Volume",
+                                OutputProcessor::Unit::L,
+                                Pollution.FuelOil2Comp.WaterPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "WaterEnvironmentalFactors",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 Nuclear High Level Waste Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil2Comp.NucHiPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear High",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo2 Nuclear Low Level Waste Volume",
+                                OutputProcessor::Unit::m3,
+                                Pollution.FuelOil2Comp.NucLoPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear Low",
+                                "FuelOilNo2Emissions",
+                                {},
+                                "");
+        } break;
+        case Constant::eFuel::FuelOilNo1: { // Pollutants from FuelOilNo1
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 Source Energy",
+                                OutputProcessor::Unit::J,
+                                Pollution.FuelOil1Comp.Source,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Source",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 CO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil1Comp.CO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO2",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 CO Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil1Comp.COPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 CH4 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil1Comp.CH4Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CH4",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 NOx Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil1Comp.NOxPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NOx",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 N2O Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil1Comp.N2OPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "N2O",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 SO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil1Comp.SO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "SO2",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 PM Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil1Comp.PMPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 PM10 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil1Comp.PM10Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM10",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 PM2.5 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil1Comp.PM25Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM2.5",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 NH3 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil1Comp.NH3Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NH3",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 NMVOC Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil1Comp.NMVOCPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NMVOC",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 Hg Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil1Comp.HgPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Hg",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 Pb Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil1Comp.PbPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Pb",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 Water Consumption Volume",
+                                OutputProcessor::Unit::L,
+                                Pollution.FuelOil1Comp.WaterPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "WaterEnvironmentalFactors",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 Nuclear High Level Waste Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.FuelOil1Comp.NucHiPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear High",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact FuelOilNo1 Nuclear Low Level Waste Volume",
+                                OutputProcessor::Unit::m3,
+                                Pollution.FuelOil1Comp.NucLoPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear Low",
+                                "FuelOilNo1Emissions",
+                                {},
+                                "");
+        } break;
+        case Constant::eFuel::Coal: { // Pollutants from Coal
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal Source Energy",
+                                OutputProcessor::Unit::J,
+                                Pollution.CoalComp.Source,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Source",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal CO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.CoalComp.CO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO2",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal CO Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.CoalComp.COPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal CH4 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.CoalComp.CH4Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CH4",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal NOx Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.CoalComp.NOxPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NOx",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal N2O Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.CoalComp.N2OPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "N2O",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal SO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.CoalComp.SO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "SO2",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal PM Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.CoalComp.PMPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal PM10 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.CoalComp.PM10Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM10",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal PM2.5 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.CoalComp.PM25Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM2.5",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal NH3 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.CoalComp.NH3Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NH3",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal NMVOC Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.CoalComp.NMVOCPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NMVOC",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal Hg Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.CoalComp.HgPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Hg",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal Pb Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.CoalComp.PbPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Pb",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal Water Consumption Volume",
+                                OutputProcessor::Unit::L,
+                                Pollution.CoalComp.WaterPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "WaterEnvironmentalFactors",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal Nuclear High Level Waste Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.CoalComp.NucHiPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear High",
+                                "CoalEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Coal Nuclear Low Level Waste Volume",
+                                OutputProcessor::Unit::m3,
+                                Pollution.CoalComp.NucLoPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear Low",
+                                "CoalEmissions",
+                                {},
+                                "");
+        } break;
+        case Constant::eFuel::Electricity: { // Pollutants from Electricity
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity Source Energy",
+                                OutputProcessor::Unit::J,
+                                Pollution.ElecComp.Source,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Source",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity CO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.ElecComp.CO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO2",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity CO Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.ElecComp.COPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity CH4 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.ElecComp.CH4Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CH4",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity NOx Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.ElecComp.NOxPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NOx",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity N2O Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.ElecComp.N2OPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "N2O",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity SO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.ElecComp.SO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "SO2",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity PM Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.ElecComp.PMPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity PM10 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.ElecComp.PM10Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM10",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity PM2.5 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.ElecComp.PM25Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM2.5",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity NH3 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.ElecComp.NH3Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NH3",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity NMVOC Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.ElecComp.NMVOCPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NMVOC",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity Hg Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.ElecComp.HgPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Hg",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity Pb Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.ElecComp.PbPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Pb",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity Water Consumption Volume",
+                                OutputProcessor::Unit::L,
+                                Pollution.ElecComp.WaterPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "WaterEnvironmentalFactors",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity Nuclear High Level Waste Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.ElecComp.NucHiPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear High",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Electricity Nuclear Low Level Waste Volume",
+                                OutputProcessor::Unit::m3,
+                                Pollution.ElecComp.NucLoPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear Low",
+                                "ElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Purchased Electricity Source Energy",
+                                OutputProcessor::Unit::J,
+                                Pollution.ElecPurchComp.Source,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Source",
+                                "PurchasedElectricityEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Surplus Sold Electricity Source",
+                                OutputProcessor::Unit::J,
+                                Pollution.ElecSurplusSoldComp.Source,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Source",
+                                "SoldElectricityEmissions",
+                                {},
+                                "");
+        } break;
+        case Constant::eFuel::Gasoline: { // Pollutants from Gasoline
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline Source Energy",
+                                OutputProcessor::Unit::J,
+                                Pollution.GasolineComp.Source,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Source",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline CO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.GasolineComp.CO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO2",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline CO Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.GasolineComp.COPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline CH4 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.GasolineComp.CH4Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CH4",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline NOx Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.GasolineComp.NOxPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NOx",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline N2O Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.GasolineComp.N2OPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "N2O",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline SO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.GasolineComp.SO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "SO2",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline PM Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.GasolineComp.PMPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline PM10 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.GasolineComp.PM10Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM10",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline PM2.5 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.GasolineComp.PM25Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM2.5",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline NH3 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.GasolineComp.NH3Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NH3",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline NMVOC Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.GasolineComp.NMVOCPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NMVOC",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline Hg Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.GasolineComp.HgPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Hg",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline Pb Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.GasolineComp.PbPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Pb",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline Water Consumption Volume",
+                                OutputProcessor::Unit::L,
+                                Pollution.GasolineComp.WaterPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "WaterEnvironmentalFactors",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline Nuclear High Level Waste Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.GasolineComp.NucHiPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear High",
+                                "GasolineEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Gasoline Nuclear Low Level Waste Volume",
+                                OutputProcessor::Unit::m3,
+                                Pollution.GasolineComp.NucLoPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear Low",
+                                "GasolineEmissions",
+                                {},
+                                "");
+        } break;
+        case Constant::eFuel::Propane: { // Pollutants from Propane
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane Source Energy",
+                                OutputProcessor::Unit::J,
+                                Pollution.PropaneComp.Source,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Source",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane CO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.PropaneComp.CO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO2",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane CO Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.PropaneComp.COPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane CH4 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.PropaneComp.CH4Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CH4",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane NOx Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.PropaneComp.NOxPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NOx",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane N2O Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.PropaneComp.N2OPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "N2O",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane SO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.PropaneComp.SO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "SO2",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane PM Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.PropaneComp.PMPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane PM10 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.PropaneComp.PM10Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM10",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane PM2.5 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.PropaneComp.PM25Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM2.5",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane NH3 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.PropaneComp.NH3Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NH3",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane NMVOC Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.PropaneComp.NMVOCPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NMVOC",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane Hg Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.PropaneComp.HgPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Hg",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane Pb Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.PropaneComp.PbPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Pb",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane Water Consumption Volume",
+                                OutputProcessor::Unit::L,
+                                Pollution.PropaneComp.WaterPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "WaterEnvironmentalFactors",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane Nuclear High Level Waste Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.PropaneComp.NucHiPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear High",
+                                "PropaneEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Propane Nuclear Low Level Waste Volume",
+                                OutputProcessor::Unit::m3,
+                                Pollution.PropaneComp.NucLoPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear Low",
+                                "PropaneEmissions",
+                                {},
+                                "");
+        } break;
+        case Constant::eFuel::Diesel: { // Pollutants from Diesel
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel Source Energy",
+                                OutputProcessor::Unit::J,
+                                Pollution.DieselComp.Source,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Source",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel CO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.DieselComp.CO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO2",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel CO Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.DieselComp.COPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel CH4 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.DieselComp.CH4Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CH4",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel NOx Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.DieselComp.NOxPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NOx",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel N2O Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.DieselComp.N2OPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "N2O",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel SO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.DieselComp.SO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "SO2",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel PM Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.DieselComp.PMPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel PM10 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.DieselComp.PM10Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM10",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel PM2.5 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.DieselComp.PM25Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM2.5",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel NH3 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.DieselComp.NH3Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NH3",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel NMVOC Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.DieselComp.NMVOCPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NMVOC",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel Hg Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.DieselComp.HgPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Hg",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel Pb Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.DieselComp.PbPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Pb",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel Water Consumption Volume",
+                                OutputProcessor::Unit::L,
+                                Pollution.DieselComp.WaterPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "WaterEnvironmentalFactors",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel Nuclear High Level Waste Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.DieselComp.NucHiPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear High",
+                                "DieselEmissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact Diesel Nuclear Low Level Waste Volume",
+                                OutputProcessor::Unit::m3,
+                                Pollution.DieselComp.NucLoPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear Low",
+                                "DieselEmissions",
+                                {},
+                                "");
+        } break;
+        case Constant::eFuel::OtherFuel1: { // Pollutants from OtherFuel1
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 Source Energy",
+                                OutputProcessor::Unit::J,
+                                Pollution.OtherFuel1Comp.Source,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Source",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 CO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel1Comp.CO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO2",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 CO Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel1Comp.COPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 CH4 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel1Comp.CH4Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CH4",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 NOx Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel1Comp.NOxPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NOx",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 N2O Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel1Comp.N2OPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "N2O",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 SO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel1Comp.SO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "SO2",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 PM Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel1Comp.PMPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 PM10 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel1Comp.PM10Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM10",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 PM2.5 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel1Comp.PM25Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM2.5",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 NH3 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel1Comp.NH3Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NH3",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 NMVOC Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel1Comp.NMVOCPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NMVOC",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 Hg Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel1Comp.HgPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Hg",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 Pb Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel1Comp.PbPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Pb",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 Water Consumption Volume",
+                                OutputProcessor::Unit::L,
+                                Pollution.OtherFuel1Comp.WaterPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "WaterEnvironmentalFactors",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 Nuclear High Level Waste Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel1Comp.NucHiPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear High",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel1 Nuclear Low Level Waste Volume",
+                                OutputProcessor::Unit::m3,
+                                Pollution.OtherFuel1Comp.NucLoPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear Low",
+                                "OtherFuel1Emissions",
+                                {},
+                                "");
+        } break;
+        case Constant::eFuel::OtherFuel2: { // Pollutants from OtherFuel2
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 Source Energy",
+                                OutputProcessor::Unit::J,
+                                Pollution.OtherFuel2Comp.Source,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Source",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 CO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel2Comp.CO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO2",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 CO Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel2Comp.COPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CO",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 CH4 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel2Comp.CH4Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "CH4",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 NOx Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel2Comp.NOxPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NOx",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 N2O Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel2Comp.N2OPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "N2O",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 SO2 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel2Comp.SO2Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "SO2",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 PM Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel2Comp.PMPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 PM10 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel2Comp.PM10Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM10",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 PM2.5 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel2Comp.PM25Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "PM2.5",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 NH3 Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel2Comp.NH3Pollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NH3",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 NMVOC Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel2Comp.NMVOCPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "NMVOC",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 Hg Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel2Comp.HgPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Hg",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 Pb Emissions Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel2Comp.PbPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Pb",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 Water Consumption Volume",
+                                OutputProcessor::Unit::L,
+                                Pollution.OtherFuel2Comp.WaterPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "WaterEnvironmentalFactors",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 Nuclear High Level Waste Mass",
+                                OutputProcessor::Unit::kg,
+                                Pollution.OtherFuel2Comp.NucHiPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear High",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+            SetupOutputVariable(state,
+                                "Environmental Impact OtherFuel2 Nuclear Low Level Waste Volume",
+                                OutputProcessor::Unit::m3,
+                                Pollution.OtherFuel2Comp.NucLoPollution,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Site",
+                                {},
+                                "Nuclear Low",
+                                "OtherFuel2Emissions",
+                                {},
+                                "");
+        } break;
+        default:
+            break;
         }
 
     } // End of the NumEnergyTypes Do Loop
@@ -6278,11 +6287,11 @@ void ReadEnergyMeters(EnergyPlusData &state)
 // *****************************************************************************
 
 void GetFuelFactorInfo(EnergyPlusData &state,
-                       std::string const &fuelName,  // input fuel name  (standard from Tabular reports)
-                       bool &fuelFactorUsed,         // return value true if user has entered this fuel
-                       Real64 &fuelSourceFactor,     // if used, the source factor
-                       bool &fuelFactorScheduleUsed, // if true, schedules for this fuel are used
-                       int &ffScheduleIndex          // if schedules for this fuel are used, return schedule index
+                       Constant::eFuel const &fuelName, // input fuel name  (standard from Tabular reports)
+                       bool &fuelFactorUsed,            // return value true if user has entered this fuel
+                       Real64 &fuelSourceFactor,        // if used, the source factor
+                       bool &fuelFactorScheduleUsed,    // if true, schedules for this fuel are used
+                       int &ffScheduleIndex             // if schedules for this fuel are used, return schedule index
 )
 {
 
@@ -6331,182 +6340,180 @@ void GetFuelFactorInfo(EnergyPlusData &state,
     fuelFactorScheduleUsed = false;
     ffScheduleIndex = 0;
 
-    {
-        auto const &SELECT_CASE_var(fuelName);
-
-        if ((SELECT_CASE_var == "NaturalGas") || (SELECT_CASE_var == "Gas")) {
-            if (Pollution.NatGasCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.NatGasCoef.Source;
-                if (Pollution.NatGasCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.NatGasCoef.SourceSched;
-                }
+    switch (fuelName) {
+    case Constant::eFuel::NaturalGas: {
+        if (Pollution.NatGasCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.NatGasCoef.Source;
+            if (Pollution.NatGasCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
             } else {
-                fuelSourceFactor = 1.084;
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.NatGasCoef.SourceSched;
             }
-
-        } else if (SELECT_CASE_var == "Electricity") {
-            if (Pollution.ElecCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.ElecCoef.Source;
-                if (Pollution.ElecCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.ElecCoef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 3.167;
-            }
-
-        } else if (SELECT_CASE_var == "FuelOilNo2") {
-            if (Pollution.FuelOil2Coef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.FuelOil2Coef.Source;
-                if (Pollution.FuelOil2Coef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.FuelOil2Coef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.05;
-            }
-
-        } else if (SELECT_CASE_var == "FuelOilNo1") {
-            if (Pollution.FuelOil1Coef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.FuelOil1Coef.Source;
-                if (Pollution.FuelOil1Coef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.FuelOil1Coef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.05;
-            }
-
-        } else if (SELECT_CASE_var == "Coal") {
-            if (Pollution.CoalCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.CoalCoef.Source;
-                if (Pollution.CoalCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.CoalCoef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.05;
-            }
-
-        } else if (SELECT_CASE_var == "Gasoline") {
-            if (Pollution.GasolineCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.GasolineCoef.Source;
-                if (Pollution.GasolineCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.GasolineCoef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.05;
-            }
-
-        } else if (SELECT_CASE_var == "Propane") {
-            if (Pollution.PropaneCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.PropaneCoef.Source;
-                if (Pollution.PropaneCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.PropaneCoef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.05;
-            }
-
-        } else if (SELECT_CASE_var == "Diesel") {
-            if (Pollution.DieselCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.DieselCoef.Source;
-                if (Pollution.DieselCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.DieselCoef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.05;
-            }
-
-        } else if (SELECT_CASE_var == "OtherFuel1") {
-            if (Pollution.OtherFuel1Coef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.OtherFuel1Coef.Source;
-                if (Pollution.OtherFuel1Coef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.OtherFuel1Coef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.0;
-            }
-
-        } else if (SELECT_CASE_var == "OtherFuel2") {
-            if (Pollution.OtherFuel2Coef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.OtherFuel2Coef.Source;
-                if (Pollution.OtherFuel2Coef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.OtherFuel2Coef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.0;
-            }
-
-        } else if (SELECT_CASE_var == "DistrictHeating") {
-            if (Pollution.NatGasCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.NatGasCoef.Source / Pollution.PurchHeatEffic;
-                if (Pollution.NatGasCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.NatGasCoef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.084 / Pollution.PurchHeatEffic;
-            }
-
-        } else if (SELECT_CASE_var == "DistrictCooling") {
-            if (Pollution.ElecCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.ElecCoef.Source / Pollution.PurchCoolCOP;
-                if (Pollution.ElecCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.ElecCoef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 3.167 / Pollution.PurchCoolCOP;
-            }
-
-        } else if (SELECT_CASE_var == "Steam") {
-            fuelSourceFactor = 0.3 / Pollution.SteamConvEffic;
-
         } else {
+            fuelSourceFactor = 1.084;
         }
+    } break;
+    case Constant::eFuel::Electricity: {
+        if (Pollution.ElecCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.ElecCoef.Source;
+            if (Pollution.ElecCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.ElecCoef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 3.167;
+        }
+    } break;
+    case Constant::eFuel::FuelOilNo2: {
+        if (Pollution.FuelOil2Coef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.FuelOil2Coef.Source;
+            if (Pollution.FuelOil2Coef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.FuelOil2Coef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.05;
+        }
+    } break;
+    case Constant::eFuel::FuelOilNo1: {
+        if (Pollution.FuelOil1Coef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.FuelOil1Coef.Source;
+            if (Pollution.FuelOil1Coef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.FuelOil1Coef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.05;
+        }
+    } break;
+    case Constant::eFuel::Coal: {
+        if (Pollution.CoalCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.CoalCoef.Source;
+            if (Pollution.CoalCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.CoalCoef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.05;
+        }
+    } break;
+    case Constant::eFuel::Gasoline: {
+        if (Pollution.GasolineCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.GasolineCoef.Source;
+            if (Pollution.GasolineCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.GasolineCoef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.05;
+        }
+    } break;
+    case Constant::eFuel::Propane: {
+        if (Pollution.PropaneCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.PropaneCoef.Source;
+            if (Pollution.PropaneCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.PropaneCoef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.05;
+        }
+    } break;
+    case Constant::eFuel::Diesel: {
+        if (Pollution.DieselCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.DieselCoef.Source;
+            if (Pollution.DieselCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.DieselCoef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.05;
+        }
+    } break;
+    case Constant::eFuel::OtherFuel1: {
+        if (Pollution.OtherFuel1Coef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.OtherFuel1Coef.Source;
+            if (Pollution.OtherFuel1Coef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.OtherFuel1Coef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.0;
+        }
+    } break;
+    case Constant::eFuel::OtherFuel2: {
+        if (Pollution.OtherFuel2Coef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.OtherFuel2Coef.Source;
+            if (Pollution.OtherFuel2Coef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.OtherFuel2Coef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.0;
+        }
+    } break;
+    case Constant::eFuel::DistrictHeating: {
+        if (Pollution.NatGasCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.NatGasCoef.Source / Pollution.PurchHeatEffic;
+            if (Pollution.NatGasCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.NatGasCoef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.084 / Pollution.PurchHeatEffic;
+        }
+    } break;
+    case Constant::eFuel::DistrictCooling: {
+        if (Pollution.ElecCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.ElecCoef.Source / Pollution.PurchCoolCOP;
+            if (Pollution.ElecCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.ElecCoef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 3.167 / Pollution.PurchCoolCOP;
+        }
+    } break;
+    case Constant::eFuel::Steam: {
+        fuelSourceFactor = 0.3 / Pollution.SteamConvEffic;
+    } break;
+    default: {
+    } break;
     }
 }
 

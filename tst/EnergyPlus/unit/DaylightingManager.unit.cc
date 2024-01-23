@@ -81,9 +81,7 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::Construction;
-using namespace EnergyPlus::DaylightingDevices;
-using namespace EnergyPlus::DaylightingManager;
-using namespace EnergyPlus::DataDaylighting;
+using namespace EnergyPlus::Dayltg;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::HeatBalanceManager;
 
@@ -155,8 +153,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test)
 
     EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->daylightControl(1).Name);
     EXPECT_EQ("WEST ZONE", state->dataDaylightingData->daylightControl(1).ZoneName);
-    EXPECT_TRUE(compare_enums(DataDaylighting::DaylightingMethod::SplitFlux, state->dataDaylightingData->daylightControl(1).DaylightMethod));
-    EXPECT_TRUE(compare_enums(DataDaylighting::LtgCtrlType::Continuous, state->dataDaylightingData->daylightControl(1).LightControlType));
+    EXPECT_TRUE(compare_enums(DaylightingMethod::SplitFlux, state->dataDaylightingData->daylightControl(1).DaylightMethod));
+    EXPECT_TRUE(compare_enums(LtgCtrlType::Continuous, state->dataDaylightingData->daylightControl(1).LightControlType));
 
     EXPECT_EQ(0.3, state->dataDaylightingData->daylightControl(1).MinPowerFraction);
     EXPECT_EQ(0.2, state->dataDaylightingData->daylightControl(1).MinLightFraction);
@@ -262,8 +260,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
 
     EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->daylightControl(1).Name);
     EXPECT_EQ("WEST ZONE", state->dataDaylightingData->daylightControl(1).ZoneName);
-    EXPECT_TRUE(compare_enums(DataDaylighting::DaylightingMethod::SplitFlux, state->dataDaylightingData->daylightControl(1).DaylightMethod));
-    EXPECT_TRUE(compare_enums(DataDaylighting::LtgCtrlType::Continuous, state->dataDaylightingData->daylightControl(1).LightControlType));
+    EXPECT_TRUE(compare_enums(DaylightingMethod::SplitFlux, state->dataDaylightingData->daylightControl(1).DaylightMethod));
+    EXPECT_TRUE(compare_enums(LtgCtrlType::Continuous, state->dataDaylightingData->daylightControl(1).LightControlType));
 
     EXPECT_EQ(0.3, state->dataDaylightingData->daylightControl(1).MinPowerFraction);
     EXPECT_EQ(0.2, state->dataDaylightingData->daylightControl(1).MinLightFraction);
@@ -426,13 +424,13 @@ TEST_F(EnergyPlusFixture, DaylightingManager_doesDayLightingUseDElight_Test)
     EXPECT_FALSE(doesDayLightingUseDElight(*state));
 
     state->dataDaylightingData->daylightControl.allocate(3);
-    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
-    state->dataDaylightingData->daylightControl(2).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
-    state->dataDaylightingData->daylightControl(3).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
+    state->dataDaylightingData->daylightControl(1).DaylightMethod = DaylightingMethod::SplitFlux;
+    state->dataDaylightingData->daylightControl(2).DaylightMethod = DaylightingMethod::SplitFlux;
+    state->dataDaylightingData->daylightControl(3).DaylightMethod = DaylightingMethod::SplitFlux;
 
     EXPECT_FALSE(doesDayLightingUseDElight(*state));
 
-    state->dataDaylightingData->daylightControl(2).DaylightMethod = DataDaylighting::DaylightingMethod::DElight;
+    state->dataDaylightingData->daylightControl(2).DaylightMethod = DaylightingMethod::DElight;
 
     EXPECT_TRUE(doesDayLightingUseDElight(*state));
 }
@@ -895,25 +893,25 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     compare_err_stream("");
     EXPECT_EQ(3, (int)state->dataDaylightingData->DaylRefPt.size());
 
-    EXPECT_NEAR(2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).x, 0.001);
+    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).y, 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).z, 0.001);
 
     state->dataHeatBal->Zone(1).RelNorth = 45.;
 
     GeometryTransformForDaylighting(*state);
 
-    EXPECT_NEAR(3.603, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(0.707, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(3.603, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).x, 0.001);
+    EXPECT_NEAR(0.707, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).y, 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).z, 0.001);
 
     state->dataHeatBal->Zone(1).RelNorth = 90.;
 
     GeometryTransformForDaylighting(*state);
 
-    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(-2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).x, 0.001);
+    EXPECT_NEAR(-2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).y, 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).z, 0.001);
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->WeightNow = 1.0;
@@ -1422,50 +1420,79 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
     int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
-    DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
-    DaylightingManager::GetDaylightingParametersInput(*state);
+    Dayltg::GetInputDayliteRefPt(*state, foundErrors);
+    Dayltg::GetDaylightingParametersInput(*state);
 
     int ISurf = state->dataHeatBal->space(state->dataHeatBal->Zone(ZoneNum).spaceIndexes[0]).WindowSurfaceFirst;
 
     // Set the following values to make thisDaylightControl.SourceLumFromWinAtRefPt much larger than
     // luminance threshold of 2000 (WindowShadingControl SetPoint2)
-    state->dataDaylightingManager->GILSK = 8.0;
+    for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
+        state->dataDaylightingManager->GILSK(iHr) = {8.0, 8.0, 8.0, 8.0};
+    }
     state->dataGlobal->WeightNow = 0.54;
     state->dataEnvrn->HISUNF = 28500.0;
     state->dataEnvrn->HISKF = 12000.0;
     state->dataEnvrn->SkyClearness = 4.6;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky = 0.2;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSun = 0.02;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSunDisk = 0.01;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylBackFacSky = 0.01;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylBackFacSun = 0.01;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylBackFacSunDisk = 0.01;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylSourceFacSky = 0.9;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylSourceFacSun = 0.26;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylSourceFacSunDisk = 0.0;
+
+    auto &thisDaylgtCtrl = state->dataDaylightingData->daylightControl(ZoneNum);
+    int numExtWins = state->dataDaylightingData->enclDaylight(1).TotalExtWindows;
+    int numRefPts = thisDaylgtCtrl.TotalDaylRefPoints;
+    int numSlatAngs = state->dataSurface->actualMaxSlatAngs;
+
+    for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
+        for (int iWin = 1; iWin <= numExtWins; ++iWin) {
+            for (int iRefPt = 1; iRefPt <= numRefPts; ++iRefPt) {
+                for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) {
+                    thisDaylgtCtrl.DaylIllFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.2, 0.2, 0.2, 0.2};
+                    thisDaylgtCtrl.DaylBackFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.01, 0.01, 0.01, 0.01};
+                    thisDaylgtCtrl.DaylSourceFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.9, 0.9, 0.9, 0.9};
+                }
+            }
+        }
+    }
+
+    thisDaylgtCtrl.DaylIllFacSun = 0.02;
+    thisDaylgtCtrl.DaylIllFacSunDisk = 0.01;
+    thisDaylgtCtrl.DaylBackFacSun = 0.01;
+    thisDaylgtCtrl.DaylBackFacSunDisk = 0.01;
+    thisDaylgtCtrl.DaylSourceFacSun = 0.26;
+    thisDaylgtCtrl.DaylSourceFacSunDisk = 0.0;
 
     state->dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::IntShadeConditionallyOff;
-    DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
+    Dayltg::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_TRUE(state->dataSurface->SurfWinShadingFlag(ISurf) == WinShadingType::IntShade);
 
     // Set the following values to make thisDaylightControl.SourceLumFromWinAtRefPt 0
-    state->dataDaylightingManager->GILSK = 100.0;
+    for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
+        state->dataDaylightingManager->GILSK(iHr) = {100.0, 100.0, 100.0, 100.0};
+    }
     state->dataGlobal->WeightNow = 1.0;
     state->dataEnvrn->HISUNF = 100.0;
     state->dataEnvrn->HISKF = 100.0;
     state->dataEnvrn->SkyClearness = 6.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSun = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSunDisk = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylBackFacSky = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylBackFacSun = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylBackFacSunDisk = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylSourceFacSky = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylSourceFacSun = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylSourceFacSunDisk = 0.0;
+
+    for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
+        for (int iWin = 1; iWin <= numExtWins; ++iWin) {
+            for (int iRefPt = 1; iRefPt <= numRefPts; ++iRefPt) {
+                for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) {
+                    thisDaylgtCtrl.DaylIllFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
+                    thisDaylgtCtrl.DaylBackFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
+                    thisDaylgtCtrl.DaylSourceFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
+                }
+            }
+        }
+    }
+
+    thisDaylgtCtrl.DaylIllFacSun = 0.0;
+    thisDaylgtCtrl.DaylIllFacSunDisk = 0.0;
+    thisDaylgtCtrl.DaylBackFacSun = 0.0;
+    thisDaylgtCtrl.DaylBackFacSunDisk = 0.0;
+    thisDaylgtCtrl.DaylSourceFacSun = 0.0;
+    thisDaylgtCtrl.DaylSourceFacSunDisk = 0.0;
 
     state->dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::IntShadeConditionallyOff;
-    DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
+    Dayltg::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_TRUE(state->dataSurface->SurfWinShadingFlag(ISurf) == WinShadingType::ShadeOff);
 }
 
@@ -1723,28 +1750,46 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
-    DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
-    DaylightingManager::GetDaylightingParametersInput(*state);
-    state->dataDaylightingManager->GILSK = 100.0;
+    Dayltg::GetInputDayliteRefPt(*state, foundErrors);
+    Dayltg::GetDaylightingParametersInput(*state);
+
+    for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
+        state->dataDaylightingManager->GILSK(iHr) = {100.0, 100.0, 100.0, 100.0};
+    }
+
     state->dataGlobal->WeightNow = 1.0;
     state->dataEnvrn->HISUNF = 100.0;
     state->dataEnvrn->HISKF = 100.0;
     state->dataEnvrn->SkyClearness = 6.0;
 
+    auto &thisDaylgtCtrl = state->dataDaylightingData->daylightControl(ZoneNum);
+    int numExtWins = state->dataDaylightingData->enclDaylight(1).TotalExtWindows;
+    int numRefPts = thisDaylgtCtrl.TotalDaylRefPoints;
+    int numSlatAngs = state->dataSurface->actualMaxSlatAngs;
+
+    for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
+        for (int iWin = 1; iWin <= numExtWins; ++iWin) {
+            for (int iRefPt = 1; iRefPt <= numRefPts; ++iRefPt) {
+                for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) {
+                    thisDaylgtCtrl.DaylIllFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
+                    thisDaylgtCtrl.DaylBackFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
+                    thisDaylgtCtrl.DaylSourceFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
+                }
+            }
+        }
+    }
+
     // Set all daylighting factors to zero
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSun = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSunDisk = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylBackFacSky = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylBackFacSun = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylBackFacSunDisk = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylSourceFacSky = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylSourceFacSun = 0.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylSourceFacSunDisk = 0.0;
-    DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
+    thisDaylgtCtrl.DaylIllFacSun = 0.0;
+    thisDaylgtCtrl.DaylIllFacSunDisk = 0.0;
+    thisDaylgtCtrl.DaylBackFacSun = 0.0;
+    thisDaylgtCtrl.DaylBackFacSunDisk = 0.0;
+    thisDaylgtCtrl.DaylSourceFacSun = 0.0;
+    thisDaylgtCtrl.DaylSourceFacSunDisk = 0.0;
+    Dayltg::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 0.0, 0.001);
 
-    int ISky = 1;
+    int iSky = (int)SkyType::Clear;
     int DayltgExtWin = 1;
     int Shaded = 2;
     int Unshaded = 1;
@@ -1754,21 +1799,21 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     // Set un-shaded surface illuminance factor to 1.0 for RefPt1, 0.1 for RefPt2
     // Set shaded surface illuminance factor to 0.5 for RefPt1, 0.05 for RefPt2
     int RefPt = 1;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 1.0;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.5;
+    thisDaylgtCtrl.DaylIllFacSky(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Unshaded).sky[iSky] = 1.0;
+    thisDaylgtCtrl.DaylIllFacSky(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Shaded).sky[iSky] = 0.5;
     RefPt = 2;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 0.1;
-    state->dataDaylightingData->daylightControl(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
+    thisDaylgtCtrl.DaylIllFacSky(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Unshaded).sky[iSky] = 0.1;
+    thisDaylgtCtrl.DaylIllFacSky(state->dataGlobal->HourOfDay, DayltgExtWin, RefPt, Shaded).sky[iSky] = 0.05;
 
     // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
     state->dataSurface->SurfWinWindowModelType(IWin) = WindowModel::Detailed;
     state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
-    DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
+    Dayltg::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
 
     state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::ExtBlind;
-    DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
+    Dayltg::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 50.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 5.0, 0.001);
 
@@ -1776,12 +1821,12 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     // BSDF does shading differently, it's integrated in the base state
     state->dataSurface->SurfWinWindowModelType(IWin) = WindowModel::BSDF;
     state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
-    DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
+    Dayltg::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
 
     state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::ExtBlind;
-    DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
+    Dayltg::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
 }
@@ -1934,12 +1979,12 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
 
-    DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
+    Dayltg::GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
     EXPECT_EQ(10, (int)state->dataDaylightingData->DaylRefPt.size());
 
-    DaylightingManager::GetDaylightingControls(*state, foundErrors);
+    Dayltg::GetDaylightingControls(*state, foundErrors);
     // Used to throw
     //    ** Severe  ** GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.
     //    **   ~~~   ** ..discovered in \"Daylighting:Controls\" for Zone=\"WEST ZONE\", trying to control 1.00 of the zone.\n
@@ -1948,8 +1993,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
 
     EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->daylightControl(1).Name);
     EXPECT_EQ("WEST ZONE", state->dataDaylightingData->daylightControl(1).ZoneName);
-    EXPECT_TRUE(compare_enums(DataDaylighting::DaylightingMethod::SplitFlux, state->dataDaylightingData->daylightControl(1).DaylightMethod));
-    EXPECT_TRUE(compare_enums(DataDaylighting::LtgCtrlType::Continuous, state->dataDaylightingData->daylightControl(1).LightControlType));
+    EXPECT_TRUE(compare_enums(DaylightingMethod::SplitFlux, state->dataDaylightingData->daylightControl(1).DaylightMethod));
+    EXPECT_TRUE(compare_enums(LtgCtrlType::Continuous, state->dataDaylightingData->daylightControl(1).LightControlType));
 
     EXPECT_EQ(0.3, state->dataDaylightingData->daylightControl(1).MinPowerFraction);
     EXPECT_EQ(0.2, state->dataDaylightingData->daylightControl(1).MinLightFraction);
@@ -2050,12 +2095,12 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotArou
     int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
 
-    DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
+    Dayltg::GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
     EXPECT_EQ(2, (int)state->dataDaylightingData->DaylRefPt.size());
 
-    DaylightingManager::GetDaylightingControls(*state, foundErrors);
+    Dayltg::GetDaylightingControls(*state, foundErrors);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** GetDaylightingControls: Fraction of zone or space controlled by the Daylighting reference points is > 1.0.",
@@ -2560,25 +2605,25 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true)); // reset eio stream after compare
     EXPECT_EQ(4, (int)state->dataDaylightingData->DaylRefPt.size());
 
-    EXPECT_NEAR(2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).x, 0.001);
+    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).y, 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).z, 0.001);
 
     state->dataHeatBal->Zone(1).RelNorth = 45.;
 
     GeometryTransformForDaylighting(*state);
 
-    EXPECT_NEAR(3.603, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(0.707, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(3.603, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).x, 0.001);
+    EXPECT_NEAR(0.707, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).y, 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).z, 0.001);
 
     state->dataHeatBal->Zone(1).RelNorth = 90.;
 
     GeometryTransformForDaylighting(*state);
 
-    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(-2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).x, 0.001);
+    EXPECT_NEAR(-2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).y, 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).z, 0.001);
 
     EXPECT_FALSE(has_dfs_output(true));
 
@@ -3298,7 +3343,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
     state->dataConstruction->Construct(state->dataSurface->Surface(7).Construction).TransDiff = 0.001; // required for GetTDDInput function to work.
-    DaylightingDevices::GetTDDInput(*state);
+    Dayltg::GetTDDInput(*state);
     CalcDayltgCoefficients(*state);
 
     std::string const error_string = delimited_string({
@@ -3320,7 +3365,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
     state->dataGlobal->NumOfZones = 1;
     state->dataDaylightingData->daylightControl.allocate(1);
     state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 3;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord.allocate(3, state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints);
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord.allocate(state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints);
     state->dataDaylightingManager->SavedMnDy.allocate(1);
     state->dataDaylightingData->IllumMap.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->IllumMap(MapNum).zoneIndex = 1;
@@ -3329,22 +3374,16 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
     state->dataEnvrn->CurMnDyHr = "JAN012001";
     state->dataDaylightingManager->SavedMnDy(1) = "JAN01";
     state->dataGlobal->WarmupFlag = true;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1) = 1.23;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1) = 2.34;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1) = 3.45;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 2) = 4.56;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 2) = 5.67;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 2) = 6.78;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 3) = 7.89;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 3) = 8.90;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 3) = 9.01;
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1) = {1.23, 2.34, 3.45};
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2) = {4.56, 5.67, 6.78};
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3) = {7.89, 8.90, 9.01};
     state->dataDaylightingData->IllumMap(MapNum).Name = "ThisOne";
     state->dataDaylightingData->IllumMap(MapNum).Z = 23.23;
 
     std::string expectedResultName = "ThisOne at 23.23m";
     std::string expectedResultPtsHeader = " RefPt1=(1.23:2.34:3.45), RefPt2=(4.56:5.67:6.78), RefPt3=(7.89:8.90:9.01)";
 
-    DaylightingManager::ReportIllumMap(*state, MapNum);
+    Dayltg::ReportIllumMap(*state, MapNum);
 
     EXPECT_EQ(expectedResultName, state->dataDaylightingData->IllumMap(1).Name);
     EXPECT_EQ(expectedResultPtsHeader, state->dataDaylightingData->IllumMap(MapNum).pointsHeader);
@@ -3654,7 +3693,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_SteppedControl_LowDaylightCondition
     auto &thisDaylightControl = state->dataDaylightingData->daylightControl(1);
     int nRefPts = 1;
     thisDaylightControl.TotalDaylRefPoints = nRefPts;
-    thisDaylightControl.DaylRefPtAbsCoord.allocate(3, nRefPts);
+    thisDaylightControl.DaylRefPtAbsCoord.allocate(nRefPts);
 
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(1);
@@ -3666,8 +3705,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_SteppedControl_LowDaylightCondition
 
     thisDaylightControl.zoneIndex = 1;
 
-    thisDaylightControl.DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
-    thisDaylightControl.LightControlType = DataDaylighting::LtgCtrlType::Stepped;
+    thisDaylightControl.DaylightMethod = DaylightingMethod::SplitFlux;
+    thisDaylightControl.LightControlType = LtgCtrlType::Stepped;
     thisDaylightControl.LightControlProbability = 1.0;
     thisDaylightControl.AvailSchedNum = -1; // Always Available
     thisDaylightControl.LightControlSteps = 4;

@@ -83,7 +83,7 @@ namespace EnergyPlus::EarthTube {
 // Cambridge Massachusetts, MIT Press, 1989, pp 206-212
 
 // This is an interesting one.  The actual members of the enum are never explicitly used
-// The enum is used in a getEnumerationValue call to determine what was found in GetInput
+// The enum is used in a getEnumValue call to determine what was found in GetInput
 // The value is then used as an array index to lookup thermal conductivity and such from some std::arrays
 // So the IDE thinks these are unused, and I'm not sure the best way to hint that they sorta aren't
 enum class SoilType
@@ -238,7 +238,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
         if (state.dataIPShortCut->cAlphaArgs(3).empty()) {
             thisEarthTube.FanType = Ventilation::Natural;
         } else {
-            thisEarthTube.FanType = static_cast<Ventilation>(getEnumerationValue(ventilationNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
+            thisEarthTube.FanType = static_cast<Ventilation>(getEnumValue(ventilationNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
             if (thisEarthTube.FanType == Ventilation::Invalid) {
                 ShowSevereError(state,
                                 format("{}: {}={}, {} invalid={}",
@@ -350,7 +350,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
             ErrorsFound = true;
         }
 
-        SoilType soilType = static_cast<SoilType>(getEnumerationValue(soilTypeNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
+        SoilType soilType = static_cast<SoilType>(getEnumValue(soilTypeNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
         constexpr std::array<Real64, static_cast<int>(SoilType::Num)> thermalDiffusivity = {0.0781056, 0.055728, 0.0445824, 0.024192};
         constexpr std::array<Real64, static_cast<int>(SoilType::Num)> thermalConductivity = {2.42, 1.3, 0.865, 0.346};
         if (soilType == SoilType::Invalid) {

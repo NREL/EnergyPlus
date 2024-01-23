@@ -2714,7 +2714,6 @@ namespace WindowComplexManager {
         Real64 edgeGlCorrFac;
 
         Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
-        Real64 SrdSurfViewFac; // View factor of a surrounding surface
         Real64 OutSrdIR;
 
         // fill local vars
@@ -2778,14 +2777,8 @@ namespace WindowComplexManager {
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                     if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-                        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-                        auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
-                        for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
-                            SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
-                            SrdSurfTempAbs =
-                                GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::KelvinConv;
-                            OutSrdIR += Constant::StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
-                        }
+                        SrdSurfTempAbs = state.dataSurface->Surface(SurfNum).SrdSurfTemp + Constant::KelvinConv;
+                        OutSrdIR = Constant::StefanBoltzmann * state.dataSurface->Surface(SurfNum).ViewFactorSrdSurfs * pow_4(SrdSurfTempAbs);
                     }
                 }
                 if (state.dataSurface->Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)

@@ -469,6 +469,7 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataPollutionModule->FuelType.FuelTypeNames.allocate(10);
+    state->dataPollutionModule->FuelType.FuelTypeNames = Constant::eFuel::Invalid;
     state->dataPollutionModule->GetInputFlagPollution = true;
     PollutionModule::SetupPollutionMeterReporting(*state);
 

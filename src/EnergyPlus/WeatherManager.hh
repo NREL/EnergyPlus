@@ -694,7 +694,7 @@ namespace WeatherManager {
                                       Real64 CosSolDeclin, // Cosine of Solar Declination
                                       Array1D<Real64> &SUNCOS);
 
-    void DetermineSunUpDown(EnergyPlusData &state, Array1D<Real64> &SunDirectionCosines);
+    void DetermineSunUpDown(EnergyPlusData &state, Vector3<Real64> &SunDirectionCosines);
 
     void OpenWeatherFile(EnergyPlusData &state, bool &ErrorsFound);
 

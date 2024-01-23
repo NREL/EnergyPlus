@@ -206,7 +206,7 @@ void GetBoilerInput(EnergyPlusData &state)
         thisBoiler.Type = DataPlant::PlantEquipmentType::Boiler_Simple;
 
         // Validate fuel type input
-        thisBoiler.FuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(2)));
+        thisBoiler.FuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(2)));
 
         thisBoiler.NomCap = state.dataIPShortCut->rNumericArgs(1);
         if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {

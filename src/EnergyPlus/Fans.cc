@@ -570,7 +570,7 @@ void GetFanInput(EnergyPlusData &state)
         }
 
         if (NumAlphas > 6 && !lAlphaFieldBlanks(7)) {
-            thisFan.AvailManagerMode = static_cast<AvailabilityManagerCoupling>(getEnumerationValue(couplingsUC, cAlphaArgs(7)));
+            thisFan.AvailManagerMode = static_cast<AvailabilityManagerCoupling>(getEnumValue(couplingsUC, cAlphaArgs(7)));
             if (thisFan.AvailManagerMode == AvailabilityManagerCoupling::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}: invalid {} entered ={} for {}={}",

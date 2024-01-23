@@ -2269,7 +2269,7 @@ namespace Curve {
                 auto const &fields = instance.value();
                 std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariable", thisObjectName);
-                state.dataCurveManager->btwxtManager.independentVarRefs.emplace(UtilityRoutines::MakeUPPERCase(thisObjectName), fields);
+                state.dataCurveManager->btwxtManager.independentVarRefs.emplace(UtilityRoutines::makeUPPER(thisObjectName), fields);
             }
         }
 
@@ -2285,13 +2285,13 @@ namespace Curve {
                 auto const &fields = instance.value();
                 std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariableList", thisObjectName);
-                std::string varListName = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                std::string varListName = UtilityRoutines::makeUPPER(thisObjectName);
 
                 std::vector<Btwxt::GridAxis> gridAxes;
 
                 // Loop through independent variables in list and add them to the grid
                 for (auto &indVar : fields.at("independent_variables")) {
-                    std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name").get<std::string>());
+                    std::string indVarName = UtilityRoutines::makeUPPER(indVar.at("independent_variable_name").get<std::string>());
                     std::string contextString = format("Table:IndependentVariable \"{}\"", indVarName);
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
                     Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
@@ -2404,7 +2404,7 @@ namespace Curve {
                     }
                 }
                 // Add grid to btwxtManager
-                state.dataCurveManager->btwxtManager.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes));
+                state.dataCurveManager->btwxtManager.addGrid(UtilityRoutines::makeUPPER(thisObjectName), Btwxt::GriddedData(gridAxes));
             }
         }
 
@@ -2419,10 +2419,10 @@ namespace Curve {
                 ++CurveNum;
                 Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-                thisCurve->Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                thisCurve->Name = UtilityRoutines::makeUPPER(thisObjectName);
                 thisCurve->interpolationType = InterpType::BtwxtMethod;
 
-                std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name").get<std::string>());
+                std::string indVarListName = UtilityRoutines::makeUPPER(fields.at("independent_variable_list_name").get<std::string>());
 
                 std::string contextString = format("Table:Lookup \"{}\"", thisCurve->Name);
                 std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
@@ -2963,7 +2963,7 @@ namespace Curve {
         if (InInputType.empty()) {
             return true; // if not used it is valid
         }
-        CurveInputType found = static_cast<CurveInputType>(getEnumerationValue(inputTypes, UtilityRoutines::MakeUPPERCase(InInputType)));
+        CurveInputType found = static_cast<CurveInputType>(getEnumValue(inputTypes, UtilityRoutines::makeUPPER(InInputType)));
         return found != CurveInputType::Invalid;
     }
 
@@ -2991,7 +2991,7 @@ namespace Curve {
         };
         constexpr std::array<std::string_view, static_cast<int>(CurveOutputType::Num)> outputTypes = {
             "DIMENSIONLESS", "PRESSURE", "TEMPERATURE", "CAPACITY", "POWER"};
-        CurveOutputType found = static_cast<CurveOutputType>(getEnumerationValue(outputTypes, UtilityRoutines::MakeUPPERCase(InOutputType)));
+        CurveOutputType found = static_cast<CurveOutputType>(getEnumValue(outputTypes, UtilityRoutines::makeUPPER(InOutputType)));
         return found != CurveOutputType::Invalid;
     }
 

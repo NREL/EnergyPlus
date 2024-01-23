@@ -831,14 +831,13 @@ namespace WindowAC {
         }
 
         if (allocated(ZoneComp)) {
+            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::WindowAirConditioner).ZoneCompAvailMgrs(WindACNum);
             if (state.dataWindowAC->MyZoneEqFlag(WindACNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(DataZoneEquipment::ZoneEquip::WindowAC).ZoneCompAvailMgrs(WindACNum).AvailManagerListName =
-                    state.dataWindowAC->WindAC(WindACNum).AvailManagerListName;
-                ZoneComp(DataZoneEquipment::ZoneEquip::WindowAC).ZoneCompAvailMgrs(WindACNum).ZoneNum = ZoneNum;
+                availMgr.AvailManagerListName = state.dataWindowAC->WindAC(WindACNum).AvailManagerListName;
+                availMgr.ZoneNum = ZoneNum;
                 state.dataWindowAC->MyZoneEqFlag(WindACNum) = false;
             }
-            state.dataWindowAC->WindAC(WindACNum).AvailStatus =
-                ZoneComp(DataZoneEquipment::ZoneEquip::WindowAC).ZoneCompAvailMgrs(WindACNum).AvailStatus;
+            state.dataWindowAC->WindAC(WindACNum).AvailStatus = availMgr.AvailStatus;
         }
 
         // need to check all Window AC units to see if they are on Zone Equipment List or issue warning

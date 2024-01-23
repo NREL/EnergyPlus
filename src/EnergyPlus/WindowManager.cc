@@ -2149,7 +2149,6 @@ namespace WindowManager {
         Real64 Tright;
 
         Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
-        Real64 SrdSurfViewFac; // View factor of a surrounding surface
         Real64 OutSrdIR;       // LWR from surrouding srfs
 
         // New variables for thermochromic windows calc
@@ -2422,19 +2421,19 @@ namespace WindowManager {
                         if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                             int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(SurfNum);
                             Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
-                            state.dataWindowManager->emis[state.dataWindowManager->nglface] = General::InterpGeneral(
+                            state.dataWindowManager->emis[state.dataWindowManager->nglface] = General::Interp(
                                 state.dataMaterial->Blind(BlNum).IRFrontEmiss(SurfWinSlatsAngIndex),
                                 state.dataMaterial->Blind(BlNum).IRFrontEmiss(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                 SurfWinSlatsAngInterpFac);
-                            state.dataWindowManager->emis[state.dataWindowManager->nglface + 1] = General::InterpGeneral(
+                            state.dataWindowManager->emis[state.dataWindowManager->nglface + 1] = General::Interp(
                                 state.dataMaterial->Blind(BlNum).IRBackEmiss(SurfWinSlatsAngIndex),
                                 state.dataMaterial->Blind(BlNum).IRBackEmiss(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                 SurfWinSlatsAngInterpFac);
-                            state.dataWindowManager->tir[state.dataWindowManager->nglface] = General::InterpGeneral(
+                            state.dataWindowManager->tir[state.dataWindowManager->nglface] = General::Interp(
                                 state.dataMaterial->Blind(BlNum).IRFrontTrans(SurfWinSlatsAngIndex),
                                 state.dataMaterial->Blind(BlNum).IRFrontTrans(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                 SurfWinSlatsAngInterpFac);
-                            state.dataWindowManager->tir[state.dataWindowManager->nglface + 1] = General::InterpGeneral(
+                            state.dataWindowManager->tir[state.dataWindowManager->nglface + 1] = General::Interp(
                                 state.dataMaterial->Blind(BlNum).IRBackTrans(SurfWinSlatsAngIndex),
                                 state.dataMaterial->Blind(BlNum).IRBackTrans(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                 SurfWinSlatsAngInterpFac);
@@ -2516,14 +2515,8 @@ namespace WindowManager {
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                     if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-                        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-                        auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
-                        for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
-                            SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
-                            SrdSurfTempAbs =
-                                GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::KelvinConv;
-                            OutSrdIR += state.dataWindowManager->sigma * SrdSurfViewFac * pow_4(SrdSurfTempAbs);
-                        }
+                        SrdSurfTempAbs = surface.SrdSurfTemp + Constant::KelvinConv;
+                        OutSrdIR = state.dataWindowManager->sigma * surface.ViewFactorSrdSurfs * pow_4(SrdSurfTempAbs);
                     }
                 }
                 if (surface.ExtWind) {             // Window is exposed to wind (and possibly rain)
@@ -2586,14 +2579,14 @@ namespace WindowManager {
             if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                 SurfInsideTemp = state.dataWindowManager->thetas[2 * state.dataWindowManager->ngllayer + 1] - state.dataWindowManager->TKelvin;
                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
-                    EffShBlEmiss = General::InterpGeneral(
-                        window.EffShBlindEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                        window.EffShBlindEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
-                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
-                    EffGlEmiss = General::InterpGeneral(
-                        window.EffGlassEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                        window.EffGlassEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
-                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                    EffShBlEmiss =
+                        General::Interp(window.EffShBlindEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
+                                        window.EffShBlindEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                    EffGlEmiss =
+                        General::Interp(window.EffGlassEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
+                                        window.EffGlassEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                 } else {
                     EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
                     EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1);
@@ -2682,14 +2675,10 @@ namespace WindowManager {
 
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-                int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-                for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
-                    SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                    SrdSurfTempAbs = GetCurrentScheduleValue(
-                                         state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                     Constant::KelvinConv;
-                    rad_out_lw_srd_per_area += -emiss_sigma_product * SrdSurfViewFac * (Tsout_4 - pow_4(SrdSurfTempAbs));
-                }
+                // update SurfHSrdSurfExt if the windows has exterior shade or blind
+                state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) =
+                    Convect::SurroundingSurfacesRadCoeffAverage(state, SurfNum, Tsout, SurfOutsideEmiss);
+                rad_out_lw_srd_per_area = state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) * (surface.SrdSurfTemp - SurfOutsideTemp);
             }
         }
 
@@ -3860,11 +3849,11 @@ namespace WindowManager {
                 TransDiff = state.dataConstruction->Construct(ConstrNumSh).TransDiff;
             } else if (ANY_BLIND(ShadeFlag)) {
                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
-                    TransDiff = General::InterpGeneral(
-                        state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                        state.dataConstruction->Construct(ConstrNumSh)
-                            .BlTransDiff(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
-                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                    TransDiff =
+                        General::Interp(state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
+                                        state.dataConstruction->Construct(ConstrNumSh)
+                                            .BlTransDiff(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                 } else {
                     TransDiff = state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(1);
                 }
@@ -7937,7 +7926,7 @@ namespace WindowManager {
                     state.dataMaterial->Screens(ScreenNum).ScreenDiameterToSpacingRatio = 1.0 - std::sqrt(thisMaterial->Trans);
 
                     state.dataMaterial->Screens(ScreenNum).screenBeamReflectanceModel = static_cast<Material::ScreenBeamReflectanceModel>(
-                        getEnumerationValue(ScreenBeamReflectanceModelNamesUC, UtilityRoutines::MakeUPPERCase(thisMaterial->ReflectanceModeling)));
+                        getEnumValue(ScreenBeamReflectanceModelNamesUC, UtilityRoutines::makeUPPER(thisMaterial->ReflectanceModeling)));
 
                     // Reflectance of screen material only
                     state.dataMaterial->Screens(ScreenNum).ReflectCylinder = thisMaterial->ReflectShade / (1 - thisMaterial->Trans);

@@ -219,7 +219,7 @@ void resetErrorFlag(EnergyPlusState state)
     thisState->dataPluginManager->apiErrorFlag = false;
 }
 
-const char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize)
+char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     auto &epjson = thisState->dataInputProcessing->inputProcessor->epJSON;
@@ -239,18 +239,83 @@ const char **getObjectNames(EnergyPlusState state, const char *objectType, unsig
     return data;
 }
 
-void freeObjectNames(const char **objectNames, unsigned int arraySize)
+void freeObjectNames(char **objectNames, unsigned int arraySize)
 {
     // as of right now we don't actually need to free the underlying strings, they exist in the epJSON instance, so just delete our array of pointers
     (void)arraySize; // no op to avoid compiler warning that this variable is unused, in the future, this may be needed so keeping it in the API now
     delete[] objectNames;
 }
 
+enum class AirLoopHVAC_AvailabilityStatus  // This does not have an enum internally
+{
+    Invalid = -1,
+    NoAction,
+    ForceOff,
+    CycleOn,
+    CycleOnZoneFansOnly,
+    Num
+};
+constexpr std::array<std::string_view, (int)AirLoopHVAC_AvailabilityStatus::Num> AirLoopHVAC_AvailabilityStatus_UC = {"NO_ACTION", "FORCE_OFF", "CYCLE_ON", "CYCLE_ON_ZONE_FANS_ONLY"};
+enum class Beatles
+{
+    Invalid = -1,
+    Ringo,
+    Paul,
+    John,
+    George,
+    Num
+};
+constexpr std::array<std::string_view, (int)Beatles::Num> beatlesUC = {"RINGO", "PAUL", "JOHN", "GEORGE"};
+
+int getEnergyPlusEnumValue(EnergyPlusState state, const char *enumClass, const char *enumKey)
+{
+    (void) state; // not currently used -- probably never, but future-proofing just in case
+    std::string className = EnergyPlus::UtilityRoutines::makeUPPER(enumClass);
+    std::string controlType = EnergyPlus::UtilityRoutines::makeUPPER(enumKey);
+    if (className == "AIRLOOPHVAC_AVAILABILITYSTATUS") {
+        return EnergyPlus::getEnumValue(AirLoopHVAC_AvailabilityStatus_UC, controlType);
+    } else if (className == "BEATLES") {
+        return EnergyPlus::getEnumValue(beatlesUC, controlType);
+    } else {
+        return -1;
+    }
+}
+char **getAllEnumKeys(EnergyPlusState state, unsigned int *resultingSize)
+{
+    (void) state; // not currently used -- probably never, but future-proofing the API signature just in case
+    *resultingSize = (
+        AirLoopHVAC_AvailabilityStatus_UC.size() + beatlesUC.size()
+    );
+    auto *data = new char *[*resultingSize];
+    unsigned int i = -1;
+    for (std::string_view sv : AirLoopHVAC_AvailabilityStatus_UC) {
+        i++;
+        std::string s = "AirLoopHVAC_AvailabilityStatus::" + std::string(sv);
+        data[i] = new char[std::strlen(s.data()) + 1];
+        std::strcpy(data[i], s.data());
+    }
+    for (std::string_view sv : beatlesUC) {
+        i++;
+        std::string s = "Beatles::" + std::string(sv);
+        data[i] = new char[std::strlen(s.data()) + 1];
+        std::strcpy(data[i], s.data());
+    }
+    return data;
+}
+void freeEnumKeys(char **enumKeys, unsigned int arraySize)
+{
+    // these strings were allocated on the heap, and we need to clean them as well as the array of pointers to the strings
+    for (unsigned int i = 0; i < arraySize; i++) {
+        delete enumKeys[i];
+    }
+    delete[] enumKeys;
+}
+
 int getNumNodesInCondFDSurfaceLayer(EnergyPlusState state, const char *surfName, const char *matName)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    std::string UCsurfName = EnergyPlus::UtilityRoutines::MakeUPPERCase(surfName);
-    std::string UCmatName = EnergyPlus::UtilityRoutines::MakeUPPERCase(matName);
+    std::string UCsurfName = EnergyPlus::UtilityRoutines::makeUPPER(surfName);
+    std::string UCmatName = EnergyPlus::UtilityRoutines::makeUPPER(matName);
     return EnergyPlus::HeatBalFiniteDiffManager::numNodesInMaterialLayer(*thisState, UCsurfName, UCmatName);
 }
 
@@ -278,8 +343,8 @@ int getVariableHandle(EnergyPlusState state, const char *type, const char *key)
     // In this function, it is as simple as looping over both types and continuing to increment
     // the handle carefully.  In the getValue function it is just a matter of checking array sizes.
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
-    std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
+    std::string const typeUC = EnergyPlus::UtilityRoutines::makeUPPER(type);
+    std::string const keyUC = EnergyPlus::UtilityRoutines::makeUPPER(key);
     int handle = -1; // initialize to -1 as a flag
     if (thisState->dataOutputProcessor->RVariableTypes.allocated()) {
         handle = 0; // initialize to 0 to get a 1 based Array1D index
@@ -347,7 +412,7 @@ Real64 getVariableValue(EnergyPlusState state, const int handle)
 int getMeterHandle(EnergyPlusState state, const char *meterName)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    std::string const meterNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(meterName);
+    std::string const meterNameUC = EnergyPlus::UtilityRoutines::makeUPPER(meterName);
     int i = EnergyPlus::GetMeterIndex(*thisState, meterNameUC);
     if (i == 0) {
         // inside E+, zero is meaningful, but through the API, I want to use negative one as a signal of a bad lookup
@@ -381,16 +446,16 @@ Real64 getMeterValue(EnergyPlusState state, int handle)
 int getActuatorHandle(EnergyPlusState state, const char *componentType, const char *controlType, const char *uniqueKey)
 {
     int handle = 0;
-    std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(componentType);
-    std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(uniqueKey);
-    std::string const controlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(controlType);
+    std::string const typeUC = EnergyPlus::UtilityRoutines::makeUPPER(componentType);
+    std::string const keyUC = EnergyPlus::UtilityRoutines::makeUPPER(uniqueKey);
+    std::string const controlUC = EnergyPlus::UtilityRoutines::makeUPPER(controlType);
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     for (int ActuatorLoop = 1; ActuatorLoop <= thisState->dataRuntimeLang->numEMSActuatorsAvailable; ++ActuatorLoop) {
         auto &availActuator = thisState->dataRuntimeLang->EMSActuatorAvailable(ActuatorLoop);
         handle++;
-        std::string const actuatorTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ComponentTypeName);
-        std::string const actuatorIDUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.UniqueIDName);
-        std::string const actuatorControlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ControlTypeName);
+        std::string const actuatorTypeUC = EnergyPlus::UtilityRoutines::makeUPPER(availActuator.ComponentTypeName);
+        std::string const actuatorIDUC = EnergyPlus::UtilityRoutines::makeUPPER(availActuator.UniqueIDName);
+        std::string const actuatorControlUC = EnergyPlus::UtilityRoutines::makeUPPER(availActuator.ControlTypeName);
         if (typeUC == actuatorTypeUC && keyUC == actuatorIDUC && controlUC == actuatorControlUC) {
 
             if (availActuator.handleCount > 0) {
@@ -517,13 +582,13 @@ Real64 getActuatorValue(EnergyPlusState state, const int handle)
 int getInternalVariableHandle(EnergyPlusState state, const char *type, const char *key)
 {
     int handle = 0;
-    std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
-    std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
+    std::string const typeUC = EnergyPlus::UtilityRoutines::makeUPPER(type);
+    std::string const keyUC = EnergyPlus::UtilityRoutines::makeUPPER(key);
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     for (auto const &availVariable : thisState->dataRuntimeLang->EMSInternalVarsAvailable) { // TODO: this should stop at numEMSInternalVarsAvailable
         handle++;
-        std::string const variableTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availVariable.DataTypeName);
-        std::string const variableIDUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availVariable.UniqueIDName);
+        std::string const variableTypeUC = EnergyPlus::UtilityRoutines::makeUPPER(availVariable.DataTypeName);
+        std::string const variableIDUC = EnergyPlus::UtilityRoutines::makeUPPER(availVariable.UniqueIDName);
         if (typeUC == variableTypeUC && keyUC == variableIDUC) {
             return handle;
         }
@@ -919,11 +984,11 @@ int kindOfSim(EnergyPlusState state)
 int getConstructionHandle(EnergyPlusState state, const char *constructionName)
 {
     int handle = 0;
-    std::string const nameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(constructionName);
+    std::string const nameUC = EnergyPlus::UtilityRoutines::makeUPPER(constructionName);
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     for (auto const &construct : thisState->dataConstruction->Construct) {
         handle++;
-        std::string const thisNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(construct.Name);
+        std::string const thisNameUC = EnergyPlus::UtilityRoutines::makeUPPER(construct.Name);
         if (nameUC == thisNameUC) {
             return handle;
         }

@@ -237,7 +237,7 @@ namespace SolarCollectors {
                 }
 
                 std::string_view const key = state.dataIPShortCut->cAlphaArgs(3);
-                state.dataSolarCollectors->Parameters(ParametersNum).TestType = static_cast<TestTypeEnum>(getEnumerationValue(testTypesUC, key));
+                state.dataSolarCollectors->Parameters(ParametersNum).TestType = static_cast<TestTypeEnum>(getEnumValue(testTypesUC, key));
                 if (state.dataSolarCollectors->Parameters(ParametersNum).TestType == TestTypeEnum::INVALID) {
                     ShowSevereError(state,
                                     format("{} = {}: {} is not supported for {}",

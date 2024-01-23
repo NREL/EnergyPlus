@@ -50,10 +50,10 @@
 #include "Data/EnergyPlusData.hh"
 #include "DataStringGlobals.hh"
 #include "FileSystem.hh"
-#include "InputProcessing/EmbeddedEpJSONSchema.hh"
 #include "InputProcessing/InputProcessor.hh"
 #include "ResultsFramework.hh"
 #include "UtilityRoutines.hh"
+#include <embedded/EmbeddedEpJSONSchema.hh>
 
 #include <algorithm>
 #include <fmt/format.h>
@@ -89,15 +89,19 @@ void InputFile::close()
 
 InputFile::ReadResult<std::string> InputFile::readLine() noexcept
 {
-    if (is) {
-        std::string line;
-        std::getline(*is, line);
+    if (!is) {
+        return {"", true, false};
+    }
+
+    std::string line;
+    if (std::getline(*is, line)) {
         if (!line.empty() && line.back() == '\r') {
             line.pop_back();
         }
-        return {std::move(line), is->eof(), is->good()};
+        // Use operator bool, see ReadResult::good() docstring
+        return {std::move(line), is->eof(), bool(is)};
     } else {
-        return {"", true, false};
+        return {"", is->eof(), false};
     }
 }
 
@@ -326,7 +330,7 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
             auto found = fields.find(field_name);
             if (found != fields.end()) {
                 input = found.value().get<std::string>();
-                input = UtilityRoutines::MakeUPPERCase(input);
+                input = UtilityRoutines::makeUPPER(input);
             } else {
                 state.dataInputProcessing->inputProcessor->getDefaultValue(state, "OutputControl:Files", field_name, input);
             }

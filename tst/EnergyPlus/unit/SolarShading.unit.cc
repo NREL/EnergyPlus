@@ -3169,6 +3169,7 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     SrdSurfsProperty.TotSurroundingSurface = 1;
     SrdSurfsProperty.SurroundingSurfs.allocate(1);
     SrdSurfsProperty.SurroundingSurfs(1).ViewFactor = 0.2;
+    SrdSurfsProperty.SurfsViewFactorSum = SrdSurfsProperty.SurroundingSurfs(1).ViewFactor;
     SrdSurfsProperty.SkyViewFactor = 0.0;
     SrdSurfsProperty.IsSkyViewFactorSet = false;
     SrdSurfsProperty.GroundViewFactor = 0.0;
@@ -3180,6 +3181,7 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     win_Surface.UseSurfPropertyGndSurfRefl = true;
     win_Surface.SurfHasSurroundingSurfProperty = true;
     win_Surface.SurfSurroundingSurfacesNum = 1;
+    win_Surface.ViewFactorSrdSurfs = SrdSurfsProperty.SurfsViewFactorSum;
 
     state->dataSurface->GroundSurfsProperty.allocate(1);
     auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(1);

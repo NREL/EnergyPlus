@@ -256,7 +256,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         }
-        thisTESCoil.ModeControlType = static_cast<PTSCCtrlType>(getEnumerationValue(modeControlStrings, state.dataIPShortCut->cAlphaArgs(3)));
+        thisTESCoil.ModeControlType = static_cast<PTSCCtrlType>(getEnumValue(modeControlStrings, state.dataIPShortCut->cAlphaArgs(3)));
         if (thisTESCoil.ModeControlType == PTSCCtrlType::Invalid) {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, thisTESCoil.Name));
             ShowContinueError(state, format("...{}=\"{}\".", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
@@ -278,7 +278,7 @@ void GetTESCoilInput(EnergyPlusData &state)
             }
         }
 
-        thisTESCoil.StorageMedia = static_cast<MediaType>(getEnumerationValue(mediaStrings, state.dataIPShortCut->cAlphaArgs(5)));
+        thisTESCoil.StorageMedia = static_cast<MediaType>(getEnumValue(mediaStrings, state.dataIPShortCut->cAlphaArgs(5)));
         switch (thisTESCoil.StorageMedia) {
         case MediaType::Ice:
         case MediaType::UserDefindFluid:
@@ -1449,7 +1449,7 @@ void GetTESCoilInput(EnergyPlusData &state)
         thisTESCoil.CondenserAirVolumeFlow = state.dataIPShortCut->rNumericArgs(34);
         thisTESCoil.CondenserAirFlowSizingFactor = state.dataIPShortCut->rNumericArgs(35);
 
-        thisTESCoil.CondenserType = static_cast<TESCondenserType>(getEnumerationValue(condenserTypesUC, state.dataIPShortCut->cAlphaArgs(58)));
+        thisTESCoil.CondenserType = static_cast<TESCondenserType>(getEnumValue(condenserTypesUC, state.dataIPShortCut->cAlphaArgs(58)));
         if (thisTESCoil.CondenserType == TESCondenserType::Invalid) {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, thisTESCoil.Name));
             ShowContinueError(state, format("{}=\"{}\".", state.dataIPShortCut->cAlphaFieldNames(58), state.dataIPShortCut->cAlphaArgs(58)));

@@ -531,6 +531,9 @@ public:
     };
 
     void close();
+
+    // This is different from istream::good(), which is false if EOF is true while there were no errors (happens when no EOL at end of file)
+    // this operate like `operator bool(istream& is)` <=> `!is.bad() && !is.fail()`
     bool good() const noexcept;
 
     bool is_open() const noexcept;
@@ -551,7 +554,7 @@ public:
     void rewind() noexcept
     {
         if (is) {
-            is->clear(); // clear eofbit and potentially failbit
+            is->clear(); // clear potentially failbit and badbit (seekg would only clear eofbit)
             is->seekg(0, std::ios::beg);
         }
     }
@@ -563,7 +566,8 @@ public:
         if (is) {
             T result;
             *is >> result;
-            return ReadResult<T>{result, is->eof(), is->good()};
+            // Use operator bool, see ReadResult::good() docstring
+            return ReadResult<T>{result, is->eof(), bool(is)};
         } else {
             return ReadResult<T>{T{}, true, false};
         }

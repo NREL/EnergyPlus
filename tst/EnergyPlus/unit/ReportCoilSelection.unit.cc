@@ -312,14 +312,14 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     state->dataZoneEquip->ZoneEquipList.allocate(3);
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).NumOfEquipTypes = 2;
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName.allocate(2);
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeName.allocate(2);
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType.allocate(2);
-    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeEnum.allocate(2);
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName(1) = "Zone 2 Fan Coil";
-    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(1) = "ZoneHVAC:FourPipeFanCoil";
-    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeEnum(1) = DataZoneEquipment::ZoneEquip::FanCoil4Pipe;
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeName(1) = "ZoneHVAC:FourPipeFanCoil";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(1) = DataZoneEquipment::ZoneEquipType::FourPipeFanCoil;
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName(2) = "Zone 2 Unit Heater";
-    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(2) = "ZoneHVAC:UnitHeater";
-    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeEnum(2) = DataZoneEquipment::ZoneEquip::UnitHeater;
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeName(2) = "ZoneHVAC:UnitHeater";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(2) = DataZoneEquipment::ZoneEquipType::UnitHeater;
 
     Real64 totGrossCap = 500.0;
     Real64 sensGrossCap = 500.0;
@@ -572,14 +572,14 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoolingCoil)
     state->dataZoneEquip->ZoneEquipList.allocate(3);
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).NumOfEquipTypes = 2;
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName.allocate(2);
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeName.allocate(2);
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType.allocate(2);
-    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeEnum.allocate(2);
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName(1) = "Zone 2 DX Eq";
-    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(1) = "ZoneHVAC:WindowAirConditioner";
-    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeEnum(1) = DataZoneEquipment::ZoneEquip::WindowAC;
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeName(1) = "ZoneHVAC:WindowAirConditioner";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(1) = DataZoneEquipment::ZoneEquipType::WindowAirConditioner;
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName(2) = "Zone 2 Unit Heater";
-    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(2) = "ZoneHVAC:UnitHeater";
-    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeEnum(2) = DataZoneEquipment::ZoneEquip::UnitHeater;
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeName(2) = "ZoneHVAC:UnitHeater";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(2) = DataZoneEquipment::ZoneEquipType::UnitHeater;
 
     Real64 totGrossCap = 500.0;
     Real64 sensGrossCap = 400.0;
@@ -820,11 +820,11 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_4PipeFCU_ElecHeatingCoil)
 
     zoneEquipList.NumOfEquipTypes = 1;
     zoneEquipList.EquipName.allocate(1);
+    zoneEquipList.EquipTypeName.allocate(1);
     zoneEquipList.EquipType.allocate(1);
-    zoneEquipList.EquipTypeEnum.allocate(1);
     zoneEquipList.EquipName(1) = "Zone 1 FCU";
-    zoneEquipList.EquipType(1) = "ZoneHVAC:FourPipeFanCoil";
-    zoneEquipList.EquipTypeEnum(1) = DataZoneEquipment::ZoneEquip::FanCoil4Pipe;
+    zoneEquipList.EquipTypeName(1) = "ZoneHVAC:FourPipeFanCoil";
+    zoneEquipList.EquipType(1) = DataZoneEquipment::ZoneEquipType::FourPipeFanCoil;
 
     Real64 totGrossCap = 6206.4;
     Real64 sensGrossCap = 6206.4;

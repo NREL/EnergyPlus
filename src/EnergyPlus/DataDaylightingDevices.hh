@@ -58,7 +58,7 @@
 
 namespace EnergyPlus {
 
-namespace DataDaylightingDevices {
+namespace Dayltg {
 
     constexpr int MaxTZones(10);   // Maximum number of transition zones
     constexpr int NumOfAngles(19); // Number of data points on transmittance vs. angle curve
@@ -108,7 +108,7 @@ namespace DataDaylightingDevices {
         Real64 TransSolDiff = 0.0;      // TDD diffuse solar transmittance
 
         // Default Constructor
-        TDDPipeData() : PipeTransVisBeam(DataDaylightingDevices::NumOfAngles, 0.0), PipeTransSolBeam(DataDaylightingDevices::NumOfAngles, 0.0)
+        TDDPipeData() : PipeTransVisBeam(Dayltg::NumOfAngles, 0.0), PipeTransSolBeam(Dayltg::NumOfAngles, 0.0)
         {
         }
     };
@@ -129,16 +129,16 @@ namespace DataDaylightingDevices {
         // Report variables
     };
 
-} // namespace DataDaylightingDevices
+} // namespace Dayltg
 
 struct DataDaylightingDevicesData : BaseGlobalStruct
 {
-    Array1D<DataDaylightingDevices::TDDPipeData> TDDPipe;
-    Array1D<DataDaylightingDevices::ShelfData> Shelf;
+    Array1D<Dayltg::TDDPipeData> TDDPipe;
+    Array1D<Dayltg::ShelfData> Shelf;
 
     void clear_state() override
     {
-        *this = DataDaylightingDevicesData();
+        new (this) DataDaylightingDevicesData();
     }
 };
 

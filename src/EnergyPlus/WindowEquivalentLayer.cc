@@ -703,7 +703,6 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     LayerType InSideLayerType;  // interior shade type
 
     Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
-    Real64 SrdSurfViewFac; // View factor of a surrounding surface
     Real64 OutSrdIR;
 
     if (CalcCondition != DataBSDFWindow::Condition::Invalid) return;
@@ -742,14 +741,8 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
             OutSrdIR = 0;
             if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                 if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-                    int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-                    auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
-                    for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
-                        SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
-                        SrdSurfTempAbs =
-                            GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::KelvinConv;
-                        OutSrdIR += Constant::StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
-                    }
+                    SrdSurfTempAbs = state.dataSurface->Surface(SurfNum).SrdSurfTemp + Constant::KelvinConv;
+                    OutSrdIR = Constant::StefanBoltzmann * state.dataSurface->Surface(SurfNum).ViewFactorSrdSurfs * pow_4(SrdSurfTempAbs);
                 }
             }
             if (state.dataSurface->Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
@@ -8117,7 +8110,7 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
     // Uses the net radiation method developed for ASHWAT fenestration
     // model (ASHRAE RP-1311) by John Wright, the University of WaterLoo
 
-    using DaylightingManager::ProfileAngle;
+    using Dayltg::ProfileAngle;
 
     // Argument array dimensioning
     CFSAbs.dim(2, CFSMAXNL + 1);

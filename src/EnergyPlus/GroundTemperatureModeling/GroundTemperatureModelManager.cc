@@ -97,7 +97,7 @@ namespace GroundTemperatureManager {
 
         // Set object type
         GroundTempObjType objectType =
-            static_cast<GroundTempObjType>(getEnumerationValue(groundTempModelNamesUC, UtilityRoutines::MakeUPPERCase(objectType_str)));
+            static_cast<GroundTempObjType>(getEnumValue(groundTempModelNamesUC, UtilityRoutines::makeUPPER(objectType_str)));
 
         assert(objectType != GroundTempObjType::Invalid);
 
