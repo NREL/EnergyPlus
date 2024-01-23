@@ -515,7 +515,8 @@ namespace HVACVariableRefrigerantFlow {
                              Real64 MaxOutdoorUnitTc,   // The maximum temperature that Tc can be at heating mode [C]
                              Real64 &OUCondHeatRelease, // Condenser heat release (cooling mode) [W]
                              Real64 &CompSpdActual,     // Actual compressor running speed [rps]
-                             Real64 &Ncomp              // Compressor power [W]
+                             Real64 &Ncomp,             // Compressor power [W]
+                             Real64 &CyclingRatio       // Cycling Ratio [W]
         );
 
         void
