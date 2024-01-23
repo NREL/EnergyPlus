@@ -248,7 +248,7 @@ void freeObjectNames(char **objectNames, unsigned int arraySize)
     delete[] objectNames;
 }
 
-enum class AirLoopHVAC_AvailabilityStatus  // This does not have an enum internally
+enum class AirLoopHVAC_AvailabilityStatus // This does not have an enum internally
 {
     Invalid = -1,
     NoAction,
@@ -257,7 +257,8 @@ enum class AirLoopHVAC_AvailabilityStatus  // This does not have an enum interna
     CycleOnZoneFansOnly,
     Num
 };
-constexpr std::array<std::string_view, (int)AirLoopHVAC_AvailabilityStatus::Num> AirLoopHVAC_AvailabilityStatus_UC = {"NO_ACTION", "FORCE_OFF", "CYCLE_ON", "CYCLE_ON_ZONE_FANS_ONLY"};
+constexpr std::array<std::string_view, (int)AirLoopHVAC_AvailabilityStatus::Num> AirLoopHVAC_AvailabilityStatus_UC = {
+    "NO_ACTION", "FORCE_OFF", "CYCLE_ON", "CYCLE_ON_ZONE_FANS_ONLY"};
 enum class Beatles
 {
     Invalid = -1,
@@ -271,7 +272,7 @@ constexpr std::array<std::string_view, (int)Beatles::Num> beatlesUC = {"RINGO", 
 
 int getEnergyPlusEnumValue(EnergyPlusState state, const char *enumClass, const char *enumKey)
 {
-    (void) state; // not currently used -- probably never, but future-proofing just in case
+    (void)state; // not currently used -- probably never, but future-proofing just in case
     std::string className = EnergyPlus::UtilityRoutines::makeUPPER(enumClass);
     std::string controlType = EnergyPlus::UtilityRoutines::makeUPPER(enumKey);
     if (className == "AIRLOOPHVAC_AVAILABILITYSTATUS") {
@@ -284,10 +285,8 @@ int getEnergyPlusEnumValue(EnergyPlusState state, const char *enumClass, const c
 }
 char **getAllEnumKeys(EnergyPlusState state, unsigned int *resultingSize)
 {
-    (void) state; // not currently used -- probably never, but future-proofing the API signature just in case
-    *resultingSize = (
-        AirLoopHVAC_AvailabilityStatus_UC.size() + beatlesUC.size()
-    );
+    (void)state; // not currently used -- probably never, but future-proofing the API signature just in case
+    *resultingSize = (AirLoopHVAC_AvailabilityStatus_UC.size() + beatlesUC.size());
     auto *data = new char *[*resultingSize];
     unsigned int i = -1;
     for (std::string_view sv : AirLoopHVAC_AvailabilityStatus_UC) {

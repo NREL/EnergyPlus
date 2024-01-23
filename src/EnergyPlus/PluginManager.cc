@@ -1465,15 +1465,14 @@ void PluginManager::runSingleUserDefinedPlugin([[maybe_unused]] EnergyPlusData &
 }
 #endif
 
-
 int PluginManager::getUserDefinedCallbackIndex(EnergyPlusData &state, std::string callbackProgramName)
 {
     int i = -1;
-    for (auto & knownName : state.dataPluginManager->userDefinedCallbackNames) {
+    for (auto &knownName : state.dataPluginManager->userDefinedCallbackNames) {
         i++;
         // Use UtilityRoutines::MakeUPPERCase() ?  Probably not.
         if (knownName == callbackProgramName) {
-            return i; 
+            return i;
         }
     }
     return -1;
@@ -1481,8 +1480,8 @@ int PluginManager::getUserDefinedCallbackIndex(EnergyPlusData &state, std::strin
 
 void PluginManager::runSingleUserDefinedCallback(EnergyPlusData &state, int index)
 {
-    if (state.dataGlobal->KickOffSimulation) return;  // Maybe?
-    state.dataPluginManager->userDefinedCallbacks[index]((void *)&state);  // Check Index first
+    if (state.dataGlobal->KickOffSimulation) return;                      // Maybe?
+    state.dataPluginManager->userDefinedCallbacks[index]((void *)&state); // Check Index first
 }
 
 #if LINK_WITH_PYTHON

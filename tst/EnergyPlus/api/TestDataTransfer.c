@@ -145,7 +145,7 @@ int testDataTransferGetEnumValueFunction(EnergyPlusState s)
 
     // test the worker functions for users to get the list of data available
     unsigned int size;
-    char ** keys = getAllEnumKeys(s, &size);
+    char **keys = getAllEnumKeys(s, &size);
     if (size != 8) ++errors;
     freeEnumKeys(keys, size);
 
