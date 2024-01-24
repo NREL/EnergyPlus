@@ -12507,6 +12507,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                 // this is not the case for heating
                 fan.FanPower *= coolingCoil.CoolingCoilRuntimeFraction;
                 fan.FanEnergy = fan.FanPower * state.dataHVACGlobal->TimeStepSysSec;
+                fan.PowerLossToAir *= coolingCoil.CoolingCoilRuntimeFraction;
             }
         }
     }
