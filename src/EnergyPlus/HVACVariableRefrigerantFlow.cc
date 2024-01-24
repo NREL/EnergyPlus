@@ -13102,8 +13102,8 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         }
     }
     // calculate sensible load met using delta enthalpy
+    // fixme: need to figure out when to overwrite, for different operation mode
     AirMassFlow = state.dataDXCoils->DXCoil(this->HeatCoilIndex).InletAirMassFlowRate;
-    TempIn = state.dataDXCoils->DXCoil(this->HeatCoilIndex).InletAirTemp;
     LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
     LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn);                                     // latent {kgWater/s}
     if (present(LatOutputProvided)) {
