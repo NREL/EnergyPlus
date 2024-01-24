@@ -867,60 +867,77 @@ namespace OutputProcessor {
         sql->createSQLiteReportDictionaryRecord(
             1, StoreType::Average, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", TimeStepType::Zone, "C", ReportFreq::Hour, false);
 
-        WriteReportRealData(*state, 1, 999.9, StoreType::Sum, 1, ReportFreq::TimeStep, 0.0, 0, 0.0, 0);
+        OutVarReal rVar;
+        rVar.ReportID = 1;
+        rVar.StoreValue = 999.9;
+        rVar.storeType = StoreType::Sum;
+        rVar.NumStored = 1;
+        rVar.MinValue = rVar.MaxValue = 0.0;
+        rVar.minValueDate = rVar.maxValueDate = 0;
+        rVar.freq = ReportFreq::TimeStep;
+        
+        rVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
-        WriteReportRealData(*state, 1, 999.9, StoreType::Sum, 1, ReportFreq::EachCall, 0.0, 0, 0.0, 0);
+        rVar.freq = ReportFreq::EachCall;
+        rVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
-        WriteReportRealData(*state, 1, 999.9, StoreType::Sum, 1, ReportFreq::Hour, 0.0, 0, 0.0, 0);
+        rVar.freq = ReportFreq::Hour;
+        rVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
-        WriteReportRealData(
-            *state, 1, 616771620.98702729, StoreType::Sum, 1, ReportFreq::Day, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460);
+        rVar.StoreValue = 616771620.98702729;
+        rVar.MinValue = 4283136.2516839253;
+        rVar.minValueDate = 12210110;
+        rVar.MaxValue = 4283136.2587211775;
+        rVar.maxValueDate = 12212460;
+        rVar.freq = ReportFreq::Day;
+        
+        rVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211775,24,60"}, "\n")));
 
-        WriteReportRealData(
-            *state, 1, 616771620.98702729, StoreType::Sum, 1, ReportFreq::Month, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460);
+        rVar.freq = ReportFreq::Month;
+        rVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211775,21,24,60"}, "\n")));
 
-        WriteReportRealData(
-            *state, 1, 616771620.98702729, StoreType::Sum, 1, ReportFreq::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460);
+        rVar.freq = ReportFreq::Simulation;
+        rVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211775,12,21,24,60"}, "\n")));
 
-        WriteReportRealData(
-            *state, 1, 616771620.98702729, StoreType::Average, 10, ReportFreq::TimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460);
+        rVar.storeType = StoreType::Average;
+        rVar.NumStored = 10;
+        rVar.freq = ReportFreq::TimeStep;
+        rVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273"}, "\n")));
 
-        WriteReportRealData(
-            *state, 1, 616771620.98702729, StoreType::Average, 10, ReportFreq::EachCall, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460);
+        rVar.freq = ReportFreq::EachCall;
+        rVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273"}, "\n")));
 
-        WriteReportRealData(
-            *state, 1, 616771620.98702729, StoreType::Average, 10, ReportFreq::Hour, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460);
+        rVar.freq = ReportFreq::Hour;
+        rVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273"}, "\n")));
 
-        WriteReportRealData(
-            *state, 1, 616771620.98702729, StoreType::Average, 10, ReportFreq::Day, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460);
+        rVar.freq = ReportFreq::Day;
+        rVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273,4283136.251683925, 1,10,4283136.2587211775,24,60"}, "\n")));
 
-        WriteReportRealData(
-            *state, 1, 616771620.98702729, StoreType::Average, 10, ReportFreq::Month, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460);
+        rVar.freq = ReportFreq::Month;
+        rVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273,4283136.251683925,21, 1,10,4283136.2587211775,21,24,60"}, "\n")));
 
-        WriteReportRealData(*state,
-                            1,
-                            616771620.98702729,
-                            StoreType::Average,
-                            10,
-                            ReportFreq::Simulation,
-                            4283136.2516839253,
-                            12210110,
-                            4283136.2587211775,
-                            12212460);
+        rVar.freq = ReportFreq::Simulation;
+        rVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273,4283136.251683925,12,21, 1,10,4283136.2587211775,12,21,24,60"}, "\n")));
 
-        WriteReportRealData(*state, 1, 0, StoreType::Sum, 1, ReportFreq::TimeStep, 0.0, 0, 0.0, 0);
+        rVar.StoreValue = 0;
+        rVar.NumStored = 1;
+        rVar.MinValue = rVar.MaxValue = 0.0;
+        rVar.minValueDate = rVar.maxValueDate = 0;
+        rVar.freq = ReportFreq::TimeStep;
+      
+        rVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.0"}, "\n")));
 
         auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
@@ -959,47 +976,98 @@ namespace OutputProcessor {
         sql->createSQLiteReportDictionaryRecord(
             1, StoreType::Average, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", TimeStepType::Zone, "C", ReportFreq::Hour, false);
 
-        WriteReportIntegerData(*state, 1, 999.9, StoreType::Sum, 1, ReportFreq::TimeStep, 0, 0, 0, 0);
+        OutVarInt iVar;
+        iVar.ReportID = 1;
+        iVar.StoreValue = 999.9;
+        iVar.storeType = StoreType::Sum;
+        iVar.NumStored = 1;
+        iVar.MinValue = iVar.MaxValue = 0;
+        iVar.minValueDate = iVar.maxValueDate = 0;
+        iVar.freq = ReportFreq::TimeStep;
+
+        iVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.900000"}, "\n")));
 
-        WriteReportIntegerData(*state, 1, 999.9, StoreType::Sum, 1, ReportFreq::EachCall, 0, 0, 0, 0);
+        iVar.freq = ReportFreq::EachCall;
+        iVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.900000"}, "\n")));
 
-        WriteReportIntegerData(*state, 1, 999.9, StoreType::Sum, 1, ReportFreq::Hour, 0, 0, 0, 0);
+        iVar.freq = ReportFreq::Hour;
+        iVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.900000"}, "\n")));
 
-        WriteReportIntegerData(*state, 1, 616771620.98702729, StoreType::Sum, 1, ReportFreq::Day, 4283136, 12210110, 4283196, 12212460);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.987027,4283136, 1,10,4283196,24,60"}, "\n")));
+        iVar.StoreValue = 616771620.98702729;
+        iVar.MinValue = 4283136;
+        iVar.minValueDate = 12210110;
+        iVar.MaxValue = 4283196;
+        iVar.maxValueDate = 12212460;
+        iVar.freq = ReportFreq::Day;
 
-        WriteReportIntegerData(*state, 1, 616771620.98702729, StoreType::Sum, 1, ReportFreq::Month, 4283136, 12210110, 4283196, 12212460);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.987027,4283136,21, 1,10,4283196,21,24,60"}, "\n")));
+        iVar.WriteReportData(*state);
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.987027,4283136.0, 1,10,4283196.0,24,60"}, "\n")));
 
-        WriteReportIntegerData(*state, 1, 616771620.98702729, StoreType::Sum, 1, ReportFreq::Simulation, 4283136, 12210110, 4283196, 12212460);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.987027,4283136,12,21, 1,10,4283196,12,21,24,60"}, "\n")));
+        iVar.freq = ReportFreq::Month;
+        iVar.WriteReportData(*state);
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.987027,4283136.0,21, 1,10,4283196.0,21,24,60"}, "\n")));
 
-        WriteReportIntegerData(*state, 1, 616771620.98702729, StoreType::Average, 10, ReportFreq::TimeStep, 0, 0, 0, 0);
+        iVar.freq = ReportFreq::Simulation;
+        iVar.WriteReportData(*state);
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.987027,4283136.0,12,21, 1,10,4283196.0,12,21,24,60"}, "\n")));
+
+        iVar.storeType = StoreType::Average;
+        iVar.NumStored = 10;
+        iVar.MinValue = iVar.MaxValue = 0;
+        iVar.minValueDate = iVar.maxValueDate = 0;
+        iVar.freq = ReportFreq::TimeStep;
+        
+        iVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703"}, "\n")));
 
-        WriteReportIntegerData(*state, 1, 616771620.98702729, StoreType::Average, 10, ReportFreq::EachCall, 0, 0, 0, 0);
+        iVar.freq = ReportFreq::EachCall;
+        iVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703"}, "\n")));
 
-        WriteReportIntegerData(*state, 1, 616771620.98702729, StoreType::Average, 10, ReportFreq::Hour, 0, 0, 0, 0);
+        iVar.freq = ReportFreq::Hour;
+        iVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703"}, "\n")));
 
-        WriteReportIntegerData(*state, 1, 616771620.98702729, StoreType::Average, 10, ReportFreq::Day, 4283136, 12210110, 4283196, 12212460);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703,4283136, 1,10,4283196,24,60"}, "\n")));
+        iVar.MinValue = 4283136;
+        iVar.minValueDate = 12210110;
+        iVar.MaxValue = 4283196;
+        iVar.maxValueDate = 12212460;
+        iVar.freq = ReportFreq::Day;
+        iVar.WriteReportData(*state);
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703,4283136.0, 1,10,4283196.0,24,60"}, "\n")));
 
-        WriteReportIntegerData(*state, 1, 616771620.98702729, StoreType::Average, 10, ReportFreq::Month, 4283136, 12210110, 4283196, 12212460);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703,4283136,21, 1,10,4283196,21,24,60"}, "\n")));
+        iVar.freq = ReportFreq::Month;
+        iVar.WriteReportData(*state);
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703,4283136.0,21, 1,10,4283196.0,21,24,60"}, "\n")));
 
-        WriteReportIntegerData(*state, 1, 616771620.98702729, StoreType::Average, 10, ReportFreq::Simulation, 4283136, 12210110, 4283196, 12212460);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703,4283136,12,21, 1,10,4283196,12,21,24,60"}, "\n")));
+        iVar.freq = ReportFreq::Simulation;
+        iVar.WriteReportData(*state);
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703,4283136.0,12,21, 1,10,4283196.0,12,21,24,60"}, "\n")));
 
-        WriteReportIntegerData(*state, 1, 0, StoreType::Sum, 1, ReportFreq::TimeStep, 0, 0, 0, 0);
+        iVar.storeType = StoreType::Sum;
+        iVar.StoreValue = 0;
+        iVar.NumStored = 1;
+        iVar.MinValue = iVar.MaxValue = 0;
+        iVar.minValueDate = iVar.minValueDate = 0;
+        iVar.freq = ReportFreq::TimeStep;
+        
+        iVar.WriteReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.0"}, "\n")));
 
-        WriteReportIntegerData(*state, 1, 25.75, StoreType::Average, 720, ReportFreq::Month, 0, 4010115, 1, 4011560);
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.035764,0, 1, 1,15,1, 1,15,60"}, "\n")));
+        iVar.StoreValue = 25.75;
+        iVar.storeType = StoreType::Average;
+        iVar.NumStored = 720;
+        iVar.MinValue = 0;
+        iVar.MaxValue = 1;
+        iVar.minValueDate = 4010115;
+        iVar.maxValueDate = 4011560;
+        iVar.freq = ReportFreq::Month;
+
+        iVar.WriteReportData(*state);
+        EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.035764,0.0, 1, 1,15,1.0, 1,15,60"}, "\n")));
 
         auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
         auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");

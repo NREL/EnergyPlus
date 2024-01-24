@@ -441,6 +441,8 @@ namespace OutputProcessor {
         bool thisTSStored = false;                      // if stored for this zone timestep
         int thisTSCount = 0;
         ReportFreq freq = ReportFreq::Hour; // How often to report this variable
+        Real64 MaxValue = -9999.0; // Maximum reporting (only for Averaged variables, and those greater than Time Step)
+        Real64 MinValue = 9999.0;  // Minimum reporting (only for Averaged variables, and those greater than Time Step)
         int maxValueDate = 0;               // Date stamp of maximum
         int minValueDate = 0;               // Date stamp of minimum
         int ReportID = 0;                   // Report variable ID number
@@ -462,31 +464,27 @@ namespace OutputProcessor {
         virtual ~OutVar(){};
 
         std::string multiplierString() const;
+
+        void WriteReportData(EnergyPlusData &state);
+
+        void WriteVariableOutput(EnergyPlusData &state,   // Real variable to write out
+                                 ReportFreq const freq);
+            
     };
 
     struct OutVarReal : public OutVar
     {
         Real64 *Which = nullptr;   // Pointer to the actual variable holding the value
-        Real64 MaxValue = -9999.0; // Maximum reporting (only for Averaged variables, and those greater than Time Step)
-        Real64 MinValue = 9999.0;  // Minimum reporting (only for Averaged variables, and those greater than Time Step)
 
-        OutVarReal()
-        {
-            varType = VariableType::Real;
-        }
+        OutVarReal() { varType = VariableType::Real; }
     };
 
     struct OutVarInt : public OutVar
     {
         // Members
         int *Which = nullptr; // The POINTER to the actual variable holding the value
-        int MaxValue = -9999; // Maximum reporting (only for Averaged variables, and those greater than Time Step)
-        int MinValue = 9999;  // Minimum reporting (only for Averaged variables, and those greater than Time Step)
 
-        OutVarInt()
-        {
-            varType = VariableType::Integer;
-        }
+        OutVarInt() { varType = VariableType::Integer; }
     };
 
     struct DDOutVar
@@ -629,9 +627,9 @@ namespace OutputProcessor {
 
     ReportFreq determineFrequency(EnergyPlusData &state, std::string_view const FreqString);
 
-    void ProduceMinMaxString(std::string &String, // Current value
-                             int DateValue,       // Date of min/max
-                             ReportFreq freq      // Reporting Frequency
+    std::string ProduceMinMaxString(std::string &String, // Current value
+                                    int DateValue,       // Date of min/max
+                                    ReportFreq freq      // Reporting Frequency
     );
 
     // *****************************************************************************
@@ -738,7 +736,7 @@ namespace OutputProcessor {
                                  OutVarReal *realVar, // Real variable to write out
                                  ReportFreq freq      // The report type or interval (e.g., hourly)
     );
-
+#ifdef GET_OUT
     void WriteReportRealData(EnergyPlusData &state,
                              int reportID,
                              Real64 repValue,
@@ -749,7 +747,7 @@ namespace OutputProcessor {
                              int minValueDate,
                              Real64 MaxValue,
                              int maxValueDate);
-
+#endif // GET_OUT
     void WriteCumulativeReportMeterData(EnergyPlusData &state,
                                         int reportID,      // The variable's report ID
                                         Real64 repValue,   // The variable's value
@@ -781,7 +779,7 @@ namespace OutputProcessor {
                                     OutVarInt *intVar, // Integer variable to write out
                                     ReportFreq freq    // The report type (i.e., the reporting interval)
     );
-
+#ifdef GET_OUT
     void WriteReportIntegerData(EnergyPlusData &state,
                                 int reportID,            // The variable's reporting ID
                                 Real64 repValue,         // The variable's value
@@ -793,7 +791,8 @@ namespace OutputProcessor {
                                 int MaxValue,            // The variable's maximum value during the reporting interval
                                 int maxValueDate         // The date the maximum value occurred
     );
-
+#endif // GET_OUT
+        
     int DetermineIndexGroupKeyFromMeterName(EnergyPlusData &state, std::string const &meterName); // the meter name
 
     std::string DetermineIndexGroupFromMeterGroup(Meter const *meter); // the meter
