@@ -283,6 +283,10 @@ void SimulateVRF(EnergyPlusData &state,
         if (state.dataHVACVarRefFlow->VRF(VRFCondenser).CondenserType == DataHeatBalance::RefrigCondenserType::Water)
             UpdateVRFCondenser(state, VRFCondenser);
     }
+    // yujie: update coil and IU evaporating temperature
+    state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).EvaporatingTemp =
+        state.dataHVACVarRefFlow->VRF(VRFCondenser).EvaporatingTemp;
+    state.dataHVACVarRefFlow->VRF(VRFCondenser).IUEvaporatingTemp = state.dataHVACVarRefFlow->VRF(VRFCondenser).EvaporatingTemp;
 }
 
 PlantComponent *VRFCondenserEquipment::factory(EnergyPlusData &state, std::string const &objectName)
@@ -14184,6 +14188,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
     Real64 T_discharge_new;                // Condensing temperature, for temporary use in iterations [C]
     Real64 Tfs;                            // Temperature of the air at the coil surface [C]]
     Real64 Tolerance(0.05);                // Tolerance for condensing temperature calculation [C]
+    Real64 TeTol(0.5);                     // Tolerance for the difference between Te and SmallLoadTe
     Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
     Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
 
@@ -14273,8 +14278,9 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                 };
 
                 General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, f, MinOutdoorUnitTe,
-                                   T_suction);   // SmallLoadTe is the updated Te'
-                if (SolFla < 0) SmallLoadTe = 6; // MinOutdoorUnitTe; //SmallLoadTe( Te'_new ) is constant during iterations
+                                   T_suction); // SmallLoadTe is the updated Te'
+                // TeTol is added to prevent the final updated Te to go out of bounds
+                if (SolFla < 0) SmallLoadTe = 6 + TeTol; // MinOutdoorUnitTe; //SmallLoadTe( Te'_new ) is constant during iterations
 
                 // Get an updated Te corresponding to the updated Te'
                 // VRFOU_TeModification( VRFCond, this->EvaporatingTemp, SmallLoadTe, Pipe_h_IU_in, OutdoorDryBulb, Pipe_Te_assumed,
@@ -14363,14 +14369,14 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                     T_suction = GetSatTemperatureRefrig(
                         state, this->RefrigerantName, max(min(Pipe_Pe_assumed - Pipe_DeltP, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
 
-                    if ((std::abs(T_suction - SmallLoadTe) > 0.5) && (Pipe_Te_assumed < this->EvaporatingTemp) && (Pipe_Te_assumed > SmallLoadTe) &&
+                    if ((std::abs(T_suction - SmallLoadTe) > TeTol) && (Pipe_Te_assumed < this->EvaporatingTemp) && (Pipe_Te_assumed > SmallLoadTe) &&
                         (NumIteTe < MaxNumIteTe)) {
                         Pipe_Te_assumed = Pipe_Te_assumed - 0.1;
                         NumIteTe = NumIteTe + 1;
                         goto Label11;
                     }
 
-                    if (std::abs(T_suction - SmallLoadTe) > 0.5) {
+                    if (std::abs(T_suction - SmallLoadTe) > TeTol) {
                         NumIteTe = 999;
                         T_suction = SmallLoadTe;
                         Pipe_SH_merged = 3.0;
