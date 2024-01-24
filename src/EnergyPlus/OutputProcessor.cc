@@ -545,9 +545,8 @@ namespace OutputProcessor {
         }
     }
 
-    std::string ProduceMinMaxString([[maybe_unused]] Real64 value, 
-                                    int const date,        // Date of min/max
-                                    ReportFreq const freq // Reporting Frequency
+    std::string produceDateString(int const date,        // Date of min/max
+                                  ReportFreq const freq // Reporting Frequency
     )
     {
 
@@ -1802,15 +1801,7 @@ namespace OutputProcessor {
             }
 
             if (periodTS.Rpt) {
-                WriteReportMeterData(state,
-                                     periodTS.RptNum,
-                                     periodTS.Value,
-                                     ReportFreq::TimeStep,
-                                     -1.0, // MinValue
-                                     -1,   // MinValueDate
-                                     -1.0, // MaxValue
-                                     -1,   // MaxValueDate
-                                     periodTS.RptFO);
+                periodTS.WriteReportData(state, ReportFreq::TimeStep);
                 rfMetersTS.pushVariableValue(periodTS.RptNum, periodTS.Value);
             }
 
@@ -1943,16 +1934,7 @@ namespace OutputProcessor {
             }
 
             if (period.Rpt) {
-                WriteReportMeterData(state,
-                                     period.RptNum,
-                                     period.Value,
-                                     freq,
-                                     (freq == ReportFreq::Hour) ? -1.0 : period.MinVal,
-                                     (freq == ReportFreq::Hour) ? -1 : period.MinValDate,
-                                     (freq == ReportFreq::Hour) ? -1.0 : period.MaxVal,
-                                     (freq == ReportFreq::Hour) ? -1 : period.MaxValDate,
-                                     period.RptFO); // EnergyMeters(Loop)%HRMinVal, EnergyMeters(Loop)%HRMinValDate, & |
-                                                    // EnergyMeters(Loop)%HRMaxVal, EnergyMeters(Loop)%HRMaxValDate, &
+                period.WriteReportData(state, freq);
                 rfMeters.pushVariableValue(period.RptNum, period.Value);
                 period.Value = 0.0;
 
@@ -2696,23 +2678,14 @@ namespace OutputProcessor {
         }
     } // WriteCumulativeReportMeterData()
 
-    void WriteReportMeterData(EnergyPlusData &state,
-                              int const reportID,      // The variable's report ID
-                              Real64 const repValue,   // The variable's value
-                              ReportFreq const freq,   // The variable's reporting interval (e.g., hourly)
-                              Real64 const minValue,   // The variable's minimum value during the reporting interval
-                              int const minValueDate,  // The date the minimum value occurred
-                              Real64 const maxValue,   // The variable's maximum value during the reporting interval
-                              int const maxValueDate,  // The date of the maximum value
-                              bool const meterOnlyFlag // Indicates whether the data is for the meter file only
+    void MeterPeriod::WriteReportData(EnergyPlusData &state,
+                                      ReportFreq const freq
     )
     {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Greg Stark
         //       DATE WRITTEN   July 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine writes for the non-cumulative meter data to the output files and
@@ -2722,49 +2695,49 @@ namespace OutputProcessor {
 
         std::string NumberOut;
 
-        if (repValue == 0.0) {
+        if (Value == 0.0) {
             NumberOut = "0.0";
         } else {
            char tmp[128];
-           dtoa(repValue, tmp);
+           dtoa(Value, tmp);
            NumberOut = std::string(tmp);
         }
 
         if (sql) {
             sql->createSQLiteReportDataRecord(
-                reportID, repValue, freq, minValue, minValueDate, maxValue, maxValueDate, state.dataGlobal->MinutesPerTimeStep);
+                RptNum, Value, freq, MinVal, MinValDate, MaxVal, MaxValDate, state.dataGlobal->MinutesPerTimeStep);
         }
 
         if ((freq == ReportFreq::EachCall) || (freq == ReportFreq::TimeStep) || (freq == ReportFreq::Hour)) { // -1, 0, 1
             if (state.files.mtr.good()) {
-                print(state.files.mtr, "{},{}\n", reportID, NumberOut);
+                print(state.files.mtr, "{},{}\n", RptNum, NumberOut);
             }
             ++state.dataGlobal->StdMeterRecordCount;
-            if (state.files.eso.good() && !meterOnlyFlag) {
-                print(state.files.eso, "{},{}\n", reportID, NumberOut);
+            if (state.files.eso.good() && !RptFO) {
+                print(state.files.eso, "{},{}\n", RptNum, NumberOut);
                 ++state.dataGlobal->StdOutputRecordCount;
             }
         } else { // if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) {
                  // // 2, 3, 4
             // Append the min and max strings with date information
             char minValString[128], maxValString[128];
-            dtoa(minValue, minValString);
-            dtoa(maxValue, maxValString);
+            dtoa(MinVal, minValString);
+            dtoa(MaxVal, maxValString);
             
-            std::string minDateString = ProduceMinMaxString(minValue, minValueDate, freq);
-            std::string maxDateString = ProduceMinMaxString(maxValue, maxValueDate, freq);
+            std::string minDateString = produceDateString(MinValDate, freq);
+            std::string maxDateString = produceDateString(MaxValDate, freq);
 
             if (state.files.mtr.good()) {
-                print(state.files.mtr, "{},{},{},{},{},{}\n", reportID, NumberOut, minValString, minDateString, maxValString, maxDateString);
+                print(state.files.mtr, "{},{},{},{},{},{}\n", RptNum, NumberOut, minValString, minDateString, maxValString, maxDateString);
             }
 
             ++state.dataGlobal->StdMeterRecordCount;
-            if (state.files.eso.good() && !meterOnlyFlag) {
-                print(state.files.eso, "{},{},{},{},{},{}\n", reportID, NumberOut, minValString, minDateString, maxValString, maxDateString);
+            if (state.files.eso.good() && !RptFO) {
+                print(state.files.eso, "{},{},{},{},{},{}\n", RptNum, NumberOut, minValString, minDateString, maxValString, maxDateString);
                 ++state.dataGlobal->StdOutputRecordCount;
             }
         }
-    } // WriteReportMeterData()
+    } // MeterPeriod::WriteReportData()
 
     void WriteNumericData(EnergyPlusData &state,
                           int const reportID,   // The variable's reporting ID
@@ -3048,8 +3021,8 @@ namespace OutputProcessor {
                 dtoa(MinValue, minValString);
                 dtoa(MaxValue, maxValString);
                     
-                std::string minDateString = ProduceMinMaxString(MinValue, minValueDate, freq);
-                std::string maxDateString = ProduceMinMaxString(MaxValue, maxValueDate, freq);
+                std::string minDateString = produceDateString(minValueDate, freq);
+                std::string maxDateString = produceDateString(maxValueDate, freq);
                     
                 print(state.files.eso, "{},{},{},{},{},{}\n", ReportID, NumberOut, minValString, minDateString, maxValString, maxDateString);
             }
@@ -3499,37 +3472,51 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
     // Main "Record Keeping" Loops for R and I variables
     for (auto *var : op->outVars) {
-        if (var->varType != VariableType::Real) continue;
+#ifdef GET_OUT
+            if (var->varType != VariableType::Real) continue;
+#endif // GET_OUT
         if (var->timeStepType != t_TimeStepTypeKey) continue;
 
-        OutVarReal *rVar = dynamic_cast<OutVarReal *>(var);
-        assert(rVar != nullptr);
+        Real64 value = (var->varType == VariableType::Real) ?
+            *(dynamic_cast<OutVarReal *>(var))->Which :
+            *(dynamic_cast<OutVarInt *>(var))->Which;
 
         var->Stored = true;
 
-        if (rVar->storeType == StoreType::Average) {
-            Real64 CurVal = (*rVar->Which) * rxTime;
+        if (var->storeType == StoreType::Average) {
+            Real64 CurVal = value * rxTime;
             // TODO: Is this correct? Integer logic is different
-            if ((*rVar->Which) > var->MaxValue) { 
-                var->MaxValue = (*rVar->Which);
-                var->maxValueDate = MDHM;
-            }
-            if ((*rVar->Which) < var->MinValue) {
-                var->MinValue = (*rVar->Which);
-                var->minValueDate = MDHM;
+            if (var->varType == VariableType::Real) {
+                if (value > var->MaxValue) { 
+                    var->MaxValue = value;
+                    var->maxValueDate = MDHM;
+                }
+                if (value < var->MinValue) {
+                    var->MinValue = value;
+                    var->minValueDate = MDHM;
+                }
+            } else { // var->varType == VariableType::Integer
+                if (CurVal > var->MaxValue) { 
+                    var->MaxValue = CurVal;
+                    var->maxValueDate = MDHM;
+                }
+                if (CurVal < var->MinValue) {
+                    var->MinValue = CurVal;
+                    var->minValueDate = MDHM;
+                }
             }
             var->TSValue += CurVal;
             var->EITSValue = var->TSValue; // CR - 8481 fix - 09/06/2011
         } else {
-            if ((*rVar->Which) > rVar->MaxValue) {
-                rVar->MaxValue = (*rVar->Which);
-                rVar->maxValueDate = MDHM;
+            if (value > var->MaxValue) {
+                var->MaxValue = value;
+                var->maxValueDate = MDHM;
             }
-            if ((*rVar->Which) < rVar->MinValue) {
-                rVar->MinValue = (*rVar->Which);
-                rVar->minValueDate = MDHM;
+            if (value < var->MinValue) {
+                var->MinValue = value;
+                var->minValueDate = MDHM;
             }
-            var->TSValue += (*rVar->Which);
+            var->TSValue += value;
             var->EITSValue = var->TSValue; // CR - 8481 fix - 09/06/2011
         }
 
@@ -3573,14 +3560,15 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             TimePrint = false;
         }
         
-        WriteNumericData(state, var->ReportID, *rVar->Which);
+        WriteNumericData(state, var->ReportID, value);
         ++state.dataGlobal->StdOutputRecordCount;
         
         if (rf->timeSeriesEnabled()) {
-            rf->detailedTSData[(int)t_TimeStepTypeKey].pushVariableValue(var->ReportID, *rVar->Which);
+            rf->detailedTSData[(int)t_TimeStepTypeKey].pushVariableValue(var->ReportID, value);
         } 
     } // for (var)
 
+#ifdef GET_OUT    
     for (auto *var : op->outVars) {
         if (var->varType != VariableType::Integer) continue;
         if (var->timeStepType != t_TimeStepTypeKey) continue;
@@ -3662,7 +3650,8 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             rf->detailedTSData[(int)t_TimeStepTypeKey].pushVariableValue(iVar->ReportID, *iVar->Which);
         }
     } // for (var)
-
+#endif // GET_OUT
+    
     if (t_TimeStepTypeKey == TimeStepType::System) return; // All other stuff happens at the "zone" time step call to this routine.
 
     // TimeStep Block (Report on Zone TimeStep)
@@ -3908,11 +3897,6 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             if (var->varType != VariableType::Integer) continue;
             if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
 
-            //        ReportNow=.TRUE.
-            //        IF (RVar%SchedPtr > 0) &
-            //          ReportNow=(GetCurrentScheduleValue(state, RVar%SchedPtr) /= 0.0)  !SetReportNow(RVar%SchedPtr)
-
-            //        IF (ReportNow) THEN
             if (var->tsStored) {
                 if (var->storeType == StoreType::Average) {
                     var->Value /= double(var->thisTSCount);
@@ -4752,7 +4736,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &op = state.dataOutputProcessor;
 
-    varType = VariableType::NotFound;
+    varType = VariableType::Invalid;
     numKeys = 0;
     storeType = StoreType::Average;
     timeStepType = TimeStepType::Zone;
@@ -5055,6 +5039,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
 
             if (ddVar->ReportedOnDDFile) continue;
 
+            static constexpr std::array<std::string_view, (int)TimeStepType::Num> timeStepNamesLocal = {"Zone", "HVAC"};
             std::string_view timeStepName = timeStepTypeNames[(int)ddVar->timeStepType];
             std::string_view storeTypeName = storeTypeNames[(int)ddVar->storeType];
             std::string_view varName = ddVar->name;

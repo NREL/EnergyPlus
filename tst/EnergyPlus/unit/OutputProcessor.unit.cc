@@ -782,50 +782,66 @@ namespace OutputProcessor {
         sql->createSQLiteReportDictionaryRecord(
             1, StoreType::Average, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", TimeStepType::Zone, "C", ReportFreq::Hour, false);
 
-        WriteReportMeterData(*state, 1, 999.9, ReportFreq::TimeStep, 0.0, 0, 0.0, 0, false);
+        MeterPeriod mp;
+        mp.RptNum = 1;
+        mp.Value = 999.9;
+        mp.MinVal = mp.MaxVal = 0.0;
+        mp.MinValDate = mp.MaxValDate = 0;
+        mp.RptFO = false;
+        
+        mp.WriteReportData(*state, ReportFreq::TimeStep);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,999.9"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
-        WriteReportMeterData(*state, 1, 999.9, ReportFreq::EachCall, 0.0, 0, 0.0, 0, false);
+        mp.WriteReportData(*state, ReportFreq::EachCall);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,999.9"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
-        WriteReportMeterData(*state, 1, 616771620.98702729, ReportFreq::Hour, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false);
+        mp.Value = 616771620.98702729;
+        mp.MinVal = 4283136.2516839253;
+        mp.MinValDate = 12210110;
+        mp.MaxVal = 4283136.2587211775;
+        mp.MaxValDate = 12212460;
+        mp.WriteReportData(*state, ReportFreq::Hour);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273"}, "\n")));
 
-        WriteReportMeterData(*state, 1, 616771620.98702729, ReportFreq::Day, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false);
+        mp.WriteReportData(*state, ReportFreq::Day);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211775,24,60"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211775,24,60"}, "\n")));
 
-        WriteReportMeterData(*state, 1, 616771620.98702729, ReportFreq::Month, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false);
+        mp.WriteReportData(*state, ReportFreq::Month);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211775,21,24,60"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211775,21,24,60"}, "\n")));
 
-        WriteReportMeterData(
-            *state, 1, 616771620.98702729, ReportFreq::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, false);
+        mp.WriteReportData(*state, ReportFreq::Simulation);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211775,12,21,24,60"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211775,12,21,24,60"}, "\n")));
 
-        WriteReportMeterData(*state, 1, 616771620.98702729, ReportFreq::TimeStep, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true);
+        mp.RptFO = true;
+        mp.WriteReportData(*state, ReportFreq::TimeStep);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273"}, "\n")));
 
-        WriteReportMeterData(*state, 1, 616771620.98702729, ReportFreq::EachCall, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true);
+        mp.WriteReportData(*state, ReportFreq::EachCall);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273"}, "\n")));
 
-        WriteReportMeterData(*state, 1, 616771620.98702729, ReportFreq::Hour, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true);
+        mp.WriteReportData(*state, ReportFreq::Hour);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273"}, "\n")));
 
-        WriteReportMeterData(*state, 1, 616771620.98702729, ReportFreq::Day, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true);
+        mp.WriteReportData(*state, ReportFreq::Day);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211775,24,60"}, "\n")));
 
-        WriteReportMeterData(*state, 1, 616771620.98702729, ReportFreq::Month, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true);
+        mp.WriteReportData(*state, ReportFreq::Month);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211775,21,24,60"}, "\n")));
 
-        WriteReportMeterData(*state, 1, 616771620.98702729, ReportFreq::Simulation, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460, true);
+        mp.WriteReportData(*state, ReportFreq::Simulation);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211775,12,21,24,60"}, "\n")));
 
-        WriteReportMeterData(*state, 1, 0, ReportFreq::TimeStep, 0.0, 0, 0.0, 0, false);
+        mp.Value = 0;
+        mp.MinVal = mp.MaxVal = 0.0;
+        mp.MinValDate = mp.MaxValDate = 0;
+        mp.RptFO = false;
+        mp.WriteReportData(*state, ReportFreq::TimeStep);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,0.0"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.0"}, "\n")));
 

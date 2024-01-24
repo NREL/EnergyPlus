@@ -539,6 +539,8 @@ namespace OutputProcessor {
             MinVal = MinSetValue;
             MinValDate = 0;
         }
+
+        void WriteReportData(EnergyPlusData &state, ReportFreq freq);            
     };
 
     struct Meter
@@ -627,9 +629,8 @@ namespace OutputProcessor {
 
     ReportFreq determineFrequency(EnergyPlusData &state, std::string_view const FreqString);
 
-    std::string ProduceMinMaxString(std::string &String, // Current value
-                                    int DateValue,       // Date of min/max
-                                    ReportFreq freq      // Reporting Frequency
+    std::string produceDateString(int DateValue,       // Date of min/max
+                                  ReportFreq freq      // Reporting Frequency
     );
 
     // *****************************************************************************
@@ -754,6 +755,7 @@ namespace OutputProcessor {
                                         bool meterOnlyFlag // A flag that indicates if the data should be written to standard output
     );
 
+#ifdef GET_OUT        
     void WriteReportMeterData(EnergyPlusData &state,
                               int reportID,      // The variable's report ID
                               Real64 repValue,   // The variable's value
@@ -764,7 +766,8 @@ namespace OutputProcessor {
                               int maxValueDate,  // The date of the maximum value
                               bool meterOnlyFlag // Indicates whether the data is for the meter file only
     );
-
+#endif // GET_OUT
+        
     void WriteNumericData(EnergyPlusData &state,
                           int reportID,   // The variable's reporting ID
                           Real64 repValue // The variable's value

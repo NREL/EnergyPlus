@@ -623,7 +623,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             // call the key count function but only need count during this pass
             int KeyCount = 0;
             GetVariableKeyCountandType(state, curVariMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
-            if (TypeVar == OutputProcessor::VariableType::NotFound) { // TODO: This NotFound thing has to go
+            if (TypeVar == OutputProcessor::VariableType::Invalid) { // TODO: This NotFound thing has to go
                 if (!ort->MonthlyInput(TabNum).isNamedMonthly) {
                     ++state.dataOutRptTab->ErrCount1;
                 }
