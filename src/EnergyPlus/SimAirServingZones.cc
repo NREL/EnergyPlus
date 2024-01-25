@@ -6421,6 +6421,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
             SysCoolRetHumRat = 0.0;
             SysCoolOutTemp = 0.0;
             SysCoolOutHumRat = 0.0;
+            int saveCoolTUSizingIndex = 0;
 
             for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over cooled zones
                 int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
@@ -6443,6 +6444,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                 CoolTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtCoolMax;
                 OutAirTemp += state.dataSize->DesDayWeath(CoolDDNum).Temp(CoolTimeStepNum) * coolMassFlow / (1.0 + termUnitSizing.InducRat);
                 OutAirHumRat += state.dataSize->DesDayWeath(CoolDDNum).HumRat(CoolTimeStepNum) * coolMassFlow / (1.0 + termUnitSizing.InducRat);
+                saveCoolTUSizingIndex = TermUnitSizingIndex;
             }
             if (state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow > 0.0) {
                 SysCoolRetTemp /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
@@ -6482,6 +6484,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
             SysHeatRetHumRat = 0.0;
             SysHeatOutTemp = 0.0;
             SysHeatOutHumRat = 0.0;
+            int saveHeatTUSizingIndex = 0;
 
             if (NumZonesHeated > 0) { // IF there are centrally heated zones
 
@@ -6507,6 +6510,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                     HeatTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtHeatMax;
                     OutAirTemp += state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
                     OutAirHumRat += state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    saveHeatTUSizingIndex = TermUnitSizingIndex;
                 }
                 if (state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow > 0.0) {
                     SysHeatRetTemp /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
@@ -6554,6 +6558,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                     HeatTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtHeatMax;
                     OutAirTemp += state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
                     OutAirHumRat += state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + termUnitSizing.InducRat);
+                    saveHeatTUSizingIndex = TermUnitSizingIndex;
                 }
                 if (state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow > 0.0) {
                     SysHeatRetTemp /= state.dataSize->CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
@@ -6591,6 +6596,14 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                     state.dataSize->CalcSysSizing(AirLoopNum).RetHumRatAtCoolPeak = SysCoolRetHumRat;
                     state.dataSize->CalcSysSizing(AirLoopNum).OutTempAtCoolPeak = SysCoolOutTemp;
                     state.dataSize->CalcSysSizing(AirLoopNum).OutHumRatAtCoolPeak = SysCoolOutHumRat;
+                    if (state.dataSize->SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD == 0 && saveCoolTUSizingIndex > 0) {
+                        CoolDDNum = state.dataSize->TermUnitFinalZoneSizing(saveCoolTUSizingIndex).CoolDDNum;
+                        CoolTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(saveCoolTUSizingIndex).TimeStepNumAtCoolMax;
+                        state.dataSize->SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD = CoolDDNum;
+                        state.dataSize->SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate = state.dataSize->DesDayWeath(CoolDDNum).DateString;
+                        state.dataSize->SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk(HeatDDNum) = CoolTimeStepNum;
+                        state.dataSize->CalcSysSizing(AirLoopNum).CoolDesDay = state.dataSize->SysSizing(CoolDDNum, AirLoopNum).CoolDesDay;
+                    }
                 }
                 // check to see if the noncoincident result is actually bigger than the coincident (for 100% outside air)
                 // why is this < 0.0 ? SysHeatCap cannot be < 0 ?? this code will always get executed
@@ -6603,6 +6616,14 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                     state.dataSize->CalcSysSizing(AirLoopNum).HeatRetHumRat = SysHeatRetHumRat;
                     state.dataSize->CalcSysSizing(AirLoopNum).HeatOutTemp = SysHeatOutTemp;
                     state.dataSize->CalcSysSizing(AirLoopNum).HeatOutHumRat = SysHeatOutHumRat;
+                    if (state.dataSize->SysSizPeakDDNum(AirLoopNum).HeatPeakDD == 0 && saveHeatTUSizingIndex > 0) {
+                        HeatDDNum = state.dataSize->TermUnitFinalZoneSizing(saveHeatTUSizingIndex).HeatDDNum;
+                        HeatTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(saveHeatTUSizingIndex).TimeStepNumAtHeatMax;
+                        state.dataSize->SysSizPeakDDNum(AirLoopNum).HeatPeakDD = HeatDDNum;
+                        state.dataSize->SysSizPeakDDNum(AirLoopNum).cHeatPeakDDDate = state.dataSize->DesDayWeath(HeatDDNum).DateString;
+                        state.dataSize->SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(HeatDDNum) = HeatTimeStepNum;
+                        state.dataSize->CalcSysSizing(AirLoopNum).HeatDesDay = state.dataSize->SysSizing(HeatDDNum, AirLoopNum).HeatDesDay;
+                    }
                 }
                 state.dataSize->CalcSysSizing(AirLoopNum).DesCoolVolFlow =
                     state.dataSize->CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
