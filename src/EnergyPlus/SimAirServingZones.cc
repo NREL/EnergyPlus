@@ -6596,12 +6596,12 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                     state.dataSize->CalcSysSizing(AirLoopNum).RetHumRatAtCoolPeak = SysCoolRetHumRat;
                     state.dataSize->CalcSysSizing(AirLoopNum).OutTempAtCoolPeak = SysCoolOutTemp;
                     state.dataSize->CalcSysSizing(AirLoopNum).OutHumRatAtCoolPeak = SysCoolOutHumRat;
-                    if (state.dataSize->SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD == 0 && saveCoolTUSizingIndex > 0) {
+                    if (saveCoolTUSizingIndex > 0) {
                         CoolDDNum = state.dataSize->TermUnitFinalZoneSizing(saveCoolTUSizingIndex).CoolDDNum;
                         CoolTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(saveCoolTUSizingIndex).TimeStepNumAtCoolMax;
                         state.dataSize->SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD = CoolDDNum;
                         state.dataSize->SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate = state.dataSize->DesDayWeath(CoolDDNum).DateString;
-                        state.dataSize->SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk(HeatDDNum) = CoolTimeStepNum;
+                        state.dataSize->SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk(CoolDDNum) = CoolTimeStepNum;
                         state.dataSize->CalcSysSizing(AirLoopNum).CoolDesDay = state.dataSize->SysSizing(CoolDDNum, AirLoopNum).CoolDesDay;
                     }
                 }
@@ -6616,7 +6616,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                     state.dataSize->CalcSysSizing(AirLoopNum).HeatRetHumRat = SysHeatRetHumRat;
                     state.dataSize->CalcSysSizing(AirLoopNum).HeatOutTemp = SysHeatOutTemp;
                     state.dataSize->CalcSysSizing(AirLoopNum).HeatOutHumRat = SysHeatOutHumRat;
-                    if (state.dataSize->SysSizPeakDDNum(AirLoopNum).HeatPeakDD == 0 && saveHeatTUSizingIndex > 0) {
+                    if (saveHeatTUSizingIndex > 0) {
                         HeatDDNum = state.dataSize->TermUnitFinalZoneSizing(saveHeatTUSizingIndex).HeatDDNum;
                         HeatTimeStepNum = state.dataSize->TermUnitFinalZoneSizing(saveHeatTUSizingIndex).TimeStepNumAtHeatMax;
                         state.dataSize->SysSizPeakDDNum(AirLoopNum).HeatPeakDD = HeatDDNum;
