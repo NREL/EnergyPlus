@@ -60,7 +60,6 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Plant/CallingOrder.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/Loop.hh>

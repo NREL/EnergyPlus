@@ -57,7 +57,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
-#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -69,6 +68,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
@@ -303,8 +303,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
         Material::MaterialBase *p = new Material::MaterialBase;
         state->dataMaterial->Material.push_back(p);
     }
-    state->dataSurface->SurfaceWindow(1).EffShBlindEmiss(1) = 0.1;
-    state->dataSurface->SurfaceWindow(1).EffGlassEmiss(1) = 0.1;
+    state->dataSurface->SurfaceWindow(1).EffShBlindEmiss[1] = 0.1;
+    state->dataSurface->SurfaceWindow(1).EffGlassEmiss[1] = 0.1;
 
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(1).Construction = 1;
@@ -2556,7 +2556,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     AllocateSurfaceHeatBalArrays(*state); // allocates a host of variables related to CTF calculations
     OutputProcessor::GetReportVariableInput(*state);
 
-    EXPECT_EQ(state->dataOutputProcessor->ReqRepVars(2).VarName, "SURFACE CONSTRUCTION INDEX");
+    EXPECT_EQ(state->dataOutputProcessor->reqVars[1]->name, "SURFACE CONSTRUCTION INDEX");
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceAddSourceTerm)
@@ -3678,18 +3678,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_EQ(2, state->dataHeatBal->Resilience(1).ZoneCO2LevelOccuHourBins[1]);
     EXPECT_EQ(1, state->dataHeatBal->Resilience(1).ZoneCO2LevelOccupiedHourBins[1]);
 
-    state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
+    state->dataDayltg->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
     int totDaylightingControls = state->dataGlobal->NumOfZones;
-    state->dataDaylightingData->daylightControl.allocate(totDaylightingControls);
-    state->dataDaylightingData->daylightControl(1).DaylightMethod = Dayltg::DaylightingMethod::SplitFlux;
-    state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
-    state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 1;
-    state->dataDaylightingData->ZoneDaylight(1).totRefPts = 1;
-    state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt.allocate(1);
-    state->dataDaylightingData->daylightControl(1).IllumSetPoint.allocate(1);
-    state->dataDaylightingData->daylightControl(1).PowerReductionFactor = 0.5;
-    state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt(1) = 300;
-    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 400;
+    state->dataDayltg->daylightControl.allocate(totDaylightingControls);
+    state->dataDayltg->daylightControl(1).DaylightMethod = Dayltg::DaylightingMethod::SplitFlux;
+    state->dataDayltg->daylightControl(1).zoneIndex = 1;
+    state->dataDayltg->daylightControl(1).TotalDaylRefPoints = 1;
+    state->dataDayltg->ZoneDaylight(1).totRefPts = 1;
+    state->dataDayltg->daylightControl(1).refPts.allocate(1);
+    state->dataDayltg->daylightControl(1).PowerReductionFactor = 0.5;
+    state->dataDayltg->daylightControl(1).refPts(1).lums[(int)DataSurfaces::Lum::Illum] = 300;
+    state->dataDayltg->daylightControl(1).refPts(1).illumSetPoint = 400;
     state->dataOutRptTab->displayVisualResilienceSummary = true;
 
     ReportVisualResilience(*state);
@@ -4401,18 +4400,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestVisualResilienceReportRe
     state->dataHeatBal->People(1).NumberOfPeople = 2;
     state->dataHeatBal->People(1).NumberOfPeoplePtr = 1;
 
-    state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
+    state->dataDayltg->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
     int totDaylightingControls = state->dataGlobal->NumOfZones;
-    state->dataDaylightingData->daylightControl.allocate(totDaylightingControls);
-    state->dataDaylightingData->daylightControl(1).DaylightMethod = Dayltg::DaylightingMethod::SplitFlux;
-    state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
-    state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 1;
-    state->dataDaylightingData->ZoneDaylight(1).totRefPts = 1;
-    state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt.allocate(1);
-    state->dataDaylightingData->daylightControl(1).IllumSetPoint.allocate(1);
-    state->dataDaylightingData->daylightControl(1).PowerReductionFactor = 0.5;
-    state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt(1) = 300;
-    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 400;
+    state->dataDayltg->daylightControl.allocate(totDaylightingControls);
+    state->dataDayltg->daylightControl(1).DaylightMethod = Dayltg::DaylightingMethod::SplitFlux;
+    state->dataDayltg->daylightControl(1).zoneIndex = 1;
+    state->dataDayltg->daylightControl(1).TotalDaylRefPoints = 1;
+    state->dataDayltg->ZoneDaylight(1).totRefPts = 1;
+    state->dataDayltg->daylightControl(1).refPts.allocate(1);
+    state->dataDayltg->daylightControl(1).PowerReductionFactor = 0.5;
+    state->dataDayltg->daylightControl(1).refPts(1).lums[(int)DataSurfaces::Lum::Illum] = 300;
+    state->dataDayltg->daylightControl(1).refPts(1).illumSetPoint = 400;
     state->dataOutRptTab->displayVisualResilienceSummary = true;
 
     int NoBins = 4;
@@ -4427,7 +4425,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestVisualResilienceReportRe
     state->dataScheduleMgr->Schedule.allocate(1);
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
-    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 250;
+    state->dataDayltg->daylightControl(1).refPts(1).illumSetPoint = 250;
     for (int hour = 1; hour <= 4; hour++) {
         state->dataGlobal->HourOfDay = hour;
         ReportVisualResilience(*state);
@@ -4447,7 +4445,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestVisualResilienceReportRe
     EXPECT_NEAR(0.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8);
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 0.4;
-    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 600;
+    state->dataDayltg->daylightControl(1).refPts(1).illumSetPoint = 600;
     for (int hour = 5; hour <= 7; hour++) {
         state->dataGlobal->HourOfDay = hour;
         ReportVisualResilience(*state);
@@ -4467,7 +4465,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestVisualResilienceReportRe
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8);
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
-    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 70;
+    state->dataDayltg->daylightControl(1).refPts(1).illumSetPoint = 70;
     for (int hour = 8; hour <= 10; hour++) {
         state->dataGlobal->HourOfDay = hour;
         ReportVisualResilience(*state);
@@ -4487,7 +4485,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestVisualResilienceReportRe
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 1)[3], 1e-8);
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
-    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 600;
+    state->dataDayltg->daylightControl(1).refPts(1).illumSetPoint = 600;
     for (int hour = 13; hour <= 15; hour++) {
         state->dataGlobal->HourOfDay = hour;
         ReportVisualResilience(*state);
@@ -4507,7 +4505,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestVisualResilienceReportRe
     EXPECT_NEAR(3.0, state->dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(1, 2)[3], 1e-8);
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
-    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 70;
+    state->dataDayltg->daylightControl(1).refPts(1).illumSetPoint = 70;
     for (int hour = 16; hour <= 18; hour++) {
         state->dataGlobal->HourOfDay = hour;
         ReportVisualResilience(*state);
@@ -4912,8 +4910,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_IncSolarMultiplier)
     state->dataConstruction->Construct(ConstrNum).TransSolBeamCoef = 0.2;
 
     state->dataSurface->SurfaceWindow.allocate(totSurf);
-    state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(state->dataGlobal->HourOfDay) = 999.0;
-    state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(state->dataGlobal->HourOfDay) = 888.0;
+    state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult[state->dataGlobal->HourOfDay] = 999.0;
+    state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult[state->dataGlobal->HourOfDay] = 888.0;
 
     SolarShading::AllocateModuleArrays(*state);
     state->dataHeatBal->SurfSunlitFrac = 1.0;
@@ -5332,8 +5330,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
         thisSurf.RadEnclIndex = 1;
     }
     state->dataViewFactor->EnclSolInfo(1).TotalEnclosureDaylRefPoints = 1;
-    state->dataDaylightingData->enclDaylight.allocate(1);
-    state->dataDaylightingData->enclDaylight(1).hasSplitFluxDaylighting = true;
+    state->dataDayltg->enclDaylight.allocate(1);
+    state->dataDayltg->enclDaylight(1).hasSplitFluxDaylighting = true;
     InitSurfaceHeatBalance(*state);
     EXPECT_FALSE(has_err_output(true));
 }

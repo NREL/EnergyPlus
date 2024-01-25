@@ -301,6 +301,14 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
     ElectricBaseboardRadiator::GetElectricBaseboardInput(*state);
     EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(1).ZonePtr, 1);
     EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(2).ZonePtr, 2);
+
+    int surfNumRight1 = Util::FindItemInList("RIGHT-1", state->dataSurface->Surface);
+    int surfNumLeft1 = Util::FindItemInList("LEFT-1", state->dataSurface->Surface);
+
+    EXPECT_EQ(state->dataSurface->allGetsRadiantHeatSurfaceList[0], surfNumRight1);
+    EXPECT_EQ(state->dataSurface->allGetsRadiantHeatSurfaceList[1], surfNumLeft1);
+    EXPECT_TRUE(state->dataSurface->surfIntConv(surfNumRight1).getsRadiantHeat);
+    EXPECT_TRUE(state->dataSurface->surfIntConv(surfNumLeft1).getsRadiantHeat);
 }
 
 TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)

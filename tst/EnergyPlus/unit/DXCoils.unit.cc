@@ -2726,8 +2726,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
 
     EXPECT_FALSE(state->dataDXCoils->DXCoil(1).ReportCoolingCoilCrankcasePower);
     // These two output variables are listed in rdd for Coil:Cooling:DX:MultiSpeed used for AC only
-    EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Rate", state->dataOutputProcessor->DDVariableTypes(10).VarNameOnly);
-    EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Energy", state->dataOutputProcessor->DDVariableTypes(11).VarNameOnly);
+    EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Rate", state->dataOutputProcessor->ddOutVars[9]->name);
+    EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Energy", state->dataOutputProcessor->ddOutVars[10]->name);
 
     state->dataGlobal->SysSizingCalc = false;
     state->dataAirLoop->AirLoopInputsFilled = false;
@@ -6852,14 +6852,14 @@ TEST_F(EnergyPlusFixture, Test_DHW_End_Use_Cat_Removal)
     GetDXCoils(*state);
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
 
-    EXPECT_EQ(24, state->dataOutputProcessor->NumEnergyMeters);
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(20).Name, "WaterSystems:Electricity");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(20).ResourceType, "Electricity");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(20).EndUse, "WaterSystems");
+    EXPECT_EQ(24, state->dataOutputProcessor->meters.size());
+    EXPECT_EQ(state->dataOutputProcessor->meters[19]->Name, "WaterSystems:Electricity");
+    EXPECT_EQ((int)state->dataOutputProcessor->meters[19]->resource, (int)Constant::eResource::Electricity);
+    EXPECT_EQ((int)state->dataOutputProcessor->meters[19]->sovEndUseCat, (int)OutputProcessor::SOVEndUseCat::WaterSystem);
 
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(21).Name, "General:WaterSystems:Electricity");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(21).ResourceType, "Electricity");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(21).EndUse, "WaterSystems");
+    EXPECT_EQ(state->dataOutputProcessor->meters[20]->Name, "General:WaterSystems:Electricity");
+    EXPECT_EQ((int)state->dataOutputProcessor->meters[20]->resource, (int)Constant::eResource::Electricity);
+    EXPECT_EQ((int)state->dataOutputProcessor->meters[20]->sovEndUseCat, (int)OutputProcessor::SOVEndUseCat::WaterSystem);
 }
 
 } // namespace EnergyPlus

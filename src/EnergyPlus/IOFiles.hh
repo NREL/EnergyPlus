@@ -673,6 +673,7 @@ public:
         OutputControl() = default;
 
         void getInput(EnergyPlusData &state);
+        bool writeTabular(EnergyPlusData &state);
 
         bool csv = false;
         bool mtr = true;

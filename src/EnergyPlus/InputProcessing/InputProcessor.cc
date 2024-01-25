@@ -69,7 +69,6 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <embedded/EmbeddedEpJSONSchema.hh>
 

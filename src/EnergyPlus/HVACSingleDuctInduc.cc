@@ -443,7 +443,7 @@ namespace HVACSingleDuctInduc {
             // report variable for all single duct air terminals
             SetupOutputVariable(state,
                                 "Zone Air Terminal Outdoor Air Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
+                                Constant::Units::m3_s,
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutdoorAirFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
