@@ -4,6 +4,7 @@ Ruleset Model Description Phase 3
 **Jason Glazer, GARD Analytics**
 
  - January 18, 2024
+ - January 25, 2024 - added cross referencing in createRMD Enhancements section and other fixes
 
 ## Justification for New Feature ##
 
@@ -281,6 +282,20 @@ The current columns are (need to verify that these are populated):
 - Exhaust airflow
 - Outdoor airflow
 
+#### Component Sizing Summary - PlantLoop ####
+
+The current columns are:
+- Initial Maximum Loop Flow Rate [m3/s]
+- Initial Plant Loop Volume [m3]
+- Maximum Loop Flow Rate [m3/s]
+- Plant Loop Volume [m3]
+
+The new columns would be:
+- Design supply temperature
+- Design return temperature
+- Sizing option (Coincident/NonCoincident)
+- Minimum Loop Flow Rate [m3/s]
+
 
 ### Add New EnergyPlus Tabular Reports and Tables ###
 
@@ -339,7 +354,8 @@ with control options and identifies the type, where they apply, sense, and contr
 - minimum and maximum setpoint temperatures
 - minimum turndown ratio
 - schedules
-- load ranges
+- load range lower limit
+- load range upper limit
 - Setpoint at Outdoor Low Temperature
 - Outdoor Low Temperature
 - Setpoint at Outdoor High Temperature
@@ -351,6 +367,12 @@ available within the data structure that would be useful to report. Include spec
 
 - Heat Recovery - Operation With Economizer
 - Heat Recovery - Supply Air Temperature Control
+- Setpoint Managers - FanSystem - temperature_control
+- Setpoint Managers - FanSystem - reset_differential_temperature
+- Setpoint Managers - FanSystem - supply_air_temperature_reset_load_fraction
+- AvailabilityManager:Scheduled
+- Pump and fan availability schedules
+- Setpoint Managers - FluidLoopDesignAndControl - temperature_reset_type
 
 
 ## Testing/Validation/Data Sources ##
@@ -370,124 +392,134 @@ Additional tabular outputs will be described in the IOref.
 
 ## createRMD Enhancements ###
 
-Certain data groups and elements are more important to implement since they are used by PNNL's Ruleset Checking Tool:
+The following describes the new data elements and data groups that will be added to createRMD. These are based on
+what is needed since they are used by PNNL's Ruleset Checking Tool. Note that not all data elements will be 
+supported that are shown below. Data elements followed by (cp) are compliance parameters and are not able to be
+captured in input to, or output from, EnergyPlus. In addition, data elements followed by (nc) have no corresponding
+data column from EnergyPlus output and no plans to support that data element. These are typically only available
+as input or would be complicated to support as output. After other data elements in parenthesis is the EnergyPlus 
+report that can be used to populate that data element.
+
+^means that it is in in schema.yaml and column is defined-delete after assessment
 
 HeatingVentilatingAirConditioningSystem
-- preheat_system
+- preheat_system (topology report)
 
 CoolingSystem:
-- dehumidification_type
+- dehumidification_type (topology report)
 
 FanSystem:
-- return_fans
-- exhaust_fans
-- relief_fans
-- air_economizer
-- air_energy_recovery
-- temperature_control
-- operation_during_occupied
-- operation_during_unoccupied
+- return_fans (PROBABLY topology report)
+- exhaust_fans (Component Sizing Summary AND topology report)
+- relief_fans (PROBABLY topology report)
+- air_economizer (System Summary - Economizer)
+- air_energy_recovery (Component Sizing Summary)
+- temperature_control (Controls report)
+- operation_during_occupied (Equipment Summary - Fans)
+- operation_during_unoccupied (Equipment Summary - Fans)
 - fan_control (cp)
-- reset_differential_temperature
-- supply_air_temperature_reset_load_fraction
-- fan_volume_reset_type
-- fan_volume_reset_fraction
-- minimum_airflow
-- minimum_outdoor_airflow
-- maximum_outdoor_airflow
-- demand_control_ventilation_control
+- reset_differential_temperature (Controls report)
+- supply_air_temperature_reset_load_fraction (Controls report)
+- fan_volume_reset_type (nc)
+- fan_volume_reset_fraction (nc)
+- minimum_airflow (Standard 62.1 Summary)
+- minimum_outdoor_airflow (Component Sizing Summary)
+- maximum_outdoor_airflow (Component Sizing Summary)
+- demand_control_ventilation_control (System Summary - Demand Controlled Ventilation using Controller:MechanicalVentilation - Type)
 
 AirEconomizer
-- type
-- high_limit_shutoff_temperature
+- type (System Summary - Economizer)
+- high_limit_shutoff_temperature (System Summary - Economizer)
 
 AirEnergyRecovery
-- enthalpy_recovery_ratio
+- enthalpy_recovery_ratio (cp)
 - energy_recovery_operation (cp)
 
 FanOutputValidationPoint
-- airflow
-- result
+- airflow (nc)
+- result (nc)
 
 Terminal (probably should do early since critical)
-- type
-- served_by_heating_ventilating_air_conditioning_system
-- heating_source
-- heating_from_loop
-- cooling_source
-- cooling_from_loop
-- fan
-- fan_configuration
-- primary_airflow
-- supply_design_heating_setpoint_temperature
-- supply_design_cooling_setpoint_temperature
-- minimum_airflow
-- minimum_outdoor_airflow
-- minimum_outdoor_airflow_multiplier_schedule
-- heating_capacity
+- type (Equipment Summary - AirTerminals - type)
+- served_by_heating_ventilating_air_conditioning_system (topology report)
+- heating_source (Equipment Summary - AirTerminals - Heat/Reheat Coil Object Type)
+- heating_from_loop (Equipment Summary - AirTerminals - Hot Water Plant Loop Name)
+- cooling_source (Equipment Summary - AirTerminals, Chilled Water Coil Object Type)
+- cooling_from_loop (Equipment Summary - AirTerminals, Chilled Water Plant Loop Name) 
+- fan (Equipment Summary - AirTerminals, Fan Name)
+- fan_configuration (Equipment Summary - AirTerminals, type of input object)
+- primary_airflow (Equipment Summary - AirTerminals, Primary Air Flow Rate)
+- supply_design_heating_setpoint_temperature (Equipment Summary - AirTerminals, Supply heating setpoint)
+- supply_design_cooling_setpoint_temperature (Equipment Summary - AirTerminals, Supply cooling setpoint)
+- minimum_airflow (Standard 62.1 Summary)
+- minimum_outdoor_airflow (Standard 62.1 Summary)
+- minimum_outdoor_airflow_multiplier_schedule (Equipment Summary - AirTerminals, Minimum Flow Schedule Name)
+- heating_capacity (Equipment Summary - AirTerminals, heating capacity)
 - is_supply_ducted (cp)
-- has_demand_control_ventilation
+- has_demand_control_ventilation (System Summary - Demand Controlled Ventilation using Controller:MechanicalVentilation, Controller:MechanicalVentilation Name, Demand Controlled Ventilation)
 
 FluidLoop
-- type
-- pump_power_per_flow_rate
-- child_loops
-- cooling_or_condensing_design_and_control
-- heating_design_and_control
+- type (Equipment Summary - PlantLoop or CondenserLoop)
+- pump_power_per_flow_rate (Equipment Summary - PlantLoop or CondenserLoop, Total pump power on loop)
+- child_loops (topology report)
+- cooling_or_condensing_design_and_control (Equipment Summary - PlantLoop or CondenserLoop)
+- heating_design_and_control (Equipment Summary - PlantLoop or CondenserLoop)
 
 FluidLoopDesignAndControl
-- design_supply_temperature
-- design_return_temperature
-- is_sized_using_coincident_load
-- minimum_flow_fraction
-- operation
-- operation_schedule
-- flow_control
-- temperature_reset_type
-- outdoor_high_for_loop_supply_reset_temperature
-- outdoor_low_for_loop_supply_reset_temperature
-- loop_supply_temperature_at_outdoor_high
-- loop_supply_temperature_at_outdoor_low
-- loop_supply_temperature_at_low_load
-- has_integrated_waterside_economizer
+- design_supply_temperature (Component Sizing Summary - PlantLoop, Design supply temperature)
+- design_return_temperature (Component Sizing Summary - PlantLoop, Design return temperature)
+- is_sized_using_coincident_load (Component Sizing Summary - PlantLoop, Sizing option)
+- minimum_flow_fraction (Component Sizing Summary - PlantLoop, Minimum Loop Flow Rate)
+- operation (Equipment Summary - Pumps, Control)
+- operation_schedule (Controls)
+- flow_control (Equipment Summary - Pumps, Type)
+- temperature_reset_type (Controls)
+- outdoor_high_for_loop_supply_reset_temperature (Controls)
+- outdoor_low_for_loop_supply_reset_temperature (Controls)
+- loop_supply_temperature_at_outdoor_high (Controls)
+- loop_supply_temperature_at_outdoor_low (Controls)
+- loop_supply_temperature_at_low_load (Controls)
+- has_integrated_waterside_economizer (topology)
 
 Boiler
 - draft_type (cp)
-- operation_lower_limit
-- operation_upper_limit
+- operation_lower_limit (Controls)
+- operation_upper_limit (Controls)
 
 Chiller 
 - compressor_type (cp)
-- is_chilled_water_pump_interlocked
-- is_condenser_water_pump_interlocked
+- is_chilled_water_pump_interlocked (topology)
+- is_condenser_water_pump_interlocked (topology)
 
 HeatRejection
-- type
+- type (Equipment Summary - Cooling Towers and Fluid Coolers, type)
 - fan_shaft_power (cp)
-- fan_speed_control
+- fan_speed_control (Equipment Summary - Cooling Towers and Fluid Coolers, type)
 - rated_water_flowrate (cp)
-- leaving_water_setpoint_temperature
+- leaving_water_setpoint_temperature (Equipment Summary - Cooling Towers and Fluid Coolers, Leaving Water Setpoint Temperature)
 
 ExternalFluidSource
-- loop
-- type
+- loop (topology)
+- type (topology)
 
 OutputInstance:
-- ruleset_model_type
-- rotation_angle
-- unmet_load_hours
-- unmet_load_hours_heating
-- unmet_occupied_load_hours_heating
-- unmet_load_hours_cooling
-- unmet_occupied_load_hours_cooling
-- building_peak_cooling_load
+- ruleset_model_type (cp)
+- rotation_angle (cp, could be from Compliance:Building)
+- unmet_load_hours (system summary)
+- unmet_load_hours_heating (system summary)
+- unmet_occupied_load_hours_heating (system summary)
+- unmet_load_hours_cooling (system summary)
+- unmet_occupied_load_hours_cooling  (system summary)
+- building_peak_cooling_load (HVAC Sizing Summary)
 
 
 Some remaining non-HVAC related items that may be added include:
 
+RulesetModelDescription
+- measured_infiltration_pressure_difference (cp)
+
 Building
-- building_open_schedule
-- measured_infiltration_pressure_difference
+- building_open_schedule (cp)
 
 BuildingSegment
 - is_all_new (cp)
@@ -497,16 +529,16 @@ BuildingSegment
 
 Zone:
 - floor_name (cp)
-- design_thermostat_cooling_setpoint
-- design_thermostat_heating_setpoint
-- maximum_humidity_setpoint_schedule
-- zonal_exhaust_fan
+- design_thermostat_cooling_setpoint (nc)
+- design_thermostat_heating_setpoint (nc)
+- maximum_humidity_setpoint_schedule (nc)
+- zonal_exhaust_fan (nc)
 - non_mechanical_cooling_fan_airflow (cp)
-- air_distribution_effectiveness
+- air_distribution_effectiveness (nc)
 
 Space:
-- occupant_sensible_heat_gain
-- occupant_latent_heat_gain
+- occupant_sensible_heat_gain (nc)
+- occupant_latent_heat_gain (nc)
 - status_type (cp)
 - function (cp)
 
@@ -518,15 +550,15 @@ Construction
 - f_factor (cp)
 
 SurfaceOpticalProperties:
-- absorptance_thermal_exterior
-- absorptance_solar_exterior
+- absorptance_thermal_exterior (nc)
+- absorptance_solar_exterior (nc)
 
 Subsurface:
 - classification (cp)
 - subclassification (cp)
-- dynamic_glazing_type
-- has_shading_overhang
-- has_shading_sidefins
+- dynamic_glazing_type (nc)
+- has_shading_overhang (nc)
+- has_shading_sidefins (nc)
 - has_manual_interior_shades (cp)
 
 InteriorLighting
@@ -537,24 +569,21 @@ MiscellaneousEquipment
 
 Transformer
 - type (cp)
-- phase
-- efficiency
-- capacity
+- phase (nc)
+- efficiency (nc)
+- capacity (nc)
 
 Schedule
-- hourly_heating_design_day
-- hourly_cooling_design_day
-- type
+- hourly_heating_design_day (nc)
+- hourly_cooling_design_day (nc)
+- type (nc)
 
 Weather
-- ground_temperature_schedule
+- ground_temperature_schedule (nc)
 - data_source_type (cp) 
 
-ExteriorLighting
-- multiplier_schedule
-
-
 (cp) indicates that it may need to be compliance parameter not based on simulation inputs or outputs
+(nc) indicates that no corresponding data column exists and we have no plans to support that data element
 
 This list is based on two sources: 
 - baseline_model.json
