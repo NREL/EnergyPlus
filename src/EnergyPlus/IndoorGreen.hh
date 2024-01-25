@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -79,13 +79,14 @@ namespace IndoorGreen {
         Real64 LEDNominalPPFD = 0.0; // nominal PPFD for LED grow light (PPFD)
         Real64 LEDNominalEleP = 0.0; // nominal power for total LED grow light (W)
         Real64 LEDRadFraction = 0.0; // radiant fraction of LED grow light (0-1)
-        Real64 ZPreTemp = 0.0;
-        Real64 ZPreHum = 0.0;
+        //Real64 ZPreTemp = 0.0;
+        //Real64 ZPreHum = 0.0;
         Real64 ZCO2 = 400;
+        Real64 ZVPD = 0.0;          // vapor pressure deficit (pa)
         Real64 ZPPFD = 0;          //PPFD
         Real64 SensibleRate = 0.0; //w
         Real64 LatentRate = 0.0;   //w
-        Real64 ETRate = 0.0;     // kg/(m2s)
+        Real64 ETRate = 0.0;       // kg/(m2s)
         Real64 LambdaET = 0.0;     //J/(kg m2)
         Real64 LEDActualPPFD = 0.0; // LED operational PPFD 
         Real64 LEDActualEleP = 0.0; // LED operational power (W)
@@ -110,11 +111,12 @@ namespace IndoorGreen {
 
     void ETModel(EnergyPlusData &state);
 
-    Real64 ETPenmanMonteith(EnergyPlusData &state, Real64 &ZonePreTemp, Real64 &ZonePreHum, Real64 &ZoneCO2, Real64 &ZonePPFD, Real64 &LAI);
+    Real64
+    ETPenmanMonteith(EnergyPlusData &state, Real64 &ZonePreTemp, Real64 &ZonePreHum, Real64 &ZoneCO2, Real64 &ZonePPFD, Real64 &VPD, Real64 &LAI);
     
-    Real64 ETStanghellini(EnergyPlusData &state);
+    Real64 ETStanghellini(EnergyPlusData &state, Real64 &ZonePreTemp, Real64 &ZonePreHum, Real64 &ZoneCO2, Real64 &ZonePPFD, Real64 &VPD, Real64 &LAI);
 
-    Real64 ETDatadriven(EnergyPlusData &state);
+    //Real64 ETDatadriven(EnergyPlusData &state, Real64 &ZonePreTemp, Real64 &ZonePreHum, Real64 &ZoneCO2, Real64 &ZonePPFD, Real64 &VPD);
 
 } // namespace IndoorGreen
 

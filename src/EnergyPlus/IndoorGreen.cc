@@ -1,4 +1,4 @@
-﻿// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+﻿// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -203,7 +203,7 @@ namespace IndoorGreen {
                 // get zone pointer
                 state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr =
                     state.dataSurface->Surface(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr).Zone;
-                state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr =
+                state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SpacePtr =
                     state.dataSurface->Surface(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr).spaceNum;
                 
                 if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr <= 0) {
@@ -439,7 +439,7 @@ namespace IndoorGreen {
 
 
             state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LeafArea = state.dataIPShortCut->rNumericArgs(1);
-            if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LeafArea <= 0) {
+            if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LeafArea < 0) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {} entered={}",
                                        RoutineName,
@@ -503,14 +503,14 @@ namespace IndoorGreen {
                                           nullptr);
                 
                  SetupOutputVariable(state,
-                                    "Indoor Living Wall Plant Surface Temperature ",
+                                    "Indoor Living Wall Plant Surface Temperature",
                                     Constant::Units::C,
                                     state.dataHeatBalSurf->SurfTempIn(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).IndoorGreenName);
                 SetupOutputVariable(state,
-                                    "Indoor Living Wall Sensible Heat Gain Rate ",
+                                    "Indoor Living Wall Sensible Heat Gain Rate",
                                     Constant::Units::W,
                                     //state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SensibleRate,
                                     //state.dataHeatBalSurf->SurfQConvInRep(loop),// loop: surface number
@@ -554,6 +554,13 @@ namespace IndoorGreen {
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).IndoorGreenName);
                 SetupOutputVariable(state,
+                                    "Indoor Living Wall VPD",
+                                    Constant::Units::Pa,
+                                    state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZVPD,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataIndoorGreen->indoorgreen(IndoorGreenNum).IndoorGreenName);
+                SetupOutputVariable(state,
                                     "Indoor Living Wall LED Sensible Heat Gain Rate",
                                     Constant::Units::W,
                                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SensibleRate,
@@ -582,8 +589,8 @@ namespace IndoorGreen {
                                     state.dataHeatBal->Zone(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr).Multiplier,
                                     state.dataHeatBal->Zone(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr).ListMultiplier,
                                     {},
-                                    {});
-                                    //state.dataHeatBal->space(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SpacePtr).spaceType);
+                                    {},
+                                    state.dataHeatBal->space(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SpacePtr).spaceType);
             }
     }
 
@@ -605,9 +612,9 @@ namespace IndoorGreen {
                 state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LatentRate = 0.0;
             // Set indoor environment conditions at the every time step initializations 
                 //LW to do ZoneList, check if this is the right parameter for temperature
-                state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZPreTemp = 0.0;
+                //state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZPreTemp = 0.0;
                     //        state.dataHeatBal->Zone(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr).ZoneMeasuredTemperature;
-                state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZPreHum = 0.0;
+                //state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZPreHum = 0.0;
                     //        state.dataHeatBal->Zone(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr).ZoneMeasuredHumidityRatio;
                 state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZCO2 = 400; 
                 state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZPPFD =0;       
@@ -635,6 +642,7 @@ namespace IndoorGreen {
             Real64 ZoneSatHum;     // Saturated humidity ratio 
             Real64 ZoneCO2;        // Indoor zone co2 concentration (ppm)
             Real64 ZonePPFD;       // Indoor net radiation (PPFD)
+            Real64 ZoneVPD;        // vapor pressure deficit (kpa); local variable
             //Real64 ETRate=0.0;         // mm/s; kg/(m2s)
             Real64 Timestep;       // s
             Real64 ETTotal;        // kg
@@ -644,14 +652,31 @@ namespace IndoorGreen {
             Real64 HCons;           // enthalpy (J/kg)
             Real64 HMid;           // enthalpy 3rd point (J/kg)
             Real64 ZoneAirVol;     // zone air volume (m3)
-            Real64 LAI;            // leaf area index, the ratio of one-side leaf area per unit plant growing area                      
+            Real64 LAI;            // leaf area index, the ratio of one-side leaf area per unit plant growing area, maximum LAI =2 if LAI_cal>2.0    
+            Real64 LAI_Cal;        // calculated leaf area index based on users's input on total leaf area
+            Real64 OutPb;          // outdoor pressure (kPa)
+            Real64 vp;             // actual vapor pressure of the air (kpa)
+            Real64 vpSat;          // saturated vapor pressure at air temperature (kpa)
+            const std::string cCurrentModuleObject = "IndoorGreen";
             Timestep = state.dataHVACGlobal->TimeStepSysSec; // unit s
             // Method for ET calculation: Penman-Monteith=1, Stanghellini=2, Data-driven=3
             for (IndoorGreenNum = 1; IndoorGreenNum <= state.dataIndoorGreen->NumIndoorGreen; ++IndoorGreenNum) {
                 ZonePreTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr).ZT;
                 ZonePreHum = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr).airHumRat;
                 ZoneCO2 = 400;  
-                LAI =state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LeafArea/state.dataSurface->Surface(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr).Area;
+                OutPb = state.dataEnvrn->OutBaroPress / 1000;                       
+                Tdp = Psychrometrics::PsyTdpFnWPb(state, ZonePreHum, OutPb*1000); 
+                vp = Psychrometrics::PsyPsatFnTemp(state, Tdp, RoutineName) / 1000; 
+                vpSat = Psychrometrics::PsyPsatFnTemp(state, ZonePreTemp, RoutineName) / 1000; 
+                state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZVPD = (vpSat - vp)*1000;  //Pa                                              
+                LAI_Cal =state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LeafArea/state.dataSurface->Surface(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr).Area;
+                LAI = LAI_Cal;
+                if (LAI_Cal > 2.0) {
+                LAI = 2.0; // maximum LAI=2.0 in the surface heat balance
+                ShowSevereError(state,
+                                format("Maximum indoor living wall leaf area index (LAI) =3.0 is used,calculated LAI is {}",
+                                       LAI_Cal));
+                }
                 //ZonePPFD
                 if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightingMethod == 1) {
                 state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZPPFD =
@@ -684,9 +709,9 @@ namespace IndoorGreen {
                                 ->Construct(state.dataSurface->Surface(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr).Construction)
                                 .InsideAbsorpSolar * 4.6;
                         Real64 comparePPFD = diffSR + RadfromLights ; 
-                        std::ofstream fout("indoorgreenvariables.txt", std::fstream::app);
-                        fout << comparePPFD << "," << diffSR<< "," << RadfromLights << "," << state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZPPFD
-                             << std::endl;
+                       // std::ofstream fout("indoorgreenvariables.txt", std::fstream::app);
+                       // fout << comparePPFD << "," << diffSR<< "," << RadfromLights << "," << state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZPPFD
+                       //      << std::endl;
                    }
                 }
                 else if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightingMethod == 3) {
@@ -719,34 +744,36 @@ namespace IndoorGreen {
                 }                   
                 }  
                 ZonePPFD = state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZPPFD;
-
+                ZoneVPD = state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZVPD/1000;//kPa            
                 //ET Calculation
                 if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ETCalculationMethod == 1) {
                         state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ETRate =
-                            ETPenmanMonteith(state, ZonePreTemp, ZonePreHum, ZoneCO2, ZonePPFD, LAI);
+                            ETPenmanMonteith(state, ZonePreTemp, ZonePreHum, ZoneCO2, ZonePPFD, ZoneVPD, LAI);
                 } 
                 else if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ETCalculationMethod == 2) {
-                        state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ETRate = ETStanghellini(state);
+                        state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ETRate =
+                            ETStanghellini(state, ZonePreTemp, ZonePreHum, ZoneCO2, ZonePPFD, ZoneVPD, LAI);
                 } 
                 else if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ETCalculationMethod == 3) {
                 // set with EMS value if being called for.
-                   if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).EMSETCalOverrideOn){
+                   if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).EMSETCalOverrideOn) {
                        state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ETRate = state.dataIndoorGreen->indoorgreen(IndoorGreenNum).EMSET;
                    }
                 //ETRate=ETDatadriven(state);
-                   else {
-                   ShowSevereError(state,
-                                   format("EMS/Python Plugin for ET Data Driven Model not find in {}={}",
-                                          state.dataIPShortCut->cCurrentModuleObject,
-                                          state.dataIndoorGreen->indoorgreen(IndoorGreenNum).IndoorGreenName));
-                   }
+                //   else {
+                //   ShowSevereError(state,
+                //                   format("EMS/Python Plugin for ET Data Driven Model not find in {}={}",
+                //                          cCurrentModuleObject,
+                //                          state.dataIndoorGreen->indoorgreen(IndoorGreenNum).IndoorGreenName));
+                //   }
                 } 
 
 
                 //debug 
                 //state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ETRate = 0.0;
-                ETTotal = state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ETRate * Timestep *
-                          state.dataSurface->Surface(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr).Area *
+                Real64 effectivearea = std::min(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LeafArea,
+                                                LAI*state.dataSurface->Surface(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr).Area); 
+                ETTotal = state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ETRate * Timestep *effectivearea*
                            ScheduleManager::GetCurrentScheduleValue(state, state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SchedPtr); //kg; this unit area should be surface area instead of total leaf area
                 Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp) / std::pow(10, 6); // Latent heat of vaporization (MJ/kg)
                state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LambdaET =
@@ -756,7 +783,7 @@ namespace IndoorGreen {
                 ZoneAirVol = state.dataHeatBal->Zone(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZonePtr).Volume;
                 ZoneNewHum =
                 ZonePreHum + ETTotal / (rhoair * ZoneAirVol);
-                Tdp = Psychrometrics::PsyTdpFnWPb(state, ZonePreHum, state.dataEnvrn->OutBaroPress); 
+                //Tdp = Psychrometrics::PsyTdpFnWPb(state, ZonePreHum, state.dataEnvrn->OutBaroPress); 
                 Twb = Psychrometrics::PsyTwbFnTdbWPb(state, ZonePreTemp, ZonePreHum, state.dataEnvrn->OutBaroPress);
                 ZoneSatHum = Psychrometrics::PsyWFnTdpPb(state, ZonePreTemp, state.dataEnvrn->OutBaroPress); //saturated humidity ratio
                 HCons = Psychrometrics::PsyHFnTdbW(ZonePreTemp, ZonePreHum);
@@ -767,8 +794,9 @@ namespace IndoorGreen {
                 ZoneNewHum = ZoneSatHum;
                 }
                 HMid = Psychrometrics::PsyHFnTdbW(ZoneNewTemp, ZoneNewHum);
+                //LW adjustment for LAI
                 state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SensibleRate =
-                    (1-state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LEDRadFraction) * state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LEDActualEleP; // convective heat gain from LED lights; heat convenction from plants was considered and counted from plant surface heat balance.
+                    (1-state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LEDRadFraction) * state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LEDActualEleP; // convective heat gain from LED lights when LED is on; heat convection from plants was considered and counted from plant surface heat balance.
                 //state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SensibleRate = 0.95* ZoneAirVol * rhoair * (HMid - HCons) / Timestep; // unit W
                 state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LatentRate = ZoneAirVol * rhoair * (HCons - HMid) / Timestep;   // unit W
                 state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr) =
@@ -776,20 +804,15 @@ namespace IndoorGreen {
                 //   0.05 * ZoneAirVol * rhoair * (HMid - HCons) / Timestep; // unit W // negative sign indicates heat loss from inside surface          
                 std::ofstream fout("indoorgreenvariables.txt", std::fstream::app);
                 fout << Timestep << "," << state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LeafArea << ","
-                     << ScheduleManager::GetCurrentScheduleValue(state, state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SchedPtr) << "," << hfg
-                     << "," << state.dataSurface->Surface(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr).Area << ","
-                     << state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ETRate << ","
                      << state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LambdaET << ","
                      << state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SensibleRate << ","
-                     << state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LatentRate << "," 
-                     << rhoair << "," << ZoneAirVol << "," << ZoneNewHum
-                     << "," << ZonePreHum << "," << ZoneSatHum << "," << ZonePreTemp << "," << ZoneNewTemp << "," << Tdp << ","<<Twb<<"," << std::endl;
+                     << state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LatentRate << ","<< std::endl;
 
             }
     }
 
 
-    Real64 ETPenmanMonteith(EnergyPlusData &state, Real64 &ZonePreTemp, Real64 &ZonePreHum, Real64 &ZoneCO2, Real64 &ZonePPFD, Real64 &LAI)
+    Real64 ETPenmanMonteith(EnergyPlusData &state, Real64 &ZonePreTemp, Real64 &ZonePreHum, Real64 &ZoneCO2, Real64 &ZonePPFD, Real64 &ZoneVPD, Real64 &LAI)
     {
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Liping Wang
@@ -811,28 +834,57 @@ namespace IndoorGreen {
             Real64 In = ZonePPFD * 0.327 / std::pow(10, 6); // net radiation MW/m2
             Real64 G = 0.0; //soil heat flux (MJ/(m2s))
             Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, OutPb * 1000, ZonePreTemp, ZonePreHum); //kg/m3
-            Real64 Tdp = Psychrometrics::PsyTdpFnWPb(state, ZonePreHum, OutPb * 1000); //dew point temperature
-            Real64 vp = Psychrometrics::PsyPsatFnTemp(state, Tdp, RoutineName)/1000; // actual vapor pressure of the air (kpa)
-            Real64 vpSat = Psychrometrics::PsyPsatFnTemp(state, ZonePreTemp, RoutineName)/1000;// saturation vapor pressure at air temperature (kpa)
-            Real64 vpd = vpSat - vp; // vapor pressure deficit (kpa)
+            // Real64 Tdp = Psychrometrics::PsyTdpFnWPb(state, ZonePreHum, OutPb * 1000); //dew point temperature
+            // Real64 vp = Psychrometrics::PsyPsatFnTemp(state, Tdp, RoutineName)/1000; // actual vapor pressure of the air (kpa)
+            // Real64 vpSat = Psychrometrics::PsyPsatFnTemp(state, ZonePreTemp, RoutineName)/1000;// saturation vapor pressure at air temperature (kpa)
+            // Real64 vpd = vpSat - vp; // vapor pressure deficit (kpa)
             Real64 ETRate; //mm/s; kg/(m2s)
             rs =60*(1500+ZonePPFD)/(200+ZonePPFD);
-            ra =350*std::pow((0.1/0.1),0.5)*(1/LAI);
-            ETRate = (1 / hfg) * (slopepat * (In - G) + (rhoair * CpAir * vpd) / ra) / (slopepat + psyconst * (1 + rs / ra));//Penman-Monteith ET model
-            std::ofstream fout("indoorgreenvariables.txt", std::fstream::app);
-            fout << state.dataGlobal->DayOfSim << "," << state.dataGlobal->HourOfDay << "," << hfg << "," << slopepat << ","
-                 <<In << "," <<vpd << ","
-                 << vp << "," << vpSat << ",";
+            ra =350*std::pow((0.1/0.1),0.5)*(1/(LAI+1e-10));
+            ETRate = (1 / hfg) * (slopepat * (In - G) + (rhoair * CpAir * ZoneVPD) / ra) / (slopepat + psyconst * (1 + rs / ra));//Penman-Monteith ET model
+            std::ofstream fout("ETindoorgreenvariables.txt", std::fstream::app);
+            fout << state.dataGlobal->DayOfSim << "," << state.dataGlobal->HourOfDay << "," << ETRate << "," << ZonePreTemp << "," << ZonePreHum << ","
+                 << hfg
+                 << "," << slopepat << "," << In << "," << rhoair << "," << CpAir << "," << ZoneVPD << "," << ra << "," << slopepat << "," << psyconst
+                 << "," << rs << ","
+                 << std::endl;
             return ETRate; //mm/s; kg/(m2s)
     }
-    Real64 ETStanghellini(EnergyPlusData &state)
+    Real64
+    ETStanghellini(EnergyPlusData &state, Real64 &ZonePreTemp, Real64 &ZonePreHum, Real64 &ZoneCO2, Real64 &ZonePPFD, Real64 &ZoneVPD, Real64 &LAI)
     {
-        return 0;
+            // SUBROUTINE INFORMATION:
+            //       AUTHOR         Liping Wang
+            //       DATE WRITTEN   Oct 2023
+
+            // PURPOSE OF THIS SUBROUTINE:
+            // This subroutine is for using Stanghellini ET model to calculate evapotranspiration rates from the Indoor Greenery System objects.
+
+            // SUBROUTINE PARAMETER DEFINITIONS:
+            static constexpr std::string_view RoutineName("ETStanghellini: ");
+            Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp) / std::pow(10, 6); // Latent heat of vaporization (MJ/kg)
+            Real64 slopepat =
+                0.200 * std::pow((0.00738 * ZonePreTemp + 0.8072), 7) - 0.000116; // Slope of the saturation vapor pressure-temperature curve (kPa/°C)
+            Real64 CpAir = Psychrometrics::PsyCpAirFnW(ZonePreHum) / std::pow(10, 6); // specific heat of air at constant pressure (MJ kg−1 °C−1)
+            Real64 OutPb = state.dataEnvrn->OutBaroPress / 1000;                      // outdoor pressure (kPa)
+            Real64 const mw = 0.622;                                                  // ratio molecular weight of water vapor / dry air = 0.622.
+            Real64 psyconst = CpAir * OutPb / (hfg * mw);                             // Psychrometric constant (kPa/°C)
+            Real64 rs = 0.0;                                                          // stomatal resistance s/m
+            Real64 ra = 0.0;                                                          // aerodynamic resistance s/m
+            Real64 In = ZonePPFD * 0.327 / std::pow(10, 6);                           // net radiation MW/m2
+            Real64 G = 0.0;                                                           // soil heat flux (MJ/(m2s))
+            Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, OutPb * 1000, ZonePreTemp, ZonePreHum); // kg/m3
+            Real64 ETRate; // mm/s; kg/(m2s)
+            rs = 60 * (1500 + ZonePPFD) / (200 + ZonePPFD);
+            ra = 350 * std::pow((0.1 / 0.1), 0.5) * (1 / LAI);
+            ETRate = (1 / hfg) * (slopepat * (In - G) + (2*LAI*rhoair * CpAir * ZoneVPD) / ra) /
+                     (slopepat + psyconst * (1 + rs / ra)); // Penman-Monteith ET model
+            // std::ofstream fout("indoorgreenvariables.txt", std::fstream::app);
+            // fout << state.dataGlobal->DayOfSim << "," << state.dataGlobal->HourOfDay << "," << hfg << "," << slopepat << ","
+            //      <<In << "," <<vpd << ","
+            //      << vp << "," << vpSat << ",";
+            return ETRate; // mm/s; kg/(m2s)
     }
-    //Real64 ETDatadriven(EnergyPlusData &state)
-    //{
-    //    return 0; 
-    //}
   
 } // namespace Indoor Green
 
