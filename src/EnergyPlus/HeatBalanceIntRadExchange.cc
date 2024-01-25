@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -271,24 +271,25 @@ namespace HeatBalanceIntRadExchange {
             Real64 CarrollMRTInKTo4th; // Carroll MRT
             for (size_type ZoneSurfNum = 0; ZoneSurfNum < s_zone_Surfaces; ++ZoneSurfNum) {
                 int const SurfNum = zone_info.SurfacePtr[ZoneSurfNum];
-                auto const &surface_window = state.dataSurface->SurfaceWindow(SurfNum);
-                int const ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-                auto const &construct = state.dataConstruction->Construct(ConstrNum);
+                auto const &surf = state.dataSurface->Surface(SurfNum);
+                auto const &surfWindow = state.dataSurface->SurfaceWindow(SurfNum);
+                int const constrNum = surf.Construction;
+                auto const &construct = state.dataConstruction->Construct(constrNum);
                 if (construct.WindowTypeEQL) {
                     SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
-                    SurfaceEmiss[ZoneSurfNum] = WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss(state, ConstrNum);
+                    SurfaceEmiss[ZoneSurfNum] = WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss(state, constrNum);
                 } else if (construct.WindowTypeBSDF && state.dataSurface->SurfWinShadingFlag(SurfNum) == DataSurfaces::WinShadingType::IntShade) {
                     SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
-                    SurfaceEmiss[ZoneSurfNum] = surface_window.EffShBlindEmiss[0] + surface_window.EffGlassEmiss[0];
+                    SurfaceEmiss[ZoneSurfNum] = surfWindow.EffShBlindEmiss[1] + surfWindow.EffGlassEmiss[1];
                 } else if (construct.WindowTypeBSDF) {
                     SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
-                } else if (construct.TypeIsWindow && state.dataSurface->SurfWinOriginalClass(SurfNum) != DataSurfaces::SurfaceClass::TDD_Diffuser) {
+                } else if (construct.TypeIsWindow && surf.OriginalClass != DataSurfaces::SurfaceClass::TDD_Diffuser) {
                     if (SurfIterations == 0 && NOT_SHADED(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                         // If the window is bare this TS and it is the first time through we use the previous TS glass
                         // temperature whether or not the window was shaded in the previous TS. If the window was shaded
                         // the previous time step this temperature is a better starting value than the shade temperature.
-                        SurfaceTempRad[ZoneSurfNum] = surface_window.ThetaFace(2 * construct.TotGlassLayers) - Constant::Kelvin;
+                        SurfaceTempRad[ZoneSurfNum] = surfWindow.thetaFace[2 * construct.TotGlassLayers] - Constant::Kelvin;
                         SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
                         // For windows with an interior shade or blind an effective inside surface temp
                         // and emiss is used here that is a weighted combination of shade/blind and glass temp and emiss.

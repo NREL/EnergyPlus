@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -140,7 +140,6 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfQRadIntGainsInRep;    // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadIntGainsInRep; // Surface thermal radiation heat transfer inside face surface [W]
     // these next four all are for Radiative HVAC sources of radiation gains on inside face
-    Array1D<bool> AnyRadiantSystems;          // True if there are any radiant systems
     Array1D<Real64> SurfQRadHVACInRep;        // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadHVACInRep;     // Surface thermal radiation heat transfer inside face surface [W]
     Array1D<Real64> SurfQdotRadHVACInPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Inside face surf

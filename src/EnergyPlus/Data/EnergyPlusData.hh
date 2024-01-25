@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -108,9 +108,8 @@ struct DataWaterData;
 struct DataZoneControlsData;
 struct DataZoneEnergyDemandsData;
 struct DataZoneEquipmentData;
-struct DaylightingData;
 struct DaylightingDevicesData;
-struct DaylightingManagerData;
+struct DaylightingData;
 struct DefineEquipData;
 struct DemandManagerData;
 struct DesiccantDehumidifiersData;
@@ -365,9 +364,8 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<DataZoneControlsData> dataZoneCtrls;
     std::unique_ptr<DataZoneEnergyDemandsData> dataZoneEnergyDemand;
     std::unique_ptr<DataZoneEquipmentData> dataZoneEquip;
-    std::unique_ptr<DaylightingData> dataDaylightingData;
     std::unique_ptr<DaylightingDevicesData> dataDaylightingDevices;
-    std::unique_ptr<DaylightingManagerData> dataDaylightingManager;
+    std::unique_ptr<DaylightingData> dataDayltg;
     std::unique_ptr<DefineEquipData> dataDefineEquipment;
     std::unique_ptr<DemandManagerData> dataDemandManager;
     std::unique_ptr<DesiccantDehumidifiersData> dataDesiccantDehumidifiers;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,7 +48,7 @@
 #ifndef PlantTopologySubcomponents_hh_INCLUDED
 #define PlantTopologySubcomponents_hh_INCLUDED
 
-#include <EnergyPlus/Plant/MeterData.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {
@@ -82,8 +82,8 @@ namespace DataPlant {
         Real64 Capacity;
         Real64 Efficiency;
         int OpMode;
-        Array1D<MeterData> MeteredVar; // Index of energy output report data
-        int AirSysToPlantPtr;          // 0=No plant connection, >0 = index to AirSysToPlant array
+        Array1D<OutputProcessor::MeterData> MeteredVar; // Index of energy output report data
+        int AirSysToPlantPtr;                           // 0=No plant connection, >0 = index to AirSysToPlant array
 
         // Default Constructor
         SubSubcomponentData()
@@ -128,8 +128,8 @@ namespace DataPlant {
         Real64 PeakPlantSupplyOtherEff;
         int AirSysToPlantPtr; // 0=No plant connection, >0 = index to AirSysToPlant array
         Real64 LoopLoadFrac;
-        Array1D<MeterData> MeteredVar;           // Index of energy output report data
-        Array1D<SubSubcomponentData> SubSubComp; // Component list
+        Array1D<OutputProcessor::MeterData> MeteredVar; // Index of energy output report data
+        Array1D<SubSubcomponentData> SubSubComp;        // Component list
 
         // Default Constructor
         SubcomponentData()

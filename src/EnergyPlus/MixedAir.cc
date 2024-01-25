@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2971,7 +2971,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 // CurrentModuleObject='AirLoopHVAC'
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air Economizer Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     loopOAController.EconomizerStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -2979,7 +2979,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
 
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air Heat Recovery Bypass Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     loopOAController.HeatRecoveryBypassStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -2987,14 +2987,14 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
 
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     loopOAController.HRHeatingCoilActive,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     airloopName);
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     loopOAController.MixedAirTempAtMinOAFlow,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -3002,7 +3002,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
 
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air High Humidity Control Status",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     loopOAController.HighHumCtrlStatus,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -3010,7 +3010,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
 
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air Limiting Factor",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     loopOAController.OALimitingFactorReport,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -3018,7 +3018,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
 
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air Flow Fraction",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     loopOAController.OAFractionRpt,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -3026,7 +3026,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
 
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air Minimum Flow Fraction",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     loopOAController.MinOAFracLimit,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -3034,7 +3034,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
 
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
+                                    Constant::Units::kg_s,
                                     loopOAController.OAMassFlow,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -3042,7 +3042,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
 
                 SetupOutputVariable(state,
                                     "Air System Mixed Air Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
+                                    Constant::Units::kg_s,
                                     loopOAController.MixMassFlow,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -3050,7 +3050,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
 
                 SetupOutputVariable(state,
                                     "Air System Relief Air Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     loopOAController.RelTotalLossRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -3058,7 +3058,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
 
                 SetupOutputVariable(state,
                                     "Air System Relief Air Sensible Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     loopOAController.RelSensiLossRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -3066,7 +3066,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
 
                 SetupOutputVariable(state,
                                     "Air System Relief Air Latent Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     loopOAController.RelLatentLossRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -3075,7 +3075,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 if (loopOAController.MixedAirSPMNum > 0) {
                     SetupOutputVariable(state,
                                         "Air System Outdoor Air Maximum Flow Fraction",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         loopOAController.MaxOAFracBySetPoint,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -3099,7 +3099,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 if (loopOAController.VentMechObjectNum > 0 && airLoopNum > 0) {
                     SetupOutputVariable(state,
                                         "Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         loopOAController.MechVentOAMassFlowRequest,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
