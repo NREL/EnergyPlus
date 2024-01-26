@@ -1307,7 +1307,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     EXPECT_NEAR(QUnitOut, 1000.0, 0.01);
     ASSERT_NEAR(state->dataLoopNodes->Node(thisSys.AirInNode).MassFlowRate, thisSys.MaxNoCoolHeatAirMassFlow, 0.001);
     ASSERT_GT(thisSys.DesignMaxOutletTemp, state->dataHeatingCoils->HeatingCoil(1).OutletAirTemp);
-    EXPECT_TRUE(thisSys.m_noLoadLowSpeed); // because input is blank, doesn't affect no load flow rate because coils are single sped
+    EXPECT_TRUE(thisSys.m_useNoLoadLowSpeedAirFlow); // because input is blank, doesn't affect no load flow rate because coils are single sped
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0; // set heating load to just below lower boundary load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2000.0;
@@ -4908,7 +4908,7 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", thisSys.UnitType);
     EXPECT_EQ("COIL:HEATING:FUEL", thisSys.m_HeatingCoilTypeName);
     EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(1).HCoilType_Num, Coil_HeatingGasOrOtherFuel);
-    EXPECT_FALSE(thisSys.m_noLoadLowSpeed);
+    EXPECT_FALSE(thisSys.m_useNoLoadLowSpeedAirFlow);
     // set input variables
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutDryBulbTemp = 10.0;

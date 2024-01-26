@@ -2114,7 +2114,7 @@ namespace UnitarySystems {
                     this->m_NoLoadAirFlowRateRatio = min(NoLoadCoolingAirFlowRateRatio, NoLoadHeatingAirFlowRateRatio);
                 }
             } else {
-                if ((this->m_CoolCoilExists || this->m_HeatCoilExists) && this->m_noLoadLowSpeed) {
+                if ((this->m_CoolCoilExists || this->m_HeatCoilExists) && this->m_useNoLoadLowSpeedAirFlow) {
                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
                         this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
                         Real64 MaxSpeedFlowRate =
@@ -2125,7 +2125,7 @@ namespace UnitarySystems {
                                 state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(1) / MaxSpeedFlowRate;
                         } else {
                             // I think all these little IFs need an else in case these inputs are autosized proportional to number of speeds/stages
-                            NoLoadCoolingAirFlowRateRatio = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds;
+                            NoLoadCoolingAirFlowRateRatio = 1.0 / state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds;
                         }
                     } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
                         // for (DehumidModeNum = 0; DehumidModeNum <= thisDXCoil.NumDehumidModes; ++DehumidModeNum)
@@ -6136,7 +6136,7 @@ namespace UnitarySystems {
             }
         }
         if (this->input_specs.no_load_supply_air_flow_rate_low_speed == "NO") {
-            this->m_noLoadLowSpeed = false;
+            this->m_useNoLoadLowSpeedAirFlow = false;
         }
 
         // check supply air flow calculation method

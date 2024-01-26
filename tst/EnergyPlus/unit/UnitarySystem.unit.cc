@@ -848,7 +848,7 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     EXPECT_NEAR(fanDT, 0.7070, 0.0001);
     fanDT = thisSys->getFanDeltaTemp(*state, true, 0.5, 0.5);
     EXPECT_NEAR(fanDT, 0.7070, 0.0001);
-    EXPECT_TRUE(thisSys->m_noLoadLowSpeed);
+    EXPECT_TRUE(thisSys->m_useNoLoadLowSpeedAirFlow);
 }
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
 {
@@ -1069,7 +1069,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
     EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(2).Temp);
-    EXPECT_TRUE(thisSys->m_noLoadLowSpeed);
+    EXPECT_TRUE(thisSys->m_useNoLoadLowSpeedAirFlow);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
@@ -9857,7 +9857,7 @@ Curve:QuadLinear,
     // Unitary System mines data from coil objects
     EXPECT_EQ(thisSys->m_MinOATCompressorCooling, -1000.0);
     EXPECT_EQ(thisSys->m_MinOATCompressorHeating, -1000.0);
-    EXPECT_FALSE(thisSys->m_noLoadLowSpeed);
+    EXPECT_FALSE(thisSys->m_useNoLoadLowSpeedAirFlow);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
