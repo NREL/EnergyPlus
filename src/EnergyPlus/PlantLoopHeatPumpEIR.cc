@@ -987,7 +987,13 @@ void EIRPlantLoopHeatPump::sizeSrcSideWSHP(EnergyPlusData &state)
         // First the definition of COP: COP = Qload/Power, therefore Power = Qload/COP
         // Then the energy balance:     Qsrc = Qload + Power
         // Substituting for Power:      Qsrc = Qload + Qload/COP, therefore Qsrc = Qload (1 + 1/COP)
-        Real64 const designSourceSideHeatTransfer = tmpCapacity * (1 + 1 / this->referenceCOP);
+        // Real64 const designSourceSideHeatTransfer = tmpCapacity * (1 + 1 / this->referenceCOP);
+        Real64 designSourceSideHeatTransfer = 0.0;
+        if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
+            designSourceSideHeatTransfer = tmpCapacity * (1 - 1 / this->referenceCOP);
+        } else {
+            designSourceSideHeatTransfer = tmpCapacity * (1 + 1 / this->referenceCOP);
+        }
         // To get the design source flow rate, just apply the sensible heat rate equation:
         //                              Qsrc = rho_src * Vdot_src * Cp_src * DeltaT_src
         //                              Vdot_src = Q_src / (rho_src * Cp_src * DeltaT_src)
@@ -1099,7 +1105,13 @@ void EIRPlantLoopHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
         // First the definition of COP: COP = Qload/Power, therefore Power = Qload/COP
         // Then the energy balance:     Qsrc = Qload + Power
         // Substituting for Power:      Qsrc = Qload + Qload/COP, therefore Qsrc = Qload (1 + 1/COP)
-        Real64 const designSourceSideHeatTransfer = tmpCapacity * (1 + 1 / this->referenceCOP);
+
+        Real64 designSourceSideHeatTransfer = 0.0;
+        if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
+            designSourceSideHeatTransfer = tmpCapacity * (1 - 1 / this->referenceCOP);
+        } else {
+            designSourceSideHeatTransfer = tmpCapacity * (1 + 1 / this->referenceCOP);
+        }
         // To get the design source flow rate, just apply the sensible heat rate equation:
         //                              Qsrc = rho_src * Vdot_src * Cp_src * DeltaT_src
         //                              Vdot_src = Q_src / (rho_src * Cp_src * DeltaT_src)
