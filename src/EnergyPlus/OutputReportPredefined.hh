@@ -864,6 +864,43 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchULnotMetHeatOcc = 0;
     int pdchULnotMetCoolOcc = 0;
 
+    // HVAC Topology
+    int pdrTopology = 0;
+
+    int pdstTopAirLoop = 0;
+    int pdchTopAirSide = 0;
+    int pdchTopAirParType = 0;
+    int pdchTopAirParName = 0;
+    int pdchTopAirCompType = 0;
+    int pdchTopAirCompName = 0;
+    int pdchTopAirConType = 0;
+
+    int pdstTopZnEqpLoop = 0;
+    int pdchTopZnEqpSide = 0;
+    int pdchTopZnEqpParType = 0;
+    int pdchTopZnEqpParName = 0;
+    int pdchTopZnEqpCompType = 0;
+    int pdchTopZnEqpCompName = 0;
+    int pdchTopZnEqpConType = 0;
+
+    int pdstTopPlantLoop = 0;
+    int pdchTopPlantSide = 0;
+    int pdchTopPlantParType = 0;
+    int pdchTopPlantParName = 0;
+    int pdchTopPlantCompType = 0;
+    int pdchTopPlantCompName = 0;
+    int pdchTopPlantConType = 0;
+
+    int pdstTopCondLoop = 0;
+    int pdchTopCondSide = 0;
+    int pdchTopCondParType = 0;
+    int pdchTopCondParName = 0;
+    int pdchTopCondCompType = 0;
+    int pdchTopCondCompName = 0;
+    int pdchTopCondConType = 0;
+
+
+
     // Outdoor Air Report
     int pdrOutsideAir = 0;
     int pdstOAavgOcc = 0;
