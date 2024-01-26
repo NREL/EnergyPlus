@@ -92,7 +92,7 @@ namespace OutputProcessor {
     enum class VariableType
     {
         Invalid = -1,
-        NotFound, // ref: GetVariableKeyCountandType, 0 = not found // TODO: This is actually used separately from Invalid, need to get rid of it
+        // NotFound, // ref: GetVariableKeyCountandType, 0 = not found // TODO: This is actually used separately from Invalid, need to get rid of it
         Integer,  // ref: GetVariableKeyCountandType, 1 = integer
         Real,     // ref: GetVariableKeyCountandType, 2 = real
         Meter,    // ref: GetVariableKeyCountandType, 3 = meter
@@ -449,27 +449,32 @@ namespace OutputProcessor {
         int SchedPtr = 0;                   // If scheduled, this points to the schedule
         int ZoneMult = 1;                   // If metered, Zone Multiplier is applied
         int ZoneListMult = 1;               // If metered, Zone List Multiplier is applied
-
+            
         std::string keyColonName = "";   // Name of Variable key:variable
         std::string keyColonNameUC = ""; // Name of Variable (Uppercase)
         std::string name = "";           // Name of Variable
         std::string nameUC = "";         // Name of Variable with out key in uppercase
+        std::string key = "";            // Name of key only
         std::string keyUC = "";          // Name of key only witht out variable in uppercase
 
         Constant::Units units = Constant::Units::Invalid; // Units for Variable
         std::string unitNameCustomEMS;                    // name of units when customEMS is used for EMS variables that are unusual
 
+        std::string indexGroup = "";
+        int indexGroupKey = -1;             // Is this thing even used?
+            
         std::vector<int> meterNums; // Meter Numbers
 
         virtual ~OutVar(){};
 
         std::string multiplierString() const;
 
-        void WriteReportData(EnergyPlusData &state);
+        void writeReportData(EnergyPlusData &state);
 
-        void WriteVariableOutput(EnergyPlusData &state,   // Real variable to write out
-                                 ReportFreq const freq);
-            
+        void writeOutput(EnergyPlusData &state,   // Real variable to write out
+                         ReportFreq const freq);
+
+        void writeReportDictionaryItem(EnergyPlusData &state);
     };
 
     struct OutVarReal : public OutVar
@@ -557,6 +562,8 @@ namespace OutputProcessor {
 
         Real64 CurTSValue = 0.0; // Current TimeStep Value (internal access)
 
+        std::string indexGroup = "";
+            
         std::array<MeterPeriod, (int)ReportFreq::Num> periods;
 
         MeterPeriod periodLastSM;
@@ -708,24 +715,10 @@ namespace OutputProcessor {
                               std::string const &yearOfSimChr, // the year of the simulation
                               bool writeToSQL);
 
-    void WriteReportVariableDictionaryItem(EnergyPlusData &state,
-                                           ReportFreq freq, // The reporting interval (e.g., hourly, daily)
-                                           StoreType storeType,
-                                           int reportID,                        // The reporting ID for the data
-                                           int indexGroupKey,                   // The reporting group (e.g., Zone, Plant Loop, etc.)
-                                           std::string const &indexGroup,       // The reporting group (e.g., Zone, Plant Loop, etc.)
-                                           std::string_view const keyedValue,   // The key name for the data
-                                           std::string_view const variableName, // The variable's actual name
-                                           TimeStepType timeStepType,
-                                           Constant::Units units, // The variables units
-                                           std::string_view const customUnitName = {},
-                                           std::string_view const ScheduleName = {});
-
     void WriteMeterDictionaryItem(EnergyPlusData &state,
                                   ReportFreq freq, // The reporting interval (e.g., hourly, daily)
                                   StoreType storeType,
                                   int reportID,                  // The reporting ID in for the variable
-                                  int indexGroupKey,             // The reporting group for the variable
                                   std::string const &indexGroup, // The reporting group for the variable
                                   std::string const &meterName,  // The variable's meter name
                                   Constant::Units unit,          // The variables units
@@ -733,41 +726,12 @@ namespace OutputProcessor {
                                   bool meterFileOnlyFlag         // A flag indicating whether the data is to be written to standard output
     );
 
-    void WriteRealVariableOutput(EnergyPlusData &state,
-                                 OutVarReal *realVar, // Real variable to write out
-                                 ReportFreq freq      // The report type or interval (e.g., hourly)
-    );
-#ifdef GET_OUT
-    void WriteReportRealData(EnergyPlusData &state,
-                             int reportID,
-                             Real64 repValue,
-                             StoreType storeType,
-                             Real64 numOfItemsStored,
-                             ReportFreq freq,
-                             Real64 minValue,
-                             int minValueDate,
-                             Real64 MaxValue,
-                             int maxValueDate);
-#endif // GET_OUT
     void WriteCumulativeReportMeterData(EnergyPlusData &state,
                                         int reportID,      // The variable's report ID
                                         Real64 repValue,   // The variable's value
                                         bool meterOnlyFlag // A flag that indicates if the data should be written to standard output
     );
 
-#ifdef GET_OUT        
-    void WriteReportMeterData(EnergyPlusData &state,
-                              int reportID,      // The variable's report ID
-                              Real64 repValue,   // The variable's value
-                              ReportFreq freq,   // The variable's reporting interval (e.g., hourly)
-                              Real64 minValue,   // The variable's minimum value during the reporting interval
-                              int minValueDate,  // The date the minimum value occurred
-                              Real64 MaxValue,   // The variable's maximum value during the reporting interval
-                              int maxValueDate,  // The date of the maximum value
-                              bool meterOnlyFlag // Indicates whether the data is for the meter file only
-    );
-#endif // GET_OUT
-        
     void WriteNumericData(EnergyPlusData &state,
                           int reportID,   // The variable's reporting ID
                           Real64 repValue // The variable's value
@@ -778,24 +742,6 @@ namespace OutputProcessor {
                           int32_t repValue // The variable's value
     );
 
-    void WriteIntegerVariableOutput(EnergyPlusData &state,
-                                    OutVarInt *intVar, // Integer variable to write out
-                                    ReportFreq freq    // The report type (i.e., the reporting interval)
-    );
-#ifdef GET_OUT
-    void WriteReportIntegerData(EnergyPlusData &state,
-                                int reportID,            // The variable's reporting ID
-                                Real64 repValue,         // The variable's value
-                                StoreType storeType,     // Type of item (averaged or summed)
-                                Real64 numOfItemsStored, // The number of items (hours or timesteps) of data stored
-                                ReportFreq freq,         // The reporting interval (e.g., monthly)
-                                int minValue,            // The variable's minimum value during the reporting interval
-                                int minValueDate,        // The date the minimum value occurred
-                                int MaxValue,            // The variable's maximum value during the reporting interval
-                                int maxValueDate         // The date the maximum value occurred
-    );
-#endif // GET_OUT
-        
     int DetermineIndexGroupKeyFromMeterName(EnergyPlusData &state, std::string const &meterName); // the meter name
 
     std::string DetermineIndexGroupFromMeterGroup(Meter const *meter); // the meter

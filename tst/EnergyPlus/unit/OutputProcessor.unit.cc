@@ -892,15 +892,15 @@ namespace OutputProcessor {
         rVar.minValueDate = rVar.maxValueDate = 0;
         rVar.freq = ReportFreq::TimeStep;
         
-        rVar.WriteReportData(*state);
+        rVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
         rVar.freq = ReportFreq::EachCall;
-        rVar.WriteReportData(*state);
+        rVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
         rVar.freq = ReportFreq::Hour;
-        rVar.WriteReportData(*state);
+        rVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
         rVar.StoreValue = 616771620.98702729;
@@ -910,41 +910,41 @@ namespace OutputProcessor {
         rVar.maxValueDate = 12212460;
         rVar.freq = ReportFreq::Day;
         
-        rVar.WriteReportData(*state);
+        rVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211775,24,60"}, "\n")));
 
         rVar.freq = ReportFreq::Month;
-        rVar.WriteReportData(*state);
+        rVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211775,21,24,60"}, "\n")));
 
         rVar.freq = ReportFreq::Simulation;
-        rVar.WriteReportData(*state);
+        rVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211775,12,21,24,60"}, "\n")));
 
         rVar.storeType = StoreType::Average;
         rVar.NumStored = 10;
         rVar.freq = ReportFreq::TimeStep;
-        rVar.WriteReportData(*state);
+        rVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273"}, "\n")));
 
         rVar.freq = ReportFreq::EachCall;
-        rVar.WriteReportData(*state);
+        rVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273"}, "\n")));
 
         rVar.freq = ReportFreq::Hour;
-        rVar.WriteReportData(*state);
+        rVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273"}, "\n")));
 
         rVar.freq = ReportFreq::Day;
-        rVar.WriteReportData(*state);
+        rVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273,4283136.251683925, 1,10,4283136.2587211775,24,60"}, "\n")));
 
         rVar.freq = ReportFreq::Month;
-        rVar.WriteReportData(*state);
+        rVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273,4283136.251683925,21, 1,10,4283136.2587211775,21,24,60"}, "\n")));
 
         rVar.freq = ReportFreq::Simulation;
-        rVar.WriteReportData(*state);
+        rVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273,4283136.251683925,12,21, 1,10,4283136.2587211775,12,21,24,60"}, "\n")));
 
         rVar.StoreValue = 0;
@@ -953,7 +953,7 @@ namespace OutputProcessor {
         rVar.minValueDate = rVar.maxValueDate = 0;
         rVar.freq = ReportFreq::TimeStep;
       
-        rVar.WriteReportData(*state);
+        rVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.0"}, "\n")));
 
         auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
@@ -1001,15 +1001,15 @@ namespace OutputProcessor {
         iVar.minValueDate = iVar.maxValueDate = 0;
         iVar.freq = ReportFreq::TimeStep;
 
-        iVar.WriteReportData(*state);
+        iVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.900000"}, "\n")));
 
         iVar.freq = ReportFreq::EachCall;
-        iVar.WriteReportData(*state);
+        iVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.900000"}, "\n")));
 
         iVar.freq = ReportFreq::Hour;
-        iVar.WriteReportData(*state);
+        iVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.900000"}, "\n")));
 
         iVar.StoreValue = 616771620.98702729;
@@ -1019,15 +1019,15 @@ namespace OutputProcessor {
         iVar.maxValueDate = 12212460;
         iVar.freq = ReportFreq::Day;
 
-        iVar.WriteReportData(*state);
+        iVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.987027,4283136.0, 1,10,4283196.0,24,60"}, "\n")));
 
         iVar.freq = ReportFreq::Month;
-        iVar.WriteReportData(*state);
+        iVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.987027,4283136.0,21, 1,10,4283196.0,21,24,60"}, "\n")));
 
         iVar.freq = ReportFreq::Simulation;
-        iVar.WriteReportData(*state);
+        iVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.987027,4283136.0,12,21, 1,10,4283196.0,12,21,24,60"}, "\n")));
 
         iVar.storeType = StoreType::Average;
@@ -1036,15 +1036,15 @@ namespace OutputProcessor {
         iVar.minValueDate = iVar.maxValueDate = 0;
         iVar.freq = ReportFreq::TimeStep;
         
-        iVar.WriteReportData(*state);
+        iVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703"}, "\n")));
 
         iVar.freq = ReportFreq::EachCall;
-        iVar.WriteReportData(*state);
+        iVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703"}, "\n")));
 
         iVar.freq = ReportFreq::Hour;
-        iVar.WriteReportData(*state);
+        iVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703"}, "\n")));
 
         iVar.MinValue = 4283136;
@@ -1052,15 +1052,15 @@ namespace OutputProcessor {
         iVar.MaxValue = 4283196;
         iVar.maxValueDate = 12212460;
         iVar.freq = ReportFreq::Day;
-        iVar.WriteReportData(*state);
+        iVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703,4283136.0, 1,10,4283196.0,24,60"}, "\n")));
 
         iVar.freq = ReportFreq::Month;
-        iVar.WriteReportData(*state);
+        iVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703,4283136.0,21, 1,10,4283196.0,21,24,60"}, "\n")));
 
         iVar.freq = ReportFreq::Simulation;
-        iVar.WriteReportData(*state);
+        iVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.098703,4283136.0,12,21, 1,10,4283196.0,12,21,24,60"}, "\n")));
 
         iVar.storeType = StoreType::Sum;
@@ -1070,7 +1070,7 @@ namespace OutputProcessor {
         iVar.minValueDate = iVar.minValueDate = 0;
         iVar.freq = ReportFreq::TimeStep;
         
-        iVar.WriteReportData(*state);
+        iVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.0"}, "\n")));
 
         iVar.StoreValue = 25.75;
@@ -1082,7 +1082,7 @@ namespace OutputProcessor {
         iVar.maxValueDate = 4011560;
         iVar.freq = ReportFreq::Month;
 
-        iVar.WriteReportData(*state);
+        iVar.writeReportData(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.035764,0.0, 1, 1,15,1.0, 1,15,60"}, "\n")));
 
         auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
@@ -1358,146 +1358,146 @@ namespace OutputProcessor {
         sql->createSQLiteTimeIndexRecord(ReportFreq::Simulation, 1, 1, 0, 2017, false);
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::TimeStep, StoreType::Average, 1, -999, "indexGroup", "meterName", Constant::Units::J, false, false);
+            *state, ReportFreq::TimeStep, StoreType::Average, 1, "indexGroup", "meterName", Constant::Units::J, false, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,meterName [J] !TimeStep"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1,meterName [J] !TimeStep"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::TimeStep, StoreType::Sum, 2, -999, "indexGroup", "meterName", Constant::Units::W, false, false);
+            *state, ReportFreq::TimeStep, StoreType::Sum, 2, "indexGroup", "meterName", Constant::Units::W, false, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"2,1,meterName [W] !TimeStep"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"2,1,meterName [W] !TimeStep"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::TimeStep, StoreType::Average, 3, -999, "indexGroup", "meterName", Constant::Units::J, true, false);
+            *state, ReportFreq::TimeStep, StoreType::Average, 3, "indexGroup", "meterName", Constant::Units::J, true, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"3,1,Cumulative meterName [J] !TimeStep"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"3,1,Cumulative meterName [J] !TimeStep"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::TimeStep, StoreType::Average, 4, -999, "indexGroup", "meterName", Constant::Units::W, false, true);
+            *state, ReportFreq::TimeStep, StoreType::Average, 4, "indexGroup", "meterName", Constant::Units::W, false, true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"4,1,meterName [W] !TimeStep"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::TimeStep, StoreType::Average, 5, -999, "indexGroup", "meterName", Constant::Units::W, true, true);
+            *state, ReportFreq::TimeStep, StoreType::Average, 5, "indexGroup", "meterName", Constant::Units::W, true, true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"5,1,Cumulative meterName [W] !TimeStep"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::EachCall, StoreType::Average, 6, -999, "indexGroup", "meterName", Constant::Units::J, false, false);
+            *state, ReportFreq::EachCall, StoreType::Average, 6, "indexGroup", "meterName", Constant::Units::J, false, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"6,1,meterName [J] !Each Call"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"6,1,meterName [J] !Each Call"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::EachCall, StoreType::Sum, 7, -999, "indexGroup", "meterName", Constant::Units::J, false, false);
+            *state, ReportFreq::EachCall, StoreType::Sum, 7, "indexGroup", "meterName", Constant::Units::J, false, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"7,1,meterName [J] !Each Call"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"7,1,meterName [J] !Each Call"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::EachCall, StoreType::Average, 8, -999, "indexGroup", "meterName", Constant::Units::J, true, false);
+            *state, ReportFreq::EachCall, StoreType::Average, 8, "indexGroup", "meterName", Constant::Units::J, true, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"8,1,Cumulative meterName [J] !Each Call"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"8,1,Cumulative meterName [J] !Each Call"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::EachCall, StoreType::Average, 9, -999, "indexGroup", "meterName", Constant::Units::J, false, true);
+            *state, ReportFreq::EachCall, StoreType::Average, 9, "indexGroup", "meterName", Constant::Units::J, false, true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"9,1,meterName [J] !Each Call"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::EachCall, StoreType::Average, 10, -999, "indexGroup", "meterName", Constant::Units::J, true, true);
+            *state, ReportFreq::EachCall, StoreType::Average, 10, "indexGroup", "meterName", Constant::Units::J, true, true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"10,1,Cumulative meterName [J] !Each Call"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Hour, StoreType::Average, 11, -999, "indexGroup", "meterName", Constant::Units::J, false, false);
+            *state, ReportFreq::Hour, StoreType::Average, 11, "indexGroup", "meterName", Constant::Units::J, false, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"11,1,meterName [J] !Hourly"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"11,1,meterName [J] !Hourly"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Hour, StoreType::Sum, 12, -999, "indexGroup", "meterName", Constant::Units::None, false, false);
+            *state, ReportFreq::Hour, StoreType::Sum, 12, "indexGroup", "meterName", Constant::Units::None, false, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"12,1,meterName [] !Hourly"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"12,1,meterName [] !Hourly"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Hour, StoreType::Average, 13, -999, "indexGroup", "meterName", Constant::Units::None, true, false);
+            *state, ReportFreq::Hour, StoreType::Average, 13, "indexGroup", "meterName", Constant::Units::None, true, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"13,1,Cumulative meterName [] !Hourly"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"13,1,Cumulative meterName [] !Hourly"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Hour, StoreType::Average, 14, -999, "indexGroup", "meterName", Constant::Units::None, false, true);
+            *state, ReportFreq::Hour, StoreType::Average, 14, "indexGroup", "meterName", Constant::Units::None, false, true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"14,1,meterName [] !Hourly"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Hour, StoreType::Average, 15, -999, "indexGroup", "meterName", Constant::Units::None, true, true);
+            *state, ReportFreq::Hour, StoreType::Average, 15, "indexGroup", "meterName", Constant::Units::None, true, true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"15,1,Cumulative meterName [] !Hourly"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Day, StoreType::Average, 16, -999, "indexGroup", "meterName", Constant::Units::None, false, false);
+            *state, ReportFreq::Day, StoreType::Average, 16, "indexGroup", "meterName", Constant::Units::None, false, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"16,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"16,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Day, StoreType::Sum, 17, -999, "indexGroup", "meterName", Constant::Units::None, false, false);
+            *state, ReportFreq::Day, StoreType::Sum, 17, "indexGroup", "meterName", Constant::Units::None, false, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"17,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"17,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Day, StoreType::Average, 18, -999, "indexGroup", "meterName", Constant::Units::deltaC, true, false);
+            *state, ReportFreq::Day, StoreType::Average, 18, "indexGroup", "meterName", Constant::Units::deltaC, true, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"18,1,Cumulative meterName [deltaC] !Daily "}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"18,1,Cumulative meterName [deltaC] !Daily "}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Day, StoreType::Average, 19, -999, "indexGroup", "meterName", Constant::Units::deltaC, false, true);
+            *state, ReportFreq::Day, StoreType::Average, 19, "indexGroup", "meterName", Constant::Units::deltaC, false, true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"19,7,meterName [deltaC] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Day, StoreType::Average, 20, -999, "indexGroup", "meterName", Constant::Units::deltaC, true, true);
+            *state, ReportFreq::Day, StoreType::Average, 20, "indexGroup", "meterName", Constant::Units::deltaC, true, true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"20,1,Cumulative meterName [deltaC] !Daily "}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Month, StoreType::Average, 21, -999, "indexGroup", "meterName", Constant::Units::deltaC, false, false);
+            *state, ReportFreq::Month, StoreType::Average, 21, "indexGroup", "meterName", Constant::Units::deltaC, false, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"21,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"21,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Month, StoreType::Sum, 22, -999, "indexGroup", "meterName", Constant::Units::deltaC, false, false);
+            *state, ReportFreq::Month, StoreType::Sum, 22, "indexGroup", "meterName", Constant::Units::deltaC, false, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"22,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"22,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Month, StoreType::Average, 23, -999, "indexGroup", "meterName", Constant::Units::deltaC, true, false);
+            *state, ReportFreq::Month, StoreType::Average, 23, "indexGroup", "meterName", Constant::Units::deltaC, true, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"23,1,Cumulative meterName [deltaC] !Monthly "}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"23,1,Cumulative meterName [deltaC] !Monthly "}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Month, StoreType::Average, 24, -999, "indexGroup", "meterName", Constant::Units::deltaC, false, true);
+            *state, ReportFreq::Month, StoreType::Average, 24, "indexGroup", "meterName", Constant::Units::deltaC, false, true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"24,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Month, StoreType::Average, 25, -999, "indexGroup", "meterName", Constant::Units::deltaC, true, true);
+            *state, ReportFreq::Month, StoreType::Average, 25, "indexGroup", "meterName", Constant::Units::deltaC, true, true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"25,1,Cumulative meterName [deltaC] !Monthly "}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Simulation, StoreType::Average, 26, -999, "indexGroup", "meterName", Constant::Units::deltaC, false, false);
+            *state, ReportFreq::Simulation, StoreType::Average, 26, "indexGroup", "meterName", Constant::Units::deltaC, false, false);
         EXPECT_TRUE(compare_mtr_stream(
             delimited_string({"26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Simulation, StoreType::Sum, 27, -999, "indexGroup", "meterName", Constant::Units::deltaC, false, false);
+            *state, ReportFreq::Simulation, StoreType::Sum, 27, "indexGroup", "meterName", Constant::Units::deltaC, false, false);
         EXPECT_TRUE(compare_mtr_stream(
             delimited_string({"27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Simulation, StoreType::Average, 28, -999, "indexGroup", "meterName", Constant::Units::deltaC, true, false);
+            *state, ReportFreq::Simulation, StoreType::Average, 28, "indexGroup", "meterName", Constant::Units::deltaC, true, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"28,1,Cumulative meterName [deltaC] !RunPeriod "}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"28,1,Cumulative meterName [deltaC] !RunPeriod "}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Simulation, StoreType::Average, 29, -999, "indexGroup", "meterName", Constant::Units::deltaC, false, true);
+            *state, ReportFreq::Simulation, StoreType::Average, 29, "indexGroup", "meterName", Constant::Units::deltaC, false, true);
         EXPECT_TRUE(compare_mtr_stream(
             delimited_string({"29,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
         WriteMeterDictionaryItem(
-            *state, ReportFreq::Simulation, StoreType::Average, 30, -999, "indexGroup", "meterName", Constant::Units::deltaC, true, true);
+            *state, ReportFreq::Simulation, StoreType::Average, 30, "indexGroup", "meterName", Constant::Units::deltaC, true, true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"30,1,Cumulative meterName [deltaC] !RunPeriod "}, "\n")));
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
@@ -1565,481 +1565,212 @@ namespace OutputProcessor {
         TimeStepType aThirdTimeStepType = TimeStepType::Zone;
         std::string aThirdTimeStepString = timeStepZoneString;
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::TimeStep,
-                                          StoreType::Average,
-                                          1,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        OutVarReal rVar;
+        rVar.freq = ReportFreq::TimeStep;
+        rVar.storeType = StoreType::Average;
+        rVar.timeStepType = TimeStepType::Zone;
+        rVar.units = Constant::Units::m3_s;
+        rVar.ReportID = 1;
+        rVar.indexGroup = "indexGroup";
+        rVar.key = "keyedValue";
+        rVar.name = "variableName";
+        rVar.unitNameCustomEMS = "";
+        rVar.SchedPtr = 0;
+        
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1,keyedValue,variableName [m3/s] !TimeStep"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::TimeStep,
-                                          StoreType::Sum,
-                                          2,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.freq = ReportFreq::TimeStep;
+        rVar.storeType = StoreType::Sum;
+        rVar.ReportID = 2;
+        
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"2,1,keyedValue,variableName [m3/s] !TimeStep"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::TimeStep,
-                                          StoreType::Average,
-                                          3,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "scheduleName");
+        state->dataScheduleMgr->Schedule.allocate(1);
+        state->dataScheduleMgr->Schedule(1).Name = "scheduleName";
+
+        rVar.ReportID = 3;
+        rVar.storeType = StoreType::Average;
+        rVar.SchedPtr = 1;
+        
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"3,1,keyedValue,variableName [m3/s] !TimeStep,scheduleName"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::TimeStep,
-                                          StoreType::Average,
-                                          4,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::System,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 4;
+        rVar.timeStepType = TimeStepType::System;
+        rVar.SchedPtr = 0;
+
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"4,1,keyedValue,variableName [m3/s] !TimeStep"}, "\n")));
 
-        // Hum, can no longer pass Something else than what's in the enum...
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::TimeStep,
-                                          StoreType::Average,
-                                          5,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          aThirdTimeStepType,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"5,1,keyedValue,variableName [m3/s] !TimeStep"}, "\n")));
-
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::EachCall,
-                                          StoreType::Average,
-                                          6,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 6;
+        rVar.freq = ReportFreq::EachCall;
+        rVar.timeStepType = TimeStepType::Zone;
+        
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"6,1,keyedValue,variableName [m3/s] !Each Call"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::EachCall,
-                                          StoreType::Sum,
-                                          7,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 7;
+        rVar.storeType = StoreType::Sum;
+        rVar.indexGroup = "indexGroup";
+        
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"7,1,keyedValue,variableName [m3/s] !Each Call"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::EachCall,
-                                          StoreType::Average,
-                                          8,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "scheduleName");
+        rVar.ReportID = 8;
+        rVar.storeType = StoreType::Average;
+        rVar.SchedPtr = 1;
+        
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"8,1,keyedValue,variableName [m3/s] !Each Call,scheduleName"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::EachCall,
-                                          StoreType::Average,
-                                          9,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::System,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 9;
+        rVar.SchedPtr = 0;
+        rVar.timeStepType = TimeStepType::System;
+        
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"9,1,keyedValue,variableName [m3/s] !Each Call"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::EachCall,
-                                          StoreType::Average,
-                                          10,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          aThirdTimeStepType,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"10,1,keyedValue,variableName [m3/s] !Each Call"}, "\n")));
-
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Hour,
-                                          StoreType::Average,
-                                          11,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 11;
+        rVar.freq = ReportFreq::Hour;
+        rVar.timeStepType = TimeStepType::Zone;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Hour]);
         op->freqTrackingVariables[(int)ReportFreq::Hour] = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"11,1,keyedValue,variableName [m3/s] !Hourly"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Hour,
-                                          StoreType::Sum,
-                                          12,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 12;
+        rVar.storeType = StoreType::Sum;
+        rVar.freq = ReportFreq::Hour;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Hour]);
         op->freqTrackingVariables[(int)ReportFreq::Hour] = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"12,1,keyedValue,variableName [m3/s] !Hourly"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Hour,
-                                          StoreType::Average,
-                                          13,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "scheduleName");
+        rVar.ReportID = 13;
+        rVar.storeType = StoreType::Average;
+        rVar.SchedPtr = 1;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Hour]);
         op->freqTrackingVariables[(int)ReportFreq::Hour] = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"13,1,keyedValue,variableName [m3/s] !Hourly,scheduleName"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Hour,
-                                          StoreType::Average,
-                                          14,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::System,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 14;
+        rVar.SchedPtr = 0;
+        rVar.timeStepType = TimeStepType::System;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Hour]);
         op->freqTrackingVariables[(int)ReportFreq::Hour] = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"14,1,keyedValue,variableName [m3/s] !Hourly"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Hour,
-                                          StoreType::Average,
-                                          15,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          aThirdTimeStepType,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
-        EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Hour]);
-        op->freqTrackingVariables[(int)ReportFreq::Hour] = false;
-        EXPECT_TRUE(compare_eso_stream(delimited_string({"15,1,keyedValue,variableName [m3/s] !Hourly"}, "\n")));
-
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Day,
-                                          StoreType::Average,
-                                          16,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 16;
+        rVar.freq = ReportFreq::Day;
+        rVar.timeStepType = TimeStepType::Zone;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Day]);
         op->freqTrackingVariables[(int)ReportFreq::Day] = false;
         EXPECT_TRUE(
             compare_eso_stream(delimited_string({"16,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Day,
-                                          StoreType::Sum,
-                                          17,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 17;
+        rVar.storeType = StoreType::Sum;
+        rVar.freq = ReportFreq::Day;
+        rVar.timeStepType = TimeStepType::Zone;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Day]);
         op->freqTrackingVariables[(int)ReportFreq::Day] = false;
         EXPECT_TRUE(
             compare_eso_stream(delimited_string({"17,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Day,
-                                          StoreType::Average,
-                                          18,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "scheduleName");
+        rVar.ReportID = 18;
+        rVar.storeType = StoreType::Average;
+        rVar.SchedPtr = 1;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Day]);
         op->freqTrackingVariables[(int)ReportFreq::Day] = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"18,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],scheduleName"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Day,
-                                          StoreType::Average,
-                                          19,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::System,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 19;
+        rVar.timeStepType = TimeStepType::System;
+        rVar.SchedPtr = 0;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Day]);
         op->freqTrackingVariables[(int)ReportFreq::Day] = false;
         EXPECT_TRUE(
             compare_eso_stream(delimited_string({"19,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Day,
-                                          StoreType::Average,
-                                          20,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          aThirdTimeStepType,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
-        EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Day]);
-        op->freqTrackingVariables[(int)ReportFreq::Day] = false;
-        EXPECT_TRUE(
-            compare_eso_stream(delimited_string({"20,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Month,
-                                          StoreType::Average,
-                                          21,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 21;
+        rVar.freq = ReportFreq::Month;
+        rVar.timeStepType = TimeStepType::Zone;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Month]);
         op->freqTrackingVariables[(int)ReportFreq::Month] = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"21,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Month,
-                                          StoreType::Sum,
-                                          22,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 22;
+        rVar.storeType = StoreType::Sum;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Month]);
         op->freqTrackingVariables[(int)ReportFreq::Month] = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"22,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Month,
-                                          StoreType::Average,
-                                          23,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "scheduleName");
+        rVar.ReportID = 23;
+        rVar.storeType = StoreType::Average;
+        rVar.SchedPtr = 1;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Month]);
         op->freqTrackingVariables[(int)ReportFreq::Month] = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"23,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute],scheduleName"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Month,
-                                          StoreType::Average,
-                                          24,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::System,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 24;
+        rVar.timeStepType = TimeStepType::System;
+        rVar.SchedPtr = 0;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Month]);
         op->freqTrackingVariables[(int)ReportFreq::Month] = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"24,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Month,
-                                          StoreType::Average,
-                                          25,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          aThirdTimeStepType,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
-        EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Month]);
-        op->freqTrackingVariables[(int)ReportFreq::Month] = false;
-        EXPECT_TRUE(compare_eso_stream(
-            delimited_string({"25,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
-
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Simulation,
-                                          StoreType::Average,
-                                          26,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 26;
+        rVar.freq = ReportFreq::Simulation;
+        rVar.timeStepType = TimeStepType::Zone;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Simulation]);
         op->freqTrackingVariables[(int)ReportFreq::Simulation] = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"26,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Simulation,
-                                          StoreType::Sum,
-                                          27,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 27;
+        rVar.storeType = StoreType::Sum;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Simulation]);
         op->freqTrackingVariables[(int)ReportFreq::Simulation] = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"27,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Simulation,
-                                          StoreType::Average,
-                                          28,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::Zone,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "scheduleName");
+        rVar.ReportID = 28;
+        rVar.storeType = StoreType::Average;
+        rVar.SchedPtr = 1;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Simulation]);
         op->freqTrackingVariables[(int)ReportFreq::Simulation] = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string(
             {"28,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute],scheduleName"}, "\n")));
 
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Simulation,
-                                          StoreType::Average,
-                                          29,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          TimeStepType::System,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
+        rVar.ReportID = 29;
+        rVar.timeStepType = TimeStepType::System;
+        rVar.SchedPtr = 0;
+        rVar.writeReportDictionaryItem(*state);
         EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Simulation]);
         op->freqTrackingVariables[(int)ReportFreq::Simulation] = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"29,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
-
-        WriteReportVariableDictionaryItem(*state,
-                                          ReportFreq::Simulation,
-                                          StoreType::Average,
-                                          30,
-                                          -999,
-                                          "indexGroup",
-                                          "keyedValue",
-                                          "variableName",
-                                          aThirdTimeStepType,
-                                          Constant::Units::m3_s,
-                                          "",
-                                          "");
-        EXPECT_TRUE(op->freqTrackingVariables[(int)ReportFreq::Simulation]);
-        op->freqTrackingVariables[(int)ReportFreq::Simulation] = false;
-        EXPECT_TRUE(compare_eso_stream(
-            delimited_string({"30,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -2048,33 +1779,30 @@ namespace OutputProcessor {
              {"2", "0", "Sum", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "Zone Timestep", "", "m3/s"},
              {"3", "0", "Avg", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "Zone Timestep", "scheduleName", "m3/s"},
              {"4", "0", "Avg", "indexGroup", timeStepSystemString, "keyedValue", "variableName", "Zone Timestep", "", "m3/s"},
-             {"5", "0", "Avg", "indexGroup", aThirdTimeStepString, "keyedValue", "variableName", "Zone Timestep", "", "m3/s"},
              {"6", "0", "Avg", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
              {"7", "0", "Sum", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
              {"8", "0", "Avg", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "HVAC System Timestep", "scheduleName", "m3/s"},
              {"9", "0", "Avg", "indexGroup", timeStepSystemString, "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
-             {"10", "0", "Avg", "indexGroup", aThirdTimeStepString, "keyedValue", "variableName", "HVAC System Timestep", "", "m3/s"},
              {"11", "0", "Avg", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "Hourly", "", "m3/s"},
              {"12", "0", "Sum", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "Hourly", "", "m3/s"},
              {"13", "0", "Avg", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "Hourly", "scheduleName", "m3/s"},
              {"14", "0", "Avg", "indexGroup", timeStepSystemString, "keyedValue", "variableName", "Hourly", "", "m3/s"},
-             {"15", "0", "Avg", "indexGroup", aThirdTimeStepString, "keyedValue", "variableName", "Hourly", "", "m3/s"},
              {"16", "0", "Avg", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "Daily", "", "m3/s"},
              {"17", "0", "Sum", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "Daily", "", "m3/s"},
              {"18", "0", "Avg", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "Daily", "scheduleName", "m3/s"},
              {"19", "0", "Avg", "indexGroup", timeStepSystemString, "keyedValue", "variableName", "Daily", "", "m3/s"},
-             {"20", "0", "Avg", "indexGroup", aThirdTimeStepString, "keyedValue", "variableName", "Daily", "", "m3/s"},
              {"21", "0", "Avg", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "Monthly", "", "m3/s"},
              {"22", "0", "Sum", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "Monthly", "", "m3/s"},
              {"23", "0", "Avg", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "Monthly", "scheduleName", "m3/s"},
              {"24", "0", "Avg", "indexGroup", timeStepSystemString, "keyedValue", "variableName", "Monthly", "", "m3/s"},
-             {"25", "0", "Avg", "indexGroup", aThirdTimeStepString, "keyedValue", "variableName", "Monthly", "", "m3/s"},
              {"26", "0", "Avg", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "Run Period", "", "m3/s"},
              {"27", "0", "Sum", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "Run Period", "", "m3/s"},
              {"28", "0", "Avg", "indexGroup", timeStepZoneString, "keyedValue", "variableName", "Run Period", "scheduleName", "m3/s"},
-             {"29", "0", "Avg", "indexGroup", timeStepSystemString, "keyedValue", "variableName", "Run Period", "", "m3/s"},
-             {"30", "0", "Avg", "indexGroup", aThirdTimeStepString, "keyedValue", "variableName", "Run Period", "", "m3/s"}});
-        EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
+             {"29", "0", "Avg", "indexGroup", timeStepSystemString, "keyedValue", "variableName", "Run Period", "", "m3/s"}});
+
+        EXPECT_EQ(reportDataDictionary.size(), reportDataDictionaryResults.size());
+        for (int i = 0; i < reportDataDictionary.size(); ++i)
+            EXPECT_EQ(reportDataDictionary[i], reportDataDictionaryResults[i]);
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_writeCumulativeReportMeterData)

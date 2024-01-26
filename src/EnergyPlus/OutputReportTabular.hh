@@ -262,7 +262,7 @@ namespace OutputReportTabular {
         // the lowest bin and above the value of the last bin are also shown.
         int resIndex = 0; // result index - pointer to BinResults array
         int numTables = 0;
-        OutputProcessor::VariableType typeOfVar = OutputProcessor::VariableType::NotFound;
+        OutputProcessor::VariableType typeOfVar = OutputProcessor::VariableType::Invalid; // Was NotFound
         OutputProcessor::StoreType avgSum = OutputProcessor::StoreType::Average;     // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType stepType = OutputProcessor::TimeStepType::Zone; // Variable time step is Zone=1 or HVAC=2
         Constant::Units units = Constant::Units::Invalid;                             // the units enumeration

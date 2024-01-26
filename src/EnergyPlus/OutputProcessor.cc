@@ -2410,18 +2410,7 @@ namespace OutputProcessor {
         }
     } // WriteYearlyTimeStamp()
 
-    void WriteReportVariableDictionaryItem(EnergyPlusData &state,
-                                           ReportFreq const freq, // The reporting interval (e.g., hourly, daily)
-                                           StoreType const storeType,
-                                           int const reportID,                       // The reporting ID for the data
-                                           [[maybe_unused]] int const indexGroupKey, // The reporting group (e.g., Zone, Plant Loop, etc.)
-                                           std::string const &indexGroup,            // The reporting group (e.g., Zone, Plant Loop, etc.)
-                                           std::string_view const keyedValue,        // The key name for the data
-                                           std::string_view const variableName,      // The variable's actual name
-                                           TimeStepType const timeStepType,
-                                           Constant::Units const units, // The variables units
-                                           std::string_view const customUnitName,
-                                           std::string_view const ScheduleName)
+    void OutVar::writeReportDictionaryItem(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2439,21 +2428,23 @@ namespace OutputProcessor {
         auto &rf = state.dataResultsFramework->resultsFramework;
         auto &sql = state.dataSQLiteProcedures->sqlite;
 
-        std::string_view unitsString = (units == Constant::Units::customEMS && !customUnitName.empty())
-                                           ? customUnitName
+        std::string_view unitsString = (units == Constant::Units::customEMS && !unitNameCustomEMS.empty())
+                                           ? unitNameCustomEMS
                                            : ((units == Constant::Units::Invalid) ? "" : Constant::unitNames[(int)units]);
 
+        std::string_view schedString = (SchedPtr != 0) ? state.dataScheduleMgr->Schedule(SchedPtr).Name : "";
+        
         if (state.files.eso.good()) {
             print(state.files.eso,
                   "{},{},{},{} [{}]{}{}{}\n",
-                  reportID,
+                  ReportID,
                   reportFreqArbitraryInts[(int)freq],
-                  keyedValue,
-                  variableName,
+                  key,
+                  name,
                   unitsString,
                   reportingFrequencyNoticeStrings[(int)freq],
-                  !ScheduleName.empty() ? "," : "",
-                  ScheduleName);
+                  !schedString.empty() ? "," : "",
+                  schedString);
         }
 
         if (freq == ReportFreq::Hour || freq == ReportFreq::Day || freq == ReportFreq::Month || freq == ReportFreq::Year ||
@@ -2462,19 +2453,18 @@ namespace OutputProcessor {
 
         if (sql) {
             sql->createSQLiteReportDictionaryRecord(
-                reportID, storeType, indexGroup, keyedValue, variableName, timeStepType, unitsString, freq, false, ScheduleName);
+                ReportID, storeType, indexGroup, key, name, timeStepType, unitsString, freq, false, schedString);
         }
 
         // add to ResultsFramework for output variable list, need to check RVI/MVI later
-        rf->addReportVariable(keyedValue, variableName, unitsString, freq);
+        rf->addReportVariable(key, name, unitsString, freq);
 
-    } // WriteReportVariableDictionaryItem()
+    } // OutVar::WriteReportDictionaryItem()
 
     void WriteMeterDictionaryItem(EnergyPlusData &state,
                                   ReportFreq const freq, // The reporting interval (e.g., hourly, daily)
                                   StoreType const storeType,
                                   int const reportID,                       // The reporting ID in for the variable
-                                  [[maybe_unused]] int const indexGroupKey, // The reporting group for the variable
                                   std::string const &indexGroup,            // The reporting group for the variable
                                   std::string const &meterName,             // The variable's meter name
                                   Constant::Units const units,              // The variables units
@@ -2537,74 +2527,7 @@ namespace OutputProcessor {
 
     } // WriteMeterDictionaryItem()
 
-#ifdef GET_OUT
-    void WriteIntegerVariableOutput(EnergyPlusData &state,
-                                    OutVarInt *intVar,          // Integer variable to write out
-                                    ReportFreq const reportFreq // The report type (i.e., the reporting interval)
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Greg Stark
-        //       DATE WRITTEN   August 2008
-        //       MODIFIED       April 2011; Linda Lawrie, December 2017; Jason DeGraw
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine writes integer report variable data to the output file and
-        // SQL database. Much of the code here was an included in earlier versions
-        // of the UpdateDataandReport subroutine. The code was moved to facilitate
-        // easier maintenance and writing of data to the SQL database.
-
-        if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface && !state.dataSysVars->ReportDuringWarmup) return;
-
-        if (intVar->Report && intVar->freq == reportFreq && intVar->Stored) {
-            if (intVar->NumStored > 0.0) {
-                intVar->WriteReportData(state);
-                ++state.dataGlobal->StdOutputRecordCount;
-            }
-
-            intVar->StoreValue = 0.0;
-            intVar->NumStored = 0.0;
-            intVar->MinValue = IMinSetValue;
-            intVar->MaxValue = IMaxSetValue;
-            intVar->Stored = false;
-        }
-    } // WriteIntegerVariableOutput()
-
-    void WriteRealVariableOutput(EnergyPlusData &state,
-                                 OutVarReal *realVar,        // Real variable to write out
-                                 ReportFreq const reportFreq // The report type or interval (e.g., hourly)
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Greg Stark
-        //       DATE WRITTEN   August 2008
-        //       MODIFIED       April 2011; Linda Lawrie, December 2017; Jason DeGraw
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine writes real report variable data to the output file and
-        // SQL database. Much of the code here was an included in earlier versions
-        // of the UpdateDataandReport subroutine. The code was moved to facilitate
-        // easier maintenance and writing of data to the SQL database.
-
-        if (realVar->Report && realVar->freq == reportFreq && realVar->Stored) {
-            if (realVar->NumStored > 0.0) {
-                realVar->WriteReportData(state);
-                ++state.dataGlobal->StdOutputRecordCount;
-            }
-
-            realVar->StoreValue = 0.0;
-            realVar->NumStored = 0.0;
-            realVar->MinValue = MinSetValue;
-            realVar->MaxValue = MaxSetValue;
-            realVar->Stored = false;
-        }
-    } // WriteRealVariableOutput()
-#endif // GET_OUT
-    void OutVar::WriteVariableOutput(EnergyPlusData &state,
+    void OutVar::writeOutput(EnergyPlusData &state,
                                      ReportFreq const reportFreq // The report type or interval (e.g., hourly)
     )
     {
@@ -2626,7 +2549,7 @@ namespace OutputProcessor {
         if (!Report || freq != reportFreq || !Stored) return;
         
         if (NumStored > 0.0) {
-            WriteReportData(state);
+            writeReportData(state);
             ++state.dataGlobal->StdOutputRecordCount;
         }
 
@@ -2635,7 +2558,7 @@ namespace OutputProcessor {
         MinValue = MinSetValue;
         MaxValue = MaxSetValue;
         Stored = false;
-    } // OutVar::WriteVariableOutput()
+    } // OutVar::WriteOutput()
 
     void WriteCumulativeReportMeterData(EnergyPlusData &state,
                                         int const reportID,      // The variable's report ID
@@ -2805,172 +2728,7 @@ namespace OutputProcessor {
         }
     } // WriteNumericData()
 
-#ifdef GET_OUT
-    void WriteReportRealData(EnergyPlusData &state,
-                             int const reportID,
-                             Real64 const repValue,
-                             StoreType const storeType,
-                             Real64 const numOfItemsStored,
-                             ReportFreq const freq,
-                             Real64 const minValue,
-                             int const minValueDate,
-                             Real64 const MaxValue,
-                             int const maxValueDate)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Greg Stark
-        //       DATE WRITTEN   July 2008
-        //       MODIFIED       April 2011; Linda Lawrie
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine writes the average real data to the output files and
-        // SQL database. It supports the WriteRealVariableOutput subroutine.
-        // Much of the code here was an included in earlier versions
-        // of the UpdateDataandReport subroutine. The code was moved to facilitate
-        // easier maintenance and writing of data to the SQL database.
-
-        std::string NumberOut;   // Character for producing "number out"
-        Real64 repVal(repValue); // The variable's value
-        auto &rf = state.dataResultsFramework->resultsFramework;
-        auto &sql = state.dataSQLiteProcedures->sqlite;
-
-        if (storeType == StoreType::Average) {
-            repVal /= numOfItemsStored;
-        }
-        if (repVal == 0.0) {
-            NumberOut = "0.0";
-        } else {
-            char realData[129];
-            dtoa(repVal, realData);
-            NumberOut = std::string(realData);
-        }
-
-        if (rf->timeSeriesEnabled()) {
-            //// The others (<= hourly) are handled inline with the code
-            if (freq == ReportFreq::Day || freq == ReportFreq::Month || freq == ReportFreq::Year || freq == ReportFreq::Simulation) {
-                rf->freqTSData[(int)freq].pushVariableValue(reportID, repVal);
-            }
-        }
-
-        if (sql) {
-            sql->createSQLiteReportDataRecord(reportID, repVal, freq, minValue, minValueDate, MaxValue, maxValueDate);
-        }
-
-        if ((freq == ReportFreq::EachCall) || (freq == ReportFreq::TimeStep) || (freq == ReportFreq::Hour)) { // -1, 0, 1
-            if (state.files.eso.good()) {
-                print(state.files.eso, "{},{}\n", reportID, NumberOut);
-            }
-
-        } else {                // if ( ( reportingInterval == ReportFreq::Daily ) || ( reportingInterval == ReportFreq::Monthly ) || (
-                                // reportingInterval == ReportFreq::Simulation ) ) { //  2, 3, 4, 5
-            std::string MaxOut; // Character for Max out string
-            std::string MinOut; // Character for Min out string
-
-            if (MaxValue == 0.0) {
-                MaxOut = "0.0";
-            } else {
-                char realData[129];
-                dtoa(MaxValue, realData);
-                MaxOut = std::string(realData);
-            }
-
-            if (minValue == 0.0) {
-                MinOut = "0.0";
-            } else {
-                char realData[129];
-                dtoa(minValue, realData);
-                MinOut = std::string(realData);
-            }
-
-            // Append the min and max strings with date information
-            ProduceMinMaxString(MinOut, minValueDate, freq);
-            ProduceMinMaxString(MaxOut, maxValueDate, freq);
-
-            if (state.files.eso.good()) {
-                print(state.files.eso, "{},{},{},{}\n", reportID, NumberOut, MinOut, MaxOut);
-            }
-        }
-    } // WriteReportRealData()
-
-    void WriteReportIntegerData(EnergyPlusData &state,
-                                int const reportID,            // The variable's reporting ID
-                                Real64 const repValue,         // The variable's value
-                                StoreType const storeType,     // Type of item (averaged or summed)
-                                Real64 const numOfItemsStored, // The number of items (hours or timesteps) of data stored
-                                ReportFreq const freq,         // The reporting interval (e.g., monthly)
-                                int const minValue,            // The variable's minimum value during the reporting interval
-                                int const minValueDate,        // The date the minimum value occurred
-                                int const MaxValue,            // The variable's maximum value during the reporting interval
-                                int const maxValueDate         // The date the maximum value occurred
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Greg Stark
-        //       DATE WRITTEN   July 2008
-        //       MODIFIED       April 2011; Linda Lawrie
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine writes averaged integer data to the output files and
-        // SQL database. It supports the WriteIntegerVariableOutput subroutine.
-        // Much of the code here was an included in earlier versions
-        // of the UpdateDataandReport subroutine. The code was moved to facilitate
-        // easier maintenance and writing of data to the SQL database.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string NumberOut; // Character for producing "number out"
-        std::string MaxOut;    // Character for Max out string
-        std::string MinOut;    // Character for Min out string
-        Real64 rmaxValue;
-        Real64 rminValue;
-        Real64 repVal; // The variable's value
-        auto &rf = state.dataResultsFramework->resultsFramework;
-        auto &sql = state.dataSQLiteProcedures->sqlite;
-
-        repVal = repValue;
-        if (storeType == StoreType::Average) {
-            repVal /= numOfItemsStored;
-        }
-        if (repValue == 0.0) {
-            NumberOut = "0.0";
-        } else {
-            NumberOut = format("{:f}", repVal);
-        }
-
-        // Append the min and max strings with date information
-        MinOut = fmt::to_string(minValue);
-        MaxOut = fmt::to_string(MaxValue);
-        ProduceMinMaxString(MinOut, minValueDate, freq);
-        ProduceMinMaxString(MaxOut, maxValueDate, freq);
-
-        if (rf->timeSeriesEnabled() &&
-            (freq == ReportFreq::Day || freq == ReportFreq::Month || freq == ReportFreq::Year || freq == ReportFreq::Simulation)) {
-            // add to daily TS data store
-            rf->freqTSData[(int)freq].pushVariableValue(reportID, repVal);
-        }
-
-        rminValue = minValue;
-        rmaxValue = MaxValue;
-        if (sql) {
-            sql->createSQLiteReportDataRecord(reportID, repVal, freq, rminValue, minValueDate, rmaxValue, maxValueDate);
-        }
-
-        if ((freq == ReportFreq::EachCall) || (freq == ReportFreq::TimeStep) || (freq == ReportFreq::Hour)) { // -1, 0, 1
-            if (state.files.eso.good()) {
-                print(state.files.eso, "{},{}\n", reportID, NumberOut);
-            }
-        } else { // if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) {
-                 // // 2, 3, 4
-            if (state.files.eso.good()) {
-                print(state.files.eso, "{},{},{},{}\n", reportID, NumberOut, MinOut, MaxOut);
-            }
-        }
-    } // WriteReportIntegerData()
-#endif // GET_OUT
-    void OutVar::WriteReportData(EnergyPlusData &state)
+    void OutVar::writeReportData(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3258,6 +3016,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         var->storeType = store;
         var->name = name;
         var->nameUC = Util::makeUPPER(var->name);
+        var->key = key;
         var->keyUC = Util::makeUPPER(key);
         var->keyColonName = fmt::format("{}:{}", key, name);
         var->keyColonNameUC = Util::makeUPPER(var->keyColonName);
@@ -3269,7 +3028,9 @@ void SetupOutputVariable(EnergyPlusData &state,
         var->Which = &ActualVariable;
         var->ZoneMult = ZoneMult;
         var->ZoneListMult = ZoneListMult;
-
+        var->indexGroupKey = indexGroupKey;
+        var->indexGroup = timeStepTypeNames[(int)var->timeStepType];
+        
         // This is only done for the first variable in the list.  It
         // could be moved out of this loop entirely but then some
         // numberings in unit tests would not line up
@@ -3289,18 +3050,7 @@ void SetupOutputVariable(EnergyPlusData &state,
             var->SchedPtr = op->reqVars[reqVarNum]->SchedPtr;
         }
 
-        WriteReportVariableDictionaryItem(state,
-                                          var->freq,
-                                          var->storeType,
-                                          var->ReportID,
-                                          indexGroupKey,
-                                          std::string(timeStepTypeNames[(int)timeStep]),
-                                          key,
-                                          name,
-                                          var->timeStepType,
-                                          var->units,
-                                          var->unitNameCustomEMS,
-                                          (var->SchedPtr != 0) ? state.dataScheduleMgr->Schedule(var->SchedPtr).Name : "");
+        var->writeReportDictionaryItem(state);
     }
 
 } // SetupOutputVariable()
@@ -3373,13 +3123,15 @@ void SetupOutputVariable(EnergyPlusData &state,
         var->storeType = storeType;
         var->name = name;
         var->nameUC = Util::makeUPPER(var->name);
+        var->key = key;
         var->keyUC = Util::makeUPPER(key);
         var->keyColonName = fmt::format("{}:{}", key, name);
         var->keyColonNameUC = Util::makeUPPER(var->keyColonName);
         var->units = units;
         var->ReportID = ++op->ReportNumberCounter;
         var->Which = &ActualVariable;
-
+        var->indexGroupKey = -1;
+        
         if (reqVarNum == -1) continue;
 
         var->Report = true;
@@ -3392,17 +3144,7 @@ void SetupOutputVariable(EnergyPlusData &state,
             var->SchedPtr = op->reqVars[reqVarNum]->SchedPtr;
         }
 
-        WriteReportVariableDictionaryItem(state,
-                                          var->freq,
-                                          var->storeType,
-                                          var->ReportID,
-                                          indexGroupKey,
-                                          std::string(timeStepTypeNames[(int)timeStepType]),
-                                          key,
-                                          name,
-                                          var->timeStepType,
-                                          var->units,
-                                          (var->SchedPtr != 0) ? state.dataScheduleMgr->Schedule(var->SchedPtr).Name : "");
+        var->writeReportDictionaryItem(state);
     }
 } // SetOutputVariable()
 
@@ -3472,9 +3214,6 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
     // Main "Record Keeping" Loops for R and I variables
     for (auto *var : op->outVars) {
-#ifdef GET_OUT
-            if (var->varType != VariableType::Real) continue;
-#endif // GET_OUT
         if (var->timeStepType != t_TimeStepTypeKey) continue;
 
         Real64 value = (var->varType == VariableType::Real) ?
@@ -3568,89 +3307,6 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
         } 
     } // for (var)
 
-#ifdef GET_OUT    
-    for (auto *var : op->outVars) {
-        if (var->varType != VariableType::Integer) continue;
-        if (var->timeStepType != t_TimeStepTypeKey) continue;
-
-        // Act on the IVariables variable
-        auto *iVar = dynamic_cast<OutVarInt *>(var);
-        assert(iVar != nullptr);
-
-        var->Stored = true;
-        if (var->storeType == StoreType::Average) {
-            Real64 ICurVal = (*iVar->Which) * rxTime;
-            iVar->TSValue += ICurVal;
-            iVar->EITSValue = iVar->TSValue; // CR - 8481 fix - 09/06/2011
-            if (nint(ICurVal) > iVar->MaxValue) {
-                iVar->MaxValue = nint(ICurVal); // Record keeping for date and time go here too
-                var->maxValueDate = MDHM;      //+ TimeValue.at(t_TimeStepTypeKey)%TimeStep
-            }
-            if (nint(ICurVal) < iVar->MinValue) {
-                iVar->MinValue = nint(ICurVal);
-                var->minValueDate = MDHM; //+ TimeValue.at(t_TimeStepTypeKey)%TimeStep
-            }
-
-        } else {
-            if ((*iVar->Which) > iVar->MaxValue) {
-                iVar->MaxValue = (*iVar->Which); // Record keeping for date and time go here too
-                var->maxValueDate = MDHM;       //+ TimeValue(TimeStepType)%TimeStep
-            }
-            if ((*iVar->Which) < iVar->MinValue) {
-                iVar->MinValue = (*iVar->Which);
-                var->minValueDate = MDHM; //+ TimeValue(TimeStepType)%TimeStep
-            }
-            iVar->TSValue += (*iVar->Which);
-            iVar->EITSValue = iVar->TSValue; // CR - 8481 fix - 09/06/2011
-        }
-
-        if (!var->Report) continue;
-
-        if (var->SchedPtr > 0 && GetCurrentScheduleValue(state, var->SchedPtr) == 0.0) continue;
-
-        var->tsStored = true;
-        if (!var->thisTSStored) {
-            ++var->thisTSCount;
-            var->thisTSStored = true;
-        }
-
-        if (var->freq != ReportFreq::EachCall) continue;
-        
-        if (TimePrint) {
-            if (op->LHourP != state.dataGlobal->HourOfDay || std::abs(op->LStartMin - StartMinute) > 0.001 ||
-                std::abs(op->LEndMin - op->TimeValue[(int)t_TimeStepTypeKey].CurMinute) > 0.001) {
-                int CurDayType = state.dataEnvrn->DayOfWeek;
-                if (state.dataEnvrn->HolidayIndex > 0) {
-                    CurDayType = state.dataEnvrn->HolidayIndex;
-                }
-                WriteTimeStampFormatData(state,
-                                         state.files.eso,
-                                         ReportFreq::EachCall,
-                                         op->freqStampReportNums[(int)ReportFreq::TimeStep],
-                                         state.dataGlobal->DayOfSimChr,
-                                         true,
-                                         state.dataEnvrn->Month,
-                                         state.dataEnvrn->DayOfMonth,
-                                         state.dataGlobal->HourOfDay,
-                                         op->TimeValue[(int)t_TimeStepTypeKey].CurMinute,
-                                         StartMinute,
-                                         state.dataEnvrn->DSTIndicator,
-                                         ScheduleManager::dayTypeNames[CurDayType]);
-                op->LHourP = state.dataGlobal->HourOfDay;
-                op->LStartMin = StartMinute;
-                op->LEndMin = op->TimeValue[(int)t_TimeStepTypeKey].CurMinute;
-            }
-            TimePrint = false;
-        }
-        // only time integer vars actual report as integer only is "detailed"
-        WriteNumericData(state, iVar->ReportID, *iVar->Which);
-        ++state.dataGlobal->StdOutputRecordCount;
-        
-        if (rf->timeSeriesEnabled()) {
-            rf->detailedTSData[(int)t_TimeStepTypeKey].pushVariableValue(iVar->ReportID, *iVar->Which);
-        }
-    } // for (var)
-#endif // GET_OUT
     
     if (t_TimeStepTypeKey == TimeStepType::System) return; // All other stuff happens at the "zone" time step call to this routine.
 
@@ -3700,9 +3356,6 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
         for (auto *var : op->outVars) {
             if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
-#ifdef GET_OUT
-            if (var->varType != VariableType::Real) continue;
-#endif // GET_OUT            
 
             bool ReportNow = true;
             if (var->SchedPtr > 0) ReportNow = (GetCurrentScheduleValue(state, var->SchedPtr) != 0.0); // SetReportNow(RVar%SchedPtr)
@@ -3756,69 +3409,6 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             var->thisTSStored = false;
         } // for (var)
 
-#ifdef GET_OUT        
-        // Have to replicate this loop twice so that all integer
-        // variables appear after all real variables to avoid spurious
-        // diffs in ESO files.  After this PR is merged can go ahead and delete this.
-        for (auto *var : op->outVars) {
-            if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
-            if (var->varType != VariableType::Integer) continue;
-            // auto *rVar = dynamic_cast<OutVarReal *>(var);
-            // assert(rVar != nullptr);
-
-            bool ReportNow = true;
-            if (var->SchedPtr > 0) ReportNow = (GetCurrentScheduleValue(state, var->SchedPtr) != 0.0); // SetReportNow(RVar%SchedPtr)
-            if (!ReportNow || !var->Report) {
-                var->TSValue = 0.0;
-            }
-            //        IF (RVar%StoreType == AveragedVar) THEN
-            //          RVar%Value=RVar%Value+RVar%TSValue/NumOfTimeStepInHour
-            //        ELSE
-            var->Value += var->TSValue;
-            //        ENDIF
-
-            if (!ReportNow || !var->Report) continue;
-
-            if (var->freq == ReportFreq::TimeStep) {
-                if (TimePrint) {
-                    if (op->LHourP != state.dataGlobal->HourOfDay || std::abs(op->LStartMin - StartMinute) > 0.001 ||
-                        std::abs(op->LEndMin - op->TimeValue[(int)var->timeStepType].CurMinute) > 0.001) {
-                        int CurDayType = state.dataEnvrn->DayOfWeek;
-                        if (state.dataEnvrn->HolidayIndex > 0) {
-                            CurDayType = state.dataEnvrn->HolidayIndex;
-                        }
-                        WriteTimeStampFormatData(state,
-                                                 state.files.eso,
-                                                 ReportFreq::EachCall,
-                                                 op->freqStampReportNums[(int)ReportFreq::TimeStep],
-                                                 state.dataGlobal->DayOfSimChr,
-                                                 true,
-                                                 state.dataEnvrn->Month,
-                                                 state.dataEnvrn->DayOfMonth,
-                                                 state.dataGlobal->HourOfDay,
-                                                 op->TimeValue[(int)var->timeStepType].CurMinute,
-                                                 StartMinute,
-                                                 state.dataEnvrn->DSTIndicator,
-                                                 ScheduleManager::dayTypeNames[CurDayType]);
-                        op->LHourP = state.dataGlobal->HourOfDay;
-                        op->LStartMin = StartMinute;
-                        op->LEndMin = op->TimeValue[(int)var->timeStepType].CurMinute;
-                    }
-                    TimePrint = false;
-                } // if (TimePrint)
-
-                WriteNumericData(state, var->ReportID, var->TSValue);
-                ++state.dataGlobal->StdOutputRecordCount;
-
-                if (rf->timeSeriesEnabled()) {
-                    rf->freqTSData[(int)ReportFreq::TimeStep].pushVariableValue(var->ReportID, var->TSValue);
-                }
-            }
-            var->TSValue = 0.0;
-            var->thisTSStored = false;
-        } // for (var)
-#endif // GET_OUT
-        
         UpdateMeters(state, MDHM);
 
         ReportTSMeters(state, StartMinute, op->TimeValue[(int)TimeStepType::Zone].CurMinute, TimePrint, TimePrint);
@@ -3860,9 +3450,6 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
         op->TimeValue[(int)TimeStepType::System].CurMinute = 0.0;
 
         for (auto *var : op->outVars) {
-#ifdef GET_OUT
-            if (var->varType != VariableType::Real) continue;
-#endif // GET_OUT
                 
             if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
 
@@ -3892,33 +3479,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             var->thisTSCount = 0;
             var->Value = 0.0;
         } // for (var)
-#ifdef GET_OUT
-        for (auto *var : op->outVars) {
-            if (var->varType != VariableType::Integer) continue;
-            if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
 
-            if (var->tsStored) {
-                if (var->storeType == StoreType::Average) {
-                    var->Value /= double(var->thisTSCount);
-                }
-                if (var->Report && var->freq == ReportFreq::Hour && var->Stored) {
-                    WriteNumericData(state, var->ReportID, var->Value);
-                    ++state.dataGlobal->StdOutputRecordCount;
-                    var->Stored = false;
-                    // add time series value for hourly to data store
-                    if (rf->timeSeriesEnabled()) {
-                        rf->freqTSData[(int)ReportFreq::Hour].pushVariableValue(var->ReportID, var->Value);
-                    }
-                }
-                var->StoreValue += var->Value;
-                ++var->NumStored;
-            }
-            var->tsStored = false;
-            var->thisTSStored = false;
-            var->thisTSCount = 0;
-            var->Value = 0.0;
-        } // for (var)
-#endif // GET_OUT
         ReportMeters(state, ReportFreq::Hour, TimePrint);
     } // Hour Block
 
@@ -3957,7 +3518,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
         op->NumHoursInMonth += 24;
         for (auto *var : op->outVars) {
             if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
-            var->WriteVariableOutput(state, ReportFreq::Day);
+            var->writeOutput(state, ReportFreq::Day);
         }
 
         ReportMeters(state, ReportFreq::Day, TimePrint);
@@ -3992,7 +3553,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
         state.dataEnvrn->EndMonthFlag = false;
         for (auto *var : op->outVars) {
             if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
-            var->WriteVariableOutput(state, ReportFreq::Month);
+            var->writeOutput(state, ReportFreq::Month);
         }
 
         ReportMeters(state, ReportFreq::Month, TimePrint);
@@ -4022,7 +3583,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
         for (auto *var : op->outVars) {
             if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
-            var->WriteVariableOutput(state, ReportFreq::Simulation);
+            var->writeOutput(state, ReportFreq::Simulation);
         }
 
         ReportMeters(state, ReportFreq::Simulation, TimePrint);
@@ -4046,7 +3607,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
         for (auto *var : op->outVars) {
             if (var->timeStepType != TimeStepType::Zone && var->timeStepType != TimeStepType::System) continue;
-            var->WriteVariableOutput(state, ReportFreq::Year);
+            var->writeOutput(state, ReportFreq::Year);
         }
 
         ReportMeters(state, ReportFreq::Year, TimePrint);
@@ -4349,7 +3910,6 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
     using namespace OutputProcessor;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string indexGroup;
     auto &op = state.dataOutputProcessor;
 
     auto *meter = op->meters[WhichMeter];
@@ -4369,10 +3929,10 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 period.RptFO = true;
             else
                 op->freqTrackingVariables[(int)freq] = true;
-            int indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, meter->Name);
-            std::string indexGroup = DetermineIndexGroupFromMeterGroup(meter);
+            // int indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, meter->Name);
+            meter->indexGroup = DetermineIndexGroupFromMeterGroup(meter);
             WriteMeterDictionaryItem(
-                state, freq, StoreType::Sum, period.RptNum, indexGroupKey, indexGroup, meter->Name, meter->units, false, MeterFileOnlyIndicator);
+                state, freq, StoreType::Sum, period.RptNum, meter->indexGroup, meter->Name, meter->units, false, MeterFileOnlyIndicator);
         }
     } else { // !CumulativeIndicator
         if (MeterFileOnlyIndicator && period.accRpt) {
@@ -4387,10 +3947,10 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
         if (!period.accRpt) {
             period.accRpt = true;
             if (MeterFileOnlyIndicator) period.accRptFO = true;
-            int indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, meter->Name);
-            std::string indexGroup = DetermineIndexGroupFromMeterGroup(op->meters[WhichMeter]);
+            // int indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, meter->Name);
+            meter->indexGroup = DetermineIndexGroupFromMeterGroup(op->meters[WhichMeter]);
             WriteMeterDictionaryItem(
-                state, freq, StoreType::Sum, period.accRptNum, indexGroupKey, indexGroup, meter->Name, meter->units, true, MeterFileOnlyIndicator);
+                state, freq, StoreType::Sum, period.accRptNum, meter->indexGroup, meter->Name, meter->units, true, MeterFileOnlyIndicator);
         }
     } // if (CumulativeIndicator)
 } // SetInitialMeterReportingAndOutputNames()
@@ -4948,15 +4508,15 @@ void InitPollutionMeterReporting(EnergyPlusData &state, OutputProcessor::ReportF
         auto *meter = op->meters[found->second];
         auto &period = meter->periods[(int)freq];
 
-        int indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, meter->Name);
-        std::string indexGroup = DetermineIndexGroupFromMeterGroup(meter);
+        // int indexGroupKey = DetermineIndexGroupKeyFromMeterName(state, meter->Name);
+        meter->indexGroup = DetermineIndexGroupFromMeterGroup(meter);
 
         // All of the specified meters are checked and the headers printed to the meter file if this
         //  has not been done previously
         if (!period.Rpt) {
             period.Rpt = true;
             WriteMeterDictionaryItem(
-                state, freq, StoreType::Sum, period.RptNum, indexGroupKey, indexGroup, meter->Name, meter->units, false, false);
+                state, freq, StoreType::Sum, period.RptNum, meter->indexGroup, meter->Name, meter->units, false, false);
             op->freqTrackingVariables[(int)freq] = true;
         }
     }
@@ -5040,7 +4600,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
             if (ddVar->ReportedOnDDFile) continue;
 
             static constexpr std::array<std::string_view, (int)TimeStepType::Num> timeStepNamesLocal = {"Zone", "HVAC"};
-            std::string_view timeStepName = timeStepTypeNames[(int)ddVar->timeStepType];
+            std::string_view timeStepName = timeStepNamesLocal[(int)ddVar->timeStepType];
             std::string_view storeTypeName = storeTypeNames[(int)ddVar->storeType];
             std::string_view varName = ddVar->name;
             std::string_view unitName =

@@ -198,7 +198,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
 
     EXPECT_EQ(fieldSetParams[0], "EXTERIOR LIGHTS ELECTRIC ENERGY");
     EXPECT_EQ(fieldSetParams[2], "J"); // m_varUnits
-    EXPECT_EQ(fieldSetParams[4], "2"); // m_typeOfVar
+    EXPECT_EQ(fieldSetParams[4], "1"); // m_typeOfVar
     EXPECT_EQ(fieldSetParams[5], "3"); // m_keyCount
     EXPECT_EQ(fieldSetParams[6], "1"); // m_varAvgSum
     EXPECT_EQ(fieldSetParams[7], "0"); // m_varStepType
@@ -412,15 +412,15 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
 
     std::vector<std::string> fieldSetParams = firstTable->inspectTableFieldSets(0);
     EXPECT_EQ(fieldSetParams[0], "ONPEAKTIME"); // m_colHead
-    EXPECT_EQ(fieldSetParams[4], "4");          // m_typeOfVar = OutputProcessor::VarType_Schedule
+    EXPECT_EQ(fieldSetParams[4], "3");          // m_typeOfVar = OutputProcessor::VarType_Schedule
 
     fieldSetParams = firstTable->inspectTableFieldSets(1);
     EXPECT_EQ(fieldSetParams[0], "Electricity:Facility"); // m_colHead
-    EXPECT_EQ(fieldSetParams[4], "3");                    // m_typeOfVar = OutputProcessor::VarType_Meter
+    EXPECT_EQ(fieldSetParams[4], "2");                    // m_typeOfVar = OutputProcessor::VarType_Meter
 
     fieldSetParams = firstTable->inspectTableFieldSets(2);
     EXPECT_EQ(fieldSetParams[0], "Misc Facility Electric Energy"); // m_colHead
-    EXPECT_EQ(fieldSetParams[4], "2");                             // m_typeOfVar = OutputProcessor::VarType_Real
+    EXPECT_EQ(fieldSetParams[4], "1");                             // m_typeOfVar = OutputProcessor::VarType_Real
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
