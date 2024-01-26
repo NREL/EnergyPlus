@@ -2442,6 +2442,7 @@ namespace UnitarySystems {
         if (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP) {
             if (this->m_AirFlowControl == UseCompFlow::On) {
                 this->m_MaxNoCoolHeatAirVolFlow = min(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
+                this->m_NoLoadAirFlowRateRatio = 1.0;
             }
             if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
                 this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
@@ -6203,10 +6204,10 @@ namespace UnitarySystems {
             if (!ScheduleManager::CheckScheduleValueMinMax(state, this->m_FanOpModeSchedPtr, ">=", 0.0, "<=", 0.0)) {
                 //           set fan operating mode to continuous so sizing can set VS coil data
                 this->m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
-                //           set air flow control mode:
-                //             UseCompressorOnFlow = operate at last cooling or heating air flow requested when compressor is off
-                //             UseCompressorOffFlow = operate at value specified by user
-                //           AirFlowControl only valid if fan opmode = ContFanCycComp
+                //  set air flow control mode:
+                //  m_AirFlowControl = UseCompFlow::On means operate at last cooling or heating air flow requested when compressor is off
+                //  m_AirFlowControl = UseCompFlow::Off means operate at no load air flow value specified by user
+                //  AirFlowControl only valid if fan opmode = ContFanCycComp
                 if (this->m_MaxNoCoolHeatAirVolFlow == 0.0) {
                     this->m_AirFlowControl = UseCompFlow::On;
                 } else {
@@ -6576,10 +6577,10 @@ namespace UnitarySystems {
 
         if (this->m_FanOpModeSchedPtr > 0) {
             if (!ScheduleManager::CheckScheduleValueMinMax(state, this->m_FanOpModeSchedPtr, ">=", 0.0, "<=", 0.0)) {
-                //           set air flow control mode:
-                //             UseCompressorOnFlow = operate at last cooling or heating air flow requested when compressor is off
-                //             UseCompressorOffFlow = operate at value specified by user
-                //           AirFlowControl only valid IF fan opmode = ContFanCycComp
+                //  set air flow control mode:
+                //  m_AirFlowControl = UseCompFlow::On means operate at last cooling or heating air flow requested when compressor is off
+                //  m_AirFlowControl = UseCompFlow::Off means operate at no load air flow value specified by user
+                //  AirFlowControl only valid if fan opmode = ContFanCycComp
                 if (this->m_MaxNoCoolHeatAirVolFlow == 0.0) {
                     this->m_AirFlowControl = UseCompFlow::On;
                 } else {
