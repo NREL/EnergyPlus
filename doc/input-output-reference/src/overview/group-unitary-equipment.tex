@@ -299,7 +299,7 @@ This numeric field defines the supply air flow rate per unit of capacity leaving
 
 \paragraph{Field: No Load Supply Air Flow Rate Control Set To Low Speed}\label{field-no-load-supply-air-flow-rate-control-set-to-low-speed-004}
 
-This alpha field defines whether the supply air flow rate leaving the air conditioner in cubic meters per second when neither cooling nor heating is required is set to the coil high speed or low speed air flow rate. The valid choices are Yes or No. The default value is Yes. If the coil type does not have multiple air flow rates or if Design Specification Multispeed Object Type = UnitarySystemPerformance:Multispeed then this field is not used. 
+This alpha field defines whether the supply air flow rate leaving the air conditioner in cubic meters per second when neither cooling nor heating is required is set to the coil high speed or low speed air flow rate. The valid choices are Yes or No. The default value is Yes. If the coil type does not have multiple air flow rates or if Design Specification Multispeed Object Type = UnitarySystemPerformance:Multispeed then this field is not used. If Yes is selected and the coil air flow rate is autosized the No Load Supply Air Flow Rate is proportional to the number of speeds.
 
 \paragraph{Field: Maximum Supply Air Temperature}\label{field-maximum-supply-air-temperature-000}
 

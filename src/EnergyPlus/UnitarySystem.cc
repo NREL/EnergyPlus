@@ -2120,43 +2120,46 @@ namespace UnitarySystems {
                         Real64 MaxSpeedFlowRate =
                             state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex)
                                 .MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds);
-                        if (MaxSpeedFlowRate > 0.0) {
+                        if (MaxSpeedFlowRate > 0.0 && state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(1) >
+                                                          0.0) { // these are the air flow at speed fields, and could be 0
                             NoLoadCoolingAirFlowRateRatio =
                                 state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(1) / MaxSpeedFlowRate;
                         } else {
-                            // I think all these little IFs need an else in case these inputs are autosized proportional to number of speeds/stages
                             NoLoadCoolingAirFlowRateRatio = 1.0 / state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds;
                         }
                     } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
                         // for (DehumidModeNum = 0; DehumidModeNum <= thisDXCoil.NumDehumidModes; ++DehumidModeNum)
                         // for (CapacityStageNum = 1; CapacityStageNum <= thisDXCoil.NumCapacityStages; ++CapacityStageNum)
                         // PerfModeNum = DehumidModeNum * 2 + CapacityStageNum
-                        // RatedAirVolFlowRate(PerfModeNum) so PerfModeNum = 1 to NumCapacityStages to find air flow ratio
+                        // RatedAirVolFlowRate(PerfModeNum) so PerfModeNum = 1 to NumCapacityStages to find air flow rate
                         Real64 MaxSpeedFlowRate = state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex)
                                                       .RatedAirVolFlowRate(state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).NumCapacityStages);
-                        if (MaxSpeedFlowRate > 0.0) {
+                        if (MaxSpeedFlowRate > 0.0 &&
+                            state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).RatedAirVolFlowRate(1) != DataSizing::AutoSize) {
                             NoLoadCoolingAirFlowRateRatio =
                                 state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).RatedAirVolFlowRate(1) / MaxSpeedFlowRate;
-                        } else {
+                        } else { // if any flow rates are autosized use the ratio of number of capacity stages
                             NoLoadCoolingAirFlowRateRatio = 1.0 / state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).NumCapacityStages;
                         }
                     } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
                         // RatedAirVolFlowRate(1) = high speed, RatedAirVolFlowRate2= low speed
                         Real64 MaxSpeedFlowRate = state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).RatedAirVolFlowRate(1);
-                        if (MaxSpeedFlowRate > 0.0) {
+                        if (MaxSpeedFlowRate > 0.0 &&
+                            state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).RatedAirVolFlowRate2 != DataSizing::AutoSize) {
                             NoLoadCoolingAirFlowRateRatio =
                                 state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).RatedAirVolFlowRate2 / MaxSpeedFlowRate;
-                        } else {
+                        } else { // above flow rates for this coil could be autosized, use 1/2 for two speed coil
                             NoLoadCoolingAirFlowRateRatio = 0.5;
                         }
                     } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
                         // MSRatedAirVolFlowRate
                         Real64 MaxSpeedFlowRate = state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex)
                                                       .MSRatedAirVolFlowRate(state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).NumOfSpeeds);
-                        if (MaxSpeedFlowRate > 0.0) {
+                        if (MaxSpeedFlowRate > 0.0 &&
+                            state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(1) != DataSizing::AutoSize) {
                             NoLoadCoolingAirFlowRateRatio =
                                 state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(1) / MaxSpeedFlowRate;
-                        } else {
+                        } else { // if any flow rates are autosized use the ratio of number of speeds
                             NoLoadCoolingAirFlowRateRatio = 1.0 / state.dataDXCoils->DXCoil(this->m_CoolingCoilIndex).NumOfSpeeds;
                         }
                     } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
@@ -2169,18 +2172,22 @@ namespace UnitarySystems {
                         Real64 MaxSpeedFlowRate =
                             state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex)
                                 .MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds);
-                        if (MaxSpeedFlowRate > 0.0) {
+                        if (MaxSpeedFlowRate > 0.0 && state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowRate(1) >
+                                                          0.0) { // these are the air flow at speed fields, and could be 0
                             NoLoadHeatingAirFlowRateRatio =
                                 state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowRate(1) / MaxSpeedFlowRate;
+                        } else {
+                            NoLoadCoolingAirFlowRateRatio = 1.0 / state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds;
                         }
                     } else if (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
                         // MSRatedAirVolFlowRate
                         Real64 MaxSpeedFlowRate = state.dataDXCoils->DXCoil(this->m_HeatingCoilIndex)
                                                       .MSRatedAirVolFlowRate(state.dataDXCoils->DXCoil(this->m_HeatingCoilIndex).NumOfSpeeds);
-                        if (MaxSpeedFlowRate > 0.0) {
+                        if (MaxSpeedFlowRate > 0.0 &&
+                            state.dataDXCoils->DXCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowRate(1) != DataSizing::AutoSize) {
                             NoLoadHeatingAirFlowRateRatio =
                                 state.dataDXCoils->DXCoil(this->m_HeatingCoilIndex).MSRatedAirVolFlowRate(1) / MaxSpeedFlowRate;
-                        } else {
+                        } else { // if any flow rates are autosized use the ratio of number of speeds
                             NoLoadHeatingAirFlowRateRatio = 1.0 / state.dataDXCoils->DXCoil(this->m_HeatingCoilIndex).NumOfSpeeds;
                         }
                     }
