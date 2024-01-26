@@ -58,27 +58,38 @@ from queue import Queue
 from sys import argv, path
 from tempfile import mkdtemp
 from threading import Thread
-from tkinter import Tk, Button, StringVar, Label, BOTH
+from time import sleep
+from tkinter import Tk, Button, StringVar, Label, BOTH, ttk, HORIZONTAL
 
 
 class EPGui(Tk):
     def __init__(self):
         super().__init__()
-        if len(argv) == 3:  # if running in a source tree, pass in the build directory and the IDF to run
-            self.install_or_build_dir: Path = Path(argv[1]) / 'Products'
+        if len(argv) == 3:
+            # if running in a build tree, pass in the path to the <build>/Products directory that contains pyenergyplus
+            # and the full path to the IDF to run
+            self.install_or_build_dir: Path = Path(argv[1])
             self.example_file_to_run: str = argv[2]
-        else:  # if running in an installation, it will live at the installation root, and you don't need any args
-            self.install_or_build_dir: Path = Path(__file__).resolve().parent
+        else:
+            # if running in an installation, it will live at the <install>/ExampleFiles/API, and you don't need any args
+            self.install_or_build_dir: Path = Path(__file__).resolve().parent.parent.parent
             self.example_file_to_run: str = str(self.install_or_build_dir / 'ExampleFiles' / '5ZoneAirCooled.idf')
-        path.insert(0, str(self.install_or_build_dir))
-        # noinspection PyUnresolvedReferences
-        from pyenergyplus.api import EnergyPlusAPI
-        self.api = EnergyPlusAPI()
+        try:  # This is the new way, if the user's Python environment includes the pip installed energyplus-api-helpers
+            # noinspection PyUnresolvedReferences
+            from energyplus_api_helpers.import_helper import EPlusAPIHelper
+            e = EPlusAPIHelper(self.install_or_build_dir)
+            self.api = e.get_api_instance()
+        except ImportError:  # This is the previous way, directly adding the E+ dir to the path before importing the API
+            path.insert(0, str(self.install_or_build_dir))
+            # noinspection PyUnresolvedReferences
+            from pyenergyplus.api import EnergyPlusAPI
+            self.api = EnergyPlusAPI()
         self.title("API/GUI Demonstration")
-        Button(self, text='Run EnergyPlus', command=lambda: Thread(target=self._run_ep, daemon=True).start()).pack()
+        Button(self, text='Run EnergyPlus', command=self._start_thread).pack(expand=True)
+        ttk.Separator(self, orient=HORIZONTAL).pack(fill=BOTH, expand=False)
         self._tk_var_message = StringVar(value="<E+ Outputs>")
         Label(self, textvariable=self._tk_var_message).pack(fill=BOTH, expand=True)
-        self.geometry('400x100')
+        self.geometry('600x100')
         self._gui_queue = Queue()
         self._check_queue()
         self.mainloop()
@@ -91,12 +102,19 @@ class EPGui(Tk):
                 self.after_idle(task)
             except Exception:
                 break
-        self.after(80, self._check_queue)
+        self.after(60, self._check_queue)
+
+    def _callback(self, message: str) -> None:
+        self._gui_queue.put(lambda: self._tk_var_message.set(message))
+        sleep(0.03)  # this is purely so that the GUI messages are readable while E+ runs
+
+    def _start_thread(self) -> None:
+        Thread(target=self._run_ep, daemon=True).start()
 
     def _run_ep(self) -> None:
         run_directory = mkdtemp()
         state = self.api.state_manager.new_state()
-        self.api.runtime.callback_message(state, lambda x: self._gui_queue.put(lambda: self._tk_var_message.set(x)))
+        self.api.runtime.callback_message(state, self._callback)
         self.api.runtime.run_energyplus(state, ['-d', run_directory, '-D', self.example_file_to_run])
         print(f"Finished running EnergyPlus, results available in {run_directory}")
 

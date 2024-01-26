@@ -372,9 +372,6 @@ install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/coeff_conv.py" DESTIN
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/energyplus.py" DESTINATION "workflows/") # COMPONENT Workflows)
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/transition.py" DESTINATION "workflows/") # COMPONENT Workflows)
 
-# provide a simple Tk GUI demo script for users who want to utilize the E+ API and/or create a GUI over EnergyPlus
-install(FILES "${PROJECT_SOURCE_DIR}/scripts/eplus_tk_api_demo.py" DESTINATION "./")
-
 ######################################################################################################################################################
 #                                                         P L A T F O R M    S P E C I F I C                                                         #
 ######################################################################################################################################################
