@@ -3272,7 +3272,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                     Vector3<Real64> HitPtRefl; // Point that ray hits reflecting surface
                     Vector3<Real64> SunVecMir; // Sun ray mirrored in reflecting surface
                     Vector3<Real64> ReflNorm;  // Normal vector to reflecting surface
-                    Vector3<Real64> TransBmBmMultRefl;
+                    Array1D<Real64> TransBmBmMultRefl(3);
                     // This window has associated obstructions that could reflect beam onto the window
                     for (int loop = 1, loop_end = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NumPossibleObs; loop <= loop_end;
                          ++loop) {

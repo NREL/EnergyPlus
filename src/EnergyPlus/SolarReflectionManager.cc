@@ -399,7 +399,7 @@ namespace SolarReflectionManager {
                 SPhi = std::sin(Phi);
                 CPhi = std::cos(Phi);
                 // Third component of ray unit vector in (Theta,Phi) direction
-                URay(3) = SPhi;
+                URay.z = SPhi;
 
                 if (PhiSurf >= 0.0) {
                     if (Phi >= Constant::PiOvr2 - PhiSurf) {
@@ -537,7 +537,7 @@ namespace SolarReflectionManager {
                         state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).HitPtSurfNum(RayNum, RecPtNum) = 0;
                         // If ray is going downward find the hit point on the ground plane if the receiving point
                         // is above ground level; note that GroundLevelZ is <= 0.0
-                        if (RayVec(3) < 0.0 &&
+                        if (RayVec.z < 0.0 &&
                             state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).RecPt(RecPtNum).z > state.dataSurface->GroundLevelZ) {
                             // Ray hits ground
                             Alfa = std::acos(-RayVec.z);
@@ -549,7 +549,7 @@ namespace SolarReflectionManager {
                             state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).HitPt(RayNum, RecPtNum) = GroundHitPt;
                             state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).HitPtSurfNum(RayNum, RecPtNum) = -1;
                             state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).RecPtHitPtDis(RayNum, RecPtNum) =
-                                (RecPt(3) - state.dataSurface->GroundLevelZ) / (-RayVec(3));
+                                (RecPt.z - state.dataSurface->GroundLevelZ) / (-RayVec.z);
                             state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).HitPtSolRefl(RayNum, RecPtNum) =
                                 state.dataEnvrn->GndReflectance;
                             state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).HitPtNormVec(RayNum, RecPtNum) = unit_z;
@@ -913,7 +913,7 @@ namespace SolarReflectionManager {
         ReflBmToDiffSolObs = 0.0;
         ReflFacTimesCosIncSum = 0.0;
 
-        if (state.dataSurface->SurfSunCosHourly(iHour)(3) < DataEnvironment::SunIsUpValue) return; // Skip if sun is below horizon
+        if (state.dataSurface->SurfSunCosHourly(iHour).z < DataEnvironment::SunIsUpValue) return; // Skip if sun is below horizon
 
         // Unit vector to sun
         state.dataSolarReflectionManager->SunVect = state.dataSurface->SurfSunCosHourly(iHour);
@@ -1213,7 +1213,7 @@ namespace SolarReflectionManager {
                         // Altitude loop
                         for (int IPhi = 1; IPhi <= (AltAngStepsForSolReflCalc / 2); ++IPhi) {
                             // Third component of ray unit vector in (Theta,Phi) direction
-                            state.dataSolarReflectionManager->URay(3) = sin_Phi[IPhi];
+                            state.dataSolarReflectionManager->URay.z = sin_Phi[IPhi];
                             Real64 dOmega = cos_Phi[IPhi] * DTheta * DPhi; // Solid angle increment (steradians)
                             // Cosine of angle of incidence of ray on ground
                             Real64 CosIncAngRayToSky = sin_Phi[IPhi]; // Cosine of incidence angle on ground of ray to sky

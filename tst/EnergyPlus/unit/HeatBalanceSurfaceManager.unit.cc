@@ -4927,9 +4927,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_IncSolarMultiplier)
     state->dataEnvrn->BeamSolarRad = 0.1;
     state->dataEnvrn->GndSolarRad = 0.2;
     state->dataEnvrn->DifSolarRad = 0.3;
-    state->dataEnvrn->SOLCOS(1) = 0.84471127222777276;
-    state->dataEnvrn->SOLCOS(2) = -0.53484539135440257;
-    state->dataEnvrn->SOLCOS(3) = 0.020081681162033127;
+    state->dataEnvrn->SOLCOS.x = 0.84471127222777276;
+    state->dataEnvrn->SOLCOS.y = -0.53484539135440257;
+    state->dataEnvrn->SOLCOS.z = 0.020081681162033127;
 
     HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
 
@@ -5321,9 +5321,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
     state->dataEnvrn->BeamSolarRad = 50;
     state->dataEnvrn->GndSolarRad = 50;
     state->dataEnvrn->DifSolarRad = 0;
-    state->dataEnvrn->SOLCOS(1) = 0.84471127222777276;
-    state->dataEnvrn->SOLCOS(2) = -0.53484539135440257;
-    state->dataEnvrn->SOLCOS(3) = 0.020081681162033127;
+    state->dataEnvrn->SOLCOS.x = 0.84471127222777276;
+    state->dataEnvrn->SOLCOS.y = -0.53484539135440257;
+    state->dataEnvrn->SOLCOS.z = 0.020081681162033127;
 
     for (auto &thisSurf : state->dataSurface->Surface) {
         thisSurf.SolarEnclIndex = 1;

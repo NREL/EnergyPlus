@@ -378,8 +378,8 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
     bcs->outdoorTemp = state.dataEnvrn->OutDryBulbTemp + Constant::Kelvin;
     bcs->localWindSpeed = DataEnvironment::WindSpeedAt(state, instance.ground->foundation.grade.roughness);
     bcs->windDirection = state.dataEnvrn->WindDir * Constant::DegToRadians;
-    bcs->solarAzimuth = std::atan2(state.dataEnvrn->SOLCOS(1), state.dataEnvrn->SOLCOS(2));
-    bcs->solarAltitude = Constant::PiOvr2 - std::acos(state.dataEnvrn->SOLCOS(3));
+    bcs->solarAzimuth = std::atan2(state.dataEnvrn->SOLCOS.x, state.dataEnvrn->SOLCOS.y);
+    bcs->solarAltitude = Constant::PiOvr2 - std::acos(state.dataEnvrn->SOLCOS.z);
     bcs->directNormalFlux = state.dataEnvrn->BeamSolarRad;
     bcs->diffuseHorizontalFlux = state.dataEnvrn->DifSolarRad;
     bcs->skyEmissivity = pow4(state.dataEnvrn->SkyTempKelvin) / pow4(bcs->outdoorTemp);

@@ -682,9 +682,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SolarShading::SkyDifSolarShading(*state);
     state->dataSolarShading->CalcSkyDifShading = false;
 
-    state->dataBSDFWindow->SUNCOSTS(4, 9)(1) = 0.1;
-    state->dataBSDFWindow->SUNCOSTS(4, 9)(2) = 0.1;
-    state->dataBSDFWindow->SUNCOSTS(4, 9)(3) = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9).x = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9).y = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9).z = 0.1;
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
 
     int windowSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
@@ -1086,17 +1086,17 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     state->dataSolarShading->CalcSkyDifShading = false;
 
     ScheduleManager::UpdateScheduleValues(*state);
-    state->dataBSDFWindow->SUNCOSTS(4, 9)(1) = 0.1;
-    state->dataBSDFWindow->SUNCOSTS(4, 9)(2) = 0.1;
-    state->dataBSDFWindow->SUNCOSTS(4, 9)(3) = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9).x = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9).y = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9).z = 0.1;
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
 
     EXPECT_TRUE(state->dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::Scheduled);
     EXPECT_DOUBLE_EQ(0.5432, ScheduleManager::LookUpScheduleValue(*state, 2, 9, 4));
-    EXPECT_FALSE(state->dataSolarShading->SUNCOS(3) < 0.00001);
+    EXPECT_FALSE(state->dataSolarShading->SUNCOS.z < 0.00001);
     EXPECT_DOUBLE_EQ(0.00001, DataEnvironment::SunIsUpValue);
 
-    EXPECT_FALSE(state->dataSolarShading->SUNCOS(3) < DataEnvironment::SunIsUpValue);
+    EXPECT_FALSE(state->dataSolarShading->SUNCOS.z < DataEnvironment::SunIsUpValue);
 
     int surfNum = Util::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
     EXPECT_DOUBLE_EQ(1, state->dataHeatBal->SurfSunlitFrac(9, 4, surfNum));

@@ -964,9 +964,9 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
     Real64 ProfAng;
     Vector3<Real64> CosDirSun; // Solar direction cosines
 
-    CosDirSun(1) = 0.882397;
-    CosDirSun(2) = 0.470492;
-    CosDirSun(3) = 0.003513;
+    CosDirSun.x = 0.882397;
+    CosDirSun.y = 0.470492;
+    CosDirSun.z = 0.003513;
 
     ProfAng = ProfileAngle(*state, 1, CosDirSun, horiz);
     EXPECT_NEAR(0.00747, ProfAng, 0.00001);
@@ -974,9 +974,9 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
     ProfAng = ProfileAngle(*state, 1, CosDirSun, vert);
     EXPECT_NEAR(2.06065, ProfAng, 0.00001);
 
-    CosDirSun(1) = 0.92318;
-    CosDirSun(2) = 0.36483;
-    CosDirSun(3) = 0.12094;
+    CosDirSun.x = 0.92318;
+    CosDirSun.y = 0.36483;
+    CosDirSun.z = 0.12094;
 
     ProfAng = ProfileAngle(*state, 1, CosDirSun, horiz);
     EXPECT_NEAR(0.32010, ProfAng, 0.00001);

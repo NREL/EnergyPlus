@@ -122,7 +122,7 @@ namespace WindowComplexManager {
         int NumStates;          // Local variable for the number of states
         Array1D<Real64> Thetas; // temp array holding theta values
         Array1D_int NPhis;      // temp array holding number of phis for a given theta
-        Array1D<Real64> V(3);   // vector array
+        Vector3<Real64> V;      // vector array
         Real64 VLen;            // Length of vector array
         int NHold;              // No. values in the Temporary array
 
@@ -602,7 +602,7 @@ namespace WindowComplexManager {
                     SunDir = state.dataBSDFWindow->SUNCOSTS(TS, Hour);
                     Theta = 0.0;
                     Phi = 0.0;
-                    if (state.dataBSDFWindow->SUNCOSTS(TS, Hour)(3) > DataEnvironment::SunIsUpValue) {
+                    if (state.dataBSDFWindow->SUNCOSTS(TS, Hour).z > DataEnvironment::SunIsUpValue) {
                         IncRay = FindInBasis(state, SunDir, RayIdentificationType::Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                         complexWindowGeom.ThetaBm[lHT] = Theta;
                         complexWindowGeom.PhiBm[lHT] = Phi;
@@ -653,7 +653,7 @@ namespace WindowComplexManager {
             SunDir = state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
             Theta = 0.0;
             Phi = 0.0;
-            if (state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay)(3) > DataEnvironment::SunIsUpValue) {
+            if (state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay).z > DataEnvironment::SunIsUpValue) {
                 IncRay = FindInBasis(state, SunDir, RayIdentificationType::Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                 complexWindowGeom.ThetaBm[lHT] = Theta;
                 complexWindowGeom.PhiBm[lHT] = Phi;

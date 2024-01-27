@@ -527,7 +527,7 @@ public: // Assignment: Scaled
 	}
 
 public: // Subscript
-
+#ifdef GET_OUT
 	// Vector3[ i ] const: 0-Based Index
 	Tr
 	operator []( size_type const i ) const
@@ -559,7 +559,7 @@ public: // Subscript
 		assert( ( 1 <= i ) && ( i <= 3 ) );
 		return ( i == 1 ? x : ( i == 2 ? y : z ) );
 	}
-
+#endif // GET_OUT
 public: // Properties: Predicates
 
 	// Is Zero Vector?

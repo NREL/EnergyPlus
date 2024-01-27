@@ -1349,14 +1349,16 @@ namespace SurfaceGeometry {
                 // Outward normal unit vector (pointing away from room)
                 state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).OutNormVec =
                     state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).NewellSurfaceNormalVector;
-                for (n = 1; n <= 3; ++n) {
-                    if (std::abs(state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).OutNormVec(n) - 1.0) < 1.e-06)
-                        state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).OutNormVec(n) = +1.0;
-                    if (std::abs(state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).OutNormVec(n) + 1.0) < 1.e-06)
-                        state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).OutNormVec(n) = -1.0;
-                    if (std::abs(state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).OutNormVec(n)) < 1.e-06)
-                        state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).OutNormVec(n) = 0.0;
-                }
+                auto &outNormVec = state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).OutNormVec;
+                if (std::abs(outNormVec.x - 1.0) < 1.e-06) outNormVec.x = +1.0;
+                if (std::abs(outNormVec.x + 1.0) < 1.e-06) outNormVec.x = -1.0;
+                if (std::abs(outNormVec.x) < 1.e-06) outNormVec.x = 0.0;
+                if (std::abs(outNormVec.y - 1.0) < 1.e-06) outNormVec.y = +1.0;
+                if (std::abs(outNormVec.y + 1.0) < 1.e-06) outNormVec.y = -1.0;
+                if (std::abs(outNormVec.y) < 1.e-06) outNormVec.y = 0.0;
+                if (std::abs(outNormVec.z - 1.0) < 1.e-06) outNormVec.z = +1.0;
+                if (std::abs(outNormVec.z + 1.0) < 1.e-06) outNormVec.z = -1.0;
+                if (std::abs(outNormVec.z) < 1.e-06) outNormVec.z = 0.0;
 
                 // Can perform tests on this surface here
                 state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ViewFactorSky =
@@ -4845,14 +4847,17 @@ namespace SurfaceGeometry {
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = 0.5 * (1.0 - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt);
         // Outward normal unit vector (pointing away from room)
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector;
-        for (n = 1; n <= 3; ++n) {
-            if (std::abs(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) - 1.0) < 1.e-06)
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) = +1.0;
-            if (std::abs(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) + 1.0) < 1.e-06)
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) = -1.0;
-            if (std::abs(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n)) < 1.e-06)
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) = 0.0;
-        }
+        auto &outNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec;
+
+        if (std::abs(outNormVec.x - 1.0) < 1.e-06) outNormVec.x = +1.0;
+        if (std::abs(outNormVec.x + 1.0) < 1.e-06) outNormVec.x = -1.0;
+        if (std::abs(outNormVec.x) < 1.e-06) outNormVec.x = 0.0;
+        if (std::abs(outNormVec.y - 1.0) < 1.e-06) outNormVec.y = +1.0;
+        if (std::abs(outNormVec.y + 1.0) < 1.e-06) outNormVec.y = -1.0;
+        if (std::abs(outNormVec.y) < 1.e-06) outNormVec.y = 0.0;
+        if (std::abs(outNormVec.z - 1.0) < 1.e-06) outNormVec.z = +1.0;
+        if (std::abs(outNormVec.z + 1.0) < 1.e-06) outNormVec.z = -1.0;
+        if (std::abs(outNormVec.z) < 1.e-06) outNormVec.z = 0.0;
 
         // Can perform tests on this surface here
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSky = 0.5 * (1.0 + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt);
@@ -6367,14 +6372,16 @@ namespace SurfaceGeometry {
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = 0.5 * (1.0 - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt);
         // Outward normal unit vector (pointing away from room)
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector;
-        for (n = 1; n <= 3; ++n) {
-            if (std::abs(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) - 1.0) < 1.e-06)
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) = +1.0;
-            if (std::abs(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) + 1.0) < 1.e-06)
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) = -1.0;
-            if (std::abs(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n)) < 1.e-06)
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) = 0.0;
-        }
+        auto &outNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec;
+        if (std::abs(outNormVec.x - 1.0) < 1.e-06) outNormVec.x = +1.0;
+        if (std::abs(outNormVec.x + 1.0) < 1.e-06) outNormVec.x = -1.0;
+        if (std::abs(outNormVec.x) < 1.e-06) outNormVec.x = 0.0;
+        if (std::abs(outNormVec.y - 1.0) < 1.e-06) outNormVec.y = +1.0;
+        if (std::abs(outNormVec.y + 1.0) < 1.e-06) outNormVec.y = -1.0;
+        if (std::abs(outNormVec.y) < 1.e-06) outNormVec.y = 0.0;
+        if (std::abs(outNormVec.z - 1.0) < 1.e-06) outNormVec.z = +1.0;
+        if (std::abs(outNormVec.z + 1.0) < 1.e-06) outNormVec.z = -1.0;
+        if (std::abs(outNormVec.z) < 1.e-06) outNormVec.z = 0.0;
 
         //  IF (SurfaceTmp(SurfNum)%Class == SurfaceClass::Roof .and. SurfTilt > 80.) THEN
         //    WRITE(TiltString,'(F5.1)') SurfTilt
@@ -9598,14 +9605,16 @@ namespace SurfaceGeometry {
             }
             // Outward normal unit vector (pointing away from room)
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector;
-            for (n = 1; n <= 3; ++n) {
-                if (std::abs(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) - 1.0) < 1.e-06)
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) = +1.0;
-                if (std::abs(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) + 1.0) < 1.e-06)
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) = -1.0;
-                if (std::abs(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n)) < 1.e-06)
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) = 0.0;
-            }
+            auto &outNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec;
+            if (std::abs(outNormVec.x - 1.0) < 1.e-06) outNormVec.x = +1.0;
+            if (std::abs(outNormVec.x + 1.0) < 1.e-06) outNormVec.x = -1.0;
+            if (std::abs(outNormVec.x) < 1.e-06) outNormVec.x = 0.0;
+            if (std::abs(outNormVec.y - 1.0) < 1.e-06) outNormVec.y = +1.0;
+            if (std::abs(outNormVec.y + 1.0) < 1.e-06) outNormVec.y = -1.0;
+            if (std::abs(outNormVec.y) < 1.e-06) outNormVec.y = 0.0;
+            if (std::abs(outNormVec.z - 1.0) < 1.e-06) outNormVec.z = +1.0;
+            if (std::abs(outNormVec.z + 1.0) < 1.e-06) outNormVec.z = -1.0;
+            if (std::abs(outNormVec.z) < 1.e-06) outNormVec.z = 0.0;
 
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Window ||
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor ||
@@ -9836,14 +9845,16 @@ namespace SurfaceGeometry {
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt = std::cos(SurfTilt * Constant::DegToRadians);
             // Outward normal unit vector (pointing away from room)
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector;
-            for (n = 1; n <= 3; ++n) {
-                if (std::abs(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) - 1.0) < 1.e-06)
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) = +1.0;
-                if (std::abs(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) + 1.0) < 1.e-06)
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) = -1.0;
-                if (std::abs(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n)) < 1.e-06)
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec(n) = 0.0;
-            }
+            auto &outNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec;
+            if (std::abs(outNormVec.x - 1.0) < 1.e-06) outNormVec.x = +1.0;
+            if (std::abs(outNormVec.x + 1.0) < 1.e-06) outNormVec.x = -1.0;
+            if (std::abs(outNormVec.x) < 1.e-06) outNormVec.x = 0.0;
+            if (std::abs(outNormVec.y - 1.0) < 1.e-06) outNormVec.y = +1.0;
+            if (std::abs(outNormVec.y + 1.0) < 1.e-06) outNormVec.y = -1.0;
+            if (std::abs(outNormVec.y) < 1.e-06) outNormVec.y = 0.0;
+            if (std::abs(outNormVec.z - 1.0) < 1.e-06) outNormVec.z = +1.0;
+            if (std::abs(outNormVec.z + 1.0) < 1.e-06) outNormVec.z = -1.0;
+            if (std::abs(outNormVec.z) < 1.e-06) outNormVec.z = 0.0;
 
             // Can perform tests on this surface here
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSky = 0.5 * (1.0 + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt);

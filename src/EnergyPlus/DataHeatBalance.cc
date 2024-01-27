@@ -1072,7 +1072,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         }
         SunAltitude = SunAltitudeToScreenNormal;
     } else {
-        SunAltitude = (Constant::PiOvr2 - std::acos(state.dataEnvrn->SOLCOS(3)));
+        SunAltitude = (Constant::PiOvr2 - std::acos(state.dataEnvrn->SOLCOS.z));
         SurfaceTilt = state.dataSurface->Surface(SurfaceNum).Tilt * Constant::DegToRadians;
         SunAltitudeToScreenNormal = std::abs(SunAltitude + (SurfaceTilt - Constant::PiOvr2));
         if (SunAltitudeToScreenNormal > Constant::PiOvr2) {

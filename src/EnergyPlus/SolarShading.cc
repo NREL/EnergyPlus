@@ -2593,7 +2593,7 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
     ++state.dataTimingsData->NumAnisoSky_Calls;
 #endif
 
-    CosZenithAng = state.dataEnvrn->SOLCOS(3);
+    CosZenithAng = state.dataEnvrn->SOLCOS.z;
     ZenithAng = std::acos(CosZenithAng);
     ZenithAngDeg = ZenithAng / Constant::DegToRadians;
 
@@ -2619,9 +2619,7 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
 
     for (int SurfNum : state.dataSurface->AllExtSolarSurfaceList) {
 
-        CosIncAngBeamOnSurface = state.dataEnvrn->SOLCOS(1) * state.dataSurface->Surface(SurfNum).OutNormVec(1) +
-                                 state.dataEnvrn->SOLCOS(2) * state.dataSurface->Surface(SurfNum).OutNormVec(2) +
-                                 state.dataEnvrn->SOLCOS(3) * state.dataSurface->Surface(SurfNum).OutNormVec(3);
+        CosIncAngBeamOnSurface = dot(state.dataEnvrn->SOLCOS, state.dataSurface->Surface(SurfNum).OutNormVec);
 
         // So I believe this should only be a diagnostic error...the calcs should always be within -1,+1; it's just round-off that we need to trap
         // for
@@ -2791,7 +2789,7 @@ void CHKGSS(EnergyPlusData &state,
     // see if no point of shadow casting surface is above low point of receiving surface
 
     auto const &surface_C = state.dataSurface->Surface(NSS);
-    if (surface_C.OutNormVec(3) > 0.9999) return; // Shadow Casting Surface is horizontal and facing upward
+    if (surface_C.OutNormVec.z > 0.9999) return; // Shadow Casting Surface is horizontal and facing upward
     auto const &vertex_C = surface_C.Vertex;
     Real64 ZMAX(vertex_C(1).z);
     for (int i = 2, e = surface_C.Sides; i <= e; ++i) {
@@ -5018,12 +5016,10 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
 
     state.dataSolarShading->SurfSunCosTheta = 0.0;
 
-    if (state.dataSolarShading->SUNCOS(3) < DataEnvironment::SunIsUpValue) return;
+    if (state.dataSolarShading->SUNCOS.z < DataEnvironment::SunIsUpValue) return;
 
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        state.dataSolarShading->SurfSunCosTheta(SurfNum) = state.dataSolarShading->SUNCOS(1) * state.dataSurface->Surface(SurfNum).OutNormVec(1) +
-                                                           state.dataSolarShading->SUNCOS(2) * state.dataSurface->Surface(SurfNum).OutNormVec(2) +
-                                                           state.dataSolarShading->SUNCOS(3) * state.dataSurface->Surface(SurfNum).OutNormVec(3);
+        state.dataSolarShading->SurfSunCosTheta(SurfNum) = dot(state.dataSolarShading->SUNCOS, state.dataSurface->Surface(SurfNum).OutNormVec);
         if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
             if (iTimeStep == state.dataGlobal->NumOfTimeStepInHour)
                 state.dataHeatBal->SurfCosIncAngHR(iHour, SurfNum) = state.dataSolarShading->SurfSunCosTheta(SurfNum);
@@ -5075,17 +5071,14 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
         }
 
         for (int IPhi = 0; IPhi < NPhi; ++IPhi) { // Loop over patch altitude values
-            state.dataSolarShading->SUNCOS(3) = state.dataSolarShading->sin_Phi[IPhi];
+            state.dataSolarShading->SUNCOS.z = state.dataSolarShading->sin_Phi[IPhi];
 
             for (int ITheta = 0; ITheta < NTheta; ++ITheta) { // Loop over patch azimuth values
-                state.dataSolarShading->SUNCOS(1) = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->cos_Theta[ITheta];
-                state.dataSolarShading->SUNCOS(2) = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->sin_Theta[ITheta];
+                state.dataSolarShading->SUNCOS.x = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->cos_Theta[ITheta];
+                state.dataSolarShading->SUNCOS.y = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->sin_Theta[ITheta];
 
                 for (int SurfNum : state.dataSurface->AllExtSolAndShadingSurfaceList) {
-                    state.dataSolarShading->SurfSunCosTheta(SurfNum) =
-                        state.dataSolarShading->SUNCOS(1) * state.dataSurface->Surface(SurfNum).OutNormVec(1) +
-                        state.dataSolarShading->SUNCOS(2) * state.dataSurface->Surface(SurfNum).OutNormVec(2) +
-                        state.dataSolarShading->SUNCOS(3) * state.dataSurface->Surface(SurfNum).OutNormVec(3);
+                    state.dataSolarShading->SurfSunCosTheta(SurfNum) = dot(state.dataSolarShading->SUNCOS, state.dataSurface->Surface(SurfNum).OutNormVec);
                 }
 
                 SHADOW(state, iHour, iTimeStep); // Determine sunlit areas and solar multipliers for all surfaces.
@@ -5672,8 +5665,8 @@ void SHADOW(EnergyPlusData &state,
 
 #ifndef EP_NO_OPENGL
     if (state.dataSolarShading->penumbra) {
-        Real64 ElevSun = Constant::PiOvr2 - std::acos(state.dataSolarShading->SUNCOS(3));
-        Real64 AzimSun = std::atan2(state.dataSolarShading->SUNCOS(1), state.dataSolarShading->SUNCOS(2));
+        Real64 ElevSun = Constant::PiOvr2 - std::acos(state.dataSolarShading->SUNCOS.z);
+        Real64 AzimSun = std::atan2(state.dataSolarShading->SUNCOS.x, state.dataSolarShading->SUNCOS.y);
         state.dataSolarShading->penumbra->set_sun_position(AzimSun, ElevSun);
         state.dataSolarShading->penumbra->submit_pssa();
     }
@@ -5736,15 +5729,9 @@ void SHADOW(EnergyPlusData &state,
                 if (state.dataSurface->Surface(GRSNR).IsShadowing) NGRS = GRSNR;
 
                 // Compute the X and Y displacements of a shadow.
-                XS = state.dataSurface->Surface(NGRS).lcsx.x * state.dataSolarShading->SUNCOS(1) +
-                     state.dataSurface->Surface(NGRS).lcsx.y * state.dataSolarShading->SUNCOS(2) +
-                     state.dataSurface->Surface(NGRS).lcsx.z * state.dataSolarShading->SUNCOS(3);
-                YS = state.dataSurface->Surface(NGRS).lcsy.x * state.dataSolarShading->SUNCOS(1) +
-                     state.dataSurface->Surface(NGRS).lcsy.y * state.dataSolarShading->SUNCOS(2) +
-                     state.dataSurface->Surface(NGRS).lcsy.z * state.dataSolarShading->SUNCOS(3);
-                ZS = state.dataSurface->Surface(NGRS).lcsz.x * state.dataSolarShading->SUNCOS(1) +
-                     state.dataSurface->Surface(NGRS).lcsz.y * state.dataSolarShading->SUNCOS(2) +
-                     state.dataSurface->Surface(NGRS).lcsz.z * state.dataSolarShading->SUNCOS(3);
+                XS = dot(state.dataSurface->Surface(NGRS).lcsx, state.dataSolarShading->SUNCOS);
+                YS = dot(state.dataSurface->Surface(NGRS).lcsy, state.dataSolarShading->SUNCOS);
+                ZS = dot(state.dataSurface->Surface(NGRS).lcsz, state.dataSolarShading->SUNCOS);
 
                 if (std::abs(ZS) > 1.e-4) {
                     state.dataSolarShading->XShadowProjection = XS / ZS;
@@ -9400,15 +9387,15 @@ void SUN4(EnergyPlusData &state,
     H = HrAngle * Constant::DegToRadians;
 
     // Compute the cosine of the solar zenith angle.
-    state.dataSolarShading->SUNCOS(3) = SinSolarDeclin * state.dataEnvrn->SinLatitude + CosSolarDeclin * state.dataEnvrn->CosLatitude * std::cos(H);
-    state.dataSolarShading->SUNCOS(2) = 0.0;
-    state.dataSolarShading->SUNCOS(1) = 0.0;
+    state.dataSolarShading->SUNCOS.z = SinSolarDeclin * state.dataEnvrn->SinLatitude + CosSolarDeclin * state.dataEnvrn->CosLatitude * std::cos(H);
+    state.dataSolarShading->SUNCOS.y = 0.0;
+    state.dataSolarShading->SUNCOS.x = 0.0;
 
-    if (state.dataSolarShading->SUNCOS(3) < DataEnvironment::SunIsUpValue) return; // Return if sun not above horizon.
+    if (state.dataSolarShading->SUNCOS.z < DataEnvironment::SunIsUpValue) return; // Return if sun not above horizon.
 
     // Compute other direction cosines.
-    state.dataSolarShading->SUNCOS(2) = SinSolarDeclin * state.dataEnvrn->CosLatitude - CosSolarDeclin * state.dataEnvrn->SinLatitude * std::cos(H);
-    state.dataSolarShading->SUNCOS(1) = CosSolarDeclin * std::sin(H);
+    state.dataSolarShading->SUNCOS.y = SinSolarDeclin * state.dataEnvrn->CosLatitude - CosSolarDeclin * state.dataEnvrn->SinLatitude * std::cos(H);
+    state.dataSolarShading->SUNCOS.x = CosSolarDeclin * std::sin(H);
 }
 
 void WindowShadingManager(EnergyPlusData &state)
@@ -9610,7 +9597,7 @@ void WindowShadingManager(EnergyPlusData &state)
                                         state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, ISurf);
                     SolarOnWindow =
                         BeamSolarOnWindow + SkySolarOnWindow + state.dataEnvrn->GndSolarRad * state.dataSurface->Surface(ISurf).ViewFactorGround;
-                    HorizSolar = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS(3) + state.dataEnvrn->DifSolarRad;
+                    HorizSolar = state.dataEnvrn->BeamSolarRad * state.dataEnvrn->SOLCOS.z + state.dataEnvrn->DifSolarRad;
                 }
 
                 // Determine whether to deploy shading depending on type of control
@@ -10423,19 +10410,17 @@ void SkyDifSolarShading(EnergyPlusData &state)
     }
 
     for (int IPhi = 0; IPhi < NPhi; ++IPhi) { // Loop over patch altitude values
-        state.dataSolarShading->SUNCOS(3) = state.dataSolarShading->sin_Phi[IPhi];
+        state.dataSolarShading->SUNCOS.z = state.dataSolarShading->sin_Phi[IPhi];
 
         for (int ITheta = 0; ITheta < NTheta; ++ITheta) { // Loop over patch azimuth values
-            state.dataSolarShading->SUNCOS(1) = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->cos_Theta[ITheta];
-            state.dataSolarShading->SUNCOS(2) = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->sin_Theta[ITheta];
+            state.dataSolarShading->SUNCOS.x = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->cos_Theta[ITheta];
+            state.dataSolarShading->SUNCOS.y = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->sin_Theta[ITheta];
 
             for (int SurfNum : state.dataSurface->AllExtSolAndShadingSurfaceList) {
                 auto &surf = state.dataSurface->Surface(SurfNum);
 
                 // Cosine of angle of incidence on surface of solar radiation from patch
-                state.dataSolarShading->SurfSunCosTheta(SurfNum) = state.dataSolarShading->SUNCOS.x * surf.OutNormVec.x +
-                                                                   state.dataSolarShading->SUNCOS.y * surf.OutNormVec.y +
-                                                                   state.dataSolarShading->SUNCOS.z * surf.OutNormVec.z;
+                state.dataSolarShading->SurfSunCosTheta(SurfNum) = dot(state.dataSolarShading->SUNCOS, surf.OutNormVec);
             }
 
             SHADOW(state, 24, 0);
@@ -10719,9 +10704,9 @@ void CalcFrameDividerShadow(EnergyPlusData &state,
     auto &surf = state.dataSurface->Surface(SurfNum);
     GlArea = surf.Area;
     ElevWin = Constant::PiOvr2 - surf.Tilt * Constant::DegToRadians;
-    ElevSun = Constant::PiOvr2 - std::acos(state.dataSolarShading->SUNCOS(3));
+    ElevSun = Constant::PiOvr2 - std::acos(state.dataSolarShading->SUNCOS.z);
     AzimWin = surf.Azimuth * Constant::DegToRadians;
-    AzimSun = std::atan2(state.dataSolarShading->SUNCOS(1), state.dataSolarShading->SUNCOS(2));
+    AzimSun = std::atan2(state.dataSolarShading->SUNCOS.x, state.dataSolarShading->SUNCOS.y);
 
     ProfileAngHor = std::atan(std::sin(ElevSun) / std::abs(std::cos(ElevSun) * std::cos(AzimWin - AzimSun))) - ElevWin;
     if (std::abs(ElevWin) < 0.1) { // Near-vertical window
@@ -10729,9 +10714,9 @@ void CalcFrameDividerShadow(EnergyPlusData &state,
     } else {
         WinNorm = surf.OutNormVec;
         ThWin = AzimWin - Constant::PiOvr2;
-        WinNormCrossBase(1) = -std::sin(ElevWin) * std::cos(ThWin);
-        WinNormCrossBase(2) = std::sin(ElevWin) * std::sin(ThWin);
-        WinNormCrossBase(3) = std::cos(ElevWin);
+        WinNormCrossBase.x = -std::sin(ElevWin) * std::cos(ThWin);
+        WinNormCrossBase.y = std::sin(ElevWin) * std::sin(ThWin);
+        WinNormCrossBase.z = std::cos(ElevWin);
         SunPrime = state.dataSolarShading->SUNCOS - WinNormCrossBase * dot(state.dataSolarShading->SUNCOS, WinNormCrossBase);
         ProfileAngVert = std::abs(std::acos(dot(WinNorm, SunPrime) / magnitude(SunPrime)));
     }
@@ -10998,10 +10983,10 @@ void CalcBeamSolarOnWinRevealSurface(EnergyPlusData &state)
                 // Calculate cosine of angle of incidence of beam solar on reveal surfaces,
                 // assumed to be perpendicular to window plane
 
-                CosBetaBottom = -state.dataEnvrn->SOLCOS(1) * surf.SinAzim * surf.CosTilt - state.dataEnvrn->SOLCOS(2) * surf.CosAzim * surf.CosTilt +
-                                state.dataEnvrn->SOLCOS(3) * surf.SinTilt;
+                CosBetaBottom = -state.dataEnvrn->SOLCOS.x * surf.SinAzim * surf.CosTilt - state.dataEnvrn->SOLCOS.y * surf.CosAzim * surf.CosTilt +
+                                state.dataEnvrn->SOLCOS.z * surf.SinTilt;
 
-                CosBetaLeft = -state.dataEnvrn->SOLCOS(1) * surf.CosAzim - state.dataEnvrn->SOLCOS(2) * surf.SinAzim;
+                CosBetaLeft = -state.dataEnvrn->SOLCOS.x * surf.CosAzim - state.dataEnvrn->SOLCOS.y * surf.SinAzim;
 
                 // Note: CosBetaTop = -CosBetaBottom, CosBetaRight = -CosBetaLeft
 
