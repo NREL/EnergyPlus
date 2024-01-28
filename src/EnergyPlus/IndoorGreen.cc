@@ -87,7 +87,7 @@ namespace IndoorGreen {
     using namespace ScheduleManager;
 
     // MODULE PARAMETER DEFINITIONS
-    const char *cCMO_IndoorGreen = "IndoorGreen";
+    const char *cCMO_IndoorGreen = "IndoorLivingWall";
     //const std::string indoorgreenModuleObject = "IndoorGreen";
     //constexpr Real64 SimpConvAirFlowSpeed(0.5); // m/s
 
@@ -150,7 +150,7 @@ namespace IndoorGreen {
         // Array1D_bool lAlphaFieldBlanks;
         // Array1D_string cAlphaArgs;
         // Array1D<Real64> rNumericArgs;
-        const std::string cCurrentModuleObject = "IndoorGreen";
+        std::string_view cCurrentModuleObject = "IndoorLivingWall"; //match the idd
 
         int NumNums;        // Number of real numbers returned by GetObjectItem
         int NumAlphas;      // Number of alphanumerics returned by GetObjectItem
@@ -481,7 +481,7 @@ namespace IndoorGreen {
             }
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator(state,
-                                 "IndoorGreen",
+                                 "IndoorLivingWall",
                                  state.dataIndoorGreen->indoorgreen(IndoorGreenNum).IndoorGreenName,
                                  "ETCaldatadriven",
                                  "[kg_m2s]",
@@ -657,7 +657,7 @@ namespace IndoorGreen {
             Real64 OutPb;          // outdoor pressure (kPa)
             Real64 vp;             // actual vapor pressure of the air (kpa)
             Real64 vpSat;          // saturated vapor pressure at air temperature (kpa)
-            const std::string cCurrentModuleObject = "IndoorGreen";
+            std::string_view cCurrentModuleObject = "IndoorLivingWall";
             Timestep = state.dataHVACGlobal->TimeStepSysSec; // unit s
             // Method for ET calculation: Penman-Monteith=1, Stanghellini=2, Data-driven=3
             for (IndoorGreenNum = 1; IndoorGreenNum <= state.dataIndoorGreen->NumIndoorGreen; ++IndoorGreenNum) {
@@ -674,7 +674,7 @@ namespace IndoorGreen {
                 if (LAI_Cal > 2.0) {
                 LAI = 2.0; // maximum LAI=2.0 in the surface heat balance
                 ShowSevereError(state,
-                                format("Maximum indoor living wall leaf area index (LAI) =3.0 is used,calculated LAI is {}",
+                                format("Maximum indoor living wall leaf area index (LAI) =2.0 is used,calculated LAI is {}",
                                        LAI_Cal));
                 }
                 //ZonePPFD
@@ -827,7 +827,7 @@ namespace IndoorGreen {
             Real64 slopepat = 0.200 * std::pow((0.00738 * ZonePreTemp + 0.8072), 7) - 0.000116; //Slope of the saturation vapor pressure-temperature curve (kPa/°C)
             Real64 CpAir = Psychrometrics::PsyCpAirFnW(ZonePreHum) / std::pow(10, 6); // specific heat of air at constant pressure (MJ kg−1 °C−1)
             Real64 OutPb = state.dataEnvrn->OutBaroPress / 1000;    // outdoor pressure (kPa)
-            Real64 const mw=0.622;//ratio molecular weight of water vapor / dry air = 0.622.
+            Real64 constexpr mw(0.622);//ratio molecular weight of water vapor / dry air = 0.622.
             Real64 psyconst = CpAir * OutPb / (hfg * mw); // Psychrometric constant (kPa/°C)
             Real64 rs =0.0; //stomatal resistance s/m
             Real64 ra =0.0; //aerodynamic resistance s/m
@@ -867,7 +867,7 @@ namespace IndoorGreen {
                 0.200 * std::pow((0.00738 * ZonePreTemp + 0.8072), 7) - 0.000116; // Slope of the saturation vapor pressure-temperature curve (kPa/°C)
             Real64 CpAir = Psychrometrics::PsyCpAirFnW(ZonePreHum) / std::pow(10, 6); // specific heat of air at constant pressure (MJ kg−1 °C−1)
             Real64 OutPb = state.dataEnvrn->OutBaroPress / 1000;                      // outdoor pressure (kPa)
-            Real64 const mw = 0.622;                                                  // ratio molecular weight of water vapor / dry air = 0.622.
+            Real64 constexpr mw(0.622);                                                  // ratio molecular weight of water vapor / dry air = 0.622.
             Real64 psyconst = CpAir * OutPb / (hfg * mw);                             // Psychrometric constant (kPa/°C)
             Real64 rs = 0.0;                                                          // stomatal resistance s/m
             Real64 ra = 0.0;                                                          // aerodynamic resistance s/m
