@@ -139,16 +139,7 @@ namespace IndoorGreen {
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetIndoorGreenInput: ");
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // Array1D_string cAlphaFieldNames;
-        // Array1D_string cNumericFieldNames;
-        // Array1D_bool lNumericFieldBlanks;
-        // Array1D_bool lAlphaFieldBlanks;
-        // Array1D_string cAlphaArgs;
-        // Array1D<Real64> rNumericArgs;
         std::string_view cCurrentModuleObject = "IndoorLivingWall"; //match the idd
-
         int NumNums;        // Number of real numbers returned by GetObjectItem
         int NumAlphas;      // Number of alphanumerics returned by GetObjectItem
         int IndoorGreenNum; // Indoor Green index
