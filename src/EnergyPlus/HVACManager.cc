@@ -578,6 +578,13 @@ void ManageHVAC(EnergyPlusData &state)
         if ((ReportDebug) && (state.dataGlobal->DayOfSim > 0)) { // Report the node data
             if (size(state.dataLoopNodes->Node) > 0 && !state.dataHVACMgr->DebugNamesReported) {
                 print(state.files.debug, "Day of Sim, Hour of Day, TimeStep,");
+                print(state.files.dblst, "{}\n", "node #   Node Type      Name");
+                for (int NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
+                    print(state.files.dblst, " {:3}        {}         {}\n", 
+                          NodeNum,
+                          DataLoopNode::NodeFluidTypeNames[static_cast<int>(state.dataLoopNodes->Node(NodeNum).FluidType)],
+                          state.dataLoopNodes->NodeID(NodeNum));
+                }
                 for (int NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
                     print(state.files.debug, "{}: Temp,", state.dataLoopNodes->NodeID(NodeNum));
                     print(state.files.debug, "{}: MassMinAv,", state.dataLoopNodes->NodeID(NodeNum));

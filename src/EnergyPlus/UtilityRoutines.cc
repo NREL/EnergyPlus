@@ -671,6 +671,11 @@ void CloseMiscOpenFiles(EnergyPlusData &state)
     } else {
         state.files.debug.del();
     }
+    if (state.dataReportFlag->DebugOutput || (state.files.dblst.good() && state.files.dblst.position() > 0)) {
+        state.files.dblst.close();
+    } else {
+        state.files.dblst.del();
+    }
 }
 
 int EndEnergyPlus(EnergyPlusData &state)
