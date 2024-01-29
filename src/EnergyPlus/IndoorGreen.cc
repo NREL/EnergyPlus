@@ -85,24 +85,12 @@ namespace IndoorGreen {
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
 
-    // MODULE PARAMETER DEFINITIONS
-    const char *cCMO_IndoorGreen = "IndoorLivingWall";
-    //const std::string indoorgreenModuleObject = "IndoorGreen";
-    //constexpr Real64 SimpConvAirFlowSpeed(0.5); // m/s
-
     void SimIndoorGreen(EnergyPlusData &state)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Liping Wang
-        //       DATE WRITTEN   Oct 2023
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the Indoor Greenery Systems.
         // Assumptions: 1) one system per zone; 2) the effects of indoor greenery systems on surface heat balance are currently ignored. 
-
 
         if (state.dataIndoorGreen->getInputFlag) { 
             bool ErrorsFound(false);
@@ -123,23 +111,12 @@ namespace IndoorGreen {
 
     void GetIndoorGreenInput(EnergyPlusData &state, bool &ErrorsFound)
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Liping Wang
-        //       DATE WRITTEN   Oct 2023
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS SUBROUTINE:
         // Get the input for the indoor greenery system data and store the input data in the indoorgreen array.
 
         // METHODOLOGY EMPLOYED:
         // Use the Get routines from the InputProcessor module.
 
-        // Using/Aliasing
-        using General::FindNumberInList;
-
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetIndoorGreenInput: ");
         std::string_view cCurrentModuleObject = "IndoorLivingWall"; //match the idd
         int NumNums;        // Number of real numbers returned by GetObjectItem
@@ -363,7 +340,7 @@ namespace IndoorGreen {
                // }
                 state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightControlPtr =
                     Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
-                                         state.dataDaylightingData->daylightControl,
+                                         state.dataDayltg->daylightControl,
                                          &EnergyPlus::Dayltg::DaylightingControl::Name); // Field: Daylighting Control Name
                 if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightControlPtr == 0) {
                     ShowSevereError(state,
@@ -686,10 +663,10 @@ namespace IndoorGreen {
                    state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LEDActualEleP =0;
                    state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LEDActualEleCon =0;
 
-                   if (!state.dataDaylightingManager->CalcDayltghCoefficients_firstTime && state.dataEnvrn->SunIsUp) {
+                   if (!state.dataDayltg->CalcDayltghCoefficients_firstTime && state.dataEnvrn->SunIsUp) {
                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZPPFD = 
-                        state.dataDaylightingData->daylightControl(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightControlPtr)
-                            .DaylIllumAtRefPt(1) / 77; // To be updated currently only take one reference point; PPFD
+                    //state.dataDayltg->daylightControl(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightControlPtr).DaylIllumAtRefPt(1) / 77; 
+                    state.dataDayltg->DaylIllum(1) / 77; // To be updated currently only take one reference point; PPFD
                              //state.dataDaylightingManager->DaylIllum(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightRefPtr) /77; // PPFD
                         Real64 diffSR = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr) /
                                         state.dataHeatBalSurf->SurfAbsSolarInt(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr) * 4.6;
@@ -707,10 +684,11 @@ namespace IndoorGreen {
                 else if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightingMethod == 3) {
                 Real64 a = ScheduleManager::GetCurrentScheduleValue(state, state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SchedLEDDaylightTargetPtr);
                 Real64 b = 0;
-                if (!state.dataDaylightingManager->CalcDayltghCoefficients_firstTime && state.dataEnvrn->SunIsUp) {
+                if (!state.dataDayltg->CalcDayltghCoefficients_firstTime && state.dataEnvrn->SunIsUp) {
                        //b= state.dataDaylightingManager->DaylIllum(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightRefPtr)/77; // PPFD
-                        b = state.dataDaylightingData->daylightControl(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightControlPtr)
-                                .DaylIllumAtRefPt(1) / 77; // To be updated currently only take one reference point; PPFD
+                       //b = state.dataDayltg->daylightControl(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightControlPtr)
+                       //         .DaylIllumAtRefPt(1) / 77; // To be updated currently only take one reference point; PPFD
+                        b = state.dataDayltg->DaylIllum(1) / 77;
                 }
                 state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LEDActualPPFD = max((a - b),0.0); 
                 if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LEDActualPPFD >=
