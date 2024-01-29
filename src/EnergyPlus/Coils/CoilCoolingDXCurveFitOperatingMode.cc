@@ -381,8 +381,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
         auto &lowerspeed(this->speeds[max(speedNum - 2, 0)]);
         lowerspeed.AirMassFlow = state.dataHVACGlobal->MSHPMassFlowRateLow * lowerspeed.active_fraction_of_face_coil_area;
 
-        // Use 0, 1, or speedRatio?
-        lowerspeed.CalcSpeedOutput(state, inletNode, outletNode, speedRatio, fanOpMode, condInletTemp); // out
+        lowerspeed.CalcSpeedOutput(state, inletNode, outletNode, 1.0, fanOpMode, condInletTemp); // out
 
         if (lowerspeed.adjustForFaceArea) {
             lowerspeed.AirMassFlow /= lowerspeed.active_fraction_of_face_coil_area;
