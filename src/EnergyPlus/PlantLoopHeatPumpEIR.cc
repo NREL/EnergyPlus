@@ -619,7 +619,7 @@ void EIRPlantLoopHeatPump::doDefrost(
         this->loadDueToDefrost = 0.0;
         this->fractionalDefrostTime = 0.0;
     }    
-
+    availableCapacity *= HeatingCapacityMultiplier;
 }
 
 void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
