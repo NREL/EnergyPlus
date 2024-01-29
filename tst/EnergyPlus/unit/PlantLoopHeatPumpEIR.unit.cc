@@ -2647,8 +2647,8 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     // assign the plant sizing data
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
 
-    Real64 const sourceSideInitTemp = 20.0;
-    Real64 const sourceSideHumRat = 0.0;
+    Real64 constexpr sourceSideInitTemp = 20.0;
+    Real64 constexpr sourceSideHumRat = 0.0;
     Real64 expectedLoadCp = 4197.93;
     Real64 expectedLoadRho = 999.898;
     Real64 expectedSourceCp = Psychrometrics::PsyCpAirFnW(sourceSideHumRat);
