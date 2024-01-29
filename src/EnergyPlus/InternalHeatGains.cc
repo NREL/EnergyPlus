@@ -59,7 +59,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
-#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -72,6 +71,7 @@
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
@@ -7412,9 +7412,9 @@ namespace InternalHeatGains {
             int spaceNum = thisLights.spaceIndex;
             Q = thisLights.DesignLevel * GetCurrentScheduleValue(state, thisLights.SchedPtr);
 
-            if (state.dataDaylightingData->ZoneDaylight(NZ).totRefPts > 0) {
+            if (state.dataDayltg->ZoneDaylight(NZ).totRefPts > 0) {
                 if (thisLights.FractionReplaceable > 0.0) { // FractionReplaceable can only be 0 or 1 for these models
-                    Q *= state.dataDaylightingData->spacePowerReductionFactor(spaceNum);
+                    Q *= state.dataDayltg->spacePowerReductionFactor(spaceNum);
                 }
             }
 
@@ -8728,7 +8728,7 @@ namespace InternalHeatGains {
             LightsRepMin = min(LightsRepMin, state.dataHeatBal->Lights(Loop).FractionReplaceable);
             LightsRepMax = max(LightsRepMax, state.dataHeatBal->Lights(Loop).FractionReplaceable);
             ++NumLights;
-            if ((state.dataDaylightingData->ZoneDaylight(WhichZone).totRefPts > 0) &&
+            if ((state.dataDayltg->ZoneDaylight(WhichZone).totRefPts > 0) &&
                 (state.dataHeatBal->Lights(Loop).FractionReplaceable > 0.0 && state.dataHeatBal->Lights(Loop).FractionReplaceable < 1.0)) {
                 ShowWarningError(state, "CheckLightsReplaceableMinMaxForZone: Fraction Replaceable must be 0.0 or 1.0 if used with daylighting.");
                 ShowContinueError(state,
@@ -8739,7 +8739,7 @@ namespace InternalHeatGains {
             }
         }
 
-        if (state.dataDaylightingData->ZoneDaylight(WhichZone).totRefPts > 0) {
+        if (state.dataDayltg->ZoneDaylight(WhichZone).totRefPts > 0) {
             if (LightsRepMax == 0.0) {
                 ShowWarningError(state,
                                  format("CheckLightsReplaceable: Zone \"{}\" has Daylighting:Controls.", state.dataHeatBal->Zone(WhichZone).Name));

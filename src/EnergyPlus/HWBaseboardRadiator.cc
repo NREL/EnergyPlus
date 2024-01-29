@@ -662,6 +662,7 @@ namespace HWBaseboardRadiator {
                 }
                 if (thisHWBaseboard.SurfacePtr(SurfNum) != 0) {
                     state.dataSurface->surfIntConv(thisHWBaseboard.SurfacePtr(SurfNum)).getsRadiantHeat = true;
+                    state.dataSurface->allGetsRadiantHeatSurfaceList.emplace_back(thisHWBaseboard.SurfacePtr(SurfNum));
                 }
 
                 AllFracsSummed += thisHWBaseboard.FracDistribToSurf(SurfNum);
@@ -1487,13 +1488,15 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
-        int SurfNum;              // Pointer to the Surface derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
         // Initialize arrays
-        state.dataHeatBalFanSys->SurfQHWBaseboard = 0.0;
+        for (auto &thisHWBB : state.dataHWBaseboardRad->HWBaseboard) {
+            for (int radSurfNum = 1; radSurfNum <= thisHWBB.TotSurfToDistrib; ++radSurfNum) {
+                int surfNum = thisHWBB.SurfacePtr(radSurfNum);
+                state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).HWBaseboard = 0.0;
+            }
+        }
         state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson = 0.0;
 
         for (auto &thisHWBB : state.dataHWBaseboardRad->HWBaseboard) {
@@ -1503,12 +1506,11 @@ namespace HWBaseboardRadiator {
             if (ZoneNum <= 0) continue;
             state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson(ZoneNum) += thisHWBB.QBBRadSource * HWBaseboardDesignDataObject.FracDistribPerson;
 
-            for (RadSurfNum = 1; RadSurfNum <= thisHWBB.TotSurfToDistrib; ++RadSurfNum) {
-                SurfNum = thisHWBB.SurfacePtr(RadSurfNum);
+            for (int RadSurfNum = 1; RadSurfNum <= thisHWBB.TotSurfToDistrib; ++RadSurfNum) {
+                int SurfNum = thisHWBB.SurfacePtr(RadSurfNum);
                 if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
                     ThisSurfIntensity = (thisHWBB.QBBRadSource * thisHWBB.FracDistribToSurf(RadSurfNum) / state.dataSurface->Surface(SurfNum).Area);
-                    state.dataHeatBalFanSys->SurfQHWBaseboard(SurfNum) += ThisSurfIntensity;
-                    state.dataHeatBalSurf->AnyRadiantSystems = true;
+                    state.dataHeatBalFanSys->surfQRadFromHVAC(SurfNum).HWBaseboard += ThisSurfIntensity;
                     // CR 8074, trap for excessive intensity (throws off surface balance )
                     if (ThisSurfIntensity > DataHeatBalFanSys::MaxRadHeatFlux) {
                         ShowSevereError(state, "DistributeBBRadGains:  excessive thermal radiation heat flux intensity detected");

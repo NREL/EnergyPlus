@@ -53,7 +53,6 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -61,6 +60,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
@@ -118,8 +118,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     // Test non-integrated option first, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 for all hours
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
-            state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour) = 999.0;
-            state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour) = 888.0;
+            state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult[Hour] = 999.0;
+            state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult[Hour] = 888.0;
         }
     }
 
@@ -128,8 +128,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
 
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
-            EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
-            EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
+            EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult[Hour]);
+            EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult[Hour]);
         }
     }
 
@@ -137,8 +137,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     // Re-initialize to new values
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
-            state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour) = 555.0;
-            state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour) = 444.0;
+            state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult[Hour] = 555.0;
+            state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult[Hour] = 444.0;
         }
     }
 
@@ -149,11 +149,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
             if (Hour == state->dataGlobal->HourOfDay) {
-                EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
-                EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
+                EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult[Hour]);
+                EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult[Hour]);
             } else {
-                EXPECT_EQ(555.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
-                EXPECT_EQ(444.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
+                EXPECT_EQ(555.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult[Hour]);
+                EXPECT_EQ(444.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult[Hour]);
             }
         }
     }
@@ -2662,10 +2662,12 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
 TEST_F(EnergyPlusFixture, WindowShadingManager_Lum_Test)
 {
     state->dataSurface->Surface.allocate(2);
+    state->dataSurface->SurfaceWindow.allocate(2);
+
     EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
     state->dataConstruction->Construct.allocate(1);
     state->dataSurface->WindowShadingControl.allocate(2);
-    state->dataDaylightingData->ZoneDaylight.allocate(1);
+    state->dataDayltg->ZoneDaylight.allocate(1);
 
     auto &surf1 = state->dataSurface->Surface(1);
     auto &surf2 = state->dataSurface->Surface(2);
