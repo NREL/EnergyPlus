@@ -407,6 +407,79 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     this->partLoadRatio = partLoadRatio;
     this->cyclingRatio = cyclingRatio;
 
+    // do defrost calculation if applicable
+    // Init defrost power adjustment factors
+    Real64 InputPowerMultiplier = 1.0;
+    this->doDefrost(state, operatingPLR, availableCapacity, InputPowerMultiplier);
+    this->defrostEnergy = this->defrostEnergyRate * reportingInterval;
+
+    // evaluate the actual current operating load side heat transfer rate
+    auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
+    Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           thisLoadPlantLoop.FluidName,
+                                                           state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
+                                                           thisLoadPlantLoop.FluidIndex,
+                                                           "PLHPEIR::simulate()");
+    this->loadSideHeatTransfer = availableCapacity * operatingPLR;
+    this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
+
+    // calculate load side outlet conditions
+    Real64 const loadMCp = this->loadSideMassFlowRate * CpLoad;
+    this->loadSideOutletTemp = this->calcLoadOutletTemp(this->loadSideInletTemp, this->loadSideHeatTransfer / loadMCp);
+
+    // now what to do here if outlet water temp exceeds limit based on HW supply temp limit curves?
+    // currentLoad will be met and there should? be some adjustment based on outlet water temp limit?
+
+    // calculate power usage from EIR curves
+    Real64 eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
+    Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, this->partLoadRatio);
+    // check curves value
+    this->doCurveCheck(state, loadSideOutletSetpointTemp, capacityModifierFuncTemp, eirModifierFuncTemp, eirModifierFuncPLR);
+
+    this->powerUsage =
+        (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp * InputPowerMultiplier * this->cyclingRatio;
+    this->powerEnergy = this->powerUsage * reportingInterval;
+
+    // energy balance on heat pump
+    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
+    this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
+
+    // calculate source side outlet conditions
+    Real64 CpSrc;
+    if (this->waterSource) {
+        auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
+        CpSrc = FluidProperties::GetSpecificHeatGlycol(
+            state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "PLHPEIR::simulate()");
+    } else {
+        CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+    }
+    // this->sourceSideCp = CpSrc; // debuging variable
+    Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
+    this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
+
+    if (this->waterSource && abs(this->sourceSideOutletTemp - this->sourceSideInletTemp) > 100.0) { // whoaa out of range happenings on water loop
+        //
+        // TODO setup recurring error warning?
+        // lets do something different than fatal the simulation
+        if ((this->sourceSideMassFlowRate / this->sourceSideDesignMassFlowRate) < 0.01) { // current source side flow is 1% of design max
+            // just send it all to skin losses and leave the fluid temperature alone
+            this->sourceSideOutletTemp = this->sourceSideInletTemp;
+        } else if (this->sourceSideOutletTemp > this->sourceSideInletTemp) {
+            this->sourceSideOutletTemp = this->sourceSideInletTemp + 100.0; // cap it at 100C delta
+
+        } else if (this->sourceSideOutletTemp < this->sourceSideInletTemp) {
+            this->sourceSideOutletTemp = this->sourceSideInletTemp - 100.0; // cap it at 100C delta
+        }
+    }
+}
+
+
+void EIRPlantLoopHeatPump::doCurveCheck(EnergyPlusData &state,
+                                        const Real64 loadSideOutletSetpointTemp,
+                                        Real64 &capacityModifierFuncTemp,
+                                        Real64 &eirModifierFuncTemp,
+                                        Real64 &eirModifierFuncPLR)
+{
     if (capacityModifierFuncTemp < 0.0) {
         if (this->capModFTErrorIndex == 0) {
             ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
@@ -428,11 +501,52 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         capacityModifierFuncTemp = 0.0;
     }
 
+    if (eirModifierFuncTemp < 0.0) {
+        if (this->eirModFTErrorIndex == 0) {
+            ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
+            ShowContinueError(state, format(" EIR Modifier curve (function of Temperatures) output is negative ({:.3T}).", eirModifierFuncTemp));
+            ShowContinueError(state,
+                              format(" Negative value occurs using a water temperature of {:.2T}C and an outdoor air temperature of {:.2T}C.",
+                                     this->loadSideOutletTemp,
+                                     this->sourceSideInletTemp));
+            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+        }
+        ShowRecurringWarningErrorAtEnd(state,
+                                       format("{} \"{}\": EIR Modifier curve (function of Temperatures) output is negative warning continues...",
+                                              DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                                              this->name),
+                                       this->eirModFTErrorIndex,
+                                       eirModifierFuncTemp,
+                                       eirModifierFuncTemp);
+        eirModifierFuncTemp = 0.0;
+    }
+
+    if (eirModifierFuncPLR < 0.0) {
+        if (this->eirModFPLRErrorIndex == 0) {
+            ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
+            ShowContinueError(state, format(" EIR Modifier curve (function of PLR) output is negative ({:.3T}).", eirModifierFuncPLR));
+            ShowContinueError(state, format(" Negative value occurs using a Part Load Ratio of {:.2T}", this->partLoadRatio));
+            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+        }
+        ShowRecurringWarningErrorAtEnd(state,
+                                       format("{} \"{}\": EIR Modifier curve (function of PLR) output is negative warning continues...",
+                                              DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                                              this->name),
+                                       this->eirModFPLRErrorIndex,
+                                       eirModifierFuncPLR,
+                                       eirModifierFuncPLR);
+        eirModifierFuncPLR = 0.0;
+    }
+}
+
+void EIRPlantLoopHeatPump::doDefrost(
+    EnergyPlusData &state, const Real64 operatingPLR, Real64 &availableCapacity, Real64 &InputPowerMultiplier)
+{
     // Initializing defrost adjustment factors
     Real64 HeatingCapacityMultiplier = 1.0;
-    Real64 InputPowerMultiplier = 1.0;
+    //Real64 InputPowerMultiplier = 1.0;
 
-    // Check outdoor temperature to determine of defrost is active
+     // Check outdoor temperature to determine of defrost is active
     if (this->defrostAvailable && state.dataEnvrn->OutDryBulbTemp <= this->maxOutdoorTemperatureDefrost) {
         // Calculate defrost adjustment factors depending on defrost control type
         // Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
@@ -504,104 +618,8 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         this->defrostEnergyRate = 0.0;
         this->loadDueToDefrost = 0.0;
         this->fractionalDefrostTime = 0.0;
-    }
-    availableCapacity *= HeatingCapacityMultiplier;
-    this->defrostEnergy = this->defrostEnergyRate * reportingInterval;
+    }    
 
-    // evaluate the actual current operating load side heat transfer rate
-    auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
-    Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(state,
-                                                           thisLoadPlantLoop.FluidName,
-                                                           state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
-                                                           thisLoadPlantLoop.FluidIndex,
-                                                           "PLHPEIR::simulate()");
-    this->loadSideHeatTransfer = availableCapacity * operatingPLR;
-    this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
-
-    // calculate load side outlet conditions
-    Real64 const loadMCp = this->loadSideMassFlowRate * CpLoad;
-    this->loadSideOutletTemp = this->calcLoadOutletTemp(this->loadSideInletTemp, this->loadSideHeatTransfer / loadMCp);
-
-    // now what to do here if outlet water temp exceeds limit based on HW supply temp limit curves?
-    // currentLoad will be met and there should? be some adjustment based on outlet water temp limit?
-
-    // calculate power usage from EIR curves
-    Real64 eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
-
-    if (eirModifierFuncTemp < 0.0) {
-        if (this->eirModFTErrorIndex == 0) {
-            ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
-            ShowContinueError(state, format(" EIR Modifier curve (function of Temperatures) output is negative ({:.3T}).", eirModifierFuncTemp));
-            ShowContinueError(state,
-                              format(" Negative value occurs using a water temperature of {:.2T}C and an outdoor air temperature of {:.2T}C.",
-                                     this->loadSideOutletTemp,
-                                     this->sourceSideInletTemp));
-            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-        }
-        ShowRecurringWarningErrorAtEnd(state,
-                                       format("{} \"{}\": EIR Modifier curve (function of Temperatures) output is negative warning continues...",
-                                              DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
-                                              this->name),
-                                       this->eirModFTErrorIndex,
-                                       eirModifierFuncTemp,
-                                       eirModifierFuncTemp);
-        eirModifierFuncTemp = 0.0;
-    }
-
-    Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, this->partLoadRatio);
-
-    if (eirModifierFuncPLR < 0.0) {
-        if (this->eirModFPLRErrorIndex == 0) {
-            ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
-            ShowContinueError(state, format(" EIR Modifier curve (function of PLR) output is negative ({:.3T}).", eirModifierFuncPLR));
-            ShowContinueError(state, format(" Negative value occurs using a Part Load Ratio of {:.2T}", this->partLoadRatio));
-            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
-        }
-        ShowRecurringWarningErrorAtEnd(state,
-                                       format("{} \"{}\": EIR Modifier curve (function of PLR) output is negative warning continues...",
-                                              DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
-                                              this->name),
-                                       this->eirModFPLRErrorIndex,
-                                       eirModifierFuncPLR,
-                                       eirModifierFuncPLR);
-        eirModifierFuncPLR = 0.0;
-    }
-
-    this->powerUsage =
-        (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp * InputPowerMultiplier * this->cyclingRatio;
-    this->powerEnergy = this->powerUsage * reportingInterval;
-
-    // energy balance on heat pump
-    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
-    this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
-
-    // calculate source side outlet conditions
-    Real64 CpSrc;
-    if (this->waterSource) {
-        auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
-        CpSrc = FluidProperties::GetSpecificHeatGlycol(
-            state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "PLHPEIR::simulate()");
-    } else {
-        CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
-    }
-    // this->sourceSideCp = CpSrc; // debuging variable
-    Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
-    this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
-
-    if (this->waterSource && abs(this->sourceSideOutletTemp - this->sourceSideInletTemp) > 100.0) { // whoaa out of range happenings on water loop
-        //
-        // TODO setup recurring error warning?
-        // lets do something different than fatal the simulation
-        if ((this->sourceSideMassFlowRate / this->sourceSideDesignMassFlowRate) < 0.01) { // current source side flow is 1% of design max
-            // just send it all to skin losses and leave the fluid temperature alone
-            this->sourceSideOutletTemp = this->sourceSideInletTemp;
-        } else if (this->sourceSideOutletTemp > this->sourceSideInletTemp) {
-            this->sourceSideOutletTemp = this->sourceSideInletTemp + 100.0; // cap it at 100C delta
-
-        } else if (this->sourceSideOutletTemp < this->sourceSideInletTemp) {
-            this->sourceSideOutletTemp = this->sourceSideInletTemp - 100.0; // cap it at 100C delta
-        }
-    }
 }
 
 void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
