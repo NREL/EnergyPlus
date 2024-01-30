@@ -246,7 +246,11 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchFanPurpose = 0;
     int pdchFanAutosized = 0;
     int pdchFanMotorEff = 0;
-    int pdchFanMotorHeatToZoneFrac = 0;
+    int pdchFanMotorHeatToZoneFrac = 0; // Motor Heat to Zone Fraction
+    int pdchFanMotorHeatZone = 0;       // Motor Loss Zone Name
+    int pdchFanOccOper = 0;             // Occupied Operation
+    int pdchFanUnoccOper = 0;           // Unoccupied Operation
+    int pdchFanLockOutDurCentHt = 0;    // Locked Out During Central Heating
     int pdchFanAirLoopName = 0;
 
     // Pump subtable
@@ -349,6 +353,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDXHeatCoilRegionNum = 0; // Region number for which HSPF is calculated
     // Standard 229 Predef outputs for DX Heating Coils
     int pdchDXHeatCoilMinOADBTforCompOp = 0;
+    int pdchDXHeatCoilSuppHiT = 0; // Supplemental Heat High Shutoff Temperature
     int pdchDXHeatCoilAirloopName = 0;
 
     // DX Heating Coil subtable| AHRI std. 210/240 2023 conditions
@@ -438,6 +443,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchPLCLProvCool = 0;        // provides cooling
     int pdchPLCLMaxLoopFlowRate = 0; // Maximum Loop Flow Rate
     int pdchPLCLMinLoopFlowRate = 0; // Minimum Loop Flow Rate
+    int pdchPLCLTotPumpPow = 0;      // Total Pump Power on Loop
 
     // Std 229 Air Terminal Table in Equipment Summary
     int pdstAirTerm = 0;
@@ -448,6 +454,17 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchAirTermSupHeatingSP = 0;   // Supply heating setpoint
     int pdchAirTermHeatingCap = 0;     // Heating capacity
     int pdchAirTermCoolingCap = 0;     // Cooling capacity
+    int pdchAirTermTypeInp = 0;        // Type of Input Object
+    int pdchAirTermHeatCoilType = 0;   // Heat/Reheat Coil Object Type
+    int pdchAirTermCoolCoilType = 0;   // Chilled Water Coil Object Type
+    int pdchAirTermFanType = 0;        // Fan Object Type
+    int pdchAirTermFanName = 0;        // Fan Name
+    int pdchAirTermPrimFlow = 0;       // Primary Air Flow Rate
+    int pdchAirTermSecdFlow = 0;       // Secondary Air Flow Rate
+    int pdchAirTermMinFlowSch = 0;     // Minimum Flow Schedule Name
+    int pdchAirTermMaxFlowReh = 0;     // Maximum Flow During Reheat
+    int pdchAirTermMinOAflowSch = 0;   // Minimum Outdoor Flow Schedule Name
+    int pdchAirTermTempCntl = 0;       // Temperature Control
 
     // Std 229 Air Heat Recovery
     int pdstAirHR = 0;
@@ -853,6 +870,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDCVZoneADEffCooling = 0;
     int pdchDCVZoneADEffHeating = 0;
     int pdchDCVZoneADEffSchName = 0;
+    int pdchDCVType = 0;
 
     int pdstSimpleComfort = 0;
     int pdchSCwinterClothes = 0;
@@ -898,8 +916,6 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchTopCondCompType = 0;
     int pdchTopCondCompName = 0;
     int pdchTopCondConType = 0;
-
-
 
     // Outdoor Air Report
     int pdrOutsideAir = 0;

@@ -146,7 +146,6 @@ The current columns are:
 The new columns would be:
 - Airloop branch name
 - Plantloop branch name
-- Supplemental heat high shutoff temperature [C]
 
 #### Equipment Summary - DX Heating Coils ####
 
@@ -160,6 +159,7 @@ The current columns are:
 - Airloop name
 
 The new columns would be:
+- Supplemental heat high shutoff temperature [C]
 - Airloop branch name
 
 #### Equipment Summary - Fans ####

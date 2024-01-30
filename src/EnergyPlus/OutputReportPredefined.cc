@@ -389,6 +389,7 @@ namespace OutputReportPredefined {
         // Std 229 Predef outputs for DX Heating Coils
         s->pdchDXHeatCoilMinOADBTforCompOp =
             newPreDefColumn(state, s->pdstDXHeatCoil, "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation");
+        s->pdchDXHeatCoilSuppHiT = newPreDefColumn(state, s->pdstDXHeatCoil, "Supplemental Heat High Shutoff Temperature [C]");
         s->pdchDXHeatCoilAirloopName = newPreDefColumn(state, s->pdstDXHeatCoil, "Airloop Name");
 
         // for DX Heating Coil AHRI Standard 2023 Ratings | HSPF2
@@ -428,6 +429,10 @@ namespace OutputReportPredefined {
         s->pdchFanAutosized = newPreDefColumn(state, s->pdstFan, "Is Autosized");
         s->pdchFanMotorEff = newPreDefColumn(state, s->pdstFan, "Motor Efficiency");
         s->pdchFanMotorHeatToZoneFrac = newPreDefColumn(state, s->pdstFan, "Motor Heat to Zone Fraction");
+        s->pdchFanMotorHeatZone = newPreDefColumn(state, s->pdstFan, "Motor Loss Zone Name");
+        s->pdchFanOccOper = newPreDefColumn(state, s->pdstFan, "Occupied Operation");
+        s->pdchFanUnoccOper = newPreDefColumn(state, s->pdstFan, "Unoccupied Operation");
+        s->pdchFanLockOutDurCentHt = newPreDefColumn(state, s->pdstFan, "Locked Out During Central Heating");
         s->pdchFanAirLoopName = newPreDefColumn(state, s->pdstFan, "Airloop Name");
 
         s->pdstPump = newPreDefSubTable(state, s->pdrEquip, "Pumps");
@@ -514,6 +519,7 @@ namespace OutputReportPredefined {
         s->pdchPLCLProvCool = newPreDefColumn(state, s->pdstPLCL, "Provides Cooling");
         s->pdchPLCLMaxLoopFlowRate = newPreDefColumn(state, s->pdstPLCL, "Maximum Loop Flow Rate [m3/s]");
         s->pdchPLCLMinLoopFlowRate = newPreDefColumn(state, s->pdstPLCL, "Minimum Loop Flow Rate [m3/s]");
+        s->pdchPLCLTotPumpPow = newPreDefColumn(state, s->pdstPLCL, "Total Pump Power on Loop [W]");
 
         // Std 229 Air Terminal Table in Equipment Summary
         s->pdstAirTerm = newPreDefSubTable(state, s->pdrEquip, "Air Terminals");
@@ -525,6 +531,18 @@ namespace OutputReportPredefined {
         s->pdchAirTermSupHeatingSP = newPreDefColumn(state, s->pdstAirTerm, "Supply Heating Setpoint [C]");
         s->pdchAirTermHeatingCap = newPreDefColumn(state, s->pdstAirTerm, "Heating Capacity [W]");
         s->pdchAirTermCoolingCap = newPreDefColumn(state, s->pdstAirTerm, "Cooling Capacity [W]");
+
+        s->pdchAirTermTypeInp = newPreDefColumn(state, s->pdstAirTerm, "Type of Input Object");
+        s->pdchAirTermHeatCoilType = newPreDefColumn(state, s->pdstAirTerm, "Heat/Reheat Coil Object Type");
+        s->pdchAirTermCoolCoilType = newPreDefColumn(state, s->pdstAirTerm, "Chilled Water Coil Object Type");
+        s->pdchAirTermFanType = newPreDefColumn(state, s->pdstAirTerm, "Fan Object Type");
+        s->pdchAirTermFanName = newPreDefColumn(state, s->pdstAirTerm, "Fan Name");
+        s->pdchAirTermPrimFlow = newPreDefColumn(state, s->pdstAirTerm, "Primary Air Flow Rate [m3/s]");
+        s->pdchAirTermSecdFlow = newPreDefColumn(state, s->pdstAirTerm, "Secondary Air Flow Rate [m3/s]");
+        s->pdchAirTermMinFlowSch = newPreDefColumn(state, s->pdstAirTerm, "Minimum Flow Schedule Name");
+        s->pdchAirTermMaxFlowReh = newPreDefColumn(state, s->pdstAirTerm, "Maximum Flow During Reheat [m3/s]");
+        s->pdchAirTermMinOAflowSch = newPreDefColumn(state, s->pdstAirTerm, "Minimum Outdoor Flow Schedule Name");
+        s->pdchAirTermTempCntl = newPreDefColumn(state, s->pdstAirTerm, "Temperature Control");
 
         // Std 229 Air Heat Recovery
         s->pdstAirHR = newPreDefSubTable(state, s->pdrEquip, "Air Heat Recovery");
@@ -879,6 +897,7 @@ namespace OutputReportPredefined {
         s->pdchDCVZoneADEffCooling = newPreDefColumn(state, s->pdstDemCntlVent, "Air Distribution Effectiveness in Cooling Mode");
         s->pdchDCVZoneADEffHeating = newPreDefColumn(state, s->pdstDemCntlVent, "Air Distribution Effectiveness in Heating Mode");
         s->pdchDCVZoneADEffSchName = newPreDefColumn(state, s->pdstDemCntlVent, "Air Distribution Effectiveness Schedule Name");
+        s->pdchDCVType = newPreDefColumn(state, s->pdstDemCntlVent, "Type");
 
         s->pdstSimpleComfort = newPreDefSubTable(state, s->pdrSystem, "Time Not Comfortable Based on Simple ASHRAE 55-2004");
         s->pdchSCwinterClothes = newPreDefColumn(state, s->pdstSimpleComfort, "Winter Clothes [hr]");
@@ -891,7 +910,7 @@ namespace OutputReportPredefined {
         s->pdchULnotMetHeatOcc = newPreDefColumn(state, s->pdstUnmetLoads, "During Occupied Heating [hr]");
         s->pdchULnotMetCoolOcc = newPreDefColumn(state, s->pdstUnmetLoads, "During Occupied Cooling [hr]");
 
-        // HVAC Topology Report 
+        // HVAC Topology Report
         s->pdrTopology = newPreDefReport(state, "HVACTopology", "Top", "HVAC Topology");
 
         s->pdstTopAirLoop = newPreDefSubTable(state, s->pdrTopology, "Air Loop Component Arrangement");
@@ -900,7 +919,7 @@ namespace OutputReportPredefined {
         s->pdchTopAirParName = newPreDefColumn(state, s->pdstTopAirLoop, "Parent Name");
         s->pdchTopAirCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Component Type");
         s->pdchTopAirCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Component Name");
-        s->pdchTopAirConType= newPreDefColumn(state, s->pdstTopAirLoop, "Connection Type");
+        s->pdchTopAirConType = newPreDefColumn(state, s->pdstTopAirLoop, "Connection Type");
 
         s->pdstTopZnEqpLoop = newPreDefSubTable(state, s->pdrTopology, " Zone Equipment Component Arrangement");
         s->pdchTopZnEqpSide = newPreDefColumn(state, s->pdstTopZnEqpLoop, "Side");
@@ -925,7 +944,6 @@ namespace OutputReportPredefined {
         s->pdchTopCondCompType = newPreDefColumn(state, s->pdstTopCondLoop, "Component Type");
         s->pdchTopCondCompName = newPreDefColumn(state, s->pdstTopCondLoop, "Component Name");
         s->pdchTopCondConType = newPreDefColumn(state, s->pdstTopCondLoop, "Connection Type");
-
 
         // Outdoor Air Report
         s->pdrOutsideAir = newPreDefReport(state, "OutdoorAirSummary", "OA", "Outdoor Air Summary");
