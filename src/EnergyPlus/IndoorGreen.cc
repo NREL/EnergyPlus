@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
@@ -323,21 +324,21 @@ namespace IndoorGreen {
             }
             if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightingMethod == 2 ||
                 state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightingMethod == 3) {
-               // state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightRefPtr =
-               //     Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
-               //                          state.dataDaylightingData->DaylRefPt,
-               //                          &EnergyPlus::Dayltg::RefPointData::Name); // Field: Daylighting Reference Point Name
+                state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightRefPtr =
+                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
+                                         state.dataDayltg->DaylRefPt,
+                                         &EnergyPlus::Dayltg::RefPointData::Name); // Field: Daylighting Reference Point Name
                 //state.dataDaylightingData->daylightControl
-               // if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightRefPtr == 0) {
-               //     ShowSevereError(state,
-               //                     format("{}: invalid {}=\"{}\" for object named: {}",
-               //                            state.dataIPShortCut->cCurrentModuleObject,
-               //                            state.dataIPShortCut->cAlphaFieldNames(7),
-               //                            state.dataIPShortCut->cAlphaArgs(7),
-               //                            state.dataIPShortCut->cAlphaArgs(1)));
-               //     ErrorsFound = true;
-               //     continue;
-               // }
+                //if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightRefPtr == 0) {
+                //    ShowSevereError(state,
+                //                    format("{}: invalid {}=\"{}\" for object named: {}",
+                //                           state.dataIPShortCut->cCurrentModuleObject,
+                //                           state.dataIPShortCut->cAlphaFieldNames(7),
+                //                           state.dataIPShortCut->cAlphaArgs(7),
+                //                           state.dataIPShortCut->cAlphaArgs(1)));
+                //    ErrorsFound = true;
+                //    continue;
+                //}
                 state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightControlPtr =
                     Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
                                          state.dataDayltg->daylightControl,
@@ -666,7 +667,7 @@ namespace IndoorGreen {
                    if (!state.dataDayltg->CalcDayltghCoefficients_firstTime && state.dataEnvrn->SunIsUp) {
                     state.dataIndoorGreen->indoorgreen(IndoorGreenNum).ZPPFD = 
                     //state.dataDayltg->daylightControl(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightControlPtr).DaylIllumAtRefPt(1) / 77; 
-                    state.dataDayltg->DaylIllum(1) / 77; // To be updated currently only take one reference point; PPFD
+                    state.dataDayltg->DaylIllum(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightRefPtr)/77; // To be updated currently only take one reference point; PPFD
                              //state.dataDaylightingManager->DaylIllum(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightRefPtr) /77; // PPFD
                         Real64 diffSR = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr) /
                                         state.dataHeatBalSurf->SurfAbsSolarInt(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).SurfPtr) * 4.6;
@@ -688,7 +689,9 @@ namespace IndoorGreen {
                        //b= state.dataDaylightingManager->DaylIllum(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightRefPtr)/77; // PPFD
                        //b = state.dataDayltg->daylightControl(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightControlPtr)
                        //         .DaylIllumAtRefPt(1) / 77; // To be updated currently only take one reference point; PPFD
-                        b = state.dataDayltg->DaylIllum(1) / 77;
+                        b = state.dataDayltg->daylightControl(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightControlPtr)
+                                .refPts(1).lums [DataSurfaces::iLum_Illum]/77;
+                       // DaylIllum(state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LightRefPtr) / 77;
                 }
                 state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LEDActualPPFD = max((a - b),0.0); 
                 if (state.dataIndoorGreen->indoorgreen(IndoorGreenNum).LEDActualPPFD >=
