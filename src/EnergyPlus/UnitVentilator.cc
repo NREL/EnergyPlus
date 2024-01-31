@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -947,49 +947,49 @@ namespace UnitVentilator {
 
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 unitVent.HeatPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 unitVent.Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 unitVent.HeatEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 unitVent.Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Total Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 unitVent.TotCoolPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 unitVent.Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Total Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 unitVent.TotCoolEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 unitVent.Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Sensible Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 unitVent.SensCoolPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 unitVent.Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Sensible Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 unitVent.SensCoolEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 unitVent.Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Fan Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 unitVent.ElecPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -997,14 +997,14 @@ namespace UnitVentilator {
             // Note that the unit vent fan electric is NOT metered because this value is already metered through the fan component
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Fan Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 unitVent.ElecEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 unitVent.Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Fan Availability Status",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 unitVent.AvailStatus,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1012,7 +1012,7 @@ namespace UnitVentilator {
             if (unitVent.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff) {
                 SetupOutputVariable(state,
                                     "Zone Unit Ventilator Fan Part Load Ratio",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     unitVent.FanPartLoadRatio,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,

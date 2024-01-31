@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -530,7 +530,7 @@ namespace PhotovoltaicThermalCollectors {
     {
         SetupOutputVariable(state,
                             "Generator Produced Thermal Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->Report.ThermPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -539,34 +539,32 @@ namespace PhotovoltaicThermalCollectors {
         if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
             SetupOutputVariable(state,
                                 "Generator Produced Thermal Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->Report.ThermEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
+                                Constant::eResource::SolarWater,
+                                OutputProcessor::SOVEndUseCat::HeatProduced,
                                 {},
-                                "SolarWater",
-                                "HeatProduced",
-                                {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
         } else if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
             SetupOutputVariable(state,
                                 "Generator Produced Thermal Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->Report.ThermEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
+                                Constant::eResource::SolarAir,
+                                OutputProcessor::SOVEndUseCat::HeatProduced,
                                 {},
-                                "SolarAir",
-                                "HeatProduced",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
 
             SetupOutputVariable(state,
                                 "Generator PVT Fluid Bypass Status",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->Report.BypassStatus,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -575,7 +573,7 @@ namespace PhotovoltaicThermalCollectors {
 
         SetupOutputVariable(state,
                             "Generator PVT Fluid Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->Report.TinletWorkFluid,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -583,7 +581,7 @@ namespace PhotovoltaicThermalCollectors {
 
         SetupOutputVariable(state,
                             "Generator PVT Fluid Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->Report.ToutletWorkFluid,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -591,7 +589,7 @@ namespace PhotovoltaicThermalCollectors {
 
         SetupOutputVariable(state,
                             "Generator PVT Fluid Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             this->Report.MdotWorkFluid,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,

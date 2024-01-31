@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -317,6 +317,14 @@ std::vector<std::string> InputOutputFile::getLines()
         return lines;
     }
     return std::vector<std::string>();
+}
+
+bool IOFiles::OutputControl::writeTabular(EnergyPlusData &state)
+{
+    bool const htmlTabular = state.files.outputControl.tabular;
+    bool const jsonTabular = state.files.outputControl.json && state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled();
+    bool const sqliteTabular = state.files.outputControl.sqlite; // && @JasonGlazer thinks something else maybe?
+    return (htmlTabular || jsonTabular || sqliteTabular);
 }
 
 void IOFiles::OutputControl::getInput(EnergyPlusData &state)

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -85,22 +85,20 @@ protected:
         return ResultsFramework::CSVWriter::convertToMonth(datetime);
     }
 
-    std::map<std::string, std::vector<std::string>> getCSVOutputs(EnergyPlusData &state,
-                                                                  json const &data,
-                                                                  OutputProcessor::ReportingFrequency reportingFrequency,
-                                                                  std::vector<std::string> const &outputVariables)
+    std::map<std::string, std::vector<std::string>>
+    getCSVOutputs(EnergyPlusData &state, json const &data, OutputProcessor::ReportFreq freq, std::vector<std::string> const &outputVariables)
     {
         ResultsFramework::CSVWriter csv(outputVariables.size());
-        csv.parseTSOutputs(state, data, outputVariables, reportingFrequency);
+        csv.parseTSOutputs(state, data, outputVariables, freq);
         return csv.outputs;
     }
 
     std::map<std::string, std::vector<std::string>> getCSVOutputs(EnergyPlusData &state,
                                                                   json const &data,
                                                                   ResultsFramework::ResultsFramework const &resultsFramework,
-                                                                  OutputProcessor::ReportingFrequency reportingFrequency)
+                                                                  OutputProcessor::ReportFreq freq)
     {
-        return getCSVOutputs(state, data, reportingFrequency, resultsFramework.outputVariables);
+        return getCSVOutputs(state, data, freq, resultsFramework.outputVariables);
     }
 };
 
