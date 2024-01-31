@@ -51,7 +51,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -354,11 +353,11 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
-    EXPECT_EQ(1, (int)state->dataDaylightingData->DElightComplexFene.size());
+    EXPECT_EQ(1, (int)state->dataDayltg->DElightComplexFene.size());
 
-    EXPECT_EQ("TEST CFS", state->dataDaylightingData->DElightComplexFene(1).Name);
-    EXPECT_EQ("BTDF^GEN^LIGHTSHELF^1.0^20.0", state->dataDaylightingData->DElightComplexFene(1).ComplexFeneType);
-    EXPECT_EQ("ZN001:WALL001", state->dataDaylightingData->DElightComplexFene(1).surfName);
-    EXPECT_EQ("ZN001:WALL001:WIN001", state->dataDaylightingData->DElightComplexFene(1).wndwName);
-    EXPECT_EQ(0., state->dataDaylightingData->DElightComplexFene(1).feneRota);
+    EXPECT_EQ("TEST CFS", state->dataDayltg->DElightComplexFene(1).Name);
+    EXPECT_EQ("BTDF^GEN^LIGHTSHELF^1.0^20.0", state->dataDayltg->DElightComplexFene(1).ComplexFeneType);
+    EXPECT_EQ("ZN001:WALL001", state->dataDayltg->DElightComplexFene(1).surfName);
+    EXPECT_EQ("ZN001:WALL001:WIN001", state->dataDayltg->DElightComplexFene(1).wndwName);
+    EXPECT_EQ(0., state->dataDayltg->DElightComplexFene(1).feneRota);
 }

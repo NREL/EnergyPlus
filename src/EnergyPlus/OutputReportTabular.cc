@@ -79,7 +79,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -94,6 +93,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
@@ -323,7 +323,7 @@ void GetInputTabularMonthly(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &ort = state.dataOutRptTab;
 
-    if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
+    if (!state.files.outputControl.writeTabular(state)) {
         ort->WriteTabularFiles = false;
         return;
     }
@@ -366,7 +366,10 @@ void GetInputTabularMonthly(EnergyPlusData &state)
         int const curTable = AddMonthlyReport(state, AlphArray(1), int(NumArray(1)));
         for (int jField = 2; jField <= NumAlphas; jField += 2) {
             if (AlphArray(jField).empty()) {
-                ShowFatalError(state, "Blank report name in Output:Table:Monthly");
+                ShowWarningError(state,
+                                 format("{}: Blank column specified in '{}', need to provide a variable or meter name ",
+                                        CurrentModuleObject,
+                                        ort->MonthlyInput(TabNum).name));
             }
             std::string const curAggString = AlphArray(jField + 1);
             AggType curAggType; // kind of aggregation identified (see AggType parameters)
@@ -402,7 +405,9 @@ void GetInputTabularMonthly(EnergyPlusData &state)
                 ShowWarningError(state, format("{}={}, Variable name={}", CurrentModuleObject, ort->MonthlyInput(TabNum).name, AlphArray(jField)));
                 ShowContinueError(state, format("Invalid aggregation type=\"{}\"  Defaulting to SumOrAverage.", curAggString));
             }
-            AddMonthlyFieldSetInput(state, curTable, AlphArray(jField), "", curAggType);
+            if (!AlphArray(jField).empty()) {
+                AddMonthlyFieldSetInput(state, curTable, AlphArray(jField), "", curAggType);
+            }
         }
     }
 }
@@ -1053,7 +1058,7 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
 
     auto &ort = state.dataOutRptTab;
 
-    if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
+    if (!state.files.outputControl.writeTabular(state)) {
         ort->WriteTabularFiles = false;
         return;
     }
@@ -1461,7 +1466,7 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
     auto &ort = state.dataOutRptTab;
     bool ErrorsFound = false;
 
-    if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
+    if (!state.files.outputControl.writeTabular(state)) {
         ort->WriteTabularFiles = false;
         return;
     }
@@ -1492,7 +1497,7 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         for (int iReport = 1; iReport <= NumAlphas; ++iReport) {
             bool nameFound = false;
             if (AlphArray(iReport).empty()) {
-                ShowFatalError(state, "Blank report name in Output:Table:SummaryReports");
+                ShowWarningError(state, "Blank report name in Output:Table:SummaryReports");
             } else if (Util::SameString(AlphArray(iReport), "AnnualBuildingUtilityPerformanceSummary")) {
                 ort->displayTabularBEPS = true;
                 ort->WriteTabularFiles = true;
@@ -13202,7 +13207,7 @@ void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodId
 void WriteVisualResilienceTables(EnergyPlusData &state)
 {
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) {
+        if (state.dataDayltg->ZoneDaylight(ZoneNum).totRefPts == 0) {
             if (state.dataOutRptTab->displayVisualResilienceSummaryExplicitly) {
                 ShowWarningError(state,
                                  format("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: Zone Average Daylighting Reference "

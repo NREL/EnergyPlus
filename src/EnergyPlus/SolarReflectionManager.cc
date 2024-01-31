@@ -469,7 +469,7 @@ namespace SolarReflectionManager {
                         if (ObsSurfNum == ObsSurfNumToSkip) continue;
                         // Determine if this ray hits ObsSurfNum (in which case hit is true) and, if so, what the
                         // distance from the receiving point to the hit point is
-                        PierceSurface(state, ObsSurfNum, RecPt, RayVec, HitPt, hit);
+                        hit = PierceSurface(state, ObsSurfNum, RecPt, RayVec, HitPt);
                         if (hit) {
                             // added TH 3/29/2010 to set ObsSurfNumToSkip
                             if (state.dataSurface->Surface(ObsSurfNum).Class == SurfaceClass::Window) {
@@ -752,12 +752,11 @@ namespace SolarReflectionManager {
 
                         // For now it is assumed that obstructions that are shading surfaces are opaque.
                         // An improvement here would be to allow these to have transmittance.
-                        PierceSurface(state,
-                                      state.dataSolarReflectionManager->ObsSurfNum,
-                                      state.dataSolarReflectionManager->OriginThisRay,
-                                      state.dataSolarReflectionManager->SunVec,
-                                      state.dataSolarReflectionManager->ObsHitPt,
-                                      hit);
+                        hit = PierceSurface(state,
+                                            state.dataSolarReflectionManager->ObsSurfNum,
+                                            state.dataSolarReflectionManager->OriginThisRay,
+                                            state.dataSolarReflectionManager->SunVec,
+                                            state.dataSolarReflectionManager->ObsHitPt);
                         if (hit) break; // An obstruction was hit
                     }
                     if (hit) continue; // Sun does not reach this ray's hit point
@@ -955,12 +954,11 @@ namespace SolarReflectionManager {
                         for (int RecPtNum = 1; RecPtNum <= NumRecPts; ++RecPtNum) {
                             // See if ray from receiving point to mirrored sun hits the reflecting surface
                             state.dataSolarReflectionManager->RecPt = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).RecPt(RecPtNum);
-                            PierceSurface(state,
-                                          ReflSurfNum,
-                                          state.dataSolarReflectionManager->RecPt,
-                                          state.dataSolarReflectionManager->SunVecMir,
-                                          state.dataSolarReflectionManager->HitPtRefl,
-                                          hitRefl);
+                            hitRefl = PierceSurface(state,
+                                                    ReflSurfNum,
+                                                    state.dataSolarReflectionManager->RecPt,
+                                                    state.dataSolarReflectionManager->SunVecMir,
+                                                    state.dataSolarReflectionManager->HitPtRefl);
                             if (hitRefl) { // Reflecting surface was hit
                                 ReflDistanceSq =
                                     distance_squared(state.dataSolarReflectionManager->HitPtRefl, state.dataSolarReflectionManager->RecPt);
@@ -972,14 +970,13 @@ namespace SolarReflectionManager {
                                      ++loop2) {
                                     int const ObsSurfNum = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).PossibleObsSurfNums(loop2);
                                     if (ObsSurfNum == ReflSurfNum || ObsSurfNum == state.dataSurface->Surface(ReflSurfNum).BaseSurf) continue;
-                                    PierceSurface(state,
-                                                  ObsSurfNum,
-                                                  state.dataSolarReflectionManager->RecPt,
-                                                  state.dataSolarReflectionManager->SunVecMir,
-                                                  ReflDistance,
-                                                  state.dataSolarReflectionManager->HitPtObs,
-                                                  hitObs); // ReflDistance cutoff added
-                                    if (hitObs) {          // => Could skip distance check (unless < vs <= ReflDistance really matters)
+                                    hitObs = PierceSurface(state,
+                                                           ObsSurfNum,
+                                                           state.dataSolarReflectionManager->RecPt,
+                                                           state.dataSolarReflectionManager->SunVecMir,
+                                                           ReflDistance,
+                                                           state.dataSolarReflectionManager->HitPtObs); // ReflDistance cutoff added
+                                    if (hitObs) { // => Could skip distance check (unless < vs <= ReflDistance really matters)
                                         if (distance_squared(state.dataSolarReflectionManager->HitPtObs, state.dataSolarReflectionManager->RecPt) <
                                             ReflDistanceSq) {
                                             hitObsRefl = true;
@@ -1003,12 +1000,11 @@ namespace SolarReflectionManager {
                                              ++loop2) {
                                             int const ObsSurfNum =
                                                 state.dataSolarReflectionManager->SolReflRecSurf(ReflSurfRecNum).PossibleObsSurfNums(loop2);
-                                            PierceSurface(state,
-                                                          ObsSurfNum,
-                                                          state.dataSolarReflectionManager->HitPtRefl,
-                                                          state.dataSolarReflectionManager->SunVect,
-                                                          state.dataSolarReflectionManager->HitPtObs,
-                                                          hitObs);
+                                            hitObs = PierceSurface(state,
+                                                                   ObsSurfNum,
+                                                                   state.dataSolarReflectionManager->HitPtRefl,
+                                                                   state.dataSolarReflectionManager->SunVect,
+                                                                   state.dataSolarReflectionManager->HitPtObs);
                                             if (hitObs) break;
                                         }
                                     }
@@ -1023,12 +1019,11 @@ namespace SolarReflectionManager {
                                             if (ObsSurfNum == ReflSurfNum - 1) continue;
                                         }
 
-                                        PierceSurface(state,
-                                                      ObsSurfNum,
-                                                      state.dataSolarReflectionManager->HitPtRefl,
-                                                      state.dataSolarReflectionManager->SunVect,
-                                                      state.dataSolarReflectionManager->HitPtObs,
-                                                      hitObs);
+                                        hitObs = PierceSurface(state,
+                                                               ObsSurfNum,
+                                                               state.dataSolarReflectionManager->HitPtRefl,
+                                                               state.dataSolarReflectionManager->SunVect,
+                                                               state.dataSolarReflectionManager->HitPtObs);
                                         if (hitObs) break;
                                     }
                                 }
@@ -1249,12 +1244,11 @@ namespace SolarReflectionManager {
                                                 continue;
                                         }
                                     }
-                                    PierceSurface(state,
-                                                  state.dataSolarReflectionManager->iObsSurfNum,
-                                                  state.dataSolarReflectionManager->HitPntRefl,
-                                                  state.dataSolarReflectionManager->URay,
-                                                  state.dataSolarReflectionManager->HitPntObs,
-                                                  hitObs);
+                                    hitObs = PierceSurface(state,
+                                                           state.dataSolarReflectionManager->iObsSurfNum,
+                                                           state.dataSolarReflectionManager->HitPntRefl,
+                                                           state.dataSolarReflectionManager->URay,
+                                                           state.dataSolarReflectionManager->HitPntObs);
                                     if (hitObs) break;
                                 }
                                 if (hitObs) continue; // Obstruction hit
