@@ -24253,7 +24253,6 @@ IF (.NOT. isBaseboardNone) THEN
     CALL AddToObjStr('Rate of Defrost Time Fraction Increase {1/K}','')
     ! MJW ???? - Not sure
     CALL AddToObjStr('Economizer Lockout','No')
-    CALL AddSenEffectCurve(base + cvsAirHandlerNameOff, 0.75, 0.7)
     CALL AddSenEffectCurve(base + fczNameOff, 0.75, 0.7)
     CALL CreateNewObj('Coil:Cooling:Water')
     CALL AddToObjFld('Name', base + fczNameOff,' Cooling Coil')
