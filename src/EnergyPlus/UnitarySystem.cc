@@ -11693,7 +11693,7 @@ namespace UnitarySystems {
             }
 
             state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
-                state, OperationMode, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode, singleMode, this->CoilSHR);
+                state, OperationMode, this->m_CoolingSpeedNum, CoilPLR, this->m_FanOpMode, singleMode, this->CoilSHR);
 
             if (this->m_CoolingSpeedNum > 1) {
                 if (this->m_SingleMode == 0) {
