@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -215,28 +215,6 @@ namespace DataZoneEquipment {
         Num
     };
 
-    struct EquipMeterData
-    {
-        // Members
-        std::string ReportVarName;
-        OutputProcessor::Unit ReportVarUnits;
-        Constant::eResource ResourceType = Constant::eResource::Invalid;
-        std::string EndUse;
-        SystemReports::EndUseType EndUse_CompMode;
-        std::string Group;
-        int ReportVarIndex;
-        OutputProcessor::TimeStepType ReportVarIndexType;
-        OutputProcessor::VariableType ReportVarType;
-        Real64 CurMeterReading;
-
-        // Default Constructor
-        EquipMeterData()
-            : ReportVarUnits(OutputProcessor::Unit::None), EndUse_CompMode(SystemReports::EndUseType::NoHeatNoCool), ReportVarIndex(0),
-              ReportVarIndexType(OutputProcessor::TimeStepType::Zone), ReportVarType(OutputProcessor::VariableType::NotFound), CurMeterReading(0.0)
-        {
-        }
-    };
-
     struct SubSubEquipmentData // data for an individual component
     {
         // Members
@@ -247,9 +225,9 @@ namespace DataZoneEquipment {
         int InletNodeNum;
         int OutletNodeNum;
         int NumMeteredVars;
-        Array1D<EquipMeterData> MeteredVar; // Index of energy output report data
-        int EnergyTransComp;                // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
-        int ZoneEqToPlantPtr;               // 0=No plant loop connection, >=0 index to ZoneEqToPlant array
+        Array1D<OutputProcessor::MeterData> MeteredVar; // Index of energy output report data
+        int EnergyTransComp;                            // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
+        int ZoneEqToPlantPtr;                           // 0=No plant loop connection, >=0 index to ZoneEqToPlant array
         int OpMode;
         Real64 Capacity;
         Real64 Efficiency;
@@ -277,10 +255,10 @@ namespace DataZoneEquipment {
         int InletNodeNum;
         int OutletNodeNum;
         int NumMeteredVars;
-        Array1D<EquipMeterData> MeteredVar;           // Index of energy output report data
-        Array1D<SubSubEquipmentData> SubSubEquipData; // Component list
-        int EnergyTransComp;                          // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
-        int ZoneEqToPlantPtr;                         // 0=No plant loop connection, >0 index to ZoneEqToPlant array
+        Array1D<OutputProcessor::MeterData> MeteredVar; // Index of energy output report data
+        Array1D<SubSubEquipmentData> SubSubEquipData;   // Component list
+        int EnergyTransComp;                            // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
+        int ZoneEqToPlantPtr;                           // 0=No plant loop connection, >0 index to ZoneEqToPlant array
         int OpMode;
         Real64 Capacity;
         Real64 Efficiency;
@@ -405,10 +383,10 @@ namespace DataZoneEquipment {
         Array1D_int InletNodeNums;
         Array1D_int OutletNodeNums;
         int NumMeteredVars;
-        Array1D<EquipMeterData> MeteredVar;     // Index of energy output report data
-        Array1D<SubEquipmentData> SubEquipData; // Component list
-        int EnergyTransComp;                    // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
-        int ZoneEqToPlantPtr;                   // 0=No plant loop connection, >0 index to ZoneEqToPlant array
+        Array1D<OutputProcessor::MeterData> MeteredVar; // Index of energy output report data
+        Array1D<SubEquipmentData> SubEquipData;         // Component list
+        int EnergyTransComp;                            // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
+        int ZoneEqToPlantPtr;                           // 0=No plant loop connection, >0 index to ZoneEqToPlant array
         Real64 TotPlantSupplyElec;
         Real64 TotPlantSupplyGas;
         Real64 TotPlantSupplyPurch;
