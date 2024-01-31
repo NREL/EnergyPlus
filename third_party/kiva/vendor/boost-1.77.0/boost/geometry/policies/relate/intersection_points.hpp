@@ -68,7 +68,9 @@ struct segments_intersection_points
         Ratio const& rb_from_wrt_a, Ratio const& rb_to_wrt_a)
     {
         return_type result;
-        unsigned int index = 0, count_a = 0, count_b = 0;
+        unsigned int index = 0;
+        [[maybe_unused]] unsigned int count_a = 0;
+        [[maybe_unused]] unsigned int count_b = 0;
         Ratio on_a[2];
 
         // The conditions "index < 2" are necessary for non-robust handling,

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1231,19 +1231,19 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
     Weather::GetNextEnvironment(*state, Available, ErrorsFound);
 
     // Test get output variables for Total Sky Cover and Opaque Sky Cover
-    EXPECT_EQ("Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->RVariableTypes(1).VarNameOnly);
-    EXPECT_EQ("Environment:Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->RVariableTypes(1).VarName);
-    EXPECT_EQ("Site Wind Speed", state->dataOutputProcessor->RVariableTypes(2).VarNameOnly);
-    EXPECT_EQ("Environment:Site Wind Speed", state->dataOutputProcessor->RVariableTypes(2).VarName);
-    EXPECT_EQ("Site Total Sky Cover", state->dataOutputProcessor->RVariableTypes(3).VarNameOnly);
-    EXPECT_EQ("Environment:Site Total Sky Cover", state->dataOutputProcessor->RVariableTypes(3).VarName);
-    EXPECT_EQ("Site Opaque Sky Cover", state->dataOutputProcessor->RVariableTypes(4).VarNameOnly);
-    EXPECT_EQ("Environment:Site Opaque Sky Cover", state->dataOutputProcessor->RVariableTypes(4).VarName);
+    EXPECT_EQ("Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->outVars[0]->name);
+    EXPECT_EQ("Environment:Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->outVars[0]->keyColonName);
+    EXPECT_EQ("Site Wind Speed", state->dataOutputProcessor->outVars[1]->name);
+    EXPECT_EQ("Environment:Site Wind Speed", state->dataOutputProcessor->outVars[1]->keyColonName);
+    EXPECT_EQ("Site Total Sky Cover", state->dataOutputProcessor->outVars[2]->name);
+    EXPECT_EQ("Environment:Site Total Sky Cover", state->dataOutputProcessor->outVars[2]->keyColonName);
+    EXPECT_EQ("Site Opaque Sky Cover", state->dataOutputProcessor->outVars[3]->name);
+    EXPECT_EQ("Environment:Site Opaque Sky Cover", state->dataOutputProcessor->outVars[3]->keyColonName);
 
-    EXPECT_EQ(7, state->dataOutputProcessor->RVariableTypes(1).ReportID);
-    EXPECT_EQ(8, state->dataOutputProcessor->RVariableTypes(2).ReportID);
-    EXPECT_EQ(9, state->dataOutputProcessor->RVariableTypes(3).ReportID);
-    EXPECT_EQ(10, state->dataOutputProcessor->RVariableTypes(4).ReportID);
+    EXPECT_EQ(7, state->dataOutputProcessor->outVars[0]->ReportID);
+    EXPECT_EQ(8, state->dataOutputProcessor->outVars[1]->ReportID);
+    EXPECT_EQ(9, state->dataOutputProcessor->outVars[2]->ReportID);
+    EXPECT_EQ(10, state->dataOutputProcessor->outVars[3]->ReportID);
 
     state->dataWeather->Envrn = 1;
 
@@ -1457,13 +1457,13 @@ TEST_F(EnergyPlusFixture, Fix_OpaqueSkyCover_Test)
     Weather::GetNextEnvironment(*state, Available, ErrorsFound);
 
     // Test get output variables for Total Sky Cover and Opaque Sky Cover
-    EXPECT_EQ("Site Total Sky Cover", state->dataOutputProcessor->RVariableTypes(1).VarNameOnly);
-    EXPECT_EQ("Environment:Site Total Sky Cover", state->dataOutputProcessor->RVariableTypes(1).VarName);
-    EXPECT_EQ("Site Opaque Sky Cover", state->dataOutputProcessor->RVariableTypes(2).VarNameOnly);
-    EXPECT_EQ("Environment:Site Opaque Sky Cover", state->dataOutputProcessor->RVariableTypes(2).VarName);
+    EXPECT_EQ("Site Total Sky Cover", state->dataOutputProcessor->outVars[0]->name);
+    EXPECT_EQ("Environment:Site Total Sky Cover", state->dataOutputProcessor->outVars[0]->keyColonName);
+    EXPECT_EQ("Site Opaque Sky Cover", state->dataOutputProcessor->outVars[1]->name);
+    EXPECT_EQ("Environment:Site Opaque Sky Cover", state->dataOutputProcessor->outVars[1]->keyColonName);
 
-    EXPECT_EQ(7, state->dataOutputProcessor->RVariableTypes(1).ReportID);
-    EXPECT_EQ(8, state->dataOutputProcessor->RVariableTypes(2).ReportID);
+    EXPECT_EQ(7, state->dataOutputProcessor->outVars[0]->ReportID);
+    EXPECT_EQ(8, state->dataOutputProcessor->outVars[1]->ReportID);
 
     state->dataWeather->Envrn = 1;
 

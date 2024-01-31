@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -802,33 +802,31 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 {
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->Report.TotElecCooling,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::Cooling,
                         {},
-                        "ELECTRICITY",
-                        "Cooling",
-                        {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->Report.TotElecHeating,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::Heating,
                         {},
-                        "ELECTRICITY",
-                        "Heating",
-                        {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Electricity Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->Report.TotElecCoolingPwr,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -836,7 +834,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Electricity Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->Report.TotElecHeatingPwr,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -844,46 +842,43 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->Report.CoolingEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
+                        Constant::eResource::EnergyTransfer,
+                        OutputProcessor::SOVEndUseCat::Chillers,
                         {},
-                        "ENERGYTRANSFER",
-                        "CHILLERS",
-                        {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->Report.HeatingEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
+                        Constant::eResource::EnergyTransfer,
+                        OutputProcessor::SOVEndUseCat::Boilers,
                         {},
-                        "ENERGYTRANSFER",
-                        "BOILER",
-                        {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Source Heat Transfer Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->Report.GLHEEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
+                        Constant::eResource::EnergyTransfer,
+                        OutputProcessor::SOVEndUseCat::HeatRejection,
                         {},
-                        "ENERGYTRANSFER",
-                        "HEATREJECTION",
-                        {},
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->Report.CoolingRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -891,7 +886,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->Report.HeatingRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -899,7 +894,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Heater System Source Heat Transfer Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->Report.GLHERate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -907,7 +902,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->Report.CHWmdot,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -915,7 +910,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->Report.HWmdot,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -923,7 +918,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Heater System Source Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->Report.GLHEmdot,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -931,7 +926,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->Report.CHWInletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -939,7 +934,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->Report.HWInletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -947,7 +942,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Heater System Source Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->Report.GLHEInletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -955,7 +950,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Heater System Cooling Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->Report.CHWOutletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -963,7 +958,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Heater System Heating Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->Report.HWOutletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -971,7 +966,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
     SetupOutputVariable(state,
                         "Chiller Heater System Source Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->Report.GLHEOutletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -983,7 +978,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Operation Mode Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->ChillerHeater(ChillerHeaterNum).Report.CurrentMode,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -991,7 +986,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Part Load Ratio Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ChillerPartLoadRatio,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -999,7 +994,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Cycling Ratio Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ChillerCyclingRatio,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1007,7 +1002,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Cooling Electricity Rate Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->ChillerHeater(ChillerHeaterNum).Report.CoolingPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1015,7 +1010,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Heating Electricity Rate Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->ChillerHeater(ChillerHeaterNum).Report.HeatingPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1023,7 +1018,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Cooling Electricity Energy Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->ChillerHeater(ChillerHeaterNum).Report.CoolingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -1031,7 +1026,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Heating Electricity Energy Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->ChillerHeater(ChillerHeaterNum).Report.HeatingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -1039,7 +1034,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Cooling Rate Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->ChillerHeater(ChillerHeaterNum).Report.QEvap,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1047,7 +1042,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Cooling Energy Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->ChillerHeater(ChillerHeaterNum).Report.EvapEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -1055,7 +1050,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater False Load Heat Transfer Rate Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ChillerFalseLoadRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1063,7 +1058,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater False Load Heat Transfer Energy Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ChillerFalseLoad,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -1071,7 +1066,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Evaporator Inlet Temperature Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->ChillerHeater(ChillerHeaterNum).Report.EvapInletTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1079,7 +1074,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Evaporator Outlet Temperature Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->ChillerHeater(ChillerHeaterNum).Report.EvapOutletTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1087,7 +1082,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Evaporator Mass Flow Rate Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 this->ChillerHeater(ChillerHeaterNum).Report.Evapmdot,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1095,7 +1090,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Condenser Heat Transfer Rate Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->ChillerHeater(ChillerHeaterNum).Report.QCond,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1103,7 +1098,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Condenser Heat Transfer Energy Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->ChillerHeater(ChillerHeaterNum).Report.CondEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -1111,7 +1106,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater COP Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::W_W,
+                                Constant::Units::W_W,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ActualCOP,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1119,7 +1114,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Capacity Temperature Modifier Multiplier Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ChillerCapFT,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1127,7 +1122,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater EIR Temperature Modifier Multiplier Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ChillerEIRFT,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1135,7 +1130,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater EIR Part Load Modifier Multiplier Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->ChillerHeater(ChillerHeaterNum).Report.ChillerEIRFPLR,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1143,7 +1138,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Condenser Inlet Temperature Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->ChillerHeater(ChillerHeaterNum).Report.CondInletTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1151,7 +1146,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Condenser Outlet Temperature Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->ChillerHeater(ChillerHeaterNum).Report.CondOutletTemp,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1159,7 +1154,7 @@ void WrapperSpecs::setupOutputVars(EnergyPlusData &state)
 
             SetupOutputVariable(state,
                                 format("Chiller Heater Condenser Mass Flow Rate Unit {}", ChillerHeaterNum),
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 this->ChillerHeater(ChillerHeaterNum).Report.Condmdot,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,

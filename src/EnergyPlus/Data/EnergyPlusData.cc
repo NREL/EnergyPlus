@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -90,10 +90,9 @@ EnergyPlusData::EnergyPlusData()
     this->dataCurveManager = std::make_unique<CurveManagerData>();
     this->dataDXCoils = std::make_unique<DXCoilsData>();
     this->dataDXFEarClipping = std::make_unique<DXFEarClippingData>();
-    this->dataDaylightingData = std::make_unique<DaylightingData>();
     this->dataDaylightingDevices = std::make_unique<DaylightingDevicesData>();
     this->dataDaylightingDevicesData = std::make_unique<DataDaylightingDevicesData>();
-    this->dataDaylightingManager = std::make_unique<DaylightingManagerData>();
+    this->dataDayltg = std::make_unique<DaylightingData>();
     this->dataDefineEquipment = std::make_unique<DefineEquipData>();
     this->dataDemandManager = std::make_unique<DemandManagerData>();
     this->dataDesiccantDehumidifiers = std::make_unique<DesiccantDehumidifiersData>();
@@ -346,10 +345,9 @@ void EnergyPlusData::clear_state()
     this->dataCurveManager->clear_state();
     this->dataDXCoils->clear_state();
     this->dataDXFEarClipping->clear_state();
-    this->dataDaylightingData->clear_state();
     this->dataDaylightingDevices->clear_state();
     this->dataDaylightingDevicesData->clear_state();
-    this->dataDaylightingManager->clear_state();
+    this->dataDayltg->clear_state();
     this->dataDefineEquipment->clear_state();
     this->dataDemandManager->clear_state();
     this->dataDesiccantDehumidifiers->clear_state();
