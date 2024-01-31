@@ -128,8 +128,9 @@ void EIRPlantLoopHeatPump::simulate(
                                                                         state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidIndex,
                                                                         "EIRPlantLoopHeatPump::simulate");
             Real64 controlLoad = this->loadSideMassFlowRate * CurSpecHeat * (leavingSetpoint - loadSideInletTemp);
+            
             this->doPhysics(state, controlLoad);
-        } else {
+        } else {         
             this->doPhysics(state, CurLoad);
         }
     } else {
@@ -313,13 +314,9 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state, bool
     }
 }
 
+
 void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 {
-
-    Real64 constexpr RH90 = 90.0;
-    Real64 constexpr RH60 = 60.0;
-    Real64 constexpr rangeRH = 30.0;
-    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
 
     // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
     // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly
@@ -328,6 +325,22 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         this->resetReportingVariables();
         return;
     }
+
+    if (this->waterSource) {
+        this->doPhysicsWSHP(state, currentLoad);
+    } else if (this->airSource) {
+        this->doPhysicsASHP(state, currentLoad);
+    }
+}
+    
+
+void EIRPlantLoopHeatPump::doPhysicsWSHP(EnergyPlusData &state, Real64 currentLoad)
+{
+
+    Real64 constexpr RH90 = 90.0;
+    Real64 constexpr RH60 = 60.0;
+    Real64 constexpr rangeRH = 30.0;
+    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
 
     // get setpoint on the load side outlet
     Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
@@ -445,14 +458,9 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
 
     // calculate source side outlet conditions
-    Real64 CpSrc;
-    if (this->waterSource) {
-        auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
-        CpSrc = FluidProperties::GetSpecificHeatGlycol(
-            state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "PLHPEIR::simulate()");
-    } else {
-        CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
-    }
+    auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
+    Real64 const CpSrc = FluidProperties::GetSpecificHeatGlycol(
+        state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "PLHPEIR::simulate()");
     // this->sourceSideCp = CpSrc; // debuging variable
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
@@ -473,6 +481,123 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     }
 }
 
+
+void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLoad)
+{
+
+    Real64 constexpr RH90 = 90.0;
+    Real64 constexpr RH60 = 60.0;
+    Real64 constexpr rangeRH = 30.0;
+    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
+
+    // get setpoint on the load side outlet
+    Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
+    Real64 originalLoadSideOutletSPTemp = loadSideOutletSetpointTemp;
+
+    // add free cooling at some point, compressor is off during free cooling, temp limits restrict free cooling range
+
+    Real64 capacityModifierFuncTemp = 1.0;
+    Real64 availableCapacity = this->referenceCapacity;
+    Real64 partLoadRatio = 0.0;
+    bool waterTempExceeded = false;
+
+    // evaluate capacity modifier curve and determine load side heat transfer
+    // any adjustment to outlet water temp set point requires some form of iteration
+    for (int loop = 0; loop < 2; ++loop) {
+        capacityModifierFuncTemp = Curve::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
+
+        availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
+
+        // apply heating mode dry outdoor (evaporator) coil correction factor for air-cooled equipment
+        if (this->capacityDryAirCurveIndex > 0 && this->airSource && state.dataEnvrn->OutRelHum < RH90) { // above 90% RH yields full capacity
+            Real64 dryCorrectionFactor = std::min(1.0, Curve::CurveValue(state, this->capacityDryAirCurveIndex, state.dataEnvrn->OutDryBulbTemp));
+            if (state.dataEnvrn->OutRelHum <= RH60) {
+                // dry heating capacity correction factor is a function of outdoor dry-bulb temperature
+                availableCapacity *= dryCorrectionFactor;
+            } else {
+                // interpolation of heating capacity between wet and dry is based on outdoor relative humidity over 60%-90% range
+                Real64 semiDryFactor = dryCorrectionFactor + (1.0 - dryCorrectionFactor) * (1.0 - ((RH90 - state.dataEnvrn->OutRelHum) / rangeRH));
+                availableCapacity *= semiDryFactor;
+            }
+        }
+
+        if (availableCapacity > 0) {
+            partLoadRatio = std::clamp(std::abs(currentLoad) / availableCapacity, 0.0, 1.0);
+        }
+
+        if (this->minSupplyWaterTempCurveIndex > 0) {
+            Real64 minWaterTemp = Curve::CurveValue(state, this->minSupplyWaterTempCurveIndex, state.dataEnvrn->OutDryBulbTemp);
+            if (loadSideOutletSetpointTemp < minWaterTemp) {
+                loadSideOutletSetpointTemp = originalLoadSideOutletSPTemp + (1.0 - partLoadRatio) * (minWaterTemp - originalLoadSideOutletSPTemp);
+                waterTempExceeded = true;
+            }
+        }
+        if (this->maxSupplyWaterTempCurveIndex > 0) {
+            Real64 maxWaterTemp = Curve::CurveValue(state, this->maxSupplyWaterTempCurveIndex, state.dataEnvrn->OutDryBulbTemp);
+            if (loadSideOutletSetpointTemp > maxWaterTemp) {
+                loadSideOutletSetpointTemp = maxWaterTemp + (1.0 - partLoadRatio) * (originalLoadSideOutletSPTemp - maxWaterTemp);
+                waterTempExceeded = true;
+            }
+        }
+        if (!waterTempExceeded) {
+            break;
+        }
+    }
+
+    Real64 cyclingRatio = 1.0;
+    Real64 operatingPLR = partLoadRatio;
+    if (partLoadRatio < this->minimumPLR) {
+        cyclingRatio = partLoadRatio / this->minimumPLR;
+        partLoadRatio = this->minimumPLR;
+        operatingPLR = partLoadRatio * cyclingRatio;
+    }
+    this->partLoadRatio = partLoadRatio;
+    this->cyclingRatio = cyclingRatio;
+
+    // do defrost calculation if applicable
+    // Init defrost power adjustment factors
+    Real64 InputPowerMultiplier = 1.0;
+    this->doDefrost(state, operatingPLR, availableCapacity, InputPowerMultiplier);
+    this->defrostEnergy = this->defrostEnergyRate * reportingInterval;
+
+    // evaluate the actual current operating load side heat transfer rate
+    auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
+    Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           thisLoadPlantLoop.FluidName,
+                                                           state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
+                                                           thisLoadPlantLoop.FluidIndex,
+                                                           "PLHPEIR::simulate()");
+    this->loadSideHeatTransfer = availableCapacity * operatingPLR;
+    this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
+
+    // calculate load side outlet conditions
+    Real64 const loadMCp = this->loadSideMassFlowRate * CpLoad;
+    this->loadSideOutletTemp = this->calcLoadOutletTemp(this->loadSideInletTemp, this->loadSideHeatTransfer / loadMCp);
+
+    // now what to do here if outlet water temp exceeds limit based on HW supply temp limit curves?
+    // currentLoad will be met and there should? be some adjustment based on outlet water temp limit?
+
+    // calculate power usage from EIR curves
+    Real64 eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
+    Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, this->partLoadRatio);
+    // check curves value
+    this->doCurveCheck(state, loadSideOutletSetpointTemp, capacityModifierFuncTemp, eirModifierFuncTemp, eirModifierFuncPLR);
+
+    this->powerUsage =
+        (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp * InputPowerMultiplier * this->cyclingRatio;
+    this->powerEnergy = this->powerUsage * reportingInterval;
+
+    // energy balance on heat pump
+    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
+    this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
+
+    // calculate source side outlet conditions
+    Real64 const CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+    // this->sourceSideCp = CpSrc; // debuging variable
+    Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
+    this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
+
+}
 
 void EIRPlantLoopHeatPump::doCurveCheck(EnergyPlusData &state,
                                         const Real64 loadSideOutletSetpointTemp,

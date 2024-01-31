@@ -229,6 +229,10 @@ namespace EIRPlantLoopHeatPumps {
 
         virtual void doPhysics(EnergyPlusData &state, Real64 currentLoad);
 
+        void doPhysicsWSHP(EnergyPlusData &state, Real64 currentLoad);
+
+        void doPhysicsASHP(EnergyPlusData &state, Real64 currentLoad);
+
         void sizeLoadSide(EnergyPlusData &state);
 
         void sizeSrcSideWSHP(EnergyPlusData &state);
