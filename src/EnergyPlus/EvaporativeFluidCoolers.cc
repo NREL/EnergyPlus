@@ -984,7 +984,7 @@ namespace EvaporativeFluidCoolers {
             // Added for fluid bypass
             SetupOutputVariable(state,
                                 "Cooling Tower Bypass Fraction",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->BypassFraction,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -996,7 +996,7 @@ namespace EvaporativeFluidCoolers {
         if (this->SuppliedByWaterSystem) {
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Water Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
+                                Constant::Units::m3_s,
                                 this->MakeUpVdot,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1004,7 +1004,7 @@ namespace EvaporativeFluidCoolers {
 
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 this->MakeUpVol,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -1012,7 +1012,7 @@ namespace EvaporativeFluidCoolers {
 
             SetupOutputVariable(state,
                                 "Cooling Tower Storage Tank Water Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
+                                Constant::Units::m3_s,
                                 this->TankSupplyVdot,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1020,20 +1020,19 @@ namespace EvaporativeFluidCoolers {
 
             SetupOutputVariable(state,
                                 "Cooling Tower Storage Tank Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 this->TankSupplyVol,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
+                                Constant::eResource::Water,
+                                OutputProcessor::SOVEndUseCat::HeatRejection,
                                 {},
-                                "Water",
-                                "HeatRejection",
-                                {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Starved Storage Tank Water Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
+                                Constant::Units::m3_s,
                                 this->StarvedMakeUpVdot,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1041,34 +1040,32 @@ namespace EvaporativeFluidCoolers {
 
             SetupOutputVariable(state,
                                 "Cooling Tower Starved Storage Tank Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 this->StarvedMakeUpVol,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
+                                Constant::eResource::Water,
+                                OutputProcessor::SOVEndUseCat::HeatRejection,
                                 {},
-                                "Water",
-                                "HeatRejection",
-                                {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Mains Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 this->StarvedMakeUpVol,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
+                                Constant::eResource::MainsWater,
+                                OutputProcessor::SOVEndUseCat::HeatRejection,
                                 {},
-                                "MainsWater",
-                                "HeatRejection",
-                                {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
         } else { // Evaporative fluid cooler water from mains and gets metered
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Water Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
+                                Constant::Units::m3_s,
                                 this->MakeUpVdot,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1076,34 +1073,32 @@ namespace EvaporativeFluidCoolers {
 
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 this->MakeUpVol,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
+                                Constant::eResource::Water,
+                                OutputProcessor::SOVEndUseCat::HeatRejection,
                                 {},
-                                "Water",
-                                "HeatRejection",
-                                {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Mains Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 this->MakeUpVol,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
+                                Constant::eResource::MainsWater,
+                                OutputProcessor::SOVEndUseCat::HeatRejection,
                                 {},
-                                "MainsWater",
-                                "HeatRejection",
-                                {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
         }
 
         SetupOutputVariable(state,
                             "Cooling Tower Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->fluidCoolerInletWaterTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1111,7 +1106,7 @@ namespace EvaporativeFluidCoolers {
 
         SetupOutputVariable(state,
                             "Cooling Tower Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             this->fluidCoolerOutletWaterTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1119,7 +1114,7 @@ namespace EvaporativeFluidCoolers {
 
         SetupOutputVariable(state,
                             "Cooling Tower Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             this->WaterMassFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1127,7 +1122,7 @@ namespace EvaporativeFluidCoolers {
 
         SetupOutputVariable(state,
                             "Cooling Tower Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->Qactual,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1135,7 +1130,7 @@ namespace EvaporativeFluidCoolers {
 
         SetupOutputVariable(state,
                             "Cooling Tower Fan Electricity Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->FanPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1143,20 +1138,19 @@ namespace EvaporativeFluidCoolers {
 
         SetupOutputVariable(state,
                             "Cooling Tower Fan Electricity Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->FanEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
+                            Constant::eResource::Electricity,
+                            OutputProcessor::SOVEndUseCat::HeatRejection,
                             {},
-                            "Electricity",
-                            "HeatRejection",
-                            {},
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
 
         SetupOutputVariable(state,
                             "Cooling Tower Water Evaporation Volume Flow Rate",
-                            OutputProcessor::Unit::m3_s,
+                            Constant::Units::m3_s,
                             this->EvaporationVdot,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1164,7 +1158,7 @@ namespace EvaporativeFluidCoolers {
 
         SetupOutputVariable(state,
                             "Cooling Tower Water Evaporation Volume",
-                            OutputProcessor::Unit::m3,
+                            Constant::Units::m3,
                             this->EvaporationVol,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
@@ -1172,7 +1166,7 @@ namespace EvaporativeFluidCoolers {
 
         SetupOutputVariable(state,
                             "Cooling Tower Water Drift Volume Flow Rate",
-                            OutputProcessor::Unit::m3_s,
+                            Constant::Units::m3_s,
                             this->DriftVdot,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1180,7 +1174,7 @@ namespace EvaporativeFluidCoolers {
 
         SetupOutputVariable(state,
                             "Cooling Tower Water Drift Volume",
-                            OutputProcessor::Unit::m3,
+                            Constant::Units::m3,
                             this->DriftVol,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
@@ -1188,7 +1182,7 @@ namespace EvaporativeFluidCoolers {
 
         SetupOutputVariable(state,
                             "Cooling Tower Water Blowdown Volume Flow Rate",
-                            OutputProcessor::Unit::m3_s,
+                            Constant::Units::m3_s,
                             this->BlowdownVdot,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1196,7 +1190,7 @@ namespace EvaporativeFluidCoolers {
 
         SetupOutputVariable(state,
                             "Cooling Tower Water Blowdown Volume",
-                            OutputProcessor::Unit::m3,
+                            Constant::Units::m3,
                             this->BlowdownVol,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,

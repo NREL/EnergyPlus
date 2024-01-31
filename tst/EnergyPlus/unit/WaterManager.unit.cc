@@ -368,11 +368,11 @@ TEST_F(EnergyPlusFixture, WaterManager_MainsWater_Meter_Test)
 
     EXPECT_EQ(state->dataWaterData->WaterStorage.size(), 1u);
 
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters.size(), 11u);
+    EXPECT_EQ(state->dataOutputProcessor->meters.size(), 11u);
 
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(4).Name, "General:WaterSystems:MainsWater");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(4).ResourceType, "MainsWater");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(4).EndUse, "WaterSystems");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(4).EndUseSub, "General");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(4).Group, "");
+    EXPECT_EQ(state->dataOutputProcessor->meters[3]->Name, "General:WaterSystems:MainsWater");
+    EXPECT_TRUE(compare_enums(state->dataOutputProcessor->meters[3]->resource, Constant::eResource::MainsWater));
+    EXPECT_TRUE(compare_enums(state->dataOutputProcessor->meters[3]->sovEndUseCat, OutputProcessor::SOVEndUseCat::WaterSystem));
+    EXPECT_EQ(state->dataOutputProcessor->meters[3]->EndUseSub, "General");
+    EXPECT_TRUE(compare_enums(state->dataOutputProcessor->meters[3]->sovGroup, OutputProcessor::SOVGroup::Invalid));
 }

@@ -127,8 +127,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
     state->dataSurface->Surface(2).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
-    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).OriginalClass = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(2).OriginalClass = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
@@ -2314,8 +2314,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
     state->dataSurface->Surface(2).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
-    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).OriginalClass = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(2).OriginalClass = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     state->dataHeatBal->TotPeople = 1; // Total number of people statements
@@ -6121,8 +6121,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
     state->dataSurface->Surface(1).Tilt = 180.0;
     state->dataSurface->Surface(1).Sides = 4;
 
-    state->dataSurface->SurfWinOriginalClass.allocate(1);
-    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).OriginalClass = DataSurfaces::SurfaceClass::Window;
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
@@ -6199,8 +6198,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     state->dataSurface->Surface(1).Tilt = 180.0;
     state->dataSurface->Surface(1).Sides = 4;
 
-    state->dataSurface->SurfWinOriginalClass.allocate(1);
-    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).OriginalClass = DataSurfaces::SurfaceClass::Window;
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
@@ -10546,8 +10544,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
     state->dataSurface->Surface(3).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
-    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
-    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).OriginalClass = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(2).OriginalClass = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
@@ -10663,8 +10661,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportZoneERV)
     state->dataSurface->Surface(1).Tilt = 180.0;
     state->dataSurface->Surface(1).Sides = 4;
 
-    state->dataSurface->SurfWinOriginalClass.allocate(1);
-    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).OriginalClass = DataSurfaces::SurfaceClass::Window;
 
     // Create air system
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -10844,8 +10841,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportZoneERV)
     state->dataSurface->Surface(1).Tilt = 180.0;
     state->dataSurface->Surface(1).Sides = 4;
 
-    state->dataSurface->SurfWinOriginalClass.allocate(1);
-    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).OriginalClass = DataSurfaces::SurfaceClass::Window;
 
     // Create air system
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -11012,8 +11008,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportUnbalancedZoneERV)
     state->dataSurface->Surface(1).Tilt = 180.0;
     state->dataSurface->Surface(1).Sides = 4;
 
-    state->dataSurface->SurfWinOriginalClass.allocate(1);
-    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).OriginalClass = DataSurfaces::SurfaceClass::Window;
 
     // Create air system
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -11193,8 +11188,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportHPWH)
     state->dataSurface->Surface(1).Tilt = 180.0;
     state->dataSurface->Surface(1).Sides = 4;
 
-    state->dataSurface->SurfWinOriginalClass.allocate(1);
-    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).OriginalClass = DataSurfaces::SurfaceClass::Window;
 
     // Create air system
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -11331,8 +11325,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWH)
     state->dataSurface->Surface(1).Tilt = 180.0;
     state->dataSurface->Surface(1).Sides = 4;
 
-    state->dataSurface->SurfWinOriginalClass.allocate(1);
-    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).OriginalClass = DataSurfaces::SurfaceClass::Window;
 
     // Create air system
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -11460,8 +11453,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWHZoneAndOA)
     state->dataSurface->Surface(1).Tilt = 180.0;
     state->dataSurface->Surface(1).Sides = 4;
 
-    state->dataSurface->SurfWinOriginalClass.allocate(1);
-    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).OriginalClass = DataSurfaces::SurfaceClass::Window;
 
     // Create air system
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);

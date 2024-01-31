@@ -371,28 +371,28 @@ namespace ThermalChimney {
         for (Loop = 1; Loop <= state.dataThermalChimneys->TotThermalChimney; ++Loop) {
             SetupOutputVariable(state,
                                 "Zone Thermal Chimney Current Density Air Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
+                                Constant::Units::m3_s,
                                 state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCVolumeFlow,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataThermalChimneys->ThermalChimneySys(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Thermal Chimney Standard Density Air Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
+                                Constant::Units::m3_s,
                                 state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCVolumeFlowStd,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataThermalChimneys->ThermalChimneySys(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Thermal Chimney Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCMassFlow,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataThermalChimneys->ThermalChimneySys(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Thermal Chimney Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 state.dataThermalChimneys->ThermalChimneyReport(Loop).OutletAirTempThermalChim,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -411,7 +411,7 @@ namespace ThermalChimney {
             for (TCZoneNum = 1; TCZoneNum <= state.dataThermalChimneys->ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
                 SetupOutputVariable(state,
                                     "Zone Thermal Chimney Heat Loss Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     state.dataThermalChimneys->ZnRptThermChim(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum))
                                         .ThermalChimneyHeatLoss,
                                     OutputProcessor::SOVTimeStepType::System,
@@ -419,7 +419,7 @@ namespace ThermalChimney {
                                     state.dataHeatBal->Zone(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Chimney Heat Gain Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     state.dataThermalChimneys->ZnRptThermChim(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum))
                                         .ThermalChimneyHeatGain,
                                     OutputProcessor::SOVTimeStepType::System,
@@ -427,7 +427,7 @@ namespace ThermalChimney {
                                     state.dataHeatBal->Zone(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Chimney Volume",
-                                    OutputProcessor::Unit::m3,
+                                    Constant::Units::m3,
                                     state.dataThermalChimneys->ZnRptThermChim(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum))
                                         .ThermalChimneyVolume,
                                     OutputProcessor::SOVTimeStepType::System,
@@ -435,7 +435,7 @@ namespace ThermalChimney {
                                     state.dataHeatBal->Zone(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Chimney Mass",
-                                    OutputProcessor::Unit::kg,
+                                    Constant::Units::kg,
                                     state.dataThermalChimneys->ZnRptThermChim(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum))
                                         .ThermalChimneyMass,
                                     OutputProcessor::SOVTimeStepType::System,
@@ -445,7 +445,7 @@ namespace ThermalChimney {
                     SetupOutputVariable(
                         state,
                         "Zone Infiltration Sensible Heat Loss Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         state.dataHeatBal->ZnAirRpt(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilHeatLoss,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
@@ -453,7 +453,7 @@ namespace ThermalChimney {
                     SetupOutputVariable(
                         state,
                         "Zone Infiltration Sensible Heat Gain Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         state.dataHeatBal->ZnAirRpt(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilHeatGain,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
@@ -461,7 +461,7 @@ namespace ThermalChimney {
                     SetupOutputVariable(
                         state,
                         "Zone Infiltration Latent Heat Loss Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         state.dataHeatBal->ZnAirRpt(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilLatentLoss,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
@@ -469,7 +469,7 @@ namespace ThermalChimney {
                     SetupOutputVariable(
                         state,
                         "Zone Infiltration Latent Heat Gain Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         state.dataHeatBal->ZnAirRpt(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilLatentGain,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
@@ -477,7 +477,7 @@ namespace ThermalChimney {
                     SetupOutputVariable(
                         state,
                         "Zone Infiltration Total Heat Loss Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         state.dataHeatBal->ZnAirRpt(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilTotalLoss,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
@@ -485,7 +485,7 @@ namespace ThermalChimney {
                     SetupOutputVariable(
                         state,
                         "Zone Infiltration Total Heat Gain Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         state.dataHeatBal->ZnAirRpt(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilTotalGain,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
@@ -493,7 +493,7 @@ namespace ThermalChimney {
                     SetupOutputVariable(
                         state,
                         "Zone Infiltration Current Density Volume Flow Rate",
-                        OutputProcessor::Unit::m3_s,
+                        Constant::Units::m3_s,
                         state.dataHeatBal->ZnAirRpt(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilVdotCurDensity,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -501,7 +501,7 @@ namespace ThermalChimney {
                     SetupOutputVariable(
                         state,
                         "Zone Infiltration Standard Density Volume Flow Rate",
-                        OutputProcessor::Unit::m3_s,
+                        Constant::Units::m3_s,
                         state.dataHeatBal->ZnAirRpt(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilVdotStdDensity,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -509,7 +509,7 @@ namespace ThermalChimney {
                     SetupOutputVariable(
                         state,
                         "Zone Infiltration Current Density Volume",
-                        OutputProcessor::Unit::m3,
+                        Constant::Units::m3,
                         state.dataHeatBal->ZnAirRpt(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilVolumeCurDensity,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
@@ -517,21 +517,21 @@ namespace ThermalChimney {
                     SetupOutputVariable(
                         state,
                         "Zone Infiltration Standard Density Volume",
-                        OutputProcessor::Unit::m3,
+                        Constant::Units::m3,
                         state.dataHeatBal->ZnAirRpt(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilVolumeStdDensity,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         state.dataHeatBal->Zone(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
                     SetupOutputVariable(state,
                                         "Zone Infiltration Mass",
-                                        OutputProcessor::Unit::kg,
+                                        Constant::Units::kg,
                                         state.dataHeatBal->ZnAirRpt(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilMass,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         state.dataHeatBal->Zone(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).Name);
                     SetupOutputVariable(state,
                                         "Zone Infiltration Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         state.dataHeatBal->ZnAirRpt(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilMdot,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -539,7 +539,7 @@ namespace ThermalChimney {
                     SetupOutputVariable(
                         state,
                         "Zone Infiltration Air Change Rate",
-                        OutputProcessor::Unit::ach,
+                        Constant::Units::ach,
                         state.dataHeatBal->ZnAirRpt(state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum)).InfilAirChangeRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,

@@ -49,7 +49,6 @@
 #define PlantOperationCallingOrder_hh_INCLUDED
 
 #include <EnergyPlus/Plant/Enums.hh>
-#include <EnergyPlus/Plant/MeterData.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {

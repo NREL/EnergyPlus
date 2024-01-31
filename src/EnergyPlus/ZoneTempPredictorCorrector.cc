@@ -1981,7 +1981,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     // CurrentModuleObject='ZoneControl:Thermostat:OperativeTemperature'
                     SetupOutputVariable(state,
                                         "Zone Thermostat Operative Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataHeatBal->ZnAirRpt(TempControlledZone(TempControlledZoneNum).ActualZoneNum).ThermOperativeTemp,
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
@@ -2089,7 +2089,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     // CurrentModuleObject='ZoneControl:Thermostat:OperativeTemperature'
                     SetupOutputVariable(state,
                                         "Zone Thermostat Operative Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataHeatBal->ZnAirRpt(TempControlledZone(TempControlledZoneNum).ActualZoneNum).ThermOperativeTemp,
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
@@ -2910,42 +2910,42 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             }
             SetupOutputVariable(state,
                                 "Zone Thermostat Air Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 state.dataHeatBalFanSys->TempTstatAir(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Control Type",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 TempControlTypeRpt(zoneNum),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Heating Setpoint Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 ZoneThermostatSetPointLo(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Cooling Setpoint Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 ZoneThermostatSetPointHi(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Adaptive Comfort Operative Temperature Set Point",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 state.dataHeatBalFanSys->AdapComfortCoolingSetPoint(zoneNum),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Sensible Load Room Air Correction Factor",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 state.dataHeatBalFanSys->LoadCorrectionFactor(zoneNum),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -2960,21 +2960,21 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                 auto &thisZone = state.dataHeatBal->Zone(zoneNum);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Control Type",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataHeatBalFanSys->ComfortControlTypeRpt(zoneNum),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     thisZone.Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Control Fanger Low Setpoint PMV",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataHeatBalFanSys->ZoneComfortControlsFanger(zoneNum).LowPMV,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     thisZone.Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Control Fanger High Setpoint PMV",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     state.dataHeatBalFanSys->ZoneComfortControlsFanger(zoneNum).HighPMV,
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
@@ -2986,28 +2986,28 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         for (int Loop = 1; Loop <= state.dataHeatBal->NumOfZoneLists; ++Loop) {
             SetupOutputVariable(state,
                                 "Zone List Sensible Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataHeatBal->ZoneListSNLoadHeatEnergy(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 ZoneList(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone List Sensible Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataHeatBal->ZoneListSNLoadCoolEnergy(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 ZoneList(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone List Sensible Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataHeatBal->ZoneListSNLoadHeatRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 ZoneList(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone List Sensible Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataHeatBal->ZoneListSNLoadCoolRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -3018,28 +3018,28 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         for (int Loop = 1; Loop <= state.dataHeatBal->NumOfZoneGroups; ++Loop) {
             SetupOutputVariable(state,
                                 "Zone Group Sensible Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataHeatBal->ZoneGroupSNLoadHeatEnergy(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneGroup(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataHeatBal->ZoneGroupSNLoadCoolEnergy(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneGroup(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataHeatBal->ZoneGroupSNLoadHeatRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->ZoneGroup(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataHeatBal->ZoneGroupSNLoadCoolRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -3252,32 +3252,32 @@ void ZoneSpaceHeatBalanceData::beginEnvironmentInit(EnergyPlusData &state)
     this->T1 = 0.0;
 }
 
-void ZoneSpaceHeatBalanceData::setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name)
+void ZoneSpaceHeatBalanceData::setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string const &name)
 {
     SetupOutputVariable(state,
                         format("{} Air Temperature", prefix),
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->ZT,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Air Humidity Ratio", prefix),
-                        OutputProcessor::Unit::None,
+                        Constant::Units::None,
                         this->airHumRat,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Air Relative Humidity", prefix),
-                        OutputProcessor::Unit::Perc,
+                        Constant::Units::Perc,
                         this->airRelHum,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Mean Radiant Temperature", prefix),
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->MRT,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::State,
@@ -5025,114 +5025,96 @@ void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
     // The down step ratio, DSRatio = OldTimeStep/ NewTimeStep
     //  is expected to be roughly integer-valued and near 2.0 or 3.0 or 4.0 or more.
 
-    // first construct data on timestamps for interpolating with later
-    Real64 const oldTime0 = 0.0;
-    Real64 const oldTime1 = oldTime0 - OldTimeStep;
+    // old math variables
+    // Real64 const oldTime0 = 0.0;
+    // Real64 const oldTime1 = oldTime0 - OldTimeStep;
+    // Real64 const newTime0 = 0.0;
+    // Real64 const newTime1 = newTime0 - NewTimeStep;
+    // Real64 const newTime2 = newTime1 - NewTimeStep;
+    // Real64 const newTime3 = newTime2 - NewTimeStep;
+    // Real64 const newTime4 = newTime3 - NewTimeStep;
 
-    Real64 const newTime0 = 0.0;
-    Real64 const newTime1 = newTime0 - NewTimeStep;
-    Real64 const newTime2 = newTime1 - NewTimeStep;
-    Real64 const newTime3 = newTime2 - NewTimeStep;
-    Real64 const newTime4 = newTime3 - NewTimeStep;
-
+    Real64 constexpr realTWO = 2.0;
+    Real64 constexpr realTHREE = 3.0;
+    // first determine the ratio of system time step to zone time step
     Real64 const DSRatio = OldTimeStep / NewTimeStep; // should pretty much be an integer value 2, 3, 4, etc.
 
     newVal0 = oldVal0;
 
-    if (std::abs(DSRatio - 2.0) < 0.01) { // DSRatio = 2
+    if (std::abs(DSRatio - realTWO) < 0.01) { // DSRatio = 2
+        // when DSRatio = 2 the 1st point lies exactly between old points, and 2nd point is old 1st point
         // first two points lie between oldVal0 and oldVal1
-        newVal1 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime1) / (OldTimeStep));
-        newVal2 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime2) / (OldTimeStep));
+        // old math example
+        // newVal1 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime1) / (OldTimeStep));
+        // newVal2 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime2) / (OldTimeStep));
+        newVal1 = (oldVal0 + oldVal1) / realTWO;
+        newVal2 = oldVal1;
+        // when DSRatio = 2 the 3rd point lies exactly between old points, and 4th point is old 2nd point
         // last two points lie between oldVal1 and oldVal2
-        newVal3 = oldVal1 + (oldVal2 - oldVal1) * ((oldTime1 - newTime3) / (OldTimeStep));
-        newVal4 = oldVal1 + (oldVal2 - oldVal1) * ((oldTime1 - newTime4) / (OldTimeStep));
-    } else if (std::abs(DSRatio - 3.0) < 0.01) { // DSRatio = 3
+        // newVal3 = oldVal1 + (oldVal2 - oldVal1) * ((oldTime1 - newTime3) / (OldTimeStep));
+        // newVal4 = oldVal1 + (oldVal2 - oldVal1) * ((oldTime1 - newTime4) / (OldTimeStep));
+        newVal3 = (oldVal1 + oldVal2) / realTWO;
+        newVal4 = oldVal2;
+    } else if (std::abs(DSRatio - realTHREE) < 0.01) { // DSRatio = 3
+        // when DSRatio = 3 the 1st point lies 1/3 way between old points, and 2nd and 3rd points are 2/3 and 3/3 the way
         // first three points lie between oldVal0 and oldVal1
-        newVal1 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime1) / (OldTimeStep));
-        newVal2 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime2) / (OldTimeStep));
-        newVal3 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime3) / (OldTimeStep));
-        // last point lie between oldVal1 and oldVal2
-        newVal4 = oldVal1 + (oldVal2 - oldVal1) * ((oldTime1 - newTime4) / (OldTimeStep));
+        // newVal1 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime1) / (OldTimeStep));
+        // newVal2 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime2) / (OldTimeStep));
+        // newVal3 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime3) / (OldTimeStep));
+        Real64 delta10 = (oldVal1 - oldVal0) / realTHREE;
+        newVal1 = oldVal0 + delta10;
+        newVal2 = newVal1 + delta10;
+        newVal3 = oldVal1;
+        // last point lies 1/3 way between oldVal1 and oldVal2
+        // newVal4 = oldVal1 + (oldVal2 - oldVal1) * ((oldTime1 - newTime4) / (OldTimeStep));
+        newVal4 = oldVal1 + (oldVal2 - oldVal1) / realTHREE;
 
     } else { // DSRatio = 4 or more
-        // all new points lie between oldVal0 and oldVal1
-        newVal1 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime1) / (OldTimeStep));
-        newVal2 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime2) / (OldTimeStep));
-        newVal3 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime3) / (OldTimeStep));
-        newVal4 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime4) / (OldTimeStep));
+        // all new points lie between oldVal0 and oldVal1 (if DSRatio = 4, newVal4 = oldVal1)
+        // newVal1 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime1) / (OldTimeStep));
+        // newVal2 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime2) / (OldTimeStep));
+        // newVal3 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime3) / (OldTimeStep));
+        // newVal4 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime4) / (OldTimeStep));
+        Real64 delta10 = (oldVal1 - oldVal0) / DSRatio;
+        newVal1 = oldVal0 + delta10;
+        newVal2 = newVal1 + delta10;
+        newVal3 = newVal2 + delta10;
+        newVal4 = newVal3 + delta10;
     }
 }
 
 Real64 DownInterpolate4HistoryValues(Real64 OldTimeStep, Real64 NewTimeStep, std::array<Real64, 4> const &oldVals, std::array<Real64, 4> &newVals)
 {
-    // first construct data on timestamps for interpolating with later
-    Real64 const oldTime0 = 0.0;
-    Real64 const oldTime1 = oldTime0 - OldTimeStep;
-
-    Real64 const newTime0 = 0.0;
-    Real64 const newTime1 = newTime0 - NewTimeStep;
-    Real64 const newTime2 = newTime1 - NewTimeStep;
-    Real64 const newTime3 = newTime2 - NewTimeStep;
-    Real64 const newTime4 = newTime3 - NewTimeStep;
-
+    Real64 constexpr realTWO = 2.0;
+    Real64 constexpr realTHREE = 3.0;
+    // first determine the ratio of system time step to zone time step
     Real64 const DSRatio = OldTimeStep / NewTimeStep; // should pretty much be an integer value 2, 3, 4, etc.
 
-    if (std::abs(DSRatio - 2.0) < 0.01) { // DSRatio = 2
-        // first two points lie between oldVals[0] and oldVals[1]
-        Real64 delta10 = oldVals[1] - oldVals[0];
-        newVals[0] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
-        newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime2) / OldTimeStep);
-        // last two points lie between oldVals[1] and oldVals[2]
-        Real64 delta21 = oldVals[2] - oldVals[1];
-        newVals[2] = oldVals[1] + delta21 * ((oldTime1 - newTime3) / OldTimeStep);
-        newVals[3] = oldVals[1] + delta21 * ((oldTime1 - newTime4) / OldTimeStep);
-    } else if (std::abs(DSRatio - 3.0) < 0.01) { // DSRatio = 3
-        // first three points lie between oldVals[0] and oldVals[1]
-        Real64 delta10 = oldVals[1] - oldVals[0];
-        newVals[0] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
-        newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime2) / OldTimeStep);
-        newVals[2] = oldVals[0] + delta10 * ((oldTime0 - newTime3) / OldTimeStep);
-        // last point lie between oldVals[1] and oldVals[2]
-        Real64 delta21 = (oldVals[2] - oldVals[1]) / OldTimeStep;
-        newVals[3] = oldVals[1] + delta21 * ((oldTime1 - newTime4) / OldTimeStep);
+    newVals[0] = oldVals[0];
+
+    if (std::abs(DSRatio - realTWO) < 0.01) { // DSRatio = 2
+        // first point lies exactly between (oldVals[0] and oldVals[1])
+        newVals[1] = (oldVals[0] + oldVals[1]) / realTWO;
+        // 2nd point is oldVal[1] and last point lies exactly between (oldVals[1] and oldVals[2])
+        newVals[2] = oldVals[1];
+        newVals[3] = (oldVals[1] + oldVals[2]) / realTWO;
+
+    } else if (std::abs(DSRatio - realTHREE) < 0.01) { // DSRatio = 3
+        // first two points lie between (oldVals[0] and oldVals[1])
+        Real64 delta10 = (oldVals[1] - oldVals[0]) / realTHREE;
+        newVals[1] = oldVals[0] + delta10;
+        newVals[2] = newVals[1] + delta10;
+        // last point is oldVals[1]
+        newVals[3] = oldVals[1];
 
     } else { // DSRatio = 4 or more
-        // all new points lie between oldVals[0] and oldVals[1]
-        Real64 delta10 = oldVals[1] - oldVals[0];
-        newVals[0] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
-        newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime2) / OldTimeStep);
-        newVals[2] = oldVals[0] + delta10 * ((oldTime0 - newTime3) / OldTimeStep);
-        newVals[3] = oldVals[0] + delta10 * ((oldTime0 - newTime4) / OldTimeStep);
+        // all new points lie between (oldVals[0] and oldVals[1])
+        Real64 delta10 = (oldVals[1] - oldVals[0]) / DSRatio;
+        newVals[1] = oldVals[0] + delta10;
+        newVals[2] = newVals[1] + delta10;
+        newVals[3] = newVals[2] + delta10;
     }
     return oldVals[0];
-
-    // if (std::abs(DSRatio - 2.0) < 0.01) { // DSRatio = 2
-    //     // first two points lie between oldVals[0] and oldVals[1]
-    //     Real64 ratio10 = (oldVals[1] - oldVals[0]) / OldTimeStep;
-    //     newVals[0] = oldVals[0] + ratio10 * (oldTime0 - newTime1);
-    //     newVals[1] = oldVals[0] + ratio10 * (oldTime0 - newTime2);
-    //     // last two points lie between oldVals[1] and oldVals[2]
-    //     Real64 ratio21 = (oldVals[2] - oldVals[1]) / OldTimeStep;
-    //     newVals[2] = oldVals[1] + ratio21 * (oldTime1 - newTime3);
-    //     newVals[3] = oldVals[1] + ratio21 * (oldTime1 - newTime4);
-    // } else if (std::abs(DSRatio - 3.0) < 0.01) { // DSRatio = 3
-    //     // first three points lie between oldVals[0] and oldVals[1]
-    //     Real64 ratio10 = (oldVals[1] - oldVals[0]) / OldTimeStep;
-    //     newVals[0] = oldVals[0] + ratio10 * (oldTime0 - newTime1);
-    //     newVals[1] = oldVals[0] + ratio10 * (oldTime0 - newTime2);
-    //     newVals[2] = oldVals[0] + ratio10 * (oldTime0 - newTime3);
-    //     // last point lie between oldVals[1] and oldVals[2]
-    //     Real64 ratio21 = (oldVals[2] - oldVals[1]) / OldTimeStep;
-    //     newVals[3] = oldVals[1] + ratio21 * (oldTime1 - newTime4);
-
-    //} else { // DSRatio = 4 or more
-    //    // all new points lie between oldVals[0] and oldVals[1]
-    //    Real64 ratio10 = (oldVals[1] - oldVals[0]) / OldTimeStep;
-    //    newVals[0] = oldVals[0] + ratio10 * (oldTime0 - newTime1);
-    //    newVals[1] = oldVals[0] + ratio10 * (oldTime0 - newTime2);
-    //    newVals[2] = oldVals[0] + ratio10 * (oldTime0 - newTime3);
-    //    newVals[3] = oldVals[0] + ratio10 * (oldTime0 - newTime4);
-    //}
 }
 void InverseModelTemperature(EnergyPlusData &state,
                              int const ZoneNum,                   // Zone number
@@ -6087,21 +6069,21 @@ void DetectOscillatingZoneTemp(EnergyPlusData &state)
             auto &zone = state.dataHeatBal->Zone(iZone);
             SetupOutputVariable(state,
                                 "Zone Oscillating Temperatures Time",
-                                OutputProcessor::Unit::hr,
+                                Constant::Units::hr,
                                 state.dataZoneTempPredictorCorrector->ZoneTempOscillate(iZone),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 zone.Name);
             SetupOutputVariable(state,
                                 "Zone Oscillating Temperatures During Occupancy Time",
-                                OutputProcessor::Unit::hr,
+                                Constant::Units::hr,
                                 state.dataZoneTempPredictorCorrector->ZoneTempOscillateDuringOccupancy(iZone),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 zone.Name);
             SetupOutputVariable(state,
                                 "Zone Oscillating Temperatures in Deadband Time",
-                                OutputProcessor::Unit::hr,
+                                Constant::Units::hr,
                                 state.dataZoneTempPredictorCorrector->ZoneTempOscillateInDeadband(iZone),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -6110,21 +6092,21 @@ void DetectOscillatingZoneTemp(EnergyPlusData &state)
         // set up a variable covering all zones
         SetupOutputVariable(state,
                             "Facility Any Zone Oscillating Temperatures Time",
-                            OutputProcessor::Unit::hr,
+                            Constant::Units::hr,
                             state.dataZoneTempPredictorCorrector->AnyZoneTempOscillate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             "Facility");
         SetupOutputVariable(state,
                             "Facility Any Zone Oscillating Temperatures During Occupancy Time",
-                            OutputProcessor::Unit::hr,
+                            Constant::Units::hr,
                             state.dataZoneTempPredictorCorrector->AnyZoneTempOscillateDuringOccupancy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             "Facility");
         SetupOutputVariable(state,
                             "Facility Any Zone Oscillating Temperatures in Deadband Time",
-                            OutputProcessor::Unit::hr,
+                            Constant::Units::hr,
                             state.dataZoneTempPredictorCorrector->AnyZoneTempOscillateInDeadband,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,

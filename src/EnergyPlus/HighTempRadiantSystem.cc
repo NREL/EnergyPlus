@@ -513,6 +513,7 @@ namespace HighTempRadiantSystem {
 
                 if (highTempRadSys.SurfacePtr(SurfNum) != 0) {
                     state.dataSurface->surfIntConv(highTempRadSys.SurfacePtr(SurfNum)).getsRadiantHeat = true;
+                    state.dataSurface->allGetsRadiantHeatSurfaceList.emplace_back(highTempRadSys.SurfacePtr(SurfNum));
                 }
 
                 AllFracsSummed += highTempRadSys.FracDistribToSurf(SurfNum);
@@ -556,63 +557,60 @@ namespace HighTempRadiantSystem {
             auto &highTempRadSys = state.dataHighTempRadSys->HighTempRadSys(Item);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 highTempRadSys.HeatPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 highTempRadSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 highTempRadSys.HeatEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 highTempRadSys.Name,
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils,
                                 {},
-                                "ENERGYTRANSFER",
-                                "HEATINGCOILS",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             if (highTempRadSys.HeaterType == Constant::eResource::NaturalGas) {
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC NaturalGas Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     highTempRadSys.GasPower,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     highTempRadSys.Name);
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC NaturalGas Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     highTempRadSys.GasEnergy,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     highTempRadSys.Name,
+                                    Constant::eResource::NaturalGas,
+                                    OutputProcessor::SOVEndUseCat::Heating,
                                     {},
-                                    "NaturalGas",
-                                    "Heating",
-                                    {},
-                                    "System");
+                                    OutputProcessor::SOVGroup::HVAC);
             } else if (highTempRadSys.HeaterType == Constant::eResource::Electricity) {
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC Electricity Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     highTempRadSys.ElecPower,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     highTempRadSys.Name);
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     highTempRadSys.ElecEnergy,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     highTempRadSys.Name,
+                                    Constant::eResource::Electricity,
+                                    OutputProcessor::SOVEndUseCat::Heating,
                                     {},
-                                    "ELECTRICITY",
-                                    "Heating",
-                                    {},
-                                    "System");
+                                    OutputProcessor::SOVGroup::HVAC);
             }
         }
     }
@@ -1139,7 +1137,12 @@ namespace HighTempRadiantSystem {
         // Initialize arrays
         dataHBFS->SumConvHTRadSys = 0.0;
         dataHBFS->SumLatentHTRadSys = 0.0;
-        dataHBFS->SurfQHTRadSys = 0.0;
+        for (auto &thisHTR : state.dataHighTempRadSys->HighTempRadSys) {
+            for (int radSurfNum = 1; radSurfNum <= thisHTR.TotSurfToDistrib; ++radSurfNum) {
+                int surfNum = thisHTR.SurfacePtr(radSurfNum);
+                state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).HTRadSys = 0.0;
+            }
+        }
         dataHBFS->ZoneQHTRadSysToPerson = 0.0;
 
         for (auto &thisHTR : state.dataHighTempRadSys->HighTempRadSys) {
@@ -1154,8 +1157,7 @@ namespace HighTempRadiantSystem {
                 if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
                     ThisSurfIntensity = (thisHTR.QHTRRadSource * thisHTR.FracRadiant * thisHTR.FracDistribToSurf(RadSurfNum) /
                                          state.dataSurface->Surface(SurfNum).Area);
-                    dataHBFS->SurfQHTRadSys(SurfNum) += ThisSurfIntensity;
-                    state.dataHeatBalSurf->AnyRadiantSystems = true;
+                    state.dataHeatBalFanSys->surfQRadFromHVAC(SurfNum).HTRadSys += ThisSurfIntensity;
 
                     if (ThisSurfIntensity > DataHeatBalFanSys::MaxRadHeatFlux) { // CR 8074, trap excessive intensity (throws off surface balance )
                         ShowSevereError(state, "DistributeHTRadGains:  excessive thermal radiation heat flux intensity detected");

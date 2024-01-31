@@ -269,7 +269,7 @@ namespace RoomAir {
                                 state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).SurfMask = state.dataRoomAir->AirNode(AirNodeNum).SurfMask;
                                 SetupOutputVariable(state,
                                                     "Room Air Node Air Temperature",
-                                                    OutputProcessor::Unit::C,
+                                                    Constant::Units::C,
                                                     state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).Temp,
                                                     OutputProcessor::SOVTimeStepType::HVAC,
                                                     OutputProcessor::SOVStoreType::Average,
