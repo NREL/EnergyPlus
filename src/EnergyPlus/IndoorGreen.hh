@@ -116,8 +116,6 @@ namespace IndoorGreen {
     
     Real64 ETStanghellini(EnergyPlusData &state, Real64 &ZonePreTemp, Real64 &ZonePreHum, Real64 &ZoneCO2, Real64 &ZonePPFD, Real64 &VPD, Real64 &LAI);
 
-    //Real64 ETDatadriven(EnergyPlusData &state, Real64 &ZonePreTemp, Real64 &ZonePreHum, Real64 &ZoneCO2, Real64 &ZonePPFD, Real64 &VPD);
-
 } // namespace IndoorGreen
 
 struct IndoorGreenData : BaseGlobalStruct
