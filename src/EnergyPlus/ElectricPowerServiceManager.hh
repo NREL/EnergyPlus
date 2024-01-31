@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -747,13 +747,13 @@ public: // Creation
     // Default Constructor
     ElectricPowerServiceManager()
         : newEnvironmentInternalGainsFlag(true), numElecStorageDevices(0), getInputFlag_(true), newEnvironmentFlag_(true), numLoadCenters_(0),
-          numTransformers_(0), setupMeterIndexFlag_(true), elecFacilityIndex_(0), elecProducedCoGenIndex_(0), elecProducedPVIndex_(0),
-          elecProducedWTIndex_(0), elecProducedStorageIndex_(0), elecProducedPowerConversionIndex_(0), name_("Whole Building"),
-          facilityPowerInTransformerPresent_(false), numPowerOutTransformers_(0), wholeBldgRemainingLoad_(0.0), electricityProd_(0.0),
-          electProdRate_(0.0), electricityPurch_(0.0), electPurchRate_(0.0), electSurplusRate_(0.0), electricitySurplus_(0.0),
-          electricityNetRate_(0.0), electricityNet_(0.0), totalBldgElecDemand_(0.0), totalHVACElecDemand_(0.0), totalElectricDemand_(0.0),
-          elecProducedPVRate_(0.0), elecProducedWTRate_(0.0), elecProducedStorageRate_(0.0), elecProducedPowerConversionRate_(0.0),
-          elecProducedCoGenRate_(0.0), pvTotalCapacity_(0.0), windTotalCapacity_(0.0)
+          numTransformers_(0), setupMeterIndexFlag_(true), elecFacilityMeterIndex_(-1), elecProducedCoGenMeterIndex_(-1),
+          elecProducedPVMeterIndex_(-1), elecProducedWTMeterIndex_(-1), elecProducedStorageMeterIndex_(-1),
+          elecProducedPowerConversionMeterIndex_(-1), name_("Whole Building"), facilityPowerInTransformerPresent_(false), numPowerOutTransformers_(0),
+          wholeBldgRemainingLoad_(0.0), electricityProd_(0.0), electProdRate_(0.0), electricityPurch_(0.0), electPurchRate_(0.0),
+          electSurplusRate_(0.0), electricitySurplus_(0.0), electricityNetRate_(0.0), electricityNet_(0.0), totalBldgElecDemand_(0.0),
+          totalHVACElecDemand_(0.0), totalElectricDemand_(0.0), elecProducedPVRate_(0.0), elecProducedWTRate_(0.0), elecProducedStorageRate_(0.0),
+          elecProducedPowerConversionRate_(0.0), elecProducedCoGenRate_(0.0), pvTotalCapacity_(0.0), windTotalCapacity_(0.0)
     {
     }
 
@@ -794,12 +794,12 @@ private:                      // data
     int numLoadCenters_;
     int numTransformers_;
     bool setupMeterIndexFlag_; // control if object needs to make calls to GetMeterIndex
-    int elecFacilityIndex_;
-    int elecProducedCoGenIndex_;
-    int elecProducedPVIndex_;
-    int elecProducedWTIndex_;
-    int elecProducedStorageIndex_;
-    int elecProducedPowerConversionIndex_;
+    int elecFacilityMeterIndex_;
+    int elecProducedCoGenMeterIndex_;
+    int elecProducedPVMeterIndex_;
+    int elecProducedWTMeterIndex_;
+    int elecProducedStorageMeterIndex_;
+    int elecProducedPowerConversionMeterIndex_;
     std::string name_;
     bool facilityPowerInTransformerPresent_;
     std::string facilityPowerInTransformerName_; // hold name for verificaton and error messages

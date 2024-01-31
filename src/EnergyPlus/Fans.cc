@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -944,40 +944,39 @@ void GetFanInput(EnergyPlusData &state)
         // Setup Report variables for the Fans  CurrentModuleObject='Fans'
         SetupOutputVariable(state,
                             "Fan Electricity Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisFan.FanPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisFan.FanName);
         SetupOutputVariable(state,
                             "Fan Rise in Air Temperature",
-                            OutputProcessor::Unit::deltaC,
+                            Constant::Units::deltaC,
                             thisFan.DeltaTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisFan.FanName);
         SetupOutputVariable(state,
                             "Fan Heat Gain to Air",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisFan.PowerLossToAir,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisFan.FanName);
         SetupOutputVariable(state,
                             "Fan Electricity Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisFan.FanEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisFan.FanName,
-                            {},
-                            "Electricity",
-                            "Fans",
+                            Constant::eResource::Electricity,
+                            OutputProcessor::SOVEndUseCat::Fans,
                             thisFan.EndUseSubcategoryName,
-                            "System");
+                            OutputProcessor::SOVGroup::HVAC);
         SetupOutputVariable(state,
                             "Fan Air Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             thisFan.OutletAirMassFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -985,14 +984,14 @@ void GetFanInput(EnergyPlusData &state)
         if ((thisFan.FanType_Num == DataHVACGlobals::FanType_ZoneExhaust) && (thisFan.BalancedFractSchedNum > 0)) {
             SetupOutputVariable(state,
                                 "Fan Unbalanced Air Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisFan.UnbalancedOutletMassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisFan.FanName);
             SetupOutputVariable(state,
                                 "Fan Balanced Air Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisFan.BalancedOutletMassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1024,7 +1023,7 @@ void GetFanInput(EnergyPlusData &state)
         FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + OnOffFanNum;
         SetupOutputVariable(state,
                             "Fan Runtime Fraction",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             Fan(FanNum).FanRuntimeFraction,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,

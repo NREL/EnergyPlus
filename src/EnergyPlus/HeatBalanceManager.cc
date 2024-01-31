@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2006,7 +2006,7 @@ namespace HeatBalanceManager {
         state.dataGlobal->NumOfZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataHeatBal->Zone.allocate(state.dataGlobal->NumOfZones);
-        state.dataDaylightingData->ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
+        state.dataDayltg->ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
         // always allocate as the data structure is needed in output variable Zone Heat Index, Zone Humidity Index
         state.dataHeatBal->Resilience.allocate(state.dataGlobal->NumOfZones);
 
@@ -2523,28 +2523,28 @@ namespace HeatBalanceManager {
         // Zone outdoor environmental variables, used for zone infiltration/ventilation
         SetupOutputVariable(state,
                             "Zone Outdoor Air Drybulb Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp,
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataHeatBal->Zone(ZoneLoop).Name);
         SetupOutputVariable(state,
                             "Zone Outdoor Air Wetbulb Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             state.dataHeatBal->Zone(ZoneLoop).OutWetBulbTemp,
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataHeatBal->Zone(ZoneLoop).Name);
         SetupOutputVariable(state,
                             "Zone Outdoor Air Wind Speed",
-                            OutputProcessor::Unit::m_s,
+                            Constant::Units::m_s,
                             state.dataHeatBal->Zone(ZoneLoop).WindSpeed,
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataHeatBal->Zone(ZoneLoop).Name);
         SetupOutputVariable(state,
                             "Zone Outdoor Air Wind Direction",
-                            OutputProcessor::Unit::deg,
+                            Constant::Units::deg,
                             state.dataHeatBal->Zone(ZoneLoop).WindDir,
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Average,
@@ -2782,7 +2782,8 @@ namespace HeatBalanceManager {
             state.dataHeatBalMgr->CountWarmupDayPoints = 0;
 
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
-                state.dataSurface->SurfaceWindow(SurfNum).ThetaFace = 296.15;
+                std::fill(
+                    state.dataSurface->SurfaceWindow(SurfNum).thetaFace.begin(), state.dataSurface->SurfaceWindow(SurfNum).thetaFace.end(), 296.15);
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) = 23.0;
             }
         }
