@@ -229,10 +229,11 @@ void GetBoilerInput(EnergyPlusData &state)
             ErrorsFound = true;
         } else if (state.dataIPShortCut->rNumericArgs(2) > 1.0) {
             ShowWarningError(state,
-                             fmt::format("{} = {}: {} should not typically be greater than 1.",
+                             fmt::format("{} = {}: {}={} should not typically be greater than 1.",
                                          state.dataIPShortCut->cCurrentModuleObject,
                                          state.dataIPShortCut->cAlphaArgs(1),
-                                         state.dataIPShortCut->cNumericFieldNames(2)));
+                                         state.dataIPShortCut->cNumericFieldNames(2),
+                                         state.dataIPShortCut->rNumericArgs(2)));
         }
 
         if (state.dataIPShortCut->cAlphaArgs(3) == "ENTERINGBOILER") {
@@ -965,7 +966,8 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
 
     // warn if overall efficiency greater than 1.1
     if (!state.dataGlobal->WarmupFlag && BoilerEff > 1.1) {
-        if (this->BoilerLoad > 0.0 && this->EfficiencyCurvePtr > 0) {
+        if (this->BoilerLoad > 0.0 && this->EfficiencyCurvePtr > 0 &&
+            NomEffic <= 1.0) { // NomEffic > 1 warning occurs elsewhere; avoid cascading warnings
             if (this->CalculatedEffError < 1) {
                 ++this->CalculatedEffError;
                 ShowWarningError(state, format("Boiler:HotWater \"{}\"", this->Name));

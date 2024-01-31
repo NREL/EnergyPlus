@@ -2453,10 +2453,11 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
             Tank.Efficiency = state.dataIPShortCut->rNumericArgs(8);
             if (state.dataIPShortCut->rNumericArgs(8) > 1.0) {
                 ShowWarningError(state,
-                                 fmt::format("{} = {}: {} should not typically be greater than 1.",
+                                 fmt::format("{} = {}: {}={} should not typically be greater than 1.",
                                              state.dataIPShortCut->cCurrentModuleObject,
                                              state.dataIPShortCut->cAlphaArgs(1),
-                                             state.dataIPShortCut->cNumericFieldNames(8)));
+                                             state.dataIPShortCut->cNumericFieldNames(8),
+                                             state.dataIPShortCut->rNumericArgs(8)));
             }
         } else {
             ShowSevereError(state,
@@ -3025,10 +3026,11 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             Tank.Efficiency = state.dataIPShortCut->rNumericArgs(11);
             if (state.dataIPShortCut->rNumericArgs(11) > 1.0) {
                 ShowWarningError(state,
-                                 fmt::format("{} = {}: {} should not typically be greater than 1.",
+                                 fmt::format("{} = {}: {}={} should not typically be greater than 1.",
                                              state.dataIPShortCut->cCurrentModuleObject,
                                              state.dataIPShortCut->cAlphaArgs(1),
-                                             state.dataIPShortCut->cNumericFieldNames(11)));
+                                             state.dataIPShortCut->cNumericFieldNames(11),
+                                             state.dataIPShortCut->rNumericArgs(11)));
             }
         } else {
             ShowSevereError(state,
