@@ -383,7 +383,15 @@ namespace AirLoopHVACDOAS {
 
                 thisSplitter.name = Util::makeUPPER(thisObjectName);
                 thisSplitter.InletNodeName = Util::makeUPPER(fields.at("inlet_node_name").get<std::string>());
-                thisSplitter.InletNodeNum = Util::FindItemInList(thisSplitter.InletNodeName, state.dataLoopNodes->NodeID);
+                thisSplitter.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                                thisSplitter.InletNodeName,
+                                                                                errorsFound,
+                                                                                DataLoopNode::ConnectionObjectType::AirLoopHVACSplitter,
+                                                                                thisObjectName,
+                                                                                DataLoopNode::NodeFluidType::Air,
+                                                                                DataLoopNode::ConnectionType::Inlet,
+                                                                                NodeInputManager::CompFluidStream::Primary,
+                                                                                DataLoopNode::ObjectIsParent);
                 thisSplitter.m_AirLoopSplitter_Num = AirLoopSplitterNum - 1;
 
                 auto NodeNames = fields.find("nodes");
