@@ -449,7 +449,7 @@ namespace Constant {
         "V",                // V
         "deltaC",           // deltaC
         "kmol/s",           // kmol_s
-        "umol/m2-s",           // umol_m2s (micromol_m2s)
+        "umol/m2-s",        // umol_m2s (micromol_m2s)
         "rev/min",          // rev_min
         "Btu/h-W",          // Btu_h_W
         "W/m2-K",           // W_m2K

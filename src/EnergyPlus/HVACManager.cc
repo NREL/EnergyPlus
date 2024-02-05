@@ -78,6 +78,7 @@
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
+#include <EnergyPlus/IndoorGreen.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/NonZoneEquipmentManager.hh>
@@ -103,7 +104,6 @@
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <EnergyPlus/IndoorGreen.hh>
 
 namespace EnergyPlus::HVACManager {
 
@@ -247,8 +247,8 @@ void ManageHVAC(EnergyPlusData &state)
             }
         }
     }
-    //LW to do check and test for the right position 
-    IndoorGreen::SimIndoorGreen(state); 
+    // LW to do check and test for the right position
+    IndoorGreen::SimIndoorGreen(state);
     InternalHeatGains::UpdateInternalGainValues(state, true, true);
 
     ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
@@ -264,7 +264,6 @@ void ManageHVAC(EnergyPlusData &state)
                                                                        state.dataHVACGlobal->ShortenTimeStepSys,
                                                                        state.dataHVACGlobal->UseZoneTimeStepHistory,
                                                                        PriorTimeStep);
-
 
     SimHVAC(state);
     if (state.dataGlobal->AnyIdealCondEntSetPointInModel && state.dataGlobal->MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {

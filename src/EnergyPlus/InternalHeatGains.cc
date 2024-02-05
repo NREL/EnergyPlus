@@ -97,7 +97,6 @@
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
-
 namespace EnergyPlus {
 
 namespace InternalHeatGains {
