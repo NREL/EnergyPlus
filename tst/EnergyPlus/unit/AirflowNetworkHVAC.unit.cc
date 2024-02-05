@@ -16306,14 +16306,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultistageHeatingCoil)
 {
     // #10389
     std::string const idf_objects = delimited_string({
-        "Coil:Heating:Electric:MultiStage,", 
-        " ElectricCoil, !-Name", 
+        "Coil:Heating:Electric:MultiStage,",
+        " ElectricCoil, !-Name",
         " always_avail, !-Availability Schedule Name",
-        " heating coil air inlet node_unit1, !-Air Inlet Node Name", 
+        " heating coil air inlet node_unit1, !-Air Inlet Node Name",
         " Supp Heating Coil Air Inlet Node_unit1, !-Air Outlet Node Name,",
-        " !-Temperature Setpoint Node Name", 
+        " !-Temperature Setpoint Node Name",
         " 2, !-Number of Stages ",
-        " 1.00, !-Stage 1 Efficiency{W / W}", 
+        " 1.00, !-Stage 1 Efficiency{W / W}",
         " 4000.0, !-Stage 1 Nominal Capacity {W}",
         " 1.00, !-Stage 2 Efficiency{W / W}",
         " 6000.0; !-Stage 2 Nominal Capacity {W}",
