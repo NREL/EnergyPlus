@@ -76,7 +76,9 @@ namespace EnergyPlus {
 
 namespace IndoorGreen {
     // Module containing the routines dealing with the Indoor Living Walls
-
+    static constexpr std::array<std::string_view, static_cast<int>(ETCalculationMethod::Num)> etCalculationMethodsUC = {
+        "PENMAN-MONTEITH", "STANGHELLINI", "DATA-DRIVEN"};
+    static constexpr std::array<std::string_view, static_cast<int>(LightingMethod::Num)> lightingMethodsUC = {"LED", "DAYLIGHT", "LED-DAYLIGHT"};
     void SimIndoorGreen(EnergyPlusData &state)
     {
         // PURPOSE OF THIS SUBROUTINE:
@@ -209,31 +211,34 @@ namespace IndoorGreen {
                     }
                 }
             }
+
             ig.etCalculationMethod = ETCalculationMethod::PenmanMonteith; // default
-            if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "PENMAN-MONTEITH")) {
-                ig.etCalculationMethod = ETCalculationMethod::PenmanMonteith; // default
-            } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "STANGHELLINI")) {
-                ig.etCalculationMethod = ETCalculationMethod::Stanghellini;
-            } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "DATA-DRIVEN")) {
-                ig.etCalculationMethod = ETCalculationMethod::DataDriven;
-            } else {
-                ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4));
-                ErrorsFound = true;
-            }
-            // read lighting method (LED=1; Daylight=2; LED-Daylight=3)
+            ig.etCalculationMethod = static_cast<ETCalculationMethod>(getEnumValue(etCalculationMethodsUC, state.dataIPShortCut->cAlphaArgs(4)));
+            // if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "PENMAN-MONTEITH")) {
+            //     ig.etCalculationMethod = ETCalculationMethod::PenmanMonteith; // default
+            // } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "STANGHELLINI")) {
+            //     ig.etCalculationMethod = ETCalculationMethod::Stanghellini;
+            // } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "DATA-DRIVEN")) {
+            //     ig.etCalculationMethod = ETCalculationMethod::DataDriven;
+            // } else {
+            //     ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4));
+            //     ErrorsFound = true;
+            // }
+            //  read lighting method (LED=1; Daylight=2; LED-Daylight=3)
             ig.lightingMethod = LightingMethod::LED; // default
-            if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "LED")) {
-                ig.lightingMethod = LightingMethod::LED; // default
-            } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "DAYLIGHT")) {
-                ig.lightingMethod = LightingMethod::Daylighting;
-            } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "LED-DAYLIGHT")) {
-                ig.lightingMethod = LightingMethod::LEDDaylighting;
-            } else {
-                ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5));
-                ErrorsFound = true;
-            }
+            ig.lightingMethod = static_cast<LightingMethod>(getEnumValue(lightingMethodsUC, state.dataIPShortCut->cAlphaArgs(5)));
+            // if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "LED")) {
+            //     ig.lightingMethod = LightingMethod::LED; // default
+            // } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "DAYLIGHT")) {
+            //     ig.lightingMethod = LightingMethod::Daylighting;
+            // } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "LED-DAYLIGHT")) {
+            //     ig.lightingMethod = LightingMethod::LEDDaylighting;
+            // } else {
+            //     ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5));
+            //     ErrorsFound = true;
+            // }
             switch (ig.lightingMethod) {
-            case LightingMethod::LED : {
+            case LightingMethod::LED: {
                 ig.SchedLEDPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
                 if (ig.SchedLEDPtr == 0) {
                     ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6));
@@ -281,7 +286,7 @@ namespace IndoorGreen {
                     continue;
                 }
             } break;
-            case LightingMethod::LEDDaylighting : {
+            case LightingMethod::LEDDaylighting: {
                 ig.LightRefPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
                                                       state.dataDayltg->DaylRefPt,
                                                       &EnergyPlus::Dayltg::RefPointData::Name); // Field: Daylighting Reference Point Name
@@ -542,13 +547,13 @@ namespace IndoorGreen {
             }
             // ZonePPFD
             switch (ig.lightingMethod) {
-            case LightingMethod::LED : {
+            case LightingMethod::LED: {
                 ig.ZPPFD = ScheduleManager::GetCurrentScheduleValue(state, ig.SchedLEDPtr) * ig.LEDNominalPPFD; // PPFD
                 ig.LEDActualPPFD = ig.LEDNominalPPFD;
                 ig.LEDActualEleP = ig.LEDNominalEleP;
                 ig.LEDActualEleCon = ig.LEDNominalEleP * Timestep;
             } break;
-            case LightingMethod::Daylighting : {
+            case LightingMethod::Daylighting: {
                 ig.ZPPFD = 0;
                 ig.LEDActualPPFD = 0;
                 ig.LEDActualEleP = 0;
@@ -558,7 +563,7 @@ namespace IndoorGreen {
                                77; // To be updated currently only take one reference point; 77 conversion factor from Lux to PPFD
                 }
             } break;
-            case LightingMethod::LEDDaylighting : {
+            case LightingMethod::LEDDaylighting: {
                 Real64 a = ScheduleManager::GetCurrentScheduleValue(state, ig.SchedLEDDaylightTargetPtr);
                 Real64 b = 0;
                 if (!state.dataDayltg->CalcDayltghCoefficients_firstTime && state.dataEnvrn->SunIsUp) {
