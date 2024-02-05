@@ -47,30 +47,30 @@
 
 // C++ Headers
 
-#include <EnergyPlus/api/datatransfer.h>
-#include <EnergyPlus/IndoorGreen.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/EMSManager.hh>
-#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/IndoorGreen.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/api/datatransfer.h>
 
 namespace EnergyPlus {
 
@@ -80,13 +80,13 @@ namespace IndoorGreen {
     void SimIndoorGreen(EnergyPlusData &state)
     {
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine simulates the thermal performance of indoor living walls including the grow lights. 
+        // This subroutine simulates the thermal performance of indoor living walls including the grow lights.
         // This subroutine interacts with inside surface heat balance, zone air heat balance and zone air moisture balance in EnergyPlus.
         auto &lw = state.dataIndoorGreen;
-        if (lw->getInputFlag) { 
+        if (lw->getInputFlag) {
             bool ErrorsFound(false);
             const char *RoutineName("IndoorLivingWall: "); // include trailing blank space
-            GetIndoorGreenInput(state,ErrorsFound);
+            GetIndoorGreenInput(state, ErrorsFound);
             if (ErrorsFound) {
                 ShowFatalError(state, format("{}Errors found in input.  Program terminates.", RoutineName));
             }
@@ -97,61 +97,62 @@ namespace IndoorGreen {
 
             // Simulate evapotranspiration from indoor living walls
             ETModel(state);
-        } 
+        }
     }
 
     void GetIndoorGreenInput(EnergyPlusData &state, bool &ErrorsFound)
     {
         // PURPOSE OF THIS SUBROUTINE:
-        // Get the input for the indoor living wall objects and store the input data in the indoorgreen array.
+        // Get the input for the indoor living wall objects and store the input data in the indoorGreens array.
 
         // METHODOLOGY EMPLOYED:
         // Use the Get routines from the InputProcessor module.
         auto &lw = state.dataIndoorGreen;
         auto &ip = state.dataInputProcessing->inputProcessor;
         static constexpr std::string_view RoutineName("GetIndoorLivingWallInput: ");
-        std::string_view cCurrentModuleObject = "IndoorLivingWall"; //match the idd
-        int NumNums;        // Number of real numbers returned by GetObjectItem
-        int NumAlphas;      // Number of alphanumerics returned by GetObjectItem
-        //int IndoorGreenNum; // Indoor Green index
-        int IOStat;         // Status flag from GetObjectItem
+        std::string_view cCurrentModuleObject = "IndoorLivingWall"; // match the idd
+        int NumNums;                                                // Number of real numbers returned by GetObjectItem
+        int NumAlphas;                                              // Number of alphanumerics returned by GetObjectItem
+        // int IndoorGreenNum; // Indoor Green index
+        int IOStat; // Status flag from GetObjectItem
         Real64 SchMin;
         Real64 SchMax;
 
         lw->NumIndoorGreen = ip->getNumObjectsFound(state, cCurrentModuleObject);
         // Get input for IndoorLivingWall objects
-        if (lw->NumIndoorGreen > 0)
-            lw->indoorgreen.allocate(lw->NumIndoorGreen); // Allocate the IndoorGreen input data array
+        if (lw->NumIndoorGreen > 0) lw->indoorGreens.allocate(lw->NumIndoorGreen); // Allocate the IndoorGreen input data array
         // Input the data for each Indoor Living Wall Object
         for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
+            auto &ig = lw->indoorGreens(IndoorGreenNum);
             ip->getObjectItem(state,
-                                                                     cCurrentModuleObject,
-                                                                     IndoorGreenNum,
-                                                                     state.dataIPShortCut->cAlphaArgs,
-                                                                     NumAlphas,
-                                                                     state.dataIPShortCut->rNumericArgs,
-                                                                     NumNums,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
+                              cCurrentModuleObject,
+                              IndoorGreenNum,
+                              state.dataIPShortCut->cAlphaArgs,
+                              NumAlphas,
+                              state.dataIPShortCut->rNumericArgs,
+                              NumNums,
+                              IOStat,
+                              state.dataIPShortCut->lNumericFieldBlanks,
+                              state.dataIPShortCut->lAlphaFieldBlanks,
+                              state.dataIPShortCut->cAlphaFieldNames,
+                              state.dataIPShortCut->cNumericFieldNames);
+            ErrorObjectHeader eoh{RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)};
             Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-            lw->indoorgreen(IndoorGreenNum).IndoorGreenName = state.dataIPShortCut->cAlphaArgs(1);
-            lw->indoorgreen(IndoorGreenNum).SurfName = state.dataIPShortCut->cAlphaArgs(2);
-            lw->indoorgreen(IndoorGreenNum).SurfPtr =
-                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
-            if (lw->indoorgreen(IndoorGreenNum).SurfPtr <= 0) {
-                ShowSevereError(state,
-                                format("{}=\"{}\", invalid {} entered={}",
-                                       RoutineName,
-                                       state.dataIPShortCut->cAlphaArgs(1),
-                                       state.dataIPShortCut->cAlphaFieldNames(2),
-                                       state.dataIPShortCut->cAlphaArgs(2)));
+            ig.Name = state.dataIPShortCut->cAlphaArgs(1);
+            ig.SurfName = state.dataIPShortCut->cAlphaArgs(2);
+            ig.SurfPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+            if (ig.SurfPtr <= 0) {
+                ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2));
+                // ShowSevereError(state,
+                //                 format("{}=\"{}\", invalid {} entered={}",
+                //                        RoutineName,
+                //                        state.dataIPShortCut->cAlphaArgs(1),
+                //                        state.dataIPShortCut->cAlphaFieldNames(2),
+                //                        state.dataIPShortCut->cAlphaArgs(2)));
                 ErrorsFound = true;
             } else {
                 // check for SurfaceProperty:HeatBalanceSourceTerm
-                if (state.dataSurface->Surface(lw->indoorgreen(IndoorGreenNum).SurfPtr).InsideHeatSourceTermSchedule > 0) {
+                if (state.dataSurface->Surface(ig.SurfPtr).InsideHeatSourceTermSchedule > 0) {
                     ShowSevereError(state,
                                     format("The indoor green surface {} has an Inside Face Heat Source Term Schedule defined. This surface cannot "
                                            "also be used for indoor green.",
@@ -159,22 +160,20 @@ namespace IndoorGreen {
                     ErrorsFound = true;
                 }
                 // get zone pointer and space pointer
-                lw->indoorgreen(IndoorGreenNum).ZonePtr =
-                    state.dataSurface->Surface(lw->indoorgreen(IndoorGreenNum).SurfPtr).Zone;
-                lw->indoorgreen(IndoorGreenNum).SpacePtr =
-                    state.dataSurface->Surface(lw->indoorgreen(IndoorGreenNum).SurfPtr).spaceNum;
-                
-                if (lw->indoorgreen(IndoorGreenNum).ZonePtr <= 0) {
+                ig.ZonePtr = state.dataSurface->Surface(ig.SurfPtr).Zone;
+                ig.SpacePtr = state.dataSurface->Surface(ig.SurfPtr).spaceNum;
+
+                if (ig.ZonePtr <= 0 || ig.SpacePtr <= 0) {
                     ShowSevereError(state,
-                                    format("{}=\"{}\", invalid {} entered={}",
+                                    format("{}=\"{}\", invalid {} entered={}, {} is not assoicated with a thermal zone or space",
                                            RoutineName,
                                            state.dataIPShortCut->cAlphaArgs(1),
                                            state.dataIPShortCut->cAlphaFieldNames(2),
+                                           state.dataIPShortCut->cAlphaArgs(2),
                                            state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
-                } else if (state.dataSurface->Surface(lw->indoorgreen(IndoorGreenNum).SurfPtr).ExtBoundCond < 0 ||
-                           state.dataSurface->Surface(lw->indoorgreen(IndoorGreenNum).SurfPtr).HeatTransferAlgorithm !=
-                               DataSurfaces::HeatTransferModel::CTF) {
+                } else if (state.dataSurface->Surface(ig.SurfPtr).ExtBoundCond < 0 ||
+                           state.dataSurface->Surface(ig.SurfPtr).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", invalid {} entered={}, not a valid surface for indoor green module",
                                            RoutineName,
@@ -184,27 +183,27 @@ namespace IndoorGreen {
                     ErrorsFound = true;
                 }
             }
-            lw->indoorgreen(IndoorGreenNum).SchedPtr =
-                ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
-            if (lw->indoorgreen(IndoorGreenNum).SchedPtr == 0) {
-                if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state,
-                                    format("{} =\"{}\", {} is required.",
-                                           RoutineName,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cAlphaFieldNames(3)));
-                } else {
-                    ShowSevereError(state,
-                                    format("{} =\"{}\", invalid {} entered={}",
-                                           RoutineName,
-                                           state.dataIPShortCut->cAlphaArgs(1),
-                                           state.dataIPShortCut->cAlphaFieldNames(3),
-                                           state.dataIPShortCut->cAlphaArgs(3)));
-                }
+            ig.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
+            if (ig.SchedPtr == 0) {
+                ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3));
+                // if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                //     ShowSevereError(state,
+                //                    format("{} =\"{}\", {} is required.",
+                //                            RoutineName,
+                //                            state.dataIPShortCut->cAlphaArgs(1),
+                //                            state.dataIPShortCut->cAlphaFieldNames(3)));
+                // } else {
+                //     ShowSevereError(state,
+                //                     format("{} =\"{}\", invalid {} entered={}",
+                //                            RoutineName,
+                //                            state.dataIPShortCut->cAlphaArgs(1),
+                //                            state.dataIPShortCut->cAlphaFieldNames(3),
+                //                            state.dataIPShortCut->cAlphaArgs(3)));
+                // }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = ScheduleManager::GetScheduleMinValue(state, lw->indoorgreen(IndoorGreenNum).SchedPtr);
-                SchMax = ScheduleManager::GetScheduleMaxValue(state, lw->indoorgreen(IndoorGreenNum).SchedPtr);
+                SchMin = ScheduleManager::GetScheduleMinValue(state, ig.SchedPtr);
+                SchMax = ScheduleManager::GetScheduleMaxValue(state, ig.SchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state,
@@ -230,62 +229,65 @@ namespace IndoorGreen {
                     }
                 }
             }
-            lw->indoorgreen(IndoorGreenNum).ETCalculationMethod = 1; // default
+            ig.etCalculationMethod = ETCalculationMethod::PenmanMonteith; // default
             if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "PENMAN-MONTEITH")) {
-                lw->indoorgreen(IndoorGreenNum).ETCalculationMethod = 1; // default
+                ig.etCalculationMethod = ETCalculationMethod::PenmanMonteith; // default
             } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "STANGHELLINI")) {
-                lw->indoorgreen(IndoorGreenNum).ETCalculationMethod = 2;
+                ig.etCalculationMethod = ETCalculationMethod::Stanghellini;
             } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "DATA-DRIVEN")) {
-                lw->indoorgreen(IndoorGreenNum).ETCalculationMethod = 3;
+                ig.etCalculationMethod = ETCalculationMethod::DataDriven;
             } else {
-                ShowSevereError(state,
-                                format("{}=\"{}\", invalid {} entered={}",
-                                       RoutineName,
-                                       state.dataIPShortCut->cAlphaArgs(1),
-                                       state.dataIPShortCut->cAlphaFieldNames(4),
-                                       state.dataIPShortCut->cAlphaArgs(4)));
+                ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4));
+                // ShowSevereError(state,
+                //                 format("{}=\"{}\", invalid {} entered={}",
+                //                        RoutineName,
+                //                        state.dataIPShortCut->cAlphaArgs(1),
+                //                        state.dataIPShortCut->cAlphaFieldNames(4),
+                //                        state.dataIPShortCut->cAlphaArgs(4)));
                 ErrorsFound = true;
             }
             // read lighting method (LED=1; Daylight=2; LED-Daylight=3)
-            lw->indoorgreen(IndoorGreenNum).LightingMethod = 1; // default
+            ig.lightingMethod = LightingMethod::LED; // default
             if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "LED")) {
-                lw->indoorgreen(IndoorGreenNum).LightingMethod = 1; // default
+                ig.lightingMethod = LightingMethod::LED; // default
             } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "DAYLIGHT")) {
-                lw->indoorgreen(IndoorGreenNum).LightingMethod = 2;
+                ig.lightingMethod = LightingMethod::Daylighting;
             } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "LED-DAYLIGHT")) {
-                lw->indoorgreen(IndoorGreenNum).LightingMethod = 3;
+                ig.lightingMethod = LightingMethod::LEDDaylighting;
             } else {
-                ShowSevereError(state,
-                                format("{}=\"{}\", invalid {} entered={}",
-                                       RoutineName,
-                                       state.dataIPShortCut->cAlphaArgs(1),
-                                       state.dataIPShortCut->cAlphaFieldNames(5),
-                                       state.dataIPShortCut->cAlphaArgs(5)));
+                ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5));
+                // ShowSevereError(state,
+                //                 format("{}=\"{}\", invalid {} entered={}",
+                //                        RoutineName,
+                //                        state.dataIPShortCut->cAlphaArgs(1),
+                //                        state.dataIPShortCut->cAlphaFieldNames(5),
+                //                        state.dataIPShortCut->cAlphaArgs(5)));
                 ErrorsFound = true;
             }
+            switch (ig.lightingMethod) {
 
-            if (lw->indoorgreen(IndoorGreenNum).LightingMethod == 1) {
-                lw->indoorgreen(IndoorGreenNum).SchedLEDPtr =
-                    ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
-                if (lw->indoorgreen(IndoorGreenNum).SchedLEDPtr == 0) {
-                    if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                        ShowSevereError(state,
-                                        format("{} =\"{}\", {} is required.",
-                                               RoutineName,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaFieldNames(6)));
-                    } else {
-                        ShowSevereError(state,
-                                        format("{} =\"{}\", invalid {} entered={}",
-                                               RoutineName,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaFieldNames(6),
-                                               state.dataIPShortCut->cAlphaArgs(6)));
-                    }
+            case (LightingMethod::LED): {
+                ig.SchedLEDPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
+                if (ig.SchedLEDPtr == 0) {
+                    ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6));
+                    // if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                    //     ShowSevereError(state,
+                    //                     format("{} =\"{}\", {} is required.",
+                    //                            RoutineName,
+                    //                            state.dataIPShortCut->cAlphaArgs(1),
+                    //                            state.dataIPShortCut->cAlphaFieldNames(6)));
+                    // } else {
+                    //     ShowSevereError(state,
+                    //                     format("{} =\"{}\", invalid {} entered={}",
+                    //                            RoutineName,
+                    //                            state.dataIPShortCut->cAlphaArgs(1),
+                    //                            state.dataIPShortCut->cAlphaFieldNames(6),
+                    //                            state.dataIPShortCut->cAlphaArgs(6)));
+                    // }
                     ErrorsFound = true;
                 } else { // check min/max on schedule
-                    SchMin = ScheduleManager::GetScheduleMinValue(state, lw->indoorgreen(IndoorGreenNum).SchedLEDPtr);
-                    SchMax = ScheduleManager::GetScheduleMaxValue(state, lw->indoorgreen(IndoorGreenNum).SchedLEDPtr);
+                    SchMin = ScheduleManager::GetScheduleMinValue(state, ig.SchedLEDPtr);
+                    SchMax = ScheduleManager::GetScheduleMaxValue(state, ig.SchedLEDPtr);
                     if (SchMin < 0.0 || SchMax < 0.0) {
                         if (SchMin < 0.0) {
                             ShowSevereError(state,
@@ -311,63 +313,88 @@ namespace IndoorGreen {
                         }
                     }
                 }
-            }
-            if (lw->indoorgreen(IndoorGreenNum).LightingMethod == 2 ||
-                lw->indoorgreen(IndoorGreenNum).LightingMethod == 3) {
-                lw->indoorgreen(IndoorGreenNum).LightRefPtr =
-                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
-                                         state.dataDayltg->DaylRefPt,
-                                         &EnergyPlus::Dayltg::RefPointData::Name); // Field: Daylighting Reference Point Name
-                //state.dataDaylightingData->daylightControl
-                //if (lw->indoorgreen(IndoorGreenNum).LightRefPtr == 0) {
-                //    ShowSevereError(state,
-                //                    format("{}: invalid {}=\"{}\" for object named: {}",
-                //                           state.dataIPShortCut->cCurrentModuleObject,
-                //                           state.dataIPShortCut->cAlphaFieldNames(7),
-                //                           state.dataIPShortCut->cAlphaArgs(7),
-                //                           state.dataIPShortCut->cAlphaArgs(1)));
-                //    ErrorsFound = true;
-                //    continue;
-                //}
-                lw->indoorgreen(IndoorGreenNum).LightControlPtr =
-                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
-                                         state.dataDayltg->daylightControl,
-                                         &EnergyPlus::Dayltg::DaylightingControl::Name); // Field: Daylighting Control Name
-                if (lw->indoorgreen(IndoorGreenNum).LightControlPtr == 0) {
-                    ShowSevereError(state,
-                                    format("{}: invalid {}=\"{}\" for object named: {}",
-                                           state.dataIPShortCut->cCurrentModuleObject,
-                                           state.dataIPShortCut->cAlphaFieldNames(7),
-                                           state.dataIPShortCut->cAlphaArgs(7),
-                                           state.dataIPShortCut->cAlphaArgs(1)));
+            } break;
+            case (LightingMethod::Daylighting): {
+                //(ig.LightingMethod == 2 || ig.LightingMethod == 3) {
+                ig.LightRefPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
+                                                      state.dataDayltg->DaylRefPt,
+                                                      &EnergyPlus::Dayltg::RefPointData::Name); // Field: Daylighting Reference Point Name
+                // state.dataDaylightingData->daylightControl
+                // if (ig.LightRefPtr == 0) {
+                //     ShowSevereError(state,
+                //                     format("{}: invalid {}=\"{}\" for object named: {}",
+                //                            state.dataIPShortCut->cCurrentModuleObject,
+                //                            state.dataIPShortCut->cAlphaFieldNames(7),
+                //                            state.dataIPShortCut->cAlphaArgs(7),
+                //                            state.dataIPShortCut->cAlphaArgs(1)));
+                //     ErrorsFound = true;
+                //     continue;
+                // }
+                ig.LightControlPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
+                                                          state.dataDayltg->daylightControl,
+                                                          &EnergyPlus::Dayltg::DaylightingControl::Name); // Field: Daylighting Control Name
+                if (ig.LightControlPtr == 0) {
+                    ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7));
+                    // ShowSevereError(state,
+                    //                 format("{}: invalid {}=\"{}\" for object named: {}",
+                    //                        state.dataIPShortCut->cCurrentModuleObject,
+                    //                        state.dataIPShortCut->cAlphaFieldNames(7),
+                    //                        state.dataIPShortCut->cAlphaArgs(7),
+                    //                        state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                     continue;
                 }
-            }
-            if (lw->indoorgreen(IndoorGreenNum).LightingMethod == 3) {
-                lw->indoorgreen(IndoorGreenNum).SchedLEDDaylightTargetPtr =
-                    ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(8));
-                if (lw->indoorgreen(IndoorGreenNum).SchedLEDDaylightTargetPtr == 0) {
-                    if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                        ShowSevereError(state,
-                                        format("{} =\"{}\", {} is required.",
-                                               RoutineName,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaFieldNames(8)));
-                    } else {
-                        ShowSevereError(state,
-                                        format("{} =\"{}\", invalid {} entered={}",
-                                               RoutineName,
-                                               state.dataIPShortCut->cAlphaArgs(1),
-                                               state.dataIPShortCut->cAlphaFieldNames(8),
-                                               state.dataIPShortCut->cAlphaArgs(8)));
-                    }
+            } break;
+            case (LightingMethod::LEDDaylighting): {
+                ig.LightRefPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
+                                                      state.dataDayltg->DaylRefPt,
+                                                      &EnergyPlus::Dayltg::RefPointData::Name); // Field: Daylighting Reference Point Name
+                // state.dataDaylightingData->daylightControl
+                // if (ig.LightRefPtr == 0) {
+                //     ShowSevereError(state,
+                //                     format("{}: invalid {}=\"{}\" for object named: {}",
+                //                            state.dataIPShortCut->cCurrentModuleObject,
+                //                            state.dataIPShortCut->cAlphaFieldNames(7),
+                //                            state.dataIPShortCut->cAlphaArgs(7),
+                //                            state.dataIPShortCut->cAlphaArgs(1)));
+                //     ErrorsFound = true;
+                //     continue;
+                // }
+                ig.LightControlPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
+                                                          state.dataDayltg->daylightControl,
+                                                          &EnergyPlus::Dayltg::DaylightingControl::Name); // Field: Daylighting Control Name
+                if (ig.LightControlPtr == 0) {
+                    ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7));
+                    // ShowSevereError(state,
+                    //                 format("{}: invalid {}=\"{}\" for object named: {}",
+                    //                        state.dataIPShortCut->cCurrentModuleObject,
+                    //                        state.dataIPShortCut->cAlphaFieldNames(7),
+                    //                        state.dataIPShortCut->cAlphaArgs(7),
+                    //                        state.dataIPShortCut->cAlphaArgs(1)));
+                    ErrorsFound = true;
+                    continue;
+                }
+                ig.SchedLEDDaylightTargetPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(8));
+                if (ig.SchedLEDDaylightTargetPtr == 0) {
+                    ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8));
+                    // if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+                    //     ShowSevereError(state,
+                    //                     format("{} =\"{}\", {} is required.",
+                    //                            RoutineName,
+                    //                            state.dataIPShortCut->cAlphaArgs(1),
+                    //                            state.dataIPShortCut->cAlphaFieldNames(8)));
+                    // } else {
+                    //     ShowSevereError(state,
+                    //                     format("{} =\"{}\", invalid {} entered={}",
+                    //                            RoutineName,
+                    //                            state.dataIPShortCut->cAlphaArgs(1),
+                    //                            state.dataIPShortCut->cAlphaFieldNames(8),
+                    //                            state.dataIPShortCut->cAlphaArgs(8)));
+                    // }
                     ErrorsFound = true;
                 } else { // check min/max on schedule
-                    SchMin =
-                        ScheduleManager::GetScheduleMinValue(state, lw->indoorgreen(IndoorGreenNum).SchedLEDDaylightTargetPtr);
-                    SchMax =
-                        ScheduleManager::GetScheduleMaxValue(state, lw->indoorgreen(IndoorGreenNum).SchedLEDDaylightTargetPtr);
+                    SchMin = ScheduleManager::GetScheduleMinValue(state, ig.SchedLEDDaylightTargetPtr);
+                    SchMax = ScheduleManager::GetScheduleMaxValue(state, ig.SchedLEDDaylightTargetPtr);
                     if (SchMin < 0.0 || SchMax < 0.0) {
                         if (SchMin < 0.0) {
                             ShowSevereError(state,
@@ -393,11 +420,13 @@ namespace IndoorGreen {
                         }
                     }
                 }
+            } break;
+            default:
+                break;
             }
 
-
-            lw->indoorgreen(IndoorGreenNum).LeafArea = state.dataIPShortCut->rNumericArgs(1);
-            if (lw->indoorgreen(IndoorGreenNum).LeafArea < 0) {
+            ig.LeafArea = state.dataIPShortCut->rNumericArgs(1);
+            if (ig.LeafArea < 0) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {} entered={}",
                                        RoutineName,
@@ -406,8 +435,8 @@ namespace IndoorGreen {
                                        state.dataIPShortCut->rNumericArgs(1)));
                 ErrorsFound = true;
             }
-            lw->indoorgreen(IndoorGreenNum).LEDNominalPPFD = state.dataIPShortCut->rNumericArgs(2);
-            if (lw->indoorgreen(IndoorGreenNum).LEDNominalPPFD <0) {
+            ig.LEDNominalPPFD = state.dataIPShortCut->rNumericArgs(2);
+            if (ig.LEDNominalPPFD < 0) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {} entered={}",
                                        RoutineName,
@@ -416,8 +445,8 @@ namespace IndoorGreen {
                                        state.dataIPShortCut->rNumericArgs(2)));
                 ErrorsFound = true;
             }
-            lw->indoorgreen(IndoorGreenNum).LEDNominalEleP = state.dataIPShortCut->rNumericArgs(3);
-            if (lw->indoorgreen(IndoorGreenNum).LEDNominalEleP< 0) {
+            ig.LEDNominalEleP = state.dataIPShortCut->rNumericArgs(3);
+            if (ig.LEDNominalEleP < 0) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {} entered={}",
                                        RoutineName,
@@ -426,9 +455,8 @@ namespace IndoorGreen {
                                        state.dataIPShortCut->rNumericArgs(3)));
                 ErrorsFound = true;
             }
-            lw->indoorgreen(IndoorGreenNum).LEDRadFraction= state.dataIPShortCut->rNumericArgs(4);
-            if (lw->indoorgreen(IndoorGreenNum).LEDRadFraction < 0 ||
-                lw->indoorgreen(IndoorGreenNum).LEDRadFraction >1.0) {
+            ig.LEDRadFraction = state.dataIPShortCut->rNumericArgs(4);
+            if (ig.LEDRadFraction < 0 || ig.LEDRadFraction > 1.0) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {} entered={}",
                                        RoutineName,
@@ -438,341 +466,320 @@ namespace IndoorGreen {
                 ErrorsFound = true;
             }
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator(state,
-                                 "IndoorLivingWall",
-                                 lw->indoorgreen(IndoorGreenNum).IndoorGreenName,
-                                 "ETCaldatadriven",
-                                 "[kg_m2s]",
-                                 lw->indoorgreen(IndoorGreenNum).EMSETCalOverrideOn,
-                                 lw->indoorgreen(IndoorGreenNum).EMSET);
+                SetupEMSActuator(state, "IndoorLivingWall", ig.Name, "ETCaldatadriven", "[kg_m2s]", ig.EMSETCalOverrideOn, ig.EMSET);
             } // EMS and API
         }
         // Set up output variables
         for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
-                SetupZoneInternalGain(state,
-                                          lw->indoorgreen(IndoorGreenNum).ZonePtr,
-                                          lw->indoorgreen(IndoorGreenNum).IndoorGreenName,
-                                          DataHeatBalance::IntGainType::IndoorGreen,
-                                          &lw->indoorgreen(IndoorGreenNum).SensibleRate,
-                                          nullptr,
-                                          &lw->indoorgreen(IndoorGreenNum).LatentRate,
-                                          nullptr,
-                                          nullptr,
-                                          nullptr);
-                
-                 SetupOutputVariable(state,
-                                    "Indoor Living Wall Plant Surface Temperature",
-                                    Constant::Units::C,
-                                    state.dataHeatBalSurf->SurfTempIn(lw->indoorgreen(IndoorGreenNum).SurfPtr),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    lw->indoorgreen(IndoorGreenNum).IndoorGreenName);
-                SetupOutputVariable(state,
-                                    "Indoor Living Wall Sensible Heat Gain Rate",
-                                    Constant::Units::W,
-                                    state.dataHeatBalSurf->SurfQConvInRep(lw->indoorgreen(IndoorGreenNum).SurfPtr), // positive sign: heat loss from plants; negative sign: heat gain from plants
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    lw->indoorgreen(IndoorGreenNum).IndoorGreenName);
-                SetupOutputVariable(state,
-                                    "Indoor Living Wall Latent Heat Gain Rate",
-                                    Constant::Units::W,
-                                    lw->indoorgreen(IndoorGreenNum).LatentRate,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    lw->indoorgreen(IndoorGreenNum).IndoorGreenName);
-                SetupOutputVariable(state,
-                                    "Indoor Living Wall Evapotranspiration Rate",
-                                    Constant::Units::kg_m2s, 
-                                    lw->indoorgreen(IndoorGreenNum).ETRate,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    lw->indoorgreen(IndoorGreenNum).IndoorGreenName);
-                SetupOutputVariable(state,
-                                    "Indoor Living Wall Energy Required For Evapotranspiration Per Unit Area",
-                                    Constant::Units::W_m2, 
-                                    lw->indoorgreen(IndoorGreenNum).LambdaET,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    lw->indoorgreen(IndoorGreenNum).IndoorGreenName);
-                SetupOutputVariable(state,
-                                    "Indoor Living Wall LED Operational PPFD",
-                                    Constant::Units::umol_m2s, 
-                                    lw->indoorgreen(IndoorGreenNum).LEDActualPPFD,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    lw->indoorgreen(IndoorGreenNum).IndoorGreenName);
-                SetupOutputVariable(state,
-                                    "Indoor Living Wall PPFD",
-                                    Constant::Units::umol_m2s,
-                                    lw->indoorgreen(IndoorGreenNum).ZPPFD,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    lw->indoorgreen(IndoorGreenNum).IndoorGreenName);
-                SetupOutputVariable(state,
-                                    "Indoor Living Wall VPD",
-                                    Constant::Units::Pa,
-                                    lw->indoorgreen(IndoorGreenNum).ZVPD,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    lw->indoorgreen(IndoorGreenNum).IndoorGreenName);
-                SetupOutputVariable(state,
-                                    "Indoor Living Wall LED Sensible Heat Gain Rate",
-                                    Constant::Units::W,
-                                    lw->indoorgreen(IndoorGreenNum).SensibleRate,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    lw->indoorgreen(IndoorGreenNum).IndoorGreenName);
-                SetupOutputVariable(state,
-                                    "Indoor Living Wall LED Operational Power",
-                                    Constant::Units::W,  
-                                    lw->indoorgreen(IndoorGreenNum).LEDActualEleP,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    lw->indoorgreen(IndoorGreenNum).IndoorGreenName);
-                SetupOutputVariable(state,
-                                    "Indoor Living Wall LED Electricity Energy",
-                                    Constant::Units::J,
-                                    lw->indoorgreen(IndoorGreenNum).LEDActualEleCon,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    lw->indoorgreen(IndoorGreenNum).IndoorGreenName,
-                                    Constant::eResource::Electricity,
-                                    OutputProcessor::SOVEndUseCat::InteriorLights,
-                                    "IndoorLivingWall",//End Use subcategory
-                                    OutputProcessor::SOVGroup::Building,
-                                    state.dataHeatBal->Zone(lw->indoorgreen(IndoorGreenNum).ZonePtr).Name,
-                                    state.dataHeatBal->Zone(lw->indoorgreen(IndoorGreenNum).ZonePtr).Multiplier,
-                                    state.dataHeatBal->Zone(lw->indoorgreen(IndoorGreenNum).ZonePtr).ListMultiplier,
-                                    {},
-                                    {},
-                                    state.dataHeatBal->space(lw->indoorgreen(IndoorGreenNum).SpacePtr).spaceType);
-            }
+            auto &ig = lw->indoorGreens(IndoorGreenNum);
+            SetupZoneInternalGain(state,
+                                  ig.ZonePtr,
+                                  ig.Name,
+                                  DataHeatBalance::IntGainType::IndoorGreen,
+                                  &ig.SensibleRate,
+                                  nullptr,
+                                  &ig.LatentRate,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr);
+
+            SetupOutputVariable(state,
+                                "Indoor Living Wall Plant Surface Temperature",
+                                Constant::Units::C,
+                                state.dataHeatBalSurf->SurfTempIn(ig.SurfPtr),
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(
+                state,
+                "Indoor Living Wall Sensible Heat Gain Rate",
+                Constant::Units::W,
+                state.dataHeatBalSurf->SurfQConvInRep(ig.SurfPtr), // positive sign: heat loss from plants; negative sign: heat gain from plants
+                OutputProcessor::SOVTimeStepType::Zone,
+                OutputProcessor::SOVStoreType::Average,
+                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall Latent Heat Gain Rate",
+                                Constant::Units::W,
+                                ig.LatentRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall Evapotranspiration Rate",
+                                Constant::Units::kg_m2s,
+                                ig.ETRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall Energy Required For Evapotranspiration Per Unit Area",
+                                Constant::Units::W_m2,
+                                ig.LambdaET,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall LED Operational PPFD",
+                                Constant::Units::umol_m2s,
+                                ig.LEDActualPPFD,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall PPFD",
+                                Constant::Units::umol_m2s,
+                                ig.ZPPFD,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall VPD",
+                                Constant::Units::Pa,
+                                ig.ZVPD,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall LED Sensible Heat Gain Rate",
+                                Constant::Units::W,
+                                ig.SensibleRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall LED Operational Power",
+                                Constant::Units::W,
+                                ig.LEDActualEleP,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall LED Electricity Energy",
+                                Constant::Units::J,
+                                ig.LEDActualEleCon,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                ig.Name,
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::InteriorLights,
+                                "IndoorLivingWall", // End Use subcategory
+                                OutputProcessor::SOVGroup::Building,
+                                state.dataHeatBal->Zone(ig.ZonePtr).Name,
+                                state.dataHeatBal->Zone(ig.ZonePtr).Multiplier,
+                                state.dataHeatBal->Zone(ig.ZonePtr).ListMultiplier,
+                                {},
+                                {},
+                                state.dataHeatBal->space(ig.SpacePtr).spaceType);
+        }
     }
 
     void InitIndoorGreen(EnergyPlusData &state)
     {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for initializations of the Indoor Living Wall objects.
-        auto &lw = state.dataIndoorGreen;           
-            for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
+        auto &lw = state.dataIndoorGreen;
+        for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
+            auto &ig = lw->indoorGreens(IndoorGreenNum);
             // Set the reporting variables to zero at each timestep.
-                lw->indoorgreen(IndoorGreenNum).SensibleRate = 0.0;
-                lw->indoorgreen(IndoorGreenNum).LatentRate = 0.0;
-                lw->indoorgreen(IndoorGreenNum).ZCO2 = 400; 
-                lw->indoorgreen(IndoorGreenNum).ZPPFD =0;       
-            }
-  
+            ig.SensibleRate = 0.0;
+            ig.LatentRate = 0.0;
+            ig.ZCO2 = 400;
+            ig.ZPPFD = 0;
+        }
     }
     void ETModel(EnergyPlusData &state)
     {
-            // PURPOSE OF THIS SUBROUTINE:
-            // This subroutine is for the calculation of evapotranspiration effects from the Indoor Greenery System objects.
-            // SUBROUTINE PARAMETER DEFINITIONS:
-            static constexpr std::string_view RoutineName("ETModel: ");
-            auto &lw = state.dataIndoorGreen;
-            Real64 ZonePreTemp;    // Indoor air temprature (C)
-            Real64 ZonePreHum;     // Indoor humidity ratio (kg moisture / kg dry air)
-            Real64 ZoneNewTemp;    // Indoor air temprature (C) after ET
-            Real64 ZoneNewHum;     // Indoor humidity ratio (kg moisture / kg dry air) after ET
-            Real64 ZoneSatHum;     // Saturated humidity ratio 
-            Real64 ZoneCO2;        // Indoor zone co2 concentration (ppm)
-            Real64 ZonePPFD;       // Indoor net radiation (PPFD)
-            Real64 ZoneVPD;        // vapor pressure deficit (kpa); local variable
-            Real64 Timestep;       // s
-            Real64 ETTotal;        // kg
-            Real64 rhoair;         // kg/m3
-            Real64 Tdp;            // dew point temperature
-            Real64 Twb;            // wet bulb temperature
-            Real64 HCons;           // enthalpy (J/kg)
-            Real64 HMid;           // enthalpy 3rd point (J/kg)
-            Real64 ZoneAirVol;     // zone air volume (m3)
-            Real64 LAI;            // leaf area index, the ratio of one-side leaf area per unit plant growing area, maximum LAI =2 if LAI_cal>2.0    
-            Real64 LAI_Cal;        // calculated leaf area index based on users's input on total leaf area
-            Real64 OutPb;          // outdoor pressure (kPa)
-            Real64 vp;             // actual vapor pressure of the air (kpa)
-            Real64 vpSat;          // saturated vapor pressure at air temperature (kpa)
-            std::string_view cCurrentModuleObject = "IndoorLivingWall";
-            Timestep = state.dataHVACGlobal->TimeStepSysSec; // unit s
-            // Method for ET calculation: Penman-Monteith=1, Stanghellini=2, Data-driven=3
-            for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
-                ZonePreTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(lw->indoorgreen(IndoorGreenNum).ZonePtr).ZT;
-                ZonePreHum = state.dataZoneTempPredictorCorrector->zoneHeatBalance(lw->indoorgreen(IndoorGreenNum).ZonePtr).airHumRat;
-                ZoneCO2 = 400;  
-                OutPb = state.dataEnvrn->OutBaroPress / 1000;                       
-                Tdp = Psychrometrics::PsyTdpFnWPb(state, ZonePreHum, OutPb*1000); 
-                vp = Psychrometrics::PsyPsatFnTemp(state, Tdp, RoutineName) / 1000; 
-                vpSat = Psychrometrics::PsyPsatFnTemp(state, ZonePreTemp, RoutineName) / 1000; 
-                lw->indoorgreen(IndoorGreenNum).ZVPD = (vpSat - vp)*1000;  //Pa                                              
-                LAI_Cal =lw->indoorgreen(IndoorGreenNum).LeafArea/state.dataSurface->Surface(lw->indoorgreen(IndoorGreenNum).SurfPtr).Area;
-                LAI = LAI_Cal;
-                if (LAI_Cal > 2.0) {
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine is for the calculation of evapotranspiration effects from the Indoor Greenery System objects.
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static constexpr std::string_view RoutineName("ETModel: ");
+        auto &lw = state.dataIndoorGreen;
+        Real64 ZonePreTemp; // Indoor air temprature (C)
+        Real64 ZonePreHum;  // Indoor humidity ratio (kg moisture / kg dry air)
+        Real64 ZoneNewTemp; // Indoor air temprature (C) after ET
+        Real64 ZoneNewHum;  // Indoor humidity ratio (kg moisture / kg dry air) after ET
+        Real64 ZoneSatHum;  // Saturated humidity ratio
+        Real64 ZoneCO2;     // Indoor zone co2 concentration (ppm)
+        Real64 ZonePPFD;    // Indoor net radiation (PPFD)
+        Real64 ZoneVPD;     // vapor pressure deficit (kpa); local variable
+        Real64 Timestep;    // s
+        Real64 ETTotal;     // kg
+        Real64 rhoair;      // kg/m3
+        Real64 Tdp;         // dew point temperature
+        Real64 Twb;         // wet bulb temperature
+        Real64 HCons;       // enthalpy (J/kg)
+        Real64 HMid;        // enthalpy 3rd point (J/kg)
+        Real64 ZoneAirVol;  // zone air volume (m3)
+        Real64 LAI;         // leaf area index, the ratio of one-side leaf area per unit plant growing area, maximum LAI =2 if LAI_cal>2.0
+        Real64 LAI_Cal;     // calculated leaf area index based on users's input on total leaf area
+        Real64 OutPb;       // outdoor pressure (kPa)
+        Real64 vp;          // actual vapor pressure of the air (kpa)
+        Real64 vpSat;       // saturated vapor pressure at air temperature (kpa)
+        std::string_view cCurrentModuleObject = "IndoorLivingWall";
+        Timestep = state.dataHVACGlobal->TimeStepSysSec; // unit s
+        // Method for ET calculation: Penman-Monteith=1, Stanghellini=2, Data-driven=3
+        for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
+            auto &ig = lw->indoorGreens(IndoorGreenNum);
+            ZonePreTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ig.ZonePtr).ZT;
+            ZonePreHum = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ig.ZonePtr).airHumRat;
+            ZoneCO2 = 400;
+            OutPb = state.dataEnvrn->OutBaroPress / 1000;
+            Tdp = Psychrometrics::PsyTdpFnWPb(state, ZonePreHum, OutPb * 1000);
+            vp = Psychrometrics::PsyPsatFnTemp(state, Tdp, RoutineName) / 1000;
+            vpSat = Psychrometrics::PsyPsatFnTemp(state, ZonePreTemp, RoutineName) / 1000;
+            ig.ZVPD = (vpSat - vp) * 1000; // Pa
+            LAI_Cal = ig.LeafArea / state.dataSurface->Surface(ig.SurfPtr).Area;
+            LAI = LAI_Cal;
+            if (LAI_Cal > 2.0) {
                 LAI = 2.0; // maximum LAI=2.0 in the surface heat balance
-                ShowSevereError(state,
-                                format("Maximum indoor living wall leaf area index (LAI) =2.0 is used,calculated LAI is {}",
-                                       LAI_Cal));
-                }
-                //ZonePPFD
-                if (lw->indoorgreen(IndoorGreenNum).LightingMethod == 1) {
-                lw->indoorgreen(IndoorGreenNum).ZPPFD =
-                    ScheduleManager::GetCurrentScheduleValue(state, lw->indoorgreen(IndoorGreenNum).SchedLEDPtr) *
-                    lw->indoorgreen(IndoorGreenNum).LEDNominalPPFD; // PPFD
-                lw->indoorgreen(IndoorGreenNum).LEDActualPPFD =
-                    lw->indoorgreen(IndoorGreenNum).LEDNominalPPFD;
-                lw->indoorgreen(IndoorGreenNum).LEDActualEleP =
-                    lw->indoorgreen(IndoorGreenNum).LEDNominalEleP;
-                lw->indoorgreen(IndoorGreenNum).LEDActualEleCon =
-                    lw->indoorgreen(IndoorGreenNum).LEDNominalEleP*Timestep;
-                }
-                else if (lw->indoorgreen(IndoorGreenNum).LightingMethod == 2) {  
-                 
-                   lw->indoorgreen(IndoorGreenNum).ZPPFD = 0;
-                   lw->indoorgreen(IndoorGreenNum).LEDActualPPFD =0;
-                   lw->indoorgreen(IndoorGreenNum).LEDActualEleP =0;
-                   lw->indoorgreen(IndoorGreenNum).LEDActualEleCon =0;
+                ShowSevereError(state, format("Maximum indoor living wall leaf area index (LAI) =2.0 is used,calculated LAI is {}", LAI_Cal));
+            }
+            // ZonePPFD
+            switch (ig.lightingMethod) {
+            case (LightingMethod::LED): {
+                ig.ZPPFD = ScheduleManager::GetCurrentScheduleValue(state, ig.SchedLEDPtr) * ig.LEDNominalPPFD; // PPFD
+                ig.LEDActualPPFD = ig.LEDNominalPPFD;
+                ig.LEDActualEleP = ig.LEDNominalEleP;
+                ig.LEDActualEleCon = ig.LEDNominalEleP * Timestep;
+            } break;
+            case (LightingMethod::Daylighting): {
 
-                   if (!state.dataDayltg->CalcDayltghCoefficients_firstTime && state.dataEnvrn->SunIsUp) {
-                    lw->indoorgreen(IndoorGreenNum).ZPPFD =
-                        state.dataDayltg->daylightControl(lw->indoorgreen(IndoorGreenNum).LightControlPtr).refPts(1).lums[DataSurfaces::iLum_Illum] /
-                        77;// To be updated currently only take one reference point; 77 conversion factor from Lux to PPFD
-                   }
+                ig.ZPPFD = 0;
+                ig.LEDActualPPFD = 0;
+                ig.LEDActualEleP = 0;
+                ig.LEDActualEleCon = 0;
+
+                if (!state.dataDayltg->CalcDayltghCoefficients_firstTime && state.dataEnvrn->SunIsUp) {
+                    ig.ZPPFD = state.dataDayltg->daylightControl(ig.LightControlPtr).refPts(1).lums[DataSurfaces::iLum_Illum] /
+                               77; // To be updated currently only take one reference point; 77 conversion factor from Lux to PPFD
                 }
-                else if (lw->indoorgreen(IndoorGreenNum).LightingMethod == 3) {
-                Real64 a = ScheduleManager::GetCurrentScheduleValue(state, lw->indoorgreen(IndoorGreenNum).SchedLEDDaylightTargetPtr);
+            } break;
+            case (LightingMethod::LEDDaylighting): {
+                Real64 a = ScheduleManager::GetCurrentScheduleValue(state, ig.SchedLEDDaylightTargetPtr);
                 Real64 b = 0;
                 if (!state.dataDayltg->CalcDayltghCoefficients_firstTime && state.dataEnvrn->SunIsUp) {
-                        b = state.dataDayltg->daylightControl(lw->indoorgreen(IndoorGreenNum).LightControlPtr)
-                                .refPts(1).lums [DataSurfaces::iLum_Illum]/77;// To be updated currently only take one reference point; 77 conversion factor from Lux to PPFD
+                    b = state.dataDayltg->daylightControl(ig.LightControlPtr).refPts(1).lums[DataSurfaces::iLum_Illum] /
+                        77; // To be updated currently only take one reference point; 77 conversion factor from Lux to PPFD
                 }
-                lw->indoorgreen(IndoorGreenNum).LEDActualPPFD = max((a - b),0.0); 
-                if (lw->indoorgreen(IndoorGreenNum).LEDActualPPFD >=
-                    lw->indoorgreen(IndoorGreenNum).LEDNominalPPFD) {
-                       lw->indoorgreen(IndoorGreenNum).ZPPFD =
-                           lw->indoorgreen(IndoorGreenNum).LEDNominalPPFD + b;// LED Nominal + Daylight
-                       lw->indoorgreen(IndoorGreenNum).LEDActualEleP =
-                           lw->indoorgreen(IndoorGreenNum).LEDNominalEleP;
-                       lw->indoorgreen(IndoorGreenNum).LEDActualEleCon =
-                           lw->indoorgreen(IndoorGreenNum).LEDNominalEleP * Timestep;    
-                }
-                else
-                {
-                       lw->indoorgreen(IndoorGreenNum).ZPPFD = a;//Targeted PPFD
-                       lw->indoorgreen(IndoorGreenNum).LEDActualEleP =
-                           lw->indoorgreen(IndoorGreenNum).LEDNominalEleP *
-                           lw->indoorgreen(IndoorGreenNum).LEDActualPPFD /
-                           lw->indoorgreen(IndoorGreenNum).LEDNominalPPFD;
-                       lw->indoorgreen(IndoorGreenNum).LEDActualEleCon =
-                           lw->indoorgreen(IndoorGreenNum).LEDActualEleP * Timestep;   
-                }                   
-                }  
-                ZonePPFD = lw->indoorgreen(IndoorGreenNum).ZPPFD;
-                ZoneVPD = lw->indoorgreen(IndoorGreenNum).ZVPD/1000;//kPa            
-                //ET Calculation
-                if (lw->indoorgreen(IndoorGreenNum).ETCalculationMethod == 1) {
-                        lw->indoorgreen(IndoorGreenNum).ETRate =
-                            ETPenmanMonteith(state, ZonePreTemp, ZonePreHum, ZoneCO2, ZonePPFD, ZoneVPD, LAI);
-                } 
-                else if (lw->indoorgreen(IndoorGreenNum).ETCalculationMethod == 2) {
-                        lw->indoorgreen(IndoorGreenNum).ETRate =
-                            ETStanghellini(state, ZonePreTemp, ZonePreHum, ZoneCO2, ZonePPFD, ZoneVPD, LAI);
-                } 
-                else if (lw->indoorgreen(IndoorGreenNum).ETCalculationMethod == 3) {
-                // set with EMS value if being called for.
-                   if (lw->indoorgreen(IndoorGreenNum).EMSETCalOverrideOn) {
-                       lw->indoorgreen(IndoorGreenNum).ETRate = lw->indoorgreen(IndoorGreenNum).EMSET;
-                   }
-                   else {
-                   ShowSevereError(state,
-                                   format("EMS/Python Plugin for ET Data Driven Model not find in {}={}",
-                                          cCurrentModuleObject,
-                                          lw->indoorgreen(IndoorGreenNum).IndoorGreenName));
-                   }
-                } 
-                Real64 effectivearea = std::min(lw->indoorgreen(IndoorGreenNum).LeafArea,
-                                                LAI*state.dataSurface->Surface(lw->indoorgreen(IndoorGreenNum).SurfPtr).Area); 
-                ETTotal = lw->indoorgreen(IndoorGreenNum).ETRate * Timestep *effectivearea*
-                           ScheduleManager::GetCurrentScheduleValue(state, lw->indoorgreen(IndoorGreenNum).SchedPtr); //kg; this unit area should be surface area instead of total leaf area
-                Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp) / std::pow(10, 6); // Latent heat of vaporization (MJ/kg)
-                lw->indoorgreen(IndoorGreenNum).LambdaET =
-                    ETTotal * hfg * std::pow(10, 6) / state.dataSurface->Surface(lw->indoorgreen(IndoorGreenNum).SurfPtr).Area /
-                    Timestep; // (W/m2))
-                rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZonePreTemp, ZonePreHum);
-                ZoneAirVol = state.dataHeatBal->Zone(lw->indoorgreen(IndoorGreenNum).ZonePtr).Volume;
-                ZoneNewHum =
-                ZonePreHum + ETTotal / (rhoair * ZoneAirVol);
-                Twb = Psychrometrics::PsyTwbFnTdbWPb(state, ZonePreTemp, ZonePreHum, state.dataEnvrn->OutBaroPress);
-                ZoneSatHum = Psychrometrics::PsyWFnTdpPb(state, ZonePreTemp, state.dataEnvrn->OutBaroPress); //saturated humidity ratio
-                HCons = Psychrometrics::PsyHFnTdbW(ZonePreTemp, ZonePreHum);
-                if (ZoneNewHum <= ZoneSatHum) {
-                ZoneNewTemp = Psychrometrics::PsyTdbFnHW(HCons, ZoneNewHum);
+                ig.LEDActualPPFD = max((a - b), 0.0);
+                if (ig.LEDActualPPFD >= ig.LEDNominalPPFD) {
+                    ig.ZPPFD = ig.LEDNominalPPFD + b; // LED Nominal + Daylight
+                    ig.LEDActualEleP = ig.LEDNominalEleP;
+                    ig.LEDActualEleCon = ig.LEDNominalEleP * Timestep;
                 } else {
+                    ig.ZPPFD = a; // Targeted PPFD
+                    ig.LEDActualEleP = ig.LEDNominalEleP * ig.LEDActualPPFD / ig.LEDNominalPPFD;
+                    ig.LEDActualEleCon = ig.LEDActualEleP * Timestep;
+                }
+            } break;
+            default:
+                break;
+            }
+            ZonePPFD = ig.ZPPFD;
+            ZoneVPD = ig.ZVPD / 1000; // kPa
+            // ET Calculation
+            switch (ig.etCalculationMethod) {
+            case ETCalculationMethod::PenmanMonteith: {
+                ig.ETRate = ETPenmanMonteith(state, ZonePreTemp, ZonePreHum, ZoneCO2, ZonePPFD, ZoneVPD, LAI);
+            } break;
+            case ETCalculationMethod::Stanghellini: {
+                ig.ETRate = ETStanghellini(state, ZonePreTemp, ZonePreHum, ZoneCO2, ZonePPFD, ZoneVPD, LAI);
+            } break;
+            case ETCalculationMethod::DataDriven: {
+                // set with EMS value if being called for.
+                if (ig.EMSETCalOverrideOn) {
+                    ig.ETRate = ig.EMSET;
+                } else {
+                    ShowSevereError(state, format("EMS/Python Plugin for ET Data Driven Model not find in {}={}", cCurrentModuleObject, ig.Name));
+                }
+            } break;
+            default:
+                break;
+            }
+            Real64 effectivearea = std::min(ig.LeafArea, LAI * state.dataSurface->Surface(ig.SurfPtr).Area);
+            ETTotal =
+                ig.ETRate * Timestep * effectivearea *
+                ScheduleManager::GetCurrentScheduleValue(state, ig.SchedPtr); // kg; this unit area should be surface area instead of total leaf area
+            Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp) / std::pow(10, 6); // Latent heat of vaporization (MJ/kg)
+            ig.LambdaET = ETTotal * hfg * std::pow(10, 6) / state.dataSurface->Surface(ig.SurfPtr).Area / Timestep; // (W/m2))
+            rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZonePreTemp, ZonePreHum);
+            ZoneAirVol = state.dataHeatBal->Zone(ig.ZonePtr).Volume;
+            ZoneNewHum = ZonePreHum + ETTotal / (rhoair * ZoneAirVol);
+            Twb = Psychrometrics::PsyTwbFnTdbWPb(state, ZonePreTemp, ZonePreHum, state.dataEnvrn->OutBaroPress);
+            ZoneSatHum = Psychrometrics::PsyWFnTdpPb(state, ZonePreTemp, state.dataEnvrn->OutBaroPress); // saturated humidity ratio
+            HCons = Psychrometrics::PsyHFnTdbW(ZonePreTemp, ZonePreHum);
+            if (ZoneNewHum <= ZoneSatHum) {
+                ZoneNewTemp = Psychrometrics::PsyTdbFnHW(HCons, ZoneNewHum);
+            } else {
                 ZoneNewTemp = Twb;
                 ZoneNewHum = ZoneSatHum;
-                }
-                HMid = Psychrometrics::PsyHFnTdbW(ZoneNewTemp, ZoneNewHum);
-                lw->indoorgreen(IndoorGreenNum).SensibleRate =
-                    (1-lw->indoorgreen(IndoorGreenNum).LEDRadFraction) * lw->indoorgreen(IndoorGreenNum).LEDActualEleP; // convective heat gain from LED lights when LED is on; heat convection from plants was considered and counted from plant surface heat balance.
-                lw->indoorgreen(IndoorGreenNum).LatentRate = ZoneAirVol * rhoair * (HCons - HMid) / Timestep;   // unit W
-                state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(lw->indoorgreen(IndoorGreenNum).SurfPtr) =
-                    -1.0*lw->indoorgreen(IndoorGreenNum).LambdaET;
             }
+            HMid = Psychrometrics::PsyHFnTdbW(ZoneNewTemp, ZoneNewHum);
+            ig.SensibleRate = (1 - ig.LEDRadFraction) * ig.LEDActualEleP; // convective heat gain from LED lights when LED is on; heat convection from
+                                                                          // plants was considered and counted from plant surface heat balance.
+            ig.LatentRate = ZoneAirVol * rhoair * (HCons - HMid) / Timestep; // unit W
+            state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(ig.SurfPtr) = -1.0 * ig.LambdaET;
+        }
     }
 
+    Real64 ETPenmanMonteith(EnergyPlusData &state, Real64 ZonePreTemp, Real64 ZonePreHum, Real64 ZoneCO2, Real64 ZonePPFD, Real64 ZoneVPD, Real64 LAI)
+    {
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine is for using Penman-Monteith ET model to calculate evapotranspiration rates from the Indoor Greenery System objects.
+        // Reference: Monteith, J.L. Evaporation and environment. in Symposia of the society for experimental biology. 1965. Cambridge University
+        // Press (CUP) Cambridge
 
-    Real64 ETPenmanMonteith(EnergyPlusData &state, Real64 &ZonePreTemp, Real64 &ZonePreHum, Real64 &ZoneCO2, Real64 &ZonePPFD, Real64 &ZoneVPD, Real64 &LAI)
-    {
-            // PURPOSE OF THIS SUBROUTINE:
-            // This subroutine is for using Penman-Monteith ET model to calculate evapotranspiration rates from the Indoor Greenery System objects.
-            // Reference: Monteith, J.L. Evaporation and environment. in Symposia of the society for experimental biology. 1965. Cambridge University Press (CUP) Cambridge
-            
-            // SUBROUTINE PARAMETER DEFINITIONS:
-            static constexpr std::string_view RoutineName("ETPenmanMonteith: ");
-            Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp)/std::pow(10,6); // Latent heat of vaporization (MJ/kg)
-            Real64 slopepat = 0.200 * std::pow((0.00738 * ZonePreTemp + 0.8072), 7) - 0.000116; //Slope of the saturation vapor pressure-temperature curve (kPa/°C)
-            Real64 CpAir = Psychrometrics::PsyCpAirFnW(ZonePreHum) / std::pow(10, 6); // specific heat of air at constant pressure (MJ kg−1 °C−1)
-            Real64 OutPb = state.dataEnvrn->OutBaroPress / 1000;    // outdoor pressure (kPa)
-            Real64 constexpr mw(0.622);//ratio molecular weight of water vapor / dry air = 0.622.
-            Real64 psyconst = CpAir * OutPb / (hfg * mw); // Psychrometric constant (kPa/°C)
-            Real64 rs =0.0; //stomatal resistance s/m
-            Real64 ra =0.0; //aerodynamic resistance s/m
-            Real64 In = ZonePPFD * 0.327 / std::pow(10, 6); // net radiation MW/m2
-            Real64 G = 0.0; //soil heat flux (MJ/(m2s))
-            Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, OutPb * 1000, ZonePreTemp, ZonePreHum); //kg/m3
-            Real64 ETRate; //mm/s; kg/(m2s)
-            rs =60*(1500+ZonePPFD)/(200+ZonePPFD);
-            ra =350*std::pow((0.1/0.1),0.5)*(1/(LAI+1e-10));
-            ETRate = (1 / hfg) * (slopepat * (In - G) + (rhoair * CpAir * ZoneVPD) / ra) / (slopepat + psyconst * (1 + rs / ra));//Penman-Monteith ET model
-            return ETRate; //mm/s; kg/(m2s)
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static constexpr std::string_view RoutineName("ETPenmanMonteith: ");
+        Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp) / std::pow(10, 6); // Latent heat of vaporization (MJ/kg)
+        Real64 slopepat =
+            0.200 * std::pow((0.00738 * ZonePreTemp + 0.8072), 7) - 0.000116; // Slope of the saturation vapor pressure-temperature curve (kPa/°C)
+        Real64 CpAir = Psychrometrics::PsyCpAirFnW(ZonePreHum) / std::pow(10, 6); // specific heat of air at constant pressure (MJ kg−1 °C−1)
+        Real64 OutPb = state.dataEnvrn->OutBaroPress / 1000;                      // outdoor pressure (kPa)
+        Real64 constexpr mw(0.622);                                               // ratio molecular weight of water vapor / dry air = 0.622.
+        Real64 psyconst = CpAir * OutPb / (hfg * mw);                             // Psychrometric constant (kPa/°C)
+        Real64 rs = 0.0;                                                          // stomatal resistance s/m
+        Real64 ra = 0.0;                                                          // aerodynamic resistance s/m
+        Real64 In = ZonePPFD * 0.327 / std::pow(10, 6);                           // net radiation MW/m2
+        Real64 G = 0.0;                                                           // soil heat flux (MJ/(m2s))
+        Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, OutPb * 1000, ZonePreTemp, ZonePreHum); // kg/m3
+        Real64 ETRate;                                                                                   // mm/s; kg/(m2s)
+        rs = 60 * (1500 + ZonePPFD) / (200 + ZonePPFD);
+        ra = 350 * std::pow((0.1 / 0.1), 0.5) * (1 / (LAI + 1e-10));
+        ETRate =
+            (1 / hfg) * (slopepat * (In - G) + (rhoair * CpAir * ZoneVPD) / ra) / (slopepat + psyconst * (1 + rs / ra)); // Penman-Monteith ET model
+        return ETRate;                                                                                                   // mm/s; kg/(m2s)
     }
-    Real64
-    ETStanghellini(EnergyPlusData &state, Real64 &ZonePreTemp, Real64 &ZonePreHum, Real64 &ZoneCO2, Real64 &ZonePPFD, Real64 &ZoneVPD, Real64 &LAI)
+    Real64 ETStanghellini(EnergyPlusData &state, Real64 ZonePreTemp, Real64 ZonePreHum, Real64 ZoneCO2, Real64 ZonePPFD, Real64 ZoneVPD, Real64 LAI)
     {
-            // PURPOSE OF THIS SUBROUTINE:
-            // This subroutine is for using Stanghellini ET model to calculate evapotranspiration rates from the Indoor Greenery System objects.
-            // Reference: Stanghellini, C., Transpiration of greenhouse crops: an aid to climate management, 1987, Institute of Agricultural Engineering, Wageningen, The Netherlands
-           
-            // SUBROUTINE PARAMETER DEFINITIONS:
-            static constexpr std::string_view RoutineName("ETStanghellini: ");
-            Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp) / std::pow(10, 6); // Latent heat of vaporization (MJ/kg)
-            Real64 slopepat =
-                0.200 * std::pow((0.00738 * ZonePreTemp + 0.8072), 7) - 0.000116; // Slope of the saturation vapor pressure-temperature curve (kPa/°C)
-            Real64 CpAir = Psychrometrics::PsyCpAirFnW(ZonePreHum) / std::pow(10, 6); // specific heat of air at constant pressure (MJ kg−1 °C−1)
-            Real64 OutPb = state.dataEnvrn->OutBaroPress / 1000;                      // outdoor pressure (kPa)
-            Real64 constexpr mw(0.622);                                                  // ratio molecular weight of water vapor / dry air = 0.622.
-            Real64 psyconst = CpAir * OutPb / (hfg * mw);                             // Psychrometric constant (kPa/°C)
-            Real64 rs = 0.0;                                                          // stomatal resistance s/m
-            Real64 ra = 0.0;                                                          // aerodynamic resistance s/m
-            Real64 In = ZonePPFD * 0.327 / std::pow(10, 6);                           // net radiation MW/m2
-            Real64 G = 0.0;                                                           // soil heat flux (MJ/(m2s))
-            Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, OutPb * 1000, ZonePreTemp, ZonePreHum); // kg/m3
-            Real64 ETRate; // mm/s; kg/(m2s)
-            rs = 60 * (1500 + ZonePPFD) / (200 + ZonePPFD);
-            ra = 350 * std::pow((0.1 / 0.1), 0.5) * (1 / LAI);
-            ETRate = (1 / hfg) * (slopepat * (In - G) + (2*LAI*rhoair * CpAir * ZoneVPD) / ra) /
-                     (slopepat + psyconst * (1 + rs / ra)); // Stanghellini ET model
-            return ETRate; // mm/s; kg/(m2s)
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine is for using Stanghellini ET model to calculate evapotranspiration rates from the Indoor Greenery System objects.
+        // Reference: Stanghellini, C., Transpiration of greenhouse crops: an aid to climate management, 1987, Institute of Agricultural Engineering,
+        // Wageningen, The Netherlands
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static constexpr std::string_view RoutineName("ETStanghellini: ");
+        Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp) / std::pow(10, 6); // Latent heat of vaporization (MJ/kg)
+        Real64 slopepat =
+            0.200 * std::pow((0.00738 * ZonePreTemp + 0.8072), 7) - 0.000116; // Slope of the saturation vapor pressure-temperature curve (kPa/°C)
+        Real64 CpAir = Psychrometrics::PsyCpAirFnW(ZonePreHum) / std::pow(10, 6); // specific heat of air at constant pressure (MJ kg−1 °C−1)
+        Real64 OutPb = state.dataEnvrn->OutBaroPress / 1000;                      // outdoor pressure (kPa)
+        Real64 constexpr mw(0.622);                                               // ratio molecular weight of water vapor / dry air = 0.622.
+        Real64 psyconst = CpAir * OutPb / (hfg * mw);                             // Psychrometric constant (kPa/°C)
+        Real64 rs = 0.0;                                                          // stomatal resistance s/m
+        Real64 ra = 0.0;                                                          // aerodynamic resistance s/m
+        Real64 In = ZonePPFD * 0.327 / std::pow(10, 6);                           // net radiation MW/m2
+        Real64 G = 0.0;                                                           // soil heat flux (MJ/(m2s))
+        Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, OutPb * 1000, ZonePreTemp, ZonePreHum); // kg/m3
+        Real64 ETRate;                                                                                   // mm/s; kg/(m2s)
+        rs = 60 * (1500 + ZonePPFD) / (200 + ZonePPFD);
+        ra = 350 * std::pow((0.1 / 0.1), 0.5) * (1 / LAI);
+        ETRate = (1 / hfg) * (slopepat * (In - G) + (2 * LAI * rhoair * CpAir * ZoneVPD) / ra) /
+                 (slopepat + psyconst * (1 + rs / ra)); // Stanghellini ET model
+        return ETRate;                                  // mm/s; kg/(m2s)
     }
-  
-} // namespace Indoor Green
+
+} // namespace IndoorGreen
 
 } // namespace EnergyPlus
