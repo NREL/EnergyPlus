@@ -111,9 +111,7 @@ namespace IndoorGreen {
         int ZoneListPtr = 0;
         int ZonePtr = 0;  // point to the zone where the indoor greenery system is located
         int SpacePtr = 0; // point to the space where the indoor greenery system is located
-        // int ETCalculationMethod = 0; // - Method for ET calculation-(Penman-Monteith=1, Stanghellini=2, Data-driven=3)
         ETCalculationMethod etCalculationMethod; // Enum for ETCalculationMethod
-        // int LightingMethod = 0;      // - Method for light calculation-(LED=1, Daylighting=2, LED-Daylighting=3)
         LightingMethod lightingMethod; // Enum for LightingMethod
         bool CheckIndoorGreenName = true;
         Real64 EMSET = 0.0;

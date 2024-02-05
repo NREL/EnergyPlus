@@ -143,12 +143,6 @@ namespace IndoorGreen {
             ig.SurfPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
             if (ig.SurfPtr <= 0) {
                 ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2));
-                // ShowSevereError(state,
-                //                 format("{}=\"{}\", invalid {} entered={}",
-                //                        RoutineName,
-                //                        state.dataIPShortCut->cAlphaArgs(1),
-                //                        state.dataIPShortCut->cAlphaFieldNames(2),
-                //                        state.dataIPShortCut->cAlphaArgs(2)));
                 ErrorsFound = true;
             } else {
                 // check for SurfaceProperty:HeatBalanceSourceTerm
@@ -186,20 +180,6 @@ namespace IndoorGreen {
             ig.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
             if (ig.SchedPtr == 0) {
                 ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3));
-                // if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                //     ShowSevereError(state,
-                //                    format("{} =\"{}\", {} is required.",
-                //                            RoutineName,
-                //                            state.dataIPShortCut->cAlphaArgs(1),
-                //                            state.dataIPShortCut->cAlphaFieldNames(3)));
-                // } else {
-                //     ShowSevereError(state,
-                //                     format("{} =\"{}\", invalid {} entered={}",
-                //                            RoutineName,
-                //                            state.dataIPShortCut->cAlphaArgs(1),
-                //                            state.dataIPShortCut->cAlphaFieldNames(3),
-                //                            state.dataIPShortCut->cAlphaArgs(3)));
-                // }
                 ErrorsFound = true;
             } else { // check min/max on schedule
                 SchMin = ScheduleManager::GetScheduleMinValue(state, ig.SchedPtr);
@@ -238,12 +218,6 @@ namespace IndoorGreen {
                 ig.etCalculationMethod = ETCalculationMethod::DataDriven;
             } else {
                 ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4));
-                // ShowSevereError(state,
-                //                 format("{}=\"{}\", invalid {} entered={}",
-                //                        RoutineName,
-                //                        state.dataIPShortCut->cAlphaArgs(1),
-                //                        state.dataIPShortCut->cAlphaFieldNames(4),
-                //                        state.dataIPShortCut->cAlphaArgs(4)));
                 ErrorsFound = true;
             }
             // read lighting method (LED=1; Daylight=2; LED-Daylight=3)
@@ -256,12 +230,6 @@ namespace IndoorGreen {
                 ig.lightingMethod = LightingMethod::LEDDaylighting;
             } else {
                 ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5));
-                // ShowSevereError(state,
-                //                 format("{}=\"{}\", invalid {} entered={}",
-                //                        RoutineName,
-                //                        state.dataIPShortCut->cAlphaArgs(1),
-                //                        state.dataIPShortCut->cAlphaFieldNames(5),
-                //                        state.dataIPShortCut->cAlphaArgs(5)));
                 ErrorsFound = true;
             }
             switch (ig.lightingMethod) {
@@ -270,20 +238,6 @@ namespace IndoorGreen {
                 ig.SchedLEDPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
                 if (ig.SchedLEDPtr == 0) {
                     ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6));
-                    // if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    //     ShowSevereError(state,
-                    //                     format("{} =\"{}\", {} is required.",
-                    //                            RoutineName,
-                    //                            state.dataIPShortCut->cAlphaArgs(1),
-                    //                            state.dataIPShortCut->cAlphaFieldNames(6)));
-                    // } else {
-                    //     ShowSevereError(state,
-                    //                     format("{} =\"{}\", invalid {} entered={}",
-                    //                            RoutineName,
-                    //                            state.dataIPShortCut->cAlphaArgs(1),
-                    //                            state.dataIPShortCut->cAlphaFieldNames(6),
-                    //                            state.dataIPShortCut->cAlphaArgs(6)));
-                    // }
                     ErrorsFound = true;
                 } else { // check min/max on schedule
                     SchMin = ScheduleManager::GetScheduleMinValue(state, ig.SchedLEDPtr);
@@ -319,28 +273,11 @@ namespace IndoorGreen {
                 ig.LightRefPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
                                                       state.dataDayltg->DaylRefPt,
                                                       &EnergyPlus::Dayltg::RefPointData::Name); // Field: Daylighting Reference Point Name
-                // state.dataDaylightingData->daylightControl
-                // if (ig.LightRefPtr == 0) {
-                //     ShowSevereError(state,
-                //                     format("{}: invalid {}=\"{}\" for object named: {}",
-                //                            state.dataIPShortCut->cCurrentModuleObject,
-                //                            state.dataIPShortCut->cAlphaFieldNames(7),
-                //                            state.dataIPShortCut->cAlphaArgs(7),
-                //                            state.dataIPShortCut->cAlphaArgs(1)));
-                //     ErrorsFound = true;
-                //     continue;
-                // }
                 ig.LightControlPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
                                                           state.dataDayltg->daylightControl,
                                                           &EnergyPlus::Dayltg::DaylightingControl::Name); // Field: Daylighting Control Name
                 if (ig.LightControlPtr == 0) {
                     ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7));
-                    // ShowSevereError(state,
-                    //                 format("{}: invalid {}=\"{}\" for object named: {}",
-                    //                        state.dataIPShortCut->cCurrentModuleObject,
-                    //                        state.dataIPShortCut->cAlphaFieldNames(7),
-                    //                        state.dataIPShortCut->cAlphaArgs(7),
-                    //                        state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                     continue;
                 }
@@ -349,48 +286,17 @@ namespace IndoorGreen {
                 ig.LightRefPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
                                                       state.dataDayltg->DaylRefPt,
                                                       &EnergyPlus::Dayltg::RefPointData::Name); // Field: Daylighting Reference Point Name
-                // state.dataDaylightingData->daylightControl
-                // if (ig.LightRefPtr == 0) {
-                //     ShowSevereError(state,
-                //                     format("{}: invalid {}=\"{}\" for object named: {}",
-                //                            state.dataIPShortCut->cCurrentModuleObject,
-                //                            state.dataIPShortCut->cAlphaFieldNames(7),
-                //                            state.dataIPShortCut->cAlphaArgs(7),
-                //                            state.dataIPShortCut->cAlphaArgs(1)));
-                //     ErrorsFound = true;
-                //     continue;
-                // }
                 ig.LightControlPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
                                                           state.dataDayltg->daylightControl,
                                                           &EnergyPlus::Dayltg::DaylightingControl::Name); // Field: Daylighting Control Name
                 if (ig.LightControlPtr == 0) {
                     ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7));
-                    // ShowSevereError(state,
-                    //                 format("{}: invalid {}=\"{}\" for object named: {}",
-                    //                        state.dataIPShortCut->cCurrentModuleObject,
-                    //                        state.dataIPShortCut->cAlphaFieldNames(7),
-                    //                        state.dataIPShortCut->cAlphaArgs(7),
-                    //                        state.dataIPShortCut->cAlphaArgs(1)));
                     ErrorsFound = true;
                     continue;
                 }
                 ig.SchedLEDDaylightTargetPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(8));
                 if (ig.SchedLEDDaylightTargetPtr == 0) {
                     ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8));
-                    // if (state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-                    //     ShowSevereError(state,
-                    //                     format("{} =\"{}\", {} is required.",
-                    //                            RoutineName,
-                    //                            state.dataIPShortCut->cAlphaArgs(1),
-                    //                            state.dataIPShortCut->cAlphaFieldNames(8)));
-                    // } else {
-                    //     ShowSevereError(state,
-                    //                     format("{} =\"{}\", invalid {} entered={}",
-                    //                            RoutineName,
-                    //                            state.dataIPShortCut->cAlphaArgs(1),
-                    //                            state.dataIPShortCut->cAlphaFieldNames(8),
-                    //                            state.dataIPShortCut->cAlphaArgs(8)));
-                    // }
                     ErrorsFound = true;
                 } else { // check min/max on schedule
                     SchMin = ScheduleManager::GetScheduleMinValue(state, ig.SchedLEDDaylightTargetPtr);
@@ -644,12 +550,10 @@ namespace IndoorGreen {
                 ig.LEDActualEleCon = ig.LEDNominalEleP * Timestep;
             } break;
             case (LightingMethod::Daylighting): {
-
                 ig.ZPPFD = 0;
                 ig.LEDActualPPFD = 0;
                 ig.LEDActualEleP = 0;
                 ig.LEDActualEleCon = 0;
-
                 if (!state.dataDayltg->CalcDayltghCoefficients_firstTime && state.dataEnvrn->SunIsUp) {
                     ig.ZPPFD = state.dataDayltg->daylightControl(ig.LightControlPtr).refPts(1).lums[DataSurfaces::iLum_Illum] /
                                77; // To be updated currently only take one reference point; 77 conversion factor from Lux to PPFD
