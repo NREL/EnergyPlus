@@ -644,27 +644,47 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConvertToEscaped)
 {
-    EXPECT_EQ("", ConvertToEscaped(""));
-    EXPECT_EQ(" ", ConvertToEscaped(" "));
-    EXPECT_EQ("String with &gt; in it", ConvertToEscaped("String with > in it"));
-    EXPECT_EQ("String with &lt; in it", ConvertToEscaped("String with < in it"));
-    EXPECT_EQ("String with &amp; in it", ConvertToEscaped("String with & in it"));
-    EXPECT_EQ("String with &quot; in it", ConvertToEscaped("String with \" in it"));
-    EXPECT_EQ("String with &apos; in it", ConvertToEscaped("String with \' in it"));
-    EXPECT_EQ("String with &quot; in it", ConvertToEscaped(R"(String with \" in it)"));
-    EXPECT_EQ("String with &apos; in it", ConvertToEscaped(R"(String with \' in it)"));
-    EXPECT_EQ("String with &deg; in it", ConvertToEscaped(std::string("String with ") + char(176) + std::string(" in it")));
-    EXPECT_EQ("String with &deg; in it", ConvertToEscaped("String with \u00B0 in it"));
-    EXPECT_EQ("String with &deg; in it", ConvertToEscaped("String with \xB0 in it"));
-    EXPECT_EQ("String with &deg; in it", ConvertToEscaped("String with \xC2\xB0 in it"));
-    EXPECT_EQ("String with \xC2 in it", ConvertToEscaped("String with \xC2 in it"));
-    EXPECT_EQ("String with \xC2\xB1 in it", ConvertToEscaped("String with \xC2\xB1 in it"));
-    EXPECT_EQ("String with &deg; in it", ConvertToEscaped(R"(String with \u00B0 in it)"));
-    EXPECT_EQ("String with &deg; in it", ConvertToEscaped(R"(String with \xB0 in it)"));
-    EXPECT_EQ("String with &le; in it", ConvertToEscaped("String with ≤ in it"));
-    EXPECT_EQ("String with &ge; in it", ConvertToEscaped("String with ≥ in it"));
-    EXPECT_ANY_THROW(ConvertToEscaped(R"(String with \u in it)"));
-    EXPECT_ANY_THROW(ConvertToEscaped(R"(String with \x in it)"));
+    // check xml
+    EXPECT_EQ("", ConvertToEscaped("", true));
+    EXPECT_EQ(" ", ConvertToEscaped(" ", true));
+    EXPECT_EQ("Xml string with &gt; in it", ConvertToEscaped("Xml string with > in it", true));
+    EXPECT_EQ("Xml string with &lt; in it", ConvertToEscaped("Xml string with < in it", true));
+    EXPECT_EQ("Xml string with &amp; in it", ConvertToEscaped("Xml string with & in it", true));
+    EXPECT_EQ("Xml string with &quot; in it", ConvertToEscaped("Xml string with \" in it", true));
+    EXPECT_EQ("Xml string with &apos; in it", ConvertToEscaped("Xml string with \' in it", true));
+    EXPECT_EQ("Xml string with &quot; in it", ConvertToEscaped(R"(Xml string with \" in it)", true));
+    EXPECT_EQ("Xml string with &apos; in it", ConvertToEscaped(R"(Xml string with \' in it)", true));
+    EXPECT_EQ("気", ConvertToEscaped("気", true), "don't mangle the Japanese character for air in unicode");
+    EXPECT_EQ(std::string("Xml string with ") + char(176) + std::string(" in it"),
+              ConvertToEscaped(std::string("Xml string with ") + char(176) + std::string(" in it"), true), 
+        "don't escape degree symbol with &deg; in xml since it is not a valid escape");
+    EXPECT_EQ("Xml string with \xC2 in it", ConvertToEscaped("Xml string with \xC2 in it", true));
+    EXPECT_EQ("Xml string with \xC2\xB1 in it", ConvertToEscaped("Xml string with \xC2\xB1 in it", true));
+    EXPECT_EQ("Xml string with ≤ in it",
+              ConvertToEscaped("Xml string with ≤ in it", true),
+              "don't escape less than or equal symbol with &le; in xml since it is not a valid escape");
+    EXPECT_EQ("Xml string with ≥; in it", ConvertToEscaped("Xml string with ≥; in it", true));
+    EXPECT_ANY_THROW(ConvertToEscaped(R"(Xml string with \u in it)", true));
+    EXPECT_ANY_THROW(ConvertToEscaped(R"(Xml string with \x in it)", true));
+
+    // check html
+    EXPECT_EQ("", ConvertToEscaped("", false));
+    EXPECT_EQ(" ", ConvertToEscaped(" ", false));
+    EXPECT_EQ("Html string with &gt; in it", ConvertToEscaped("Html string with > in it", false));
+    EXPECT_EQ("Html string with &lt; in it", ConvertToEscaped("Html string with < in it", false));
+    EXPECT_EQ("Html string with &amp; in it", ConvertToEscaped("Html string with & in it", false));
+    EXPECT_EQ("Html string with &deg; in it", ConvertToEscaped(std::string("Html string with ") + char(176) + std::string(" in it"), false));
+    EXPECT_EQ("Html string with &deg; in it", ConvertToEscaped("Html string with \u00B0 in it", false));
+    EXPECT_EQ("Html string with &deg; in it", ConvertToEscaped("Html string with \xB0 in it", false));
+    EXPECT_EQ("Html string with &deg; in it", ConvertToEscaped("Html string with \xC2\xB0 in it", false));
+    EXPECT_EQ("Html string with \xC2 in it", ConvertToEscaped("Html string with \xC2 in it", false));
+    EXPECT_EQ("Html string with \xC2\xB1 in it", ConvertToEscaped("Html string with \xC2\xB1 in it", false));
+    EXPECT_EQ("Html string with &deg; in it", ConvertToEscaped(R"(Html string with \u00B0 in it)", false));
+    EXPECT_EQ("Html string with &deg; in it", ConvertToEscaped(R"(Html string with \xB0 in it)", false));
+    EXPECT_EQ("Html string with &le; in it", ConvertToEscaped("Html string with ≤ in it", false));
+    EXPECT_EQ("Html string with &ge; in it", ConvertToEscaped("Html string with ≥ in it", false));
+    EXPECT_ANY_THROW(ConvertToEscaped(R"(Html string with \u in it)", false));
+    EXPECT_ANY_THROW(ConvertToEscaped(R"(Html string with \x in it)", false));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConvertUnicodeToUTF8)
