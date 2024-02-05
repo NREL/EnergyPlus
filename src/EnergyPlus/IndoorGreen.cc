@@ -233,8 +233,7 @@ namespace IndoorGreen {
                 ErrorsFound = true;
             }
             switch (ig.lightingMethod) {
-
-            case (LightingMethod::LED): {
+            case LightingMethod::LED : {
                 ig.SchedLEDPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
                 if (ig.SchedLEDPtr == 0) {
                     ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6));
@@ -268,7 +267,7 @@ namespace IndoorGreen {
                     }
                 }
             } break;
-            case (LightingMethod::Daylighting): {
+            case LightingMethod::Daylighting: {
                 //(ig.LightingMethod == 2 || ig.LightingMethod == 3) {
                 ig.LightRefPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
                                                       state.dataDayltg->DaylRefPt,
@@ -282,7 +281,7 @@ namespace IndoorGreen {
                     continue;
                 }
             } break;
-            case (LightingMethod::LEDDaylighting): {
+            case LightingMethod::LEDDaylighting : {
                 ig.LightRefPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
                                                       state.dataDayltg->DaylRefPt,
                                                       &EnergyPlus::Dayltg::RefPointData::Name); // Field: Daylighting Reference Point Name
@@ -543,13 +542,13 @@ namespace IndoorGreen {
             }
             // ZonePPFD
             switch (ig.lightingMethod) {
-            case (LightingMethod::LED): {
+            case LightingMethod::LED : {
                 ig.ZPPFD = ScheduleManager::GetCurrentScheduleValue(state, ig.SchedLEDPtr) * ig.LEDNominalPPFD; // PPFD
                 ig.LEDActualPPFD = ig.LEDNominalPPFD;
                 ig.LEDActualEleP = ig.LEDNominalEleP;
                 ig.LEDActualEleCon = ig.LEDNominalEleP * Timestep;
             } break;
-            case (LightingMethod::Daylighting): {
+            case LightingMethod::Daylighting : {
                 ig.ZPPFD = 0;
                 ig.LEDActualPPFD = 0;
                 ig.LEDActualEleP = 0;
@@ -559,7 +558,7 @@ namespace IndoorGreen {
                                77; // To be updated currently only take one reference point; 77 conversion factor from Lux to PPFD
                 }
             } break;
-            case (LightingMethod::LEDDaylighting): {
+            case LightingMethod::LEDDaylighting : {
                 Real64 a = ScheduleManager::GetCurrentScheduleValue(state, ig.SchedLEDDaylightTargetPtr);
                 Real64 b = 0;
                 if (!state.dataDayltg->CalcDayltghCoefficients_firstTime && state.dataEnvrn->SunIsUp) {
