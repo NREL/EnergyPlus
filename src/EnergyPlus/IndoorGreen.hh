@@ -123,6 +123,8 @@ namespace IndoorGreen {
 
     void GetIndoorGreenInput(EnergyPlusData &state, bool &ErrorsFound);
 
+    void SetIndoorGreenOutput(EnergyPlusData &state);
+
     void InitIndoorGreen(EnergyPlusData &state);
 
     void ETModel(EnergyPlusData &state);

@@ -92,6 +92,7 @@ namespace IndoorGreen {
             if (ErrorsFound) {
                 ShowFatalError(state, format("{}Errors found in input.  Program terminates.", RoutineName));
             }
+            SetIndoorGreenOutput(state);
             lw->getInputFlag = false;
         }
         if (lw->NumIndoorGreen > 0) {
@@ -379,7 +380,11 @@ namespace IndoorGreen {
                 SetupEMSActuator(state, "IndoorLivingWall", ig.Name, "ETCaldatadriven", "[kg_m2s]", ig.EMSETCalOverrideOn, ig.EMSET);
             } // EMS and API
         }
+    }
+    void SetIndoorGreenOutput(EnergyPlusData &state)
+    {
         // Set up output variables
+        auto &lw = state.dataIndoorGreen;
         for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
             auto &ig = lw->indoorGreens(IndoorGreenNum);
             SetupZoneInternalGain(state,
