@@ -654,10 +654,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConvertToEscaped)
     EXPECT_EQ("Xml string with &apos; in it", ConvertToEscaped("Xml string with \' in it", true));
     EXPECT_EQ("Xml string with &quot; in it", ConvertToEscaped(R"(Xml string with \" in it)", true));
     EXPECT_EQ("Xml string with &apos; in it", ConvertToEscaped(R"(Xml string with \' in it)", true));
-    EXPECT_EQ("気", ConvertToEscaped("気", true), "don't mangle the Japanese character for air in unicode");
+    EXPECT_EQ("気", ConvertToEscaped("気", true)); // Don't mangle the Japanese character for air in unicode.
     EXPECT_EQ(std::string("Xml string with ") + char(176) + std::string(" in it"),
-              ConvertToEscaped(std::string("Xml string with ") + char(176) + std::string(" in it"), true), 
-        "don't escape degree symbol with &deg; in xml since it is not a valid escape");
+              ConvertToEscaped(std::string("Xml string with ") + char(176) + std::string(" in it"), true));
+    // Don't escape degree symbol with &deg; in xml since it is not a valid escape.
+
     EXPECT_EQ("Xml string with \xC2 in it", ConvertToEscaped("Xml string with \xC2 in it", true));
     EXPECT_EQ("Xml string with \xC2\xB1 in it", ConvertToEscaped("Xml string with \xC2\xB1 in it", true));
     EXPECT_EQ("Xml string with ≤ in it",
