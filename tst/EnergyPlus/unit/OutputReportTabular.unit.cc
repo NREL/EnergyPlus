@@ -661,9 +661,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConvertToEscaped)
 
     EXPECT_EQ("Xml string with \xC2 in it", ConvertToEscaped("Xml string with \xC2 in it", true));
     EXPECT_EQ("Xml string with \xC2\xB1 in it", ConvertToEscaped("Xml string with \xC2\xB1 in it", true));
-    EXPECT_EQ("Xml string with ≤ in it",
-              ConvertToEscaped("Xml string with ≤ in it", true),
-              "don't escape less than or equal symbol with &le; in xml since it is not a valid escape");
+    EXPECT_EQ("Xml string with ≤ in it", ConvertToEscaped("Xml string with ≤ in it", true));
+    // Don't escape less than or equal symbol with &le; in xml since it is not a valid escape.
+
     EXPECT_EQ("Xml string with ≥; in it", ConvertToEscaped("Xml string with ≥; in it", true));
     EXPECT_ANY_THROW(ConvertToEscaped(R"(Xml string with \u in it)", true));
     EXPECT_ANY_THROW(ConvertToEscaped(R"(Xml string with \x in it)", true));
