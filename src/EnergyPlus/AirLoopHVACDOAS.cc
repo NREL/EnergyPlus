@@ -247,7 +247,15 @@ namespace AirLoopHVACDOAS {
                     for (auto const &NodeDOASName : NodeArray) {
                         num += 1;
                         std::string name = Util::makeUPPER(NodeDOASName.at("inlet_node_name").get<std::string>());
-                        int NodeNum = Util::FindItemInList(name, state.dataLoopNodes->NodeID);
+                        int NodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                          name,
+                                                                          errorsFound,
+                                                                          DataLoopNode::ConnectionObjectType::AirLoopHVACMixer,
+                                                                          thisObjectName,
+                                                                          DataLoopNode::NodeFluidType::Air,
+                                                                          DataLoopNode::ConnectionType::Inlet,
+                                                                          NodeInputManager::CompFluidStream::Primary,
+                                                                          DataLoopNode::ObjectIsParent);
                         if (NodeNum > 0 && num <= thisMixer.numOfInletNodes) {
                             thisMixer.InletNodeName.push_back(name);
                             thisMixer.InletNodeNum.push_back(NodeNum);
@@ -403,7 +411,15 @@ namespace AirLoopHVACDOAS {
                         num += 1;
 
                         std::string name = Util::makeUPPER(NodeDOASName.at("outlet_node_name").get<std::string>());
-                        int NodeNum = Util::FindItemInList(name, state.dataLoopNodes->NodeID);
+                        int NodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                          name,
+                                                                          errorsFound,
+                                                                          DataLoopNode::ConnectionObjectType::AirLoopHVACSplitter,
+                                                                          thisObjectName,
+                                                                          DataLoopNode::NodeFluidType::Air,
+                                                                          DataLoopNode::ConnectionType::Inlet,
+                                                                          NodeInputManager::CompFluidStream::Primary,
+                                                                          DataLoopNode::ObjectIsParent);
                         if (NodeNum > 0 && num <= thisSplitter.numOfOutletNodes) {
                             thisSplitter.OutletNodeName.push_back(name);
                             thisSplitter.OutletNodeNum.push_back(NodeNum);
