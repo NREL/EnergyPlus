@@ -1883,36 +1883,6 @@
     West Zone,               !- Output:Variable or Output:Meter Index Key Name
     Zone Thermostat Cooling Setpoint Temperature;  !- Output:Variable or Output:Meter Name
 
-  EnergyManagementSystem:Actuator,
-    Zone1WinAC_PrimAir_Tout, !- Name
-    Zone1WindAC,             !- Actuated Component Unique Name
-    Primary Air Connection,  !- Actuated Component Type
-    Outlet Temperature;      !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    Zone1WinAC_PrimAir_Wout, !- Name
-    Zone1WindAC,             !- Actuated Component Unique Name
-    Primary Air Connection,  !- Actuated Component Type
-    Outlet Humidity Ratio;   !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    Zone1WinAC_PrimAir_MdotOut,  !- Name
-    Zone1WindAC,             !- Actuated Component Unique Name
-    Primary Air Connection,  !- Actuated Component Type
-    Outlet Mass Flow Rate;   !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    Zone1WinAC_PrimAir_MdotIn,  !- Name
-    Zone1WindAC,             !- Actuated Component Unique Name
-    Primary Air Connection,  !- Actuated Component Type
-    Inlet Mass Flow Rate;    !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    Zone1WinAC_OA_MdotIn,    !- Name
-    Zone1WindAC,             !- Actuated Component Unique Name
-    Secondary Air Connection,!- Actuated Component Type
-    Inlet Mass Flow Rate;    !- Actuated Component Control Type
-
   EnergyManagementSystem:InternalVariable,
     Zone1WinAC_PrimAir_Tinlet,  !- Name
     Zone1WindAC,             !- Internal Data Index Key Name
@@ -2352,7 +2322,7 @@
     W;                       !- Units
 
   EnergyManagementSystem:MeteredOutputVariable,
-    Zone 3 WinAC Electricity Consumption [J],  !- Name
+    Zone 3 WinAC Electricity Consumption,  !- Name
     Zone3WinAC_ElectEnergy,  !- EMS Variable Name
     SystemTimestep,          !- Update Frequency
     Zone3_WinAC_ModelOuput,  !- EMS Program or Subroutine Name
