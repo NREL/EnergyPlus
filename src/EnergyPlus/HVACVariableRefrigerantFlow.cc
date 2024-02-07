@@ -11718,9 +11718,9 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 
         // Key outputs of this subroutine
         this->CompActSpeed = max(CompSpdActual, 0.0);
-        this->Ncomp = max(Ncomp, 0.0) / this->EffCompInverter; // 0.95 is the efficiency of the compressor inverter, can come from IDF //@minor
-        this->OUFanPower = this->RatedOUFanPower;              //@ * pow_3( CondFlowRatio )
-        this->VRFCondCyclingRatio = CyclingRatio;              // report variable for cycling rate
+        this->Ncomp = max(Ncomp, 0.0) / this->EffCompInverter;   // 0.95 is the efficiency of the compressor inverter, can come from IDF //@minor
+        this->OUFanPower = this->RatedOUFanPower * CyclingRatio; //@ * pow_3( CondFlowRatio )
+        this->VRFCondCyclingRatio = CyclingRatio;                // report variable for cycling rate
 
         Tdischarge = this->CondensingTemp; // outdoor unit condensing temperature
         this->CoolingCapacity =
@@ -11943,7 +11943,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         // Key outputs of this subroutine
         this->CompActSpeed = max(CompSpdActual, 0.0);
         this->Ncomp = max(Ncomp, 0.0) / this->EffCompInverter;
-        this->OUFanPower = this->RatedOUFanPower;
+        this->OUFanPower = this->RatedOUFanPower * CyclingRatio;
         this->VRFCondCyclingRatio = CyclingRatio;
 
         Tsuction = this->EvaporatingTemp; // Outdoor unit evaporating temperature
@@ -12490,6 +12490,27 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         this->ElecHeatingPower = 0;
     }
     this->VRFCondRTF = VRFRTF;
+    // consider cycling in fan calculation
+    for (int TUListNum = 1; TUListNum <= state.dataHVACVarRefFlow->NumVRFTULists; ++TUListNum) {
+        auto &thisTUList = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum);
+        for (int TUNum = 1; TUNum <= thisTUList.NumTUInList; ++TUNum) {
+            int heatingCoilNum = state.dataHVACVarRefFlow->VRFTU(TUNum).HeatCoilIndex;
+            int coolingCoilNum = state.dataHVACVarRefFlow->VRFTU(TUNum).CoolCoilIndex;
+            auto &heatingCoil = state.dataDXCoils->DXCoil(heatingCoilNum);
+            auto &coolingCoil = state.dataDXCoils->DXCoil(coolingCoilNum);
+            int fanIndex = state.dataHVACVarRefFlow->VRFTU(TUNum).FanIndex;
+            // only deal with cooling for now. heating RTF might have some issue
+            // does Fan:SystemModel need adjustment as well? if so consider 0-indexing and it's in state.dataHVACFan->fanObjs vector
+            if (fanIndex > 0 && heatingCoil.HeatingCoilRuntimeFraction == 0.0) { // in cooling mode
+                // here coolingCoil.CoolingCoilRuntimeFraction equals state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondCyclingRatio
+                // this is not the case for heating
+                auto &fan = state.dataFans->Fan(fanIndex);
+                fan.FanPower *= coolingCoil.CoolingCoilRuntimeFraction;
+                fan.FanEnergy = fan.FanPower * state.dataHVACGlobal->TimeStepSysSec;
+                fan.PowerLossToAir *= coolingCoil.CoolingCoilRuntimeFraction;
+            }
+        }
+    }
 
     // Calculate CrankCaseHeaterPower: VRF Heat Pump Crankcase Heater Electric Power [W]
     if (this->MaxOATCCHeater > OutdoorDryBulb) {
