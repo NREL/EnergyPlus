@@ -449,7 +449,7 @@ namespace IndoorGreen {
                                 OutputProcessor::SOVStoreType::Average,
                                 ig.Name);
             SetupOutputVariable(state,
-                                "Indoor Living Wall VPD",
+                                "Indoor Living Wall Vapor Pressure Deficit",
                                 Constant::Units::Pa,
                                 ig.ZVPD,
                                 OutputProcessor::SOVTimeStepType::Zone,
