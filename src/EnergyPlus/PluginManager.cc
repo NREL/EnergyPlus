@@ -108,9 +108,10 @@ void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledF
     state.dataPluginManager->callbacks[iCalledFrom].push_back(f);
 }
 
-void registerUserDefinedCallback(EnergyPlusData &state, const std::function<void(void *)> &f, std::string programNameInInputFile)
+void registerUserDefinedCallback(EnergyPlusData &state, const std::function<void(void *)> &f, const std::string &programNameInInputFile)
 {
-    state.dataPluginManager->userDefinedCallbackNames.push_back(programNameInInputFile);
+    // internally, E+ will UPPER the program name; we should upper the passed in registration name so it matches
+    state.dataPluginManager->userDefinedCallbackNames.push_back(Util::makeUPPER(programNameInInputFile));
     state.dataPluginManager->userDefinedCallbacks.push_back(f);
 }
 
@@ -1465,13 +1466,10 @@ void PluginManager::runSingleUserDefinedPlugin([[maybe_unused]] EnergyPlusData &
 }
 #endif
 
-int PluginManager::getUserDefinedCallbackIndex(EnergyPlusData &state, std::string callbackProgramName)
+int PluginManager::getUserDefinedCallbackIndex(EnergyPlusData &state, const std::string &callbackProgramName)
 {
-    int i = -1;
-    for (auto &knownName : state.dataPluginManager->userDefinedCallbackNames) {
-        i++;
-        // Use UtilityRoutines::MakeUPPERCase() ?  Probably not.
-        if (knownName == callbackProgramName) {
+    for (int i = 0; i < state.dataPluginManager->userDefinedCallbackNames.size(); i++) {
+        if (state.dataPluginManager->userDefinedCallbackNames[i] == callbackProgramName) {
             return i;
         }
     }

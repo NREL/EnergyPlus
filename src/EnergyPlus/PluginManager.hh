@@ -83,7 +83,7 @@ namespace PluginManagement {
     constexpr const char *programName = "python";
 
     void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void(void *)> &f);
-    void registerUserDefinedCallback(EnergyPlusData &state, const std::function<void(void *)> &f, std::string programNameInInputFile);
+    void registerUserDefinedCallback(EnergyPlusData &state, const std::function<void(void *)> &f, const std::string &programNameInInputFile);
 
     void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan);
     void onBeginEnvironment(EnergyPlusData &state);
@@ -208,7 +208,7 @@ namespace PluginManagement {
         static void updatePluginValues(EnergyPlusData &state);
 
         static int getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::string const &_programName);
-        static int getUserDefinedCallbackIndex(EnergyPlusData &state, std::string callbackProgramName);
+        static int getUserDefinedCallbackIndex(EnergyPlusData &state, const std::string &callbackProgramName);
         static void runSingleUserDefinedPlugin(EnergyPlusData &state, int index);
         static void runSingleUserDefinedCallback(EnergyPlusData &state, int index);
         static bool anyUnexpectedPluginObjects(EnergyPlusData &state);
