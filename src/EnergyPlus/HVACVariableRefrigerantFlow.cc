@@ -299,7 +299,9 @@ void SimulateVRF(EnergyPlusData &state,
     } else {
         PLF = 1.0;
     }
-    coolingCoil.CoolingCoilRuntimeFraction = state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFCondCyclingRatio / PLF;
+    if (coolingCoil.TotalCoolingEnergyRate > 0.0) {
+        coolingCoil.CoolingCoilRuntimeFraction = state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFCondCyclingRatio / PLF;
+    }
 }
 
 PlantComponent *VRFCondenserEquipment::factory(EnergyPlusData &state, std::string const &objectName)
