@@ -284,9 +284,22 @@ void SimulateVRF(EnergyPlusData &state,
             UpdateVRFCondenser(state, VRFCondenser);
     }
     // yujie: update coil and IU evaporating temperature
-    state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).EvaporatingTemp =
-        state.dataHVACVarRefFlow->VRF(VRFCondenser).EvaporatingTemp;
-    state.dataHVACVarRefFlow->VRF(VRFCondenser).IUEvaporatingTemp = state.dataHVACVarRefFlow->VRF(VRFCondenser).EvaporatingTemp;
+    if (state.dataHVACVarRefFlow->VRF(VRFCondenser).adjustedTe && (!FirstHVACIteration)) {
+        state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).EvaporatingTemp =
+            state.dataHVACVarRefFlow->VRF(VRFCondenser).EvaporatingTemp;
+        state.dataHVACVarRefFlow->VRF(VRFCondenser).IUEvaporatingTemp = state.dataHVACVarRefFlow->VRF(VRFCondenser).EvaporatingTemp;
+    }
+
+    auto const &thisTU = state.dataHVACVarRefFlow->VRFTU(VRFTUNum);
+    auto &coolingCoil = state.dataDXCoils->DXCoil(thisTU.CoolCoilIndex);
+    int PLF;
+    if (coolingCoil.PLFFPLR(1) > 0 && state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFCondCyclingRatio < 1.0) {
+        PLF = Curve::CurveValue(
+            state, coolingCoil.PLFFPLR(1), state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFCondCyclingRatio); // Calculate part-load factor
+    } else {
+        PLF = 1.0;
+    }
+    coolingCoil.CoolingCoilRuntimeFraction = state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFCondCyclingRatio / PLF;
 }
 
 PlantComponent *VRFCondenserEquipment::factory(EnergyPlusData &state, std::string const &objectName)
@@ -14207,6 +14220,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
     C_cap_operation = this->VRFOU_CapModFactor(
         state, Pipe_h_comp_in, Pipe_h_IU_in, max(min(P_suction, RefPHigh), RefPLow), T_suction + Modifi_SH, T_suction + 8, T_discharge - 5);
 
+    this->adjustedTe = false;
     for (CounterCompSpdTemp = 1; CounterCompSpdTemp <= NumOfCompSpdInput; CounterCompSpdTemp++) {
         // Iteration to find the VRF speed that can meet the required load, Iteration DoName1
 
@@ -14281,6 +14295,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                     NumIteTe = 1;
                     MaxNumIteTe = (this->EvaporatingTemp - SmallLoadTe) / 0.1 + 1; // upper bound and lower bound of Te iterations
                     Pipe_Te_assumed = this->EvaporatingTemp - 0.1;
+                    this->adjustedTe = true;
 
                 Label11:;
                     Pipe_m_ref = 0; // Total Ref Flow Rate( kg/s )
@@ -14426,6 +14441,8 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                 if (CapDiff > (Tolerance * Cap_Eva0)) {
                     NumIteCcap = 999;
                     CyclingRatio = (TU_load + Pipe_Q) * C_cap_operation / Cap_Eva1;
+                } else {
+                    CyclingRatio = 1.0;
                 }
 
                 Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction);
