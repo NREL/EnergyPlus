@@ -13,7 +13,7 @@ jobs:
     - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: 3.10
+        python-version: '3.10'
 
     - name: Set up LaTeX
       run: sudo apt update && sudo apt install -y texlive texlive-xetex texlive-science poppler-utils
