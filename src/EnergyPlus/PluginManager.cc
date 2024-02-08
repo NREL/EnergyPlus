@@ -137,7 +137,7 @@ void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iC
     if (state.dataGlobal->KickOffSimulation) return;
     for (auto const &cb : state.dataPluginManager->callbacks[iCalledFrom]) {
         if (iCalledFrom == EMSManager::EMSCallFrom::UserDefinedComponentModel) {
-            continue;  // these are called -intentionally- using the runSingleUserDefinedCallback method
+            continue; // these are called -intentionally- using the runSingleUserDefinedCallback method
         }
         cb((void *)&state);
         anyRan = true;
