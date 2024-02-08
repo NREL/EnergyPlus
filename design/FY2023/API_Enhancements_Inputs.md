@@ -4,6 +4,7 @@
 
 - 2023-06-21 Initial draft
 - 2023-08-02 Revised draft with more design detail
+- 2024-02-07 Note that some of these enhancements are now being completed for 24.1, while the remaining pieces will be pushed to 24.2.
 
 ## Background
 

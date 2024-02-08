@@ -232,7 +232,6 @@ namespace SimulationManager {
         state.dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(state);
 
         state.dataGlobal->DoingSizing = true;
-
         SizingManager::ManageSizing(state);
 
         bool SimsDone = false;
