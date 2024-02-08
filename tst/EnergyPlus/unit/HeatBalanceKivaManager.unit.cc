@@ -68,7 +68,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-
+ 
 namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)

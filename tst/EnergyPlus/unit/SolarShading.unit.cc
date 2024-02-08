@@ -111,9 +111,14 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     state->dataSurface->SurfOpaqAO.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->SurfWinBackSurfaces.allocate(HoursInDay, NumTimeSteps, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
     state->dataHeatBal->SurfWinOverlapAreas.allocate(HoursInDay, NumTimeSteps, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+
+    state->dataSurface->SunCosHourly.allocate(HoursInDay);
+    state->dataSurface->SolarAzimuthHourly.allocate(HoursInDay);
+    state->dataSurface->SolarAltitudeHourly.allocate(HoursInDay);
     for (int hour = 1; hour <= HoursInDay; hour++) {
-        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+        state->dataSurface->SunCosHourly(hour) = {0.0, 0.0, 0.0};
+        state->dataSurface->SolarAltitudeHourly(hour) = 0.0;
+        state->dataSurface->SolarAzimuthHourly(hour) = 0.0;
     }
     // Test non-integrated option first, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 for all hours
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {

@@ -5886,9 +5886,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     int const HoursInDay(24);
-    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    state->dataSurface->SunCosHourly.allocate(HoursInDay);
+    state->dataSurface->SolarAltitudeHourly.allocate(HoursInDay);
+    state->dataSurface->SolarAzimuthHourly.allocate(HoursInDay);
     for (int hour = 1; hour <= HoursInDay; hour++) {
-        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+        state->dataSurface->SunCosHourly(hour) = {0.0, 0.0, 0.0};
+        state->dataSurface->SolarAltitudeHourly(hour) = 0.0;
+        state->dataSurface->SolarAzimuthHourly(hour) = 0.0;
     }
     //    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
     //    EXPECT_FALSE(ErrorsFound);

@@ -897,10 +897,15 @@ void AllocateModuleArrays(EnergyPlusData &state)
     state.dataSolarShading->XTEMP1.dimension(2 * (state.dataSurface->MaxVerticesPerSurface + 1), 0.0);
     state.dataSolarShading->YTEMP1.dimension(2 * (state.dataSurface->MaxVerticesPerSurface + 1), 0.0);
 
-    state.dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    state.dataSurface->SunCosHourly.allocate(HoursInDay);
+    state.dataSurface->SolarAzimuthHourly.allocate(HoursInDay);
+    state.dataSurface->SolarAltitudeHourly.allocate(HoursInDay);
     for (int hour = 1; hour <= HoursInDay; hour++) {
-        state.dataSurface->SurfSunCosHourly(hour) = 0.0;
+        state.dataSurface->SunCosHourly(hour) = {0.0, 0.0, 0.0};
+        state.dataSurface->SolarAzimuthHourly(hour) = 0.0;
+        state.dataSurface->SolarAltitudeHourly(hour) = 0.0;
     }
+    
     state.dataSurface->SurfSunlitArea.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSurface->SurfSunlitFrac.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSurface->SurfSkySolarInc.dimension(state.dataSurface->TotSurfaces, 0);
@@ -4982,13 +4987,16 @@ void FigureSunCosines(EnergyPlusData &state,
     SUN4(state, CurrentTime, EqOfTime, SinSolarDeclin, CosSolarDeclin);
 
     // Save hourly values for use in DaylightingManager
-    if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
-        if (iTimeStep == state.dataGlobal->NumOfTimeStepInHour) state.dataSurface->SurfSunCosHourly(iHour) = state.dataSolarShading->SUNCOS;
-    } else {
-        state.dataSurface->SurfSunCosHourly(iHour) = state.dataSolarShading->SUNCOS;
+    if (state.dataSysVars->DetailedSolarTimestepIntegration || iTimeStep == state.dataGlobal->NumOfTimeStepInHour) {
+        state.dataSurface->SunCosHourly(iHour) = state.dataSolarShading->SUNCOS;
+        state.dataSurface->SolarAzimuthHourly(iHour) = state.dataSolarShading->SolarAzimuth;
+        state.dataSurface->SolarAltitudeHourly(iHour) = state.dataSolarShading->SolarAltitude;
     }
     // Save timestep values for use in WindowComplexManager
     state.dataBSDFWindow->SUNCOSTS(iTimeStep, iHour) = state.dataSolarShading->SUNCOS;
+    state.dataBSDFWindow->SolarAzimuth(iTimeStep, iHour) = state.dataSolarShading->SolarAzimuth;
+    state.dataBSDFWindow->SolarAltitude(iTimeStep, iHour) = state.dataSolarShading->SolarAltitude;
+    
 }
 
 void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const iTimeStep)
@@ -5013,6 +5021,8 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
 
     // Recover the sun direction from the array stored in previous loop
     state.dataSolarShading->SUNCOS = state.dataBSDFWindow->SUNCOSTS(iTimeStep, iHour);
+    state.dataSolarShading->SolarAzimuth = state.dataBSDFWindow->SolarAzimuth(iTimeStep, iHour);
+    state.dataSolarShading->SolarAltitude = state.dataBSDFWindow->SolarAltitude(iTimeStep, iHour);
 
     state.dataSolarShading->SurfSunCosTheta = 0.0;
 
@@ -9388,14 +9398,17 @@ void SUN4(EnergyPlusData &state,
 
     // Compute the cosine of the solar zenith angle.
     state.dataSolarShading->SUNCOS.z = SinSolarDeclin * state.dataEnvrn->SinLatitude + CosSolarDeclin * state.dataEnvrn->CosLatitude * std::cos(H);
-    state.dataSolarShading->SUNCOS.y = 0.0;
-    state.dataSolarShading->SUNCOS.x = 0.0;
+    state.dataSolarShading->SolarAltitude = std::asin(state.dataSolarShading->SUNCOS.z);
 
-    if (state.dataSolarShading->SUNCOS.z < DataEnvironment::SunIsUpValue) return; // Return if sun not above horizon.
-
-    // Compute other direction cosines.
-    state.dataSolarShading->SUNCOS.y = SinSolarDeclin * state.dataEnvrn->CosLatitude - CosSolarDeclin * state.dataEnvrn->SinLatitude * std::cos(H);
-    state.dataSolarShading->SUNCOS.x = CosSolarDeclin * std::sin(H);
+    if (state.dataSolarShading->SUNCOS.z < DataEnvironment::SunIsUpValue) { // Return if sun not above horizon.
+        state.dataSolarShading->SUNCOS.x = 0.0;
+        state.dataSolarShading->SUNCOS.y = 0.0;
+        state.dataSolarShading->SolarAzimuth = 0;
+    } else {
+        state.dataSolarShading->SUNCOS.y = SinSolarDeclin * state.dataEnvrn->CosLatitude - CosSolarDeclin * state.dataEnvrn->SinLatitude * std::cos(H);
+        state.dataSolarShading->SUNCOS.x = CosSolarDeclin * std::sin(H);
+        state.dataSolarShading->SolarAzimuth = std::atan2(state.dataSolarShading->SUNCOS.x, state.dataSolarShading->SUNCOS.y);
+    }
 }
 
 void WindowShadingManager(EnergyPlusData &state)
@@ -10536,7 +10549,6 @@ void CalcWindowProfileAngles(EnergyPlusData &state)
     Vector3<Real64> WinNorm;                                  // Unit vector normal to window
     Vector3<Real64> WinNormCrossBase;                         // Cross product of WinNorm and vector along window baseline
     Vector3<Real64> SunPrime;                                 // Projection of sun vector onto plane (perpendicular to
-    Vector3<Real64> const SolCosVec(state.dataEnvrn->SOLCOS); // Local Vector3 copy for speed (until SOLCOS mig to Vector3)
     //  window plane) determined by WinNorm and vector along
     //  baseline of window
     Real64 ThWin; // Azimuth angle of WinNorm (radians)
@@ -10544,8 +10556,8 @@ void CalcWindowProfileAngles(EnergyPlusData &state)
     Real64 dot2;
     Real64 dot3;
 
-    ElevSun = Constant::PiOvr2 - std::acos(SolCosVec.z);
-    AzimSun = std::atan2(SolCosVec.x, SolCosVec.y);
+    ElevSun = state.dataEnvrn->SolarAltitude;
+    AzimSun = state.dataEnvrn->SolarAzimuth;
 
     Real64 const cos_ElevSun = std::cos(ElevSun);
     Real64 const sin_ElevSun = std::sin(ElevSun);
@@ -10579,7 +10591,7 @@ void CalcWindowProfileAngles(EnergyPlusData &state)
                 WinNormCrossBase.x = -(sin_Elevwin * std::cos(ThWin));
                 WinNormCrossBase.y = sin_Elevwin * std::sin(ThWin);
                 WinNormCrossBase.z = std::cos(ElevWin);
-                SunPrime = SolCosVec - WinNormCrossBase * dot(SolCosVec, WinNormCrossBase);
+                SunPrime = state.dataEnvrn->SOLCOS - WinNormCrossBase * dot(state.dataEnvrn->SOLCOS, WinNormCrossBase);
                 dot1 = dot(WinNorm, SunPrime);
                 dot2 = SunPrime.magnitude();
                 dot3 = dot1 / dot2;
@@ -10685,12 +10697,12 @@ void CalcFrameDividerShadow(EnergyPlusData &state,
     Real64 FracShFDin; // Fraction of glazing that illuminates frame and divider
     //  inside projections with beam radiation
 
-    Vector3<Real64> WinNorm(3);  // Window outward normal unit vector
+    Vector3<Real64> WinNorm;  // Window outward normal unit vector
     Real64 ThWin;                // Azimuth angle of WinNorm
-    Vector3<Real64> SunPrime(3); // Projection of sun vector onto plane (perpendicular to
+    Vector3<Real64> SunPrime; // Projection of sun vector onto plane (perpendicular to
     //  window plane) determined by WinNorm and vector along
     //  baseline of window
-    Vector3<Real64> WinNormCrossBase(3); // Cross product of WinNorm and vector along window baseline
+    Vector3<Real64> WinNormCrossBase; // Cross product of WinNorm and vector along window baseline
 
     if (state.dataSurface->FrameDivider(FrDivNum).FrameProjectionOut == 0.0 && state.dataSurface->FrameDivider(FrDivNum).FrameProjectionIn == 0.0 &&
         state.dataSurface->FrameDivider(FrDivNum).DividerProjectionOut == 0.0 && state.dataSurface->FrameDivider(FrDivNum).DividerProjectionIn == 0.0)
@@ -10704,9 +10716,9 @@ void CalcFrameDividerShadow(EnergyPlusData &state,
     auto &surf = state.dataSurface->Surface(SurfNum);
     GlArea = surf.Area;
     ElevWin = Constant::PiOvr2 - surf.Tilt * Constant::DegToRadians;
-    ElevSun = Constant::PiOvr2 - std::acos(state.dataSolarShading->SUNCOS.z);
+    ElevSun = state.dataSolarShading->SolarAltitude; // Constant::PiOvr2 - std::acos(state.dataSolarShading->SUNCOS.z);
     AzimWin = surf.Azimuth * Constant::DegToRadians;
-    AzimSun = std::atan2(state.dataSolarShading->SUNCOS.x, state.dataSolarShading->SUNCOS.y);
+    AzimSun = state.dataSolarShading->SolarAzimuth; // std::atan2(state.dataSolarShading->SUNCOS.x, state.dataSolarShading->SUNCOS.y);
 
     ProfileAngHor = std::atan(std::sin(ElevSun) / std::abs(std::cos(ElevSun) * std::cos(AzimWin - AzimSun))) - ElevWin;
     if (std::abs(ElevWin) < 0.1) { // Near-vertical window

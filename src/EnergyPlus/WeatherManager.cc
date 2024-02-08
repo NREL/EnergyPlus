@@ -2024,6 +2024,9 @@ namespace Weather {
 
         // Determine if Sun is up or down, set Solar Cosine values for time step.
         DetermineSunUpDown(state, state.dataEnvrn->SOLCOS);
+        state.dataEnvrn->SolarAzimuth = state.dataWeather->SolarAzimuth;
+        state.dataEnvrn->SolarAltitude = state.dataWeather->SolarAltitude;
+        
         if (state.dataEnvrn->SunIsUp && state.dataWeather->SolarAltitudeAngle < 0.0) {
             ShowFatalError(state, format("SetCurrentWeather: At {} Sun is Up but Solar Altitude Angle is < 0.0", state.dataEnvrn->CurMnDyHr));
         }
@@ -4052,8 +4055,6 @@ namespace Weather {
         // REFERENCES:
         // "NECAP Engineering Manual", 1974, p.3-117
 
-        EP_SIZE_CHECK(SUNCOS, 3); // NOLINT(misc-static-assert)
-
         // COMPUTE THE HOUR ANGLE
         Real64 H =
             (15.0 * (12.0 - (TimeValue + EqOfTime)) + (state.dataEnvrn->TimeZoneMeridian - state.dataEnvrn->Longitude)) * Constant::DegToRadians;
@@ -4105,16 +4106,16 @@ namespace Weather {
         Real64 SolarZenith = std::acos(CosZenith);
         Real64 SinAltitude = state.dataEnvrn->CosLatitude * state.dataWeather->TodayVariables.CosSolarDeclinAngle * std::cos(H) +
                              state.dataEnvrn->SinLatitude * state.dataWeather->TodayVariables.SinSolarDeclinAngle;
-        Real64 SolarAltitude = std::asin(SinAltitude);
+        state.dataWeather->SolarAltitude = std::asin(SinAltitude);
         Real64 CosAzimuth = -(state.dataEnvrn->SinLatitude * CosZenith - state.dataWeather->TodayVariables.SinSolarDeclinAngle) /
                             (state.dataEnvrn->CosLatitude * std::sin(SolarZenith));
         // Following because above can yield invalid cos value.  (e.g. at south pole)
         CosAzimuth = max(CosAzimuth, -1.0);
         CosAzimuth = min(1.0, CosAzimuth);
-        Real64 SolarAzimuth = std::acos(CosAzimuth);
+        state.dataWeather->SolarAzimuth = std::acos(CosAzimuth);
 
-        state.dataWeather->SolarAltitudeAngle = SolarAltitude / Constant::DegToRadians;
-        state.dataWeather->SolarAzimuthAngle = SolarAzimuth / Constant::DegToRadians;
+        state.dataWeather->SolarAltitudeAngle = state.dataWeather->SolarAltitude / Constant::DegToRadians;
+        state.dataWeather->SolarAzimuthAngle = state.dataWeather->SolarAzimuth / Constant::DegToRadians;
         if (state.dataWeather->HrAngle < 0.0) {
             state.dataWeather->SolarAzimuthAngle = 360.0 - state.dataWeather->SolarAzimuthAngle;
         }

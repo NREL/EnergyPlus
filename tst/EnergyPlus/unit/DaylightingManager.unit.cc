@@ -939,9 +939,13 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     state->dataGlobal->WeightNow = 1.0;
     state->dataGlobal->WeightPreviousHour = 0.0;
 
-    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    state->dataSurface->SunCosHourly.allocate(HoursInDay);
+    state->dataSurface->SolarAltitudeHourly.allocate(HoursInDay);
+    state->dataSurface->SolarAzimuthHourly.allocate(HoursInDay);
     for (int hour = 1; hour <= HoursInDay; hour++) {
-        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+        state->dataSurface->SunCosHourly(hour) = {0.0, 0.0, 0.0};
+        state->dataSurface->SolarAltitudeHourly(hour) = 0.0;
+        state->dataSurface->SolarAzimuthHourly(hour) = 0.0;
     }
     CalcDayltgCoefficients(*state);
     int zoneNum = 1;
@@ -2658,9 +2662,14 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->WeightNow = 1.0;
     state->dataGlobal->WeightPreviousHour = 0.0;
-    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    state->dataSurface->SunCosHourly.allocate(HoursInDay);
+    state->dataSurface->SolarAltitudeHourly.allocate(HoursInDay);
+    state->dataSurface->SolarAzimuthHourly.allocate(HoursInDay);
     for (int hour = 1; hour <= HoursInDay; hour++) {
-        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+        state->dataSurface->SunCosHourly(hour) = {0.0, 0.0, 0.0};
+        state->dataSurface->SolarAltitudeHourly(hour) = 0.0;
+        state->dataSurface->SolarAzimuthHourly(hour) = 0.0;
+        
     }
     CalcDayltgCoefficients(*state);
     int zoneNum = 1;
@@ -3359,9 +3368,13 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     int constexpr HoursInDay(24);
-    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    state->dataSurface->SunCosHourly.allocate(HoursInDay);
+    state->dataSurface->SolarAltitudeHourly.allocate(HoursInDay);
+    state->dataSurface->SolarAzimuthHourly.allocate(HoursInDay);
     for (int hour = 1; hour <= HoursInDay; hour++) {
-        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+        state->dataSurface->SunCosHourly(hour) = {0.0, 0.0, 0.0};
+        state->dataSurface->SolarAltitudeHourly(hour) = 0.0;
+        state->dataSurface->SolarAzimuthHourly(hour) = 0.0;
     }
     SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                            // expect no errors

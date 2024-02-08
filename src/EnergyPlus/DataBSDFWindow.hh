@@ -386,6 +386,9 @@ struct BSDFWindowData : BaseGlobalStruct
 
     // calculation
     Array2D<Vector3<Real64>> SUNCOSTS = Array2D<Vector3<Real64>>(60, 24); // Timestep values of solar direction cosines
+    Array2D<Real64> SolarAzimuth = Array2D<Real64>(60,24);
+    Array2D<Real64> SolarAltitude = Array2D<Real64>(60,24);
+        
     Array2D<Real64> BSDFTempMtrx;                                         // Temporary matrix for holding axisymmetric input
     EPVector<DataBSDFWindow::BSDFWindowGeomDescr> ComplexWind;            // Window geometry structure: set in CalcPerSolarBeam/SolarShading
 

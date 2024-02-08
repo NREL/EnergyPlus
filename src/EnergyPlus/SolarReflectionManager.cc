@@ -619,7 +619,7 @@ namespace SolarReflectionManager {
         ReflBmToDiffSolGnd = 0.0;
 
         // Unit vector to sun
-        state.dataSolarReflectionManager->SunVec = state.dataSurface->SurfSunCosHourly(iHour);
+        state.dataSolarReflectionManager->SunVec = state.dataSurface->SunCosHourly(iHour);
 
         // loop through each surface that can receive beam solar reflected as diffuse solar from other surfaces
         for (state.dataSolarReflectionManager->RecSurfNum = 1;
@@ -913,10 +913,10 @@ namespace SolarReflectionManager {
         ReflBmToDiffSolObs = 0.0;
         ReflFacTimesCosIncSum = 0.0;
 
-        if (state.dataSurface->SurfSunCosHourly(iHour).z < DataEnvironment::SunIsUpValue) return; // Skip if sun is below horizon
+        if (state.dataSurface->SunCosHourly(iHour).z < DataEnvironment::SunIsUpValue) return; // Skip if sun is below horizon
 
         // Unit vector to sun
-        state.dataSolarReflectionManager->SunVect = state.dataSurface->SurfSunCosHourly(iHour);
+        state.dataSolarReflectionManager->SunVect = state.dataSurface->SunCosHourly(iHour);
 
         for (int RecSurfNum = 1; RecSurfNum <= state.dataSolarReflectionManager->TotSolReflRecSurf; ++RecSurfNum) {
             int const SurfNum =

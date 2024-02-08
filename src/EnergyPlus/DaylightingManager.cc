@@ -467,7 +467,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
             dl->sunAnglesHr = {SunAngles()};
             dl->horIllum = {Illums()};
             for (int IHR = 1; IHR <= Constant::HoursInDay; ++IHR) {
-                auto const &surfSunCosHr = state.dataSurface->SurfSunCosHourly(IHR);
+                auto const &surfSunCosHr = state.dataSurface->SunCosHourly(IHR);
                 if (surfSunCosHr.z < DataEnvironment::SunIsUpValue)
                     continue; // Skip if sun is below horizon //Autodesk SurfSunCosHourly was uninitialized here
 
@@ -481,7 +481,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
     } else { // timestep integrated calculations
         dl->sunAngles = dl->sunAnglesHr[state.dataGlobal->HourOfDay] = {SunAngles()};
         dl->horIllum[state.dataGlobal->HourOfDay] = Illums();
-        auto const &surfSunCosHr = state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay);
+        auto const &surfSunCosHr = state.dataSurface->SunCosHourly(state.dataGlobal->HourOfDay);
         if (!(surfSunCosHr.z < DataEnvironment::SunIsUpValue)) { // Skip if sun is below horizon
             Real64 phi = Constant::PiOvr2 - std::acos(surfSunCosHr.z);
             Real64 theta = std::atan2(surfSunCosHr.y, surfSunCosHr.x);
@@ -2816,7 +2816,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     // METHODOLOGY EMPLOYED:
     // switch as need to serve both reference points and map points based on calledFrom
 
-    if (state.dataSurface->SurfSunCosHourly(iHour).z < DataEnvironment::SunIsUpValue) return;
+    if (state.dataSurface->SunCosHourly(iHour).z < DataEnvironment::SunIsUpValue) return;
 
     auto &dl = state.dataDayltg;
 
@@ -3028,7 +3028,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
             Real64 const GILSK_mult((state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi) * ObTrans * SkyObstructionMult);
             Real64 const TVISB_ObTrans(TVISB * ObTrans);
             Real64 const AVWLSU_add(TVISB_ObTrans * dl->horIllum[iHour].sun * (state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi));
-            Vector3<Real64> const SUNCOS_iHour(state.dataSurface->SurfSunCosHourly(iHour));
+            Vector3<Real64> const SUNCOS_iHour(state.dataSurface->SunCosHourly(iHour));
             assert(equal_dimensions(dl->dirIllum, dl->avgWinLum));
             auto &edirsk = dl->dirIllum(iHour, 1);
             auto &avwlsk = dl->avgWinLum(iHour, 1);
@@ -3494,7 +3494,7 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &dl = state.dataDayltg;
 
-    if (state.dataSurface->SurfSunCosHourly(iHour).z < DataEnvironment::SunIsUpValue) return;
+    if (state.dataSurface->SunCosHourly(iHour).z < DataEnvironment::SunIsUpValue) return;
 
     ++ISunPos;
 
@@ -3613,7 +3613,7 @@ void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &dl = state.dataDayltg;
 
-    if (state.dataSurface->SurfSunCosHourly(iHour).z < DataEnvironment::SunIsUpValue) return;
+    if (state.dataSurface->SunCosHourly(iHour).z < DataEnvironment::SunIsUpValue) return;
 
     // Loop over shading index (1=bare window; 2=diffusing glazing, shade, screen or fixed slat-angle blind;
     // 2 to Material::MaxSlatAngs+1 for variable slat-angle blind)
@@ -7138,7 +7138,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     DPH = (PHMAX - PHMIN) / double(NPHMAX);
 
     // Sky/ground element altitude integration
-    Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SurfSunCosHourly(IHR));
+    Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SunCosHourly(IHR));
     for (int IPH = 1; IPH <= NPHMAX; ++IPH) {
         PH = PHMIN + (double(IPH) - 0.5) * DPH;
 
@@ -7677,7 +7677,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 Real64 ProfAng;
                 if (BlindOn) {
                     auto const &blind = state.dataMaterial->Blind(BlNum);
-                    ProfAng = ProfileAngle(state, IWin, state.dataSurface->SurfSunCosHourly(IHR), blind.SlatOrientation);
+                    ProfAng = ProfileAngle(state, IWin, state.dataSurface->SunCosHourly(IHR), blind.SlatOrientation);
                 }
 
                 for (int JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
@@ -7936,7 +7936,7 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
 
         // add exterior ground element obstruction multipliers to calculated luminances. For sun reflection, calculate if
         // sun reaches the ground for that point
-        Vector3<Real64> const SUNCOS_IHR = state.dataSurface->SurfSunCosHourly(IHR);
+        Vector3<Real64> const SUNCOS_IHR = state.dataSurface->SunCosHourly(IHR);
         for (int iGndElem = 1; iGndElem <= complexWinRefPoint.NGnd(WinEl); ++iGndElem) {
             // case for sky elements. Integration is done over upper ground hemisphere to determine how many obstructions
             // were hit in the process
@@ -7983,7 +7983,7 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
 
         // add exterior ground element obstruction multipliers to calculated luminances. For sun reflection, calculate if
         // sun reaches the ground for that point
-        Vector3<Real64> const SUNCOS_IHR = state.dataSurface->SurfSunCosHourly(IHR);
+        Vector3<Real64> const SUNCOS_IHR = state.dataSurface->SunCosHourly(IHR);
         for (int iGndElem = 1; iGndElem <= complexWinIllumMap.NGnd(WinEl); ++iGndElem) {
             // case for sky elements. Integration is done over upper ground hemisphere to determine how many obstructions
             // were hit in the process
@@ -8607,7 +8607,7 @@ Real64 DayltgSurfaceLumFromSun(EnergyPlusData &state,
         }
     }
     // Cosine of angle of incidence of sun at HitPt if sun were to reach HitPt
-    Vector3<Real64> const SUNCOS_IHR = state.dataSurface->SurfSunCosHourly(IHR);
+    Vector3<Real64> const SUNCOS_IHR = state.dataSurface->SunCosHourly(IHR);
     Real64 CosIncAngAtHitPt = dot(SurfaceLumFromSunReflNorm, SUNCOS_IHR);
     // Require that the sun be in front of this surface relative to window element
     if (CosIncAngAtHitPt <= 0.0) return 0.0; // Sun is in back of reflecting surface

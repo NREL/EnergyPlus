@@ -847,6 +847,8 @@ struct WeatherManagerData : BaseGlobalStruct
     int RptDayType = 0; // DayType Report Value
 
     Real64 HrAngle = 0.0;            // Current Hour Angle
+    Real64 SolarAltitude = 0.0;
+    Real64 SolarAzimuth = 0.0;
     Real64 SolarAltitudeAngle = 0.0; // Angle of Solar Altitude (degrees)
     Real64 SolarAzimuthAngle = 0.0;  // Angle of Solar Azimuth (degrees)
     Real64 HorizIRSky = 0.0;         // Horizontal Infrared Radiation Intensity (W/m2)
