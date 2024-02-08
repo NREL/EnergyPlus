@@ -127,6 +127,18 @@ namespace OutputReportTabular {
     constexpr std::array<std::string_view, static_cast<int>(UnitsStyle::Num) - 1> UnitsStyleNamesUC{
         "NONE", "JTOKWH", "JTOMJ", "JTOGJ", "INCHPOUND", "INCHPOUNDEXCEPTELECTRICITY"};
 
+    struct ortUnitS // Output Processor Tabular Unit Style
+    {
+        UnitsStyle unitsStyle;
+        ortUnitS(UnitsStyle us) : unitsStyle(us)
+        {
+        }
+        bool ip() const
+        {
+            return this->unitsStyle == UnitsStyle::InchPound || this->unitsStyle == UnitsStyle::InchPoundExceptElectricity;
+        }
+    };
+
     enum class EndUseSubTableType
     {
         Invalid = -1,
