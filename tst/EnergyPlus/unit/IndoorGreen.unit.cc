@@ -200,10 +200,10 @@ TEST_F(EnergyPlusFixture, IndoorGreen_CheckGetInputDataFunction)
     EXPECT_FALSE(ErrorsFound);                             // expect no errors
     auto &thisindoorgreen = state->dataIndoorGreen->indoorGreens(IndoorGreenNum);
     EXPECT_EQ(thisindoorgreen.LeafArea, 30.0);
-    EXPECT_EQ(thisindoorgreen.lightingMethod, IndoorGreen::LightingMethod::LED);
-    EXPECT_EQ(thisindoorgreen.etCalculationMethod, IndoorGreen::ETCalculationMethod::PenmanMonteith);
-
-    // ETPenmanMonteith(*state, ZonePreTemp, Real64 ZonePreHum, Real64 ZoneCO2, Real64 ZonePPFD, Real64 VPD, Real64 LAI)
+    EXPECT_TRUE(compare_enums(thisindoorgreen.lightingMethod, IndoorGreen::LightingMethod::LED));
+    EXPECT_TRUE(compare_enums(thisindoorgreen.etCalculationMethod, IndoorGreen::ETCalculationMethod::PenmanMonteith));
+    EXPECT_EQ((int)thisindoorgreen.lightingMethod, (int)IndoorGreen::LightingMethod::LED);
+    EXPECT_EQ((int)thisindoorgreen.etCalculationMethod, (int)IndoorGreen::ETCalculationMethod::PenmanMonteith);
 }
 TEST_F(EnergyPlusFixture, IndoorGreen_CheckETFunction)
 {
