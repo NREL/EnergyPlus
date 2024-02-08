@@ -5,6 +5,10 @@ Duct model road map
 
 ** Florida Solar Energy Center**
 
+ - Second draft, 2/7/24
+
+	After Technicalities on 2/7/24
+
  - Original draft, 1/20/24
 
 ## Background ##
@@ -16,6 +20,110 @@ The AFN model is able to simulate duct conduction and leakage losses. The drivin
 
 Since the process is very complicated, a roadmap is needed to provide dicrection how to implement the new feature. It may involve changes of existing AFN objects.
 
+## E-mail and Conference Call Conclusions ##
+
+### E-mail communication with Mike ###
+
+The most important restriction is that any proposed new objects or existing objects have to be used in the AFN model for the roadmap.
+
+I'm not sure I understand. I thought the goal here was a simplified model that didn't require AFN.
+Mike
+
+On 2/6/2024 2:08 PM, gu@fsec.ucf.edu wrote:
+Mike:
+ 
+Thanks for your comments. Let me explain what I need to define duct objects to calculate conduction loss and leakage first. Here are requirements.
+ 
+1.	Air node
+ 
+Some nodes are needed to be redefined, in addition to air node defined in AirLoopHAVC. For example, the inlet node of a zone splitter is the same node of AirloopHVAC demand outlet node. In order to build a duct, I need to make two separate nodes, instead of one.
+ 
+2.	Duct as a linkage
+ 
+A linkage is needed to use two air nodes to represent a duct for conduction loss calculation.
+ 
+3.	Leak as a linkage
+ 
+A zone and an air node have to used to represent a supply or return leak
+ 
+4.	Make up air as a linkage
+ 
+Due to unbalanced supply and return leaks, additional flows between outdoor and a zone, and between two zones have to be defined based on a leakage
+ 
+5.	Duct component
+ 
+Duct geometry and materials are needed for conduction loss calculation
+ 
+6.	Leakage component
+ 
+The fraction flow is needed to represent leakage
+ 
+The most important restriction is that any proposed new objects or existing objects have to be used in the AFN model for the roadmap.
+ 
+Therefore, I propose to use existing the AFN objects. An alternative choice is that the AFN objects may be renames by removing “AirflowNetwork” for general purpose. For example, AirflowNetwork:Distribution:Node can be replaced by Distribution:Node.
+ 
+Therefore, expansion of ZoneHVAC:AirDistributionUnit may not be enough to cover what I need. The object may not be used in the AFN model. 
+ 
+Thanks.
+ 
+Gu
+ 
+From: Michael J. Witte <mjwitte@gard.com> 
+Sent: Tuesday, February 6, 2024 12:49 PM
+To: Lixing Gu <gu@fsec.ucf.edu>; 'Lee, Edwin' <Edwin.Lee@nrel.gov>; 'Horowitz, Scott' <Scott.Horowitz@nrel.gov>; 'Winkler, Jon' <Jon.Winkler@nrel.gov>; 'DeGraw, Jason' <degrawjw@ornl.gov>; 'Neal Kruis' <neal.kruis@bigladdersoftware.com>; rraustad@fsec.ucf.edu
+Subject: Re: Roadmap for comments
+ 
+Gu,
+
+Did you consider extending the leakage options in ZoneHVAC:AirDistributionUnit instead of using the AFN objects?
+
+ZoneHVAC:AirDistributionUnit,
+
+  N1 , \field Nominal Upstream Leakage Fraction
+       \note fraction at system design Flow; leakage Flow constant, leakage fraction
+       \note varies with variable system Flow Rate.
+ N2 , \field Constant Downstream Leakage Fraction
+
+Mike
+
+### Discussion in the technicalities on 2/7/24 ###
+
+The roadmap was discussed in the Technicalities on 2/7/24. Here are comments and my reply after my name.
+
+Scott: Temperature control at the exterior boundary conditions
+
+Gu: I am going to add 3 more fields at the end of Duct:Loss:
+
+\field Environment Type
+\field Ambient Temperature Zone Name
+\field Ambient Temperature Schedule Name
+
+
+Mike: Heat dump from condution and leakaga to the zone?
+
+Scott: Use regain factor
+
+Gu: Any energy loss or gain from conduction and leakage will be added as zone loads. The detailed implementation will be addressed in the design document
+
+Jason DeGraw: Not undesrand fully and will need time to provide comments later.
+
+Gu: Will make offline contact
+
+Scott: Solve option in the AirflowNetwork:SimulationControl may be controversial, so that the AirflowNetwork:SimulationControl object may not be used.
+
+Jason: Agree.
+
+Brett: It is odd to use AirflowNetwork:SimulationControl for non AFN simplified duct model.
+
+Gu: I agree not to use AirflowNetwork:SimulationControl to trigger the simplified duct model. Instead, a new proposed object of Duct:Loss will be used.
+
+The trigger option using AirflowNetwork:SimulationControl in the Roadmap will be removed.
+
+Mike: May use duplcated objects as two sets. The first set for the AFN model, while the second set is used for the simplified duct model.
+
+Gu: I have no objection. The advantages are that different fields in different object sets can be applied. For example, some fields in the AFN model are used for pressure calculation, so that these fields may not be applied to the simplified duct model.
+
+
 ## Roadmap ##
 
 The roadmap presents my view to implement simplified duct model without using the AFN model. The proposed new feature should meet the above requirements and include a new object and possible modifications of existing objects. The present document addresses the possible inputs.
@@ -23,6 +131,8 @@ The roadmap presents my view to implement simplified duct model without using th
 The following figure represents proposed duct configuration.
 
 ![duct model](DuctLoss.PNG)
+
+Note: Any air movement from a zone to outdoors is not presented in the figure, becuase exfiltration is not a part of zone energy balance.
 
 ### General inputs ###
 
@@ -54,6 +164,25 @@ An optional field may help users to understand the object function:
       \key Leakage
       \default Conduction
 
+ <span style="color:red">
+
+    A5,  \field Environment Type
+        \type choice
+        \key Zone
+        \key Schedule
+        \default Zone
+   	A6,  \field Ambient Temperature Zone Name
+        \type object-list
+        \object-list ZoneNames
+   	A7;  \field Ambient Temperature Schedule Name
+        \type object-list
+        \object-list ScheduleNames
+</span>
+
+Note:
+
+1. Additional 3 optional fields will be added to allow user to specify duct exterior enviroment for conduction loss calculation.
+ 
 #### Existing object AirflowNetwork:Distribution:Node ####
 
 The added choice is highlighted in red.
@@ -270,7 +399,6 @@ Let's keep the field for the time being. We may need to think to use the partial
 
 4. The Component:LeakageRatio is the only component listed in the Component Name defined in the Linkage object for conduction leakage calculation.
 
-
 An example of objects used to calculate duct condiuction loss in an IDF is:
 
 \begin{lstlisting}
@@ -337,11 +465,13 @@ Field Effective Leakage Ratio is used as leakage, a fraction of AirLoopHVAC flow
 
 #### Makeup air ####
 
-An important factor for duct leakage is to introduce make up flow due to supply and return leaks. Since we don't use pressure to calculate make up airflow impact, we will allow users to specify make up flows and direction using existing AFN object, so that make up airflows can flow from outdoor to a zone, and from a zone to another zone. The requirements are as follows:
+An important factor for duct leakage is to introduce make up flow due to supply and return leaks. Since we don't use pressure to calculate make up airflow impact, we will allow users to specify makeup air flows and direction using existing AFN object, so that make up airflows can flow from outdoor to a zone, and from a zone to another zone. The requirements are as follows:
 
 1. The Node 1 name and Node 2 name in the AirflowNetwork:Distribution:Linkage object have to be either zone names for both fields or a zone name and an outdoor node name. The Node 1 name represents flow starting point, and the Node 2 name represents flow ending points. The flow direction for a linkage with a zone name and an outdoor node name should be from outdoor to a zone, equivalent to air infiltration. When both zone names are specified, the equivalent object should Zobe Mixing. 
 
 2. Exfiltration is not used in energy calculation. In other words, an outdoor air node can not be specified as Node 2 name.
+
+3. The current makeup air is limited in a single AirLoopHVAC. When multiple AirLoopHVACs are applied, makeup air movement between two zones can be very complicated. More deep discussion may be needed after implementation with a single AirLoopHVAC.  
 
 An example of objects used to calculate duct leak loss in an IDF is:
 
@@ -380,6 +510,11 @@ An example of objects used to calculate duct leak loss in an IDF is:
 
 ! Make up air
 
+	Duct:Loss,
+      Makeup air,    !- Name
+      Main AirLoopHVAC,    !- AirLoopHAVC Name
+   	  Duct Leak Makeup;  \field AirflowNetwork:Distribution:Linkage Name
+
   	AirflowNetwork:Distribution:Node,
       OutdoorAirNode,      !- Name
       Outdoor Air Node,  !- Component Name or Node Name
@@ -414,158 +549,7 @@ The duct model can be trigged by two choices. The first choice is to use a new o
 
 #### Can be triggered by new chocies of AirflowNetwork Control ####
 
-There are many choices defined in the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object.
-
-Three more choices are:
-
-ConductionLossWithoutAFN
-LeakageLossWithoutAFN
-ConductionAndLeakageLossWithoutAFN
-
-	AirflowNetwork:SimulationControl,
-      \min-fields 16
-      \unique-object
-      \memo This object defines the global parameters used in an Airflow Network simulation.
- 	A1 , \field Name
-      \required-field
-      \note Enter a unique name for this object.
- 	A2 , \field AirflowNetwork Control
-      \type choice
-      \key MultizoneWithDistribution
-      \key MultizoneWithoutDistribution
-      \key MultizoneWithDistributionOnlyDuringFanOperation
-      \key NoMultizoneOrDistribution
-	ConductionLossWithoutAFN
-	LeakageLossWithoutAFN
-	ConductionAndLeakageLossWithoutAFN
-      \default NoMultizoneOrDistribution
-      \note NoMultizoneOrDistribution: Only perform Simple calculations (objects ZoneInfiltration:*,
-      \note ZoneVentilation:*, ZoneMixing, ZoneCrossMixing, ZoneRefrigerationDoorMixing,
-      \note ZoneAirBalance:OutdoorAir, ZoneEarthtube, ZoneThermalChimney, and ZoneCoolTower:Shower);
-      \note MultizoneWithoutDistribution: Use AirflowNetwork objects to simulate multizone
-      \note Airflows driven by wind during simulation time,
-      \note and objects of ZoneInfiltration:*, ZoneVentilation:*, ZoneMixing, ZoneCrossMixing
-      \note ZoneRefrigerationDoorMixing, ZoneAirBalance:OutdoorAir, ZoneEarthtube,
-      \note ZoneThermalChimney, and ZoneCoolTower:Shower are ignored;
-      \note MultizoneWithDistributionOnlyDuringFanOperation: Perform distribution system
-      \note calculations during system fan on time
-      \note and Simple calculations during system Fan off time;
-      \note MultizoneWithDistribution: Perform distribution system calculations during system
-      \note fan on time and multizone Airflow driven by wind during system fan off time.
-      \note ConductionLossWithoutAFN: Perform conduction loss simulation without AFN
-      \note LeakageLossWithoutAFN: Perform leakage loss simulation without AFN
-      \note ConductionAndLeakageLossWithoutAFN: Perform conduction and leakage loss simulation without AFN
- 	A3 , \field Wind Pressure Coefficient Type
-      \type choice
-      \key Input
-      \key SurfaceAverageCalculation
-      \default SurfaceAverageCalculation
-      \note Input: User must enter AirflowNetwork:MultiZone:WindPressureCoefficientArray,
-      \note AirflowNetwork:MultiZone:ExternalNode, and
-      \note AirflowNetwork:MultiZone:WindPressureCoefficientValues objects.
-      \note SurfaceAverageCalculation: used only for rectangular buildings.
-      \note If SurfaceAverageCalculation is selected,
-      \note AirflowNetwork:MultiZone:WindPressureCoefficientArray, AirflowNetwork:MultiZone:ExternalNode,
-      \note and AirflowNetwork:MultiZone:WindPressureCoefficientValues objects are not used.
- 	A4 , \field Height Selection for Local Wind Pressure Calculation
-      \type choice
-      \key ExternalNode
-      \key OpeningHeight
-      \default OpeningHeight
-      \note If ExternalNode is selected, the height given in the
-      \note AirflowNetwork:MultiZone:ExternalNode object will be used.
-      \note If OpeningHeight is selected, the surface opening height (centroid) will be used to
-      \note calculate local wind pressure
-      \note This field is ignored when the choice of the Wind Pressure Coefficient Type field is
-      \note SurfaceAverageCalculation.
- 	A5 , \field Building Type
-      \note Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation,
-      \note otherwise this field may be left blank.
-      \type choice
-      \key LowRise
-      \key HighRise
-      \default LowRise
- 	N1 , \field Maximum Number of Iterations
-      \type integer
-      \units dimensionless
-      \default 500
-      \minimum> 10
-      \maximum 30000
-      \note Determines the maximum number of iterations used to converge on a solution. If this limit
-      \note is exceeded, the program terminates.
- 	A6 , \field Initialization Type
-      \type choice
-      \key LinearInitializationMethod
-      \key ZeroNodePressures
-      \default ZeroNodePressures
- 	N2 , \field Relative Airflow Convergence Tolerance
-      \type real
-      \units dimensionless
-      \default 1.E-4
-      \minimum> 0
-      \note This tolerance is defined as the absolute value of the sum of the mass Flow Rates
-      \note divided by the sum of the absolute value of the mass Flow Rates. The mass Flow Rates
-      \note described here refer to the mass Flow Rates at all Nodes in the AirflowNetwork model.
-      \note The solution converges when both this tolerance and the tolerance in the next field
-      \note (Absolute Airflow Convergence Tolerance) are satisfied.
- 	N3 , \field Absolute Airflow Convergence Tolerance
-      \type real
-      \units kg/s
-      \default 1.E-6
-      \minimum> 0
-      \note This tolerance is defined as the absolute value of the sum of the mass flow rates. The mass
-      \note flow rates described here refer to the mass flow rates at all nodes in the AirflowNetwork
-      \note model. The solution converges when both this tolerance and the tolerance in the previous
-      \note field (Relative Airflow Convergence Tolerance) are satisfied.
- 	N4 , \field Convergence Acceleration Limit
-      \type real
-      \units dimensionless
-      \note Used only for AirflowNetwork:SimulationControl
-      \minimum -1
-      \maximum 1
-      \default -0.5
- 	N5 , \field Azimuth Angle of Long Axis of Building
-      \type real
-      \units deg
-      \minimum 0.0
-      \maximum 180.0
-      \default 0.0
-      \note Degrees clockwise from true North.
-      \note Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation.
- 	N6 , \field Ratio of Building Width Along Short Axis to Width Along Long Axis
-      \type real
-      \minimum> 0.0
-      \maximum 1.0
-      \default 1.0
-      \note Used only if Wind Pressure Coefficient Type = SurfaceAverageCalculation.
- 	A7 , \field Height Dependence of External Node Temperature
-      \note If Yes, external node temperature is height dependent.
-      \note If No, external node temperature is based on zero height.
-      \type choice
-      \key Yes
-      \key No
-      \default No
- 	A8 , \field Solver
-      \note Select the solver to use for the pressure network solution
-      \type choice
-      \key SkylineLU
-      \key ConjugateGradient
-      \default SkylineLU
- 	A9 , \field Allow Unsupported Zone Equipment
-      \note Set this input to Yes to have zone equipment that are currently unsupported in the AirflowNetwork model
-      \note allowed in the simulation if present. Setting this field to Yes, allows the following equipment
-      \note to be modeled along an AirflowNetwork model: ZoneHVAC:Dehumidifier, ZoneHVAC:EnergyRecoveryVentilator,
-      \note WaterHeater:HeatPump:*.
-      \type choice
-      \key Yes
-      \key No
-      \default No
- 	A10; \field Do Distribution Duct Sizing Calculation
-      \note Controls duct sizing. See AirflowNetwork:Distribution:DuctSizing for sizing options.
-      \type choice
-      \key Yes
-      \key No
-      \default No
+Thie option is removed based on most people opinions in the Technicalities.
 
 #### Self start with new obejcts only ####
 
