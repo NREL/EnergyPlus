@@ -127,10 +127,10 @@ namespace OutputReportTabular {
     constexpr std::array<std::string_view, static_cast<int>(UnitsStyle::Num) - 1> UnitsStyleNamesUC{
         "NONE", "JTOKWH", "JTOMJ", "JTOGJ", "INCHPOUND", "INCHPOUNDEXCEPTELECTRICITY"};
 
-    struct ortUnitS // Output Processor Tabular Unit Style
+    struct ortUST // output processor tabular Unit STyle
     {
         UnitsStyle unitsStyle;
-        ortUnitS(UnitsStyle us) : unitsStyle(us)
+        ortUST(UnitsStyle us) : unitsStyle(us)
         {
         }
         bool ip() const
