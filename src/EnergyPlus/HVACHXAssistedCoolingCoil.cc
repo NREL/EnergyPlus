@@ -983,9 +983,8 @@ namespace HVACHXAssistedCoolingCoil {
                 state.dataCoilCooingDX->coilCoolingDXs[thisHXCoil.CoolingCoilIndex].simulate(
                     state,
                     OperationMode, // partially implemented for HXAssistedCoil
-                    CoilPLR,       // PartLoadRatio,
                     mCoolingSpeedNum,
-                    mCoolingSpeedRatio,
+                    CoilPLR,
                     FanOpMode,
                     singleMode); //
 
