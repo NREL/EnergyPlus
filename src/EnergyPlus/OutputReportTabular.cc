@@ -7871,14 +7871,15 @@ void WriteBEPSTable(EnergyPlusData &state)
             ort->gatherElecSurplusSold = gtElecSurplusSold;
         }
         // convert to GJ
-        ort->gatherPowerFuelFireGen /= (largeConversionFactor / ipElectricityConversionFactor);
-        ort->gatherPowerPV /= (largeConversionFactor / ipElectricityConversionFactor);
-        ort->gatherPowerWind /= (largeConversionFactor / ipElectricityConversionFactor);
-        ort->gatherPowerHTGeothermal /= (largeConversionFactor / ipElectricityConversionFactor);
-        ort->gatherPowerConversion /= (largeConversionFactor / ipElectricityConversionFactor);
-        ort->gatherElecProduced /= (largeConversionFactor / ipElectricityConversionFactor);
-        ort->gatherElecPurchased /= (largeConversionFactor / ipElectricityConversionFactor);
-        ort->gatherElecSurplusSold /= (largeConversionFactor / ipElectricityConversionFactor);
+        Real64 convFactorMulti = ipElectricityConversionFactor / largeConversionFactor;
+        ort->gatherPowerFuelFireGen *= convFactorMulti;
+        ort->gatherPowerPV *= convFactorMulti;
+        ort->gatherPowerWind *= convFactorMulti;
+        ort->gatherPowerHTGeothermal *= convFactorMulti;
+        ort->gatherPowerConversion *= convFactorMulti;
+        ort->gatherElecProduced *= convFactorMulti;
+        ort->gatherElecPurchased *= convFactorMulti;
+        ort->gatherElecSurplusSold *= convFactorMulti;
 
         // get change in overall state of charge for electrical storage devices.
         if (state.dataElectPwrSvcMgr->facilityElectricServiceObj->numElecStorageDevices > 0) {
@@ -7886,7 +7887,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             // necessary OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum(
             // ElecStorage.ThisTimeStepStateOfCharge() ) ) + gatherElecStorage;
             ort->OverallNetEnergyFromStorage = ort->gatherElecStorage;
-            ort->OverallNetEnergyFromStorage /= (largeConversionFactor / ipElectricityConversionFactor);
+            ort->OverallNetEnergyFromStorage *= convFactorMulti;
         } else {
             ort->OverallNetEnergyFromStorage = 0.0;
         }
