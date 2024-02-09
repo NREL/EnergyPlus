@@ -3345,7 +3345,7 @@ void WriteTableOfContents(EnergyPlusData &state)
                         for (int jTable = 1; jTable <= ort->OutputTableBinned(iInput).numTables; ++jTable) {
                             int const curTable = ort->OutputTableBinned(iInput).resIndex + (jTable - 1);
                             std::string curName;
-                            if (ortUST(ort->unitsStyle).ip()) {
+                            if (ort->ip()) {
                                 std::string origName = format("{} [{}]",
                                                               ort->OutputTableBinned(iInput).varOrMeter,
                                                               Constant::unitNames[(int)ort->OutputTableBinned(iInput).units]);
@@ -5527,7 +5527,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
             lnPtr = index(lineIn.substr(12), 'm');
             if (lnPtr != std::string::npos) {
                 curNameWithSIUnits = "Elevation (m) " + lineIn.substr(12 + lnPtr + 2);
-                if (ortUST(ort->unitsStyle).ip()) {
+                if (ort->ip()) {
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchWthrVal,
@@ -5578,7 +5578,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
             if (iscalc) {
                 if (isASHRAE) {
                     if (ashDesYear == "2001") {
-                        if (ortUST(ort->unitsStyle).ip()) {
+                        if (ort->ip()) {
                             curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                             LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(state,
@@ -5600,7 +5600,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                                              GetColumnUsingTabs(lineIn, 3) + degChar);
                         }
                     } else { // 2005 and 2009 are the same
-                        if (ortUST(ort->unitsStyle).ip()) {
+                        if (ort->ip()) {
                             curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                             LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(state,
@@ -5630,7 +5630,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         col1 = 4;
                         col2 = 5;
                     }
-                    if (ortUST(ort->unitsStyle).ip()) {
+                    if (ort->ip()) {
                         curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                         LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                         PreDefTableEntry(state,
@@ -5658,7 +5658,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
             if (iscalc) {
                 if (isASHRAE) {
                     if (ashDesYear == "2001") {
-                        if (ortUST(ort->unitsStyle).ip()) {
+                        if (ort->ip()) {
                             curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                             LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(state,
@@ -5688,7 +5688,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                                              GetColumnUsingTabs(lineIn, 6) + degChar);
                         }
                     } else { // 2005 and 2009 are the same
-                        if (ortUST(ort->unitsStyle).ip()) {
+                        if (ort->ip()) {
                             curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                             LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(state,
@@ -5728,7 +5728,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         col2 = 5;
                         col3 = 6;
                     }
-                    if (ortUST(ort->unitsStyle).ip()) {
+                    if (ort->ip()) {
                         curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                         LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                         PreDefTableEntry(state,
@@ -5777,7 +5777,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 eposlt -= 2;
             }
             if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                if (ortUST(ort->unitsStyle).ip()) {
+                if (ort->ip()) {
                     curNameWithSIUnits = "Maximum Dry Bulb Temperature (C)";
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
@@ -5812,7 +5812,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 eposlt -= 2;
             }
             if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                if (ortUST(ort->unitsStyle).ip()) {
+                if (ort->ip()) {
                     curNameWithSIUnits = "Minimum Dry Bulb Temperature (C)";
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
@@ -5847,7 +5847,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 eposlt -= 2;
             }
             if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                if (ortUST(ort->unitsStyle).ip()) {
+                if (ort->ip()) {
                     curNameWithSIUnits = "Maximum Dew Point Temperature (C)";
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
@@ -5882,7 +5882,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 eposlt -= 2;
             }
             if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                if (ortUST(ort->unitsStyle).ip()) {
+                if (ort->ip()) {
                     curNameWithSIUnits = "Minimum Dew Point Temperature (C)";
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
@@ -5951,7 +5951,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
         } break;
         case StatLineType::WithHDDLine: { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
             if (storeASHRAEHDD != "") {
-                if (ortUST(ort->unitsStyle).ip()) {
+                if (ort->ip()) {
                     curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
@@ -5963,7 +5963,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", storeASHRAEHDD);
                 }
             } else {
-                if (ortUST(ort->unitsStyle).ip()) {
+                if (ort->ip()) {
                     PreDefTableEntry(
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found");
                 } else {
@@ -5971,7 +5971,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", "not found");
                 }
             }
-            if (ortUST(ort->unitsStyle).ip()) {
+            if (ort->ip()) {
                 curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                 PreDefTableEntry(state,
@@ -5990,7 +5990,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
         } break;
         case StatLineType::WithCDDLine: { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
             if (storeASHRAECDD != "") {
-                if (ortUST(ort->unitsStyle).ip()) {
+                if (ort->ip()) {
                     curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
@@ -6002,7 +6002,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", storeASHRAECDD);
                 }
             } else {
-                if (ortUST(ort->unitsStyle).ip()) {
+                if (ort->ip()) {
                     PreDefTableEntry(
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found");
                 } else {
@@ -6010,7 +6010,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", "not found");
                 }
             }
-            if (ortUST(ort->unitsStyle).ip()) {
+            if (ort->ip()) {
                 curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                 PreDefTableEntry(state,
@@ -6875,7 +6875,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
                          state.dataEnvrn->EnvironmentName + " ** " + state.dataEnvrn->WeatherFileLocationTitle);
     }
 
-    if (ortUST(ort->unitsStyle).ip()) {
+    if (ort->ip()) {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", "-");
     } else {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", "-");
@@ -7060,7 +7060,8 @@ void WriteMonthlyTables(EnergyPlusData &state)
                         curAggString = " {" + stripped(curAggString) + '}';
                     }
                     // do the unit conversions
-                    if (ortUST(unitsStyle_cur).ip()) {
+                    if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+                        unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
                         varNameWithUnits =
                             format("{} [{}]", ort->MonthlyColumns(curCol).varName, Constant::unitNames[(int)ort->MonthlyColumns(curCol).units]);
                         LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
@@ -7561,7 +7562,8 @@ void WriteTimeBinTables(EnergyPlusData &state)
                     repMean = ort->BinStatistics(repIndex).sum / ort->BinStatistics(repIndex).n;
                 }
 
-                if (ortUST(unitsStyle_cur).ip()) {
+                if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+                    unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
                     tableBodyStat(1, 1) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).minimum), 2);
                     tableBodyStat(1, 2) = RealToStr(ConvertIP(state, indexUnitConv, repMean - 2 * repStDev), 2);
                     tableBodyStat(1, 3) = RealToStr(ConvertIP(state, indexUnitConv, repMean), 2);
@@ -8341,7 +8343,8 @@ void WriteBEPSTable(EnergyPlusData &state)
         tableBody = "";
         tableBody(1, 1) = RealToStr(convBldgGrossFloorArea, 2);
 
-        if (ortUST(unitsStyle_cur).ip()) {
+        if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+            unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
             if (produceTabular) {
                 PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", RealToStr(convBldgGrossFloorArea, 2));
@@ -9367,7 +9370,8 @@ void WriteBEPSTable(EnergyPlusData &state)
             }
 
             std::string const curNameWithSIUnits = "Degrees [deltaC]";
-            if (ortUST(unitsStyle_cur).ip()) {
+            if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+                unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
                 int indexUnitConv = -1;
                 std::string curNameAndUnits;
                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
@@ -9379,7 +9383,8 @@ void WriteBEPSTable(EnergyPlusData &state)
             rowHead(1) = "Tolerance for Zone Heating Setpoint Not Met Time";
             rowHead(2) = "Tolerance for Zone Cooling Setpoint Not Met Time";
 
-            if (!ortUST(unitsStyle_cur).ip()) {
+            if (!(unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+                  unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity)) {
                 tableBody(1, 1) = RealToStr(std::abs(state.dataHVACGlobal->deviationFromSetPtThresholdHtg), 2);
                 tableBody(1, 2) = RealToStr(state.dataHVACGlobal->deviationFromSetPtThresholdClg, 2);
             } else {
@@ -10703,7 +10708,6 @@ void WriteCompCostTable(EnergyPlusData &state)
 
     for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
         UnitsStyle unitsStyle_cur = ort->unitsStyle;
-        ortUST ortUS(unitsStyle_cur);
         bool produceTabular = true;
         bool produceSQLite = false;
         if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
@@ -10728,7 +10732,8 @@ void WriteCompCostTable(EnergyPlusData &state)
         rowHead(7) = "Permits, Bonds, Insurance (~~$~~)";
         rowHead(8) = "Commissioning (~~$~~)";
         rowHead(9) = "Cost Estimate Total (~~$~~)";
-        if (ortUST(unitsStyle_cur).ip()) {
+        if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+            unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
             std::string const SIunit = "[m2]";
             std::string m2_unitName;
             LookupSItoIP(state, SIunit, state.dataOutRptTab->unitConvIndexWCCT, m2_unitName);
@@ -10863,7 +10868,8 @@ void WriteCompCostTable(EnergyPlusData &state)
         for (int item = 1; item <= (int)state.dataCostEstimateManager->CostLineItem.size(); ++item) {
             tableBody(1, item) = fmt::to_string(state.dataCostEstimateManager->CostLineItem(item).LineNumber);
             tableBody(2, item) = state.dataCostEstimateManager->CostLineItem(item).LineName;
-            if (ortUST(unitsStyle_cur).ip()) {
+            if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+                unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
                 std::string IPunitName;
                 LookupSItoIP(state, state.dataCostEstimateManager->CostLineItem(item).Units, state.dataOutRptTab->unitConvIndexWCCT, IPunitName);
                 if (state.dataOutRptTab->unitConvIndexWCCT != 0) {
@@ -12323,7 +12329,8 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
     Real64 degreeHourConversion;
     UnitsStyle unitsStyle_cur = ort->unitsStyle;
 
-    if (ortUST(unitsStyle_cur).ip()) {
+    if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+        unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
         degreeHourConversion = getSpecificUnitMultiplier(state, "°C·hr", "°F·hr");
     } else {
         degreeHourConversion = 1.0;
@@ -12338,7 +12345,8 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
     columnWidth.allocate(columnNum);
     columnWidth = 10;
     Array1D_string columnHead(5);
-    if (ortUST(unitsStyle_cur).ip()) {
+    if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+        unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
         columnHead(1) = "Safe (≤ 80.1°F) [hr]";
         columnHead(2) = "Caution (> 80.1°F, ≤ 90.0°F) [hr]";
         columnHead(3) = "Extreme Caution (> 90.0°F, ≤ 102.9°F) [hr]";
@@ -12469,7 +12477,8 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         columnHead(4) = "Longest SET ≤ 12.2°C Duration for Occupied Period [hr]";
         columnHead(5) = "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period ";
 
-        if (ortUST(unitsStyle_cur).ip()) {
+        if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+            unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
             columnHead(1) = "SET ≤ 54.0°F Degree-Hours [°F·hr]";
             columnHead(2) = "SET ≤ 54.0°F Occupant-Weighted Degree-Hours [°F·hr]";
             columnHead(3) = "SET ≤ 54.0°F Occupied Degree-Hours [°F·hr]";
@@ -12500,7 +12509,8 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                           tableBodySET,
                                           degreeHourConversion);
 
-        if (ortUST(unitsStyle_cur).ip()) {
+        if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+            unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
             columnHead(1) = "SET > 86°F Degree-Hours [°F·hr]";
             columnHead(2) = "SET > 86°F Occupant-Weighted Degree-Hours [°F·hr]";
             columnHead(3) = "SET > 86°F Occupied Degree-Hours [°F·hr]";
@@ -12573,7 +12583,8 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
     columnHeadUnmetDegHr(6) = "Heating Setpoint Unmet Occupied Degree-Hours [°C·hr]";
     tableName = "Unmet Degree-Hours";
 
-    if (ortUST(unitsStyle_cur).ip()) {
+    if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+        unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
         int indexUnitConv;
         std::string curUnits;
         for (int i = 1; i < columnNumUnmetDegHr; i++) {
@@ -13091,7 +13102,8 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
 
     Real64 degreeHourConversion;
     UnitsStyle unitsStyle_cur = ort->unitsStyle;
-    if (ortUST(unitsStyle_cur).ip()) {
+    if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+        unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
         degreeHourConversion = getSpecificUnitMultiplier(state, "°C·hr", "°F·hr");
     } else {
         degreeHourConversion = 1.0;
@@ -13108,7 +13120,8 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
     tableBody.allocate(numColumnThermalTbl, state.dataGlobal->NumOfZones + 4);
     Array1D_string columnHeadStr(numColumnThermalTbl);
 
-    if (ortUST(unitsStyle_cur).ip()) {
+    if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+        unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
         columnHeadStr(1) = "Safe (≤ 80.1°F) [hr]";
         columnHeadStr(2) = "Caution (> 80.1°F, ≤ 90.0°F) [hr]";
         columnHeadStr(3) = "Extreme Caution (> 90.0°F, ≤ 102.9°F) [hr]";
@@ -13179,7 +13192,8 @@ void WriteThermalResilienceTables(EnergyPlusData &state)
     }
 
     if (hasPierceSET) {
-        if (ortUST(unitsStyle_cur).ip()) {
+        if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+            unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
             columnHeadStr(1) = "SET > 86°F Degree-Hours [°F·hr]";
             columnHeadStr(2) = "SET > 86°F Occupant-Weighted Degree-Hours [°F·hr]";
             columnHeadStr(3) = "SET > 86°F Occupied Degree-Hours [°F·hr]";
@@ -13514,7 +13528,8 @@ void WriteHeatEmissionTable(EnergyPlusData &state)
             tableBody.allocate(6, 1);
 
             Real64 energyconversion = 1.0;
-            if (ortUST(unitsStyle_cur).ip()) {
+            if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+                unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
                 rowHead(1) = "Heat Emissions [kBtu]";
                 energyconversion = 1.0 / getSpecificUnitDivider(state, "GJ", "kBtu"); // 1054351.84 J to kBtu
             } else if (unitsStyle_cur == UnitsStyle::JtoGJ) {
@@ -13747,10 +13762,12 @@ void WritePredefinedTables(EnergyPlusData &state)
                                     }
                                 }
                                 // finally assign the entry to the place in the table body
-                                if (ortUST(unitsStyle_cur).ip() || unitsStyle_cur == UnitsStyle::JtoKWH) {
+                                if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+                                    unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity ||
+                                    unitsStyle_cur == UnitsStyle::JtoKWH) {
                                     int columnUnitConv = colUnitConv(colCurrent);
                                     if (Util::SameString(state.dataOutRptPredefined->subTable(jSubTable).name, "SizingPeriod:DesignDay") &&
-                                        ortUST(unitsStyle_cur).ip()) {
+                                        ort->ip()) {
                                         if (Util::SameString(columnHead(colCurrent), "Humidity Value")) {
                                             std::string repTableTag;
                                             LookupSItoIP(state,
@@ -14304,7 +14321,9 @@ void WriteEioTables(EnergyPlusData &state)
                             std::vector<std::string> dataFields = splitCommaString(bodyLine);
                             rowHead(rowNum) = fmt::to_string(rowNum);
                             for (int iCol = 1; iCol <= numCols && iCol < int(dataFields.size()); ++iCol) {
-                                if (ortUST(unitsStyle_cur).ip() || unitsStyle_cur == UnitsStyle::JtoKWH) {
+                                if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+                                    unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity ||
+                                    unitsStyle_cur == UnitsStyle::JtoKWH) {
                                     if (isNumber(dataFields[iCol]) && colUnitConv(iCol) > 0) { // if it is a number that has a conversion
                                         int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
                                         Real64 convertedVal = ConvertIP(state, colUnitConv(iCol), StrToReal(dataFields[iCol]));
@@ -16335,7 +16354,7 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
 {
     auto const &ort = state.dataOutRptTab;
 
-    if (!ortUST(ort->unitsStyle).ip()) {
+    if (!ort->ip()) {
         return;
     }
 
@@ -16394,7 +16413,8 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
 // apply unit conversions to the load components summary tables
 void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal, UnitsStyle unitsStyle_para)
 {
-    if (ortUST(unitsStyle_para).ip()) {
+    if (unitsStyle_para == OutputReportTabular::UnitsStyle::InchPound ||
+        unitsStyle_para == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
         Real64 powerConversion = getSpecificUnitMultiplier(state, "W", "Btu/h");
         Real64 areaConversion = getSpecificUnitMultiplier(state, "m2", "ft2");
         Real64 powerPerAreaConversion = getSpecificUnitMultiplier(state, "W/m2", "Btu/h-ft2");
@@ -16567,7 +16587,8 @@ void OutputCompLoadSummary(EnergyPlusData &state,
         rowHead(LoadCompRow::GrdTot) = "Grand Total";
 
         columnHead.allocate(LoadCompCol::PerArea);
-        if (!ortUST(unitsStyle_para).ip()) {
+        if (!(unitsStyle_para == OutputReportTabular::UnitsStyle::InchPound ||
+              unitsStyle_para == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity)) {
             columnHead(LoadCompCol::SensInst) = "Sensible - Instant [W]";
             columnHead(LoadCompCol::SensDelay) = "Sensible - Delayed [W]";
             columnHead(LoadCompCol::SensRA) = "Sensible - Return Air [W]";
@@ -16616,7 +16637,8 @@ void OutputCompLoadSummary(EnergyPlusData &state,
         tableBody = "";
 
         columnHead(1) = "Value";
-        if (!ortUST(unitsStyle_para).ip()) {
+        if (!(unitsStyle_para == OutputReportTabular::UnitsStyle::InchPound ||
+              unitsStyle_para == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity)) {
             rowHead(1) = "Time of Peak Load";
             rowHead(2) = "Outside Dry Bulb Temperature [C]";
             rowHead(3) = "Outside Wet Bulb Temperature [C]";
@@ -16705,7 +16727,8 @@ void OutputCompLoadSummary(EnergyPlusData &state,
         tableBody = "";
 
         columnHead(1) = "Value";
-        if (!ortUST(unitsStyle_para).ip()) {
+        if (!(unitsStyle_para == OutputReportTabular::UnitsStyle::InchPound ||
+              unitsStyle_para == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity)) {
             rowHead(1) = "Outside Air Fraction [fraction]";
             rowHead(2) = "Airflow per Floor Area [m3/s-m2]";
             rowHead(3) = "Airflow per Total Capacity [m3/s-W]";

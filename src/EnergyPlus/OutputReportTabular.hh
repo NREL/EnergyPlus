@@ -127,18 +127,6 @@ namespace OutputReportTabular {
     constexpr std::array<std::string_view, static_cast<int>(UnitsStyle::Num) - 1> UnitsStyleNamesUC{
         "NONE", "JTOKWH", "JTOMJ", "JTOGJ", "INCHPOUND", "INCHPOUNDEXCEPTELECTRICITY"};
 
-    struct ortUST // output processor tabular Unit STyle
-    {
-        UnitsStyle unitsStyle;
-        ortUST(UnitsStyle us) : unitsStyle(us)
-        {
-        }
-        bool ip() const
-        {
-            return this->unitsStyle == UnitsStyle::InchPound || this->unitsStyle == UnitsStyle::InchPoundExceptElectricity;
-        }
-    };
-
     enum class EndUseSubTableType
     {
         Invalid = -1,
@@ -985,6 +973,11 @@ struct OutputReportTabularData : BaseGlobalStruct
 {
 
     OutputReportTabular::UnitsStyle unitsStyle = OutputReportTabular::UnitsStyle::None;
+    bool ip() const
+    {
+        return this->unitsStyle == OutputReportTabular::UnitsStyle::InchPound ||
+               this->unitsStyle == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity;
+    }
     OutputReportTabular::UnitsStyle unitsStyle_SQLite = OutputReportTabular::UnitsStyle::NotFound;
     int OutputTableBinnedCount = 0;
     int BinResultsTableCount = 0;
