@@ -13746,11 +13746,10 @@ void WritePredefinedTables(EnergyPlusData &state)
                                     }
                                 }
                                 // finally assign the entry to the place in the table body
-                                if (unitsStyle_cur == UnitsStyle::InchPound || unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity ||
-                                    unitsStyle_cur == UnitsStyle::JtoKWH) {
+                                if (ortUnitS(unitsStyle_cur).ip() || unitsStyle_cur == UnitsStyle::JtoKWH) {
                                     int columnUnitConv = colUnitConv(colCurrent);
                                     if (Util::SameString(state.dataOutRptPredefined->subTable(jSubTable).name, "SizingPeriod:DesignDay") &&
-                                        (unitsStyle_cur == UnitsStyle::InchPound || unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
+                                        ortUnitS(unitsStyle_cur).ip()) {
                                         if (Util::SameString(columnHead(colCurrent), "Humidity Value")) {
                                             std::string repTableTag;
                                             LookupSItoIP(state,
@@ -14304,8 +14303,7 @@ void WriteEioTables(EnergyPlusData &state)
                             std::vector<std::string> dataFields = splitCommaString(bodyLine);
                             rowHead(rowNum) = fmt::to_string(rowNum);
                             for (int iCol = 1; iCol <= numCols && iCol < int(dataFields.size()); ++iCol) {
-                                if (unitsStyle_cur == UnitsStyle::InchPound || unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity ||
-                                    unitsStyle_cur == UnitsStyle::JtoKWH) {
+                                if (ortUnitS(unitsStyle_cur).ip() || unitsStyle_cur == UnitsStyle::JtoKWH) {
                                     if (isNumber(dataFields[iCol]) && colUnitConv(iCol) > 0) { // if it is a number that has a conversion
                                         int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
                                         Real64 convertedVal = ConvertIP(state, colUnitConv(iCol), StrToReal(dataFields[iCol]));
