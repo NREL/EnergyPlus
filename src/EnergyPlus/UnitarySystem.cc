@@ -11669,19 +11669,16 @@ namespace UnitarySystems {
                 if (this->m_EMSOverrideCoilSpeedNumOn) {
                     CoilPLR = this->m_CoolingSpeedRatio;
                 } else {
-                    if (state.dataUnitarySystems->CoolingLoad) {
-                        if (this->m_CoolingSpeedNum > 1) {
-                            if (!singleMode) {
-                                CoilPLR = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? 1.0 : 0.0;
-                                this->m_CoolingSpeedRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
-                            } else {
-                                CoilPLR = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
-                            }
-                        } else {
-                            CoilPLR = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
-                        }
-                    } else {
+                    if (CompressorOn == DataHVACGlobals::CompressorOperation::Off) {
+                        this->m_CoolingSpeedNum = 1; // Bypass mixed-speed calculations in called functions
                         CoilPLR = 0.0;
+                    } else {
+                        if (singleMode) {
+                            CoilPLR = (m_CoolingSpeedNum == 1) ? PartLoadRatio
+                                                               : 0.0; // singleMode allows cycling, but not part load operation at higher speeds
+                        } else {
+                            CoilPLR = PartLoadRatio;
+                        }
                     }
                 }
             }
