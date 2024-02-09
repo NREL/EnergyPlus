@@ -9378,7 +9378,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             rowHead(1) = "Tolerance for Zone Heating Setpoint Not Met Time";
             rowHead(2) = "Tolerance for Zone Cooling Setpoint Not Met Time";
 
-            if ((unitsStyle_cur != UnitsStyle::InchPound) && (unitsStyle_cur != UnitsStyle::InchPoundExceptElectricity)) {
+            if (!ortUST(unitsStyle_cur).ip()) {
                 tableBody(1, 1) = RealToStr(std::abs(state.dataHVACGlobal->deviationFromSetPtThresholdHtg), 2);
                 tableBody(1, 2) = RealToStr(state.dataHVACGlobal->deviationFromSetPtThresholdClg, 2);
             } else {
@@ -16334,7 +16334,7 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
 {
     auto const &ort = state.dataOutRptTab;
 
-    if ((ort->unitsStyle != UnitsStyle::InchPound) && (ort->unitsStyle != UnitsStyle::InchPoundExceptElectricity)) {
+    if (!ortUST(ort->unitsStyle).ip()) {
         return;
     }
 
@@ -16566,7 +16566,7 @@ void OutputCompLoadSummary(EnergyPlusData &state,
         rowHead(LoadCompRow::GrdTot) = "Grand Total";
 
         columnHead.allocate(LoadCompCol::PerArea);
-        if ((unitsStyle_para != UnitsStyle::InchPound) && (unitsStyle_para != UnitsStyle::InchPoundExceptElectricity)) {
+        if (!ortUST(unitsStyle_para).ip()) {
             columnHead(LoadCompCol::SensInst) = "Sensible - Instant [W]";
             columnHead(LoadCompCol::SensDelay) = "Sensible - Delayed [W]";
             columnHead(LoadCompCol::SensRA) = "Sensible - Return Air [W]";
@@ -16615,7 +16615,7 @@ void OutputCompLoadSummary(EnergyPlusData &state,
         tableBody = "";
 
         columnHead(1) = "Value";
-        if ((unitsStyle_para != UnitsStyle::InchPound) && (unitsStyle_para != UnitsStyle::InchPoundExceptElectricity)) {
+        if (!ortUST(unitsStyle_para).ip()) {
             rowHead(1) = "Time of Peak Load";
             rowHead(2) = "Outside Dry Bulb Temperature [C]";
             rowHead(3) = "Outside Wet Bulb Temperature [C]";
@@ -16704,7 +16704,7 @@ void OutputCompLoadSummary(EnergyPlusData &state,
         tableBody = "";
 
         columnHead(1) = "Value";
-        if ((unitsStyle_para != UnitsStyle::InchPound) && (unitsStyle_para != UnitsStyle::InchPoundExceptElectricity)) {
+        if (!ortUST(unitsStyle_para).ip()) {
             rowHead(1) = "Outside Air Fraction [fraction]";
             rowHead(2) = "Airflow per Floor Area [m3/s-m2]";
             rowHead(3) = "Airflow per Total Capacity [m3/s-W]";
