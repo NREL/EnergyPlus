@@ -128,22 +128,17 @@ void EIRPlantLoopHeatPump::simulate(
                                                                         state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidIndex,
                                                                         "EIRPlantLoopHeatPump::simulate");
             Real64 controlLoad = this->loadSideMassFlowRate * CurSpecHeat * (leavingSetpoint - loadSideInletTemp);
-            
+
             this->doPhysics(state, controlLoad);
-        } else {         
+        } else {
             this->doPhysics(state, CurLoad);
         }
     } else {
         this->resetReportingVariables();
     }
 
-    // update nodes
-    PlantUtilities::SafeCopyPlantNode(state, this->loadSideNodes.inlet, this->loadSideNodes.outlet);
-    state.dataLoopNodes->Node(this->loadSideNodes.outlet).Temp = this->loadSideOutletTemp;
-    if (this->waterSource) {
-        PlantUtilities::SafeCopyPlantNode(state, this->sourceSideNodes.inlet, this->sourceSideNodes.outlet);
-    }
-    state.dataLoopNodes->Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
+    // update report variables and nodes
+    this->report(state);
 }
 
 Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state) const
@@ -314,7 +309,6 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state, bool
     }
 }
 
-
 void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 {
 
@@ -332,7 +326,6 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         this->doPhysicsASHP(state, currentLoad);
     }
 }
-    
 
 void EIRPlantLoopHeatPump::doPhysicsWSHP(EnergyPlusData &state, Real64 currentLoad)
 {
@@ -355,24 +348,20 @@ void EIRPlantLoopHeatPump::doPhysicsWSHP(EnergyPlusData &state, Real64 currentLo
     this->partLoadRatio = partLoadRatio;
     this->cyclingRatio = cyclingRatio;
 
-    // do defrost calculation if applicable
-    // Init defrost power adjustment factors
+    //// do defrost calculation if applicable
+    //// Init defrost power adjustment factors
     Real64 InputPowerMultiplier = 1.0;
-    this->doDefrost(state, operatingPLR, availableCapacity, InputPowerMultiplier);
-    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
-    this->defrostEnergy = this->defrostEnergyRate * reportingInterval;
+    //this->doDefrost(state, operatingPLR, availableCapacity, InputPowerMultiplier);
 
     // evaluate the actual current operating load side heat transfer rate
-    calcLoadSideHeatTransfer(state, availableCapacity, partLoadRatio);
+    calcLoadSideHeatTransfer(state, availableCapacity, operatingPLR);
 
     // calculate power usage from EIR curves
     calcPowerUsage(state, InputPowerMultiplier);
 
     // evaluate the source side heat transfer rate
     calcSourceSideHeatTransferWSHP(state);
-
 }
-
 
 void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLoad)
 {
@@ -397,19 +386,16 @@ void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLo
     // do defrost calculation if applicable
     // Init defrost power adjustment factors
     Real64 InputPowerMultiplier = 1.0;
-    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
     this->doDefrost(state, operatingPLR, availableCapacity, InputPowerMultiplier);
-    this->defrostEnergy = this->defrostEnergyRate * reportingInterval;
 
     // evaluate the actual current operating load side heat transfer rate
-    calcLoadSideHeatTransfer(state, availableCapacity, partLoadRatio);
+    calcLoadSideHeatTransfer(state, availableCapacity, operatingPLR);
 
     //  calculate power usage from EIR curves
     calcPowerUsage(state, InputPowerMultiplier);
 
     // evaluate the source side heat transfer rate
     calcSourceSideHeatTransferASHP(state);
-
 }
 
 void EIRPlantLoopHeatPump::getAvailableCapacity(EnergyPlusData &state, Real64 const currentLoad, Real64 &availableCapacity, Real64 &partLoadRatio)
@@ -429,8 +415,8 @@ void EIRPlantLoopHeatPump::getAvailableCapacity(EnergyPlusData &state, Real64 co
 
     // evaluate capacity modifier curve and determine load side heat transfer
     // any adjustment to outlet water temp set point requires some form of iteration
-     for (int loop = 0; loop < 2; ++loop) {
-         capacityModifierFuncTemp = Curve::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
+    for (int loop = 0; loop < 2; ++loop) {
+        capacityModifierFuncTemp = Curve::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
 
         availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
 
@@ -488,8 +474,6 @@ void EIRPlantLoopHeatPump::getAvailableCapacity(EnergyPlusData &state, Real64 co
 
 void EIRPlantLoopHeatPump::calcLoadSideHeatTransfer(EnergyPlusData &state, Real64 const availableCapacity, Real64 const operatingPLR)
 {
-    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
-
     // evaluate the actual current operating load side heat transfer rate
     auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
     Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(state,
@@ -498,7 +482,6 @@ void EIRPlantLoopHeatPump::calcLoadSideHeatTransfer(EnergyPlusData &state, Real6
                                                            thisLoadPlantLoop.FluidIndex,
                                                            "PLHPEIR::simulate()");
     this->loadSideHeatTransfer = availableCapacity * operatingPLR;
-    this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
 
     // calculate load side outlet conditions
     Real64 const loadMCp = this->loadSideMassFlowRate * CpLoad;
@@ -506,33 +489,25 @@ void EIRPlantLoopHeatPump::calcLoadSideHeatTransfer(EnergyPlusData &state, Real6
 
     // now what to do here if outlet water temp exceeds limit based on HW supply temp limit curves?
     // currentLoad will be met and there should? be some adjustment based on outlet water temp limit?
-
 }
 
 void EIRPlantLoopHeatPump::calcPowerUsage(EnergyPlusData &state, Real64 const InputPowerMultiplier)
 {
-    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
 
     // calculate power usage from EIR curves
     Real64 eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
     Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, this->partLoadRatio);
     // check curves value
     this->eirModFTCurveCheck(state, eirModifierFuncTemp, eirModifierFuncPLR);
-
     this->powerUsage =
         (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp * InputPowerMultiplier * this->cyclingRatio;
-    this->powerEnergy = this->powerUsage * reportingInterval;
-
 }
 
 void EIRPlantLoopHeatPump::calcSourceSideHeatTransferWSHP(EnergyPlusData &state)
 {
-    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
 
     // energy balance on heat pump
     this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
-    this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
-
     // calculate source side outlet conditions
     Real64 CpSrc;
     auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
@@ -557,25 +532,18 @@ void EIRPlantLoopHeatPump::calcSourceSideHeatTransferWSHP(EnergyPlusData &state)
             this->sourceSideOutletTemp = this->sourceSideInletTemp - 100.0; // cap it at 100C delta
         }
     }
-
 }
 
 void EIRPlantLoopHeatPump::calcSourceSideHeatTransferASHP(EnergyPlusData &state)
 {
-    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
-
     // energy balance on heat pump
     this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
-    this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
-
     // calculate source side outlet conditions
     Real64 CpSrc;
     CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
-
 }
-
 
 void EIRPlantLoopHeatPump::capModFTCurveCheck(EnergyPlusData &state, const Real64 loadSideOutletSetpointTemp, Real64 &capacityModifierFuncTemp)
 {
@@ -600,7 +568,6 @@ void EIRPlantLoopHeatPump::capModFTCurveCheck(EnergyPlusData &state, const Real6
         capacityModifierFuncTemp = 0.0;
     }
 }
-
 
 void EIRPlantLoopHeatPump::eirModFTCurveCheck(EnergyPlusData &state, Real64 &eirModifierFuncTemp, Real64 &eirModifierFuncPLR)
 {
@@ -647,7 +614,7 @@ void EIRPlantLoopHeatPump::doDefrost(EnergyPlusData &state, const Real64 operati
     // Initializing defrost adjustment factors
     Real64 HeatingCapacityMultiplier = 1.0;
 
-     // Check outdoor temperature to determine of defrost is active
+    // Check outdoor temperature to determine of defrost is active
     if (this->defrostAvailable && state.dataEnvrn->OutDryBulbTemp <= this->maxOutdoorTemperatureDefrost) {
         // Calculate defrost adjustment factors depending on defrost control type
         // Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
@@ -719,10 +686,11 @@ void EIRPlantLoopHeatPump::doDefrost(EnergyPlusData &state, const Real64 operati
         this->defrostEnergyRate = 0.0;
         this->loadDueToDefrost = 0.0;
         this->fractionalDefrostTime = 0.0;
-    }    
+    }
     availableCapacity *= HeatingCapacityMultiplier;
 }
-    void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
+
+void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
 {
     // This function does all one-time and begin-environment initialization
     std::string static const routineName = std::string("EIRPlantLoopHeatPump :") + __FUNCTION__;
@@ -1938,6 +1906,25 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
         }
         this->oneTimeInitFlag = false;
     }
+}
+
+void EIRPlantLoopHeatPump::report(EnergyPlusData &state)
+{
+
+    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
+
+    this->defrostEnergy = this->defrostEnergyRate * reportingInterval;
+    this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
+    this->powerEnergy = this->powerUsage * reportingInterval;
+    this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
+
+    // update nodes
+    PlantUtilities::SafeCopyPlantNode(state, this->loadSideNodes.inlet, this->loadSideNodes.outlet);
+    state.dataLoopNodes->Node(this->loadSideNodes.outlet).Temp = this->loadSideOutletTemp;
+    if (this->waterSource) {
+        PlantUtilities::SafeCopyPlantNode(state, this->sourceSideNodes.inlet, this->sourceSideNodes.outlet);
+    }
+    state.dataLoopNodes->Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
 }
 
 // From here on, the Fuel Fired Heat Pump module EIRFuelFiredHeatPump
