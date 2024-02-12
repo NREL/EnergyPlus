@@ -637,7 +637,6 @@ void EIRPlantLoopHeatPump::doDefrost(
 {
     // Initializing defrost adjustment factors
     Real64 HeatingCapacityMultiplier = 1.0;
-    //Real64 InputPowerMultiplier = 1.0;
 
      // Check outdoor temperature to determine of defrost is active
     if (this->defrostAvailable && state.dataEnvrn->OutDryBulbTemp <= this->maxOutdoorTemperatureDefrost) {
