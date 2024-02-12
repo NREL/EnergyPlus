@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes
 
-  Version,23.2;
+  Version,24.1;
 
   Building,
     Building,                !- Name
@@ -3649,9 +3649,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     DistrictCooling:Facility,!- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    DistrictHeating:Facility,!- Variable or Meter 3 Name
+    DistrictHeatingWater:Facility,!- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    DistrictHeating:Facility,!- Variable or Meter 4 Name
+    DistrictHeatingWater:Facility,!- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,

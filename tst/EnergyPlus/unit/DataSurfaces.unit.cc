@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -357,8 +357,10 @@ TEST_F(EnergyPlusFixture, SurfaceTest_HashMap)
     int numSurfs = state->dataSurface->TotSurfaces = 4;
     state->dataSurface->Surface.allocate(numSurfs);
     state->dataSurface->SurfTAirRef.dimension(numSurfs, 0);
-    state->dataSurface->SurfIntConvCoeffIndex.dimension(numSurfs, 0);
-    state->dataSurface->SurfExtConvCoeffIndex.dimension(numSurfs, 0);
+    state->dataSurface->surfIntConv.allocate(numSurfs);
+    std::fill(state->dataSurface->surfIntConv.begin(), state->dataSurface->surfIntConv.end(), SurfIntConv());
+    state->dataSurface->surfExtConv.allocate(numSurfs);
+    std::fill(state->dataSurface->surfExtConv.begin(), state->dataSurface->surfExtConv.end(), SurfExtConv());
     state->dataSurface->SurfWinStormWinConstr.dimension(numSurfs, 0);
     state->dataSurface->SurfMaterialMovInsulExt.dimension(numSurfs, 0);
     state->dataSurface->SurfMaterialMovInsulInt.dimension(numSurfs, 0);

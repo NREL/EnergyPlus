@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -118,6 +118,14 @@ namespace ScheduleManager {
         No,      // no interpolation
         Average, // interpolation only to resolve time intervals not matching timestep lengths (this was previously interpolate:yes)
         Linear,  // linear interpolation from the previous time to the current time for the entire schedule
+        Num
+    };
+
+    enum class Clusivity
+    {
+        Invalid = -1,
+        Inclusive,
+        Exclusive,
         Num
     };
 
@@ -272,11 +280,19 @@ namespace ScheduleManager {
     );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const ScheduleIndex,      // Which Schedule being tested
-                                  std::string const &MinString, // Minimum indicator ('>', '>=')
-                                  Real64 const Minimum,         // Minimum desired value
-                                  std::string const &MaxString, // Maximum indicator ('<', ',=')
-                                  Real64 const Maximum          // Maximum desired value
+                                  int const ScheduleIndex,    // Which Schedule being tested
+                                  std::string_view MinString, // Minimum indicator ('>', '>=')
+                                  Real64 const Minimum,       // Minimum desired value
+                                  std::string_view MaxString, // Maximum indicator ('<', ',=')
+                                  Real64 const Maximum        // Maximum desired value
+    );
+
+    bool CheckScheduleValueMinMax(EnergyPlusData &state,
+                                  int const ScheduleIndex, // Which Schedule being tested
+                                  Clusivity clusiveMin,    // true ? '>' : '>='
+                                  Real64 const Minimum,    // Minimum desired value
+                                  Clusivity clusiveMax,    // true ? '<' : '<='
+                                  Real64 const Maximum     // Maximum desired value
     );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,

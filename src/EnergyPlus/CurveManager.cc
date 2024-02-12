@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -109,25 +109,9 @@ namespace Curve {
     // validating it, and storing it in such a manner that the curve manager
     // can provide the simulation with performance curve output.
 
-    // Functions
-    void BtwxtMessageCallback(const Btwxt::MsgLevel messageType, const std::string message, void *contextPtr)
-    {
-        std::pair<EnergyPlusData *, std::string> contextPair = *(std::pair<EnergyPlusData *, std::string> *)contextPtr;
-        std::string fullMessage = format("{}: {}", contextPair.second, message);
-        if (messageType == Btwxt::MsgLevel::MSG_ERR) {
-            ShowSevereError(*contextPair.first, fullMessage);
-            ShowFatalError(*contextPair.first, "Btwxt: Errors discovered, program terminates.");
-        } else {
-            if (static_cast<int>(messageType) >= Btwxt::LOG_LEVEL) {
-                if (messageType == Btwxt::MsgLevel::MSG_WARN) {
-                    ShowWarningError(*contextPair.first, fullMessage);
-                } else {
-                    ShowMessage(*contextPair.first, fullMessage);
-                }
-            }
-        }
-    }
+    std::shared_ptr<EnergyPlusLogger> BtwxtManager::btwxt_logger{{std::make_shared<EnergyPlusLogger>()}};
 
+    // Functions
     void commonEnvironInit(EnergyPlusData &state)
     {
         // need to be careful on where and how resetting curve outputs to some "inactive value" is done
@@ -2196,7 +2180,7 @@ namespace Curve {
                                                              ErrorsFound);
 
                     // Ensure the CP array name should be the same as the name of AirflowNetwork:MultiZone:WindPressureCoefficientArray
-                    if (!UtilityRoutines::SameString(Alphas(2), wpcName)) {
+                    if (!Util::SameString(Alphas(2), wpcName)) {
                         ShowSevereError(state,
                                         format("GetCurveInput: Invalid {} = {} in {} = ",
                                                state.dataIPShortCut->cAlphaFieldNames(2),
@@ -2215,7 +2199,7 @@ namespace Curve {
 
                     std::string contextString = format("{} \"{}\"", CurrentModuleObject, Alphas(1));
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-                    Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+                    state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
 
                     thisCurve->inputLimits[0].min = 0.0;
                     thisCurve->inputLimits[0].minPresent = true;
@@ -2248,13 +2232,22 @@ namespace Curve {
                             lookupValues.push_back(Numbers(1));
                         }
 
-                        std::vector<Btwxt::GridAxis> gridAxes;
-                        gridAxes.emplace_back(axis, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
+                        try {
+                            std::vector<Btwxt::GridAxis> gridAxes;
+                            gridAxes.emplace_back(axis,
+                                                  "",
+                                                  Btwxt::InterpolationMethod::linear,
+                                                  Btwxt::ExtrapolationMethod::linear,
+                                                  std::pair<double, double>{0.0, 360.0},
+                                                  BtwxtManager::btwxt_logger);
 
-                        auto gridIndex = // (AUTO_OK_OBJ)
-                            state.dataCurveManager->btwxtManager.addGrid(Alphas(1), Btwxt::GriddedData(gridAxes));
-                        thisCurve->TableIndex = gridIndex;
-                        thisCurve->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
+                            auto gridIndex = // (AUTO_OK_OBJ)
+                                state.dataCurveManager->btwxtManager.addGrid(Alphas(1), gridAxes);
+                            thisCurve->TableIndex = gridIndex;
+                            thisCurve->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
+                        } catch (Btwxt::BtwxtException &e) {
+                            ShowFatalError(state, "Btwxt::GridAxis construction error; program terminates.");
+                        }
                     }
                 }
             }
@@ -2269,7 +2262,7 @@ namespace Curve {
                 auto const &fields = instance.value();
                 std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariable", thisObjectName);
-                state.dataCurveManager->btwxtManager.independentVarRefs.emplace(UtilityRoutines::MakeUPPERCase(thisObjectName), fields);
+                state.dataCurveManager->btwxtManager.independentVarRefs.emplace(Util::makeUPPER(thisObjectName), fields);
             }
         }
 
@@ -2285,16 +2278,16 @@ namespace Curve {
                 auto const &fields = instance.value();
                 std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariableList", thisObjectName);
-                std::string varListName = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                std::string varListName = Util::makeUPPER(thisObjectName);
 
                 std::vector<Btwxt::GridAxis> gridAxes;
 
                 // Loop through independent variables in list and add them to the grid
                 for (auto &indVar : fields.at("independent_variables")) {
-                    std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name").get<std::string>());
+                    std::string indVarName = Util::makeUPPER(indVar.at("independent_variable_name").get<std::string>());
                     std::string contextString = format("Table:IndependentVariable \"{}\"", indVarName);
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-                    Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+                    state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
 
                     // Find independent variable input data
                     if (state.dataCurveManager->btwxtManager.independentVarRefs.count(indVarName)) {
@@ -2358,21 +2351,21 @@ namespace Curve {
 
                         // This could be an enum lookup, but they are accessing enums inside Btwxt that we don't control, and it's only two options
                         // for each
-                        Btwxt::Method interpMethod = Btwxt::Method::CUBIC; // Assume cubic as the default
+                        Btwxt::InterpolationMethod interpMethod = Btwxt::InterpolationMethod::cubic; // Assume cubic as the default
                         auto interpIterator = indVarInstance.find("interpolation_method");
                         if (interpIterator != indVarInstance.end()) {
                             if (interpIterator->get<std::string>() == "Linear") {
-                                interpMethod = Btwxt::Method::LINEAR;
+                                interpMethod = Btwxt::InterpolationMethod::linear;
                             }
                         }
-                        Btwxt::Method extrapMethod = Btwxt::Method::LINEAR; // Assume linear as the default
+                        Btwxt::ExtrapolationMethod extrapMethod = Btwxt::ExtrapolationMethod::linear; // Assume linear as the default
                         auto extrapIterator = indVarInstance.find("extrapolation_method");
                         if (extrapIterator != indVarInstance.end()) {
                             if (extrapIterator->get<std::string>() == "Unavailable") {
                                 ShowSevereError(state, format("{}: Extrapolation method \"Unavailable\" is not yet available.", contextString));
                                 ErrorsFound = true;
                             } else if (extrapIterator->get<std::string>() == "Constant") {
-                                extrapMethod = Btwxt::Method::CONSTANT;
+                                extrapMethod = Btwxt::ExtrapolationMethod::constant;
                             }
                         }
 
@@ -2395,7 +2388,8 @@ namespace Curve {
                         min_val = min(min_val, min_grid_value);
                         max_val = max(max_val, max_grid_value);
 
-                        gridAxes.emplace_back(axis, extrapMethod, interpMethod, std::pair<double, double>{min_val, max_val});
+                        gridAxes.emplace_back(
+                            axis, "", interpMethod, extrapMethod, std::pair<double, double>{min_val, max_val}, BtwxtManager::btwxt_logger);
 
                     } else {
                         // Independent variable does not exist
@@ -2404,7 +2398,7 @@ namespace Curve {
                     }
                 }
                 // Add grid to btwxtManager
-                state.dataCurveManager->btwxtManager.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes));
+                state.dataCurveManager->btwxtManager.addGrid(Util::makeUPPER(thisObjectName), gridAxes);
             }
         }
 
@@ -2419,14 +2413,14 @@ namespace Curve {
                 ++CurveNum;
                 Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-                thisCurve->Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                thisCurve->Name = Util::makeUPPER(thisObjectName);
                 thisCurve->interpolationType = InterpType::BtwxtMethod;
 
-                std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name").get<std::string>());
+                std::string indVarListName = Util::makeUPPER(fields.at("independent_variable_list_name").get<std::string>());
 
                 std::string contextString = format("Table:Lookup \"{}\"", thisCurve->Name);
                 std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-                Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+                state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
 
                 // TODO: Actually use this to define output variable units
                 if (fields.count("output_unit_type")) {
@@ -2491,9 +2485,9 @@ namespace Curve {
                 };
                 NormalizationMethod normalizeMethod = NM_NONE;
                 if (fields.count("normalization_method")) {
-                    if (UtilityRoutines::SameString(fields.at("normalization_method").get<std::string>(), "DIVISORONLY")) {
+                    if (Util::SameString(fields.at("normalization_method").get<std::string>(), "DIVISORONLY")) {
                         normalizeMethod = NM_DIVISOR_ONLY;
-                    } else if (UtilityRoutines::SameString(fields.at("normalization_method").get<std::string>(), "AUTOMATICWITHDIVISOR")) {
+                    } else if (Util::SameString(fields.at("normalization_method").get<std::string>(), "AUTOMATICWITHDIVISOR")) {
                         normalizeMethod = NM_AUTO_WITH_DIVISOR;
                     }
                 }
@@ -2604,12 +2598,12 @@ namespace Curve {
 
     int BtwxtManager::addOutputValues(int gridIndex, std::vector<double> values)
     {
-        return (int)grids[gridIndex].add_value_table(values);
+        return (int)grids[gridIndex].add_grid_point_data_set(values);
     }
 
     int BtwxtManager::getNumGridDims(int gridIndex)
     {
-        return (int)grids[gridIndex].get_ndims();
+        return (int)grids[gridIndex].get_number_of_dimensions();
     }
 
     double BtwxtManager::getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target)
@@ -2619,7 +2613,7 @@ namespace Curve {
 
     double BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> &target, const double scalar)
     {
-        return grids[gridIndex].normalize_values_at_target(outputIndex, target, scalar);
+        return grids[gridIndex].normalize_grid_point_data_set_at_target(outputIndex, target, scalar);
     }
 
     void BtwxtManager::clear()
@@ -2727,7 +2721,7 @@ namespace Curve {
                 std::string numStr = fmt::to_string(dim);
                 SetupOutputVariable(state,
                                     format("Performance Curve Input Variable {} Value", numStr),
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     thisCurve->inputs[dim - 1],
                                     OutputProcessor::SOVTimeStepType::HVAC,
                                     OutputProcessor::SOVStoreType::Average,
@@ -2736,7 +2730,7 @@ namespace Curve {
             // set the output up last so it shows up after the input in the csv file
             SetupOutputVariable(state,
                                 "Performance Curve Output Value",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisCurve->output,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Average,
@@ -2746,28 +2740,28 @@ namespace Curve {
         for (auto &thisPressCurve : state.dataBranchAirLoopPlant->PressureCurve) {
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 1 Value",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisPressCurve.CurveInput1,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisPressCurve.Name);
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 2 Value",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisPressCurve.CurveInput2,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisPressCurve.Name);
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 3 Value",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisPressCurve.CurveInput3,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisPressCurve.Name);
             SetupOutputVariable(state,
                                 "Performance Curve Output Value",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisPressCurve.CurveOutput,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Average,
@@ -2802,7 +2796,7 @@ namespace Curve {
 
         std::string contextString = format("Table:Lookup \"{}\"", this->Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
         Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
 
         if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
@@ -2822,7 +2816,7 @@ namespace Curve {
 
         std::string contextString = format("Table:Lookup \"{}\"", this->Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
         Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
 
         if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
@@ -2844,7 +2838,7 @@ namespace Curve {
 
         std::string contextString = format("Table:Lookup \"{}\"", this->Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
         Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
 
         if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
@@ -2868,7 +2862,7 @@ namespace Curve {
 
         std::string contextString = format("Table:Lookup \"{}\"", this->Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
         Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
 
         if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
@@ -2894,7 +2888,7 @@ namespace Curve {
 
         std::string contextString = format("Table:Lookup \"{}\"", this->Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
         Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
 
         if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
@@ -2922,7 +2916,7 @@ namespace Curve {
 
         std::string contextString = format("Table:Lookup \"{}\"", this->Name);
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
+        state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
         Real64 TableValue = state.dataCurveManager->btwxtManager.getGridValue(this->TableIndex, this->GridValueIndex, target);
 
         if (this->outputLimits.minPresent) TableValue = max(TableValue, this->outputLimits.min);
@@ -2963,7 +2957,7 @@ namespace Curve {
         if (InInputType.empty()) {
             return true; // if not used it is valid
         }
-        CurveInputType found = static_cast<CurveInputType>(getEnumerationValue(inputTypes, UtilityRoutines::MakeUPPERCase(InInputType)));
+        CurveInputType found = static_cast<CurveInputType>(getEnumValue(inputTypes, Util::makeUPPER(InInputType)));
         return found != CurveInputType::Invalid;
     }
 
@@ -2991,13 +2985,13 @@ namespace Curve {
         };
         constexpr std::array<std::string_view, static_cast<int>(CurveOutputType::Num)> outputTypes = {
             "DIMENSIONLESS", "PRESSURE", "TEMPERATURE", "CAPACITY", "POWER"};
-        CurveOutputType found = static_cast<CurveOutputType>(getEnumerationValue(outputTypes, UtilityRoutines::MakeUPPERCase(InOutputType)));
+        CurveOutputType found = static_cast<CurveOutputType>(getEnumValue(outputTypes, Util::makeUPPER(InOutputType)));
         return found != CurveOutputType::Invalid;
     }
 
     bool CheckCurveDims(EnergyPlusData &state,
                         int const CurveIndex,
-                        std::vector<int> validDims,
+                        std::vector<int> const &validDims,
                         const std::string_view routineName,
                         std::string_view objectType,
                         std::string_view objectName,
@@ -3006,23 +3000,28 @@ namespace Curve {
         // Returns true if errors found
         Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
         int curveDim = thisCurve->numDims;
-        if (std::find(validDims.begin(), validDims.end(), curveDim) != validDims.end()) {
-            // Compatible
-            return false;
-        } else {
-            // Not compatible
-            ShowSevereError(state, fmt::format("{}{}=\"{}\"", routineName, objectType, objectName));
-            ShowContinueError(state, format("...Invalid curve for {}.", curveFieldText));
-            std::string validString = fmt::to_string(validDims[0]);
-            for (std::size_t i = 1; i < validDims.size(); i++) {
-                validString += format(" or {}", validDims[i]);
-            }
-            std::string plural1 = curveDim > 1 ? "s" : "";
-            std::string plural2 = validDims[validDims.size() - 1] > 1 ? "s" : "";
-            ShowContinueError(state, format("...Input curve=\"{}\" has {} dimension{}.", thisCurve->Name, curveDim, plural1));
-            ShowContinueError(state, format("...Curve type must have {} dimension{}.", validString, plural2));
-            return true;
-        }
+        if (std::find(validDims.begin(), validDims.end(), curveDim) != validDims.end()) return false;
+
+        ErrorObjectHeader eoh{routineName, objectType, objectName};
+        std::string validString = fmt::to_string(validDims[0]);
+        for (std::size_t i = 1; i < validDims.size(); i++)
+            validString += format(" or {}", validDims[i]);
+
+        ShowErrorCurveDims(state, eoh, curveFieldText, thisCurve->Name, validString, curveDim);
+        return true;
+    }
+
+    void ShowErrorCurveDims(EnergyPlusData &state,
+                            ErrorObjectHeader const &eoh,
+                            std::string_view fieldName,
+                            std::string_view curveName,
+                            std::string_view validDims,
+                            int dim)
+    {
+        ShowSevereError(state, fmt::format("{}{}=\"{}\"", eoh.routineName, eoh.objectType, eoh.objectName));
+        ShowContinueError(state, format("...Invalid curve for {}.", fieldName));
+        ShowContinueError(state, format("...Input curve=\"{}\" has dimension {}.", curveName, dim));
+        ShowContinueError(state, format("...Curve type must have dimension {}.", validDims));
     }
 
     std::string GetCurveName(EnergyPlusData &state, int const CurveIndex) // index of curve in curve array
@@ -3057,7 +3056,7 @@ namespace Curve {
         // Given a curve name, returns the curve index
 
         // METHODOLOGY EMPLOYED:
-        // uses UtilityRoutines::FindItemInList( to search the curve array for the curve name
+        // uses Util::FindItemInList( to search the curve array for the curve name
 
         // First time GetCurveIndex is called, get the input for all the performance curves
         if (state.dataCurveManager->GetCurvesInputFlag) {
@@ -3473,7 +3472,7 @@ namespace Curve {
         // Then try to retrieve a pressure curve object
         if (allocated(state.dataBranchAirLoopPlant->PressureCurve)) {
             if (size(state.dataBranchAirLoopPlant->PressureCurve) > 0) {
-                TempCurveIndex = UtilityRoutines::FindItemInList(PressureCurveName, state.dataBranchAirLoopPlant->PressureCurve);
+                TempCurveIndex = Util::FindItemInList(PressureCurveName, state.dataBranchAirLoopPlant->PressureCurve);
             } else {
                 TempCurveIndex = 0;
             }

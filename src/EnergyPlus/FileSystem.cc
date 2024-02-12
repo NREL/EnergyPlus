@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -81,9 +81,9 @@ namespace FileSystem {
 #endif
 
     static constexpr std::array<std::string_view, static_cast<std::size_t>(FileTypes::Num)> FileTypesExt{
-        "epJSON", "json", "glhe", "cbor", "msgpack", "ubjson", "bson", "idf", "imf", "csv", "tsv", "txt", "eso", "mtr"};
+        "epJSON", "json", "glhe", "cbor", "msgpack", "ubjson", "bson", "idf", "imf", "csv", "tsv", "txt", "eso", "mtr", "ddy"};
     static constexpr std::array<std::string_view, static_cast<std::size_t>(FileTypes::Num)> FileTypesExtUC{
-        "EPJSON", "JSON", "GLHE", "CBOR", "MSGPACK", "UBJSON", "BSON", "IDF", "IMF", "CSV", "TSV", "TXT", "ESO", "MTR"};
+        "EPJSON", "JSON", "GLHE", "CBOR", "MSGPACK", "UBJSON", "BSON", "IDF", "IMF", "CSV", "TSV", "TXT", "ESO", "MTR", "DDY"};
 
     static_assert(FileTypesExt.size() == static_cast<std::size_t>(FileTypes::Num), "Mismatched FileTypes enum and FileTypesExt array.");
     static_assert(FileTypesExtUC.size() == static_cast<std::size_t>(FileTypes::Num), "Mismatched FileTypes enum and FileTypesExtUC array.");
@@ -235,7 +235,7 @@ namespace FileSystem {
 
         extension.remove_prefix(extension.find_last_of('.') + 1);
         std::string stringExtension = std::string(extension);
-        return static_cast<FileTypes>(getEnumerationValue(FileTypesExtUC, UtilityRoutines::MakeUPPERCase(stringExtension)));
+        return static_cast<FileTypes>(getEnumValue(FileTypesExtUC, Util::makeUPPER(stringExtension)));
     }
 
     // TODO: remove for fs::path::replace_extension directly? Note that replace_extension mutates the object

@@ -53,7 +53,7 @@ The applications for this include:
 \begin{itemize}
  \item a vehicle driving along the road,
  \item a rotating building, such as for experimental testing at different orientations, or
- \item if combind with a ``\hyperref[surfacepropertyunderwater]{SurfaceProperty:Underwater}'' boundary condition, it could apply to ships and vessels.
+ \item if combined with a ``\hyperref[surfacepropertyunderwater]{SurfaceProperty:Underwater}'' boundary condition, it could apply to ships and vessels.
 \end{itemize}
 
 The latitude, longitude, and orientation are all defined according to the same conventions as in the regular ``\hyperref[sitelocation]{Site:Location}'' object.
@@ -315,7 +315,7 @@ Optional integer number of days for an upper limit on the number of warmup days 
 
 \paragraph{Field: Begin Environment Reset Mode}\label{field-beg-env-reset-mode}
 
-Optional choice field to control if zone heat balance history terms should be reset when beginning to run this sizing period.  This can reduce the number of warmup days needed to reach zone convergence.  The options are \textbf{FullResetAtBeginEnvironment} or \textbf{SuppressThermalResetAtBeginEnvironment}.  \textbf{FullResetAtBeginEnvironment} means that at the beginning of the design day warmup the building model's surfaces are set to 23 degrees C, which is the usual starting point for each environment.  \textbf{SuppressThermalResetAtBeginEnvironment} means that at the beginning of the design day warmup the building model's surfaces are not reset and will just retain whatever thermal history results they had at the end of the previous design day.  The warmup days still proceed as usual but because the initial condition is closer it needs fewer warmup days to reach convergence.  This is available to reduce simulation run time when using many design days that are similiar to each other.
+Optional choice field to control if zone heat balance history terms should be reset when beginning to run this sizing period.  This can reduce the number of warmup days needed to reach zone convergence.  The options are \textbf{FullResetAtBeginEnvironment} or \textbf{SuppressThermalResetAtBeginEnvironment}.  \textbf{FullResetAtBeginEnvironment} means that at the beginning of the design day warmup the building model's surfaces are set to 23 degrees C, which is the usual starting point for each environment.  \textbf{SuppressThermalResetAtBeginEnvironment} means that at the beginning of the design day warmup the building model's surfaces are not reset and will just retain whatever thermal history results they had at the end of the previous design day.  The warmup days still proceed as usual but because the initial condition is closer it needs fewer warmup days to reach convergence.  This is available to reduce simulation run time when using many design days that are similar to each other.
 
 
 IDF Examples:
@@ -966,7 +966,7 @@ Terrain Description & Exponent & Boundary Layer Thickness (m) \tabularnewline
 
 \caption[]{Wind Speed Profile Coefficients (ASHRAE Fundamentals 2005).} \tabularnewline
 \toprule
-Terrain Description & Exponent & Bounhary Layer Thickness (m) \tabularnewline
+Terrain Description & Exponent & Boundary Layer Thickness (m) \tabularnewline
 \midrule
 \endhead
 
@@ -1263,7 +1263,7 @@ Site:GroundTemperature:Undisturbed:Xing,
   1.08,         !- Soil Thermal Conductivity {W/m-K}
   962,          !- Soil Density {kg/m3}
   2576,         !- Soil Specific Heat {J/kg-K}
-  11.1,         !- Average Soil Surface Tempeature {C}
+  11.1,         !- Average Soil Surface Temperature {C}
   13.4,         !- Soil Surface Temperature Amplitude 1 {deltaC}
   0.7,          !- Soil Surface Temperature Amplitude 2 {deltaC}
   25,           !- Phase Shift of Temperature Amplitude 1 {days}
@@ -1737,7 +1737,7 @@ Water mains temperatures are a function of outdoor climate conditions and vary w
   maximum difference in monthly average outdoor air temperatures
 \end{itemize}
 
-These values can be calculated from annual weather data using the auxillary program CalcSoilSurfTemp preprocessor. For more information on the water mains temperatures correlation, see the \emph{EnergyPlus Engineering Document}.
+These values can be calculated from annual weather data using the auxiliary program CalcSoilSurfTemp preprocessor. For more information on the water mains temperatures correlation, see the \emph{EnergyPlus Engineering Document}.
 
 Alternatively, the Site:WaterMainsTemperature object can read values from a schedule. This is useful for measured data or when water comes from a source other than buried pipes, e.g., a river or lake.
 

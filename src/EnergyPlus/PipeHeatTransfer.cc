@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -272,8 +272,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
-        state.dataPipeHT->PipeHT(Item).ConstructionNum =
-            UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
+        state.dataPipeHT->PipeHT(Item).ConstructionNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
 
         if (state.dataPipeHT->PipeHT(Item).ConstructionNum == 0) {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -327,12 +326,11 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         if (state.dataIPShortCut->lAlphaFieldBlanks(5)) state.dataIPShortCut->cAlphaArgs(5) = "ZONE";
 
         PipeIndoorBoundaryType indoorType =
-            static_cast<PipeIndoorBoundaryType>(getEnumerationValue(pipeIndoorBoundaryTypeNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
+            static_cast<PipeIndoorBoundaryType>(getEnumValue(pipeIndoorBoundaryTypeNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
         switch (indoorType) {
         case PipeIndoorBoundaryType::Zone:
             state.dataPipeHT->PipeHT(Item).EnvironmentPtr = EnvrnPtr::ZoneEnv;
-            state.dataPipeHT->PipeHT(Item).EnvrZonePtr =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataHeatBal->Zone);
+            state.dataPipeHT->PipeHT(Item).EnvrZonePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataHeatBal->Zone);
             if (state.dataPipeHT->PipeHT(Item).EnvrZonePtr == 0) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
                 ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -428,8 +426,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
-        state.dataPipeHT->PipeHT(Item).ConstructionNum =
-            UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
+        state.dataPipeHT->PipeHT(Item).ConstructionNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
 
         if (state.dataPipeHT->PipeHT(Item).ConstructionNum == 0) {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -565,8 +562,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
-        state.dataPipeHT->PipeHT(Item).ConstructionNum =
-            UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
+        state.dataPipeHT->PipeHT(Item).ConstructionNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
 
         if (state.dataPipeHT->PipeHT(Item).ConstructionNum == 0) {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -619,9 +615,9 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         // Solar inclusion flag
         // A6,  \field Sun Exposure
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "SUNEXPOSED")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "SUNEXPOSED")) {
             state.dataPipeHT->PipeHT(Item).SolarExposed = true;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "NOSUN")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "NOSUN")) {
             state.dataPipeHT->PipeHT(Item).SolarExposed = false;
         } else {
             ShowSevereError(state, format("GetPipesHeatTransfer: invalid key for sun exposure flag for {}", state.dataIPShortCut->cAlphaArgs(1)));
@@ -651,8 +647,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         // Also get the soil material name
         // A7,  \field Soil Material
         state.dataPipeHT->PipeHT(Item).SoilMaterial = state.dataIPShortCut->cAlphaArgs(6);
-        state.dataPipeHT->PipeHT(Item).SoilMaterialNum =
-            UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material);
+        state.dataPipeHT->PipeHT(Item).SoilMaterialNum = Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material);
         if (state.dataPipeHT->PipeHT(Item).SoilMaterialNum == 0) {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataPipeHT->PipeHT(Item).SoilMaterial));
             ShowContinueError(state, format("Found in {}={}", cCurrentModuleObject, state.dataPipeHT->PipeHT(Item).Name));
@@ -756,14 +751,14 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Pipe Fluid Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             state.dataPipeHT->PipeHT(Item).FluidHeatLossRate,
                             OutputProcessor::SOVTimeStepType::Plant,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataPipeHT->PipeHT(Item).Name);
         SetupOutputVariable(state,
                             "Pipe Fluid Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             state.dataPipeHT->PipeHT(Item).FluidHeatLossEnergy,
                             OutputProcessor::SOVTimeStepType::Plant,
                             OutputProcessor::SOVStoreType::Summed,
@@ -772,14 +767,14 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         if (state.dataPipeHT->PipeHT(Item).EnvironmentPtr == EnvrnPtr::ZoneEnv) {
             SetupOutputVariable(state,
                                 "Pipe Ambient Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 state.dataPipeHT->PipeHT(Item).EnvironmentHeatLossRate,
                                 OutputProcessor::SOVTimeStepType::Plant,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataPipeHT->PipeHT(Item).Name);
             SetupOutputVariable(state,
                                 "Pipe Ambient Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataPipeHT->PipeHT(Item).EnvHeatLossEnergy,
                                 OutputProcessor::SOVTimeStepType::Plant,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -794,28 +789,28 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Pipe Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             state.dataPipeHT->PipeHT(Item).MassFlowRate,
                             OutputProcessor::SOVTimeStepType::Plant,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataPipeHT->PipeHT(Item).Name);
         SetupOutputVariable(state,
                             "Pipe Volume Flow Rate",
-                            OutputProcessor::Unit::m3_s,
+                            Constant::Units::m3_s,
                             state.dataPipeHT->PipeHT(Item).VolumeFlowRate,
                             OutputProcessor::SOVTimeStepType::Plant,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataPipeHT->PipeHT(Item).Name);
         SetupOutputVariable(state,
                             "Pipe Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             state.dataPipeHT->PipeHT(Item).FluidInletTemp,
                             OutputProcessor::SOVTimeStepType::Plant,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataPipeHT->PipeHT(Item).Name);
         SetupOutputVariable(state,
                             "Pipe Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             state.dataPipeHT->PipeHT(Item).FluidOutletTemp,
                             OutputProcessor::SOVTimeStepType::Plant,
                             OutputProcessor::SOVStoreType::Average,
@@ -1351,7 +1346,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
     // This then interfaces with the Hanby model for near-pipe region
 
     // Using/Aliasing
-    using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
+    using Convect::CalcASHRAESimpExtConvCoeff;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr NumSections(20);
@@ -1416,8 +1411,8 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
 
                         // If on soil boundary, load up local variables and perform calculations
                         NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Previous);
-                        PastNodeTempAbs = NodePast + Constant::KelvinConv;
-                        SkyTempAbs = state.dataEnvrn->SkyTemp + Constant::KelvinConv;
+                        PastNodeTempAbs = NodePast + Constant::Kelvin;
+                        SkyTempAbs = state.dataEnvrn->SkyTemp + Constant::Kelvin;
                         TopRoughness = this->SoilRoughness;
                         TopThermAbs = this->SoilThermAbs;
                         TopSolarAbs = this->SoilSolarAbs;
@@ -1427,7 +1422,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
                         Cp = this->SoilCp;
 
                         // ASHRAE simple convection coefficient model for external surfaces.
-                        this->OutdoorConvCoef = CalcASHRAESimpExtConvectCoeff(TopRoughness, state.dataEnvrn->WindSpeed);
+                        this->OutdoorConvCoef = CalcASHRAESimpExtConvCoeff(TopRoughness, state.dataEnvrn->WindSpeed);
                         ConvCoef = this->OutdoorConvCoef;
 
                         // thermal radiation coefficient using surf temp from past time step

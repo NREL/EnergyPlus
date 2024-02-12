@@ -10,10 +10,10 @@ jobs:
     - name: Checkout EnergyPlus
       uses: actions/checkout@v3
 
-    - name: Set up Python 3.7
+    - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: 3.7
+        python-version: '3.10'
 
     - name: Set up LaTeX
       run: sudo apt update && sudo apt install -y texlive texlive-xetex texlive-science poppler-utils
@@ -30,7 +30,7 @@ jobs:
 
     - name: Build Docs
       working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
-      run: cmake --build . -j 2
+      run: cmake --build . -j 4
 
     - name: Upload Acknowledgments
       uses: actions/upload-artifact@v3

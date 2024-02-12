@@ -133,7 +133,7 @@ Parametric:Logic,
 
 The statements include PARAMETER, IF, ELSE, ELSEIF, ENDIF, SELECT, CASE, DEFAULT, ENDSELECT, ENABLE, DISABLE, and REMARK. Nested IF and SELECT statements are allowed.~ All objects are enabled until they are specifically disabled using the DISABLE statement and could be later re-enabled with ENABLE. An object that is named with the DISABLE statement would not appear in that simulation run.
 
-The PARAMETER statement declares the name of the parameter. It is necessary that every parameter used in the Parametric:Logic object be initialized using the PARAMETER statement unless the parametes are created using the \hyperref[parametricsetvalueforrun]{Parametric:SetValueForRun} object. Requiring explicit parameter declaration reduces errors in software programming. Parameter names would not be case sensitive.
+The PARAMETER statement declares the name of the parameter. It is necessary that every parameter used in the Parametric:Logic object be initialized using the PARAMETER statement unless the parameters are created using the \hyperref[parametricsetvalueforrun]{Parametric:SetValueForRun} object. Requiring explicit parameter declaration reduces errors in software programming. Parameter names would not be case sensitive.
 
 The DISABLE and ENABLE commands can have one or two arguments. If a second argument is present it is the kind of object.
 
@@ -227,7 +227,7 @@ SELECT <expression>
   ENDSELECT
 \end{lstlisting}
 
-With any number of CASE statements. The \textless{}expression\textgreater{} is evaluated and compared to the constants with each CASE statement. If a match is found the corresponding \textless{}case-block-of-statements\textgreater{} are executed otherwise if no match if found the \textless{}default-block-of-statements\textgreater{} is excecuted. One one matching CASE statement for each SELECT block is executed. An example of how this works is shown below:
+With any number of CASE statements. The \textless{}expression\textgreater{} is evaluated and compared to the constants with each CASE statement. If a match is found the corresponding \textless{}case-block-of-statements\textgreater{} are executed otherwise if no match if found the \textless{}default-block-of-statements\textgreater{} is executed. One one matching CASE statement for each SELECT block is executed. An example of how this works is shown below:
 
 \begin{lstlisting}
 

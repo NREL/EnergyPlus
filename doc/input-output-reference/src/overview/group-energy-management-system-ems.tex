@@ -114,7 +114,7 @@ This field describes when the Erl programs managed under this object are called 
 \item
   BeginNewEnvironment. This calling point occurs near the beginning of each environment period. Environment periods include sizing periods such as design days and run periods. This calling point will not be useful for control actions but is useful for initialization of Erl program variables and other one-time set up actions for EMS.
 \item
-  BeginZoneTimestepBeforeSetCurrentWeather. This calling point occurs near the beginning of each timestep during weather data setup. It is called from ``ManageWeather'' before ``SetCurrentWeather'' which sets the environment variables for a given timstep. ``SetCurrentWeather'' is where the Weather Data actuators may override certain environment variables. Note that this calling point is not active during sizing.
+  BeginZoneTimestepBeforeSetCurrentWeather. This calling point occurs near the beginning of each timestep during weather data setup. It is called from ``ManageWeather'' before ``SetCurrentWeather'' which sets the environment variables for a given timestep. ``SetCurrentWeather'' is where the Weather Data actuators may override certain environment variables. Note that this calling point is not active during sizing.
 \item
   AfterNewEnvironmentWarmUpIsComplete. This calling point occurs at the beginning of each environment period but after warm up days are complete. Warm up days are used to condition the transient aspects of the model with the first day before proceeding. This calling point will not be useful for control actions but is useful for re-initializing Erl programs with fresh values after warm up is complete. Programs called from this point might be used to reset counters or summed variables that would change during warmup.
 \item
@@ -130,7 +130,7 @@ This field describes when the Erl programs managed under this object are called 
 \item
   AfterPredictorAfterHVACManagers. This calling point happens each timestep after predictor executes and after the SetpointManager and AvailabilityManager models are called. This calling point is useful for a variety of control actions. However, if there are conflicts, SetpointManager or AvailabilityManager actions may be overwritten by EMS control actions.
 \item
-  InsideHVACSystemIterationLoop. This calling point happens each HVAC iteration. The HVAC systems solvers iterate to convergence within each timestep and this calling point is inside this iteration loop. This calling point is useful for a variety of control actions. Being inside the interation loop, this calling point has the advantage that input data need not necessarily be lagged from prior timestep results and can, in some cases, improve the accuracy of controls. The disadvantage is that programs may run an excessive number of times slowing down the execution of the program.
+  InsideHVACSystemIterationLoop. This calling point happens each HVAC iteration. The HVAC systems solvers iterate to convergence within each timestep and this calling point is inside this iteration loop. This calling point is useful for a variety of control actions. Being inside the iteration loop, this calling point has the advantage that input data need not necessarily be lagged from prior timestep results and can, in some cases, improve the accuracy of controls. The disadvantage is that programs may run an excessive number of times slowing down the execution of the program.
 \item
   EndOfZoneTimestepBeforeZoneReporting. This calling point happens each zone timestep just before the output reports are updated for zone-timestep variables and meters. This calling point is useful for custom output variables with Zone frequency because they will be in sync with the rest of the zone output variables.
 \item
@@ -142,7 +142,7 @@ This field describes when the Erl programs managed under this object are called 
 \item
   EndOfZoneSizing. This calling point happens once during each simulation and only if the run is set to do zone sizing. The calling point occurs just after the native zone sizing calculations are completed but before the sizing results are finalized. This calling point is useful for taking the intermediate results of zone sizing calculations and modifying them based on custom calculations.
 \item
-  EndOfSystemSizing. This calling pont happens once during each simulation and only if the run is set to do system sizing. The calling point occurs just after the native air system sizing calculations are completed but before the sizing results are finalized. This calling point is useful for taking the intermediate results of zone and system sizing calculations and modifying them based on custom calculations.
+  EndOfSystemSizing. This calling point happens once during each simulation and only if the run is set to do system sizing. The calling point occurs just after the native air system sizing calculations are completed but before the sizing results are finalized. This calling point is useful for taking the intermediate results of zone and system sizing calculations and modifying them based on custom calculations.
 \item
   AfterComponentInputReadIn. This calling point occurs early in the simulation when HVAC component s input data has been processed but before any component-level calculations for automatic sizing. This calling point occurs once for each of the types of HVAC components that have EMS actuators for autosize overrides. This calling point is not directly useful for control actions but is useful for overriding the results of sizing at the component level.
 \item
@@ -367,7 +367,7 @@ EnergyManagementSystem:OutputVariable,
   CWcoil1_tot_cool_Power,   !- EMS Variable Name
   Averaged,                               !- Type of Data in Variable
   SystemTimestep,                   !- Update Frequency
-  MainCWCoil1_ModelOuput,   !- EMS Program or Subroutine Name
+  MainCWCoil1_Modeloutput,   !- EMS Program or Subroutine Name
   W;                                             !- Units
 \end{lstlisting}
 
@@ -431,7 +431,7 @@ This field is used to specify the type of resource that the output variable cons
 \item
   \textbf{\hyperref[districtcooling]{DistrictCooling}}, this selects the meter for district chilled water energy consumption, in units of Joules {[}J{]},
 \item
-  \textbf{\hyperref[districtheating]{DistrictHeating}}, this selects the meter for district hot water energy consumption, in units of Joules {[}J{]},
+  \textbf{\hyperref[districtheating]{DistrictHeatingWater}}, this selects the meter for district hot water energy consumption, in units of Joules {[}J{]},
 \item
   \textbf{ElectricityProducedOnSite}, this selects the meter for electricity produced on the site, in units of Joules {[}J{]},
 \item
@@ -504,7 +504,7 @@ EnergyManagementSystem:MeteredOutputVariable,
   Zone 1 WinAC Electricity Consumption,   !- Name
   Zone1WinAC_ElectEnergy,   !- EMS Variable Name
   SystemTimestep,                   !- Update Frequency
-  Zone1_WinAC_ModelOuput,   !- EMS Program or Subroutine Name
+  Zone1_WinAC_Modeloutput,   !- EMS Program or Subroutine Name
   Electricity,                         !- Resource Type
   HVAC,                                       !- Group Type
   Cooling,                                 !- End-Use Category
@@ -562,7 +562,7 @@ This field contains the unique identifier for the internal variable. This is usu
 
 \paragraph{Field: Internal Data Type}\label{field-internal-data-type}
 
-This field defines the type of internal data source that is to be mapped to the EMS variable. The types of internal source data that can be used as internal variables are listed in the EIO output file whan an input file has any EMS-related objects.
+This field defines the type of internal data source that is to be mapped to the EMS variable. The types of internal source data that can be used as internal variables are listed in the EIO output file when an input file has any EMS-related objects.
 
 An example of this object follows.
 

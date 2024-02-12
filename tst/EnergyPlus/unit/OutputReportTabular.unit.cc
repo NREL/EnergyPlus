@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -255,9 +255,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmResourceWarning)
     EXPECT_EQ(
         "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: District Cooling [kBtu]",
         ResourceWarningMessage("District Cooling [kBtu]"));
-    EXPECT_EQ(
-        "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: District Heating [kBtu]",
-        ResourceWarningMessage("District Heating [kBtu]"));
+    EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: District Heating "
+              "Water [kBtu]",
+              ResourceWarningMessage("District Heating Water [kBtu]"));
     EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: Water [GJ]",
               ResourceWarningMessage("Water [GJ]"));
     EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: Electricity [GJ]",
@@ -661,6 +661,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConvertToEscaped)
     EXPECT_EQ("String with \xC2\xB1 in it", ConvertToEscaped("String with \xC2\xB1 in it"));
     EXPECT_EQ("String with &deg; in it", ConvertToEscaped(R"(String with \u00B0 in it)"));
     EXPECT_EQ("String with &deg; in it", ConvertToEscaped(R"(String with \xB0 in it)"));
+    EXPECT_EQ("String with &le; in it", ConvertToEscaped("String with ≤ in it"));
+    EXPECT_EQ("String with &ge; in it", ConvertToEscaped("String with ≥ in it"));
     EXPECT_ANY_THROW(ConvertToEscaped(R"(String with \u in it)"));
     EXPECT_ANY_THROW(ConvertToEscaped(R"(String with \x in it)"));
 }
@@ -2259,6 +2261,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         "   ,                      !- Evaporative Condenser Air Flow Rate",
         "   autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
         "   0.0,                   !- Crankcase Heater Capacity",
+        "   ,                      !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "   10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
         "Coil:Heating:Fuel,",
@@ -3514,36 +3517,33 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
 
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -3582,36 +3582,33 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -3626,8 +3623,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::Zone].TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep = 60;
 
     GetInputOutputTableSummaryReports(*state);
 
@@ -3663,15 +3660,24 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 {
     // Glazer - Sep 2017
+    auto &op = state->dataOutputProcessor;
 
     state->dataOutRptTab->displayDemandEndUse = true;
     state->dataOutRptTab->displayLEEDSummary = true;
     state->dataGlobal->TimeStepZoneSec = 900.0;
 
     int resourceNum = 1;
-    int totalMeterNum = 2;
-    int endUseMeterNum = 3;
-    int subEndUseMeterNum = 4;
+
+    Meter *meterTotal = new Meter("Total");
+    Meter *meterEndUse = new Meter("EndUse");
+    Meter *meterSubEndUse = new Meter("SubEndUse");
+
+    op->meters.push_back(meterTotal);
+    int totalMeterNum = (int)op->meters.size() - 1;
+    state->dataOutputProcessor->meters.push_back(meterEndUse);
+    int endUseMeterNum = (int)op->meters.size() - 1;
+    state->dataOutputProcessor->meters.push_back(meterSubEndUse);
+    int subEndUseMeterNum = (int)op->meters.size() - 1;
 
     int endUseNum = 1;
     int subEndUseNum = 1;
@@ -3679,7 +3685,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     state->dataOutRptTab->meterNumEndUseSubBEPS.allocate(10, 10, 10);
     state->dataOutRptTab->gatherDemandEndUseSub.allocate(10, 10, 10);
     state->dataOutRptTab->gatherDemandIndEndUseSub.allocate(10, 10, 10);
-    state->dataOutputProcessor->EnergyMeters.allocate(100);
 
     state->dataOutputProcessor->EndUseCategory.allocate(endUseNum);
     state->dataOutputProcessor->EndUseCategory(endUseNum).NumSubcategories = 1;
@@ -3697,12 +3702,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // first "timestep"
 
-    state->dataOutputProcessor->EnergyMeters(totalMeterNum).CurTSValue =
-        123.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the total meter
-    state->dataOutputProcessor->EnergyMeters(endUseMeterNum).CurTSValue =
-        47.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the end use meter
-    state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
-        28.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
+    op->meters[totalMeterNum]->CurTSValue = 123.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the total meter
+    op->meters[endUseMeterNum]->CurTSValue = 47.0 * state->dataGlobal->TimeStepZoneSec;    // create the current value for the end use meter
+    op->meters[subEndUseMeterNum]->CurTSValue = 28.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
 
@@ -3716,11 +3718,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // next "timestep" total higher
 
-    state->dataOutputProcessor->EnergyMeters(totalMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[totalMeterNum]->CurTSValue =
         133.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the total meter
-    state->dataOutputProcessor->EnergyMeters(endUseMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[endUseMeterNum]->CurTSValue =
         57.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the end use meter
-    state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[subEndUseMeterNum]->CurTSValue =
         38.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
@@ -3735,11 +3737,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // next "timestep" total lower but end use higher and sub end use higher
 
-    state->dataOutputProcessor->EnergyMeters(totalMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[totalMeterNum]->CurTSValue =
         103.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the total meter
-    state->dataOutputProcessor->EnergyMeters(endUseMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[endUseMeterNum]->CurTSValue =
         61.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the end use meter
-    state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[subEndUseMeterNum]->CurTSValue =
         42.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
@@ -3754,11 +3756,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
 
     // next "timestep" total higher but end use lower and sub end use lower
 
-    state->dataOutputProcessor->EnergyMeters(totalMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[totalMeterNum]->CurTSValue =
         143.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the total meter
-    state->dataOutputProcessor->EnergyMeters(endUseMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[endUseMeterNum]->CurTSValue =
         59.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the end use meter
-    state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
+    state->dataOutputProcessor->meters[subEndUseMeterNum]->CurTSValue =
         39.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
     GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
@@ -3809,7 +3811,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataDXCoils->DXCoil.allocate(2);
     state->dataDXCoils->DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     state->dataDXCoils->DXCoil(1).CondenserType(1) = DataHeatBalance::RefrigCondenserType::Air;
-    state->dataDXCoils->DXCoil(1).FuelType = Constant::eResource::NaturalGas;
+    state->dataDXCoils->DXCoil(1).FuelType = Constant::eFuel::NaturalGas;
     state->dataDXCoils->DXCoil(1).ElecCoolingConsumption = 100.0;
     state->dataDXCoils->DXCoil(1).TotalCoolingEnergy = 100.0;
     state->dataDXCoils->DXCoil(1).MSFuelWasteHeat = 1.0;
@@ -3819,16 +3821,41 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataDXCoils->DXCoil(2).ElecHeatingConsumption = 50.0;
     state->dataDXCoils->DXCoil(2).TotalHeatingEnergy = 40.0;
     state->dataDXCoils->DXCoil(2).DefrostConsumption = 0.0;
-    state->dataDXCoils->DXCoil(2).FuelConsumed = 0.0;
+    // state->dataDXCoils->DXCoil(2).FuelConsumed = 0.0; should be initialized to zero
     state->dataDXCoils->DXCoil(2).CrankcaseHeaterConsumption = 0.0;
 
-    Real64 coilReject = 1.0 * state->dataHVACGlobal->TimeStepSysSec + 200.0 + 10.0;
+    Real64 coilReject = 1.0 * state->dataHVACGlobal->TimeStepSysSec + (100.0 + 100.0) + (50.0 - 40.0);
     GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::System);
     EXPECT_EQ(reliefEnergy, state->dataHeatBal->SysTotalHVACReliefHeatLoss);
     EXPECT_EQ(2 * reliefEnergy * Constant::convertJtoGJ, state->dataHeatBal->BuildingPreDefRep.emiHVACRelief);
     EXPECT_EQ(condenserReject + coilReject, state->dataHeatBal->SysTotalHVACRejectHeatLoss);
     EXPECT_EQ(2 * condenserReject * Constant::convertJtoGJ + coilReject * Constant::convertJtoGJ,
               state->dataHeatBal->BuildingPreDefRep.emiHVACReject);
+
+    state->dataDXCoils->DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
+    state->dataDXCoils->DXCoil(1).CondenserType(1) = DataHeatBalance::RefrigCondenserType::Air;
+    state->dataDXCoils->DXCoil(1).FuelType = Constant::eFuel::NaturalGas;
+    state->dataDXCoils->DXCoil(1).ElecCoolingConsumption = 100.0;
+    state->dataDXCoils->DXCoil(1).TotalCoolingEnergy = 100.0;
+    state->dataDXCoils->DXCoil(1).MSFuelWasteHeat = 1.0;
+    state->dataDXCoils->DXCoil(1).DefrostConsumption = 0.0;
+    state->dataDXCoils->DXCoil(1).CrankcaseHeaterConsumption = 20.0;
+    state->dataDXCoils->DXCoil(1).FuelConsumed = 50.0; // not included for cooling
+    state->dataDXCoils->DXCoil(2).DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedHeating;
+    state->dataDXCoils->DXCoil(2).ElecHeatingConsumption = 15.0;
+    state->dataDXCoils->DXCoil(2).TotalHeatingEnergy = 100.0;
+    state->dataDXCoils->DXCoil(2).DefrostConsumption = 10.0;
+    state->dataDXCoils->DXCoil(2).FuelConsumed = 30.0;
+    state->dataDXCoils->DXCoil(2).CrankcaseHeaterConsumption = 5.0;
+
+    Real64 coilReject2 = 1.0 * state->dataHVACGlobal->TimeStepSysSec + (100.0 + 100.0 + 20.0) + (15.0 + 10.0 + 30.0 + 5.0 - 100.0);
+    GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::System);
+    EXPECT_EQ(reliefEnergy, state->dataHeatBal->SysTotalHVACReliefHeatLoss);
+    EXPECT_NEAR(3 * reliefEnergy * Constant::convertJtoGJ, state->dataHeatBal->BuildingPreDefRep.emiHVACRelief, 0.0000001);
+    EXPECT_EQ(condenserReject + coilReject2, state->dataHeatBal->SysTotalHVACRejectHeatLoss);
+    EXPECT_NEAR(3 * condenserReject * Constant::convertJtoGJ + (coilReject + coilReject2) * Constant::convertJtoGJ,
+                state->dataHeatBal->BuildingPreDefRep.emiHVACReject,
+                0.0000001);
 }
 
 TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
@@ -6112,7 +6139,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitSubstring_Test)
 
 TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularVeriSum = true;
@@ -6188,7 +6214,6 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     EXPECT_EQ(174ul, tabularData.size());
     // tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId,
@@ -6222,7 +6247,6 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
 // Test for #6350 and #6469
 TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularVeriSum = true;
@@ -6416,8 +6440,6 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
                           rowName + "'" + "  AND ColumnName = '" + columnName + "'");
 
         std::string flag = queryResult(query, "TabularDataWithStrings")[0][0];
-        // Not needed, we're just querying, not inside a transaction
-        // state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
         // Add informative message if failed
         EXPECT_EQ(std::get<2>(v), flag) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
@@ -6510,7 +6532,6 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
                           rowName + "'" + "  AND ColumnName = '" + columnName + "'");
 
         Real64 return_val = execAndReturnFirstDouble(query);
-        // state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
         // Add informative message if failed
         EXPECT_NEAR(std::get<2>(v), return_val, 0.01) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
@@ -6538,36 +6559,33 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
 
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
@@ -6596,14 +6614,12 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     state->dataHeatBal->Zone(1).ListMultiplier = 1;
     state->dataHeatBal->Zone(1).FloorArea = 12.;
 
-    state->dataWeatherManager->DesDayInput.allocate(1);
-    state->dataWeatherManager->DesDayInput(1).Month = 5;
-    state->dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
+    state->dataWeather->DesDayInput.allocate(1);
+    state->dataWeather->DesDayInput(1).Month = 5;
+    state->dataWeather->DesDayInput(1).DayOfMonth = 21;
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
-
-    state->dataSize->CoolPeakDateHrMin.allocate(1);
 
     state->dataSize->CalcFinalZoneSizing.allocate(1);
     state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(96);
@@ -7036,7 +7052,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
 
 TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoop_ZeroDesignDay)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataHVACGlobal->NumPrimaryAirSys = 1;
@@ -7058,7 +7073,6 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     EXPECT_EQ(460ul, tabularData.size());
     EXPECT_EQ(77ul, strings.size());
@@ -7069,7 +7083,6 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 // We ensure that if the Airloop peak matches the zone peak, we don't do the IP conversion twice
 TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoop_IPConversion)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     OutputReportTabular::SetupUnitConversions(*state);
@@ -7090,11 +7103,11 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     int numDesDays = 2;
     state->dataEnvrn->TotDesDays = numDesDays;
     state->dataEnvrn->TotRunDesPersDays = 0;
-    state->dataWeatherManager->DesDayInput.allocate(2);
-    state->dataWeatherManager->DesDayInput(1).Month = 7;
-    state->dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
-    state->dataWeatherManager->DesDayInput(2).Month = 1;
-    state->dataWeatherManager->DesDayInput(2).DayOfMonth = 21;
+    state->dataWeather->DesDayInput.allocate(2);
+    state->dataWeather->DesDayInput(1).Month = 7;
+    state->dataWeather->DesDayInput(1).DayOfMonth = 21;
+    state->dataWeather->DesDayInput(2).Month = 1;
+    state->dataWeather->DesDayInput(2).DayOfMonth = 21;
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
@@ -7120,7 +7133,6 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     auto &finalZoneSizing = state->dataSize->CalcFinalZoneSizing(1);
     finalZoneSizing.CoolDDNum = coolDDNum;
     finalZoneSizing.TimeStepNumAtCoolMax = coolTimeOfMax;
-    state->dataSize->CoolPeakDateHrMin.allocate(1);
 
     finalZoneSizing.CoolOutTempSeq.allocate(numTimeStepInDay);
     finalZoneSizing.CoolOutTempSeq(coolTimeOfMax) = 38.;
@@ -7139,7 +7151,6 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     int heatTimeOfMax = 4;
     finalZoneSizing.HeatDDNum = heatDDNum;
     finalZoneSizing.TimeStepNumAtHeatMax = heatTimeOfMax;
-    state->dataSize->HeatPeakDateHrMin.allocate(1);
 
     finalZoneSizing.HeatOutTempSeq.allocate(numTimeStepInDay);
     finalZoneSizing.HeatOutTempSeq(heatTimeOfMax) = -17.4;
@@ -7253,8 +7264,6 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
                           "  AND RowName = 'Outside Dry Bulb Temperature';");
 
         std::string oa_db = queryResult(query, "TabularDataWithStrings")[0][0];
-        // Not needed, we're just querying, not inside a transaction
-        // state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
         // Add informative message if failed
         EXPECT_EQ(std::get<2>(v), oa_db) << "Failed for TableName=" << tableName << "; ReportName=" << reportName;
@@ -7396,7 +7405,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     for (int i = 0; i < 2; ++i) {
         SetupOutputVariable(*state,
                             "Zone Mean Air Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             zoneTemp,
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Average,
@@ -7404,28 +7413,28 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
 
         SetupOutputVariable(*state,
                             "Zone Heating Setpoint Not Met Time",
-                            OutputProcessor::Unit::hr,
+                            Constant::Units::hr,
                             timeNotMet,
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             ZoneNames[i]);
         SetupOutputVariable(*state,
                             "Zone Heating Setpoint Not Met While Occupied Time",
-                            OutputProcessor::Unit::hr,
+                            Constant::Units::hr,
                             timeNotMet,
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             ZoneNames[i]);
         SetupOutputVariable(*state,
                             "Zone Cooling Setpoint Not Met Time",
-                            OutputProcessor::Unit::hr,
+                            Constant::Units::hr,
                             timeNotMet,
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
                             ZoneNames[i]);
         SetupOutputVariable(*state,
                             "Zone Cooling Setpoint Not Met While Occupied Time",
-                            OutputProcessor::Unit::hr,
+                            Constant::Units::hr,
                             timeNotMet,
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
@@ -7451,7 +7460,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     }
 
     // Variables aren't going to be output to SQL/ESO anyways
-    EXPECT_EQ(state->dataOutputProcessor->NumOfReqVariables, 0);
+    EXPECT_EQ(state->dataOutputProcessor->reqVars.size(), 0);
 
     EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
     // If everything worked, we should have 2 tables, one for each zone.
@@ -7462,7 +7471,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
 // https://github.com/NREL/EnergyPlus/issues/6442
 TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->WriteTabularFiles = true;
@@ -7491,7 +7499,6 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     state->dataOutRptPredefined->reportName(5).show = true;
 
     WritePredefinedTables(*state);
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
     state->dataSQLiteProcedures->sqlite->initializeIndexes();
 
     auto units = queryResult("Select Units From TabularDataWithStrings "
@@ -7502,7 +7509,6 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
                               "WHERE ReportName = \"EquipmentSummary\" "
                               "  AND ColumnName = \"Rated Net Cooling Capacity Test A\"",
                               "TabularDataWithStrings");
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     EXPECT_EQ(1u, units.size());
     // Because the table has 8 cols
@@ -7521,7 +7527,6 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
 // https://github.com/NREL/EnergyPlus/issues/7565
 TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->WriteTabularFiles = true;
@@ -7545,7 +7550,6 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
     state->dataOutRptPredefined->reportName(7).show = true;
 
     WritePredefinedTables(*state);
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
     state->dataSQLiteProcedures->sqlite->initializeIndexes();
 
     for (const std::string reportName : {"HVACSizingSummary", "CoilSizingDetails"}) {
@@ -7556,8 +7560,6 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
                                       "\""
                                       "  AND ColumnName = \"Coil Leaving Air Humidity Ratio at Ideal Loads Peak\"",
                                   "TabularDataWithStrings");
-
-        state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
         EXPECT_EQ(1u, result.size());
         // Because the table has 8 cols
@@ -7836,7 +7838,6 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
 TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea)
 {
 
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displaySourceEnergyEndUseSummary = true;
@@ -8013,13 +8014,10 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea)
             EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
         }
     }
-
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }
 
 TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularBEPS = true;
@@ -8044,69 +8042,63 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "AnotherEndUseSubCat");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Coal Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         CoalHeating,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite4",
-                        {},
-                        "Coal",
-                        "Heating",
+                        Constant::eResource::Coal,
+                        OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Gasoline Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         GasolineHeating,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite5",
-                        {},
-                        "Gasoline",
-                        "Heating",
+                        Constant::eResource::Gasoline,
+                        OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Propane Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         PropaneHeating,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite6",
-                        {},
-                        "Propane",
-                        "Heating",
+                        Constant::eResource::Propane,
+                        OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
@@ -8120,8 +8112,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::Zone].TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep = 60;
 
     GetInputOutputTableSummaryReports(*state);
 
@@ -8159,8 +8151,6 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
     OutputReportTabular::WriteBEPSTable(*state);
     OutputReportTabular::WriteDemandEndUseSummary(*state);
-
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     // We test for Heating and Total, since they should be the same
     std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
@@ -8236,7 +8226,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                           "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 
     // Specifically get the each fuel (Coal, Gasoline, and Propane) usage for End Use = Heating,
@@ -8290,7 +8280,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                           "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 
     {
@@ -8300,7 +8290,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                           "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 }
 
@@ -8517,8 +8507,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
     bool fFScheduleUsed;
     int ffScheduleIndex;
 
-    PollutionModule::GetFuelFactorInfo(*state, "Steam", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
-
+    Pollution::GetFuelFactorInfo(*state, Constant::eFuel::DistrictHeatingSteam, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     EXPECT_EQ(curSourceFactor, 1.2);
 }
 
@@ -8605,61 +8594,60 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
 
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
 
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 0.25;
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->DisplayExtraWarnings = false;
 
     InitializeOutput(*state);
 
-    int meter_array_ptr = -1;
-    bool errors_found = false;
-
-    std::string resourceType("NaturalGas");
-    std::string endUse("Heating");
     std::string endUseSub("");
-    std::string group("");
     std::string const zoneName("");
     std::string const spaceType("");
 
-    AttachMeters(*state, OutputProcessor::Unit::J, resourceType, endUse, endUseSub, group, zoneName, spaceType, 1, meter_array_ptr, errors_found);
+    // AttachMeters(*state, Constant::Units::J, resource, sovEndUseCat, endUseSub, sovGroup, zoneName, spaceType, -1);
+    Meter *meter1 = new Meter("NATURALGAS:FACILITY");
+    meter1->resource = Constant::eResource::NaturalGas;
+    meter1->sovEndUseCat = OutputProcessor::SOVEndUseCat::Invalid;
+    state->dataOutputProcessor->meters.push_back(meter1);
+    state->dataOutputProcessor->meterMap.insert_or_assign("NATURALGAS:FACILITY", state->dataOutputProcessor->meters.size() - 1);
 
-    EXPECT_FALSE(errors_found);
-    EXPECT_EQ(3, meter_array_ptr); // 2 meters were setup via SetupOutputVariable already
+    Meter *meter2 = new Meter("HEATING:NATURALGAS");
+    meter2->resource = Constant::eResource::NaturalGas;
+    meter2->sovEndUseCat = OutputProcessor::SOVEndUseCat::Heating;
+    state->dataOutputProcessor->meters.push_back(meter2);
+    state->dataOutputProcessor->meterMap.insert_or_assign("HEATING:NATURALGAS", state->dataOutputProcessor->meters.size() - 1);
 
     OutputReportTabular::GetInputTabularMonthly(*state);
     OutputReportTabular::InitializeTabularMonthly(*state);
 
-    std::string expected_error = delimited_string({
-        "   ** Warning ** In Output:Table:Monthly 'MY REPORT' invalid Variable or Meter Name 'HEATING:GAS'",
-        "   ** Warning ** In Output:Table:Monthly 'MY REPORT' invalid Variable or Meter Name 'EXTERIOR LIGHTS ELECTRIC POWER'",
-        "   ** Warning ** In Output:Table:Monthly 'MY REPORT' invalid Variable or Meter Name 'ALWAYSON'",
+    std::string const expected_error = delimited_string({
+        "   ** Warning ** Processing Monthly Tabular Reports: Variable names not valid for this simulation",
+        "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables.",
     });
-
     compare_err_stream(expected_error);
 }
 
-TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
+TEST_F(SQLiteFixture, ORT_DualUnits_Process_Regular_Case_1)
 {
     // Test units to ensure proper Output:SQLite unit conversion handling
 
@@ -8669,89 +8657,52 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->files.outputControl.sqlite = true;
-    state->dataStrGlobals->outputSqlFilePath = "eplussqlite1.err";
-    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout1.sql";
-
-    state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
-
     EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::NotFound));
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
-
-    state->dataStrGlobals->outputSqlFilePath = "eplussqlite.err";
-    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout.sql";
 }
 
-TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
+TEST_F(SQLiteFixture, ORT_DualUnits_Process_Regular_Case_2)
 {
     // Test the regular scenario (No missing or default values) Case 2: InchPound
     std::string const idf_objects = delimited_string({"Output:SQLite,", "SimpleAndTabular, !-Option Type", "InchPound; !-Tabular Unit Conversion"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->files.outputControl.sqlite = true;
-
-    state->dataStrGlobals->outputSqlFilePath = "eplussqlite2.err";
-    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout2.sql";
-    state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
-
     EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::InchPound));
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
-
-    state->dataStrGlobals->outputSqlFilePath = "eplussqlite.err";
-    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout.sql";
 }
 
-TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
+TEST_F(SQLiteFixture, ORT_DualUnits_Process_Regular_Case_3)
 {
     // Test the regular scenario (No missing or default values) Case 3: None
     std::string const idf_objects = delimited_string({"Output:SQLite,", "SimpleAndTabular, !-Option Type", "None; !-Tabular Unit Conversion"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->files.outputControl.sqlite = true;
-
-    state->dataStrGlobals->outputSqlFilePath = "eplussqlite3.err";
-    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout3.sql";
-    state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
-
     EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::None));
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
-
-    state->dataStrGlobals->outputSqlFilePath = "eplussqlite.err";
-    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout.sql";
 }
 
-TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
+TEST_F(SQLiteFixture, ORT_DualUnits_Process_Missing_Case_1)
 {
     // Test the missing scenario (has missing or default fields) Case 1: Default empty input
     std::string const idf_objects = delimited_string({"Output:SQLite,", "SimpleAndTabular, !-Option Type", "; !-Tabular Unit Conversion"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->files.outputControl.sqlite = true;
-
-    state->dataStrGlobals->outputSqlFilePath = "eplussqlite4.err";
-    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout4.sql";
-
-    state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
-
     EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::NotFound));
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
-
-    state->dataStrGlobals->outputSqlFilePath = "eplussqlite.err";
-    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout.sql";
 }
 
-TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
+TEST_F(SQLiteFixture, ORT_DualUnits_Process_Missing_Case_2)
 {
     // Test the missing scenario (has missing or default fields) Case 2: Missing A2 field at all
     // This will allow a backward compatiability: even an earlier version format can be correctly handeled.
@@ -8759,25 +8710,14 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->files.outputControl.sqlite = true;
-
-    state->dataStrGlobals->outputSqlFilePath = "eplussqlite5.err";
-    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout5.sql";
-
-    state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
-
     EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::NotFound));
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
-
-    state->dataStrGlobals->outputSqlFilePath = "eplussqlite.err";
-    state->dataStrGlobals->outputSqliteErrFilePath = "eplusout.sql";
 }
 
 TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayHeatEmissionsSummary = true;
@@ -8960,13 +8900,10 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
             EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
         }
     }
-
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }
 
 TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displaySourceEnergyEndUseSummary = true;
@@ -9152,8 +9089,6 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
             EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
         }
     }
-
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }
 
 TEST_F(EnergyPlusFixture, ORT_LoadSummaryUnitConversion_OverLoad_DualUnits)
@@ -9197,7 +9132,6 @@ TEST_F(EnergyPlusFixture, ORT_LoadSummaryUnitConversion_OverLoad_DualUnits)
 
 TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest_DualUnits)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularVeriSum = true;
@@ -9280,7 +9214,6 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest_DualUnits)
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     EXPECT_EQ(174ul, tabularData.size());
     // tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId,
@@ -9314,7 +9247,6 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest_DualUnits)
 // Dual Unit test: Borrowed from Test for #6350 and #6469
 TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularVeriSum = true;
@@ -9510,8 +9442,6 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
                           rowName + "'" + "  AND ColumnName = '" + columnName + "'");
 
         std::string flag = queryResult(query, "TabularDataWithStrings")[0][0];
-        // Not needed, we're just querying, not inside a transaction
-        // state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
         // Add informative message if failed
         EXPECT_EQ(std::get<2>(v), flag) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
@@ -9603,7 +9533,6 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
                           rowName + "'" + "  AND ColumnName = '" + columnName + "'");
 
         Real64 return_val = execAndReturnFirstDouble(query);
-        // state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
         // Add informative message if failed
         EXPECT_NEAR(std::get<2>(v), return_val, 0.01) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
@@ -9612,7 +9541,6 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
 
 TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularBEPS = true;
@@ -9639,69 +9567,63 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
 
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "AnotherEndUseSubCat");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         extLitUse,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
-                        {},
-                        "Electricity",
-                        "Exterior Lights",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Coal Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         CoalHeating,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite4",
-                        {},
-                        "Coal",
-                        "Heating",
+                        Constant::eResource::Coal,
+                        OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Gasoline Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         GasolineHeating,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite5",
-                        {},
-                        "Gasoline",
-                        "Heating",
+                        Constant::eResource::Gasoline,
+                        OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Propane Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         PropaneHeating,
                         OutputProcessor::SOVTimeStepType::Zone,
                         OutputProcessor::SOVStoreType::Summed,
                         "Lite6",
-                        {},
-                        "Propane",
-                        "Heating",
+                        Constant::eResource::Propane,
+                        OutputProcessor::SOVEndUseCat::Heating,
                         "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
@@ -9715,8 +9637,8 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::Zone].TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep = 60;
 
     GetInputOutputTableSummaryReports(*state);
 
@@ -9754,8 +9676,6 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
 
     OutputReportTabular::WriteBEPSTable(*state);
     OutputReportTabular::WriteDemandEndUseSummary(*state);
-
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     // We test for Heating and Total, since they should be the same
     std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
@@ -9833,7 +9753,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                           "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 
     // Specifically get the each fuel (Coal, Gasoline, and Propane) usage for End Use = Heating,
@@ -9891,7 +9811,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                           "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 
     {
@@ -9901,14 +9821,13 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                           "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 }
 
 TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
 {
     // Test for #8542 - Ensures strings are escaped before going to HTML
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     auto &ort(state->dataOutRptTab);
@@ -9979,8 +9898,6 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
                                       "\""
                                       "  AND ColumnName = \"Coil Leaving Air Humidity Ratio at Ideal Loads Peak\"",
                                   "TabularDataWithStrings");
-
-        state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
         EXPECT_EQ(1u, result.size());
         // Because the table has 8 cols
@@ -10057,8 +9974,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_Standard62_1_N
     SetPredefinedTables(*state);
     EXPECT_GT(state->dataOutRptPredefined->numReportName, 0);
     auto &reportNameArray = state->dataOutRptPredefined->reportName;
-    auto it = std::find_if(
-        reportNameArray.begin(), reportNameArray.end(), [](const auto &rN) { return UtilityRoutines::SameString("Standard62.1Summary", rN.name); });
+    auto it =
+        std::find_if(reportNameArray.begin(), reportNameArray.end(), [](const auto &rN) { return Util::SameString("Standard62.1Summary", rN.name); });
     EXPECT_FALSE(it != reportNameArray.end()); // Not found
 
     GetInputOutputTableSummaryReports(*state);
@@ -10091,10 +10008,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_Standard62_1_W
     SetPredefinedTables(*state);
     EXPECT_GT(state->dataOutRptPredefined->numReportName, 0);
     auto &reportNameArray = state->dataOutRptPredefined->reportName;
-    auto it = std::find_if(
-        reportNameArray.begin(), reportNameArray.end(), [](const auto &rN) { return UtilityRoutines::SameString("Standard62.1Summary", rN.name); });
+    auto it =
+        std::find_if(reportNameArray.begin(), reportNameArray.end(), [](const auto &rN) { return Util::SameString("Standard62.1Summary", rN.name); });
     EXPECT_TRUE(it != reportNameArray.end());
-    // EXPECT_TRUE(UtilityRoutines::FindItem("Standard62.1Summary", state->dataOutRptPredefined->reportName));
+    // EXPECT_TRUE(Util::FindItem("Standard62.1Summary", state->dataOutRptPredefined->reportName));
 
     GetInputOutputTableSummaryReports(*state);
 
@@ -10105,7 +10022,6 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
 {
     // Test for #8921
 
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     std::string const idf_objects = delimited_string({
@@ -10144,10 +10060,10 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataOutputProcessor->NumEnergyMeters = 1;
-    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
-    state->dataOutputProcessor->EnergyMeters(1).Name = "Electricity:Facility";
-
+    Meter *meter = new Meter("Electricity:Facility");
+    meter->units = Constant::Units::J;
+    state->dataOutputProcessor->meters.push_back(meter);
+    state->dataOutputProcessor->meterMap.insert_or_assign("ELECTRICITY:FACILITY", (int)state->dataOutputProcessor->meters.size() - 1);
     // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
     state->dataGlobal->DoWeathSim = true; // flag to trick tabular reports to scan meters
     state->dataGlobal->TimeStepZone = 0.25;
@@ -10163,7 +10079,6 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
         R"(SELECT DISTINCT(ColumnName) FROM TabularDataWithStrings
              WHERE ReportName LIKE "MONTHLY EXAMPLE%")",
         "TabularDataWithStrings");
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     // 13 agg types for the same variable requested above + the {TIMESTAMP} ones (but distinct, so counts as 1)
     EXPECT_EQ(14, columnHeaders.size());
@@ -10173,7 +10088,6 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
              WHERE ReportName LIKE "MONTHLY EXAMPLE%"
              AND ColumnName LIKE "%{%" AND ColumnName NOT LIKE "%}%")",
         "TabularDataWithStrings");
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     // Should be none!
     for (auto &col : missingBracesHeaders) {
@@ -10187,7 +10101,6 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
              WHERE ReportName LIKE "MONTHLY EXAMPLE%"
              AND ColumnName LIKE "%} %")",
         "TabularDataWithStrings");
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     // Should be none!
     for (auto &col : extraSpaceAfterBracesHeaders) {
@@ -10227,7 +10140,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WarningMultiplePeopleObj)
         "ACTIVITY_SCH,            !- Activity Level Schedule Name",
         ",                        !- Carbon Dioxide Generation Rate {m3/s-W}",
         "No,                      !- Enable ASHRAE 55 Comfort Warnings",
-        "ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         ",                        !- Surface Name/Angle Factor List Name",
         ",                        !- Work Efficiency Schedule Name",
         ",                        !- Clothing Insulation Calculation Method",
@@ -10258,7 +10171,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WarningMultiplePeopleObj)
         "ACTIVITY_SCH,            !- Activity Level Schedule Name",
         ",                        !- Carbon Dioxide Generation Rate {m3/s-W}",
         "No,                      !- Enable ASHRAE 55 Comfort Warnings",
-        "ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         ",                        !- Surface Name/Angle Factor List Name",
         ",                        !- Work Efficiency Schedule Name",
         ",                        !- Clothing Insulation Calculation Method",
@@ -10344,15 +10257,15 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableReportingPer
     columnHead(5) = "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period ";
 
     Real64 degreeHourConversion = 1.8;
-    state->dataWeatherManager->TotReportPers = 2;
+    state->dataWeather->TotReportPers = 2;
 
-    state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    for (int i = 1; i <= state->dataWeatherManager->TotReportPers; i++) {
+    state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotReportPers);
+    for (int i = 1; i <= state->dataWeather->TotReportPers; i++) {
         state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, i).assign(5, 0.0);
     }
 
     int encodedMonDayHrMin;
-    for (int k = 1; k <= state->dataWeatherManager->TotReportPers; k++) {
+    for (int k = 1; k <= state->dataWeather->TotReportPers; k++) {
         for (int i = 0; i < 4; i++) {
             state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, k)[i] = float(k) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
         }
@@ -10428,14 +10341,14 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourRepPeriodUnitCo
     std::string tableName = "Unmet Degree-Hours";
 
     Real64 degreeHourConversion = 1.8;
-    state->dataWeatherManager->TotReportPers = 2;
+    state->dataWeather->TotReportPers = 2;
 
-    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    for (int i = 1; i <= state->dataWeatherManager->TotReportPers; i++) {
+    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotReportPers);
+    for (int i = 1; i <= state->dataWeather->TotReportPers; i++) {
         state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, i).assign(columnNumUnmetDegHr, 0.0);
     }
     // state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins: [0, -1, 4, -9, 16, -25]
-    for (int k = 1; k <= state->dataWeatherManager->TotReportPers; k++) {
+    for (int k = 1; k <= state->dataWeather->TotReportPers; k++) {
         for (int i = 0; i < 6; i++) {
             state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, k)[i] = float(k) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
         }
@@ -10684,7 +10597,6 @@ TEST_F(SQLiteFixture, StatFile_TMYx)
     state->files.inStatFilePath.filePath =
         configured_source_directory() / "tst/EnergyPlus/unit/Resources/USA_IL_Chicago.OHare.Intl.AP.725300_TMYx.stat";
 
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->WriteTabularFiles = true;
@@ -10706,7 +10618,6 @@ TEST_F(SQLiteFixture, StatFile_TMYx)
     // EXPECT_TRUE(state->dataOutRptPredefined->reportName(1).show);
 
     WritePredefinedTables(*state);
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     // - Monthly Statistics for Liquid Precipitation [mm]
     //              Jan     Feb     Mar     Apr     May     Jun     Jul     Aug     Sep     Oct     Nov     Dec
@@ -10730,7 +10641,6 @@ TEST_F(SQLiteFixture, StatFile_TMYx)
 
 TEST_F(SQLiteFixture, WriteVeriSumSpaceTables_Test)
 {
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularVeriSum = true;
@@ -10875,15 +10785,14 @@ TEST_F(SQLiteFixture, WriteVeriSumSpaceTables_Test)
     state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
 
-    state->dataHeatBal->space(1).floorArea = 100.0;
-    state->dataHeatBal->space(2).floorArea = 100.0;
+    state->dataHeatBal->space(1).FloorArea = 100.0;
+    state->dataHeatBal->space(2).FloorArea = 100.0;
 
     OutputReportTabular::writeVeriSumSpaceTables(*state, produceTabular, produceSQLite);
 
     auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
     auto strings = queryResult("SELECT * FROM Strings;", "Strings");
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     EXPECT_EQ(80ul, tabularData.size());
     // tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId,
@@ -10903,4 +10812,2806 @@ TEST_F(SQLiteFixture, WriteVeriSumSpaceTables_Test)
     EXPECT_NEAR(100.00, std::stod(tabularData[1][10]), 0.01);
     EXPECT_NEAR(200.00, std::stod(tabularData[2][10]), 0.01);
     EXPECT_NEAR(200.00, std::stod(tabularData[3][10]), 0.01);
+}
+
+TEST_F(SQLiteFixture, DOASDirectToZone_ZoneMultiplierRemoved)
+{
+    std::string const idf_objects_1 = R"IDF(
+  Version,23.1;
+
+  Timestep,4;
+
+  Building,
+    NONE,                    !- Name
+    0,                       !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.039999999,             !- Loads Convergence Tolerance Value {W}
+    0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
+    FullInteriorAndExterior, !- Solar Distribution
+    25,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  Zone,
+    Test Zone,               !- Name
+    0,                       !- Direction of Relative North {deg}
+    0,                       !- X Origin {m}
+    0,                       !- Y Origin {m}
+    0,                       !- Z Origin {m}
+    ,                        !- Type
+    10;                      !- Multiplier
+
+  BuildingSurface:Detailed,
+    Zn001:Flr001,            !- Name
+    Floor,                   !- Surface Type
+    FLOOR SLAB 8 IN,         !- Construction Name
+    Test Zone,               !- Zone Name
+    ,                        !- Space Name
+    Adiabatic,               !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    1,                       !- View Factor to Ground
+    ,                        !- Number of Vertices
+    6,6,0,                   !- X,Y,Z ==> Vertex 1 {m}
+    6,0,0,                   !- X,Y,Z ==> Vertex 2 {m}
+    0,0,0,                   !- X,Y,Z ==> Vertex 3 {m}
+    0,6,0;                   !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Roof001,           !- Name
+    Roof,                    !- Surface Type
+    ROOF34,                  !- Construction Name
+    Test Zone,               !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0,                       !- View Factor to Ground
+    ,                        !- Number of Vertices
+    6,0,3,                   !- X,Y,Z ==> Vertex 1 {m}
+    6,6,3,                   !- X,Y,Z ==> Vertex 2 {m}
+    0,6,3,                   !- X,Y,Z ==> Vertex 3 {m}
+    0,0,3;                   !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall001,           !- Name
+    Wall,                    !- Surface Type
+    ExteriorWall,               !- Construction Name
+    Test Zone,               !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    ,                        !- Number of Vertices
+    0,0,3,                   !- X,Y,Z ==> Vertex 1 {m}
+    0,0,0,                   !- X,Y,Z ==> Vertex 2 {m}
+    6,0,0,                   !- X,Y,Z ==> Vertex 3 {m}
+    6,0,3;                   !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn001:Wall001:Win001,    !- Name
+    Window,                  !- Surface Type
+    SimpleGlazing,           !- Construction Name
+    Zn001:Wall001,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5,                     !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1,                       !- Multiplier
+    ,                        !- Number of Vertices
+    0.548,0,2,               !- X,Y,Z ==> Vertex 1 {m}
+    0.548,0,1,               !- X,Y,Z ==> Vertex 2 {m}
+    5.548,0,1,               !- X,Y,Z ==> Vertex 3 {m}
+    5.548,0,2;               !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall002,           !- Name
+    Wall,                    !- Surface Type
+    ExteriorWall,            !- Construction Name
+    Test Zone,               !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    ,                        !- Number of Vertices
+    0,6,3,                   !- X,Y,Z ==> Vertex 1 {m}
+    0,6,0,                   !- X,Y,Z ==> Vertex 2 {m}
+    0,0,0,                   !- X,Y,Z ==> Vertex 3 {m}
+    0,0,3;                   !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall003,           !- Name
+    Wall,                    !- Surface Type
+    ExteriorWall,            !- Construction Name
+    Test Zone,               !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    ,                        !- Number of Vertices
+    6,6,3,                   !- X,Y,Z ==> Vertex 1 {m}
+    6,6,0,                   !- X,Y,Z ==> Vertex 2 {m}
+    0,6,0,                   !- X,Y,Z ==> Vertex 3 {m}
+    0,6,3;                   !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall004,           !- Name
+    Wall,                    !- Surface Type
+    ExteriorWall,            !- Construction Name
+    Test Zone,               !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    ,                        !- Number of Vertices
+    6,0,3,  !- X,Y,Z ==> Vertex 1 {m}
+    6,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    6,6,0,  !- X,Y,Z ==> Vertex 3 {m}
+    6,6,3;  !- X,Y,Z ==> Vertex 4 {m}
+
+  Lights,
+    TestZone Lights,       !- Name
+    Test Zone,               !- Zone or ZoneList or Space or SpaceList Name
+    Always On,               !- Schedule Name
+    LightingLevel,           !- Design Level Calculation Method
+    1878.6252,               !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.2,                     !- Fraction Radiant
+    0.2,                     !- Fraction Visible
+    0,                       !- Fraction Replaceable
+    GeneralLights;           !- End-Use Subcategory
+
+  ElectricEquipment,
+    TestZone ElecEq,         !- Name
+    Test Zone,               !- Zone or ZoneList or Space or SpaceList Name
+    Always On,               !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    1928.751,                !- Design Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  ZoneInfiltration:DesignFlowRate,
+    TestZone Infiltration,   !- Name
+    Test Zone,               !- Zone or ZoneList or Space or SpaceList Name
+    Always On,               !- Schedule Name
+    Flow/Zone,               !- Design Flow Rate Calculation Method
+    0,                       !- Design Flow Rate {m3/s}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Exterior Surface Area {m3/s-m2}
+    ,                        !- Air Changes per Hour {1/hr}
+    0,                       !- Constant Term Coefficient
+    0,                       !- Temperature Term Coefficient
+    0.2237,                  !- Velocity Term Coefficient
+    0;                       !- Velocity Squared Term Coefficient
+
+  ZoneControl:Thermostat,
+    Test Zone Thermostat,  !- Name
+    Test Zone,        !- Zone or ZoneList Name
+    Test Zone Thermostat Schedule,  !- Control Type Schedule Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
+    DualThermostat,          !- Control 1 Name
+    ,                        !- Control 2 Object Type
+    ,                        !- Control 2 Name
+    ,                        !- Control 3 Object Type
+    ,                        !- Control 3 Name
+    ,                        !- Control 4 Object Type
+    ,                        !- Control 4 Name
+    0;                       !- Temperature Difference Between Cutout And Setpoint {deltaC}
+
+  Schedule:Compact,
+    Test Zone Thermostat Schedule,  !- Name
+    Test Zone Thermostat Schedule Type Limits,  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,4;          !- Field 3
+
+  ScheduleTypeLimits,
+    Test Zone Thermostat Schedule Type Limits,  !- Name
+    0,                       !- Lower Limit Value
+    4,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+  ThermostatSetpoint:DualSetpoint,
+    DualThermostat,          !- Name
+    Heating Setpoints,       !- Heating Setpoint Temperature Schedule Name
+    Cooling Setpoints;       !- Cooling Setpoint Temperature Schedule Name
+
+  Schedule:Compact,
+    Heating Setpoints,       !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,22.5;       !- Field 3
+
+  ScheduleTypeLimits,
+    Temperature,             !- Name
+    -60,                     !- Lower Limit Value
+    200,                     !- Upper Limit Value
+    CONTINUOUS,              !- Numeric Type
+    temperature;             !- Unit Type
+
+  Schedule:Compact,
+    Cooling Setpoints,       !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,23.5;       !- Field 3
+
+  Schedule:Constant,Always On,On/Off,1;
+
+  ScheduleTypeLimits,
+    On/Off,                  !- Name
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
+    Discrete,                !- Numeric Type
+    availability;            !- Unit Type
+
+  ZoneHVAC:EquipmentConnections,
+    Test Zone,        !- Zone Name
+    Test Zone Equipment List,  !- Zone Conditioning Equipment List Name
+    Test Zone Inlet Node List,  !- Zone Air Inlet Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
+    ZoneAirNode,             !- Zone Air Node Name
+    Test Zone Return Node List;  !- Zone Return Air Node or NodeList Name
+
+  NodeList,
+    Test Zone Inlet Node List,  !- Name
+    Node 5;                  !- Node 1 Name
+
+  NodeList,
+    Test Zone Return Node List,  !- Name
+    Node 29;                 !- Node 1 Name
+
+  ZoneHVAC:AirDistributionUnit,
+    ADU VAV No Rht,          !- Name
+    Node 5,                  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type
+    VAV No Rht;              !- Air Terminal Name
+
+  AirTerminal:SingleDuct:VAV:NoReheat,
+    VAV No Rht,              !- Name
+    Always On,               !- Availability Schedule Name
+    Node 5,                  !- Air Outlet Node Name
+    Node 10,                 !- Air Inlet Node Name
+    Autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
+    Autosize;                !- Fixed Minimum Air Flow Rate {m3/s}
+
+  ZoneHVAC:EquipmentList,
+    Test Zone Equipment List,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ADU VAV No Rht,          !- Zone Equipment 1 Name
+    1,                       !- Zone Equipment 1 Cooling Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+
+  Sizing:Zone,
+    Test Zone,               !- Zone or ZoneList Name
+    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
+    12,                      !- Zone Cooling Design Supply Air Temperature {C}
+    11.11,                   !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
+    50,                      !- Zone Heating Design Supply Air Temperature {C}
+    11.11,                   !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    0.0085,                  !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    SZ DSOA TestZone,        !- Design Specification Outdoor Air Object Name
+    0,                       !- Zone Heating Sizing Factor
+    0,                       !- Zone Cooling Sizing Factor
+    DesignDay,               !- Cooling Design Air Flow Method
+    0,                       !- Cooling Design Air Flow Rate {m3/s}
+    0.000762,                !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
+    0,                       !- Cooling Minimum Air Flow {m3/s}
+    0,                       !- Cooling Minimum Air Flow Fraction
+    DesignDay,               !- Heating Design Air Flow Method
+    0,                       !- Heating Design Air Flow Rate {m3/s}
+    0.002032,                !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
+    0.1415762,               !- Heating Maximum Air Flow {m3/s}
+    0.3,                     !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    Yes,                     !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ,                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
+    Sensible Load Only No Latent Load,  !- Zone Load Sizing Method
+    HumidityRatioDifference, !- Zone Latent Cooling Design Supply Air Humidity Ratio Input Method
+    ,                        !- Zone Dehumidification Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.005,                   !- Zone Cooling Design Supply Air Humidity Ratio Difference {kgWater/kgDryAir}
+    HumidityRatioDifference, !- Zone Latent Heating Design Supply Air Humidity Ratio Input Method
+    ,                        !- Zone Humidification Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.005;                   !- Zone Humidification Design Supply Air Humidity Ratio Difference {kgWater/kgDryAir}
+
+)IDF";
+
+    std::string const idf_objects_2 = R"IDF(
+
+  DesignSpecification:OutdoorAir,
+    SZ DSOA TestZone,        !- Name
+    Sum,                     !- Outdoor Air Method
+    0.0009,                  !- Outdoor Air Flow per Person {m3/s-person}
+    0.01020,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    0,                       !- Outdoor Air Flow per Zone {m3/s}
+    0;                       !- Outdoor Air Flow Air Changes per Hour {1/hr}
+
+  SimulationControl,
+    Yes,                     !- Do Zone Sizing Calculation
+    Yes,                     !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
+    Yes,                     !- Run Simulation for Sizing Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    ;                        !- Maximum Number of HVAC Sizing Simulation Passes
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    Counterclockwise,        !- Vertex Entry Direction
+    Relative,                !- Coordinate System
+    Relative,                !- Daylighting Reference Point Coordinate System
+    Relative;                !- Rectangular Surface Coordinate System
+
+  Material,
+    B6 - 4 IN DENSE INSULATION,  !- Name
+    VeryRough,               !- Roughness
+    0.101559364,             !- Thickness {m}
+    0.04323943,              !- Conductivity {W/m-K}
+    91.30524,                !- Density {kg/m3}
+    836.8,                   !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.5,                     !- Solar Absorptance
+    0.5;                     !- Visible Absorptance
+
+  Material,
+    C10 - 8 IN HW CONCRETE,  !- Name
+    MediumRough,             !- Roughness
+    0.2033016,               !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8,                   !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.65,                    !- Solar Absorptance
+    0.65;                    !- Visible Absorptance
+
+  Material,
+    C4 - 4 IN COMMON BRICK,  !- Name
+    Rough,                   !- Roughness
+    0.1014984,               !- Thickness {m}
+    0.7264224,               !- Conductivity {W/m-K}
+    1922.216,                !- Density {kg/m3}
+    836.8,                   !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.76,                    !- Solar Absorptance
+    0.76;                    !- Visible Absorptance
+
+  Material,
+    E2 - 1 / 2 IN SLAG OR STONE,  !- Name
+    Rough,                   !- Roughness
+    0.012710161,             !- Thickness {m}
+    1.435549,                !- Conductivity {W/m-K}
+    881.0155,                !- Density {kg/m3}
+    1673.6,                  !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.55,                    !- Solar Absorptance
+    0.55;                    !- Visible Absorptance
+
+  Material,
+    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name
+    Rough,                   !- Roughness
+    0.0095402403,            !- Thickness {m}
+    0.1902535,               !- Conductivity {W/m-K}
+    1121.292,                !- Density {kg/m3}
+    1673.6,                  !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.75,                    !- Solar Absorptance
+    0.75;                    !- Visible Absorptance
+
+  WindowMaterial:SimpleGlazingSystem,
+    Theoretical Glazing,     !- Name
+    3.0,                     !- U-Factor {W/m2-K}
+    0.5,                     !- Solar Heat Gain Coefficient
+    0.4;                     !- Visible Transmittance
+
+  Construction,
+    ExteriorWall,            !- Name
+    C4 - 4 IN COMMON BRICK;  !- Layer 2
+
+  Construction,
+    FLOOR SLAB 8 IN,         !- Name
+    C10 - 8 IN HW CONCRETE;  !- Outside Layer
+
+  Construction,
+    ROOF34,                  !- Name
+    E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer
+    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2
+    B6 - 4 IN DENSE INSULATION;  !- Layer 3
+
+  Construction,
+    SimpleGlazing,           !- Name
+    Theoretical Glazing;     !- Outside Layer
+
+  OutdoorAir:Node,
+    Model Outdoor Air Node;  !- Name
+
+  AirLoopHVAC,
+    DOAS System,             !- Name
+    ,                        !- Controller List Name
+    DOAS SystemAvailability Manager List,  !- Availability Manager List Name
+    Autosize,                !- Design Supply Air Flow Rate {m3/s}
+    DOAS System Supply Branches,  !- Branch List Name
+    ,                        !- Connector List Name
+    Node 1,                  !- Supply Side Inlet Node Name
+    Node 4,                  !- Demand Side Outlet Node Name
+    DOAS System Demand Inlet Nodes,  !- Demand Side Inlet Node Names
+    DOAS System Supply Outlet Nodes,  !- Supply Side Outlet Node Names
+    1;                       !- Design Return Air Flow Fraction of Supply Air Flow
+
+  NodeList,
+    DOAS System Supply Outlet Nodes,  !- Name
+    Node 2;                  !- Node 1 Name
+
+  NodeList,
+    DOAS System Demand Inlet Nodes,  !- Name
+    Node 3;                  !- Node 1 Name
+
+  Sizing:System,
+    DOAS System,             !- AirLoop Name
+    Sensible,                !- Type of Load to Size On
+    Autosize,                !- Design Outdoor Air Flow Rate {m3/s}
+    0.3,                     !- Central Heating Maximum System Air Flow Ratio
+    7,                       !- Preheat Design Temperature {C}
+    0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
+    12.8,                    !- Precool Design Temperature {C}
+    0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
+    12.8,                    !- Central Cooling Design Supply Air Temperature {C}
+    40,                      !- Central Heating Design Supply Air Temperature {C}
+    NonCoincident,           !- Type of Zone Sum to Use
+    Yes,                     !- 100% Outdoor Air in Cooling
+    Yes,                     !- 100% Outdoor Air in Heating
+    0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    0.0099676501,            !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    1,                       !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    3.9475456e-05,           !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    0.0099676501,            !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    1,                       !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    1,                       !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    3.1588213e-05,           !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ZoneSum,                 !- System Outdoor Air Method
+    1,                       !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    Autosize,                !- Cooling Design Capacity {W}
+    234.7,                   !- Cooling Design Capacity Per Floor Area {W/m2}
+    1,                       !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    157,                     !- Heating Design Capacity Per Floor Area {W/m2}
+    1,                       !- Fraction of Autosized Heating Design Capacity
+    OnOff,                   !- Central Cooling Capacity Control Method
+    Autosize;                !- Occupant Diversity
+
+  AvailabilityManagerAssignmentList,
+    DOAS SystemAvailability Manager List,  !- Name
+    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
+    DOAS System Availability Manager;  !- Availability Manager 1 Name
+
+  AvailabilityManager:Scheduled,
+    DOAS System Availability Manager,  !- Name
+    Always On;      !- Schedule Name
+
+  BranchList,
+    DOAS System Supply Branches,  !- Name
+    DOAS System Main Branch;  !- Branch 1 Name
+
+  Branch,
+    DOAS System Main Branch, !- Name
+    ,                        !- Pressure Drop Curve Name
+    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
+    DOAS System OA System,   !- Component 1 Name
+    Node 1,                  !- Component 1 Inlet Node Name
+    Node 8,                  !- Component 1 Outlet Node Name
+    CoilSystem:Cooling:DX,   !- Component 2 Object Type
+    Main DX Clg Coil System, !- Component 2 Name
+    Node 8,                  !- Component 2 Inlet Node Name
+    Node 11,                 !- Component 2 Outlet Node Name
+    Coil:Heating:Electric,   !- Component 3 Object Type
+    Elec Htg Coil,           !- Component 3 Name
+    Node 11,                 !- Component 3 Inlet Node Name
+    Node 9,                  !- Component 3 Outlet Node Name
+    Fan:SystemModel,         !- Component 4 Object Type
+    DOAS System Supply Fan,  !- Component 4 Name
+    Node 9,                  !- Component 4 Inlet Node Name
+    Node 2;                  !- Component 4 Outlet Node Name
+
+)IDF";
+
+    std::string const idf_objects_3 = R"IDF(
+
+  AirLoopHVAC:OutdoorAirSystem,
+    DOAS System OA System,  !- Name
+    DOAS System OA System Controller List,  !- Controller List Name
+    DOAS System OA System Equipment List;  !- Outdoor Air Equipment List Name
+
+  AirLoopHVAC:ControllerList,
+    DOAS System OA System Controller List,  !- Name
+    Controller:OutdoorAir,   !- Controller 1 Object Type
+    DOAS System OA Controller;  !- Controller 1 Name
+
+  Controller:OutdoorAir,
+    DOAS System OA Controller,  !- Name
+    Node 7,                  !- Relief Air Outlet Node Name
+    Node 1,                  !- Return Air Node Name
+    Node 8,                  !- Mixed Air Node Name
+    Node 6,                  !- Actuator Node Name
+    0,                       !- Minimum Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    NoEconomizer,            !- Economizer Control Type
+    ModulateFlow,            !- Economizer Control Action Type
+    28,                      !- Economizer Maximum Limit Dry-Bulb Temperature {C}
+    64000,                   !- Economizer Maximum Limit Enthalpy {J/kg}
+    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
+    ,                        !- Electronic Enthalpy Limit Curve Name
+    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}
+    NoLockout,               !- Lockout Type
+    FixedMinimum,            !- Minimum Limit Type
+    ,                        !- Minimum Outdoor Air Schedule Name
+    ,                        !- Minimum Fraction of Outdoor Air Schedule Name
+    ,                        !- Maximum Fraction of Outdoor Air Schedule Name
+    ,                        !- Mechanical Ventilation Controller Name
+    ,                        !- Time of Day Economizer Control Schedule Name
+    No,                      !- High Humidity Control
+    ,                        !- Humidistat Control Zone Name
+    ,                        !- High Humidity Outdoor Air Flow Ratio
+    Yes,                     !- Control High Indoor Humidity Based on Outdoor Humidity Ratio
+    BypassWhenWithinEconomizerLimits;  !- Heat Recovery Bypass Control Type
+
+  OutdoorAir:NodeList,
+    Node 6;                  !- Node or NodeList Name 1
+
+  AirLoopHVAC:OutdoorAirSystem:EquipmentList,
+    DOAS System OA System Equipment List,  !- Name
+    OutdoorAir:Mixer,        !- Component 1 Object Type
+    OA Mixer;  !- Component 1 Name
+
+  OutdoorAir:Mixer,
+    OA Mixer,                !- Name
+    Node 8,                  !- Mixed Air Node Name
+    Node 6,                  !- Outdoor Air Stream Node Name
+    Node 7,                  !- Relief Air Stream Node Name
+    Node 1;                  !- Return Air Stream Node Name
+
+  SetpointManager:MixedAir,
+    Node 8 OS Default SPM,   !- Name
+    Temperature,             !- Control Variable
+    Node 2,                  !- Reference Setpoint Node Name
+    Node 9,                  !- Fan Inlet Node Name
+    Node 2,                  !- Fan Outlet Node Name
+    Node 8;                  !- Setpoint Node or NodeList Name
+
+  CoilSystem:Cooling:DX,
+    Main DX Clg Coil System, !- Name
+    Always On,               !- Availability Schedule Name
+    Node 8,                  !- DX Cooling Coil System Inlet Node Name
+    Node 11,                 !- DX Cooling Coil System Outlet Node Name
+    Node 11,                 !- DX Cooling Coil System Sensor Node Name
+    Coil:Cooling:DX:SingleSpeed,!- Cooling Coil Object Type
+    Main DX Clg Coil;        !- Cooling Coil Name
+
+  Coil:Cooling:DX:SingleSpeed,
+    Main DX Clg Coil,        !- Name
+    Always On,               !- Availability Schedule Name
+    Autosize,                !- Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    Node 8,                  !- Air Inlet Node Name
+    Node 11,                 !- Air Outlet Node Name
+    Curve Biquadratic,       !- Total Cooling Capacity Function of Temperature Curve Name
+    Curve Quadratic,         !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Curve Biquadratic,       !- Energy Input Ratio Function of Temperature Curve Name
+    Curve Quadratic,         !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Curve Quadratic,         !- Part Load Fraction Correlation Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    1000,                    !- Nominal Time for Condensate Removal to Begin {s}
+    0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    4,                       !- Maximum Cycling Rate {cycles/hr}
+    45;                      !- Latent Capacity Time Constant {s}
+
+  SetpointManager:MixedAir,
+    Node 11 OS Default SPM,  !- Name
+    Temperature,             !- Control Variable
+    Node 2,                  !- Reference Setpoint Node Name
+    Node 9,                  !- Fan Inlet Node Name
+    Node 2,                  !- Fan Outlet Node Name
+    Node 11;                 !- Setpoint Node or NodeList Name
+
+  Curve:Biquadratic,
+    Curve Biquadratic,       !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50;                      !- Maximum Value of y
+
+  Curve:Quadratic,
+    Curve Quadratic,         !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.9,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  Coil:Heating:Electric,
+    Elec Htg Coil,           !- Name
+    Always On,               !- Availability Schedule Name
+    1,                       !- Efficiency
+    Autosize,                !- Nominal Capacity {W}
+    Node 11,                 !- Air Inlet Node Name
+    Node 9,                  !- Air Outlet Node Name
+    Node 9;                  !- Temperature Setpoint Node Name
+
+  SetpointManager:MixedAir,
+    Node 9 OS Default SPM,   !- Name
+    Temperature,             !- Control Variable
+    Node 2,                  !- Reference Setpoint Node Name
+    Node 9,                  !- Fan Inlet Node Name
+    Node 2,                  !- Fan Outlet Node Name
+    Node 9;                  !- Setpoint Node or NodeList Name
+
+  Fan:SystemModel,
+    DOAS System Supply Fan,  !- Name
+    Always On,               !- Availability Schedule Name
+    Node 9,                  !- Air Inlet Node Name
+    Node 2,                  !- Air Outlet Node Name
+    Autosize,                !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.2,                     !- Electric Power Minimum Flow Rate Fraction
+    500,                     !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1,                       !- Motor In Air Stream Fraction
+    Autosize,                !- Design Electric Power Consumption {W}
+    PowerPerFlowPerPressure, !- Design Power Sizing Method
+    840,                     !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    1.66667,                 !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.524386048,             !- Fan Total Efficiency
+    VAV Fan Curve,           !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    0,                       !- Motor Loss Radiative Fraction
+    General,                 !- End-Use Subcategory
+    1;                       !- Number of Speeds
+
+  Curve:Quartic,
+    VAV Fan Curve,           !- Name
+    0.040759894,             !- Coefficient1 Constant
+    0.08804497,              !- Coefficient2 x
+    -0.07292612,             !- Coefficient3 x**2
+    0.943739823,             !- Coefficient4 x**3
+    0,                       !- Coefficient5 x**4
+    0,                       !- Minimum Value of x
+    1,                       !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    1,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+  SetpointManager:Warmest,
+    DOAS System SetPoint Manager Warmest,  !- Name
+    Temperature,             !- Control Variable
+    DOAS System,         !- HVAC Air Loop Name
+    12.2,                    !- Minimum Setpoint Temperature {C}
+    15.6,                    !- Maximum Setpoint Temperature {C}
+    MaximumTemperature,      !- Strategy
+    Node 2;                  !- Setpoint Node or NodeList Name
+
+  AirLoopHVAC:SupplyPath,
+    DOAS System Node 3 Supply Path,  !- Name
+    Node 3,                  !- Supply Air Path Inlet Node Name
+    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type
+    Air Loop HVAC Zone Splitter 1;  !- Component 1 Name
+
+  AirLoopHVAC:ZoneSplitter,
+    Air Loop HVAC Zone Splitter 1,  !- Name
+    Node 3,                  !- Inlet Node Name
+    Node 10;                 !- Outlet 1 Node Name
+
+  AirLoopHVAC:ReturnPath,
+    DOAS System Return Path,  !- Name
+    Node 4,                  !- Return Air Path Outlet Node Name
+    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type
+    Air Loop HVAC Zone Mixer 1;  !- Component 1 Name
+
+  AirLoopHVAC:ZoneMixer,
+    Air Loop HVAC Zone Mixer 1,  !- Name
+    Node 4,                  !- Outlet Node Name
+    Node 29;                 !- Inlet 1 Node Name
+
+  Site:Location,
+    Atlanta Hartsfield Intl Ap,  !- Name
+    33.63,                   !- Latitude {deg}
+    -84.43,                  !- Longitude {deg}
+    -5,                      !- Time Zone {hr}
+    308;                     !- Elevation {m}
+
+  SizingPeriod:DesignDay,
+    Atlanta Hartsfield Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    34.4,                    !- Maximum Dry-Bulb Temperature {C}
+    9.5,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    23.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    97679,                   !- Barometric Pressure {Pa}
+    4,                       !- Wind Speed {m/s}
+    300,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAETau,               !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    0.556,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    1.779,                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    ;                       !- Sky Clearness
+
+  SizingPeriod:DesignDay,
+    Atlanta Hartsfield Intl Ap Ann Htg 99.6% Condns DB,  !- Name
+    1,                       !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -6.3,                    !- Maximum Dry-Bulb Temperature {C}
+    0,                       !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -6.3,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    97679,                   !- Barometric Pressure {Pa}
+    5.3,                     !- Wind Speed {m/s}
+    320,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0;                       !- Sky Clearness
+
+  OutputControl:Table:Style,
+    TabAndHTML,              !- Column Separator
+    InchPound;               !- Unit Conversion
+
+  Output:VariableDictionary,IDF,Unsorted;
+
+  Output:SQLite,
+    SimpleAndTabular;        !- Option Type
+
+  Output:Table:SummaryReports,
+    AllSummary,              !- Report 1 Name
+    AllSummaryAndSizingPeriod;  !- Report 2 Name
+)IDF";
+
+    std::string const idf_objects = idf_objects_1 + idf_objects_2 + idf_objects_3;
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ManageSimulation(*state); // run the design days
+    auto &finalSysSizing = state->dataSize->FinalSysSizing(1);
+    EXPECT_TRUE(compare_enums(finalSysSizing.coolingPeakLoad, DataSizing::PeakLoad::SensibleCooling));
+
+    // get the total 'DOAS Direct to Zone' cooling peak load component
+    std::string query_total("SELECT Value From TabularDataWithStrings"
+                            "  WHERE TableName = 'Estimated Cooling Peak Load Components'"
+                            "  AND ReportName = 'Zone Component Load Summary'"
+                            "  AND ColumnName = 'Total'"
+                            "  AND RowName = 'DOAS Direct to Zone'");
+    // check the value from result records
+    Real64 return_val_total = execAndReturnFirstDouble(query_total);
+    EXPECT_EQ(return_val_total, 598.2);
+
+    // get the sensible instant 'DOAS Direct to Zone' cooling peak load component
+    std::string query_sensible_instant("SELECT Value From TabularDataWithStrings"
+                                       "  WHERE TableName = 'Estimated Cooling Peak Load Components'"
+                                       "  AND ReportName = 'Zone Component Load Summary'"
+                                       "  AND ColumnName = 'Sensible - Instant'"
+                                       "  AND RowName = 'DOAS Direct to Zone'");
+    // check the value from result records
+    Real64 return_val_sensible_instant = execAndReturnFirstDouble(query_sensible_instant);
+    EXPECT_EQ(return_val_sensible_instant, 600.28);
+}
+
+TEST_F(SQLiteFixture, UpdateSizing_EndSysSizingCalc)
+{
+    std::string const idf_objects_1 = R"IDF(
+  Version,23.1;
+
+  Timestep,4;
+
+  Building,
+    NONE,                    !- Name
+    0,                       !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.039999999,             !- Loads Convergence Tolerance Value {W}
+    0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
+    FullInteriorAndExterior, !- Solar Distribution
+    25,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  Zone,
+    Thermal Zone one,        !- Name
+    0,                       !- Direction of Relative North {deg}
+    0,                       !- X Origin {m}
+    0,                       !- Y Origin {m}
+    0;                       !- Z Origin {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Flr001,            !- Name
+    Floor,                   !- Surface Type
+    FLOOR SLAB 8 IN,         !- Construction Name
+    Thermal Zone one,        !- Zone Name
+    ,                        !- Space Name
+    Adiabatic,               !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    1,                       !- View Factor to Ground
+    ,                        !- Number of Vertices
+    6,6,0,  !- X,Y,Z ==> Vertex 1 {m}
+    6,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,6,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Roof001,           !- Name
+    Roof,                    !- Surface Type
+    ROOF34,                  !- Construction Name
+    Thermal Zone one,        !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0,                       !- View Factor to Ground
+    ,                        !- Number of Vertices
+    6,0,3,  !- X,Y,Z ==> Vertex 1 {m}
+    6,6,3,  !- X,Y,Z ==> Vertex 2 {m}
+    0,6,3,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,3;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall001,           !- Name
+    Wall,                    !- Surface Type
+    ExteriorWall,               !- Construction Name
+    Thermal Zone one,        !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    ,                        !- Number of Vertices
+    0,0,3,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    6,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    6,0,3;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn001:Wall001:Win001,    !- Name
+    Window,                  !- Surface Type
+    SimpleGlazing,           !- Construction Name
+    Zn001:Wall001,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5,                     !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1,                       !- Multiplier
+    ,                        !- Number of Vertices
+    0.548,0,2,  !- X,Y,Z ==> Vertex 1 {m}
+    0.548,0,1,  !- X,Y,Z ==> Vertex 2 {m}
+    5.548,0,1,  !- X,Y,Z ==> Vertex 3 {m}
+    5.548,0,2;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall002,           !- Name
+    Wall,                    !- Surface Type
+    ExteriorWall,            !- Construction Name
+    Thermal Zone one,        !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    ,                        !- Number of Vertices
+    0,6,3,  !- X,Y,Z ==> Vertex 1 {m}
+    0,6,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,3;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall003,           !- Name
+    Wall,                    !- Surface Type
+    ExteriorWall,            !- Construction Name
+    Thermal Zone one,        !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    ,                        !- Number of Vertices
+    6,6,3,  !- X,Y,Z ==> Vertex 1 {m}
+    6,6,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,6,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,6,3;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall004,           !- Name
+    Wall,                    !- Surface Type
+    ExteriorWall,            !- Construction Name
+    Thermal Zone one,        !- Zone Name
+    ,                        !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    ,                        !- Number of Vertices
+    6,0,3,  !- X,Y,Z ==> Vertex 1 {m}
+    6,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    6,6,0,  !- X,Y,Z ==> Vertex 3 {m}
+    6,6,3;  !- X,Y,Z ==> Vertex 4 {m}
+
+  Lights,
+    West Zone Lights,        !- Name
+    Thermal Zone one,        !- Zone or ZoneList or Space or SpaceList Name
+    Always On,               !- Schedule Name
+    LightingLevel,           !- Design Level Calculation Method
+    1878.6252,               !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.2,                     !- Fraction Radiant
+    0.2,                     !- Fraction Visible
+    0,                       !- Fraction Replaceable
+    GeneralLights;           !- End-Use Subcategory
+
+  ElectricEquipment,
+    West Zone ElecEq,        !- Name
+    Thermal Zone one,        !- Zone or ZoneList or Space or SpaceList Name
+    Always On,               !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    1928.751,                !- Design Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.3,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  ZoneInfiltration:DesignFlowRate,
+    West Zone Infiltration,  !- Name
+    Thermal Zone one,        !- Zone or ZoneList or Space or SpaceList Name
+    Always On,               !- Schedule Name
+    Flow/Zone,               !- Design Flow Rate Calculation Method
+    0,                       !- Design Flow Rate {m3/s}
+    ,                        !- Flow Rate per Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Exterior Surface Area {m3/s-m2}
+    ,                        !- Air Changes per Hour {1/hr}
+    0,                       !- Constant Term Coefficient
+    0,                       !- Temperature Term Coefficient
+    0.2237,                  !- Velocity Term Coefficient
+    0;                       !- Velocity Squared Term Coefficient
+
+  ZoneControl:Thermostat,
+    Thermal Zone one Thermostat,  !- Name
+    Thermal Zone one,        !- Zone or ZoneList Name
+    Thermal Zone one Thermostat Schedule,  !- Control Type Schedule Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
+    DualThermostat,          !- Control 1 Name
+    ,                        !- Control 2 Object Type
+    ,                        !- Control 2 Name
+    ,                        !- Control 3 Object Type
+    ,                        !- Control 3 Name
+    ,                        !- Control 4 Object Type
+    ,                        !- Control 4 Name
+    0;                       !- Temperature Difference Between Cutout And Setpoint {deltaC}
+
+  Schedule:Compact,
+    Thermal Zone one Thermostat Schedule,  !- Name
+    Thermal Zone one Thermostat Schedule Type Limits,  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,4;          !- Field 3
+
+  ScheduleTypeLimits,
+    Thermal Zone one Thermostat Schedule Type Limits,  !- Name
+    0,                       !- Lower Limit Value
+    4,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+  ThermostatSetpoint:DualSetpoint,
+    DualThermostat,          !- Name
+    Heating Setpoints,       !- Heating Setpoint Temperature Schedule Name
+    Cooling Setpoints;       !- Cooling Setpoint Temperature Schedule Name
+
+  Schedule:Compact,
+    Heating Setpoints,       !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,22.5;       !- Field 3
+
+  ScheduleTypeLimits,
+    Temperature,             !- Name
+    -60,                     !- Lower Limit Value
+    200,                     !- Upper Limit Value
+    CONTINUOUS,              !- Numeric Type
+    temperature;             !- Unit Type
+
+  Schedule:Compact,
+    Cooling Setpoints,       !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,23.5;       !- Field 3
+
+  Schedule:Constant,Always On,On/Off,1;
+
+  ScheduleTypeLimits,
+    On/Off,                  !- Name
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
+    Discrete,                !- Numeric Type
+    availability;            !- Unit Type
+
+  ZoneHVAC:EquipmentConnections,
+    Thermal Zone one,        !- Zone Name
+    Thermal Zone one Equipment List,  !- Zone Conditioning Equipment List Name
+    Thermal Zone one Inlet Node List,  !- Zone Air Inlet Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
+    ZoneAirNode,             !- Zone Air Node Name
+    Thermal Zone one Return Node List;  !- Zone Return Air Node or NodeList Name
+
+  NodeList,
+    Thermal Zone one Inlet Node List,  !- Name
+    Node 5;                  !- Node 1 Name
+
+  NodeList,
+    Thermal Zone one Return Node List,  !- Name
+    Node 29;                 !- Node 1 Name
+
+  ZoneHVAC:AirDistributionUnit,
+    ADU VAV No Rht,          !- Name
+    Node 5,                  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type
+    VAV No Rht;              !- Air Terminal Name
+
+  AirTerminal:SingleDuct:VAV:NoReheat,
+    VAV No Rht,              !- Name
+    Always On,               !- Availability Schedule Name
+    Node 5,                  !- Air Outlet Node Name
+    Node 10,                 !- Air Inlet Node Name
+    Autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Zone Minimum Air Flow Input Method
+    ,                        !- Constant Minimum Air Flow Fraction
+    Autosize;                !- Fixed Minimum Air Flow Rate {m3/s}
+
+  ZoneHVAC:EquipmentList,
+    Thermal Zone one Equipment List,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ADU VAV No Rht,          !- Zone Equipment 1 Name
+    1,                       !- Zone Equipment 1 Cooling Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+
+  Sizing:Zone,
+    Thermal Zone one,        !- Zone or ZoneList Name
+    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
+    12,                      !- Zone Cooling Design Supply Air Temperature {C}
+    11.11,                   !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
+    50,                      !- Zone Heating Design Supply Air Temperature {C}
+    11.11,                   !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    0.0085,                  !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    SZ DSOA West Zone,       !- Design Specification Outdoor Air Object Name
+    0,                       !- Zone Heating Sizing Factor
+    0,                       !- Zone Cooling Sizing Factor
+    DesignDay,               !- Cooling Design Air Flow Method
+    0,                       !- Cooling Design Air Flow Rate {m3/s}
+    0.000762,                !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
+    0,                       !- Cooling Minimum Air Flow {m3/s}
+    0,                       !- Cooling Minimum Air Flow Fraction
+    DesignDay,               !- Heating Design Air Flow Method
+    0,                       !- Heating Design Air Flow Rate {m3/s}
+    0.002032,                !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
+    0.1415762,               !- Heating Maximum Air Flow {m3/s}
+    0.3,                     !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ,                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
+    Sensible Load Only No Latent Load,  !- Zone Load Sizing Method
+    HumidityRatioDifference, !- Zone Latent Cooling Design Supply Air Humidity Ratio Input Method
+    ,                        !- Zone Dehumidification Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.005,                   !- Zone Cooling Design Supply Air Humidity Ratio Difference {kgWater/kgDryAir}
+    HumidityRatioDifference, !- Zone Latent Heating Design Supply Air Humidity Ratio Input Method
+    ,                        !- Zone Humidification Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.005;                   !- Zone Humidification Design Supply Air Humidity Ratio Difference {kgWater/kgDryAir}
+
+)IDF";
+
+    std::string const idf_objects_2 = R"IDF(
+
+  DesignSpecification:OutdoorAir,
+    SZ DSOA West Zone,       !- Name
+    Sum,                     !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
+    0,                       !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    0,                       !- Outdoor Air Flow per Zone {m3/s}
+    0;                       !- Outdoor Air Flow Air Changes per Hour {1/hr}
+
+  SimulationControl,
+    Yes,                     !- Do Zone Sizing Calculation
+    Yes,                     !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
+    Yes,                     !- Run Simulation for Sizing Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    ;                        !- Maximum Number of HVAC Sizing Simulation Passes
+
+  ShadowCalculation,
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    20,                      !- Shading Calculation Update Frequency
+    15000,                   !- Maximum Figures in Shadow Overlap Calculations
+    SutherlandHodgman,       !- Polygon Clipping Algorithm
+    512,                     !- Pixel Counting Resolution
+    SimpleSkyDiffuseModeling,!- Sky Diffuse Modeling Algorithm
+    No,                      !- Output External Shading Calculation Results
+    No,                      !- Disable Self-Shading Within Shading Zone Groups
+    No;                      !- Disable Self-Shading From Shading Zone Groups to Other Zones
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    Counterclockwise,        !- Vertex Entry Direction
+    Relative,                !- Coordinate System
+    Relative,                !- Daylighting Reference Point Coordinate System
+    Relative;                !- Rectangular Surface Coordinate System
+
+  Material,
+    A1 - 1 IN STUCCO,        !- Name
+    Smooth,                  !- Roughness
+    0.025389841,             !- Thickness {m}
+    0.6918309,               !- Conductivity {W/m-K}
+    1858.142,                !- Density {kg/m3}
+    836.8,                   !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.92,                    !- Solar Absorptance
+    0.92;                    !- Visible Absorptance
+
+  Material,
+    B5 - 1 IN DENSE INSULATION,  !- Name
+    VeryRough,               !- Roughness
+    0.025389841,             !- Thickness {m}
+    0.04323943,              !- Conductivity {W/m-K}
+    91.30524,                !- Density {kg/m3}
+    836.8,                   !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.5,                     !- Solar Absorptance
+    0.5;                     !- Visible Absorptance
+
+  Material,
+    B6 - 4 IN DENSE INSULATION,  !- Name
+    VeryRough,               !- Roughness
+    0.101559364,             !- Thickness {m}
+    0.04323943,              !- Conductivity {W/m-K}
+    91.30524,                !- Density {kg/m3}
+    836.8,                   !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.5,                     !- Solar Absorptance
+    0.5;                     !- Visible Absorptance
+
+  Material,
+    C10 - 8 IN HW CONCRETE,  !- Name
+    MediumRough,             !- Roughness
+    0.2033016,               !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8,                   !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.65,                    !- Solar Absorptance
+    0.65;                    !- Visible Absorptance
+
+  Material,
+    C12 - 2 IN HW CONCRETE,  !- Name
+    MediumRough,             !- Roughness
+    0.050901599,             !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8,                   !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.65,                    !- Solar Absorptance
+    0.65;                    !- Visible Absorptance
+
+  Material,
+    C4 - 4 IN COMMON BRICK,  !- Name
+    Rough,                   !- Roughness
+    0.1014984,               !- Thickness {m}
+    0.7264224,               !- Conductivity {W/m-K}
+    1922.216,                !- Density {kg/m3}
+    836.8,                   !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.76,                    !- Solar Absorptance
+    0.76;                    !- Visible Absorptance
+
+  Material,
+    C6 - 8 IN CLAY TILE,     !- Name
+    Smooth,                  !- Roughness
+    0.2033016,               !- Thickness {m}
+    0.5707605,               !- Conductivity {W/m-K}
+    1121.292,                !- Density {kg/m3}
+    836.8,                   !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.82,                    !- Solar Absorptance
+    0.82;                    !- Visible Absorptance
+
+  Material,
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
+    Smooth,                  !- Roughness
+    0.01905,                 !- Thickness {m}
+    0.7264224,               !- Conductivity {W/m-K}
+    1601.846,                !- Density {kg/m3}
+    836.8,                   !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.92,                    !- Solar Absorptance
+    0.92;                    !- Visible Absorptance
+
+  Material,
+    E2 - 1 / 2 IN SLAG OR STONE,  !- Name
+    Rough,                   !- Roughness
+    0.012710161,             !- Thickness {m}
+    1.435549,                !- Conductivity {W/m-K}
+    881.0155,                !- Density {kg/m3}
+    1673.6,                  !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.55,                    !- Solar Absorptance
+    0.55;                    !- Visible Absorptance
+
+  Material,
+    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name
+    Rough,                   !- Roughness
+    0.0095402403,            !- Thickness {m}
+    0.1902535,               !- Conductivity {W/m-K}
+    1121.292,                !- Density {kg/m3}
+    1673.6,                  !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.75,                    !- Solar Absorptance
+    0.75;                    !- Visible Absorptance
+
+  Material:NoMass,
+    CP02 CARPET PAD,         !- Name
+    VeryRough,               !- Roughness
+    0.21648,                 !- Thermal Resistance {m2-K/W}
+    0.9,                     !- Thermal Absorptance
+    0.7,                     !- Solar Absorptance
+    0.7;                     !- Visible Absorptance
+
+  WindowMaterial:SimpleGlazingSystem,
+    Theoretical Glazing,     !- Name
+    3.0,                     !- U-Factor {W/m2-K}
+    0.5,                     !- Solar Heat Gain Coefficient
+    0.4;                     !- Visible Transmittance
+
+  Construction,
+    ExteriorWall,            !- Name
+    A1 - 1 IN STUCCO,        !- Outside Layer
+    C4 - 4 IN COMMON BRICK,  !- Layer 2
+    B5 - 1 IN DENSE INSULATION,  !- Layer 3
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 4
+
+  Construction,
+    FLOOR SLAB 8 IN,         !- Name
+    C10 - 8 IN HW CONCRETE,  !- Outside Layer
+    CP02 CARPET PAD;         !- Layer 2
+
+  Construction,
+    ROOF34,                  !- Name
+    E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer
+    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2
+    B6 - 4 IN DENSE INSULATION,  !- Layer 3
+    C12 - 2 IN HW CONCRETE;  !- Layer 4
+
+  Construction,
+    SimpleGlazing,           !- Name
+    Theoretical Glazing;     !- Outside Layer
+
+  OutdoorAir:Node,
+    Model Outdoor Air Node;  !- Name
+
+  AirLoopHVAC,
+    VAV with Reheat,         !- Name
+    ,                        !- Controller List Name
+    VAV with ReheatAvailability Manager List,  !- Availability Manager List Name
+    Autosize,                !- Design Supply Air Flow Rate {m3/s}
+    VAV with Reheat Supply Branches,  !- Branch List Name
+    ,                        !- Connector List Name
+    Node 1,                  !- Supply Side Inlet Node Name
+    Node 4,                  !- Demand Side Outlet Node Name
+    VAV with Reheat Demand Inlet Nodes,  !- Demand Side Inlet Node Names
+    VAV with Reheat Supply Outlet Nodes,  !- Supply Side Outlet Node Names
+    1;                       !- Design Return Air Flow Fraction of Supply Air Flow
+
+  NodeList,
+    VAV with Reheat Supply Outlet Nodes,  !- Name
+    Node 2;                  !- Node 1 Name
+
+  NodeList,
+    VAV with Reheat Demand Inlet Nodes,  !- Name
+    Node 3;                  !- Node 1 Name
+
+  Sizing:System,
+    VAV with Reheat,         !- AirLoop Name
+    Total,                   !- Type of Load to Size On
+    Autosize,                !- Design Outdoor Air Flow Rate {m3/s}
+    0.3,                     !- Central Heating Maximum System Air Flow Ratio
+    7,                       !- Preheat Design Temperature {C}
+    0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
+    12.8,                    !- Precool Design Temperature {C}
+    0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
+    12.8,                    !- Central Cooling Design Supply Air Temperature {C}
+    40,                      !- Central Heating Design Supply Air Temperature {C}
+    NonCoincident,           !- Type of Zone Sum to Use
+    No,                      !- 100% Outdoor Air in Cooling
+    No,                      !- 100% Outdoor Air in Heating
+    0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    0.0099676501,            !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    1,                       !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    3.9475456e-05,           !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    0.0099676501,            !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    1,                       !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    1,                       !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    3.1588213e-05,           !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ZoneSum,                 !- System Outdoor Air Method
+    1,                       !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    Autosize,                !- Cooling Design Capacity {W}
+    234.7,                   !- Cooling Design Capacity Per Floor Area {W/m2}
+    1,                       !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    157,                     !- Heating Design Capacity Per Floor Area {W/m2}
+    1,                       !- Fraction of Autosized Heating Design Capacity
+    OnOff,                   !- Central Cooling Capacity Control Method
+    Autosize;                !- Occupant Diversity
+
+  AvailabilityManagerAssignmentList,
+    VAV with ReheatAvailability Manager List,  !- Name
+    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
+    VAV with Reheat Availability Manager;  !- Availability Manager 1 Name
+
+  AvailabilityManager:Scheduled,
+    VAV with Reheat Availability Manager,  !- Name
+    Always On;      !- Schedule Name
+
+  BranchList,
+    VAV with Reheat Supply Branches,  !- Name
+    VAV with Reheat Main Branch;  !- Branch 1 Name
+
+  Branch,
+    VAV with Reheat Main Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
+    VAV with Reheat OA System,  !- Component 1 Name
+    Node 1,                  !- Component 1 Inlet Node Name
+    Node 8,                  !- Component 1 Outlet Node Name
+    CoilSystem:Cooling:DX,   !- Component 2 Object Type
+    VAV Main DX Clg Coil CoilSystem,  !- Component 2 Name
+    Node 8,                  !- Component 2 Inlet Node Name
+    Node 11,                 !- Component 2 Outlet Node Name
+    Coil:Heating:Electric,   !- Component 3 Object Type
+    Elec Htg Coil,           !- Component 3 Name
+    Node 11,                 !- Component 3 Inlet Node Name
+    Node 9,                  !- Component 3 Outlet Node Name
+    Fan:SystemModel,         !- Component 4 Object Type
+    VAV with Reheat Supply Fan,  !- Component 4 Name
+    Node 9,                  !- Component 4 Inlet Node Name
+    Node 2;                  !- Component 4 Outlet Node Name
+
+)IDF";
+
+    std::string const idf_objects_3 = R"IDF(
+
+  AirLoopHVAC:OutdoorAirSystem,
+    VAV with Reheat OA System,  !- Name
+    VAV with Reheat OA System Controller List,  !- Controller List Name
+    VAV with Reheat OA System Equipment List;  !- Outdoor Air Equipment List Name
+
+  AirLoopHVAC:ControllerList,
+    VAV with Reheat OA System Controller List,  !- Name
+    Controller:OutdoorAir,   !- Controller 1 Object Type
+    VAV with Reheat OA Controller;  !- Controller 1 Name
+
+  Controller:OutdoorAir,
+    VAV with Reheat OA Controller,  !- Name
+    Node 7,                  !- Relief Air Outlet Node Name
+    Node 1,                  !- Return Air Node Name
+    Node 8,                  !- Mixed Air Node Name
+    Node 6,                  !- Actuator Node Name
+    0,                       !- Minimum Outdoor Air Flow Rate {m3/s}
+    Autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    NoEconomizer,            !- Economizer Control Type
+    ModulateFlow,            !- Economizer Control Action Type
+    28,                      !- Economizer Maximum Limit Dry-Bulb Temperature {C}
+    64000,                   !- Economizer Maximum Limit Enthalpy {J/kg}
+    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
+    ,                        !- Electronic Enthalpy Limit Curve Name
+    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}
+    NoLockout,               !- Lockout Type
+    FixedMinimum,            !- Minimum Limit Type
+    ,                        !- Minimum Outdoor Air Schedule Name
+    ,                        !- Minimum Fraction of Outdoor Air Schedule Name
+    ,                        !- Maximum Fraction of Outdoor Air Schedule Name
+    ,                        !- Mechanical Ventilation Controller Name
+    ,                        !- Time of Day Economizer Control Schedule Name
+    No,                      !- High Humidity Control
+    ,                        !- Humidistat Control Zone Name
+    ,                        !- High Humidity Outdoor Air Flow Ratio
+    Yes,                     !- Control High Indoor Humidity Based on Outdoor Humidity Ratio
+    BypassWhenWithinEconomizerLimits;  !- Heat Recovery Bypass Control Type
+
+  AvailabilityManagerAssignmentList,
+    VAV with Reheat OA System Availability Manager List,  !- Name
+    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
+    VAV with Reheat OA System Availability Manager;  !- Availability Manager 1 Name
+
+  AvailabilityManager:Scheduled,
+    VAV with Reheat OA System Availability Manager,  !- Name
+    Always On;      !- Schedule Name
+
+  OutdoorAir:NodeList,
+    Node 6;                  !- Node or NodeList Name 1
+
+  AirLoopHVAC:OutdoorAirSystem:EquipmentList,
+    VAV with Reheat OA System Equipment List,  !- Name
+    OutdoorAir:Mixer,        !- Component 1 Object Type
+    OA Mixer;  !- Component 1 Name
+
+  OutdoorAir:Mixer,
+    OA Mixer,                !- Name
+    Node 8,                  !- Mixed Air Node Name
+    Node 6,                  !- Outdoor Air Stream Node Name
+    Node 7,                  !- Relief Air Stream Node Name
+    Node 1;                  !- Return Air Stream Node Name
+
+  SetpointManager:MixedAir,
+    Node 8 OS Default SPM,   !- Name
+    Temperature,             !- Control Variable
+    Node 2,                  !- Reference Setpoint Node Name
+    Node 9,                  !- Fan Inlet Node Name
+    Node 2,                  !- Fan Outlet Node Name
+    Node 8;                  !- Setpoint Node or NodeList Name
+
+  CoilSystem:Cooling:DX,
+    VAV Main DX Clg Coil CoilSystem,  !- Name
+    Always On,               !- Availability Schedule Name
+    Node 8,                  !- DX Cooling Coil System Inlet Node Name
+    Node 11,                 !- DX Cooling Coil System Outlet Node Name
+    Node 11,                 !- DX Cooling Coil System Sensor Node Name
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
+    VAV Main DX Clg Coil;    !- Cooling Coil Name
+
+  Coil:Cooling:DX:TwoSpeed,
+    VAV Main DX Clg Coil,    !- Name
+    Always On,               !- Availability Schedule Name
+    Autosize,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- High Speed Rated Sensible Heat Ratio
+    3,                       !- High Speed Gross Rated Cooling COP {W/W}
+    Autosize,                !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    773.3,                   !- Unit Internal Static Air Pressure {Pa}
+    Node 8,                  !- Air Inlet Node Name
+    Node 11,                 !- Air Outlet Node Name
+    Curve Biquadratic,       !- Total Cooling Capacity Function of Temperature Curve Name
+    Curve Quadratic,         !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Curve Biquadratic,       !- Energy Input Ratio Function of Temperature Curve Name
+    Curve Quadratic,         !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Curve Quadratic,         !- Part Load Fraction Correlation Curve Name
+    Autosize,                !- Low Speed Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Low Speed Gross Rated Sensible Heat Ratio
+    3,                       !- Low Speed Gross Rated Cooling COP {W/W}
+    Autosize,                !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    Curve Biquadratic,       !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    Curve Biquadratic,       !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ,                        !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    -25,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- High Speed Evaporative Condenser Effectiveness {dimensionless}
+    Autosize,                !- High Speed Evaporative Condenser Air Flow Rate {m3/s}
+    Autosize,                !- High Speed Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Low Speed Evaporative Condenser Effectiveness {dimensionless}
+    Autosize,                !- Low Speed Evaporative Condenser Air Flow Rate {m3/s}
+    Autosize,                !- Low Speed Evaporative Condenser Pump Rated Power Consumption {W}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    10,                      !- Basin Heater Capacity {W/K}
+    2;                       !- Basin Heater Setpoint Temperature {C}
+
+  SetpointManager:MixedAir,
+    Node 11 OS Default SPM,  !- Name
+    Temperature,             !- Control Variable
+    Node 2,                  !- Reference Setpoint Node Name
+    Node 9,                  !- Fan Inlet Node Name
+    Node 2,                  !- Fan Outlet Node Name
+    Node 11;                 !- Setpoint Node or NodeList Name
+
+  Curve:Biquadratic,
+    Curve Biquadratic,       !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    0,                       !- Minimum Value of x
+    50,                      !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    50;                      !- Maximum Value of y
+
+  Curve:Quadratic,
+    Curve Quadratic,         !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.9,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  Coil:Heating:Electric,
+    Elec Htg Coil,           !- Name
+    Always On,               !- Availability Schedule Name
+    1,                       !- Efficiency
+    Autosize,                !- Nominal Capacity {W}
+    Node 11,                 !- Air Inlet Node Name
+    Node 9,                  !- Air Outlet Node Name
+    Node 9;                  !- Temperature Setpoint Node Name
+
+  SetpointManager:MixedAir,
+    Node 9 OS Default SPM,   !- Name
+    Temperature,             !- Control Variable
+    Node 2,                  !- Reference Setpoint Node Name
+    Node 9,                  !- Fan Inlet Node Name
+    Node 2,                  !- Fan Outlet Node Name
+    Node 9;                  !- Setpoint Node or NodeList Name
+
+  Fan:SystemModel,
+    VAV with Reheat Supply Fan,  !- Name
+    Always On,               !- Availability Schedule Name
+    Node 9,                  !- Air Inlet Node Name
+    Node 2,                  !- Air Outlet Node Name
+    Autosize,                !- Design Maximum Air Flow Rate {m3/s}
+    Continuous,              !- Speed Control Method
+    0.2,                     !- Electric Power Minimum Flow Rate Fraction
+    500,                     !- Design Pressure Rise {Pa}
+    0.9,                     !- Motor Efficiency
+    1,                       !- Motor In Air Stream Fraction
+    Autosize,                !- Design Electric Power Consumption {W}
+    PowerPerFlowPerPressure, !- Design Power Sizing Method
+    840,                     !- Electric Power Per Unit Flow Rate {W/(m3/s)}
+    1.66667,                 !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
+    0.524386048,             !- Fan Total Efficiency
+    VAV Fan Curve,           !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    0,                       !- Motor Loss Radiative Fraction
+    General,                 !- End-Use Subcategory
+    1;                       !- Number of Speeds
+
+  Curve:Quartic,
+    VAV Fan Curve,           !- Name
+    0.040759894,             !- Coefficient1 Constant
+    0.08804497,              !- Coefficient2 x
+    -0.07292612,             !- Coefficient3 x**2
+    0.943739823,             !- Coefficient4 x**3
+    0,                       !- Coefficient5 x**4
+    0,                       !- Minimum Value of x
+    1,                       !- Maximum Value of x
+    0,                       !- Minimum Curve Output
+    1,                       !- Maximum Curve Output
+    Dimensionless,           !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+  SetpointManager:Warmest,
+    VAV with Reheat SetPoint Manager Warmest,  !- Name
+    Temperature,             !- Control Variable
+    VAV with Reheat,         !- HVAC Air Loop Name
+    12.2,                    !- Minimum Setpoint Temperature {C}
+    15.6,                    !- Maximum Setpoint Temperature {C}
+    MaximumTemperature,      !- Strategy
+    Node 2;                  !- Setpoint Node or NodeList Name
+
+  AirLoopHVAC:SupplyPath,
+    VAV with Reheat Node 3 Supply Path,  !- Name
+    Node 3,                  !- Supply Air Path Inlet Node Name
+    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type
+    Air Loop HVAC Zone Splitter 1;  !- Component 1 Name
+
+  AirLoopHVAC:ZoneSplitter,
+    Air Loop HVAC Zone Splitter 1,  !- Name
+    Node 3,                  !- Inlet Node Name
+    Node 10;                 !- Outlet 1 Node Name
+
+  AirLoopHVAC:ReturnPath,
+    VAV with Reheat Return Path,  !- Name
+    Node 4,                  !- Return Air Path Outlet Node Name
+    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type
+    Air Loop HVAC Zone Mixer 1;  !- Component 1 Name
+
+  AirLoopHVAC:ZoneMixer,
+    Air Loop HVAC Zone Mixer 1,  !- Name
+    Node 4,                  !- Outlet Node Name
+    Node 29;                 !- Inlet 1 Node Name
+
+  Site:Location,
+    Atlanta Hartsfield Intl Ap,  !- Name
+    33.63,                   !- Latitude {deg}
+    -84.43,                  !- Longitude {deg}
+    -5,                      !- Time Zone {hr}
+    308;                     !- Elevation {m}
+
+  SizingPeriod:DesignDay,
+    Atlanta Hartsfield Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    34.4,                    !- Maximum Dry-Bulb Temperature {C}
+    9.5,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    23.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    97679,                   !- Barometric Pressure {Pa}
+    4,                       !- Wind Speed {m/s}
+    300,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAETau,               !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    0.556,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    1.779,                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    ;                       !- Sky Clearness
+
+  SizingPeriod:DesignDay,
+    Atlanta Hartsfield Intl Ap Ann Htg 99.6% Condns DB,  !- Name
+    1,                       !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -6.3,                    !- Maximum Dry-Bulb Temperature {C}
+    0,                       !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -6.3,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    97679,                   !- Barometric Pressure {Pa}
+    5.3,                     !- Wind Speed {m/s}
+    320,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0;                       !- Sky Clearness
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+  Output:VariableDictionary,IDF,Unsorted;
+
+  Output:SQLite,
+    SimpleAndTabular;        !- Option Type
+
+  Output:Table:SummaryReports,
+    AllSummary,              !- Report 1 Name
+    AllSummaryAndSizingPeriod;  !- Report 2 Name
+)IDF";
+
+    std::string const idf_objects = idf_objects_1 + idf_objects_2 + idf_objects_3;
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ManageSimulation(*state); // run the design days
+    auto &finalSysSizing = state->dataSize->FinalSysSizing(1);
+    EXPECT_TRUE(compare_enums(finalSysSizing.coolingPeakLoad, DataSizing::PeakLoad::TotalCooling));
+
+    // get the 'Peak Sensible Load with Sizing Factor'
+    std::string query("SELECT Value From TabularDataWithStrings"
+                      "  WHERE TableName = 'Cooling Peak Conditions'"
+                      "  AND ReportName = 'AirLoop Component Load Summary'"
+                      "  AND ColumnName = 'Value'"
+                      "  AND RowName = 'Peak Sensible Load with Sizing Factor'");
+    // check the value from result records
+    Real64 return_val = execAndReturnFirstDouble(query);
+    EXPECT_EQ(return_val, 5080.22);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthly)
+{
+    // #9621 - Only warn if a bad variable is defined in a Monthly table user requested, not on the AllSummaryAndMonthly ones
+    std::string const idf_objects = delimited_string({
+        "Output:Table:Monthly,",
+        "  Space Gains Annual Report, !- Name",
+        "  2, !-  Digits After Decimal",
+        "  Exterior Lights Electricity Energy, !- Variable or Meter 1 Name",
+        "  SumOrAverage, !- Aggregation Type for Variable or Meter 1",
+        "  NON EXISTANT VARIABLE, !- Variable or Meter 2 Name", // That's not how you spell EXISTENT
+        "  Maximum; !- Aggregation Type for Variable or Meter 2",
+
+        "Output:Table:SummaryReports,",
+        "  AllSummaryAndMonthly;              !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Real64 extLitUse;
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        Constant::Units::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite1",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        "General");
+
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather; // Trigger the extra warning
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->DisplayExtraWarnings = false;
+
+    GetInputTabularMonthly(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
+    GetInputOutputTableSummaryReports(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, numNamedMonthly + 1);
+
+    InitializeTabularMonthly(*state);
+
+    std::string const expected_error = delimited_string({
+        "   ** Warning ** Processing Monthly Tabular Reports: Variable names not valid for this simulation",
+        "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables.",
+    });
+    compare_err_stream(expected_error);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthly_AlwaysIfWeatherRunRequested)
+{
+    // #9621 - Only warn if a bad variable is defined in a Monthly table user requested, not on the AllSummaryAndMonthly ones
+    // If I request a Weater File run Period I expect a warning
+    // Regardless of the fact that the sizing run happens first
+    std::string const idf_objects = delimited_string({
+        "SimulationControl,",
+        "  No,                                 !- Do Zone Sizing Calculation",
+        "  No,                                 !- Do System Sizing Calculation",
+        "  No,                                 !- Do Plant Sizing Calculation",
+        "  Yes,                                !- Run Simulation for Sizing Periods",
+        "  Yes;                                !- Run Simulation for Weather File Run Periods",
+
+        "Output:Table:Monthly,",
+        "  Space Gains Annual Report,          !- Name",
+        "  2,                                  !-  Digits After Decimal",
+        "  Exterior Lights Electricity Energy, !- Variable or Meter 1 Name",
+        "  SumOrAverage,                       !- Aggregation Type for Variable or Meter 1",
+        "  NON EXISTANT VARIABLE,              !- Variable or Meter 2 Name",
+        "  Maximum;                            !- Aggregation Type for Variable or Meter 2",
+
+        "Output:Table:SummaryReports,",
+        "  AllSummaryAndMonthly;               !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(*state);
+    EXPECT_TRUE(state->dataGlobal->DoDesDaySim);
+    EXPECT_TRUE(state->dataGlobal->DoWeathSim);
+
+    Real64 extLitUse;
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        Constant::Units::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite1",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        "General");
+
+    // In a regular simulation with the above SimulationControl, when InitializeTabularMonthly is called it's DesignDay
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::DesignDay;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->DisplayExtraWarnings = false;
+
+    GetInputTabularMonthly(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
+    GetInputOutputTableSummaryReports(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, numNamedMonthly + 1);
+
+    InitializeTabularMonthly(*state);
+
+    std::string const expected_error = delimited_string({
+        "   ** Warning ** Processing Monthly Tabular Reports: Variable names not valid for this simulation",
+        "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables.",
+    });
+    compare_err_stream(expected_error);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthlyDisplayExtraWarnings)
+{
+    // #9621 - Only warn if a bad variable is defined in a Monthly table user requested, not on the AllSummaryAndMonthly ones
+    std::string const idf_objects = delimited_string({
+        "Output:Table:Monthly,",
+        "  Space Gains Annual Report, !- Name",
+        "  2, !-  Digits After Decimal",
+        "  NON EXISTANT VARIABLE, !- Variable or Meter 1 Name",
+        "  SumOrAverage, !- Aggregation Type for Variable or Meter 1",
+        "  NON EXISTANT VARIABLE BIS, !- Variable or Meter 2 Name",
+        "  Maximum; !- Aggregation Type for Variable or Meter 2",
+
+        "Output:Table:SummaryReports,",
+        "  AllSummaryAndMonthly;              !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Real64 extLitUse;
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        Constant::Units::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite1",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        "General");
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        Constant::Units::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite2",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        "General");
+
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather; // Trigger the extra warning
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->DisplayExtraWarnings = true;
+
+    GetInputTabularMonthly(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
+    GetInputOutputTableSummaryReports(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, numNamedMonthly + 1);
+
+    InitializeTabularMonthly(*state);
+
+    std::string const expected_error = delimited_string({
+        "   ** Warning ** Processing Monthly Tabular Reports: Variable names not valid for this simulation",
+        "   **   ~~~   ** ..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column of the Table Report.",
+        "   ** Warning ** In Output:Table:Monthly 'SPACE GAINS ANNUAL REPORT' invalid Variable or Meter Name 'NON EXISTANT VARIABLE'",
+        "   ** Warning ** In Output:Table:Monthly 'SPACE GAINS ANNUAL REPORT' invalid Variable or Meter Name 'NON EXISTANT VARIABLE BIS'",
+    });
+    compare_err_stream(expected_error);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthlyBlankVariable)
+{
+    // #6919 - Warn instead of fatal on blank monthly table
+    std::string const idf_objects = delimited_string({
+        "Output:Table:Monthly,",
+        "  Space Gains Annual Report, !- Name",
+        "  2, !-  Digits After Decimal",
+        "  , !- Variable or Meter 1 Name",
+        "  SumOrAverage; !- Aggregation Type for Variable or Meter 1",
+
+        "Output:Table:SummaryReports,",
+        "  AllSummaryAndMonthly;              !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Real64 extLitUse;
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        Constant::Units::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite1",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        "General");
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        Constant::Units::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite2",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        "General");
+
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather; // Trigger the extra warning
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->DisplayExtraWarnings = true;
+
+    GetInputTabularMonthly(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
+    GetInputOutputTableSummaryReports(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, numNamedMonthly + 1);
+
+    InitializeTabularMonthly(*state);
+
+    std::string const expected_error = delimited_string(
+        {"   ** Warning ** Output:Table:Monthly: Blank column specified in 'SPACE GAINS ANNUAL REPORT', need to provide a variable or meter name "});
+    compare_err_stream(expected_error);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_NoWarnMonthlIfNoWeatherFileRun)
+{
+    // #9621 - Only warn if a bad variable is defined in a Monthly table user requested, not on the AllSummaryAndMonthly ones
+    std::string const idf_objects = delimited_string({
+        "Output:Table:Monthly,",
+        "  Space Gains Annual Report, !- Name",
+        "  2, !-  Digits After Decimal",
+        "  NON EXISTANT VARIABLE, !- Variable or Meter 1 Name",
+        "  SumOrAverage, !- Aggregation Type for Variable or Meter 1",
+        "  NON EXISTANT VARIABLE BIS, !- Variable or Meter 2 Name",
+        "  Maximum; !- Aggregation Type for Variable or Meter 2",
+
+        "Output:Table:SummaryReports,",
+        "  AllSummaryAndMonthly;              !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Real64 extLitUse;
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        Constant::Units::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite1",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        "General");
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        Constant::Units::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite2",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        "General");
+
+    state->dataGlobal->DoWeathSim = false; // <- here
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::DesignDay;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->DisplayExtraWarnings = true;
+
+    GetInputTabularMonthly(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
+    GetInputOutputTableSummaryReports(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, numNamedMonthly);
+
+    InitializeTabularMonthly(*state);
+
+    std::string const expected_error = delimited_string({
+        "   ** Warning ** Output:Table:Monthly requested with SimulationControl Run Simulation for Weather File Run Periods set to No so "
+        "Output:Table:Monthly will not be generated",
+    });
+    compare_err_stream(expected_error);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_DontWarnMonthlyIfOnlyNamedReports)
+{
+    // #9621 - Only warn if a bad variable is defined in a Monthly table user requested, not on the AllSummaryAndMonthly ones
+    std::string const idf_objects = delimited_string({
+        "Output:Table:SummaryReports,",
+        "  AllSummaryAndMonthly;              !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Real64 extLitUse;
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        Constant::Units::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite1",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        "General");
+
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather; // Trigger the extra warning
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->DisplayExtraWarnings = true;
+
+    GetInputTabularMonthly(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 0);
+    GetInputOutputTableSummaryReports(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, numNamedMonthly);
+
+    InitializeTabularMonthly(*state);
+
+    compare_err_stream("");
+}
+
+TEST_F(SQLiteFixture, OutputReportTabular_DistrictHeating)
+{
+    // Test for #10190 - District Heating Steam is empty
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    state->dataOutRptTab->displayTabularBEPS = true;
+    state->dataOutRptTab->displayDemandEndUse = true;
+    state->dataOutRptTab->displayLEEDSummary = true;
+
+    state->dataOutRptTab->WriteTabularFiles = true;
+
+    SetupUnitConversions(*state);
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoKWH;
+
+    // Needed to avoid crash (from ElectricPowerServiceManager.hh)
+    createFacilityElectricPowerServiceObject(*state);
+
+    SetPredefinedTables(*state);
+
+    Real64 DistrictHeatingWater = 4e8;
+    SetupOutputVariable(*state,
+                        "Exterior Equipment DistrictHeatingWater Energy",
+                        Constant::Units::J,
+                        DistrictHeatingWater,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "DHWaterExtEq",
+                        Constant::eResource::DistrictHeatingWater,
+                        OutputProcessor::SOVEndUseCat::ExteriorEquipment,
+                        "General");
+
+    Real64 DistrictHeatingSteam = 5e8;
+    SetupOutputVariable(*state,
+                        "Exterior Equipment DistrictHeatingSteam Energy",
+                        Constant::Units::J,
+                        DistrictHeatingSteam,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "DHSteamExtEq",
+                        Constant::eResource::DistrictHeatingSteam,
+                        OutputProcessor::SOVEndUseCat::ExteriorEquipment,
+                        "General");
+
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->TimeStepZone = 1.0;
+    state->dataGlobal->MinutesPerTimeStep = state->dataGlobal->TimeStepZone * 60;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 3600.0;
+    state->dataOutRptTab->displayTabularBEPS = true;
+    // OutputProcessor::TimeValue.allocate(2);
+
+    auto timeStep = 1.0;
+
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
+
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::Zone].TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep = 60;
+
+    GetInputOutputTableSummaryReports(*state);
+
+    state->dataEnvrn->Month = 12;
+
+    UpdateMeterReporting(*state);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+
+    auto &ort = state->dataOutRptTab;
+    constexpr int dhWaterIndex = 4;
+    constexpr int dhSteamIndex = 5;
+    EXPECT_EQ("DistrictHeatingWater", ort->resourceTypeNames(dhWaterIndex));
+    EXPECT_EQ("DistrictHeatingSteam", ort->resourceTypeNames(dhSteamIndex));
+
+    EXPECT_NEAR(DistrictHeatingWater, state->dataOutRptTab->gatherTotalsBEPS(dhWaterIndex), 1.);
+    EXPECT_NEAR(
+        DistrictHeatingWater, state->dataOutRptTab->gatherEndUseBEPS(dhWaterIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1), 1.);
+    // General
+    EXPECT_NEAR(DistrictHeatingWater,
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhWaterIndex),
+                1.);
+
+    EXPECT_NEAR(DistrictHeatingSteam, state->dataOutRptTab->gatherTotalsBEPS(dhSteamIndex), 1.);
+    EXPECT_NEAR(
+        DistrictHeatingSteam, state->dataOutRptTab->gatherEndUseBEPS(dhSteamIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1), 1.);
+    // General
+    EXPECT_NEAR(DistrictHeatingSteam,
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhSteamIndex),
+                1.);
+
+    UpdateMeterReporting(*state);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    EXPECT_NEAR(DistrictHeatingWater * 2, state->dataOutRptTab->gatherTotalsBEPS(dhWaterIndex), 1.);
+    EXPECT_NEAR(DistrictHeatingWater * 2,
+                state->dataOutRptTab->gatherEndUseBEPS(dhWaterIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1),
+                1.);
+    // General
+    EXPECT_NEAR(DistrictHeatingWater * 2,
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhWaterIndex),
+                1.);
+
+    EXPECT_NEAR(DistrictHeatingSteam * 2, state->dataOutRptTab->gatherTotalsBEPS(dhSteamIndex), 1.);
+    EXPECT_NEAR(DistrictHeatingSteam * 2,
+                state->dataOutRptTab->gatherEndUseBEPS(dhSteamIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1),
+                1.);
+    // General
+    EXPECT_NEAR(DistrictHeatingSteam * 2,
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhSteamIndex),
+                1.);
+
+    OutputReportTabular::WriteBEPSTable(*state);
+    OutputReportTabular::WriteDemandEndUseSummary(*state);
+
+    // We test for Heating and Total, since they should be the same
+    std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
+    std::vector<std::string> endUseSubCategoryNames = {"General"};
+
+    // Query End Use
+    {
+        std::string query(R"sql(
+        SELECT Value From TabularDataWithStrings
+           WHERE TableName = 'End Uses'
+             AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'
+             AND ColumnName = 'District Heating Water'
+             AND RowName = 'Exterior Equipment')sql");
+        auto const result = queryResult(query, "TabularDataWithStrings");
+        Real64 const return_val1 = execAndReturnFirstDouble(query);
+
+        ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
+        EXPECT_NEAR(DistrictHeatingWater * 2 / 3.6e6, return_val1, 0.01) << "Failed for query: " << query;
+    }
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'District Heating Steam'"
+                          "  AND RowName = 'Exterior Equipment'");
+        auto const result = queryResult(query, "TabularDataWithStrings");
+        Real64 const return_val = execAndReturnFirstDouble(query);
+
+        ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
+        EXPECT_NEAR(DistrictHeatingSteam * 2 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
+    }
+
+    // Query End Use with Subcategory
+    {
+        std::string const query("SELECT Value From TabularDataWithStrings"
+                                "  WHERE TableName = 'End Uses By Subcategory'"
+                                "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                                "  AND ColumnName = 'District Heating Water'"
+                                "  AND RowName = 'Exterior Equipment:General'");
+        Real64 const return_val = execAndReturnFirstDouble(query);
+        EXPECT_NEAR(DistrictHeatingWater * 2 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
+    }
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses By Subcategory'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'District Heating Steam'"
+                          "  AND RowName = 'Exterior Equipment:General'");
+        Real64 return_val = execAndReturnFirstDouble(query);
+        EXPECT_NEAR(DistrictHeatingSteam * 2 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
+    }
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabular_Test_SetupUnitConversion_Fix)
+{
+    // Unit test for PR 10261 that fixes Issue 10260
+    std::string unitString;
+    std::string curUnits;
+
+    SetupUnitConversions(*state);
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPound;
+
+    // Mimic the unit conversion for LEED Table EAp2-17b
+    // Energy Use Intensity - Natural Gas
+    unitString = "Natural Gas [MJ/m2]";
+    int unitConvNum = unitsFromHeading(*state, unitString);
+    EXPECT_EQ("Natural Gas [kBtu/ft2]", unitString);
+    EXPECT_EQ(93, unitConvNum);
+    Real64 unitConvFactor = state->dataOutRptTab->UnitConv(unitConvNum).mult;
+    EXPECT_NEAR(unitConvFactor, 0.94708628903179 / 10.764961, 1e-5);
+
+    // Mimic the unit conversion for LEED Table EAp2-17b
+    // Energy Use Intensity - Natural Gas
+    // Another form
+    unitString = "Natural Gas {MJ/m2}";
+    unitConvNum = unitsFromHeading(*state, unitString);
+    EXPECT_EQ(93, unitConvNum);
+    EXPECT_EQ("Natural Gas {kBtu/ft2}", unitString);
+    unitConvFactor = state->dataOutRptTab->UnitConv(unitConvNum).mult;
+    EXPECT_NEAR(unitConvFactor, 0.94708628903179 / 10.764961, 1e-5);
+
+    // Test affected Unit Conversion Entry #94 as well
+    unitString = "Additional [MJ/m2]";
+    unitConvNum = unitsFromHeading(*state, unitString);
+    EXPECT_EQ(94, unitConvNum);
+    EXPECT_EQ("Additional [kBtu/ft2]", unitString);
+    unitConvFactor = state->dataOutRptTab->UnitConv(unitConvNum).mult;
+    EXPECT_NEAR(unitConvFactor, 0.94708628903179 / 10.764961, 1e-5);
+
+    // Should not affect entries after #93-94
+    unitString = "";
+    unitConvNum = unitsFromHeading(*state, unitString);
+    EXPECT_EQ(97, unitConvNum);
+    EXPECT_EQ("", unitString);
+    unitConvFactor = state->dataOutRptTab->UnitConv(unitConvNum).mult;
+    EXPECT_NEAR(unitConvFactor, 1.0, 1e-5);
+}
+
+TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummaryperArea_IPExceptElec)
+{
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    state->dataOutRptTab->displaySourceEnergyEndUseSummary = true;
+
+    // DetermineBuildingFloorArea
+
+    state->dataEnvrn->Latitude = 12.3;
+    state->dataEnvrn->Longitude = 45.6;
+
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+
+    // walls
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).GrossArea = 200.; // 20 x 10
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Zone = 1;
+
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).GrossArea = 300.; // 30 x 10
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Zone = 2;
+
+    // windows
+    state->dataSurface->Surface(3).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).GrossArea = 40.;
+    state->dataSurface->Surface(3).Height = 5;
+    state->dataSurface->Surface(3).Width = 8;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Zone = 1;
+
+    state->dataSurface->Surface(4).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).GrossArea = 60.;
+    state->dataSurface->Surface(4).Height = 6;
+    state->dataSurface->Surface(4).Width = 10;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Zone = 2;
+
+    // Loads
+    state->dataHeatBal->TotLights = 3;
+    state->dataHeatBal->Lights.allocate(state->dataHeatBal->TotLights);
+
+    state->dataHeatBal->TotPeople = 3;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+
+    state->dataHeatBal->TotElecEquip = 3;
+    state->dataHeatBal->ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
+
+    state->dataHeatBal->Lights(1).ZonePtr = 1;
+    state->dataHeatBal->Lights(1).DesignLevel = 1000.0;
+    state->dataHeatBal->Lights(2).ZonePtr = 2;
+    state->dataHeatBal->Lights(2).DesignLevel = 100.0;
+    state->dataHeatBal->Lights(3).ZonePtr = 3;
+    state->dataHeatBal->Lights(3).DesignLevel = 10.0;
+
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 10.0;
+    state->dataHeatBal->People(2).ZonePtr = 2;
+    state->dataHeatBal->People(2).NumberOfPeople = 5.0;
+    state->dataHeatBal->People(3).ZonePtr = 3;
+    state->dataHeatBal->People(3).NumberOfPeople = 1.0;
+
+    state->dataHeatBal->ZoneElectric(1).ZonePtr = 1;
+    state->dataHeatBal->ZoneElectric(1).DesignLevel = 500.0;
+    state->dataHeatBal->ZoneElectric(2).ZonePtr = 2;
+    state->dataHeatBal->ZoneElectric(2).DesignLevel = 50.0;
+    state->dataHeatBal->ZoneElectric(3).ZonePtr = 3;
+    state->dataHeatBal->ZoneElectric(3).DesignLevel = 5.0;
+
+    // zone
+    state->dataGlobal->NumOfZones = 3;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "PartofTot Conditioned Zone";
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(1).Multiplier = 1.;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(1).FloorArea = 1000.;
+    state->dataHeatBal->Zone(1).Volume = 2000.;
+    state->dataHeatBal->Zone(1).ExtGrossWallArea = 800.;
+    state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
+
+    state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
+    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
+    state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(2).Multiplier = 1.;
+    state->dataHeatBal->Zone(2).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(2).FloorArea = 100.;
+    state->dataHeatBal->Zone(2).Volume = 200.;
+    state->dataHeatBal->Zone(2).ExtGrossWallArea = 80.;
+    state->dataHeatBal->Zone(2).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(2).ExtWindowArea = 0.0;
+
+    state->dataHeatBal->Zone(3).Name = "NOT PartofTot Conditioned Zone";
+    state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
+    state->dataHeatBal->Zone(3).Multiplier = 1.;
+    state->dataHeatBal->Zone(3).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(3).FloorArea = 10.;
+    state->dataHeatBal->Zone(3).Volume = 20.;
+    state->dataHeatBal->Zone(3).ExtGrossWallArea = 8.;
+    state->dataHeatBal->Zone(3).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(3).ExtWindowArea = 0.0;
+
+    // 2023-10-13: Need a set up unit conversion first:
+    OutputReportTabular::SetupUnitConversions(*state);
+
+    // Gross areas
+    Real64 expectedBuildingGrossFloorArea = (state->dataHeatBal->Zone(1).FloorArea + state->dataHeatBal->Zone(2).FloorArea);
+    // Conditioned areas
+    Real64 expectedBuildingConditionedFloorArea = state->dataHeatBal->Zone(1).FloorArea;
+
+    // Assume heating electricity usage with a value of 3.6e6 * 1e4 J =10000 kWh that comes for a single end use
+    // state->dataGlobalConst->iEndUse.at(Constant::EndUse::Heating)=1
+    state->dataOutRptTab->gatherEndUseBySourceBEPS(1, static_cast<int>(Constant::EndUse::Heating) + 1) = 3.6e10; // J
+    state->dataOutRptTab->gatherTotalsBySourceBEPS(1) = 3.6e10;                                                  // J
+    Real64 eleckWh = 1e4;                                                                                        // kWh
+
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPoundExceptElectricity;
+
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPoundExceptElectricity;
+
+    // Call Source Energy End Use Summary writing function
+    OutputReportTabular::WriteSourceEnergyEndUseSummary(*state);
+
+    // Check that DetermineBuildingFloorArea is converted correctly (called from WriteSourceEnergyEndUseSummary)
+    EXPECT_EQ(expectedBuildingGrossFloorArea, state->dataOutRptTab->buildingGrossFloorArea);
+    EXPECT_EQ(expectedBuildingConditionedFloorArea, state->dataOutRptTab->buildingConditionedFloorArea);
+
+    // Now test the reporting text:
+    // We consistently test in the same report (three different tables) and at the same column for fuel = Elec
+    const std::string reportName = "SourceEnergyEndUseComponentsSummary";
+    const std::string columnName = "Source Electricity";
+
+    // Test for Heating and Total, and they should be the same for this case
+    std::vector<std::string> testRowNames = {"Heating", "Total Source Energy End Use Components"};
+
+    // TableName, value
+    std::vector<std::tuple<std::string, Real64>> results({
+        {"Source Energy End Use Components Summary", eleckWh},
+        {"Source Energy End Use Components Per Conditioned Floor Area", 10000.0 / (expectedBuildingConditionedFloorArea / (0.3048 * 0.3048))},
+        {"Source Energy End Use Components Per Total Floor Area", 10000.0 / (expectedBuildingGrossFloorArea / (0.3048 * 0.3048))},
+    });
+
+    // Test that the reported values are successfully matching kWh/ft2 values (kWh Electricity with InchPound others)
+    for (auto &v : results) {
+
+        std::string tableName = std::get<0>(v);
+        Real64 expectedValue = std::get<1>(v);
+
+        for (auto &rowName : testRowNames) {
+            std::string query("SELECT Value From TabularDataWithStrings"
+                              "  WHERE ReportName = '" +
+                              reportName +
+                              "'"
+                              "  AND TableName = '" +
+                              tableName +
+                              "'"
+                              "  AND RowName = '" +
+                              rowName + "'" + "  AND ColumnName = '" + columnName + "'");
+
+            Real64 return_val = execAndReturnFirstDouble(query);
+
+            // Add informative message if failed
+            EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
+        }
+    }
+}
+
+TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_IPUnitExceptElec)
+{
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    state->dataOutRptTab->displayTabularBEPS = true;
+    state->dataOutRptTab->displayDemandEndUse = true;
+    state->dataOutRptTab->displayLEEDSummary = true;
+
+    state->dataOutRptTab->WriteTabularFiles = true;
+
+    SetupUnitConversions(*state);
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
+    // state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPoundExceptElectricity;
+    Real64 enerConv = getSpecificUnitDivider(*state, "GJ", "kBtu"); // 948.45
+    EXPECT_NEAR(1.0 / enerConv, 948.0, 0.5);
+
+    // Needed to avoid crash (from ElectricPowerServiceManager.hh)
+    createFacilityElectricPowerServiceObject(*state);
+
+    SetPredefinedTables(*state);
+
+    Real64 extLitUse = 1e8;
+    Real64 CoalHeating = 2e8;
+    Real64 GasolineHeating = 3e8;
+    Real64 PropaneHeating = 4e8;
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        Constant::Units::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite1",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        "General");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        Constant::Units::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite2",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        "AnotherEndUseSubCat");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        Constant::Units::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite3",
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        "General");
+    SetupOutputVariable(*state,
+                        "Heating Coal Energy",
+                        Constant::Units::J,
+                        CoalHeating,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite4",
+                        Constant::eResource::Coal,
+                        OutputProcessor::SOVEndUseCat::Heating,
+                        "General");
+    SetupOutputVariable(*state,
+                        "Heating Gasoline Energy",
+                        Constant::Units::J,
+                        GasolineHeating,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite5",
+                        Constant::eResource::Gasoline,
+                        OutputProcessor::SOVEndUseCat::Heating,
+                        "General");
+    SetupOutputVariable(*state,
+                        "Heating Propane Energy",
+                        Constant::Units::J,
+                        PropaneHeating,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite6",
+                        Constant::eResource::Propane,
+                        OutputProcessor::SOVEndUseCat::Heating,
+                        "General");
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->TimeStepZone = 1.0;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 3600.0;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataOutRptTab->displayTabularBEPS = true;
+    // OutputProcessor::TimeValue.allocate(2);
+
+    auto timeStep = 1.0;
+
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
+
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::Zone].TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep = 60;
+
+    GetInputOutputTableSummaryReports(*state);
+
+    state->dataEnvrn->Month = 12;
+
+    UpdateMeterReporting(*state);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    EXPECT_NEAR(extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1), 1.);
+    // General
+    EXPECT_NEAR(extLitUse * 2, state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
+    // AnotherEndUseSubCat
+    EXPECT_NEAR(extLitUse * 1, state->dataOutRptTab->gatherEndUseSubBEPS(2, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
+
+    UpdateMeterReporting(*state);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    EXPECT_NEAR(extLitUse * 6, state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1), 1.);
+    // General
+    EXPECT_NEAR(extLitUse * 4, state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
+    // AnotherEndUseSubCat
+    EXPECT_NEAR(extLitUse * 2, state->dataOutRptTab->gatherEndUseSubBEPS(2, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
+
+    UpdateMeterReporting(*state);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    EXPECT_NEAR(extLitUse * 9, state->dataOutRptTab->gatherEndUseBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1), 1.);
+    // General
+    EXPECT_NEAR(extLitUse * 6, state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
+    // AnotherEndUseSubCat
+    EXPECT_NEAR(extLitUse * 3, state->dataOutRptTab->gatherEndUseSubBEPS(2, static_cast<int>(Constant::EndUse::ExteriorLights) + 1, 1), 1.);
+
+    OutputReportTabular::WriteBEPSTable(*state);
+    OutputReportTabular::WriteDemandEndUseSummary(*state);
+
+    // We test for Heating and Total, since they should be the same
+    std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
+    std::vector<std::string> endUseSubCategoryNames = {"General", "AnotherEndUseSubCat"};
+
+    std::string endUseName = "Exterior Lighting";
+    std::string endUseSubCategoryName = "AnotherEndUseSubCat";
+    std::string rowName = endUseName + ":" + endUseSubCategoryName;
+    std::string columnName = "Electricity";
+
+    for (auto &endUseSubCategoryName : endUseSubCategoryNames) {
+        for (auto &reportName : testReportNames) {
+
+            std::string query("SELECT Value From TabularDataWithStrings"
+                              "  WHERE TableName = 'End Uses By Subcategory'"
+                              "  AND ColumnName = 'Electricity'"
+                              "  AND ReportName = '" +
+                              reportName +
+                              "'"
+                              "  AND RowName = '" +
+                              endUseName + ":" + endUseSubCategoryName + "'"); // Now Like 'Exterior Lighting:General'
+
+            auto result = queryResult(query, "TabularDataWithStrings");
+
+            ASSERT_EQ(1ul, result.size()) << "Query crashed for reportName=" << reportName;
+        }
+    }
+
+    for (auto &reportName : testReportNames) {
+
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ColumnName = 'Electricity'"
+                          "  AND ReportName = '" +
+                          reportName +
+                          "'"
+                          "  AND RowName = '" +
+                          endUseName + "'");
+
+        auto result = queryResult(query, "TabularDataWithStrings");
+
+        ASSERT_EQ(1ul, result.size()) << "Query crashed for reportName=" << reportName;
+    }
+
+    // Specifically get the electricity usage for End Use = Exterior Lighting, and End Use Subcat = AnotherEndUseSubCat,
+    // and make sure it's the right number that's returned
+    std::string query("SELECT Value From TabularDataWithStrings"
+                      "  WHERE TableName = 'End Uses By Subcategory'"
+                      "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                      "  AND ColumnName = 'Electricity'"
+                      "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
+    Real64 return_val = execAndReturnFirstDouble(query);
+
+    // EXPECT_NEAR(extLitUse * 3 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
+    Real64 expected_value = extLitUse * 3.0 / 3.6e6; // 1.0e9 / enerConv;
+    EXPECT_NEAR(expected_value, return_val, 0.01) << "Failed for query: " << query;
+
+    // Get all Interior Lighting End Uses (all subcats) for Electricity
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses By Subcategory'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'Electricity'"
+                          "  AND RowName LIKE 'Exterior Lighting:%'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+
+        ASSERT_EQ(2u, result.size()) << "Failed for query: " << query;
+    }
+
+    // Get all subcat usage for all fuels (13)
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses By Subcategory'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
+    }
+
+    // Specifically get the each fuel (Coal, Gasoline, and Propane) usage for End Use = Heating,
+    // and make sure it's the right number that's returned
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'Coal'"
+                          "  AND RowName = 'Heating'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+        Real64 return_val1 = execAndReturnFirstDouble(query);
+
+        ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
+        // EXPECT_NEAR(CoalHeating * 3 / 3.6e6, return_val1, 0.01) << "Failed for query: " << query;
+        Real64 expected_coalHt = CoalHeating * 3 / 1.0e9 / enerConv;
+        EXPECT_NEAR(expected_coalHt, return_val1, 0.01) << "Failed for query: " << query;
+    }
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'Gasoline'"
+                          "  AND RowName = 'Heating'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+        Real64 return_val2 = execAndReturnFirstDouble(query);
+
+        ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
+        // EXPECT_NEAR(GasolineHeating * 3 / 3.6e6, return_val2, 0.01) << "Failed for query: " << query;
+        EXPECT_NEAR(GasolineHeating * 3 / 1.0e9 / enerConv, return_val2, 0.01) << "Failed for query: " << query;
+    }
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'Propane'"
+                          "  AND RowName = 'Heating'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+        Real64 return_val3 = execAndReturnFirstDouble(query);
+
+        ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
+        // EXPECT_NEAR(PropaneHeating * 3 / 3.6e6, return_val3, 0.01) << "Failed for query: " << query;
+        EXPECT_NEAR(PropaneHeating * 3 / 1.0e9 / enerConv, return_val3, 0.01) << "Failed for query: " << query;
+    }
+
+    // Check the heating category has the result size of 13 (including all disaggregated additional fuels) in both reports)
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND RowName = 'Heating'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
+    }
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ReportName = 'DemandEndUseComponentsSummary'"
+                          "  AND RowName = 'Heating'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
+    }
 }

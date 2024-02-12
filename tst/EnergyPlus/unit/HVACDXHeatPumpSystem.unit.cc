@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -90,6 +90,7 @@ TEST_F(EnergyPlusFixture, ExerciseHVACDXHeatPumpSystem)
                           "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
                           "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
                           "    200.0,                   !- Crankcase Heater Capacity {W}",
+                          "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
                           "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
                           "    Resistive,               !- Defrost Strategy",
                           "    TIMED,                   !- Defrost Control",

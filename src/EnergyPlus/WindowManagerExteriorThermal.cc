@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -115,7 +115,7 @@ namespace WindowManager {
         }
 
         for (int k = 1; k <= 2 * totSolidLayers; ++k) {
-            Guess.push_back(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(k));
+            Guess.push_back(state.dataSurface->SurfaceWindow(SurfNum).thetaFace[k]);
         }
 
         try {
@@ -134,26 +134,26 @@ namespace WindowManager {
                 aTemp = aLayer->getTemperature(aSide);
                 state.dataWindowManager->thetas[i - 1] = aTemp;
                 if (i == 1) {
-                    SurfOutsideTemp = aTemp - Constant::KelvinConv;
+                    SurfOutsideTemp = aTemp - Constant::Kelvin;
                 }
                 ++i;
             }
-            SurfInsideTemp = aTemp - Constant::KelvinConv;
+            SurfInsideTemp = aTemp - Constant::Kelvin;
             if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                 Real64 EffShBlEmiss;
                 Real64 EffGlEmiss;
                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
-                    EffShBlEmiss = General::InterpGeneral(
-                        window.EffShBlindEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                        window.EffShBlindEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
-                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
-                    EffGlEmiss = General::InterpGeneral(
-                        window.EffGlassEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                        window.EffGlassEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
-                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                    EffShBlEmiss =
+                        General::Interp(window.EffShBlindEmiss[state.dataSurface->SurfWinSlatsAngIndex(SurfNum)],
+                                        window.EffShBlindEmiss[std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)],
+                                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                    EffGlEmiss =
+                        General::Interp(window.EffGlassEmiss[state.dataSurface->SurfWinSlatsAngIndex(SurfNum)],
+                                        window.EffGlassEmiss[std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)],
+                                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                 } else {
-                    EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
-                    EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1);
+                    EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss[1];
+                    EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[1];
                 }
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
                     (EffShBlEmiss * SurfInsideTemp +
@@ -193,7 +193,7 @@ namespace WindowManager {
             Real64 NetIRHeatGainGlass =
                 ShadeArea * (glassEmiss * TauShIR / ShGlReflFacIR) *
                 (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas[state.dataWindowManager->nglface - 1], 4) - rmir);
-            Real64 tind = surface.getInsideAirTemperature(state, SurfNum) + Constant::KelvinConv;
+            Real64 tind = surface.getInsideAirTemperature(state, SurfNum) + Constant::Kelvin;
             Real64 ConvHeatGainFrZoneSideOfShade = ShadeArea * state.dataHeatBalSurf->SurfHConvInt(SurfNum) *
                                                    (state.dataWindowManager->thetas[state.dataWindowManager->nglfacep - 1] - tind);
             state.dataSurface->SurfWinHeatGain(SurfNum) =
@@ -204,14 +204,14 @@ namespace WindowManager {
             // Effective shade and glass emissivities that are used later for energy calculations.
             // This needs to be checked as well. (Simon)
             Real64 EffShBlEmiss = EpsShIR1 * (1.0 + RhoGlIR2 * TauShIR / (1.0 - RhoGlIR2 * RhoShIR2));
-            state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss = EffShBlEmiss;
+            std::fill(window.EffShBlindEmiss.begin(), window.EffShBlindEmiss.end(), EffShBlEmiss);
 
             Real64 EffGlEmiss = glassEmiss * TauShIR / (1.0 - RhoGlIR2 * RhoShIR2);
-            state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss = EffGlEmiss;
+            std::fill(window.EffGlassEmiss.begin(), window.EffGlassEmiss.end(), EffGlEmiss);
 
             Real64 glassTemperature = aGlassLayer->getSurface(FenestrationCommon::Side::Back)->getTemperature();
             state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
-                (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (glassTemperature - Constant::KelvinConv)) / (EffShBlEmiss + EffGlEmiss);
+                (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (glassTemperature - Constant::Kelvin)) / (EffShBlEmiss + EffGlEmiss);
 
         } else {
             // Another adoptation to old source that looks suspicious. Check if heat flow through
@@ -232,8 +232,9 @@ namespace WindowManager {
 
             state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
                 aLayers[totLayers - 1]->getTemperature(FenestrationCommon::Side::Back) - state.dataWindowManager->TKelvin;
-            state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss =
-                aLayers[totLayers - 1]->getSurface(FenestrationCommon::Side::Back)->getEmissivity();
+            std::fill(window.EffGlassEmiss.begin(),
+                      window.EffGlassEmiss.end(),
+                      aLayers[totLayers - 1]->getSurface(FenestrationCommon::Side::Back)->getEmissivity());
 
             state.dataSurface->SurfWinHeatGain(SurfNum) =
                 state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
@@ -247,12 +248,12 @@ namespace WindowManager {
         state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum);
 
         for (int k = 1; k <= surface.getTotLayers(state); ++k) {
-            state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas[2 * k - 2];
-            state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k) = state.dataWindowManager->thetas[2 * k - 1];
+            window.thetaFace[2 * k - 1] = state.dataWindowManager->thetas[2 * k - 2];
+            window.thetaFace[2 * k] = state.dataWindowManager->thetas[2 * k - 1];
 
             // temperatures for reporting
-            state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = state.dataWindowManager->thetas[2 * k - 2] - Constant::KelvinConv;
-            state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, k) = state.dataWindowManager->thetas[2 * k - 1] - Constant::KelvinConv;
+            state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = state.dataWindowManager->thetas[2 * k - 2] - Constant::Kelvin;
+            state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, k) = state.dataWindowManager->thetas[2 * k - 1] - Constant::Kelvin;
         }
     }
 
@@ -798,7 +799,7 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates indoor environment object from surface properties in EnergyPlus
-        Real64 tin = m_Surface.getInsideAirTemperature(state, m_SurfNum) + Constant::KelvinConv;
+        Real64 tin = m_Surface.getInsideAirTemperature(state, m_SurfNum) + Constant::Kelvin;
         Real64 hcin = state.dataHeatBalSurf->SurfHConvInt(m_SurfNum);
 
         Real64 IR = state.dataSurface->SurfWinIRfromParentZone(m_SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(m_SurfNum);
@@ -821,7 +822,7 @@ namespace WindowManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates outdoor environment object from surface properties in EnergyPlus
-        double tout = m_Surface.getOutsideAirTemperature(state, m_SurfNum) + Constant::KelvinConv;
+        double tout = m_Surface.getOutsideAirTemperature(state, m_SurfNum) + Constant::Kelvin;
         double IR = m_Surface.getOutsideIR(state, m_SurfNum);
         // double dirSolRad = SurfQRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
         double swRadiation = m_Surface.getSWIncident(state, m_SurfNum);
@@ -892,15 +893,15 @@ namespace WindowManager {
     std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getOutdoorNfrc(bool const useSummerConditions)
     {
         // NFRC 100 Section 4.3.1
-        Real64 airTemperature = -18.0 + Constant::KelvinConv; // Kelvins
-        Real64 airSpeed = 5.5;                                // meters per second
-        Real64 tSky = -18.0 + Constant::KelvinConv;           // Kelvins
-        Real64 solarRadiation = 0.;                           // W/m2
+        Real64 airTemperature = -18.0 + Constant::Kelvin; // Kelvins
+        Real64 airSpeed = 5.5;                            // meters per second
+        Real64 tSky = -18.0 + Constant::Kelvin;           // Kelvins
+        Real64 solarRadiation = 0.;                       // W/m2
         if (useSummerConditions) {
             // NFRC 200 Section 4.3.1
-            airTemperature = 32.0 + Constant::KelvinConv;
+            airTemperature = 32.0 + Constant::Kelvin;
             airSpeed = 2.75;
-            tSky = 32.0 + Constant::KelvinConv;
+            tSky = 32.0 + Constant::Kelvin;
             solarRadiation = 783.;
         }
         auto Outdoor = // (AUTO_OK_SPTR)
@@ -912,10 +913,10 @@ namespace WindowManager {
     std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getIndoorNfrc(bool const useSummerConditions)
     {
         // NFRC 100 Section 4.3.1
-        Real64 roomTemperature = 21. + Constant::KelvinConv;
+        Real64 roomTemperature = 21. + Constant::Kelvin;
         if (useSummerConditions) {
             // NFRC 200 Section 4.3.1
-            roomTemperature = 24. + Constant::KelvinConv;
+            roomTemperature = 24. + Constant::Kelvin;
         }
         return Tarcog::ISO15099::Environments::indoor(roomTemperature);
     }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -122,9 +122,6 @@ namespace VariableSpeedCoils {
                                std::string_view CompName,              // Coil Name
                                int &CompIndex,                         // Index for Component name
                                int const CyclingScheme,                // Continuous fan OR cycling compressor
-                               Real64 &MaxONOFFCyclesperHour,          // Maximum cycling rate of heat pump [cycles/hr]
-                               Real64 &HPTimeConstant,                 // Heat pump time constant [s]
-                               Real64 &FanDelayTime,                   // Fan delay time, time delay for the HP's fan to
                                CompressorOperation const CompressorOp, // compressor on/off. 0 = off; 1= on
                                Real64 const PartLoadFrac,
                                int const SpeedNum,            // compressor speed number
@@ -148,9 +145,8 @@ namespace VariableSpeedCoils {
         using General::SolveRoot;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int DXCoilNum;      // The WatertoAirHP that you are currently loading input into
-        Real64 RuntimeFrac; // run time fraction
-        int SpeedCal;       // variable for error proof speed input
+        int DXCoilNum; // The WatertoAirHP that you are currently loading input into
+        int SpeedCal;  // variable for error proof speed input
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (state.dataVariableSpeedCoils->GetCoilsInputFlag) { // First time subroutine has been entered
@@ -159,7 +155,7 @@ namespace VariableSpeedCoils {
         }
 
         if (CompIndex == 0) {
-            DXCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataVariableSpeedCoils->VarSpeedCoil);
+            DXCoilNum = Util::FindItemInList(CompName, state.dataVariableSpeedCoils->VarSpeedCoil);
             if (DXCoilNum == 0) {
                 ShowFatalError(state, format("WaterToAirHPVSWEquationFit not found={}", CompName));
             }
@@ -193,60 +189,20 @@ namespace VariableSpeedCoils {
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) ||
             (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_CoolingAirToAirVariableSpeed)) {
             // Cooling mode
-            InitVarSpeedCoil(state,
-                             DXCoilNum,
-                             MaxONOFFCyclesperHour,
-                             HPTimeConstant,
-                             FanDelayTime,
-                             SensLoad,
-                             LatentLoad,
-                             CyclingScheme,
-                             OnOffAirFlowRatio,
-                             SpeedRatio,
-                             SpeedCal);
-            CalcVarSpeedCoilCooling(state,
-                                    DXCoilNum,
-                                    CyclingScheme,
-                                    RuntimeFrac,
-                                    SensLoad,
-                                    LatentLoad,
-                                    CompressorOp,
-                                    PartLoadFrac,
-                                    OnOffAirFlowRatio,
-                                    SpeedRatio,
-                                    SpeedCal);
+            InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+            CalcVarSpeedCoilCooling(
+                state, DXCoilNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
             UpdateVarSpeedCoil(state, DXCoilNum);
         } else if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) ||
                    (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_HeatingAirToAirVariableSpeed)) {
             // Heating mode
-            InitVarSpeedCoil(state,
-                             DXCoilNum,
-                             MaxONOFFCyclesperHour,
-                             HPTimeConstant,
-                             FanDelayTime,
-                             SensLoad,
-                             LatentLoad,
-                             CyclingScheme,
-                             OnOffAirFlowRatio,
-                             SpeedRatio,
-                             SpeedCal);
-            CalcVarSpeedCoilHeating(
-                state, DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+            InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+            CalcVarSpeedCoilHeating(state, DXCoilNum, CyclingScheme, SensLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
             UpdateVarSpeedCoil(state, DXCoilNum);
         } else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == CoilDX_HeatPumpWaterHeaterVariableSpeed) {
             // Heating mode
-            InitVarSpeedCoil(state,
-                             DXCoilNum,
-                             MaxONOFFCyclesperHour,
-                             HPTimeConstant,
-                             FanDelayTime,
-                             SensLoad,
-                             LatentLoad,
-                             CyclingScheme,
-                             OnOffAirFlowRatio,
-                             SpeedRatio,
-                             SpeedCal);
-            CalcVarSpeedHPWH(state, DXCoilNum, RuntimeFrac, PartLoadFrac, SpeedRatio, SpeedNum, CyclingScheme);
+            InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+            CalcVarSpeedHPWH(state, DXCoilNum, PartLoadFrac, SpeedRatio, SpeedNum, CyclingScheme);
             UpdateVarSpeedCoil(state, DXCoilNum);
         } else {
             ShowFatalError(state, "SimVariableSpeedCoils: WatertoAir heatpump not in either HEATING or COOLING mode");
@@ -402,7 +358,10 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate = NumArray(5);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Twet_Rated = NumArray(6);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Gamma_Rated = NumArray(7);
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HOTGASREHEATFLG = int(NumArray(8));
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = NumArray(8);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LatentCapacityTimeConstant = NumArray(9);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime = NumArray(10);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HOTGASREHEATFLG = int(NumArray(11));
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = DataHeatBalance::RefrigCondenserType::Water;
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInletNodeNum =
@@ -503,14 +462,12 @@ namespace VariableSpeedCoils {
             }
 
             for (I = 1; I <= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++I) {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(9 + (I - 1) * 8);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedSHR(I) = NumArray(10 + (I - 1) * 8);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(11 + (I - 1) * 8);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(12 + (I - 1) * 8);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedEvaporatorFanPowerPerVolumeFlowRate2017(I) = NumArray(13 + (I - 1) * 8);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedEvaporatorFanPowerPerVolumeFlowRate2023(I) = NumArray(14 + (I - 1) * 8);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(I) = NumArray(15 + (I - 1) * 8);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSWasteHeatFrac(I) = NumArray(16 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(12 + (I - 1) * 6);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedSHR(I) = NumArray(13 + (I - 1) * 6);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(14 + (I - 1) * 6);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(15 + (I - 1) * 6);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(I) = NumArray(16 + (I - 1) * 6);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSWasteHeatFrac(I) = NumArray(17 + (I - 1) * 6);
 
                 AlfaFieldIncre = 7 + (I - 1) * 7;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) =
@@ -848,54 +805,51 @@ namespace VariableSpeedCoils {
             // CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit"
             SetupOutputVariable(state,
                                 "Cooling Coil Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "Electricity",
-                                "Cooling",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::SOVEndUseCat::CoolingCoils,
                                 {},
-                                "ENERGYTRANSFER",
-                                "COOLINGCOILS",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Cooling Coil Sensible Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySensible,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Latent Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLatent,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Source Side Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySource,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                Constant::eResource::PlantLoopCoolingDemand,
+                                OutputProcessor::SOVEndUseCat::CoolingCoils,
                                 {},
-                                "PLANTLOOPCOOLINGDEMAND",
-                                "COOLINGCOILS",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
 
             // for table output, being consistent with outher water-to-air coils
             //        IF (VarSpeedCoil(DXCoilNum)%RatedCapCoolTotal /= AutoSize) THEN
@@ -960,6 +914,9 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = NumArray(4);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Twet_Rated = NumArray(5);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Gamma_Rated = NumArray(6);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = NumArray(7);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LatentCapacityTimeConstant = NumArray(8);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime = NumArray(9);
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum =
                 GetOnlySingleNode(state,
@@ -1066,9 +1023,9 @@ namespace VariableSpeedCoils {
                 }
             }
 
-            if ((UtilityRoutines::SameString(AlphArray(6), "AirCooled")) || lAlphaBlanks(6)) {
+            if ((Util::SameString(AlphArray(6), "AirCooled")) || lAlphaBlanks(6)) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = DataHeatBalance::RefrigCondenserType::Air;
-            } else if (UtilityRoutines::SameString(AlphArray(6), "EvaporativelyCooled")) {
+            } else if (Util::SameString(AlphArray(6), "EvaporativelyCooled")) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = DataHeatBalance::RefrigCondenserType::Evap;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).ReportEvapCondVars = true;
             } else {
@@ -1080,38 +1037,51 @@ namespace VariableSpeedCoils {
                 ErrorsFound = true;
             }
 
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower = NumArray(7);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower = NumArray(10);
 
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower < 0.0) {
                 ShowSevereError(
                     state,
                     format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(7)));
-                ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(7)));
+                ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(10)));
+                ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(10)));
                 ErrorsFound = true;
             }
 
             // Set crankcase heater capacity
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity = NumArray(8);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity = NumArray(11);
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity < 0.0) {
                 ShowSevereError(
                     state,
                     format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(8)));
-                ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(8)));
+                ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(11)));
+                ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(11)));
                 ErrorsFound = true;
             }
 
             // Set crankcase heater cutout temperature
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater = NumArray(9);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater = NumArray(12);
 
             // Set crankcase heater cutout temperature
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MinOATCompressor = NumArray(10);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MinOATCompressor = NumArray(13);
+
+            // A7; \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
+            if (!lAlphaBlanks(7)) {
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, AlphArray(7));
+                ErrorsFound |=
+                    Curve::CheckCurveDims(state,
+                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex, // Curve index
+                                          {1},                                                                                     // Valid dimensions
+                                          RoutineName,                                                                             // Routine name
+                                          CurrentModuleObject,                                                                     // Object Type
+                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,                              // Object Name
+                                          cAlphaFields(7));                                                                        // Field Name
+            }
 
             // Get Water System tank connections
-            //  A7, \field Name of Water Storage Tank for Supply
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterSupplyName = AlphArray(7);
-            if (lAlphaBlanks(7)) {
+            //  A8, \field Name of Water Storage Tank for Supply
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterSupplyName = AlphArray(8);
+            if (lAlphaBlanks(8)) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromMains;
             } else {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromTank;
@@ -1124,9 +1094,9 @@ namespace VariableSpeedCoils {
                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterTankDemandARRID);
             }
 
-            // A8; \field Name of Water Storage Tank for Condensate Collection
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondensateCollectName = AlphArray(8);
-            if (lAlphaBlanks(8)) {
+            // A9; \field Name of Water Storage Tank for Condensate Collection
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondensateCollectName = AlphArray(9);
+            if (lAlphaBlanks(9)) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondensateCollectMode = CondensateDiscarded;
             } else {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondensateCollectMode = CondensateToTank;
@@ -1140,17 +1110,17 @@ namespace VariableSpeedCoils {
             }
 
             //   Basin heater power as a function of temperature must be greater than or equal to 0
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPowerFTempDiff = NumArray(11);
-            if (NumArray(11) < 0.0) {
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPowerFTempDiff = NumArray(14);
+            if (NumArray(14) < 0.0) {
                 ShowSevereError(
                     state,
                     format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                ShowContinueError(state, format("...{} must be >= 0.0.", cNumericFields(11)));
-                ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(11)));
+                ShowContinueError(state, format("...{} must be >= 0.0.", cNumericFields(14)));
+                ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(14)));
                 ErrorsFound = true;
             }
 
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterSetPointTemp = NumArray(12);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterSetPointTemp = NumArray(15);
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPowerFTempDiff > 0.0) {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterSetPointTemp < 2.0) {
                     ShowWarningError(state,
@@ -1158,42 +1128,42 @@ namespace VariableSpeedCoils {
                                             RoutineName,
                                             CurrentModuleObject,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                    ShowContinueError(state, format("...{} is < 2 {{C}}. Freezing could occur.", cNumericFields(12)));
-                    ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(12)));
+                    ShowContinueError(state, format("...{} is < 2 {{C}}. Freezing could occur.", cNumericFields(15)));
+                    ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(15)));
                 }
             }
 
-            if (!lAlphaBlanks(9)) {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterSchedulePtr = GetScheduleIndex(state, AlphArray(9));
+            if (!lAlphaBlanks(10)) {
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterSchedulePtr = GetScheduleIndex(state, AlphArray(10));
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterSchedulePtr == 0) {
                     ShowWarningError(
                         state,
                         format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(14), AlphArray(9)));
+                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(10), AlphArray(10)));
                     ShowContinueError(state, "Basin heater will be available to operate throughout the simulation.");
                 }
             }
 
             for (I = 1; I <= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++I) {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(13 + (I - 1) * 8);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedSHR(I) = NumArray(14 + (I - 1) * 8);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(15 + (I - 1) * 8);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(16 + (I - 1) * 8);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedEvaporatorFanPowerPerVolumeFlowRate2017(I) = NumArray(17 + (I - 1) * 8);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedEvaporatorFanPowerPerVolumeFlowRate2023(I) = NumArray(18 + (I - 1) * 8);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondAirFlow(I) = NumArray(19 + (I - 1) * 8);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondEffect(I) = NumArray(20 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(16 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedSHR(I) = NumArray(17 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(18 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(19 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedEvaporatorFanPowerPerVolumeFlowRate2017(I) = NumArray(20 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedEvaporatorFanPowerPerVolumeFlowRate2023(I) = NumArray(21 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondAirFlow(I) = NumArray(22 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondEffect(I) = NumArray(23 + (I - 1) * 8);
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondEffect(I) < 0.0 ||
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondEffect(I) > 1.0) {
                     ShowSevereError(
                         state,
                         format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                    ShowContinueError(state, format("...{} cannot be < 0.0 or > 1.0.", cNumericFields(20 + (I - 1) * 8)));
-                    ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(20 + (I - 1) * 8)));
+                    ShowContinueError(state, format("...{} cannot be < 0.0 or > 1.0.", cNumericFields(23 + (I - 1) * 8)));
+                    ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(23 + (I - 1) * 8)));
                     ErrorsFound = true;
                 }
 
-                AlfaFieldIncre = 10 + (I - 1) * 4;
+                AlfaFieldIncre = 11 + (I - 1) * 4;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) =
                     GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) == 0) {
@@ -1239,7 +1209,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 11 + (I - 1) * 4;
+                AlfaFieldIncre = 12 + (I - 1) * 4;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) =
                     GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) == 0) {
@@ -1284,7 +1254,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 12 + (I - 1) * 4;
+                AlfaFieldIncre = 13 + (I - 1) * 4;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) =
                     GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) == 0) {
@@ -1330,7 +1300,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 13 + (I - 1) * 4;
+                AlfaFieldIncre = 14 + (I - 1) * 4;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) =
                     GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) == 0) {
@@ -1392,45 +1362,43 @@ namespace VariableSpeedCoils {
             // CurrentModuleObject = "Coil:Cooling:DX:VariableSpeed"
             SetupOutputVariable(state,
                                 "Cooling Coil Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "Electricity",
-                                "Cooling",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::SOVEndUseCat::CoolingCoils,
                                 {},
-                                "ENERGYTRANSFER",
-                                "COOLINGCOILS",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Cooling Coil Sensible Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySensible,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Latent Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLatent,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Source Side Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySource,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -1489,6 +1457,11 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = NumArray(4);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate = NumArray(5);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = DataHeatBalance::RefrigCondenserType::Water;
+
+            // Previously set by parent objects, but not user-definable
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = 4;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LatentCapacityTimeConstant = 0.;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime = 0.;
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInletNodeNum =
                 GetOnlySingleNode(state,
@@ -1704,7 +1677,7 @@ namespace VariableSpeedCoils {
                                                RoutineName,
                                                CurrentModuleObject,
                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                        ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(AlfaFieldIncre), AlphArray(14 + (I - 1) * 6)));
+                        ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(AlfaFieldIncre), AlphArray(AlfaFieldIncre)));
                     }
                     ErrorsFound = true;
                 } else {
@@ -1797,7 +1770,7 @@ namespace VariableSpeedCoils {
                                                RoutineName,
                                                CurrentModuleObject,
                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                        ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(AlfaFieldIncre), AlphArray(16 + (I - 1) * 6)));
+                        ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(AlfaFieldIncre), AlphArray(AlfaFieldIncre)));
                     }
                     ErrorsFound = true;
                 } else {
@@ -1936,40 +1909,37 @@ namespace VariableSpeedCoils {
             // CurrentModuleObject = "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit"
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Heating,
                                 {},
-                                "Electricity",
-                                "Heating",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils,
                                 {},
-                                "ENERGYTRANSFER",
-                                "HEATINGCOILS",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Heating Coil Source Side Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySource,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                Constant::eResource::PlantLoopHeatingDemand,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils,
                                 {},
-                                "PLANTLOOPHEATINGDEMAND",
-                                "HEATINGCOILS",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
 
             // create predefined report entries
             PreDefTableEntry(
@@ -2018,6 +1988,11 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel = int(NumArray(2));
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapHeat = NumArray(3);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = NumArray(4);
+
+            // Previously set by parent objects, but not user-definable
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = 4;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LatentCapacityTimeConstant = 0.;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime = 0.;
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum =
                 GetOnlySingleNode(state,
@@ -2096,7 +2071,19 @@ namespace VariableSpeedCoils {
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostEIRFT = GetCurveIndex(state, AlphArray(5)); // convert curve name to number
 
-            if (UtilityRoutines::SameString(AlphArray(6), "ReverseCycle")) {
+            if (!lAlphaBlanks(6)) {
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, AlphArray(6));
+                ErrorsFound |=
+                    Curve::CheckCurveDims(state,
+                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex, // Curve index
+                                          {1},                                                                                     // Valid dimensions
+                                          RoutineName,                                                                             // Routine name
+                                          CurrentModuleObject,                                                                     // Object Type
+                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,                              // Object Name
+                                          cAlphaFields(6));                                                                        // Field Name
+            }
+
+            if (Util::SameString(AlphArray(7), "ReverseCycle")) {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostEIRFT == 0) {
                     if (lAlphaBlanks(5)) {
                         ShowSevereError(state,
@@ -2105,7 +2092,7 @@ namespace VariableSpeedCoils {
                                                CurrentModuleObject,
                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
                         ShowContinueError(state, format("...required {} is blank.", cAlphaFields(5)));
-                        ShowContinueError(state, format("...field is required because {} is \"ReverseCycle\".", cAlphaFields(6)));
+                        ShowContinueError(state, format("...field is required because {} is \"ReverseCycle\".", cAlphaFields(7)));
                     } else {
                         ShowSevereError(state,
                                         format("{}{}=\"{}\", invalid",
@@ -2127,27 +2114,24 @@ namespace VariableSpeedCoils {
                 }
             }
 
-            if (UtilityRoutines::SameString(AlphArray(6), "ReverseCycle"))
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostStrategy = ReverseCycle;
-            if (UtilityRoutines::SameString(AlphArray(6), "Resistive"))
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostStrategy = Resistive;
+            if (Util::SameString(AlphArray(7), "ReverseCycle")) state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostStrategy = ReverseCycle;
+            if (Util::SameString(AlphArray(7), "Resistive")) state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostStrategy = Resistive;
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostStrategy == 0) {
                 ShowSevereError(
                     state,
                     format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                ShowContinueError(state, format("...illegal {}=\"{}\".", cAlphaFields(6), AlphArray(6)));
+                ShowContinueError(state, format("...illegal {}=\"{}\".", cAlphaFields(7), AlphArray(7)));
                 ShowContinueError(state, "...valid values for this field are ReverseCycle or Resistive.");
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(AlphArray(7), "Timed")) state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostControl = Timed;
-            if (UtilityRoutines::SameString(AlphArray(7), "OnDemand"))
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostControl = OnDemand;
+            if (Util::SameString(AlphArray(8), "Timed")) state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostControl = Timed;
+            if (Util::SameString(AlphArray(8), "OnDemand")) state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostControl = OnDemand;
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostControl == 0) {
                 ShowSevereError(
                     state,
                     format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                ShowContinueError(state, format("...illegal {}=\"{}\".", cAlphaFields(7), AlphArray(7)));
+                ShowContinueError(state, format("...illegal {}=\"{}\".", cAlphaFields(8), AlphArray(8)));
                 ShowContinueError(state, "...valid values for this field are Timed or OnDemand.");
                 ErrorsFound = true;
             }
@@ -2213,7 +2197,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 }
 
-                AlfaFieldIncre = 8 + (I - 1) * 4;
+                AlfaFieldIncre = 9 + (I - 1) * 4;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) =
                     GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) == 0) {
@@ -2259,7 +2243,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 9 + (I - 1) * 4;
+                AlfaFieldIncre = 10 + (I - 1) * 4;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) =
                     GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) == 0) {
@@ -2304,7 +2288,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 10 + (I - 1) * 4;
+                AlfaFieldIncre = 11 + (I - 1) * 4;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) =
                     GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) == 0) {
@@ -2350,7 +2334,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 11 + (I - 1) * 4;
+                AlfaFieldIncre = 12 + (I - 1) * 4;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) =
                     GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) == 0) {
@@ -2411,31 +2395,29 @@ namespace VariableSpeedCoils {
             // CurrentModuleObject = "Coil:Heating:DX:Variablespeed "
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Heating,
                                 {},
-                                "Electricity",
-                                "Heating",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils,
                                 {},
-                                "ENERGYTRANSFER",
-                                "HEATINGCOILS",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Heating Coil Source Side Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySource,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -2550,9 +2532,9 @@ namespace VariableSpeedCoils {
                 }
             }
 
-            if (UtilityRoutines::SameString(AlphArray(2), "Yes") || UtilityRoutines::SameString(AlphArray(2), "No")) {
+            if (Util::SameString(AlphArray(2), "Yes") || Util::SameString(AlphArray(2), "No")) {
                 //  initialized to TRUE on allocate
-                if (UtilityRoutines::SameString(AlphArray(2), "No"))
+                if (Util::SameString(AlphArray(2), "No"))
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanPowerIncludedInCOP = false;
                 else
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanPowerIncludedInCOP = true;
@@ -2565,9 +2547,9 @@ namespace VariableSpeedCoils {
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(AlphArray(3), "Yes") || UtilityRoutines::SameString(AlphArray(3), "No")) {
+            if (Util::SameString(AlphArray(3), "Yes") || Util::SameString(AlphArray(3), "No")) {
                 //  initialized to FALSE on allocate
-                if (UtilityRoutines::SameString(AlphArray(3), "Yes"))
+                if (Util::SameString(AlphArray(3), "Yes"))
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondPumpPowerInCOP = true;
                 else
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondPumpPowerInCOP = false;
@@ -2580,9 +2562,9 @@ namespace VariableSpeedCoils {
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(AlphArray(4), "Yes") || UtilityRoutines::SameString(AlphArray(4), "No")) {
+            if (Util::SameString(AlphArray(4), "Yes") || Util::SameString(AlphArray(4), "No")) {
                 //  initialized to FALSE on allocate
-                if (UtilityRoutines::SameString(AlphArray(4), "Yes"))
+                if (Util::SameString(AlphArray(4), "Yes"))
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondPumpHeatInCapacity = true;
                 else
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondPumpHeatInCapacity = false;
@@ -2681,17 +2663,29 @@ namespace VariableSpeedCoils {
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(AlphArray(9), "DryBulbTemperature")) {
+            if (!lAlphaBlanks(9)) {
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, AlphArray(9));
+                ErrorsFound |=
+                    Curve::CheckCurveDims(state,
+                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex, // Curve index
+                                          {1},                                                                                     // Valid dimensions
+                                          RoutineName,                                                                             // Routine name
+                                          CurrentModuleObject,                                                                     // Object Type
+                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,                              // Object Name
+                                          cAlphaFields(9));                                                                        // Field Name
+            }
+
+            if (Util::SameString(AlphArray(10), "DryBulbTemperature")) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType = DryBulbIndicator;
-            } else if (UtilityRoutines::SameString(AlphArray(9), "WetBulbTemperature")) {
+            } else if (Util::SameString(AlphArray(10), "WetBulbTemperature")) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType = WetBulbIndicator;
             } else {
                 //   wrong temperature type selection
                 ShowSevereError(
                     state,
                     format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                ShowContinueError(state, format("...{} must be DryBulbTemperature or WetBulbTemperature.", cAlphaFields(9)));
-                ShowContinueError(state, format("...entered value=\"{}\".", AlphArray(9)));
+                ShowContinueError(state, format("...{} must be DryBulbTemperature or WetBulbTemperature.", cAlphaFields(10)));
+                ShowContinueError(state, format("...entered value=\"{}\".", AlphArray(10)));
                 ErrorsFound = true;
             }
 
@@ -2705,18 +2699,18 @@ namespace VariableSpeedCoils {
             WHInletWaterTemp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletWaterTemp;
 
             // part load curve
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PLFFPLR = GetCurveIndex(state, AlphArray(10)); // convert curve name to number
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PLFFPLR = GetCurveIndex(state, AlphArray(11)); // convert curve name to number
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PLFFPLR == 0) {
-                if (lAlphaBlanks(10)) {
+                if (lAlphaBlanks(11)) {
                     ShowSevereError(
                         state,
                         format("{}{}=\"{}\", missing", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(10)));
+                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(11)));
                 } else {
                     ShowSevereError(
                         state,
                         format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(10), AlphArray(10)));
+                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(11), AlphArray(11)));
                 }
                 ErrorsFound = true;
             } else {
@@ -2727,7 +2721,7 @@ namespace VariableSpeedCoils {
                                             RoutineName,
                                             CurrentModuleObject,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                    ShowContinueError(state, format("...{} output is not equal to 1.0 (+ or - 10%) at rated conditions.", cAlphaFields(10)));
+                    ShowContinueError(state, format("...{} output is not equal to 1.0 (+ or - 10%) at rated conditions.", cAlphaFields(11)));
                     ShowContinueError(state, format("...Curve output at rated conditions = {:.3T}", CurveVal));
                 }
             }
@@ -2740,7 +2734,7 @@ namespace VariableSpeedCoils {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(I) = NumArray(16 + (I - 1) * 6);
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSWHPumpPower(I) = NumArray(17 + (I - 1) * 6);
 
-                AlfaFieldIncre = 11 + (I - 1) * 6;
+                AlfaFieldIncre = 12 + (I - 1) * 6;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) =
                     GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) == 0) {
@@ -2786,7 +2780,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 12 + (I - 1) * 6;
+                AlfaFieldIncre = 13 + (I - 1) * 6;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) =
                     GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) == 0) {
@@ -2831,7 +2825,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 13 + (I - 1) * 6;
+                AlfaFieldIncre = 14 + (I - 1) * 6;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I) =
                     GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I) == 0) {
@@ -2876,7 +2870,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 14 + (I - 1) * 6;
+                AlfaFieldIncre = 15 + (I - 1) * 6;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) =
                     GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) == 0) {
@@ -2922,7 +2916,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 15 + (I - 1) * 6;
+                AlfaFieldIncre = 16 + (I - 1) * 6;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) =
                     GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) == 0) {
@@ -2967,7 +2961,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 16 + (I - 1) * 6;
+                AlfaFieldIncre = 17 + (I - 1) * 6;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I) =
                     GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I) == 0) {
@@ -3033,60 +3027,57 @@ namespace VariableSpeedCoils {
             // CurrentModuleObject = "Coil:Waterheating:Airtowaterheatpump:Variablespeed"
             SetupOutputVariable(state,
                                 "Cooling Coil Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Heating,
                                 {},
-                                "Electricity",
-                                "Heating",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Cooling Coil Sensible Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySensible,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Latent Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLatent,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Water Side Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergySource,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                Constant::eResource::PlantLoopHeatingDemand,
+                                OutputProcessor::SOVEndUseCat::HeatingCoils,
                                 {},
-                                "PLANTLOOPHEATINGDEMAND",
-                                "HEATINGCOILS",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
 
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).IsDXCoilInZone) {
                 SetupOutputVariable(state,
                                     "Cooling Coil Cooling Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                    Constant::eResource::EnergyTransfer,
+                                    OutputProcessor::SOVEndUseCat::CoolingCoils,
                                     {},
-                                    "ENERGYTRANSFER",
-                                    "COOLINGCOILS",
-                                    {},
-                                    "System");
+                                    OutputProcessor::SOVGroup::HVAC);
             } else {
                 SetupOutputVariable(state,
                                     "Cooling Coil Cooling Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EnergyLoadTotal,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
@@ -3119,98 +3110,98 @@ namespace VariableSpeedCoils {
                     // air source cooling coils
                     SetupOutputVariable(state,
                                         "Cooling Coil Air Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Air Inlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Air Inlet Humidity Ratio",
-                                        OutputProcessor::Unit::kgWater_kgDryAir,
+                                        Constant::Units::kgWater_kgDryAir,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Latent Cooling Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLatent,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Air Outlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Air Outlet Humidity Ratio",
-                                        OutputProcessor::Unit::kgWater_kgDryAir,
+                                        Constant::Units::kgWater_kgDryAir,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Sensible Cooling Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSensible,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Total Cooling Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Part Load Ratio",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Electricity Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Runtime Fraction",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Source Side Heat Transfer Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSource,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Upper Speed Level",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SpeedNumReport,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Neighboring Speed Levels Ratio",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SpeedRatioReport,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -3219,186 +3210,180 @@ namespace VariableSpeedCoils {
                     if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondensateCollectMode == CondensateToTank) {
                         SetupOutputVariable(state,
                                             "Cooling Coil Condensate Volume Flow Rate",
-                                            OutputProcessor::Unit::m3_s,
+                                            Constant::Units::m3_s,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondensateVdot,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                         SetupOutputVariable(state,
                                             "Cooling Coil Condensate Volume",
-                                            OutputProcessor::Unit::m3,
+                                            Constant::Units::m3,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondensateVol,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                            Constant::eResource::OnSiteWater,
+                                            OutputProcessor::SOVEndUseCat::Condensate,
                                             {},
-                                            "OnSiteWater",
-                                            "Condensate",
-                                            {},
-                                            "System");
+                                            OutputProcessor::SOVGroup::HVAC);
                     }
 
                     if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).ReportEvapCondVars) {
                         SetupOutputVariable(state,
                                             "Cooling Coil Condenser Inlet Temperature",
-                                            OutputProcessor::Unit::C,
+                                            Constant::Units::C,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondInletTemp,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                         SetupOutputVariable(state,
                                             "Cooling Coil Evaporative Condenser Water Volume",
-                                            OutputProcessor::Unit::m3,
+                                            Constant::Units::m3,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterConsump,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                            Constant::eResource::Water,
+                                            OutputProcessor::SOVEndUseCat::Cooling,
                                             {},
-                                            "Water",
-                                            "Cooling",
-                                            {},
-                                            "System");
+                                            OutputProcessor::SOVGroup::HVAC);
                         SetupOutputVariable(state,
                                             "Cooling Coil Evaporative Condenser Mains Water Volume",
-                                            OutputProcessor::Unit::m3,
+                                            Constant::Units::m3,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterConsump,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                            Constant::eResource::MainsWater,
+                                            OutputProcessor::SOVEndUseCat::Cooling,
                                             {},
-                                            "MainsWater",
-                                            "Cooling",
-                                            {},
-                                            "System");
+                                            OutputProcessor::SOVGroup::HVAC);
                         SetupOutputVariable(state,
                                             "Cooling Coil Evaporative Condenser Pump Electricity Rate",
-                                            OutputProcessor::Unit::W,
+                                            Constant::Units::W,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecPower,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Average,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                         SetupOutputVariable(state,
                                             "Cooling Coil Evaporative Condenser Pump Electricity Energy",
-                                            OutputProcessor::Unit::J,
+                                            Constant::Units::J,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecConsumption,
                                             OutputProcessor::SOVTimeStepType::System,
                                             OutputProcessor::SOVStoreType::Summed,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                            Constant::eResource::Electricity,
+                                            OutputProcessor::SOVEndUseCat::Cooling,
                                             {},
-                                            "Electricity",
-                                            "COOLING",
-                                            {},
-                                            "System");
+                                            OutputProcessor::SOVGroup::HVAC);
                         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPowerFTempDiff > 0.0) {
                             SetupOutputVariable(state,
                                                 "Cooling Coil Basin Heater Electricity Rate",
-                                                OutputProcessor::Unit::W,
+                                                Constant::Units::W,
                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPower,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Average,
                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                             SetupOutputVariable(state,
                                                 "Cooling Coil Basin Heater Electricity Energy",
-                                                OutputProcessor::Unit::J,
+                                                Constant::Units::J,
                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterConsumption,
                                                 OutputProcessor::SOVTimeStepType::System,
                                                 OutputProcessor::SOVStoreType::Summed,
                                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                                Constant::eResource::Electricity,
+                                                OutputProcessor::SOVEndUseCat::Cooling,
                                                 {},
-                                                "Electricity",
-                                                "COOLING",
-                                                {},
-                                                "System");
+                                                OutputProcessor::SOVGroup::HVAC);
                         }
                     }
 
                     SetupOutputVariable(state,
                                         "Cooling Coil Crankcase Heater Electricity Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Crankcase Heater Electricity Energy",
-                                        OutputProcessor::Unit::J,
+                                        Constant::Units::J,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterConsumption,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                        Constant::eResource::Electricity,
+                                        OutputProcessor::SOVEndUseCat::Cooling,
                                         {},
-                                        "Electricity",
-                                        "COOLING",
-                                        {},
-                                        "System");
+                                        OutputProcessor::SOVGroup::HVAC);
                 } else {
                     // air source heating coils
                     SetupOutputVariable(state,
                                         "Heating Coil Air Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Air Inlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Air Inlet Humidity Ratio",
-                                        OutputProcessor::Unit::kgWater_kgDryAir,
+                                        Constant::Units::kgWater_kgDryAir,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Air Outlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Air Outlet Humidity Ratio",
-                                        OutputProcessor::Unit::kgWater_kgDryAir,
+                                        Constant::Units::kgWater_kgDryAir,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Sensible Heating Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSensible,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Heating Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Part Load Ratio",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Electricity Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Runtime Fraction",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -3406,21 +3391,21 @@ namespace VariableSpeedCoils {
 
                     SetupOutputVariable(state,
                                         "Heating Coil Source Side Heat Transfer Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSource,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Upper Speed Level",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SpeedNumReport,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Neighboring Speed Levels Ratio",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SpeedRatioReport,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -3428,42 +3413,40 @@ namespace VariableSpeedCoils {
 
                     SetupOutputVariable(state,
                                         "Heating Coil Defrost Electricity Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Defrost Electricity Energy",
-                                        OutputProcessor::Unit::J,
+                                        Constant::Units::J,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostConsumption,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                        Constant::eResource::Electricity,
+                                        OutputProcessor::SOVEndUseCat::Heating,
                                         {},
-                                        "Electricity",
-                                        "HEATING",
-                                        {},
-                                        "System");
+                                        OutputProcessor::SOVGroup::HVAC);
                     SetupOutputVariable(state,
                                         "Heating Coil Crankcase Heater Electricity Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Crankcase Heater Electricity Energy",
-                                        OutputProcessor::Unit::J,
+                                        Constant::Units::J,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterConsumption,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                        Constant::eResource::Electricity,
+                                        OutputProcessor::SOVEndUseCat::Heating,
                                         {},
-                                        "Electricity",
-                                        "HEATING",
-                                        {},
-                                        "System");
+                                        OutputProcessor::SOVGroup::HVAC);
                 }
             } else {
 
@@ -3472,49 +3455,49 @@ namespace VariableSpeedCoils {
                     // Setup Report variables for water source Heat Pump
                     SetupOutputVariable(state,
                                         "Cooling Coil Electricity Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Total Cooling Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Sensible Cooling Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSensible,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Latent Cooling Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLatent,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Source Side Heat Transfer Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSource,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Part Load Ratio",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Runtime Fraction",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -3522,56 +3505,56 @@ namespace VariableSpeedCoils {
 
                     SetupOutputVariable(state,
                                         "Cooling Coil Air Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Air Inlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Air Inlet Humidity Ratio",
-                                        OutputProcessor::Unit::kgWater_kgDryAir,
+                                        Constant::Units::kgWater_kgDryAir,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Air Outlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Air Outlet Humidity Ratio",
-                                        OutputProcessor::Unit::kgWater_kgDryAir,
+                                        Constant::Units::kgWater_kgDryAir,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Source Side Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterMassFlowRate,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Source Side Inlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Source Side Outlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletWaterTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -3579,21 +3562,21 @@ namespace VariableSpeedCoils {
 
                     SetupOutputVariable(state,
                                         "Cooling Coil Upper Speed Level",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SpeedNumReport,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Neighboring Speed Levels Ratio",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SpeedRatioReport,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Recoverable Heat Transfer Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QWasteHeat,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -3604,21 +3587,21 @@ namespace VariableSpeedCoils {
                     // Setup Report variables for water source Heat Pump
                     SetupOutputVariable(state,
                                         "Heating Coil Electricity Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Heating Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Sensible Heating Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSensible,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -3626,21 +3609,21 @@ namespace VariableSpeedCoils {
 
                     SetupOutputVariable(state,
                                         "Heating Coil Source Side Heat Transfer Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSource,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Part Load Ratio",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Runtime Fraction",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -3648,56 +3631,56 @@ namespace VariableSpeedCoils {
 
                     SetupOutputVariable(state,
                                         "Heating Coil Air Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Air Inlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Air Inlet Humidity Ratio",
-                                        OutputProcessor::Unit::kgWater_kgDryAir,
+                                        Constant::Units::kgWater_kgDryAir,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Air Outlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Air Outlet Humidity Ratio",
-                                        OutputProcessor::Unit::kgWater_kgDryAir,
+                                        Constant::Units::kgWater_kgDryAir,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Source Side Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterMassFlowRate,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Source Side Inlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Source Side Outlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletWaterTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -3705,21 +3688,21 @@ namespace VariableSpeedCoils {
 
                     SetupOutputVariable(state,
                                         "Heating Coil Upper Speed Level",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SpeedNumReport,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Neighboring Speed Levels Ratio",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SpeedRatioReport,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Heating Coil Recoverable Heat Transfer Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QWasteHeat,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -3728,49 +3711,49 @@ namespace VariableSpeedCoils {
                     // air source water heating coil
                     SetupOutputVariable(state,
                                         "Cooling Coil Water Heating Electricity Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Total Cooling Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Sensible Cooling Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSensible,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Latent Cooling Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLatent,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Total Water Heating Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).TotalHeatingEnergyRate,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Part Load Ratio",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Runtime Fraction",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -3778,56 +3761,56 @@ namespace VariableSpeedCoils {
 
                     SetupOutputVariable(state,
                                         "Cooling Coil Air Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Air Inlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Air Inlet Humidity Ratio",
-                                        OutputProcessor::Unit::kgWater_kgDryAir,
+                                        Constant::Units::kgWater_kgDryAir,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Air Outlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Air Outlet Humidity Ratio",
-                                        OutputProcessor::Unit::kgWater_kgDryAir,
+                                        Constant::Units::kgWater_kgDryAir,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Water Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
+                                        Constant::Units::kg_s,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterMassFlowRate,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Water Inlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Water Outlet Temperature",
-                                        OutputProcessor::Unit::C,
+                                        Constant::Units::C,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletWaterTemp,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -3835,34 +3818,33 @@ namespace VariableSpeedCoils {
 
                     SetupOutputVariable(state,
                                         "Cooling Coil Crankcase Heater Electricity Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Crankcase Heater Electricity Energy",
-                                        OutputProcessor::Unit::J,
+                                        Constant::Units::J,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterConsumption,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                        Constant::eResource::Electricity,
+                                        OutputProcessor::SOVEndUseCat::Heating,
                                         {},
-                                        "Electricity",
-                                        "HEATING",
-                                        {},
-                                        "System");
+                                        OutputProcessor::SOVGroup::HVAC);
 
                     SetupOutputVariable(state,
                                         "Cooling Coil Upper Speed Level",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SpeedNumReport,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Neighboring Speed Levels Ratio",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SpeedRatioReport,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -3870,23 +3852,22 @@ namespace VariableSpeedCoils {
 
                     SetupOutputVariable(state,
                                         "Cooling Coil Water Heating Pump Electricity Rate",
-                                        OutputProcessor::Unit::W,
+                                        Constant::Units::W,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Cooling Coil Water Heating Pump Electricity Energy",
-                                        OutputProcessor::Unit::J,
+                                        Constant::Units::J,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecConsumption,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Summed,
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                        Constant::eResource::Electricity,
+                                        OutputProcessor::SOVEndUseCat::Heating,
                                         {},
-                                        "Electricity",
-                                        "HEATING",
-                                        {},
-                                        "System");
+                                        OutputProcessor::SOVGroup::HVAC);
                 }
             }
         }
@@ -3902,9 +3883,6 @@ namespace VariableSpeedCoils {
 
     void InitVarSpeedCoil(EnergyPlusData &state,
                           int const DXCoilNum,                             // Current DXCoilNum under simulation
-                          Real64 const MaxONOFFCyclesperHour,              // Maximum cycling rate of heat pump [cycles/hr]
-                          Real64 const HPTimeConstant,                     // Heat pump time constant [s]
-                          Real64 const FanDelayTime,                       // Fan delay time, time delay for the HP's fan to
                           Real64 const SensLoad,                           // Control zone sensible load[W]
                           Real64 const LatentLoad,                         // Control zone latent load[W]
                           int const CyclingScheme,                         // fan operating mode
@@ -4140,7 +4118,7 @@ namespace VariableSpeedCoils {
                 }
 
                 // calculate coil model at rating point
-                Real64 runtimeFrac(1.0);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 1.0;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DesignAirMassFlowRate =
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds);
@@ -4157,7 +4135,6 @@ namespace VariableSpeedCoils {
                 CalcVarSpeedCoilCooling(state,
                                         DXCoilNum,
                                         2.0,
-                                        runtimeFrac,
                                         SensLoad,
                                         LatentLoad,
                                         CompressorOperation::On,
@@ -4277,7 +4254,7 @@ namespace VariableSpeedCoils {
                 }
 
                 // calculate coil model at rating point
-                Real64 runtimeFrac(1.0);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 1.0;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DesignAirMassFlowRate =
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds);
@@ -4293,7 +4270,6 @@ namespace VariableSpeedCoils {
                 CalcVarSpeedCoilHeating(state,
                                         DXCoilNum,
                                         2.0,
-                                        runtimeFrac,
                                         SensLoad,
                                         CompressorOperation::On,
                                         1.0,
@@ -4423,10 +4399,6 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 0.0;
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio = 0.0;
 
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = MaxONOFFCyclesperHour;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPTimeConstant = HPTimeConstant;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime = FanDelayTime;
-
             if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_HeatingWaterToAirHPVSEquationFit) ||
                 (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_CoolingWaterToAirHPVSEquationFit)) {
                 WaterInletNode = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInletNodeNum;
@@ -4551,10 +4523,6 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat = state.dataLoopNodes->Node(AirInletNode).HumRat;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy = state.dataLoopNodes->Node(AirInletNode).Enthalpy;
 
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = MaxONOFFCyclesperHour;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPTimeConstant = HPTimeConstant;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime = FanDelayTime;
-
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirPressure = state.dataEnvrn->OutBaroPress; // temporary
         // Outlet variables
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power = 0.0;
@@ -4582,6 +4550,7 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterConsumption = 0.0;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecConsumption = 0.0;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower = 0.0;
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower = 0.0;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostConsumption = 0.0;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondensateVdot = 0.0;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondensateVol = 0.0;
@@ -5879,13 +5848,12 @@ namespace VariableSpeedCoils {
     }
 
     void CalcVarSpeedCoilCooling(EnergyPlusData &state,
-                                 int const DXCoilNum,                        // Heat Pump Number
-                                 int const CyclingScheme,                    // Fan/Compressor cycling scheme indicator
-                                 Real64 &RuntimeFrac,                        // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-                                 [[maybe_unused]] Real64 const SensDemand,   // Cooling Sensible Demand [W] !unused1208
-                                 [[maybe_unused]] Real64 const LatentDemand, // Cooling Latent Demand [W]
-                                 CompressorOperation const CompressorOp,     // compressor operation flag
-                                 Real64 const PartLoadRatio,                 // compressor part load ratio
+                                 int const DXCoilNum,                             // Heat Pump Number
+                                 int const CyclingScheme,                         // Fan/Compressor cycling scheme indicator
+                                 [[maybe_unused]] Real64 const SensDemand,        // Cooling Sensible Demand [W] !unused1208
+                                 [[maybe_unused]] Real64 const LatentDemand,      // Cooling Latent Demand [W]
+                                 CompressorOperation const CompressorOp,          // compressor operation flag
+                                 Real64 const PartLoadRatio,                      // compressor part load ratio
                                  [[maybe_unused]] Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
                                  Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
                                  int const SpeedNum       // Speed number, high bound
@@ -6092,6 +6060,12 @@ namespace VariableSpeedCoils {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater) {
                 state.dataVariableSpeedCoils->CrankcaseHeatingPower_CalcVarSpeedCoilCooling =
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity;
+                if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex > 0) {
+                    state.dataVariableSpeedCoils->CrankcaseHeatingPower_CalcVarSpeedCoilCooling *=
+                        Curve::CurveValue(state,
+                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex,
+                                          state.dataEnvrn->OutDryBulbTemp);
+                }
             } else {
                 state.dataVariableSpeedCoils->CrankcaseHeatingPower_CalcVarSpeedCoilCooling = 0.0;
             }
@@ -6155,7 +6129,6 @@ namespace VariableSpeedCoils {
         LoadSideInletEnth_Unit = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy;
         CpAir_Unit = PsyCpAirFnW(LoadSideInletHumRat_Unit);
 
-        RuntimeFrac = 1.0;
         state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 1.0;
         if ((SpeedNum == 1) && (PartLoadRatio < 1.0)) {
@@ -6175,8 +6148,6 @@ namespace VariableSpeedCoils {
             } else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac < 0.0) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 0.0;
             }
-
-            RuntimeFrac = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac;
         }
 
         while (true) {
@@ -6439,7 +6410,7 @@ namespace VariableSpeedCoils {
                                               DXCoilNum,
                                               SHRss,
                                               CyclingScheme,
-                                              RuntimeFrac,
+                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac,
                                               state.dataVariableSpeedCoils->QLatRated,
                                               state.dataVariableSpeedCoils->QLatActual,
                                               state.dataVariableSpeedCoils->LoadSideInletDBTemp,
@@ -6476,20 +6447,23 @@ namespace VariableSpeedCoils {
                 RhoEvapCondWater = RhoH2O(state.dataVariableSpeedCoils->OutdoorDryBulb_CalcVarSpeedCoilCooling);
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterConsumpRate =
                     (CondInletHumRat - state.dataVariableSpeedCoils->OutdoorHumRat_CalcVarSpeedCoilCooling) * CondAirMassFlow / RhoEvapCondWater *
-                    RuntimeFrac;
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecPower =
-                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower * RuntimeFrac;
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower *
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac;
                 // Calculate basin heater power
                 CalcBasinHeaterPower(state,
                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPowerFTempDiff,
                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterSchedulePtr,
                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterSetPointTemp,
                                      state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPower);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPower *= (1.0 - RuntimeFrac);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPower *=
+                    (1.0 - state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac);
             }
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower =
-                state.dataVariableSpeedCoils->CrankcaseHeatingPower_CalcVarSpeedCoilCooling * (1.0 - RuntimeFrac);
+                state.dataVariableSpeedCoils->CrankcaseHeatingPower_CalcVarSpeedCoilCooling *
+                (1.0 - state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac);
 
             // set water system demand request (if needed)
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
@@ -6550,8 +6524,7 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->QLoadTotal *= PartLoadRatio;
         state.dataVariableSpeedCoils->QSensible *= PartLoadRatio;
         // count the powr separately
-        state.dataVariableSpeedCoils->Winput *= RuntimeFrac; //+ VarSpeedCoil(DXCoilNum)%CrankcaseHeaterPower &
-        //+ VarSpeedCoil(DXCoilNum)%BasinHeaterPower + VarSpeedCoil(DXCoilNum)%EvapCondPumpElecPower
+        state.dataVariableSpeedCoils->Winput *= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac;
         state.dataVariableSpeedCoils->QSource *= PartLoadRatio;
         QWasteHeat *= PartLoadRatio;
 
@@ -6576,13 +6549,12 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPower * TimeStepSysSec;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecConsumption =
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecPower * TimeStepSysSec;
-        if (RuntimeFrac == 0.0) {
+        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac == 0.0) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).COP = 0.0;
         } else {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).COP =
                 state.dataVariableSpeedCoils->QLoadTotal / state.dataVariableSpeedCoils->Winput;
         }
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = RuntimeFrac;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio = PartLoadRatio;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate = state.dataVariableSpeedCoils->PLRCorrLoadSideMdot;
         rhoair = PsyRhoAirFnPbTdbW(state,
@@ -6632,7 +6604,6 @@ namespace VariableSpeedCoils {
 
     void CalcVarSpeedHPWH(EnergyPlusData &state,
                           int const DXCoilNum,        // the number of the DX coil to be simulated
-                          Real64 &RuntimeFrac,        // Runtime Fraction of compressor or percent on time (on-time/cycle time)
                           Real64 const PartLoadRatio, // sensible water heating load / full load sensible water heating capacity
                           Real64 const SpeedRatio,    // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
                           int const SpeedNum,         // Speed number, high bound
@@ -6688,7 +6659,6 @@ namespace VariableSpeedCoils {
         Real64 AirMassFlowRatio;      // Ratio of evaporator inlet air mass flow rate to rated mass flow rate
         Real64 WaterMassFlowRatio;    // Ratio of evaporator inlet water mass flow rate to rated mass flow rate
         Real64 PumpHeatToWater;       // Amount of pump heat attributed to heating water
-        Real64 HPRTF;                 // Heat pump run time fraction
         Real64 PLF;                   // part-load function
         Real64 CBFSpeed;              // bypass factor as individual speed level
         Real64 COPAirFFModFac;        // air flow fraction modification
@@ -6780,6 +6750,12 @@ namespace VariableSpeedCoils {
             // Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
             if (state.dataEnvrn->OutDryBulbTemp < state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater) {
                 CrankcaseHeatingPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity;
+                if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex > 0) {
+                    CrankcaseHeatingPower *=
+                        Curve::CurveValue(state,
+                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex,
+                                          state.dataEnvrn->OutDryBulbTemp);
+                }
             };
         }
 
@@ -6807,7 +6783,6 @@ namespace VariableSpeedCoils {
         }
 
         // part-load calculation
-        RuntimeFrac = 1.0;
         state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 1.0;
         if ((SpeedNum == 1) && (PartLoadRatio < 1.0)) {
@@ -6827,8 +6802,6 @@ namespace VariableSpeedCoils {
             } else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac < 0.0) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 0.0;
             }
-
-            RuntimeFrac = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac;
         }
 
         // interpolate between speeds
@@ -6895,16 +6868,15 @@ namespace VariableSpeedCoils {
                 TotalTankHeatingCapacity = OperatingHeatingCapacity + PumpHeatToWater;
             }
 
-            HPRTF = RuntimeFrac;
             // calculate evaporator total cooling capacity
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanPowerIncludedInCOP) {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondPumpPowerInCOP) {
                     //       make sure fan power is full load fan power, it isn't though,
-                    CompressorPower = OperatingHeatingPower - locFanElecPower / HPRTF -
+                    CompressorPower = OperatingHeatingPower - locFanElecPower / state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac -
                                       state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower;
                     if (OperatingHeatingPower > 0.0) TankHeatingCOP = TotalTankHeatingCapacity / OperatingHeatingPower;
                 } else {
-                    CompressorPower = OperatingHeatingPower - locFanElecPower / HPRTF;
+                    CompressorPower = OperatingHeatingPower - locFanElecPower / state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac;
                     if ((OperatingHeatingPower + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower) > 0.0)
                         TankHeatingCOP = TotalTankHeatingCapacity /
                                          (OperatingHeatingPower + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower);
@@ -6913,14 +6885,16 @@ namespace VariableSpeedCoils {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondPumpPowerInCOP) {
                     //       make sure fan power is full load fan power
                     CompressorPower = OperatingHeatingPower - state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower;
-                    if ((OperatingHeatingPower + locFanElecPower / HPRTF) > 0.0)
-                        TankHeatingCOP = TotalTankHeatingCapacity / (OperatingHeatingPower + locFanElecPower / HPRTF);
+                    if ((OperatingHeatingPower + locFanElecPower / state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac) > 0.0)
+                        TankHeatingCOP = TotalTankHeatingCapacity /
+                                         (OperatingHeatingPower + locFanElecPower / state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac);
                 } else {
                     CompressorPower = OperatingHeatingPower;
-                    if ((OperatingHeatingPower + locFanElecPower / HPRTF +
+                    if ((OperatingHeatingPower + locFanElecPower / state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac +
                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower) > 0.0)
-                        TankHeatingCOP = TotalTankHeatingCapacity / (OperatingHeatingPower + locFanElecPower / HPRTF +
-                                                                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower);
+                        TankHeatingCOP = TotalTankHeatingCapacity /
+                                         (OperatingHeatingPower + locFanElecPower / state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac +
+                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower);
                 }
             }
 
@@ -7029,7 +7003,7 @@ namespace VariableSpeedCoils {
                 TotalTankHeatingCapacity = OperatingHeatingCapacity + PumpHeatToWater;
             }
 
-            HPRTF = RuntimeFrac;
+            Real64 HPRTF = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac;
             // calculate evaporator total cooling capacity
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanPowerIncludedInCOP) {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondPumpPowerInCOP) {
@@ -7111,11 +7085,13 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).TotalHeatingEnergyRate = TotalTankHeatingCapacity * PartLoadRatio;
         // calculate total compressor plus condenser pump power, fan power reported in fan module
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).ElecWaterHeatingPower =
-            (CompressorPower + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower) * HPRTF;
+            (CompressorPower + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower) *
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac;
 
         // pass the outputs for the cooling coil section
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).BasinHeaterPower = 0.0;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower = CrankcaseHeatingPower * (1.0 - RuntimeFrac);
+        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower =
+            CrankcaseHeatingPower * (1.0 - state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac);
 
         // calculate coil outlet state variables
         state.dataVariableSpeedCoils->LoadSideOutletEnth =
@@ -7165,13 +7141,15 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->QLoadTotal *= PartLoadRatio;
         state.dataVariableSpeedCoils->QSensible *= PartLoadRatio;
         // count the powr separately
-        state.dataVariableSpeedCoils->Winput *= RuntimeFrac; //+ VarSpeedCoil(DXCoilNum)%CrankcaseHeaterPower &
+        state.dataVariableSpeedCoils->Winput *=
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac; //+ VarSpeedCoil(DXCoilNum)%CrankcaseHeaterPower &
         //+ VarSpeedCoil(DXCoilNum)%BasinHeaterPower + VarSpeedCoil(DXCoilNum)%EvapCondPumpElecPower
         state.dataVariableSpeedCoils->QSource *= PartLoadRatio;
 
         // Update heat pump data structure
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower =
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower * RuntimeFrac; // water heating pump power
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower *
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac; // water heating pump power
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Power = state.dataVariableSpeedCoils->Winput;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QLoadTotal = state.dataVariableSpeedCoils->QLoadTotal;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSensible = state.dataVariableSpeedCoils->QSensible;
@@ -7191,13 +7169,12 @@ namespace VariableSpeedCoils {
         // re-use EvapCondPumpElecConsumption to store WH pump energy consumption
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecConsumption =
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower * TimeStepSysSec;
-        if (RuntimeFrac == 0.0) {
+        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac == 0.0) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).COP = 0.0;
         } else {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).COP =
                 state.dataVariableSpeedCoils->QLoadTotal / state.dataVariableSpeedCoils->Winput;
         }
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = RuntimeFrac;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio = PartLoadRatio;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate = state.dataVariableSpeedCoils->PLRCorrLoadSideMdot;
         rhoair = PsyRhoAirFnPbTdbW(state,
@@ -7246,12 +7223,11 @@ namespace VariableSpeedCoils {
     }
 
     void CalcVarSpeedCoilHeating(EnergyPlusData &state,
-                                 int const DXCoilNum,                      // Heat Pump Number
-                                 int const CyclingScheme,                  // Fan/Compressor cycling scheme indicator
-                                 Real64 &RuntimeFrac,                      // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-                                 [[maybe_unused]] Real64 const SensDemand, // Cooling Sensible Demand [W] !unused1208
-                                 CompressorOperation const CompressorOp,   // compressor operation flag
-                                 Real64 const PartLoadRatio,               // compressor part load ratio
+                                 int const DXCoilNum,                             // Heat Pump Number
+                                 int const CyclingScheme,                         // Fan/Compressor cycling scheme indicator
+                                 [[maybe_unused]] Real64 const SensDemand,        // Cooling Sensible Demand [W] !unused1208
+                                 CompressorOperation const CompressorOp,          // compressor operation flag
+                                 Real64 const PartLoadRatio,                      // compressor part load ratio
                                  [[maybe_unused]] Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
                                  Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
                                  int const SpeedNum       // Speed number, high bound, i.e. SpeedNum - 1 is the other side
@@ -7367,6 +7343,12 @@ namespace VariableSpeedCoils {
             // Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
             if (state.dataVariableSpeedCoils->OutdoorDryBulb < state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater) {
                 state.dataVariableSpeedCoils->CrankcaseHeatingPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity;
+                if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex > 0) {
+                    state.dataVariableSpeedCoils->CrankcaseHeatingPower *=
+                        Curve::CurveValue(state,
+                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex,
+                                          state.dataEnvrn->OutDryBulbTemp);
+                }
             } else {
                 state.dataVariableSpeedCoils->CrankcaseHeatingPower = 0.0;
             }
@@ -7407,7 +7389,6 @@ namespace VariableSpeedCoils {
             SpeedCal = SpeedNum;
         }
 
-        RuntimeFrac = 1.0;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 1.0;
         state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
         if ((SpeedNum == 1) && (PartLoadRatio < 1.0)) {
@@ -7427,8 +7408,6 @@ namespace VariableSpeedCoils {
             } else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac < 0.0) {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = 0.0;
             }
-
-            RuntimeFrac = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac;
         }
 
         if ((SpeedNum == 1) || (SpeedNum > MaxSpeed) || (SpeedRatio == 1.0)) {
@@ -7624,7 +7603,7 @@ namespace VariableSpeedCoils {
                     state.dataVariableSpeedCoils->InputPowerMultiplier = 0.954 * (1.0 - state.dataVariableSpeedCoils->FractionalDefrostTime);
                 }
                 // correction fractional defrost time shorten by runtime fraction
-                state.dataVariableSpeedCoils->FractionalDefrostTime *= RuntimeFrac;
+                state.dataVariableSpeedCoils->FractionalDefrostTime *= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac;
 
                 if (state.dataVariableSpeedCoils->FractionalDefrostTime > 0.0) {
                     // Calculate defrost adjustment factors depending on defrost control strategy
@@ -7651,7 +7630,7 @@ namespace VariableSpeedCoils {
             }
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower =
-                state.dataVariableSpeedCoils->CrankcaseHeatingPower * (1.0 - RuntimeFrac);
+                state.dataVariableSpeedCoils->CrankcaseHeatingPower * (1.0 - state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac);
             //! Modify total heating capacity based on defrost heating capacity multiplier
             //! MaxHeatCap passed from parent object VRF Condenser and is used to limit capacity of TU's to that available from condenser
             //  IF(PRESENT(MaxHeatCap))THEN
@@ -7709,7 +7688,8 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->QLoadTotal *= PartLoadRatio;
         state.dataVariableSpeedCoils->QSensible *= PartLoadRatio;
         // count the powr separately
-        state.dataVariableSpeedCoils->Winput *= RuntimeFrac; //+ VarSpeedCoil(DXCoilNum)%CrankcaseHeaterPower
+        state.dataVariableSpeedCoils->Winput *=
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac; //+ VarSpeedCoil(DXCoilNum)%CrankcaseHeaterPower
         state.dataVariableSpeedCoils->QSource *= PartLoadRatio;
         QWasteHeat *= PartLoadRatio;
 
@@ -7727,13 +7707,12 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower * TimeStepSysSec;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostConsumption =
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower * TimeStepSysSec;
-        if (RuntimeFrac == 0.0) {
+        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac == 0.0) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).COP = 0.0;
         } else {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).COP =
                 state.dataVariableSpeedCoils->QLoadTotal / state.dataVariableSpeedCoils->Winput;
         }
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RunFrac = RuntimeFrac;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PartLoadRatio = PartLoadRatio;
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate = state.dataVariableSpeedCoils->PLRCorrLoadSideMdot;
         rhoair = PsyRhoAirFnPbTdbW(state,
@@ -7795,17 +7774,16 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->GetCoilsInputFlag = false;
         }
 
-        if (UtilityRoutines::SameString(CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") ||
-            UtilityRoutines::SameString(CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") ||
-            UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:VARIABLESPEED") ||
-            UtilityRoutines::SameString(CoilType, "COIL:HEATING:DX:VARIABLESPEED") ||
-            UtilityRoutines::SameString(CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED")) {
-            WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
+        if (Util::SameString(CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") ||
+            Util::SameString(CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") ||
+            Util::SameString(CoilType, "COIL:COOLING:DX:VARIABLESPEED") || Util::SameString(CoilType, "COIL:HEATING:DX:VARIABLESPEED") ||
+            Util::SameString(CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED")) {
+            WhichCoil = Util::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
             if (WhichCoil != 0) {
-                if (UtilityRoutines::SameString(CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") ||
-                    UtilityRoutines::SameString(CoilType, "COIL:HEATING:DX:VARIABLESPEED")) {
+                if (Util::SameString(CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") ||
+                    Util::SameString(CoilType, "COIL:HEATING:DX:VARIABLESPEED")) {
                     CoilCapacity = state.dataVariableSpeedCoils->VarSpeedCoil(WhichCoil).RatedCapHeat;
-                } else if (UtilityRoutines::SameString(CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED")) {
+                } else if (Util::SameString(CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED")) {
                     CoilCapacity = state.dataVariableSpeedCoils->VarSpeedCoil(WhichCoil).RatedCapWH;
                 } else {
                     CoilCapacity = state.dataVariableSpeedCoils->VarSpeedCoil(WhichCoil).RatedCapCoolTotal;
@@ -7855,7 +7833,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->GetCoilsInputFlag = false;
         }
 
-        IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
+        IndexNum = Util::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
 
         if (IndexNum == 0) {
             ShowSevereError(state, format("GetCoilIndexVariableSpeed: Could not find CoilType=\"{}\" with Name=\"{}\"", CoilType, CoilName));
@@ -7896,12 +7874,11 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->GetCoilsInputFlag = false;
         }
 
-        if (UtilityRoutines::SameString(CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") ||
-            UtilityRoutines::SameString(CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") ||
-            UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:VARIABLESPEED") ||
-            UtilityRoutines::SameString(CoilType, "COIL:HEATING:DX:VARIABLESPEED") ||
-            UtilityRoutines::SameString(CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED")) {
-            WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
+        if (Util::SameString(CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") ||
+            Util::SameString(CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") ||
+            Util::SameString(CoilType, "COIL:COOLING:DX:VARIABLESPEED") || Util::SameString(CoilType, "COIL:HEATING:DX:VARIABLESPEED") ||
+            Util::SameString(CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED")) {
+            WhichCoil = Util::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
             if (WhichCoil != 0) {
                 // CoilAirFlowRate=VarSpeedCoil(WhichCoil)%RatedAirVolFlowRate
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(WhichCoil).RatedAirVolFlowRate == AutoSize) { // means autosize
@@ -7958,7 +7935,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->GetCoilsInputFlag = false;
         }
 
-        WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
+        WhichCoil = Util::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
         if (WhichCoil != 0) {
             PLRNumber = state.dataVariableSpeedCoils->VarSpeedCoil(WhichCoil).PLFFPLR;
         }
@@ -8042,7 +8019,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->GetCoilsInputFlag = false;
         }
 
-        WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
+        WhichCoil = Util::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
         if (WhichCoil != 0) {
             NodeNumber = state.dataVariableSpeedCoils->VarSpeedCoil(WhichCoil).AirInletNodeNum;
         }
@@ -8090,7 +8067,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->GetCoilsInputFlag = false;
         }
 
-        WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
+        WhichCoil = Util::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
         if (WhichCoil != 0) {
             NodeNumber = state.dataVariableSpeedCoils->VarSpeedCoil(WhichCoil).AirOutletNodeNum;
         }
@@ -8133,7 +8110,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->GetCoilsInputFlag = false;
         }
 
-        WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
+        WhichCoil = Util::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
         if (WhichCoil != 0) {
             CondNode = state.dataVariableSpeedCoils->VarSpeedCoil(WhichCoil).CondenserInletNodeNum;
         } else {
@@ -8194,7 +8171,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->GetCoilsInputFlag = false;
         }
 
-        WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
+        WhichCoil = Util::FindItemInList(CoilName, state.dataVariableSpeedCoils->VarSpeedCoil);
         if (WhichCoil != 0) {
             Speeds = state.dataVariableSpeedCoils->VarSpeedCoil(WhichCoil).NumOfSpeeds;
         } else {
@@ -8455,12 +8432,12 @@ namespace VariableSpeedCoils {
         // at the current operating conditions (sec)
         Real64 Gamma; // Initial moisture evaporation rate divided by steady-state AC latent capacity
         // at the current operating conditions
-        Real64 Twet_Rated;            // Twet at rated conditions (coil air flow rate and air temperatures), sec
-        Real64 Gamma_Rated;           // Gamma at rated conditions (coil air flow rate and air temperatures)
-        Real64 Twet_max;              // Maximum allowed value for Twet
-        Real64 MaxONOFFCyclesperHour; // Maximum cycling rate of heat pump [cycles/hr]
-        Real64 HPTimeConstant;        // Heat pump time constant [s]
-        Real64 FanDelayTime;          // Fan delay time, time delay for the HP's fan to
+        Real64 Twet_Rated;                 // Twet at rated conditions (coil air flow rate and air temperatures), sec
+        Real64 Gamma_Rated;                // Gamma at rated conditions (coil air flow rate and air temperatures)
+        Real64 Twet_max;                   // Maximum allowed value for Twet
+        Real64 MaxONOFFCyclesperHour;      // Maximum cycling rate of heat pump [cycles/hr]
+        Real64 LatentCapacityTimeConstant; // Latent capacity time constant [s]
+        Real64 FanDelayTime;               // Fan delay time, time delay for the HP's fan to
         // shut off after compressor cycle off  [s]
         Real64 Ton;     // Coil on time (sec)
         Real64 Toff;    // Coil off time (sec)
@@ -8474,14 +8451,14 @@ namespace VariableSpeedCoils {
         Twet_Rated = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Twet_Rated;
         Gamma_Rated = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Gamma_Rated;
         MaxONOFFCyclesperHour = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour;
-        HPTimeConstant = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPTimeConstant;
+        LatentCapacityTimeConstant = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LatentCapacityTimeConstant;
         FanDelayTime = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime;
 
         //  No moisture evaporation (latent degradation) occurs for runtime fraction of 1.0
         //  All latent degradation model parameters cause divide by 0.0 if not greater than 0.0
         //  Latent degradation model parameters initialize to 0.0 meaning no evaporation model used.
         if ((RTF >= 1.0) || (QLatRated == 0.0) || (QLatActual == 0.0) || (Twet_Rated <= 0.0) || (Gamma_Rated <= 0.0) ||
-            (MaxONOFFCyclesperHour <= 0.0) || (HPTimeConstant <= 0.0) || (RTF <= 0.0)) {
+            (MaxONOFFCyclesperHour <= 0.0) || (LatentCapacityTimeConstant <= 0.0) || (RTF <= 0.0)) {
             SHReff = SHRss;
             return SHReff;
         }
@@ -8515,20 +8492,20 @@ namespace VariableSpeedCoils {
         //  Use sucessive substitution to solve for To
         aa = (Gamma * Toffa) - (0.25 / Twet) * pow_2(Gamma) * pow_2(Toffa);
 
-        To1 = aa + HPTimeConstant;
+        To1 = aa + LatentCapacityTimeConstant;
         Error = 1.0;
         while (Error > 0.001) {
-            To2 = aa - HPTimeConstant * (std::exp(-To1 / HPTimeConstant) - 1.0);
+            To2 = aa - LatentCapacityTimeConstant * (std::exp(-To1 / LatentCapacityTimeConstant) - 1.0);
             Error = std::abs((To2 - To1) / To1);
             To1 = To2;
         }
 
         //  Adjust Sensible Heat Ratio (SHR) using Latent Heat Ratio (LHR) multiplier
-        //  Floating underflow errors occur when -Ton/HPTimeConstant is a large negative number.
+        //  Floating underflow errors occur when -Ton/LatentCapacityTimeConstant is a large negative number.
         //  Cap lower limit at -700 to avoid the underflow errors.
-        aa = std::exp(max(-700.0, -Ton / HPTimeConstant));
+        aa = std::exp(max(-700.0, -Ton / LatentCapacityTimeConstant));
         //  Calculate latent heat ratio multiplier
-        LHRmult = max(((Ton - To2) / (Ton + HPTimeConstant * (aa - 1.0))), 0.0);
+        LHRmult = max(((Ton - To2) / (Ton + LatentCapacityTimeConstant * (aa - 1.0))), 0.0);
 
         //  Calculate part-load or "effective" sensible heat ratio
         SHReff = 1.0 - (1.0 - SHRss) * LHRmult;

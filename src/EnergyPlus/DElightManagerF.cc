@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,13 +60,14 @@
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDElight.hh>
-#include <EnergyPlus/DataDaylighting.hh>
+// #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
@@ -148,7 +149,7 @@ namespace DElightManagerF {
         Real64 SinZoneRelNorth; // Sine of Zone rotation
         Real64 Xb;              // temp var for transformation calc
         Real64 Yb;              // temp var for transformation calc
-        Array1D<Real64> RefPt_WCS_Coord(3);
+        Vector3<Real64> RefPt_WCS_Coord;
         Array1D_int iWndoConstIndexes(100);
         bool lWndoConstFound;      // Flag for non-unique window const index
         std::string cNameWOBlanks; // Name without blanks
@@ -236,8 +237,8 @@ namespace DElightManagerF {
         SinBldgRelNorth = std::sin(-state.dataHeatBal->BuildingAzimuth * Constant::DegToRadians);
 
         // Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
-        for (auto &znDayl : state.dataDaylightingData->daylightControl) {
-            if (znDayl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
+        for (auto &znDayl : state.dataDayltg->daylightControl) {
+            if (znDayl.DaylightMethod == Dayltg::DaylightingMethod::DElight) {
 
                 // Register Error if 0 DElight RefPts have been input for valid DElight object
                 if (znDayl.TotalDaylRefPoints == 0) {
@@ -252,15 +253,21 @@ namespace DElightManagerF {
                     ShowWarningError(state, format("Maximum of 100 Reference Points exceeded for daylighting zone using DElight ={}", znDayl.Name));
                     ShowWarningError(state, "  Only first 100 Reference Points included in DElight analysis");
                 }
-                znDayl.DaylRefPtAbsCoord.allocate(3, znDayl.TotalDaylRefPoints);
-                znDayl.DaylRefPtAbsCoord = 0.0;
+
+                // Should already be allocated
+                assert((int)znDayl.refPts.size() == znDayl.TotalDaylRefPoints);
+                for (auto &refPt : znDayl.refPts) {
+                    refPt.absCoords = {0.0, 0.0, 0.0};
+                    refPt.lums[(int)Lum::Illum] = 0.0;
+                    refPt.glareIndex = 0.0;
+                }
 
                 // RJH 2008-03-07: Allocate and Init DaylIllumAtRefPt array for this DElight zone
-                znDayl.DaylIllumAtRefPt.allocate(znDayl.TotalDaylRefPoints);
-                znDayl.DaylIllumAtRefPt = 0.0;
-                // following not used in DElight but allocated for convenience
-                znDayl.GlareIndexAtRefPt.allocate(znDayl.TotalDaylRefPoints);
-                znDayl.GlareIndexAtRefPt = 0.0;
+                // znDayl.DaylIllumAtRefPt.allocate(znDayl.TotalDaylRefPoints);
+                // znDayl.DaylIllumAtRefPt = 0.0;
+                // The following not used in DElight but allocated for convenience
+                // znDayl.GlareIndexAtRefPt.allocate(znDayl.TotalDaylRefPoints);
+                // znDayl.GlareIndexAtRefPt = 0.0;
 
                 // Increment counter of Thermal Zones with valid hosted DElight object
                 ++iNumDElightZones;
@@ -272,9 +279,9 @@ namespace DElightManagerF {
 
         // Loop through the Daylighting:DElight objects searching for a match to the current Zone
 
-        for (auto &znDayl : state.dataDaylightingData->daylightControl) {
-            if (znDayl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
-                int const izone = UtilityRoutines::FindItemInList(znDayl.ZoneName, state.dataHeatBal->Zone);
+        for (auto &znDayl : state.dataDayltg->daylightControl) {
+            if (znDayl.DaylightMethod == Dayltg::DaylightingMethod::DElight) {
+                int const izone = Util::FindItemInList(znDayl.ZoneName, state.dataHeatBal->Zone);
                 if (izone != 0) {
 
                     rLightLevel = GetDesignLightingLevelForZone(state, izone);
@@ -402,7 +409,7 @@ namespace DElightManagerF {
 
                                             // Loop through all Doppelganger Surface Names to ignore these Windows
                                             lWndoIsDoppelganger = false;
-                                            for (auto const &cfs : state.dataDaylightingData->DElightComplexFene) {
+                                            for (auto const &cfs : state.dataDayltg->DElightComplexFene) {
 
                                                 // Is the current Window Surface a Doppelganger?
                                                 if (wndo.Name == cfs.wndwName) {
@@ -436,7 +443,7 @@ namespace DElightManagerF {
                                                 // Loop through all Doppelganger Surface Names to ignore these Windows
                                                 lWndoIsDoppelganger = false;
 
-                                                for (auto const &cfs : state.dataDaylightingData->DElightComplexFene) {
+                                                for (auto const &cfs : state.dataDayltg->DElightComplexFene) {
 
                                                     // Is the current Window Surface a Doppelganger?
                                                     if (wndo2.Name == cfs.wndwName) {
@@ -489,7 +496,7 @@ namespace DElightManagerF {
                                 iHostedCFS = 0;
 
                                 // Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
-                                for (auto const &cfs : state.dataDaylightingData->DElightComplexFene) {
+                                for (auto const &cfs : state.dataDayltg->DElightComplexFene) {
 
                                     // Does the current Opaque Bounding Surface host the current CFS object?
                                     if (surf.Name == cfs.surfName) {
@@ -502,7 +509,7 @@ namespace DElightManagerF {
 
                                 // Now write each of the hosted CFS data
                                 // Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
-                                for (auto const &cfs : state.dataDaylightingData->DElightComplexFene) {
+                                for (auto const &cfs : state.dataDayltg->DElightComplexFene) {
 
                                     // Does the current Opaque Bounding Surface host the current CFS object?
                                     if (surf.Name == cfs.surfName) {
@@ -559,7 +566,7 @@ namespace DElightManagerF {
                     print(delightInFile, Format_912, znDayl.TotalDaylRefPoints);
 
                     // Loop through the Daylighting:DElight:Reference Point objects checking for the current DElight Zone host
-                    for (auto &refPt : state.dataDaylightingData->DaylRefPt) {
+                    for (auto &refPt : state.dataDayltg->DaylRefPt) {
 
                         // Is this RefPt hosted by current DElight Zone?
                         if (izone == refPt.ZoneNum) {
@@ -569,20 +576,18 @@ namespace DElightManagerF {
                             if (znDayl.TotalDaylRefPoints <= 100) {
 
                                 if (state.dataSurface->DaylRefWorldCoordSystem) {
-                                    RefPt_WCS_Coord(1) = refPt.x;
-                                    RefPt_WCS_Coord(2) = refPt.y;
-                                    RefPt_WCS_Coord(3) = refPt.z;
+                                    RefPt_WCS_Coord = refPt.coords;
                                 } else {
                                     // Transform reference point coordinates into building coordinate system
-                                    Xb = refPt.x * CosZoneRelNorth - refPt.y * SinZoneRelNorth + thisZone.OriginX;
-                                    Yb = refPt.x * SinZoneRelNorth + refPt.y * CosZoneRelNorth + thisZone.OriginY;
+                                    Xb = refPt.coords.x * CosZoneRelNorth - refPt.coords.y * SinZoneRelNorth + thisZone.OriginX;
+                                    Yb = refPt.coords.x * SinZoneRelNorth + refPt.coords.y * CosZoneRelNorth + thisZone.OriginY;
                                     // Transform into World Coordinate System
-                                    RefPt_WCS_Coord(1) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
-                                    RefPt_WCS_Coord(2) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
-                                    RefPt_WCS_Coord(3) = refPt.z + thisZone.OriginZ;
-                                    if (ldoTransform) {          // Geometry transform
-                                        Xo = RefPt_WCS_Coord(1); // world coordinates.... shifted by relative north angle...
-                                        Yo = RefPt_WCS_Coord(2);
+                                    RefPt_WCS_Coord.x = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
+                                    RefPt_WCS_Coord.y = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
+                                    RefPt_WCS_Coord.z = refPt.coords.z + thisZone.OriginZ;
+                                    if (ldoTransform) {         // Geometry transform
+                                        Xo = RefPt_WCS_Coord.x; // world coordinates.... shifted by relative north angle...
+                                        Yo = RefPt_WCS_Coord.y;
                                         // next derotate the building
                                         XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
                                         YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
@@ -590,42 +595,42 @@ namespace DElightManagerF {
                                         Xtrans = XnoRot * std::sqrt(rnewAspectRatio / roldAspectRatio);
                                         Ytrans = YnoRot * std::sqrt(roldAspectRatio / rnewAspectRatio);
                                         // rerotate
-                                        RefPt_WCS_Coord(1) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
+                                        RefPt_WCS_Coord.x = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
 
-                                        RefPt_WCS_Coord(2) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
+                                        RefPt_WCS_Coord.y = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
                                     }
                                 }
-                                znDayl.DaylRefPtAbsCoord({1, 3}, refPt.indexToFracAndIllum) = RefPt_WCS_Coord({1, 3});
+                                znDayl.refPts(refPt.indexToFracAndIllum).absCoords = RefPt_WCS_Coord;
 
                                 // Validate that Reference Point coordinates are within the host Zone
-                                if (RefPt_WCS_Coord(1) < thisZone.MinimumX || RefPt_WCS_Coord(1) > thisZone.MaximumX) {
+                                if (RefPt_WCS_Coord.x < thisZone.MinimumX || RefPt_WCS_Coord.x > thisZone.MaximumX) {
                                     ShowWarningError(
                                         state, format("DElightInputGenerator:Reference point X Value outside Zone Min/Max X, Zone={}", zn.Name));
                                     ShowSevereError(state,
                                                     format("...X Reference Point= {:.2R}, Zone Minimum X= {:.2R}, Zone Maximum X= {:.2R}",
                                                            thisZone.MinimumX,
-                                                           RefPt_WCS_Coord(1),
+                                                           RefPt_WCS_Coord.x,
                                                            thisZone.MaximumX));
                                     ErrorsFound = true;
                                 }
-                                if (RefPt_WCS_Coord(2) < thisZone.MinimumY || RefPt_WCS_Coord(2) > thisZone.MaximumY) {
+                                if (RefPt_WCS_Coord.y < thisZone.MinimumY || RefPt_WCS_Coord.y > thisZone.MaximumY) {
                                     ShowWarningError(
                                         state, format("DElightInputGenerator:Reference point Y Value outside Zone Min/Max Y, Zone={}", zn.Name));
                                     ShowSevereError(state,
                                                     format("...Y Reference Point= {:.2R}, Zone Minimum Y= {:.2R}, Zone Maximum Y= {:.2R}",
                                                            thisZone.MinimumY,
-                                                           RefPt_WCS_Coord(2),
+                                                           RefPt_WCS_Coord.y,
                                                            thisZone.MaximumY));
                                     ErrorsFound = true;
                                 }
-                                if (RefPt_WCS_Coord(3) < state.dataHeatBal->Zone(izone).MinimumZ || RefPt_WCS_Coord(3) > thisZone.MaximumZ) {
+                                if (RefPt_WCS_Coord.z < state.dataHeatBal->Zone(izone).MinimumZ || RefPt_WCS_Coord.z > thisZone.MaximumZ) {
                                     ShowWarningError(
                                         state,
                                         format("DElightInputGenerator:Reference point Z Value outside Zone Min/Max Z, Zone={}", thisZone.Name));
                                     ShowSevereError(state,
                                                     format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}",
                                                            thisZone.MinimumZ,
-                                                           RefPt_WCS_Coord(3),
+                                                           RefPt_WCS_Coord.z,
                                                            thisZone.MaximumZ));
                                     ErrorsFound = true;
                                 }
@@ -638,17 +643,17 @@ namespace DElightManagerF {
                                     print(delightInFile,
                                           Format_913,
                                           cNameWOBlanks,
-                                          RefPt_WCS_Coord(1) * M2FT,
-                                          RefPt_WCS_Coord(2) * M2FT,
-                                          RefPt_WCS_Coord(3) * M2FT,
-                                          znDayl.FracZoneDaylit(refPt.indexToFracAndIllum),
-                                          znDayl.IllumSetPoint(refPt.indexToFracAndIllum) * LUX2FC,
+                                          RefPt_WCS_Coord.x * M2FT,
+                                          RefPt_WCS_Coord.y * M2FT,
+                                          RefPt_WCS_Coord.z * M2FT,
+                                          znDayl.refPts(refPt.indexToFracAndIllum).fracZoneDaylit,
+                                          znDayl.refPts(refPt.indexToFracAndIllum).illumSetPoint * LUX2FC,
                                           znDayl.LightControlType);
                                     // RJH 2008-03-07: Set up DaylIllumAtRefPt for output for this DElight zone RefPt
                                     SetupOutputVariable(state,
                                                         "Daylighting Reference Point Illuminance",
-                                                        OutputProcessor::Unit::lux,
-                                                        znDayl.DaylIllumAtRefPt(refPt.indexToFracAndIllum),
+                                                        Constant::Units::lux,
+                                                        znDayl.refPts(refPt.indexToFracAndIllum).lums[(int)Lum::Illum],
                                                         OutputProcessor::SOVTimeStepType::Zone,
                                                         OutputProcessor::SOVStoreType::Average,
                                                         refPt.Name);
@@ -656,9 +661,9 @@ namespace DElightManagerF {
                                     print(delightInFile,
                                           Format_913,
                                           cNameWOBlanks,
-                                          RefPt_WCS_Coord(1) * M2FT,
-                                          RefPt_WCS_Coord(2) * M2FT,
-                                          RefPt_WCS_Coord(3) * M2FT,
+                                          RefPt_WCS_Coord.x * M2FT,
+                                          RefPt_WCS_Coord.y * M2FT,
+                                          RefPt_WCS_Coord.z * M2FT,
                                           0.0,
                                           0.0 * LUX2FC,
                                           znDayl.LightControlType); // should never happen but just in case send zero fraction and illuminance
@@ -725,8 +730,8 @@ namespace DElightManagerF {
         constexpr std::string_view cCurrentModuleObject("Daylighting:DELight:ComplexFenestration");
 
         int TotDElightCFS = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        state.dataDaylightingData->DElightComplexFene.allocate(TotDElightCFS);
-        for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
+        state.dataDayltg->DElightComplexFene.allocate(TotDElightCFS);
+        for (auto &cfs : state.dataDayltg->DElightComplexFene) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      ++CFSNum,
@@ -742,7 +747,7 @@ namespace DElightManagerF {
             cfs.Name = state.dataIPShortCut->cAlphaArgs(1);
             cfs.ComplexFeneType = state.dataIPShortCut->cAlphaArgs(2);
             cfs.surfName = state.dataIPShortCut->cAlphaArgs(3);
-            if (UtilityRoutines::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
+            if (Util::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
                 ShowSevereError(state,
                                 format("{}{}",
                                        cCurrentModuleObject,
@@ -750,7 +755,7 @@ namespace DElightManagerF {
                 ErrorsFound = true;
             }
             cfs.wndwName = state.dataIPShortCut->cAlphaArgs(4);
-            if (UtilityRoutines::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
+            if (Util::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
                 ShowSevereError(state,
                                 format("{}{}",
                                        cCurrentModuleObject,
@@ -836,8 +841,6 @@ namespace DElightManagerF {
         // FUNCTION INFORMATION:
         //       AUTHOR         Robert J. Hitchcock
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       From UtilityRoutines::MakeUPPERCase( function by Linda K. Lawrie
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This function returns a representation of the InputString with blanks replaced with underscores.

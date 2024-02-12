@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -252,9 +252,6 @@ namespace IntegratedHeatPump {
                 std::string_view CompName,                         // Coil Name
                 int &CompIndex,                                    // Index for Component name
                 int const CyclingScheme,                           // Continuous fan OR cycling compressor
-                Real64 &MaxONOFFCyclesperHour,                     // Maximum cycling rate of heat pump [cycles/hr]
-                Real64 &HPTimeConstant,                            // Heat pump time constant [s]
-                Real64 &FanDelayTime,                              // Fan delay time, time delay for the HP's fan to
                 DataHVACGlobals::CompressorOperation CompressorOp, // compressor on/off. 0 = off; 1= on
                 Real64 const PartLoadFrac,
                 int const SpeedNum,            // compressor speed number

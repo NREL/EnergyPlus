@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -216,7 +216,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
     state->dataLoopNodes->Node(4).HumRat = 0.000;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 24.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MixingMassFlowZone = 0.0;
 
@@ -346,7 +346,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
     state->dataLoopNodes->Node(4).HumRat = 0.000;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 24.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MixingMassFlowZone = 0.0;
 
@@ -515,11 +515,11 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
     state->dataLoopNodes->Node(4).HumRat = 0.000;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 24.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.008;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZT = 23.5;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).airHumRat = 0.008;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).ZT = 24.5;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MixingMassFlowZone = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone = 0.0;
@@ -701,11 +701,11 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     state->dataLoopNodes->Node(4).MassFlowRate = 0.03; // Zone return node
     state->dataLoopNodes->Node(4).HumRat = 0.000;
     state->dataLoopNodes->Node(5).HumRat = 0.000;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 24.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.008;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZT = 23.5;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).airHumRat = 0.008;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).ZT = 24.5;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MixingMassFlowZone = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone = 0.0;

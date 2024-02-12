@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -973,8 +973,8 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap)
     // # 'FOR' => Number of additional day schedules
     // So we use 366 Week Schedules, all with one day (LeapYear)
     state->dataEnvrn->CurrentYearIsLeapYear = true;
-    state->dataWeatherManager->WFAllowsLeapYears = true;
-    state->dataWeatherManager->LeapYearAdd = 1;
+    state->dataWeather->WFAllowsLeapYears = true;
+    state->dataWeather->LeapYearAdd = 1;
 
     int nDays = 366;
     state->dataGlobal->NumOfTimeStepInHour = 4;
@@ -1156,8 +1156,8 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap)
     // # 'FOR' => Number of additional day schedules
     // So we use 366 Week Schedules, all with one day (LeapYear)
     state->dataEnvrn->CurrentYearIsLeapYear = false;
-    state->dataWeatherManager->WFAllowsLeapYears = false;
-    state->dataWeatherManager->LeapYearAdd = 0;
+    state->dataWeather->WFAllowsLeapYears = false;
+    state->dataWeather->LeapYearAdd = 0;
 
     // ScheduleManager always assume LeapYear really.
     int nDays = 365;

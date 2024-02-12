@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,7 +78,7 @@ namespace ChillerGasAbsorption {
         bool InHeatingMode = false;
         // Part of Type that directly corresponds with IDD definition
         std::string Name;                         // user identifier
-        Constant::eResource FuelType;             // Type of Fuel - DIESEL, GASOLINE, GAS
+        Constant::eFuel FuelType;                 // Type of Fuel - DIESEL, GASOLINE, GAS
         Real64 NomCoolingCap = 0.0;               // W - design nominal capacity of Absorber
         bool NomCoolingCapWasAutoSized = false;   // true if nominal capacity was autosize on input
         Real64 NomHeatCoolRatio = 0.0;            // ratio of heating to cooling capacity

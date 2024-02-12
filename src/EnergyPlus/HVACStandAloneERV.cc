@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -126,7 +126,7 @@ void SimStandAloneERV(EnergyPlusData &state,
 
     // Find the correct Stand Alone ERV unit index
     if (CompIndex == 0) {
-        StandAloneERVNum = UtilityRoutines::FindItem(CompName, state.dataHVACStandAloneERV->StandAloneERV);
+        StandAloneERVNum = Util::FindItem(CompName, state.dataHVACStandAloneERV->StandAloneERV);
         if (StandAloneERVNum == 0) {
             ShowFatalError(state, format("SimStandAloneERV: Unit not found={}", CompName));
         }
@@ -725,7 +725,7 @@ void GetStandAloneERV(EnergyPlusData &state)
 
         thisOAController.Name = Alphas(1);
         thisOAController.ControllerType = MixedAir::MixedAirControllerType::ControllerStandAloneERV;
-        int WhichERV = UtilityRoutines::FindItemInList(Alphas(1), state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
+        int WhichERV = Util::FindItemInList(Alphas(1), state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
         if (WhichERV != 0) {
             AirFlowRate = state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirVolFlow;
             state.dataHVACStandAloneERV->StandAloneERV(WhichERV).ControllerIndex = OutAirNum;
@@ -854,9 +854,9 @@ void GetStandAloneERV(EnergyPlusData &state)
         Real64 HighRHOARatio = 1.0;
         //   READ Modify Air Flow Data
         //   High humidity control option is YES, read in additional data
-        if (UtilityRoutines::SameString(Alphas(6), "Yes")) {
+        if (Util::SameString(Alphas(6), "Yes")) {
 
-            HStatZoneNum = UtilityRoutines::FindItemInList(Alphas(7), state.dataHeatBal->Zone);
+            HStatZoneNum = Util::FindItemInList(Alphas(7), state.dataHeatBal->Zone);
             thisOAController.HumidistatZoneNum = HStatZoneNum;
 
             // Get the node number for the zone with the humidistat
@@ -911,17 +911,17 @@ void GetStandAloneERV(EnergyPlusData &state)
                 HighRHOARatio = 1.0;
             }
 
-            if (UtilityRoutines::SameString(Alphas(8), "Yes")) {
+            if (Util::SameString(Alphas(8), "Yes")) {
                 thisOAController.ModifyDuringHighOAMoisture = false;
             } else {
                 thisOAController.ModifyDuringHighOAMoisture = true;
             }
 
-        } else if (!UtilityRoutines::SameString(Alphas(6), "No") && NumAlphas > 4 && (!lAlphaBlanks(5))) {
+        } else if (!Util::SameString(Alphas(6), "No") && NumAlphas > 4 && (!lAlphaBlanks(5))) {
             ShowWarningError(state, format("{} \"{}\"", CurrentModuleObject, Alphas(1)));
             ShowContinueError(state, format("... Invalid {} = {}", cAlphaFields(6), Alphas(6)));
             ShowContinueError(state, format("... {} is assumed to be \"No\" and the simulation continues.", cAlphaFields(6)));
-        } // IF(UtilityRoutines::SameString(Alphas(6),'Yes'))THEN
+        } // IF(Util::SameString(Alphas(6),'Yes'))THEN
 
         thisOAController.HighRHOAFlowRatio = HighRHOARatio;
         if (WhichERV != 0) {
@@ -993,42 +993,42 @@ void GetStandAloneERV(EnergyPlusData &state)
         auto &standAloneERV = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex);
         SetupOutputVariable(state,
                             "Zone Ventilator Sensible Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             standAloneERV.SensCoolingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Sensible Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             standAloneERV.SensCoolingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Latent Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             standAloneERV.LatCoolingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Latent Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             standAloneERV.LatCoolingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Total Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             standAloneERV.TotCoolingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Total Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             standAloneERV.TotCoolingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
@@ -1036,42 +1036,42 @@ void GetStandAloneERV(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Zone Ventilator Sensible Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             standAloneERV.SensHeatingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Sensible Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             standAloneERV.SensHeatingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Latent Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             standAloneERV.LatHeatingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Latent Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             standAloneERV.LatHeatingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Total Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             standAloneERV.TotHeatingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Total Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             standAloneERV.TotHeatingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
@@ -1079,21 +1079,21 @@ void GetStandAloneERV(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Zone Ventilator Electricity Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             standAloneERV.ElecUseRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Electricity Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             standAloneERV.ElecUseEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             standAloneERV.Name);
         SetupOutputVariable(state,
                             "Zone Ventilator Supply Fan Availability Status",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             standAloneERV.AvailStatus,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -1139,14 +1139,14 @@ void InitStandAloneERV(EnergyPlusData &state,
     }
 
     if (allocated(state.dataHVACGlobal->ZoneComp)) {
+        auto &availMgr =
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator).ZoneCompAvailMgrs(StandAloneERVNum);
         if (state.dataHVACStandAloneERV->MyZoneEqFlag(StandAloneERVNum)) { // initialize the name of each availability manager list and zone number
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ERVStandAlone).ZoneCompAvailMgrs(StandAloneERVNum).AvailManagerListName =
-                state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailManagerListName;
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ERVStandAlone).ZoneCompAvailMgrs(StandAloneERVNum).ZoneNum = ZoneNum;
+            availMgr.AvailManagerListName = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailManagerListName;
+            availMgr.ZoneNum = ZoneNum;
             state.dataHVACStandAloneERV->MyZoneEqFlag(StandAloneERVNum) = false;
         }
-        state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailStatus =
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ERVStandAlone).ZoneCompAvailMgrs(StandAloneERVNum).AvailStatus;
+        state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailStatus = availMgr.AvailStatus;
     }
 
     // need to check all units to see if they are on Zone Equipment List or issue warning
@@ -1654,8 +1654,8 @@ Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
         state.dataHVACStandAloneERV->GetERVInputFlag = false;
     }
 
-    if (UtilityRoutines::SameString(ERVType, "ZoneHVAC:EnergyRecoveryVentilator")) {
-        int WhichERV = UtilityRoutines::FindItem(ERVCtrlName, state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
+    if (Util::SameString(ERVType, "ZoneHVAC:EnergyRecoveryVentilator")) {
+        int WhichERV = Util::FindItem(ERVCtrlName, state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
         if (WhichERV != 0) {
             return state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirVolFlow;
         }

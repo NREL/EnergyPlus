@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -497,7 +497,7 @@ namespace WaterThermalTanks {
         TankOperatingMode SavedMode = TankOperatingMode::Floating; // Mode indicator saved from previous time step
         HeaterControlMode ControlType;                             // Indicator for Heater Control type
         PriorityControlMode StratifiedControlMode;                 // Indicator for Stratified Water Heaters Priority Control Type
-        Constant::eResource FuelType;                              // Fuel type
+        Constant::eFuel FuelType;                                  // Fuel type
         Real64 MaxCapacity;                                        // Maximum capacity of auxiliary heater 1 (W)
         bool MaxCapacityWasAutoSized;                              // true if heater 1 capacity was autosized on input
         Real64 MinCapacity;                                        // Minimum capacity of auxiliary heater 1 (W)
@@ -509,10 +509,10 @@ namespace WaterThermalTanks {
         Real64 TankTempLimit;                                      // Maximum tank temperature limit before venting (C)
         Real64 IgnitionDelay;                                      // Time delay before heater is allowed to turn on (s)
         Real64 OffCycParaLoad;                                     // Rate for off-cycle parasitic load (W)
-        Constant::eResource OffCycParaFuelType;                    // Fuel type for off-cycle parasitic load
+        Constant::eFuel OffCycParaFuelType;                        // Fuel type for off-cycle parasitic load
         Real64 OffCycParaFracToTank;                               // Fraction of off-cycle parasitic energy ending up in tank (W)
         Real64 OnCycParaLoad;                                      // Rate for on-cycle parasitic load (W)
-        Constant::eResource OnCycParaFuelType;                     // Fuel type for on-cycle parasitic load
+        Constant::eFuel OnCycParaFuelType;                         // Fuel type for on-cycle parasitic load
         Real64 OnCycParaFracToTank;                                // Fraction of on-cycle parasitic energy ending up in tank (W)
         DataPlant::FlowLock UseCurrentFlowLock;                    // current flow lock setting on use side
         int UseInletNode;                                          // Inlet node on the use side; colder water returning to a hottank

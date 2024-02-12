@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.2;
+  Version,24.1;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2186,10 +2186,6 @@
     SPACE1-1 HP Heating Mode,!- Heating Coil Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
     SPACE1-1 HP Cooling Mode,!- Cooling Coil Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60.0,                    !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     SPACE1-1 HP Supp Coil,   !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -2217,10 +2213,6 @@
     SPACE2-1 HP Heating Mode,!- Heating Coil Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
     SPACE2-1 HP Cooling Mode,!- Cooling Coil Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60.0,                    !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     SPACE2-1 HP Supp Coil,   !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -2248,10 +2240,6 @@
     SPACE3-1 HP Heating Mode,!- Heating Coil Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
     SPACE3-1 HP Cooling Mode,!- Cooling Coil Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60.0,                    !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     SPACE3-1 HP Supp Coil,   !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -2279,10 +2267,6 @@
     SPACE4-1 HP Heating Mode,!- Heating Coil Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
     SPACE4-1 HP Cooling Mode,!- Cooling Coil Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60.0,                    !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     SPACE4-1 HP Supp Coil,   !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -2310,10 +2294,6 @@
     SPACE5-1 HP Heating Mode,!- Heating Coil Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
     SPACE5-1 HP Cooling Mode,!- Cooling Coil Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60.0,                    !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     SPACE5-1 HP Supp Coil,   !- Supplemental Heating Coil Name
     50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -2659,8 +2639,6 @@
     SPACE1-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE1-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
-    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -2671,8 +2649,12 @@
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Cooling:WaterToAirHeatPump:EquationFit,
     SPACE2-1 HP Cooling Mode,!- Name
@@ -2681,8 +2663,6 @@
     SPACE2-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE2-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
-    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -2693,8 +2673,12 @@
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Cooling:WaterToAirHeatPump:EquationFit,
     SPACE3-1 HP Cooling Mode,!- Name
@@ -2703,8 +2687,6 @@
     SPACE3-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE3-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
-    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -2715,8 +2697,12 @@
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Cooling:WaterToAirHeatPump:EquationFit,
     SPACE4-1 HP Cooling Mode,!- Name
@@ -2725,8 +2711,6 @@
     SPACE4-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE4-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
-    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -2737,8 +2721,12 @@
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Cooling:WaterToAirHeatPump:EquationFit,
     SPACE5-1 HP Cooling Mode,!- Name
@@ -2747,8 +2735,6 @@
     SPACE5-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE5-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
-    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -2759,8 +2745,12 @@
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT ===========
 
@@ -2778,7 +2768,8 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
-    HeatPowCurve;            !- Heating Power Consumption Curve Name
+    HeatPowCurve,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     SPACE2-1 HP Heating Mode,!- Name
@@ -2794,7 +2785,8 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
-    HeatPowCurve;            !- Heating Power Consumption Curve Name
+    HeatPowCurve,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     SPACE3-1 HP Heating Mode,!- Name
@@ -2810,7 +2802,8 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
-    HeatPowCurve;            !- Heating Power Consumption Curve Name
+    HeatPowCurve,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     SPACE4-1 HP Heating Mode,!- Name
@@ -2826,7 +2819,8 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
-    HeatPowCurve;            !- Heating Power Consumption Curve Name
+    HeatPowCurve,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     SPACE5-1 HP Heating Mode,!- Name
@@ -2842,7 +2836,24 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
-    HeatPowCurve;            !- Heating Power Consumption Curve Name
+    HeatPowCurve,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
+
+  Curve:Quadratic,
+    HPACCOOLPLFFPLR,         !- Name
+    0.75,                    !- Coefficient1 Constant
+    0.25,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    HPACHEATPLFFPLR,         !- Name
+    0.75,                    !- Coefficient1 Constant
+    0.25,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
 
 !-   ===========  ALL OBJECTS IN CLASS: CURVE:QUADLINEAR ===========
 

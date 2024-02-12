@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -356,31 +356,23 @@ namespace EconomicLifeCycleCost {
     struct UsePriceEscalationType
     {
         // Members
-        std::string name;             // Name
-        Constant::eResource resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-        int escalationStartYear;      // Escalation Start Year 1900-2100
-        int escalationStartMonth;     // Escalation Start Month 1 to 12
-        Array1D<Real64> Escalation;   // Escalation by year, first year is baseDateYear
+        std::string name; // Name
+        Constant::eResource resource =
+            Constant::eResource::Invalid; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
+        int escalationStartYear = 0;      // Escalation Start Year 1900-2100
+        int escalationStartMonth = 0;     // Escalation Start Month 1 to 12
+        Array1D<Real64> Escalation;       // Escalation by year, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
-
-        // Default Constructor
-        UsePriceEscalationType() : resource(Constant::eResource::Invalid), escalationStartYear(0), escalationStartMonth(0)
-        {
-        }
     };
 
     struct UseAdjustmentType
     {
         // Members
-        std::string name;             // Name
-        Constant::eResource resource; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-        Array1D<Real64> Adjustment;   // Adjustment by year, first year is baseDateYear
+        std::string name; // Name
+        Constant::eResource resource =
+            Constant::eResource::Invalid; // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
+        Array1D<Real64> Adjustment;       // Adjustment by year, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
-
-        // Default Constructor
-        UseAdjustmentType() : resource(Constant::eResource::Invalid)
-        {
-        }
     };
 
     struct CashFlowType

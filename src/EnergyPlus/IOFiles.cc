@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,10 +50,10 @@
 #include "Data/EnergyPlusData.hh"
 #include "DataStringGlobals.hh"
 #include "FileSystem.hh"
-#include "InputProcessing/EmbeddedEpJSONSchema.hh"
 #include "InputProcessing/InputProcessor.hh"
 #include "ResultsFramework.hh"
 #include "UtilityRoutines.hh"
+#include <embedded/EmbeddedEpJSONSchema.hh>
 
 #include <algorithm>
 #include <fmt/format.h>
@@ -89,15 +89,19 @@ void InputFile::close()
 
 InputFile::ReadResult<std::string> InputFile::readLine() noexcept
 {
-    if (is) {
-        std::string line;
-        std::getline(*is, line);
+    if (!is) {
+        return {"", true, false};
+    }
+
+    std::string line;
+    if (std::getline(*is, line)) {
         if (!line.empty() && line.back() == '\r') {
             line.pop_back();
         }
-        return {std::move(line), is->eof(), is->good()};
+        // Use operator bool, see ReadResult::good() docstring
+        return {std::move(line), is->eof(), bool(is)};
     } else {
-        return {"", true, false};
+        return {"", is->eof(), false};
     }
 }
 
@@ -315,6 +319,14 @@ std::vector<std::string> InputOutputFile::getLines()
     return std::vector<std::string>();
 }
 
+bool IOFiles::OutputControl::writeTabular(EnergyPlusData &state)
+{
+    bool const htmlTabular = state.files.outputControl.tabular;
+    bool const jsonTabular = state.files.outputControl.json && state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled();
+    bool const sqliteTabular = state.files.outputControl.sqlite; // && @JasonGlazer thinks something else maybe?
+    return (htmlTabular || jsonTabular || sqliteTabular);
+}
+
 void IOFiles::OutputControl::getInput(EnergyPlusData &state)
 {
     auto &ip = state.dataInputProcessing->inputProcessor;
@@ -326,7 +338,7 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
             auto found = fields.find(field_name);
             if (found != fields.end()) {
                 input = found.value().get<std::string>();
-                input = UtilityRoutines::MakeUPPERCase(input);
+                input = Util::makeUPPER(input);
             } else {
                 state.dataInputProcessing->inputProcessor->getDefaultValue(state, "OutputControl:Files", field_name, input);
             }

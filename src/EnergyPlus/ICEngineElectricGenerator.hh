@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,16 +77,16 @@ namespace ICEngineElectricGenerator {
         std::string Name;   // user identifier
         std::string TypeOf; // Type of Generator
         GeneratorType CompType_Num;
-        Constant::eResource FuelType; // Type of Fuel - DIESEL, GASOLINE, GAS
-        Real64 RatedPowerOutput;      // W - design nominal capacity of Generator
-        int ElectricCircuitNode;      // Electric Circuit Node
-        Real64 MinPartLoadRat;        // (IC ENGINE MIN) min allowed operating frac full load
-        Real64 MaxPartLoadRat;        // (IC ENGINE MAX) max allowed operating frac full load
-        Real64 OptPartLoadRat;        // (IC ENGINE BEST) optimal operating frac full load
-        Real64 ElecOutputFuelRat;     // (RELDC) Ratio of Generator output to Fuel Energy Input
-        int ElecOutputFuelCurve;      // Curve Index for generator output to Fuel Energy Input Coeff Poly Fit
-        Real64 RecJacHeattoFuelRat;   // (RJACDC) Ratio of Recoverable Jacket Heat to Fuel Energy Input
-        int RecJacHeattoFuelCurve;    // Curve Index for Ratio of Recoverable Jacket Heat to
+        Constant::eFuel FuelType;   // Type of Fuel - DIESEL, GASOLINE, GAS
+        Real64 RatedPowerOutput;    // W - design nominal capacity of Generator
+        int ElectricCircuitNode;    // Electric Circuit Node
+        Real64 MinPartLoadRat;      // (IC ENGINE MIN) min allowed operating frac full load
+        Real64 MaxPartLoadRat;      // (IC ENGINE MAX) max allowed operating frac full load
+        Real64 OptPartLoadRat;      // (IC ENGINE BEST) optimal operating frac full load
+        Real64 ElecOutputFuelRat;   // (RELDC) Ratio of Generator output to Fuel Energy Input
+        int ElecOutputFuelCurve;    // Curve Index for generator output to Fuel Energy Input Coeff Poly Fit
+        Real64 RecJacHeattoFuelRat; // (RJACDC) Ratio of Recoverable Jacket Heat to Fuel Energy Input
+        int RecJacHeattoFuelCurve;  // Curve Index for Ratio of Recoverable Jacket Heat to
         // Fuel Energy Input Coeff Poly Fit
         Real64 RecLubeHeattoFuelRat; // (RLUBDC) Ratio of Recoverable Lube Oil Heat to Fuel Energy Input
         int RecLubeHeattoFuelCurve;  // Curve Index for Ratio of Recoverable Lube Oil Heat to

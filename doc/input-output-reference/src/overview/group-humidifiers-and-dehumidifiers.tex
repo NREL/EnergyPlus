@@ -94,7 +94,7 @@ This field reports the water consumption rate of the steam humidifier in cubic m
 
 \paragraph{Humidifier Water Volume{[}m3{]}}\label{humidifier-water-volumem3}
 
-This ouput is the cubic meters of water consumed by the steam humidifier over the timestep being reported.
+This output is the cubic meters of water consumed by the steam humidifier over the timestep being reported.
 
 \paragraph{Humidifier Electricity Rate {[}W{]}}\label{humidifier-electric-powerw}
 
@@ -130,7 +130,7 @@ This output contains the volume of water obtained from the mains.
 
 \subsection{Humidifier:Steam:Gas}\label{humidifiersteamgas}
 
-The gas fired steam humidifier is a component that represents a gas fired self-contained steam humidifier. The component uses gas fired energy to convert ordinary tap water to steam which it then blows or injects into the supply air stream. Blower fan may not be required depending on how the dry steam is delivered into the supply air stream. The humidifier model includes local control of the humidifier unit to meet a humidity ratio setpoint on its air outlet node of the unit. A humidity set point manager is needed to put a setpoint on the outlet node but no other local controllers are needed. The humidifier either blows or injects dry steam to meet the humidity ratio setpoint requirement. If the Rated Gas Use Rate input field is not autosized, the thermal efficiency input specified will be ignored and ovverriden by a thermal efficiency value determined from user specified Rated Gas Use Rate, rated capacity (m3/s) and design conditions for sizing calculation.
+The gas fired steam humidifier is a component that represents a gas fired self-contained steam humidifier. The component uses gas fired energy to convert ordinary tap water to steam which it then blows or injects into the supply air stream. Blower fan may not be required depending on how the dry steam is delivered into the supply air stream. The humidifier model includes local control of the humidifier unit to meet a humidity ratio setpoint on its air outlet node of the unit. A humidity set point manager is needed to put a setpoint on the outlet node but no other local controllers are needed. The humidifier either blows or injects dry steam to meet the humidity ratio setpoint requirement. If the Rated Gas Use Rate input field is not autosized, the thermal efficiency input specified will be ignored and overridden by a thermal efficiency value determined from user specified Rated Gas Use Rate, rated capacity (m3/s) and design conditions for sizing calculation.
 
 \subsubsection{Inputs}\label{inputs-1-021}
 
@@ -338,7 +338,7 @@ Type of setpoint control. Options are
   \hyperref[setpointmanagermultizonehumiditymaximum]{SetpointManager:MultiZone:Humidity:Maximum}
 \end{itemize}
 
-This will also require the use of a \textbf{\hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat}} object. If the dehumidifer is located in the outdoor air stream, it may also be necessary to use \textbf{\hyperref[setpointmanageroutdoorairpretreat]{SetpointManager:OutdoorAirPretreat}}.
+This will also require the use of a \textbf{\hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat}} object. If the dehumidifier is located in the outdoor air stream, it may also be necessary to use \textbf{\hyperref[setpointmanageroutdoorairpretreat]{SetpointManager:OutdoorAirPretreat}}.
 
 \paragraph{Field: Leaving Maximum Humidity Ratio Setpoint}\label{field-leaving-maximum-humidity-ratio-setpoint}
 

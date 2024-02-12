@@ -270,7 +270,7 @@ This factor (m\(^{3}\)/s-m\(^{2}\)) is multiplied by the zone area, to determine
 
 \paragraph{Field: Maximum Flow Fraction During Reheat}\label{field-maximum-flow-fraction-during-reheat}
 
-This fraction is multiplied by the Maximum Air Flow Rate to determine the maximum volume flow rate (m\(^{3}\)/s) allowed during reheat operation (see detailed explanation above). This field is autosizeable and is defaulted to autosize. If autosizeable is selected or the field is blank, the value is set to 0.002032 m\(^{3}\)/s-m\(^{2}\) (0.4 cfm/ft\(^{2}\)) multiplied by the zone floor area divided by the Maximum Air Flow Rate. If this field and the previous field are entered, the greater of the two inputs is used. This field and the following field are only used if Damper Heating Action = ReverseWithLimits.
+This fraction is multiplied by the Maximum Air Flow Rate to determine the maximum volume flow rate (m\(^{3}\)/s) allowed during reheat operation (see detailed explanation above). This field is autosizable and is defaulted to autosize. If autosizable is selected or the field is blank, the value is set to 0.002032 m\(^{3}\)/s-m\(^{2}\) (0.4 cfm/ft\(^{2}\)) multiplied by the zone floor area divided by the Maximum Air Flow Rate. If this field and the previous field are entered, the greater of the two inputs is used. This field and the following field are only used if Damper Heating Action = ReverseWithLimits.
 
 \paragraph{Field: Maximum Reheat Air Temperature}\label{field-maximum-reheat-air-temperature-1}
 
@@ -1306,7 +1306,7 @@ The default is 0.001.
 
 \paragraph{Field: Zone Mixer Name}\label{field-zone-mixer-name-2}
 
-The name of an zone mixer component (object: \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}) which composes part of the terminal unit. Note that some of the zone mixer's inputs will duplicate some of the terminal units's inputs. One of the zone mixer inlet nodes should be the same as the supply air inlet node of the terminal unit; the other inlet node of the zone mixer should be the same as the cooling coil air outlet node. The outlet node of the zone mixer should be the same as the outlet node of the terminal unit.
+The name of an zone mixer component (object: \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}) which composes part of the terminal unit. Note that some of the zone mixer's inputs will duplicate some of the terminal unit's inputs. One of the zone mixer inlet nodes should be the same as the supply air inlet node of the terminal unit; the other inlet node of the zone mixer should be the same as the cooling coil air outlet node. The outlet node of the zone mixer should be the same as the outlet node of the terminal unit.
 
 An IDF example:
 
@@ -1640,7 +1640,7 @@ Surface area on the air side of the beam per unit beam length. The units are squ
 
 \paragraph{Field: Model Parameter a (a)}\label{field-model-parameter-a-a}
 
-This is ain the above equations. The default is 15.3
+This is in the above equations. The default is 15.3
 
 \paragraph{Field: Model Parameter n1}\label{field-model-parameter-n1}
 

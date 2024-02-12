@@ -1,6 +1,6 @@
 \section{Group -- Electric Load Center-Generator Specifications}\label{group-electric-load-center-generator-specifications}
 
-This group of input objects is related to electric power serving the facility. EnergyPlus has models for various types of electric generators and power conditioning devices that might be part of the electric power system serving the building being modeled. Buildings with simple utility electric power service will not necesarily need any of the models in this group. All EnergyPlus models that have any electric power consumption are assumed to have a straightforward connection to utility grid service and no extra input is needed. The models in this group of inputs are useful for facilities that more complex electric power service such as:
+This group of input objects is related to electric power serving the facility. EnergyPlus has models for various types of electric generators and power conditioning devices that might be part of the electric power system serving the building being modeled. Buildings with simple utility electric power service will not necessarily need any of the models in this group. All EnergyPlus models that have any electric power consumption are assumed to have a straightforward connection to utility grid service and no extra input is needed. The models in this group of inputs are useful for facilities that more complex electric power service such as:
 
 \begin{itemize}
 \tightlist
@@ -228,7 +228,7 @@ This alpha field contains the identifying name for the electric load center.
 
 \paragraph{Field: Generator List Name}\label{field-generator-list-name}
 
-This alpha field contains the identifying name for the list of generators in the set defined in an \hyperref[electricloadcentergenerators]{ElectricLoadCenter:Generators} object. All the generators connected to this load center need to be of the same type in terms of all AC or all DC. Currently the only DC generators are photovoltaic panels, the others are all AC. A facility with both AC and DC generators will need to use seperate ElectricLoadCenter:Distribution objects. The generator list named here can only be associated with one load center. This field can be left blank if there are no generators.
+This alpha field contains the identifying name for the list of generators in the set defined in an \hyperref[electricloadcentergenerators]{ElectricLoadCenter:Generators} object. All the generators connected to this load center need to be of the same type in terms of all AC or all DC. Currently the only DC generators are photovoltaic panels, the others are all AC. A facility with both AC and DC generators will need to use separate ElectricLoadCenter:Distribution objects. The generator list named here can only be associated with one load center. This field can be left blank if there are no generators.
 
 \paragraph{Field: Generator Operation Scheme Type}\label{field-generator-operation-scheme-type}
 
@@ -1154,7 +1154,7 @@ The kinetic battery model assumes that part of the battery's energy storage capa
 
 Each individual battery module is modeled as a voltage source in series with an electrical resistance. KiBaM assumes that the internal resistance is constant and the open circuit voltage varies with the electric current, the state of charge and the operation mode (charging or discharging). For an individual battery module, the open circuit voltage at any time is correlated to the voltage at fully charged/discharged state and three other regression coefficients. These regression coefficients are usually obtained via curve fitting based on battery test data.
 
-The object offers user the option to perform battery life calculation. If battery life is modeled, the user needs to provide a group of coefficients for the correlation between the number of cycles for battery failure and the corresponding cycle range. More detailed information can be found from the Engineering Reference.
+The object offers users the option to perform battery life calculation. If battery life is modeled, the user needs to provide a group of coefficients for the correlation between the number of cycles for battery failure and the corresponding cycle range. More detailed information can be found from the Engineering Reference.
 
 \subsubsection{Inputs}
 
@@ -1184,7 +1184,7 @@ This field defines the number of modules connected in series in the battery bank
 
 \paragraph{Field: Maximum Module Capacity}\label{field-maximum-module-capacity}
 
-This field indicates the maximum capacity of one battery module. It is evaluated as the total Amp-hours available when a full battery is discharged at infinitesimal current. This capacity is for an individual battery module, not for the whole battery bank. The maximum capacity can be found from manufacture s data or derived from test data by curve fitting.
+This field indicates the maximum capacity of one battery module. It is evaluated as the total Amp-hours available when a full battery is discharged at infinitesimal current. This capacity is for an individual battery module, not for the whole battery bank. The maximum capacity can be found from manufacture's data or derived from test data by curve fitting.
 
 \paragraph{Field: Initial Fractional State of Charge}\label{field-initial-fractional-state-of-charge}
 
@@ -1216,7 +1216,11 @@ The curve has the following form:
 \Delta E = ({C_1}*X)/({C_2} + X) + {C_3}*X
 \end{equation}
 
-where X is the battery charge divided by the maximum capacity at a given current. More details can be found from the Engineering Reference.
+where X is the battery charge divided by the maximum capacity at a given current.
+
+Note that a check is made when the input is retrieved to look at the voltage when charging and discharging (see next field). The voltage during charging at a particular battery charge should be higher for charging.  If not, it would potentially lead to results that show more energy being discharged by the battery than was charged. Warning messages are produced to alert the user of this situation so that curves can be analyzed and corrected as needed.
+
+More details on the kinetic battery as well as the charging and discharging algorithm can be found from the Engineering Reference.
 
 \paragraph{Field: Voltage Change Curve Name for Discharging}\label{field-voltage-change-curve-name-for-discharging}
 
@@ -1228,7 +1232,11 @@ The curve has the following form:
 \Delta E = ({C_1}*X)/({C_2} + X) + {C_3}*X
 \end{equation}
 
-where X is the removed charge divided by the maximum capacity at a given current. More details can be found from the Engineering Reference.
+where X is the removed charge divided by the maximum capacity at a given current.
+
+Note that a check is made when the input is retrieved to look at the voltage when charging (see previous field) and discharging. The voltage during charging at a particular battery charge should be higher for charging.  If not, it would potentially lead to results that show more energy being discharged by the battery than was charged. Warning messages are produced to alert the user of this situation so that curves can be analyzed and corrected as needed.
+
+More details on the kinetic battery as well as the charging and discharging algorithm can be found from the Engineering Reference.
 
 \paragraph{Field: Module Internal Electrical Resistance}\label{field-module-internal-electrical-resistance}
 
@@ -1267,57 +1275,57 @@ An example input of the ElectricLoadCenter:Storage: Battery input is:
 \begin{lstlisting}
 
 ElectricLoadCenter:Storage:Battery,
-  Lead Acid Battery A,   !-Name
-  Always On,                       !- Availability Schedule Name
-  ,                                         !- Zone Name
-  ,                                         !-Radiative Fraction
-  1,                                       !- Number of Battery Modules in Parallel
-  1,                                       !- Number of Battery Modules in Series
-  86.1,                                 !- Maximum Module Capacity {Ah}
-  1.0,                                   !- Initial Fractional State of Charge
-  0.3747,                             !- Fraction of Available Charge Capacity
-  0.5874,                             !- Change Rate from Bound Charge to Available Charge {hr$^{-1}$}
-  12.60,                               !- Fully Charged Module Open Circuit Voltage {V}
-  12.37,                               !- Fully Discharged Module Open Circuit Voltage {V}
-  BatteryChargeCurve,     !- Voltage Change Curve Name for Charging
-  BatteryDischargeCurve,!- Voltage Change Curve Name for Discharging
-  0.0538,                             !- Module Internal Electrical Resistance {Ohm}
-  100,                                   !- Maximum Module Discharging Current {A}
-  10.2,                                 !- Module Cut-off Voltage {V}
-  1,                                       !- Module Charge Rate Limit {1/hr}
-  Yes,                                   !- Battery Life Calculation
-  10,                                   !- Number of Cycle Bins
-  BatteryCycleCurve;       !- Battery Cycle Life Curve Name
+  Lead Acid Battery A,   !- Name
+  Always On,             !- Availability Schedule Name
+  ,                      !- Zone Name
+  ,                      !- Radiative Fraction
+  1,                     !- Number of Battery Modules in Parallel
+  1,                     !- Number of Battery Modules in Series
+  86.1,                  !- Maximum Module Capacity {Ah}
+  1.0,                   !- Initial Fractional State of Charge
+  0.3747,                !- Fraction of Available Charge Capacity
+  0.5874,                !- Change Rate from Bound Charge to Available Charge {hr$^{-1}$}
+  12.60,                 !- Fully Charged Module Open Circuit Voltage {V}
+  12.37,                 !- Fully Discharged Module Open Circuit Voltage {V}
+  BatteryChargeCurve,    !- Voltage Change Curve Name for Charging
+  BatteryDischargeCurve, !- Voltage Change Curve Name for Discharging
+  0.0538,                !- Module Internal Electrical Resistance {Ohm}
+  100,                   !- Maximum Module Discharging Current {A}
+  10.2,                  !- Module Cut-off Voltage {V}
+  1,                     !- Module Charge Rate Limit {1/hr}
+  Yes,                   !- Battery Life Calculation
+  10,                    !- Number of Cycle Bins
+  BatteryCycleCurve;     !- Battery Cycle Life Curve Name
 
   Curve:RectangularHyperbola2,
-  BatteryChargeCurve,     !- Name
-  -0.2765,                           !- Coefficient1 C1
-  -93.27,                             !- Coefficient2 C2
-  0.0068,                             !- Coefficient3 C3
-  0,                                       !- Minimum Value of x
-  1.0,                                   !- Maximum Value of x
-  -100,                                 !- Minimum Curve Output
-  100;                                   !- Maximum Curve Output
+  BatteryChargeCurve,    !- Name
+  -0.2765,               !- Coefficient1 C1
+  -93.27,                !- Coefficient2 C2
+  0.0068,                !- Coefficient3 C3
+  0,                     !- Minimum Value of x
+  1.0,                   !- Maximum Value of x
+  -100,                  !- Minimum Curve Output
+  100;                   !- Maximum Curve Output
 
   Curve:RectangularHyperbola2,
-  BatteryDischargeCurve,     !- Name
-  0.0899,                                   !- Coefficient1 C1
-  -98.24,                                   !- Coefficient2 C2
-  -0.0082,                                 !- Coefficient3 C3
-  0,                                             !- Minimum Value of x
-  1.0,                                         !- Maximum Value of x
-  -100,                                       !- Minimum Curve Output
-  100;                                         !- Maximum Curve Output
+  BatteryDischargeCurve, !- Name
+  0.0899,                !- Coefficient1 C1
+  -98.24,                !- Coefficient2 C2
+  -0.0082,               !- Coefficient3 C3
+  0,                     !- Minimum Value of x
+  1.0,                   !- Maximum Value of x
+  -100,                  !- Minimum Curve Output
+  100;                   !- Maximum Curve Output
 
   Curve:DoubleExponentialDecay,
-  BatteryCycleCurve,         !- Name
-  1380,                                   !- Coefficient1 C1
-  6834,                                   !- Coefficient2 C2
-  -8.75,                                 !- Coefficient3 C3
-  6747,                                   !- Coefficient4 C4
-  -6.22,                                 !- Coefficient5 C5
-  0,                                         !- Minimum Value of x
-  1.0;                                     !- Maximum Value of x
+  BatteryCycleCurve,     !- Name
+  1380,                  !- Coefficient1 C1
+  6834,                  !- Coefficient2 C2
+  -8.75,                 !- Coefficient3 C3
+  6747,                  !- Coefficient4 C4
+  -6.22,                 !- Coefficient5 C5
+  0,                     !- Minimum Value of x
+  1.0;                   !- Maximum Value of x
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{electricloadcenter-storagebattery-outputs}
@@ -1357,7 +1365,7 @@ This output reports the battery mode of operation: 0 for idle; 1 for discharging
 
 \paragraph{Electric Storage Charge State {[}Ah{]}}\label{electric-storage-charge-state-ah}
 
-The state of charge is expressed as the amount of charge stored in the battery at a point of time. It has the same unit as the maximum capacity. This value is given for an individual battery module
+The state of charge is expressed as the amount of charge stored in the battery at a point of time. It has the same unit as the maximum capacity. This value is given for an individual battery module.
 
 \paragraph{Electric Storage Charge Fraction {[]}}\label{electric-storage-charge-fraction}
 

@@ -4,7 +4,13 @@ This group of EnergyPlus input objects provides methods for users to include the
 
 Some building energy performance rating systems allow analysts to option of using exceptional calculation methods when a simulation program cannot perform the function required to be modeled. These user defined component models are intended to provide a means for including such exceptional calculations within the context of a full EnergyPlus model. This allows using EnergyPlus for everything it can model and extending it yourself to include a new type of HVAC or Plant component.
 
-These objects are advanced. Making good use of them requires the user to have a detailed understanding of EnergyPlus HVAC and Plant models as well as the Energy Management System (EMS). The EnergyPlus Runtime Language (Erl) is used to program the component model. The Application Guide for EMS provides more discussion of how to use the objects in this group see the chapter called User-Defined Component Models.
+These objects are advanced. Making good use of them requires the user to have a detailed understanding of EnergyPlus HVAC and Plant models as well as the Energy Management System (EMS). There are three methods for creating the programs:
+
+\begin{description}
+  \item[Erl-Based] In this case, the EnergyPlus Runtime Language (Erl) is used to program the component model right in the IDF itself. The Application Guide for EMS provides more discussion of how to use the objects in this group see the chapter called User-Defined Component Models.
+  \item[Python Plugin] In this case, the user will create a PythonPlugin:Instance object in the IDF which lists the name of a Python file and class.  That class should override the \texttt{on\_user\_defined\_component\_model} method to create user defined behavior.
+  \item[API Callback] This approach is very similar to the Python Plugin in that the user will still create the user defined behavior in Python.  However in this case, the user will create a callback function for modeling the behavior, and register the function using the runtime API function \texttt{callback\_user\_defined\_component\_model}.  The string passed to this registration function should be entered into the user-defined object's Program Name input field to match them up.
+\end{description}
 
 \subsection{ZoneHVAC:ForcedAir:UserDefined}\label{zonehvacforcedairuserdefined}
 
@@ -178,7 +184,7 @@ AirTerminal:SingleDuct:UserDefined,
 
 \subsection{Coil:UserDefined}\label{coiluserdefined}
 
-This object is used to define a generic coil for custom component modeling of a device that processes air as part of an air handeler. The Coil:UserDefined object appears directly on a \hyperref[branch]{Branch} object used to define the supply side of an air handler, or in the \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} object used to define outdoor air systems. This object has one or two air connections and an optional plant connection. Water storage tanks can be connected for supply or collection. An ambient zone can be connected for skin losses to be treated as separate internal gains.
+This object is used to define a generic coil for custom component modeling of a device that processes air as part of an air handler. The Coil:UserDefined object appears directly on a \hyperref[branch]{Branch} object used to define the supply side of an air handler, or in the \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} object used to define outdoor air systems. This object has one or two air connections and an optional plant connection. Water storage tanks can be connected for supply or collection. An ambient zone can be connected for skin losses to be treated as separate internal gains.
 
 \subsubsection{Field: Name}\label{field-name-2-041}
 
@@ -261,7 +267,7 @@ An example of this input object follows.
 \begin{lstlisting}
 
 EnergyManagementSystem:Program,
-  MainHWCoil1_ModelOuput,  !- Name
+  MainHWCoil1_Modeloutput,  !- Name
   Set HWcoil1_Water_MdotRequest = Water_MdotRequest,  !- Program Line 1
   Set HWcoil1_Air_Tout          = Air_Tout,  !- Program Line 2
   Set HWcoil1_Air_Wout          = Air_Wout,  !- <none>
@@ -274,7 +280,7 @@ EnergyManagementSystem:Program,
   HWcoil1 tot heat Energy, !- Name
   HWcoil1_tot_heat_Energy, !- EMS Variable Name
   SystemTimestep,          !- Update Frequency
-  MainHWCoil1_ModelOuput,  !- EMS Program or Subroutine Name
+  MainHWCoil1_Modeloutput,  !- EMS Program or Subroutine Name
   ENERGYTRANSFER,          !- Resource Type
   System,                  !- Group Type
   HEATINGCOILS,            !- End-Use Category
@@ -348,7 +354,7 @@ This field defines the nature of the plant component with respect to how it affe
 
 \paragraph{Field: Plant Connection \textless{}\#\textgreater{} Initialization Program Calling Manager Name}\label{field-plant-connection-x-initialization-program-calling-manager-name}
 
-This field specifies the Erl programs that are used to initialize and size the plant component with regard to this particular plant connection. This field should contain the name of an \hyperref[energymanagementsystemprogramcallingmanager]{EnergyManagementSystem:ProgramCallingManager} that is defined elsewhere and uses the calling point called UserDefinedComponentModel. The program manager referenced here should include all the Erl programs that are needed to do any initial setup that should occur before the main modeling programs are run. These include calculating and setting values for things that do not vary over time such as component sizes, control parameters, modeling constants etc. The user defined component will trigger this calling manager during the intitial setup routines for plant systems.
+This field specifies the Erl programs that are used to initialize and size the plant component with regard to this particular plant connection. This field should contain the name of an \hyperref[energymanagementsystemprogramcallingmanager]{EnergyManagementSystem:ProgramCallingManager} that is defined elsewhere and uses the calling point called UserDefinedComponentModel. The program manager referenced here should include all the Erl programs that are needed to do any initial setup that should occur before the main modeling programs are run. These include calculating and setting values for things that do not vary over time such as component sizes, control parameters, modeling constants etc. The user defined component will trigger this calling manager during the initial setup routines for plant systems.
 
 \paragraph{Field: Plant Connection \textless{}\#\textgreater{} Simulation Program Calling Manager Name}\label{field-plant-connection-x-simulation-program-calling-manager-name}
 

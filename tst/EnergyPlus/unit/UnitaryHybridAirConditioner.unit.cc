@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -422,51 +422,39 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     std::string TypeOfComp = "ZoneHVAC:HybridUnitaryHVAC";
     std::string NameOfComp = thisUnitary.Name;
     int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
-    Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
-    Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
-    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
-    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-    std::map<int, Constant::eResource> ResourceTypes;                // ResourceTypes for each variable
-    Array1D_string EndUses(NumVariables);                            // EndUses for each variable
-    Array1D_string Groups(NumVariables);                             // Groups for each variable
-    Array1D_string Names(NumVariables);                              // Variable Names for each variable
+    Array1D<OutputProcessor::MeteredVar> meteredVars(NumVariables); // Variable Types (1=integer, 2=real, 3=meter)
 
-    for (int varN = 1; varN <= NumVariables; ++varN) {
-        ResourceTypes.insert(std::pair<int, Constant::eResource>(varN, Constant::eResource::Invalid));
-    }
-
-    GetMeteredVariables(
-        *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+    NumFound = GetMeteredVariables(*state, NameOfComp, meteredVars);
 
     // output results
     Real64 MaxFlow = thisUnitary.ScaledSystemMaximumSupplyAirVolumeFlowRate;
 
     // Check the meters associated with the ZoneHVAC:HybridUnitaryHVAC outputs
     EXPECT_EQ(14, NumFound);
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(1), Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER - Cooling
-    EXPECT_EQ(EndUses(1), "COOLINGCOILS");
-    EXPECT_EQ(Groups(1), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(2), Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER - Heating
-    EXPECT_EQ(EndUses(2), "HEATINGCOILS");
-    EXPECT_EQ(Groups(2), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(3), Constant::eResource::Electricity)); // ELECTRIC - Cooling Energy
-    EXPECT_EQ(EndUses(3), "COOLING");
-    EXPECT_EQ(Groups(3), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(4), Constant::eResource::Electricity)); // ELECTRIC - Fan Energy
-    EXPECT_EQ(EndUses(4), "FANS");
-    EXPECT_EQ(Groups(4), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(5),
+    EXPECT_TRUE(compare_enums(meteredVars(1).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER - Cooling
+    EXPECT_TRUE(compare_enums(meteredVars(1).sovEndUseCat, OutputProcessor::SOVEndUseCat::CoolingCoils));
+    EXPECT_TRUE(compare_enums(meteredVars(1).sovGroup, OutputProcessor::SOVGroup::HVAC));
+    EXPECT_TRUE(compare_enums(meteredVars(2).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER - Heating
+    EXPECT_TRUE(compare_enums(meteredVars(2).sovEndUseCat, OutputProcessor::SOVEndUseCat::HeatingCoils));
+    EXPECT_TRUE(compare_enums(meteredVars(2).sovGroup, OutputProcessor::SOVGroup::HVAC));
+    EXPECT_TRUE(compare_enums(meteredVars(3).resource, Constant::eResource::Electricity)); // ELECTRIC - Cooling Energy
+    EXPECT_TRUE(compare_enums(meteredVars(3).sovEndUseCat, OutputProcessor::SOVEndUseCat::Cooling));
+    EXPECT_TRUE(compare_enums(meteredVars(3).sovGroup, OutputProcessor::SOVGroup::HVAC));
+    EXPECT_TRUE(compare_enums(meteredVars(4).resource, Constant::eResource::Electricity)); // ELECTRIC - Fan Energy
+    EXPECT_TRUE(compare_enums(meteredVars(4).sovEndUseCat, OutputProcessor::SOVEndUseCat::Fans));
+    EXPECT_TRUE(compare_enums(meteredVars(4).sovGroup, OutputProcessor::SOVGroup::HVAC));
+    EXPECT_TRUE(compare_enums(meteredVars(5).resource,
                               Constant::eResource::NaturalGas)); // NATURALGAS - Secondary Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
-    EXPECT_EQ(EndUses(5), "COOLING");
-    EXPECT_EQ(Groups(5), "HVAC");
+    EXPECT_TRUE(compare_enums(meteredVars(5).sovEndUseCat, OutputProcessor::SOVEndUseCat::Cooling));
+    EXPECT_TRUE(compare_enums(meteredVars(5).sovGroup, OutputProcessor::SOVGroup::HVAC));
     EXPECT_TRUE(
-        compare_enums(ResourceTypes.at(6),
+        compare_enums(meteredVars(6).resource,
                       Constant::eResource::DistrictCooling)); // DISTRICTCOOLING - Third Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
-    EXPECT_EQ(EndUses(6), "COOLING");
-    EXPECT_EQ(Groups(6), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(7), Constant::eResource::Water)); // WATER - Cooling Water Use
-    EXPECT_EQ(EndUses(7), "COOLING");
-    EXPECT_EQ(Groups(7), "HVAC");
+    EXPECT_TRUE(compare_enums(meteredVars(6).sovEndUseCat, OutputProcessor::SOVEndUseCat::Cooling));
+    EXPECT_TRUE(compare_enums(meteredVars(6).sovGroup, OutputProcessor::SOVGroup::HVAC));
+    EXPECT_TRUE(compare_enums(meteredVars(7).resource, Constant::eResource::Water)); // WATER - Cooling Water Use
+    EXPECT_TRUE(compare_enums(meteredVars(7).sovEndUseCat, OutputProcessor::SOVEndUseCat::Cooling));
+    EXPECT_TRUE(compare_enums(meteredVars(7).sovGroup, OutputProcessor::SOVGroup::HVAC));
 
     // Check that unit is included in Component Sizing Summary Report
     EXPECT_EQ("ZoneHVAC:HybridUnitaryHVAC", state->dataOutRptPredefined->CompSizeTableEntry(1).typeField);

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -122,7 +122,7 @@ namespace ElectricBaseboardRadiator {
 
         // Find the correct Baseboard Equipment
         if (CompIndex == 0) {
-            BaseboardNum = UtilityRoutines::FindItemInList(EquipName, state.dataElectBaseboardRad->ElecBaseboard, &ElecBaseboardParams::EquipName);
+            BaseboardNum = Util::FindItemInList(EquipName, state.dataElectBaseboardRad->ElecBaseboard, &ElecBaseboardParams::EquipName);
             if (BaseboardNum == 0) {
                 ShowFatalError(state, "SimElectricBaseboard: Unit not found=" + EquipName);
             }
@@ -239,7 +239,7 @@ namespace ElectricBaseboardRadiator {
             }
 
             // Determine HW radiant baseboard heating design capacity sizing method
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
                 elecBaseboard.HeatingCapMethod = DataSizing::HeatingDesignCapacity;
 
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
@@ -261,7 +261,7 @@ namespace ElectricBaseboardRadiator {
                                       "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
                 elecBaseboard.HeatingCapMethod = DataSizing::CapacityPerFloorArea;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     elecBaseboard.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
@@ -293,7 +293,7 @@ namespace ElectricBaseboardRadiator {
                                       "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
                 elecBaseboard.HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                     elecBaseboard.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
@@ -340,15 +340,14 @@ namespace ElectricBaseboardRadiator {
             }
 
             // Remaining fraction is added to the zone as convective heat transfer
-            Real64 AllFracsSummed = elecBaseboard.FracRadiant;
-            if (AllFracsSummed > MaxFraction) {
+            if (elecBaseboard.FracRadiant > MaxFraction) {
                 ShowWarningError(state,
                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                      "\", Fraction Radiant was higher than the allowable maximum.");
                 elecBaseboard.FracRadiant = MaxFraction;
                 elecBaseboard.FracConvect = 0.0;
             } else {
-                elecBaseboard.FracConvect = 1.0 - AllFracsSummed;
+                elecBaseboard.FracConvect = 1.0 - elecBaseboard.FracRadiant;
             }
 
             elecBaseboard.FracDistribPerson = state.dataIPShortCut->rNumericArgs(6);
@@ -386,9 +385,9 @@ namespace ElectricBaseboardRadiator {
             elecBaseboard.FracDistribToSurf = 0.0;
 
             elecBaseboard.ZonePtr =
-                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::BBElectric, elecBaseboard.EquipName);
+                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::BaseboardElectric, elecBaseboard.EquipName);
 
-            AllFracsSummed = elecBaseboard.FracDistribPerson;
+            Real64 AllFracsSummed = elecBaseboard.FracDistribPerson;
             for (int SurfNum = 1; SurfNum <= elecBaseboard.TotSurfToDistrib; ++SurfNum) {
                 elecBaseboard.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 3);
                 elecBaseboard.SurfacePtr(SurfNum) = HeatBalanceIntRadExchange::GetRadiantSystemSurface(
@@ -409,7 +408,8 @@ namespace ElectricBaseboardRadiator {
                     elecBaseboard.TotSurfToDistrib = MinFraction;
                 }
                 if (elecBaseboard.SurfacePtr(SurfNum) != 0) {
-                    state.dataSurface->SurfIntConvSurfGetsRadiantHeat(elecBaseboard.SurfacePtr(SurfNum)) = true;
+                    state.dataSurface->surfIntConv(elecBaseboard.SurfacePtr(SurfNum)).getsRadiantHeat = true;
+                    state.dataSurface->allGetsRadiantHeatSurfaceList.emplace_back(elecBaseboard.SurfacePtr(SurfNum));
                 }
 
                 AllFracsSummed += elecBaseboard.FracDistribToSurf(SurfNum);
@@ -439,7 +439,7 @@ namespace ElectricBaseboardRadiator {
             // CurrentModuleObject='ZoneHVAC:Baseboard:RadiantConvective:Electric'
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 elecBaseboard.TotPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -447,14 +447,14 @@ namespace ElectricBaseboardRadiator {
 
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 elecBaseboard.ConvPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 elecBaseboard.EquipName);
             SetupOutputVariable(state,
                                 "Baseboard Radiant Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 elecBaseboard.RadPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -462,46 +462,44 @@ namespace ElectricBaseboardRadiator {
 
             SetupOutputVariable(state,
                                 "Baseboard Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 elecBaseboard.ElecUseLoad,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 elecBaseboard.EquipName,
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::Heating,
                                 {},
-                                "Electricity",
-                                "HEATING",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Baseboard Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 elecBaseboard.ElecUseRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 elecBaseboard.EquipName);
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 elecBaseboard.TotEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 elecBaseboard.EquipName,
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::SOVEndUseCat::Baseboard,
                                 {},
-                                "ENERGYTRANSFER",
-                                "BASEBOARD",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
 
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 elecBaseboard.ConvEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 elecBaseboard.EquipName);
             SetupOutputVariable(state,
                                 "Baseboard Radiant Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 elecBaseboard.RadEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -599,13 +597,14 @@ namespace ElectricBaseboardRadiator {
             auto &elecBaseboard = state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum);
             state.dataSize->DataScalableCapSizingON = false;
 
-            std::string CompType = state.dataElectBaseboardRad->cCMO_BBRadiator_Electric;
-            std::string CompName = elecBaseboard.EquipName;
+            std::string_view const CompType = state.dataElectBaseboardRad->cCMO_BBRadiator_Electric;
+            std::string_view const CompName = elecBaseboard.EquipName;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = elecBaseboard.ZonePtr;
             int SizingMethod = DataHVACGlobals::HeatingCapacitySizing; // Integer representation of sizing method name (e.g., CoolingAirflowSizing)
             int FieldNum = 1;                                          // IDD numeric field number where input field description is found
-            std::string SizingString = state.dataElectBaseboardRad->ElecBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
+            std::string const SizingString =
+                format("{} [W]", state.dataElectBaseboardRad->ElecBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum));
             // capacity sizing methods (e.g., HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity)
             int CapSizingMethod = elecBaseboard.HeatingCapMethod;
             zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
@@ -741,7 +740,7 @@ namespace ElectricBaseboardRadiator {
                     DistributeBBElecRadGains(state);
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
-                    // Recalculate LoadMet with new ZeroSource... term and see if it is positive now.  If not, shut it down.
+                    // Recalculate LoadMet with new ZeroBBSource... term and see if it is positive now.  If not, shut it down.
                     LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - TempZeroBBSourceSumHATsurf) +
                               (QBBCap * elecBaseboard.FracConvect) + (RadHeat * elecBaseboard.FracDistribPerson);
                     if (LoadMet < 0.0) {
@@ -905,7 +904,12 @@ namespace ElectricBaseboardRadiator {
         Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
         // Initialize arrays
-        state.dataHeatBalFanSys->SurfQElecBaseboard = 0.0;
+        for (auto &elecBaseboard : state.dataElectBaseboardRad->ElecBaseboard) {
+            for (int radSurfNum = 1; radSurfNum <= elecBaseboard.TotSurfToDistrib; ++radSurfNum) {
+                int surfNum = elecBaseboard.SurfacePtr(radSurfNum);
+                state.dataHeatBalFanSys->surfQRadFromHVAC(surfNum).ElecBaseboard = 0.0;
+            }
+        }
         state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson = 0.0;
 
         for (auto &elecBaseboard : state.dataElectBaseboardRad->ElecBaseboard) {
@@ -918,8 +922,7 @@ namespace ElectricBaseboardRadiator {
                     if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
                         Real64 ThisSurfIntensity =
                             (elecBaseboard.QBBElecRadSource * elecBaseboard.FracDistribToSurf(RadSurfNum) / state.dataSurface->Surface(SurfNum).Area);
-                        state.dataHeatBalFanSys->SurfQElecBaseboard(SurfNum) += ThisSurfIntensity;
-                        state.dataHeatBalSurf->AnyRadiantSystems = true;
+                        state.dataHeatBalFanSys->surfQRadFromHVAC(SurfNum).ElecBaseboard += ThisSurfIntensity;
                         if (ThisSurfIntensity > DataHeatBalFanSys::MaxRadHeatFlux) {
                             ShowSevereError(state, "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected");
                             ShowContinueError(state, "Surface = " + state.dataSurface->Surface(SurfNum).Name);

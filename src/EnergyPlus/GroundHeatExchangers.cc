@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -134,8 +134,8 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
 
     this->name = objName;
 
-    std::string inletNodeName = UtilityRoutines::MakeUPPERCase(j["inlet_node_name"].get<std::string>());
-    std::string outletNodeName = UtilityRoutines::MakeUPPERCase(j["outlet_node_name"].get<std::string>());
+    std::string inletNodeName = Util::makeUPPER(j["inlet_node_name"].get<std::string>());
+    std::string outletNodeName = Util::makeUPPER(j["outlet_node_name"].get<std::string>());
 
     // get inlet node num
     this->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -179,10 +179,10 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
     this->pipe.outRadius = this->pipe.outDia / 2.0;
     this->pipe.thickness = j["pipe_thickness"].get<Real64>();
 
-    std::string const hxConfig = UtilityRoutines::MakeUPPERCase(j["heat_exchanger_configuration"].get<std::string>());
-    if (UtilityRoutines::SameString(hxConfig, "VERTICAL")) {
+    std::string const hxConfig = Util::makeUPPER(j["heat_exchanger_configuration"].get<std::string>());
+    if (Util::SameString(hxConfig, "VERTICAL")) {
         this->verticalConfig = true;
-    } else if (UtilityRoutines::SameString(hxConfig, "HORIZONTAL")) {
+    } else if (Util::SameString(hxConfig, "HORIZONTAL")) {
         this->verticalConfig = false;
     }
 
@@ -246,8 +246,8 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
     }
 
     // Initialize ground temperature model and get pointer reference
-    std::string const gtmType = UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_type"].get<std::string>());
-    std::string const gtmName = UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_name"].get<std::string>());
+    std::string const gtmType = Util::makeUPPER(j["undisturbed_ground_temperature_model_type"].get<std::string>());
+    std::string const gtmName = Util::makeUPPER(j["undisturbed_ground_temperature_model_name"].get<std::string>());
     this->groundTempModel = GetGroundTempModelAndInit(state, gtmType, gtmName);
 
     // Check for Errors
@@ -272,7 +272,8 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
     this->name = objName;
 
     // get inlet node num
-    std::string const inletNodeName = UtilityRoutines::MakeUPPERCase(j["inlet_node_name"].get<std::string>());
+    std::string const inletNodeName = Util::makeUPPER(j["inlet_node_name"].get<std::string>());
+
     this->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                              inletNodeName,
                                                              errorsFound,
@@ -284,7 +285,8 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
                                                              DataLoopNode::ObjectIsNotParent);
 
     // get outlet node num
-    std::string const outletNodeName = UtilityRoutines::MakeUPPERCase(j["outlet_node_name"].get<std::string>());
+    std::string const outletNodeName = Util::makeUPPER(j["outlet_node_name"].get<std::string>());
+
     this->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                               outletNodeName,
                                                               errorsFound,
@@ -307,8 +309,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
 
     if (j.find("ghe_vertical_responsefactors_object_name") != j.end()) {
         // Response factors come from IDF object
-        this->myRespFactors =
-            GetResponseFactor(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_responsefactors_object_name"].get<std::string>()));
+        this->myRespFactors = GetResponseFactor(state, Util::makeUPPER(j["ghe_vertical_responsefactors_object_name"].get<std::string>()));
         this->gFunctionsExist = true;
     }
 
@@ -317,7 +318,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
 
         // g-function calculation method
         if (j.find("g_function_calculation_method") != j.end()) {
-            std::string gFunctionMethodStr = UtilityRoutines::MakeUPPERCase(j["g_function_calculation_method"].get<std::string>());
+            std::string gFunctionMethodStr = Util::makeUPPER(j["g_function_calculation_method"].get<std::string>());
             if (gFunctionMethodStr == "UHFCALC") {
                 this->gFuncCalcMethod = GFuncCalcMethod::UniformHeatFlux;
             } else if (gFunctionMethodStr == "UBHWTCALC") {
@@ -332,7 +333,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
         if (j.find("ghe_vertical_array_object_name") != j.end()) {
             // Response factors come from array object
             this->myRespFactors = BuildAndGetResponseFactorObjectFromArray(
-                state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_array_object_name"].get<std::string>())));
+                state, GetVertArray(state, Util::makeUPPER(j["ghe_vertical_array_object_name"].get<std::string>())));
         } else {
             if (j.find("vertical_well_locations") == j.end()) {
                 // No ResponseFactors, GHEArray, or SingleBH object are referenced
@@ -348,7 +349,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
             for (auto const &var : vars) {
                 if (!var.at("ghe_vertical_single_object_name").empty()) {
                     std::shared_ptr<GLHEVertSingle> tempBHptr =
-                        GetSingleBH(state, UtilityRoutines::MakeUPPERCase(var.at("ghe_vertical_single_object_name").get<std::string>()));
+                        GetSingleBH(state, Util::makeUPPER(var.at("ghe_vertical_single_object_name").get<std::string>()));
                     tempVectOfBHObjects.push_back(tempBHptr);
                 } else {
                     break;
@@ -411,10 +412,9 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
     state.dataGroundHeatExchanger->prevTimeSteps = 0.0;
 
     // Initialize ground temperature model and get pointer reference
-    this->groundTempModel =
-        GetGroundTempModelAndInit(state,
-                                  UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_type"].get<std::string>()),
-                                  UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_name"].get<std::string>()));
+    this->groundTempModel = GetGroundTempModelAndInit(state,
+                                                      Util::makeUPPER(j["undisturbed_ground_temperature_model_type"].get<std::string>()),
+                                                      Util::makeUPPER(j["undisturbed_ground_temperature_model_name"].get<std::string>()));
 
     // Check for Errors
     if (errorsFound) {
@@ -434,7 +434,7 @@ GLHEVertSingle::GLHEVertSingle(EnergyPlusData &state, std::string const &objName
     }
 
     this->name = objName;
-    this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_properties_object_name"].get<std::string>()));
+    this->props = GetVertProps(state, Util::makeUPPER(j["ghe_vertical_properties_object_name"].get<std::string>()));
     this->xLoc = j["x_location"].get<Real64>();
     this->yLoc = j["y_location"].get<Real64>();
     this->dl_i = 0.0;
@@ -454,7 +454,7 @@ GLHEVertArray::GLHEVertArray(EnergyPlusData &state, std::string const &objName, 
     }
 
     this->name = objName;
-    this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_properties_object_name"].get<std::string>()));
+    this->props = GetVertProps(state, Util::makeUPPER(j["ghe_vertical_properties_object_name"].get<std::string>()));
     this->numBHinXDirection = j["number_of_boreholes_in_x_direction"].get<int>();
     this->numBHinYDirection = j["number_of_boreholes_in_y_direction"].get<int>();
     this->bhSpacing = j["borehole_spacing"].get<Real64>();
@@ -473,7 +473,7 @@ GLHEResponseFactors::GLHEResponseFactors(EnergyPlusData &state, std::string cons
     }
 
     this->name = objName;
-    this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_properties_object_name"].get<std::string>()));
+    this->props = GetVertProps(state, Util::makeUPPER(j["ghe_vertical_properties_object_name"].get<std::string>()));
     this->numBoreholes = j["number_of_boreholes"].get<int>();
     this->gRefRatio = j["g_function_reference_ratio"].get<Real64>();
     this->maxSimYears = state.dataEnvrn->MaxNumberSimYears;
@@ -2405,7 +2405,7 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
         for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
             auto const &instance = it.value();
             std::string const &objName = it.key();
-            std::string const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+            std::string const &objNameUC = Util::makeUPPER(objName);
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
             std::shared_ptr<GLHEVertProps> thisObj(new GLHEVertProps(state, objNameUC, instance));
             state.dataGroundHeatExchanger->vertPropsVector.push_back(thisObj);
@@ -2425,7 +2425,7 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
         for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
             auto const &instance = it.value();
             std::string const &objName = it.key();
-            std::string const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+            std::string const &objNameUC = Util::makeUPPER(objName);
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
             std::shared_ptr<GLHEResponseFactors> thisObj(new GLHEResponseFactors(state, objNameUC, instance));
             state.dataGroundHeatExchanger->responseFactorsVector.push_back(thisObj);
@@ -2445,7 +2445,7 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
         for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
             auto const &instance = it.value();
             std::string const &objName = it.key();
-            std::string const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+            std::string const &objNameUC = Util::makeUPPER(objName);
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
             std::shared_ptr<GLHEVertArray> thisObj(new GLHEVertArray(state, objNameUC, instance));
             state.dataGroundHeatExchanger->vertArraysVector.push_back(thisObj);
@@ -2465,7 +2465,7 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
         for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
             auto const &instance = it.value();
             std::string const &objName = it.key();
-            std::string const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+            std::string const &objNameUC = Util::makeUPPER(objName);
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
             std::shared_ptr<GLHEVertSingle> thisObj(new GLHEVertSingle(state, objNameUC, instance));
             state.dataGroundHeatExchanger->singleBoreholesVector.push_back(thisObj);
@@ -2485,7 +2485,7 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
         for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
             auto const &instance = it.value();
             std::string const &objName = it.key();
-            std::string const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+            std::string const &objNameUC = Util::makeUPPER(objName);
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
             state.dataGroundHeatExchanger->verticalGLHE.emplace_back(state, objNameUC, instance);
         }
@@ -2505,7 +2505,7 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
         for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
             auto const &instance = it.value();
             std::string const &objName = it.key();
-            std::string const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+            std::string const &objNameUC = Util::makeUPPER(objName);
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(currObj, objName);
             state.dataGroundHeatExchanger->slinkyGLHE.emplace_back(state, objNameUC, instance);
         }
@@ -2518,49 +2518,49 @@ void GLHEBase::setupOutput(EnergyPlusData &state)
 {
     SetupOutputVariable(state,
                         "Ground Heat Exchanger Average Borehole Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->bhTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->name);
     SetupOutputVariable(state,
                         "Ground Heat Exchanger Heat Transfer Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->QGLHE,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->name);
     SetupOutputVariable(state,
                         "Ground Heat Exchanger Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->inletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->name);
     SetupOutputVariable(state,
                         "Ground Heat Exchanger Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->outletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->name);
     SetupOutputVariable(state,
                         "Ground Heat Exchanger Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->massFlowRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->name);
     SetupOutputVariable(state,
                         "Ground Heat Exchanger Average Fluid Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->aveFluidTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->name);
     SetupOutputVariable(state,
                         "Ground Heat Exchanger Farfield Ground Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->tempGround,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,

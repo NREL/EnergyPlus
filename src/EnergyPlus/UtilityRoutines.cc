@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,21 +64,21 @@ extern "C" {
 // EnergyPlus Headers
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+// #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
+// #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/DataTimings.hh>
+// #include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/DaylightingManager.hh>
-#include <EnergyPlus/DisplayRoutines.hh>
+// #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/ExternalInterface.hh>
-#include <EnergyPlus/FileSystem.hh>
+// #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/IOFiles.hh>
+// #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
@@ -88,13 +88,12 @@ extern "C" {
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-
 // Third Party Headers
 #include <fast_float/fast_float.h>
 
 namespace EnergyPlus {
 
-namespace UtilityRoutines {
+namespace Util {
 
     Real64 ProcessNumber(std::string_view String, bool &ErrorFlag)
     {
@@ -274,7 +273,7 @@ namespace UtilityRoutines {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int FindItem = UtilityRoutines::FindItemInList(String, ListOfItems, NumItems);
+        int FindItem = Util::FindItemInList(String, ListOfItems, NumItems);
         if (FindItem != 0) return FindItem;
 
         for (int Count = 1; Count <= NumItems; ++Count) {
@@ -299,7 +298,7 @@ namespace UtilityRoutines {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int FindItem = UtilityRoutines::FindItemInList(String, ListOfItems, NumItems);
+        int FindItem = Util::FindItemInList(String, ListOfItems, NumItems);
         if (FindItem != 0) return FindItem;
 
         for (int Count = 1; Count <= NumItems; ++Count) {
@@ -400,7 +399,7 @@ namespace UtilityRoutines {
 
     size_t case_insensitive_hasher::operator()(std::string_view const key) const noexcept
     {
-        std::string keyCopy = MakeUPPERCase(key);
+        std::string keyCopy = makeUPPER(key);
         return std::hash<std::string>()(keyCopy);
     }
 
@@ -486,7 +485,7 @@ namespace UtilityRoutines {
         return calctime;
     }
 
-} // namespace UtilityRoutines
+} // namespace Util
 
 int AbortEnergyPlus(EnergyPlusData &state)
 {
@@ -588,7 +587,7 @@ int AbortEnergyPlus(EnergyPlusData &state)
     NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
 
     // catch up with timings if in middle
-    state.dataSysVars->Time_Finish = UtilityRoutines::epElapsedTime();
+    state.dataSysVars->Time_Finish = Util::epElapsedTime();
     if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
     state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
     if (state.dataSysVars->Elapsed_Time < 0.0) state.dataSysVars->Elapsed_Time = 0.0;
@@ -637,6 +636,10 @@ int AbortEnergyPlus(EnergyPlusData &state)
         state.files.flushAll();
     }
 
+    // The audit file seems to be held open in some cases, make sure it is closed before leaving.
+    // EnergyPlus can close through two paths: EndEnergyPlus and AbortEnergyPlus, so do the same thing there.
+    state.files.audit.close();
+
     return EXIT_FAILURE;
 }
 
@@ -657,8 +660,8 @@ void CloseMiscOpenFiles(EnergyPlusData &state)
     // Use INQUIRE to determine if file is open.
 
     // Using/Aliasing
-    using DaylightingManager::CloseDFSFile;
-    using DaylightingManager::CloseReportIllumMaps;
+    using Dayltg::CloseDFSFile;
+    using Dayltg::CloseReportIllumMaps;
 
     CloseReportIllumMaps(state);
     CloseDFSFile(state);
@@ -724,11 +727,11 @@ int EndEnergyPlus(EnergyPlusData &state)
     NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
     strip(NumSevereDuringSizing);
 
-    state.dataSysVars->Time_Finish = UtilityRoutines::epElapsedTime();
+    state.dataSysVars->Time_Finish = Util::epElapsedTime();
     if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
     state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
     if (state.dataGlobal->createPerfLog) {
-        UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", state.dataSysVars->Elapsed_Time));
+        Util::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", state.dataSysVars->Elapsed_Time));
     }
     Hours = state.dataSysVars->Elapsed_Time / 3600.0;
     state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
@@ -744,9 +747,9 @@ int EndEnergyPlus(EnergyPlusData &state)
     state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
     if (state.dataGlobal->createPerfLog) {
-        UtilityRoutines::appendPerfLog(state, "Run Time [string]", Elapsed);
-        UtilityRoutines::appendPerfLog(state, "Number of Warnings", NumWarnings);
-        UtilityRoutines::appendPerfLog(state, "Number of Severe", NumSevere, true); // last item so write the perfLog file
+        Util::appendPerfLog(state, "Run Time [string]", Elapsed);
+        Util::appendPerfLog(state, "Number of Warnings", NumWarnings);
+        Util::appendPerfLog(state, "Number of Severe", NumSevere, true); // last item so write the perfLog file
     }
     ShowMessage(
         state,
@@ -772,9 +775,20 @@ int EndEnergyPlus(EnergyPlusData &state)
     // indicating that E+ finished its simulation
     if ((state.dataExternalInterface->NumExternalInterfaces > 0) && state.dataExternalInterface->haveExternalInterfaceBCVTB) CloseSocket(state, 1);
 
+    if (state.dataGlobal->fProgressPtr) {
+        state.dataGlobal->fProgressPtr(100);
+    }
+    if (state.dataGlobal->progressCallback) {
+        state.dataGlobal->progressCallback(100);
+    }
+
     if (state.dataGlobal->eplusRunningViaAPI) {
         state.files.flushAll();
     }
+
+    // The audit file seems to be held open in some cases, make sure it is closed before leaving.
+    // EnergyPlus can close through two paths: EndEnergyPlus and AbortEnergyPlus, so do the same thing there.
+    state.files.audit.close();
 
     return EXIT_SUCCESS;
 }
@@ -1253,7 +1267,7 @@ void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
     }
     bool bNewMessageFound = true;
     for (int Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
-        if (UtilityRoutines::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " ** Severe  ** " + Message)) {
+        if (Util::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " ** Severe  ** " + Message)) {
             bNewMessageFound = false;
             MsgIndex = Loop;
             break;
@@ -1308,7 +1322,7 @@ void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
     }
     bool bNewMessageFound = true;
     for (int Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
-        if (UtilityRoutines::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " ** Warning ** " + Message)) {
+        if (Util::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " ** Warning ** " + Message)) {
             bNewMessageFound = false;
             MsgIndex = Loop;
             break;
@@ -1363,7 +1377,7 @@ void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,
     }
     bool bNewMessageFound = true;
     for (int Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
-        if (UtilityRoutines::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " **   ~~~   ** " + Message)) {
+        if (Util::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " **   ~~~   ** " + Message)) {
             bNewMessageFound = false;
             MsgIndex = Loop;
             break;
@@ -1632,6 +1646,91 @@ void ShowRecurringErrors(EnergyPlusData &state)
         }
         ShowMessage(state, "");
     }
+}
+
+void ShowSevereDuplicateName(EnergyPlusData &state, ErrorObjectHeader const &eoh)
+{
+    ShowSevereError(state, format("{}: {} = {}, duplicate name.", eoh.routineName, eoh.objectType, eoh.objectName));
+}
+
+void ShowSevereEmptyField(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view depFieldName, std::string_view depFieldVal)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state,
+                      format("{} cannot be empty{}.", fieldName, depFieldName.empty() ? "" : format(" when {} = {}", depFieldName, depFieldVal)));
+}
+
+void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, item not found.", fieldName, fieldVal));
+}
+
+void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, invalid key.", fieldName, fieldVal));
+}
+
+void ShowSevereInvalidBool(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, invalid boolean (\"Yes\"/\"No\").", fieldName, fieldVal));
+}
+
+void ShowSevereCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{}", msg));
+}
+
+void ShowWarningItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
+{
+    ShowWarningError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, item not found", fieldName, fieldVal));
+}
+
+void ShowWarningCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg)
+{
+    ShowWarningError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{}", msg));
+}
+
+void ShowWarningInvalidKey(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal, std::string_view defaultVal)
+{
+    ShowWarningError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, invalid key, {} will be used.", fieldName, fieldVal, defaultVal));
+}
+
+void ShowWarningInvalidBool(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal, std::string_view defaultVal)
+{
+    ShowWarningError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, invalid boolean (\"Yes\"/\"No\"), {} will be used.", fieldName, fieldVal, defaultVal));
+}
+
+void ShowWarningEmptyField(EnergyPlusData &state,
+                           ErrorObjectHeader const &eoh,
+                           std::string_view fieldName,
+                           std::string_view defaultVal,
+                           std::string_view depFieldName,
+                           std::string_view depFieldVal)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state,
+                      format("{} cannot be empty{}, {} will be used.",
+                             fieldName,
+                             depFieldName.empty() ? "" : format(" when {} = {}", depFieldName, depFieldVal),
+                             defaultVal));
+}
+
+void ShowWarningItemNotFound(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal, std::string_view defaultVal)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, item not found, {} will be used.", fieldName, fieldVal, defaultVal));
 }
 
 } // namespace EnergyPlus

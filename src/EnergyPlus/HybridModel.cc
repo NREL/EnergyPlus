@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,7 +78,6 @@ namespace HybridModel {
 
     // Using/Aliasing
     using namespace DataHeatBalance;
-    using namespace DataRoomAirModel;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -147,16 +146,14 @@ namespace HybridModel {
                                                                          cNumericFieldNames);
 
                 ZoneListPtr = 0;
-                ZonePtr =
-                    UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone); // "Zone" is a 1D array, cAlphaArgs(2) is the zone name
+                ZonePtr = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone); // "Zone" is a 1D array, cAlphaArgs(2) is the zone name
                 if (ZonePtr == 0 && state.dataHeatBal->NumOfZoneLists > 0)
-                    ZoneListPtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
+                    ZoneListPtr = Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
                 if (ZonePtr > 0) {
-                    state.dataHybridModel->HybridModelZone(ZonePtr).Name = cAlphaArgs(1);                          // Zone HybridModel name
-                    state.dataHybridModel->FlagHybridModel_TM = UtilityRoutines::SameString(cAlphaArgs(3), "Yes"); // Calculate thermal mass option
-                    state.dataHybridModel->FlagHybridModel_AI =
-                        UtilityRoutines::SameString(cAlphaArgs(4), "Yes"); // Calculate infiltration rate option
-                    state.dataHybridModel->FlagHybridModel_PC = UtilityRoutines::SameString(cAlphaArgs(5), "Yes"); // Calculate people count option
+                    state.dataHybridModel->HybridModelZone(ZonePtr).Name = cAlphaArgs(1);               // Zone HybridModel name
+                    state.dataHybridModel->FlagHybridModel_TM = Util::SameString(cAlphaArgs(3), "Yes"); // Calculate thermal mass option
+                    state.dataHybridModel->FlagHybridModel_AI = Util::SameString(cAlphaArgs(4), "Yes"); // Calculate infiltration rate option
+                    state.dataHybridModel->FlagHybridModel_PC = Util::SameString(cAlphaArgs(5), "Yes"); // Calculate people count option
 
                     // Pointers used to help decide which unknown parameter to solve
                     // Zone Air Infiltration Rate and Zone Internal Thermal Mass calculations cannot be performed simultaneously
@@ -451,14 +448,14 @@ namespace HybridModel {
                         state.dataHybridModel->HybridModelZone(ZonePtr).InfiltrationCalc_C) {
                         SetupOutputVariable(state,
                                             "Zone Infiltration Hybrid Model Air Change Rate",
-                                            OutputProcessor::Unit::ach,
+                                            Constant::Units::ach,
                                             state.dataHeatBal->Zone(ZonePtr).InfilOAAirChangeRateHM,
                                             OutputProcessor::SOVTimeStepType::Zone,
                                             OutputProcessor::SOVStoreType::Average,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                         SetupOutputVariable(state,
                                             "Zone Infiltration Hybrid Model Mass Flow Rate",
-                                            OutputProcessor::Unit::kg_s,
+                                            Constant::Units::kg_s,
                                             state.dataHeatBal->Zone(ZonePtr).MCPIHM,
                                             OutputProcessor::SOVTimeStepType::Zone,
                                             OutputProcessor::SOVStoreType::Average,
@@ -469,7 +466,7 @@ namespace HybridModel {
                         state.dataHybridModel->HybridModelZone(ZonePtr).PeopleCountCalc_C) {
                         SetupOutputVariable(state,
                                             "Zone Hybrid Model People Count",
-                                            OutputProcessor::Unit::None,
+                                            Constant::Units::None,
                                             state.dataHeatBal->Zone(ZonePtr).NumOccHM,
                                             OutputProcessor::SOVTimeStepType::Zone,
                                             OutputProcessor::SOVStoreType::Average,
@@ -495,8 +492,8 @@ namespace HybridModel {
                 for (ZonePtr = 1; ZonePtr <= state.dataGlobal->NumOfZones; ZonePtr++) {
                     if ((state.dataHybridModel->HybridModelZone(ZonePtr).InternalThermalMassCalc_T ||
                          state.dataHybridModel->HybridModelZone(ZonePtr).InfiltrationCalc_T) &&
-                        (state.dataRoomAirMod->AirModel(ZonePtr).AirModelType != DataRoomAirModel::RoomAirModel::Mixing)) {
-                        state.dataRoomAirMod->AirModel(ZonePtr).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
+                        (state.dataRoomAir->AirModel(ZonePtr).AirModel != RoomAir::RoomAirModel::Mixing)) {
+                        state.dataRoomAir->AirModel(ZonePtr).AirModel = RoomAir::RoomAirModel::Mixing;
                         ShowWarningError(state, "Room Air Model Type should be Mixing if Hybrid Modeling is performed for the zone.");
                     }
                 }

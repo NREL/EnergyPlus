@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -83,6 +83,8 @@ namespace PluginManagement {
     constexpr const char *programName = "python";
 
     void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void(void *)> &f);
+    void registerUserDefinedCallback(EnergyPlusData &state, const std::function<void(void *)> &f, const std::string &programNameInInputFile);
+
     void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan);
     void onBeginEnvironment(EnergyPlusData &state);
     std::string pythonStringForUsage(EnergyPlusData &state);
@@ -184,8 +186,7 @@ namespace PluginManagement {
         ~PluginManager();
 
         static int numActiveCallbacks(EnergyPlusData &state);
-        static void addToPythonPath(EnergyPlusData &state, const fs::path &path, bool userDefinedPath);
-        static fs::path sanitizedPath(fs::path const &path);
+        static void addToPythonPath(EnergyPlusData &state, const fs::path &includePath, bool userDefinedPath);
         static void setupOutputVariables(EnergyPlusData &state);
 
         int maxGlobalVariableIndex = -1;
@@ -207,10 +208,15 @@ namespace PluginManagement {
         static void updatePluginValues(EnergyPlusData &state);
 
         static int getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::string const &_programName);
+        static int getUserDefinedCallbackIndex(EnergyPlusData &state, const std::string &callbackProgramName);
         static void runSingleUserDefinedPlugin(EnergyPlusData &state, int index);
+        static void runSingleUserDefinedCallback(EnergyPlusData &state, int index);
         static bool anyUnexpectedPluginObjects(EnergyPlusData &state);
 
         bool eplusRunningViaPythonAPI = false;
+
+        // For debugging purposes / issuing better error messages
+        static std::vector<std::string> currentPythonPath();
     };
 
     struct PluginTrendVariable
@@ -235,6 +241,8 @@ namespace PluginManagement {
 struct PluginManagerData : BaseGlobalStruct
 {
     std::map<EMSManager::EMSCallFrom, std::vector<std::function<void(void *)>>> callbacks;
+    std::vector<std::string> userDefinedCallbackNames;
+    std::vector<std::function<void(void *)>> userDefinedCallbacks;
     std::unique_ptr<PluginManagement::PluginManager> pluginManager;
     std::vector<PluginManagement::PluginTrendVariable> trends;
     std::vector<PluginManagement::PluginInstance> plugins;
@@ -251,6 +259,8 @@ struct PluginManagerData : BaseGlobalStruct
     void clear_state() override
     {
         callbacks.clear();
+        userDefinedCallbackNames.clear();
+        userDefinedCallbacks.clear();
 #if LINK_WITH_PYTHON
         for (auto &plugin : plugins) {
             plugin.shutdown(); // clear unmanaged memory first

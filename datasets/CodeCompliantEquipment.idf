@@ -103,11 +103,11 @@ Curve:Cubic,
     0.0,                                                                             !- Minimum Value of x
     1.0;                                                                             !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_air_B_gt528kW_2.96COP_4.1IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_air_B_gt150ton_10.1EER_14.0IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_air_B_gte528kW_2.96COP_4.1IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_air_B_gte150ton_10.1EER_14.0IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_air_B_gt528kW_2.96COP_4.1IPLV.SI_cap-f-t,                            !- Name
+    ASHRAE901_AppJ_air_B_gte528kW_2.96COP_4.1IPLV.SI_cap-f-t,                            !- Name
     0.794185315225093,                                                                  !- Coefficient1 Constant
     0.060198988329897,                                                                  !- Coefficient2 x
     -0.00201553365333625,                                                               !- Coefficient3 x**2
@@ -120,7 +120,7 @@ Curve:Biquadratic,
     52;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_air_B_gt528kW_2.96COP_4.1IPLV.SI_eir-f-t,                            !- Name
+    ASHRAE901_AppJ_air_B_gte528kW_2.96COP_4.1IPLV.SI_eir-f-t,                            !- Name
     0.807832111491946,                                                                  !- Coefficient1 Constant
     -0.0294518276175435,                                                                !- Coefficient2 x
     0.00143133716733664,                                                                !- Coefficient3 x**2
@@ -133,7 +133,7 @@ Curve:Biquadratic,
     52;                                                                                 !- Maximum Value of y
 
 Curve:Cubic,
-    ASHRAE901_AppJ_air_B_gt528kW_2.96COP_4.1IPLV.SI_eir-f-plr,                       !- Name
+    ASHRAE901_AppJ_air_B_gte528kW_2.96COP_4.1IPLV.SI_eir-f-plr,                       !- Name
     0.118080543023348,                                                               !- Coefficient1 Constant
     0.10747666191967,                                                                !- Coefficient2 x
     1.57083798659907,                                                                !- Coefficient3 x**2
@@ -178,11 +178,11 @@ Curve:Quadratic,
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_D_pdsp_gt264lt528kW_4.88COP_6.28IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_D_pdsp_gt75lt150ton_0.72kWpton_0.56IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_D_pdsp_gte264lt528kW_4.88COP_6.28IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_D_pdsp_gte75lt150ton_0.72kWpton_0.56IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_D_pdsp_gt264lt528kW_4.88COP_6.28IPLV.SI_cap-f-t,                 !- Name
+    ASHRAE901_AppJ_wtr_D_pdsp_gte264lt528kW_4.88COP_6.28IPLV.SI_cap-f-t,                 !- Name
     0.861840198586768,                                                                  !- Coefficient1 Constant
     0.0578371828490339,                                                                 !- Coefficient2 x
     -0.00216958540389355,                                                               !- Coefficient3 x**2
@@ -195,7 +195,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_D_pdsp_gt264lt528kW_4.88COP_6.28IPLV.SI_eir-f-t,                 !- Name
+    ASHRAE901_AppJ_wtr_D_pdsp_gte264lt528kW_4.88COP_6.28IPLV.SI_eir-f-t,                 !- Name
     0.740919724129239,                                                                  !- Coefficient1 Constant
     -0.0301443336651491,                                                                !- Coefficient2 x
     0.0014786319749185,                                                                 !- Coefficient3 x**2
@@ -208,18 +208,18 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_D_pdsp_gt264lt528kW_4.88COP_6.28IPLV.SI_eir-f-plr,                 !- Name
+    ASHRAE901_AppJ_wtr_D_pdsp_gte264lt528kW_4.88COP_6.28IPLV.SI_eir-f-plr,                 !- Name
     0.208981833155775,                                                                    !- Coefficient1 Constant
     0.224001372656158,                                                                    !- Coefficient2 x
     0.561479374288065,                                                                    !- Coefficient3 x**2
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_E_pdsp_gt528lt1055kW_5.33COP_6.54IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_E_pdsp_gt150lt300ton_0.66kWpton_0.538IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_E_pdsp_gte528lt1055kW_5.33COP_6.54IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_E_pdsp_gte150lt300ton_0.66kWpton_0.538IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_E_pdsp_gt528lt1055kW_5.33COP_6.54IPLV.SI_cap-f-t,                !- Name
+    ASHRAE901_AppJ_wtr_E_pdsp_gte528lt1055kW_5.33COP_6.54IPLV.SI_cap-f-t,                !- Name
     0.800065687328999,                                                                  !- Coefficient1 Constant
     0.0353774308143739,                                                                 !- Coefficient2 x
     -0.0014824153146761,                                                                !- Coefficient3 x**2
@@ -232,7 +232,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_E_pdsp_gt528lt1055kW_5.33COP_6.54IPLV.SI_eir-f-t,                !- Name
+    ASHRAE901_AppJ_wtr_E_pdsp_gte528lt1055kW_5.33COP_6.54IPLV.SI_eir-f-t,                !- Name
     0.62083394489479,                                                                   !- Coefficient1 Constant
     -0.0236422051855316,                                                                !- Coefficient2 x
     0.00129976495343239,                                                                !- Coefficient3 x**2
@@ -245,7 +245,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_E_pdsp_gt528lt1055kW_5.33COP_6.54IPLV.SI_eir-f-plr,                !- Name
+    ASHRAE901_AppJ_wtr_E_pdsp_gte528lt1055kW_5.33COP_6.54IPLV.SI_eir-f-plr,                !- Name
     0.246643709273782,                                                                    !- Coefficient1 Constant
     0.184575915610184,                                                                    !- Coefficient2 x
     0.566463161216033,                                                                    !- Coefficient3 x**2
@@ -289,11 +289,11 @@ Curve:Quadratic,
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_G_pdsp_gt2110kW_6.28COP_7.05IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_G_pdsp_gt600ton_0.56kWpton_0.499IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_G_pdsp_gte2110kW_6.28COP_7.05IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_G_pdsp_gte600ton_0.56kWpton_0.499IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_G_pdsp_gt2110kW_6.28COP_7.05IPLV.SI_cap-f-t,                     !- Name
+    ASHRAE901_AppJ_wtr_G_pdsp_gte2110kW_6.28COP_7.05IPLV.SI_cap-f-t,                     !- Name
     0.83080383460836,                                                                   !- Coefficient1 Constant
     0.0163100863412201,                                                                 !- Coefficient2 x
     -0.000949079445226831,                                                              !- Coefficient3 x**2
@@ -306,7 +306,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_G_pdsp_gt2110kW_6.28COP_7.05IPLV.SI_eir-f-t,                     !- Name
+    ASHRAE901_AppJ_wtr_G_pdsp_gte2110kW_6.28COP_7.05IPLV.SI_eir-f-t,                     !- Name
     0.544966803829136,                                                                  !- Coefficient1 Constant
     -0.0304909793495366,                                                                !- Coefficient2 x
     0.00139455174655485,                                                                !- Coefficient3 x**2
@@ -319,7 +319,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_G_pdsp_gt2110kW_6.28COP_7.05IPLV.SI_eir-f-plr,                     !- Name
+    ASHRAE901_AppJ_wtr_G_pdsp_gte2110kW_6.28COP_7.05IPLV.SI_eir-f-plr,                     !- Name
     0.264370704367519,                                                                    !- Coefficient1 Constant
     0.263302396212442,                                                                    !- Coefficient2 x
     0.471689663820038,                                                                    !- Coefficient3 x**2
@@ -363,11 +363,11 @@ Curve:Quadratic,
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_H_cent_gt528kWlt1055kW_5.77COP_6.41IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_H_cent_gt150tonlt300ton_0.61kWpton_0.549IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_H_cent_gte528kWlt1055kW_5.77COP_6.41IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_H_cent_gte150tonlt300ton_0.61kWpton_0.549IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_H_cent_gt528kWlt1055kW_5.77COP_6.41IPLV.SI_cap-f-t,              !- Name
+    ASHRAE901_AppJ_wtr_H_cent_gte528kWlt1055kW_5.77COP_6.41IPLV.SI_cap-f-t,              !- Name
     0.837420357605505,                                                                  !- Coefficient1 Constant
     0.0385281390706064,                                                                 !- Coefficient2 x
     -0.00216689147954852,                                                               !- Coefficient3 x**2
@@ -380,7 +380,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_H_cent_gt528kWlt1055kW_5.77COP_6.41IPLV.SI_eir-f-t,              !- Name
+    ASHRAE901_AppJ_wtr_H_cent_gte528kWlt1055kW_5.77COP_6.41IPLV.SI_eir-f-t,              !- Name
     0.447242911793089,                                                                  !- Coefficient1 Constant
     -0.0337851600873886,                                                                !- Coefficient2 x
     0.000724056063895174,                                                               !- Coefficient3 x**2
@@ -393,7 +393,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_H_cent_gt528kWlt1055kW_5.77COP_6.41IPLV.SI_eir-f-plr,              !- Name
+    ASHRAE901_AppJ_wtr_H_cent_gte528kWlt1055kW_5.77COP_6.41IPLV.SI_eir-f-plr,              !- Name
     0.304205902179811,                                                                    !- Coefficient1 Constant
     0.0738657242488116,                                                                   !- Coefficient2 x
     0.621457085571376,                                                                    !- Coefficient3 x**2
@@ -437,11 +437,11 @@ Curve:Quadratic,
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_J_cent_gt1407lt2110kW_6.28COP_7.05IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_J_cent_gt400lt600ton_0.56kWpton_0.499IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_J_cent_gte1407lt2110kW_6.28COP_7.05IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_J_cent_gte400lt600ton_0.56kWpton_0.499IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_J_cent_gt1407lt2110kW_6.28COP_7.05IPLV.SI_cap-f-t,               !- Name
+    ASHRAE901_AppJ_wtr_J_cent_gte1407lt2110kW_6.28COP_7.05IPLV.SI_cap-f-t,               !- Name
     0.896805796938432,                                                                  !- Coefficient1 Constant
     0.056738655451968,                                                                  !- Coefficient2 x
     -0.0025441924944187,                                                                !- Coefficient3 x**2
@@ -454,7 +454,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_J_cent_gt1407lt2110kW_6.28COP_7.05IPLV.SI_eir-f-t,               !- Name
+    ASHRAE901_AppJ_wtr_J_cent_gte1407lt2110kW_6.28COP_7.05IPLV.SI_eir-f-t,               !- Name
     0.489242239617685,                                                                  !- Coefficient1 Constant
     -0.0288507328624182,                                                                !- Coefficient2 x
     0.000973201667096245,                                                               !- Coefficient3 x**2
@@ -467,7 +467,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_J_cent_gt1407lt2110kW_6.28COP_7.05IPLV.SI_eir-f-plr,               !- Name
+    ASHRAE901_AppJ_wtr_J_cent_gte1407lt2110kW_6.28COP_7.05IPLV.SI_eir-f-plr,               !- Name
     0.290890645605933,                                                                    !- Coefficient1 Constant
     0.0593657257659549,                                                                   !- Coefficient2 x
     0.649421343028111,                                                                    !- Coefficient3 x**2
@@ -475,11 +475,11 @@ Curve:Quadratic,
     1.0;                                                                                  !- Maximum Value of x
 
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_J_cent_gt2110kW_6.28COP_7.05IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_J_cent_gt600ton_0.56kWpton_0.499IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_J_cent_gte2110kW_6.28COP_7.05IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_J_cent_gte600ton_0.56kWpton_0.499IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_J_cent_gt2110kW_6.28COP_7.05IPLV.SI_cap-f-t,                     !- Name
+    ASHRAE901_AppJ_wtr_J_cent_gte2110kW_6.28COP_7.05IPLV.SI_cap-f-t,                     !- Name
     0.896805796938432,                                                                  !- Coefficient1 Constant
     0.056738655451968,                                                                  !- Coefficient2 x
     -0.0025441924944187,                                                                !- Coefficient3 x**2
@@ -492,7 +492,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_J_cent_gt2110kW_6.28COP_7.05IPLV.SI_eir-f-t,                     !- Name
+    ASHRAE901_AppJ_wtr_J_cent_gte2110kW_6.28COP_7.05IPLV.SI_eir-f-t,                     !- Name
     0.489242239617685,                                                                  !- Coefficient1 Constant
     -0.0288507328624182,                                                                !- Coefficient2 x
     0.000973201667096245,                                                               !- Coefficient3 x**2
@@ -505,7 +505,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_J_cent_gt2110kW_6.28COP_7.05IPLV.SI_eir-f-plr,                     !- Name
+    ASHRAE901_AppJ_wtr_J_cent_gte2110kW_6.28COP_7.05IPLV.SI_eir-f-plr,                     !- Name
     0.290890645605933,                                                                    !- Coefficient1 Constant
     0.0593657257659549,                                                                   !- Coefficient2 x
     0.649421343028111,                                                                    !- Coefficient3 x**2
@@ -550,11 +550,11 @@ Curve:Cubic,
     0.0,                                                                             !- Minimum Value of x
     1.0;                                                                             !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_air_L_gt528kW_2.84COP_4.72IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_air_L_gt150ton_9.7EER_16.11IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_air_L_gte528kW_2.84COP_4.72IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_air_L_gte150ton_9.7EER_16.11IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_air_L_gt528kW_2.84COP_4.72IPLV.SI_cap-f-t,                           !- Name
+    ASHRAE901_AppJ_air_L_gte528kW_2.84COP_4.72IPLV.SI_cap-f-t,                           !- Name
     0.879844416630538,                                                                  !- Coefficient1 Constant
     0.0604150176709789,                                                                 !- Coefficient2 x
     -0.00199418747324271,                                                               !- Coefficient3 x**2
@@ -567,7 +567,7 @@ Curve:Biquadratic,
     52;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_air_L_gt528kW_2.84COP_4.72IPLV.SI_eir-f-t,                           !- Name
+    ASHRAE901_AppJ_air_L_gte528kW_2.84COP_4.72IPLV.SI_eir-f-t,                           !- Name
     0.711588903409163,                                                                  !- Coefficient1 Constant
     -0.0295197355608497,                                                                !- Coefficient2 x
     0.00139048310597048,                                                                !- Coefficient3 x**2
@@ -580,7 +580,7 @@ Curve:Biquadratic,
     52;                                                                                 !- Maximum Value of y
 
 Curve:Cubic,
-    ASHRAE901_AppJ_air_L_gt528kW_2.84COP_4.72IPLV.SI_eir-f-plr,                      !- Name
+    ASHRAE901_AppJ_air_L_gte528kW_2.84COP_4.72IPLV.SI_eir-f-plr,                      !- Name
     0.0957110065782636,                                                              !- Coefficient1 Constant
     0.00990268145861235,                                                             !- Coefficient2 x
     1.54339631880243,                                                                !- Coefficient3 x**2
@@ -625,11 +625,11 @@ Curve:Quadratic,
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_N_pdsp_gt264lt528kW_4.69COP_7.19IPLV.SI
+!- Set of performance curves for ASHRAE901_AppJ_wtr_N_pdsp_gte264lt528kW_4.69COP_7.19IPLV.SI
 !- (Also applicable for ASHRAE901_AppJ_wtr_N_pdsp_gt75lt150ton_0.75kWpton_0.489IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_N_pdsp_gt264lt528kW_4.69COP_7.19IPLV.SI_cap-f-t,                 !- Name
+    ASHRAE901_AppJ_wtr_N_pdsp_gte264lt528kW_4.69COP_7.19IPLV.SI_cap-f-t,                 !- Name
     0.85070990377567,                                                                   !- Coefficient1 Constant
     0.0560374938498493,                                                                 !- Coefficient2 x
     -0.00207749440742218,                                                               !- Coefficient3 x**2
@@ -642,7 +642,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_N_pdsp_gt264lt528kW_4.69COP_7.19IPLV.SI_eir-f-t,                 !- Name
+    ASHRAE901_AppJ_wtr_N_pdsp_gte264lt528kW_4.69COP_7.19IPLV.SI_eir-f-t,                 !- Name
     0.797371334177358,                                                                  !- Coefficient1 Constant
     -0.0313612846011331,                                                                !- Coefficient2 x
     0.00151439202063022,                                                                !- Coefficient3 x**2
@@ -655,18 +655,18 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_N_pdsp_gt264lt528kW_4.69COP_7.19IPLV.SI_eir-f-plr,                 !- Name
+    ASHRAE901_AppJ_wtr_N_pdsp_gte264lt528kW_4.69COP_7.19IPLV.SI_eir-f-plr,                 !- Name
     0.183810628690404,                                                                    !- Coefficient1 Constant
     -0.0444166329081994,                                                                  !- Coefficient2 x
     0.855659760517794,                                                                    !- Coefficient3 x**2
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_O_pdsp_gt528lt1055kW_5.17COP_8.03IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_O_pdsp_gt150lt300ton_0.68kWpton_0.438IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_O_pdsp_gte528lt1055kW_5.17COP_8.03IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_O_pdsp_gte150lt300ton_0.68kWpton_0.438IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_O_pdsp_gt528lt1055kW_5.17COP_8.03IPLV.SI_cap-f-t,                !- Name
+    ASHRAE901_AppJ_wtr_O_pdsp_gte528lt1055kW_5.17COP_8.03IPLV.SI_cap-f-t,                !- Name
     0.822518898446997,                                                                  !- Coefficient1 Constant
     0.0389684690240185,                                                                 !- Coefficient2 x
     -0.00158759086252118,                                                               !- Coefficient3 x**2
@@ -679,7 +679,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_O_pdsp_gt528lt1055kW_5.17COP_8.03IPLV.SI_eir-f-t,                !- Name
+    ASHRAE901_AppJ_wtr_O_pdsp_gte528lt1055kW_5.17COP_8.03IPLV.SI_eir-f-t,                !- Name
     0.617870578273555,                                                                  !- Coefficient1 Constant
     -0.0201098781586568,                                                                !- Coefficient2 x
     0.00117488673146018,                                                                !- Coefficient3 x**2
@@ -692,18 +692,18 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_O_pdsp_gt528lt1055kW_5.17COP_8.03IPLV.SI_eir-f-plr,                !- Name
+    ASHRAE901_AppJ_wtr_O_pdsp_gte528lt1055kW_5.17COP_8.03IPLV.SI_eir-f-plr,                !- Name
     0.0909358559361297,                                                                   !- Coefficient1 Constant
     0.207812402682297,                                                                    !- Coefficient2 x
     0.696735129081572,                                                                    !- Coefficient3 x**2
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_P_pdsp_gt1055lt2110kW_5.63COP_8.6IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_P_pdsp_gt300lt600ton_0.625kWpton_0.409IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_P_pdsp_gte1055lt2110kW_5.63COP_8.6IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_P_pdsp_gte300lt600ton_0.625kWpton_0.409IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_P_pdsp_gt1055lt2110kW_5.63COP_8.6IPLV.SI_cap-f-t,                !- Name
+    ASHRAE901_AppJ_wtr_P_pdsp_gte1055lt2110kW_5.63COP_8.6IPLV.SI_cap-f-t,                !- Name
     0.877217920252064,                                                                  !- Coefficient1 Constant
     0.0283928066538352,                                                                 !- Coefficient2 x
     -0.0012574771826124,                                                                !- Coefficient3 x**2
@@ -716,7 +716,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_P_pdsp_gt1055lt2110kW_5.63COP_8.6IPLV.SI_eir-f-t,                !- Name
+    ASHRAE901_AppJ_wtr_P_pdsp_gte1055lt2110kW_5.63COP_8.6IPLV.SI_eir-f-t,                !- Name
     0.656762759748161,                                                                  !- Coefficient1 Constant
     -0.0278910068323571,                                                                !- Coefficient2 x
     0.00134311095585416,                                                                !- Coefficient3 x**2
@@ -729,18 +729,18 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_P_pdsp_gt1055lt2110kW_5.63COP_8.6IPLV.SI_eir-f-plr,                !- Name
+    ASHRAE901_AppJ_wtr_P_pdsp_gte1055lt2110kW_5.63COP_8.6IPLV.SI_eir-f-plr,                !- Name
     0.103664727441931,                                                                    !- Coefficient1 Constant
     0.148024452126455,                                                                    !- Coefficient2 x
     0.744887320031613,                                                                    !- Coefficient3 x**2
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_Q_pdsp_gt2110kW_6.01COP_9.28IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_Q_pdsp_gt600ton_0.585kWpton_0.379IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_Q_pdsp_gte2110kW_6.01COP_9.28IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_Q_pdsp_gte600ton_0.585kWpton_0.379IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_Q_pdsp_gt2110kW_6.01COP_9.28IPLV.SI_cap-f-t,                     !- Name
+    ASHRAE901_AppJ_wtr_Q_pdsp_gte2110kW_6.01COP_9.28IPLV.SI_cap-f-t,                     !- Name
     0.83182802133229,                                                                   !- Coefficient1 Constant
     0.0156565611166638,                                                                 !- Coefficient2 x
     -0.000927599295797936,                                                              !- Coefficient3 x**2
@@ -753,7 +753,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_Q_pdsp_gt2110kW_6.01COP_9.28IPLV.SI_eir-f-t,                     !- Name
+    ASHRAE901_AppJ_wtr_Q_pdsp_gte2110kW_6.01COP_9.28IPLV.SI_eir-f-t,                     !- Name
     0.5536942221919,                                                                    !- Coefficient1 Constant
     -0.0303467036038219,                                                                !- Coefficient2 x
     0.00141191503427415,                                                                !- Coefficient3 x**2
@@ -766,7 +766,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_Q_pdsp_gt2110kW_6.01COP_9.28IPLV.SI_eir-f-plr,                     !- Name
+    ASHRAE901_AppJ_wtr_Q_pdsp_gte2110kW_6.01COP_9.28IPLV.SI_eir-f-plr,                     !- Name
     0.0617061022735642,                                                                   !- Coefficient1 Constant
     0.261711120841577,                                                                    !- Coefficient2 x
     0.677017397684858,                                                                    !- Coefficient3 x**2
@@ -810,11 +810,11 @@ Curve:Quadratic,
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_S_cent_gt528lt1055kW_5.54COP_8.81IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_S_cent_gt150lt300ton_0.635kWpton_0.399IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_S_cent_gte528lt1055kW_5.54COP_8.81IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_S_cent_gte150lt300ton_0.635kWpton_0.399IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_S_cent_gt528lt1055kW_5.54COP_8.81IPLV.SI_cap-f-t,                !- Name
+    ASHRAE901_AppJ_wtr_S_cent_gte528lt1055kW_5.54COP_8.81IPLV.SI_cap-f-t,                !- Name
     0.971699116458859,                                                                  !- Coefficient1 Constant
     0.0361920290240177,                                                                 !- Coefficient2 x
     -0.00185774607737747,                                                               !- Coefficient3 x**2
@@ -827,7 +827,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_S_cent_gt528lt1055kW_5.54COP_8.81IPLV.SI_eir-f-t,                !- Name
+    ASHRAE901_AppJ_wtr_S_cent_gte528lt1055kW_5.54COP_8.81IPLV.SI_eir-f-t,                !- Name
     0.526475031540476,                                                                  !- Coefficient1 Constant
     -0.0308431669279707,                                                                !- Coefficient2 x
     0.000734914166904871,                                                               !- Coefficient3 x**2
@@ -840,18 +840,18 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_S_cent_gt528lt1055kW_5.54COP_8.81IPLV.SI_eir-f-plr,                !- Name
+    ASHRAE901_AppJ_wtr_S_cent_gte528lt1055kW_5.54COP_8.81IPLV.SI_eir-f-plr,                !- Name
     0.0649786389666422,                                                                   !- Coefficient1 Constant
     0.151829213809826,                                                                    !- Coefficient2 x
     0.779131231823531,                                                                    !- Coefficient3 x**2
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_T_cent_gt1055lt1407kW_5.91COP_9.04IPLV.SI
+!- Set of performance curves for ASHRAE901_AppJ_wtr_T_cent_gte1055lt1407kW_5.91COP_9.04IPLV.SI
 !- (Also applicable for ASHRAE901_AppJ_wtr_T_cent_gt300lt400ton_0.595kWpton_0.389IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_T_cent_gt1055lt1407kW_5.91COP_9.04IPLV.SI_cap-f-t,               !- Name
+    ASHRAE901_AppJ_wtr_T_cent_gte1055lt1407kW_5.91COP_9.04IPLV.SI_cap-f-t,               !- Name
     1.02333694450971,                                                                   !- Coefficient1 Constant
     0.0333781947173553,                                                                 !- Coefficient2 x
     -0.00174216726822566,                                                               !- Coefficient3 x**2
@@ -864,7 +864,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_T_cent_gt1055lt1407kW_5.91COP_9.04IPLV.SI_eir-f-t,               !- Name
+    ASHRAE901_AppJ_wtr_T_cent_gte1055lt1407kW_5.91COP_9.04IPLV.SI_eir-f-t,               !- Name
     0.547809585784552,                                                                  !- Coefficient1 Constant
     -0.0294703091959571,                                                                !- Coefficient2 x
     0.000841857227067557,                                                               !- Coefficient3 x**2
@@ -877,18 +877,18 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_T_cent_gt1055lt1407kW_5.91COP_9.04IPLV.SI_eir-f-plr,               !- Name
+    ASHRAE901_AppJ_wtr_T_cent_gte1055lt1407kW_5.91COP_9.04IPLV.SI_eir-f-plr,               !- Name
     0.0828121003830807,                                                                   !- Coefficient1 Constant
     0.152816343206313,                                                                    !- Coefficient2 x
     0.764822154710605,                                                                    !- Coefficient3 x**2
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_U_cent_gt1407lt2110kW_6.01COP_9.28IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_U_cent_gt400lt600ton_0.585kWpton_0.379IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_U_cent_gte1407lt2110kW_6.01COP_9.28IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_U_cent_gte400lt600ton_0.585kWpton_0.379IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_U_cent_gt1407lt2110kW_6.01COP_9.28IPLV.SI_cap-f-t,               !- Name
+    ASHRAE901_AppJ_wtr_U_cent_gte1407lt2110kW_6.01COP_9.28IPLV.SI_cap-f-t,               !- Name
     0.953579582863989,                                                                  !- Coefficient1 Constant
     0.0530095768947128,                                                                 !- Coefficient2 x
     -0.00238693256378436,                                                               !- Coefficient3 x**2
@@ -901,7 +901,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_U_cent_gt1407lt2110kW_6.01COP_9.28IPLV.SI_eir-f-t,               !- Name
+    ASHRAE901_AppJ_wtr_U_cent_gte1407lt2110kW_6.01COP_9.28IPLV.SI_eir-f-t,               !- Name
     0.569569226633626,                                                                  !- Coefficient1 Constant
     -0.0246997814063844,                                                                !- Coefficient2 x
     0.000727341321689694,                                                               !- Coefficient3 x**2
@@ -914,18 +914,18 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_U_cent_gt1407lt2110kW_6.01COP_9.28IPLV.SI_eir-f-plr,               !- Name
+    ASHRAE901_AppJ_wtr_U_cent_gte1407lt2110kW_6.01COP_9.28IPLV.SI_eir-f-plr,               !- Name
     0.0585829703893892,                                                                   !- Coefficient1 Constant
     0.205485686772911,                                                                    !- Coefficient2 x
     0.736344937637699,                                                                    !- Coefficient3 x**2
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_U_cent_gt2110kW_6.01COP_9.28IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_U_cent_gt600ton_0.585kWpton_0.379IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_U_cent_gte2110kW_6.01COP_9.28IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_U_cent_gte600ton_0.585kWpton_0.379IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_U_cent_gt2110kW_6.01COP_9.28IPLV.SI_cap-f-t,               !- Name
+    ASHRAE901_AppJ_wtr_U_cent_gte2110kW_6.01COP_9.28IPLV.SI_cap-f-t,               !- Name
     0.953579582863989,                                                                  !- Coefficient1 Constant
     0.0530095768947128,                                                                 !- Coefficient2 x
     -0.00238693256378436,                                                               !- Coefficient3 x**2
@@ -938,7 +938,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_U_cent_gt2110kW_6.01COP_9.28IPLV.SI_eir-f-t,               !- Name
+    ASHRAE901_AppJ_wtr_U_cent_gte2110kW_6.01COP_9.28IPLV.SI_eir-f-t,               !- Name
     0.569569226633626,                                                                  !- Coefficient1 Constant
     -0.0246997814063844,                                                                !- Coefficient2 x
     0.000727341321689694,                                                               !- Coefficient3 x**2
@@ -951,7 +951,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_U_cent_gt2110kW_6.01COP_9.28IPLV.SI_eir-f-plr,               !- Name
+    ASHRAE901_AppJ_wtr_U_cent_gte2110kW_6.01COP_9.28IPLV.SI_eir-f-plr,               !- Name
     0.0585829703893892,                                                                   !- Coefficient1 Constant
     0.205485686772911,                                                                    !- Coefficient2 x
     0.736344937637699,                                                                    !- Coefficient3 x**2
@@ -995,11 +995,11 @@ Curve:Quadratic,
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_X_pdsp_gt528lt1055kW_4.9COP_5.63IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_X_pdsp_gt150lt300ton_0.7178kWpton_0.625IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_X_pdsp_gte528lt1055kW_4.9COP_5.63IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_X_pdsp_gte150lt300ton_0.7178kWpton_0.625IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_X_pdsp_gt528lt1055kW_4.9COP_5.63IPLV.SI_cap-f-t,                 !- Name
+    ASHRAE901_AppJ_wtr_X_pdsp_gte528lt1055kW_4.9COP_5.63IPLV.SI_cap-f-t,                 !- Name
     0.850132807800842,                                                                  !- Coefficient1 Constant
     0.0502343295352255,                                                                 !- Coefficient2 x
     -0.00195120457939483,                                                               !- Coefficient3 x**2
@@ -1012,7 +1012,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_X_pdsp_gt528lt1055kW_4.9COP_5.63IPLV.SI_eir-f-t,                 !- Name
+    ASHRAE901_AppJ_wtr_X_pdsp_gte528lt1055kW_4.9COP_5.63IPLV.SI_eir-f-t,                 !- Name
     0.627193472420831,                                                                  !- Coefficient1 Constant
     -0.0156455505981998,                                                                !- Coefficient2 x
     0.00106744617521574,                                                                !- Coefficient3 x**2
@@ -1025,18 +1025,18 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_X_pdsp_gt528lt1055kW_4.9COP_5.63IPLV.SI_eir-f-plr,                 !- Name
+    ASHRAE901_AppJ_wtr_X_pdsp_gte528lt1055kW_4.9COP_5.63IPLV.SI_eir-f-plr,                 !- Name
     0.250800802489875,                                                                    !- Coefficient1 Constant
     0.345915394600576,                                                                    !- Coefficient2 x
     0.399137769109547,                                                                    !- Coefficient3 x**2
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_Y_pdsp_gt1055kW_5.5COP_6.16IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_Y_pdsp_gt300ton_0.6395kWpton_0.571IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_Y_pdsp_gte1055kW_5.5COP_6.16IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_Y_pdsp_gte300ton_0.6395kWpton_0.571IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_Y_pdsp_gt1055kW_5.5COP_6.16IPLV.SI_cap-f-t,                      !- Name
+    ASHRAE901_AppJ_wtr_Y_pdsp_gte1055kW_5.5COP_6.16IPLV.SI_cap-f-t,                      !- Name
     0.873130400739749,                                                                  !- Coefficient1 Constant
     0.0335989914501505,                                                                 !- Coefficient2 x
     -0.00139120004985455,                                                               !- Coefficient3 x**2
@@ -1049,7 +1049,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_Y_pdsp_gt1055kW_5.5COP_6.16IPLV.SI_eir-f-t,                      !- Name
+    ASHRAE901_AppJ_wtr_Y_pdsp_gte1055kW_5.5COP_6.16IPLV.SI_eir-f-t,                      !- Name
     0.664853649239487,                                                                  !- Coefficient1 Constant
     -0.0290160572428209,                                                                !- Coefficient2 x
     0.00133902470193009,                                                                !- Coefficient3 x**2
@@ -1062,7 +1062,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_Y_pdsp_gt1055kW_5.5COP_6.16IPLV.SI_eir-f-plr,                      !- Name
+    ASHRAE901_AppJ_wtr_Y_pdsp_gte1055kW_5.5COP_6.16IPLV.SI_eir-f-plr,                      !- Name
     0.320097331849236,                                                                    !- Coefficient1 Constant
     0.0743563119447526,                                                                   !- Coefficient2 x
     0.602937685106011,                                                                    !- Coefficient3 x**2
@@ -1106,11 +1106,11 @@ Curve:Quadratic,
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_AA_cent_gt528lt1055kW_5.55COP_5.91IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_AA_cent_gt150lt300ton_0.6337kWpton_0.595IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_AA_cent_gte528lt1055kW_5.55COP_5.91IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_AA_cent_gte150lt300ton_0.6337kWpton_0.595IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_AA_cent_gt528lt1055kW_5.55COP_5.91IPLV.SI_cap-f-t,               !- Name
+    ASHRAE901_AppJ_wtr_AA_cent_gte528lt1055kW_5.55COP_5.91IPLV.SI_cap-f-t,               !- Name
     0.909632522228273,                                                                  !- Coefficient1 Constant
     0.0354598311790981,                                                                 !- Coefficient2 x
     -0.0018813582248979,                                                                !- Coefficient3 x**2
@@ -1123,7 +1123,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_AA_cent_gt528lt1055kW_5.55COP_5.91IPLV.SI_eir-f-t,               !- Name
+    ASHRAE901_AppJ_wtr_AA_cent_gte528lt1055kW_5.55COP_5.91IPLV.SI_eir-f-t,               !- Name
     0.464330147187021,                                                                  !- Coefficient1 Constant
     -0.0338344301001628,                                                                !- Coefficient2 x
     0.000730584200983082,                                                               !- Coefficient3 x**2
@@ -1136,18 +1136,18 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_AA_cent_gt528lt1055kW_5.55COP_5.91IPLV.SI_eir-f-plr,               !- Name
+    ASHRAE901_AppJ_wtr_AA_cent_gte528lt1055kW_5.55COP_5.91IPLV.SI_eir-f-plr,               !- Name
     0.339493762471831,                                                                    !- Coefficient1 Constant
     0.0490895433870147,                                                                   !- Coefficient2 x
     0.611582147741153,                                                                    !- Coefficient3 x**2
     0.0,                                                                                  !- Minimum Value of x
     1.0;                                                                                  !- Maximum Value of x
 
-!- Set of performance curves for ASHRAE901_AppJ_wtr_AB_cent_gt1055kW_6.1COP_6.41IPLV.SI
-!- (Also applicable for ASHRAE901_AppJ_wtr_AB_cent_gt300ton_0.5766kWpton_0.549IPLV.IP)
+!- Set of performance curves for ASHRAE901_AppJ_wtr_AB_cent_gte1055kW_6.1COP_6.41IPLV.SI
+!- (Also applicable for ASHRAE901_AppJ_wtr_AB_cent_gte300ton_0.5766kWpton_0.549IPLV.IP)
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_AB_cent_gt1055kW_6.1COP_6.41IPLV.SI_cap-f-t,                     !- Name
+    ASHRAE901_AppJ_wtr_AB_cent_gte1055kW_6.1COP_6.41IPLV.SI_cap-f-t,                     !- Name
     0.988289399105446,                                                                  !- Coefficient1 Constant
     0.031127718217927,                                                                  !- Coefficient2 x
     -0.00154986412921254,                                                               !- Coefficient3 x**2
@@ -1160,7 +1160,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Biquadratic,
-    ASHRAE901_AppJ_wtr_AB_cent_gt1055kW_6.1COP_6.41IPLV.SI_eir-f-t,                     !- Name
+    ASHRAE901_AppJ_wtr_AB_cent_gte1055kW_6.1COP_6.41IPLV.SI_eir-f-t,                     !- Name
     0.563967192309392,                                                                  !- Coefficient1 Constant
     -0.034330681975216,                                                                 !- Coefficient2 x
     0.00101506219660673,                                                                !- Coefficient3 x**2
@@ -1173,7 +1173,7 @@ Curve:Biquadratic,
     40;                                                                                 !- Maximum Value of y
 
 Curve:Quadratic,
-    ASHRAE901_AppJ_wtr_AB_cent_gt1055kW_6.1COP_6.41IPLV.SI_eir-f-plr,                     !- Name
+    ASHRAE901_AppJ_wtr_AB_cent_gte1055kW_6.1COP_6.41IPLV.SI_eir-f-plr,                     !- Name
     0.309752375539755,                                                                    !- Coefficient1 Constant
     0.153649268551135,                                                                    !- Coefficient2 x
     0.536462254009109,                                                                    !- Coefficient3 x**2

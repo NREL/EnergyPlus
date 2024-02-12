@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -179,6 +179,36 @@ namespace TranspiredCollector {
     int GetAirInletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound);
 
     int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound);
+
+    void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
+                                      const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
+                                      Real64 const VentArea,         // Area available for venting the gap [m2]
+                                      Real64 const Cv,               // Oriface coefficient for volume-based discharge, wind-driven [--]
+                                      Real64 const Cd,               // oriface coefficient for discharge,  buoyancy-driven [--]
+                                      Real64 const HdeltaNPL,        // Height difference from neutral pressure level [m]
+                                      Real64 const SolAbs,           // solar absorptivity of baffle [--]
+                                      Real64 const AbsExt,           // thermal absorptance/emittance of baffle material [--]
+                                      Real64 const Tilt,             // Tilt of gap [Degrees]
+                                      Real64 const AspRat,           // aspect ratio of gap  Height/gap [--]
+                                      Real64 const GapThick,         // Thickness of air space between baffle and underlying heat transfer surface
+                                      Material::SurfaceRoughness const Roughness, // Roughness index (1-6), see DataHeatBalance parameters
+                                      Real64 const QdotSource,                    // Source/sink term, e.g. electricity exported from solar cell [W]
+                                      Real64 &TsBaffle,                           // Temperature of baffle (both sides) use lagged value on input [C]
+                                      Real64 &TaGap, // Temperature of air gap (assumed mixed) use lagged value on input [C]
+                                      ObjexxFCL::Optional<Real64> HcGapRpt = _,
+                                      ObjexxFCL::Optional<Real64> HrGapRpt = _,
+                                      ObjexxFCL::Optional<Real64> IscRpt = _,
+                                      ObjexxFCL::Optional<Real64> MdotVentRpt = _,
+                                      ObjexxFCL::Optional<Real64> VdotWindRpt = _,
+                                      ObjexxFCL::Optional<Real64> VdotBuoyRpt = _);
+
+    //****************************************************************************
+
+    Real64 PassiveGapNusseltNumber(Real64 const AspRat, // Aspect Ratio of Gap height to gap width
+                                   Real64 const Tilt,   // Tilt of gap, degrees
+                                   Real64 const Tso,    // Temperature of gap surface closest to outside (K)
+                                   Real64 const Tsi,    // Temperature of gap surface closest to zone (K)
+                                   Real64 const Gr);
 
 } // namespace TranspiredCollector
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -146,7 +146,7 @@ namespace FanCoilUnits {
 
         // Find the correct Fan Coil Equipment
         if (CompIndex == 0) {
-            FanCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataFanCoilUnits->FanCoil);
+            FanCoilNum = Util::FindItemInList(CompName, state.dataFanCoilUnits->FanCoil);
             if (FanCoilNum == 0) {
                 ShowFatalError(state, format("SimFanCoil: Unit not found={}", CompName));
             }
@@ -288,7 +288,7 @@ namespace FanCoilUnits {
                                                                                              "MULTISPEEDFAN",
                                                                                              "ASHRAE90VARIABLEFAN"};
             std::string capCtrlMeth = Alphas(3);
-            fanCoil.CapCtrlMeth_Num = static_cast<CCM>(getEnumerationValue(CapCtrlMethUC, capCtrlMeth));
+            fanCoil.CapCtrlMeth_Num = static_cast<CCM>(getEnumValue(CapCtrlMethUC, capCtrlMeth));
             if (fanCoil.CapCtrlMeth_Num == CCM::ASHRAE) {
                 fanCoil.DesZoneCoolingLoad = DataSizing::AutoSize;
                 fanCoil.DesZoneHeatingLoad = DataSizing::AutoSize;
@@ -373,28 +373,27 @@ namespace FanCoilUnits {
             fanCoil.MinHotWaterVolFlow = Numbers(9);
             fanCoil.HotControlOffset = Numbers(10);
 
-            if (UtilityRoutines::SameString(Alphas(11), "Coil:Cooling:Water") ||
-                UtilityRoutines::SameString(Alphas(11), "Coil:Cooling:Water:DetailedGeometry") ||
-                UtilityRoutines::SameString(Alphas(11), "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
+            if (Util::SameString(Alphas(11), "Coil:Cooling:Water") || Util::SameString(Alphas(11), "Coil:Cooling:Water:DetailedGeometry") ||
+                Util::SameString(Alphas(11), "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                 fanCoil.CCoilType = Alphas(11);
-                if (UtilityRoutines::SameString(Alphas(11), "Coil:Cooling:Water")) {
+                if (Util::SameString(Alphas(11), "Coil:Cooling:Water")) {
                     fanCoil.CCoilType_Num = CCoil::Water;
                     fanCoil.CCoilPlantName = fanCoil.CCoilName;
                     fanCoil.CCoilPlantType = DataPlant::PlantEquipmentType::CoilWaterCooling;
                 }
-                if (UtilityRoutines::SameString(Alphas(11), "Coil:Cooling:Water:DetailedGeometry")) {
+                if (Util::SameString(Alphas(11), "Coil:Cooling:Water:DetailedGeometry")) {
                     fanCoil.CCoilType_Num = CCoil::Detailed;
                     fanCoil.CCoilPlantName = fanCoil.CCoilName;
                     fanCoil.CCoilPlantType = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
                 }
                 std::string CCoilType;
-                if (UtilityRoutines::SameString(Alphas(11), "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
+                if (Util::SameString(Alphas(11), "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                     fanCoil.CCoilType_Num = CCoil::HXAssist;
                     HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName(
                         state, fanCoil.CCoilType, fanCoil.CCoilName, ErrorsFound, CCoilType, fanCoil.CCoilPlantName);
-                    if (UtilityRoutines::SameString(CCoilType, "Coil:Cooling:Water")) {
+                    if (Util::SameString(CCoilType, "Coil:Cooling:Water")) {
                         fanCoil.CCoilPlantType = DataPlant::PlantEquipmentType::CoilWaterCooling;
-                    } else if (UtilityRoutines::SameString(CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
+                    } else if (Util::SameString(CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
                         fanCoil.CCoilPlantType = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
                     } else {
                         ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, fanCoil.Name));
@@ -442,7 +441,7 @@ namespace FanCoilUnits {
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(Alphas(13), "Coil:Heating:Water")) {
+            if (Util::SameString(Alphas(13), "Coil:Heating:Water")) {
                 fanCoil.HCoilType_Num = HCoil::Water;
                 fanCoil.HCoilPlantTypeOf = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
                 IsNotOK = false;
@@ -462,7 +461,7 @@ namespace FanCoilUnits {
                         fanCoil.HeatCoilOutletNodeNum = state.dataWaterCoils->WaterCoil(coilIndex).AirOutletNodeNum;
                     }
                 }
-            } else if (UtilityRoutines::SameString(Alphas(13), "Coil:Heating:Electric")) {
+            } else if (Util::SameString(Alphas(13), "Coil:Heating:Electric")) {
                 fanCoil.HCoilType_Num = HCoil::Electric;
                 IsNotOK = false;
                 ValidateComponent(state, fanCoil.HCoilType, fanCoil.HCoilName, IsNotOK, CurrentModuleObject);
@@ -496,7 +495,7 @@ namespace FanCoilUnits {
 
             fanCoil.HVACSizingIndex = 0;
             if (!lAlphaBlanks(16)) {
-                fanCoil.HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(16), state.dataSize->ZoneHVACSizing);
+                fanCoil.HVACSizingIndex = Util::FindItemInList(Alphas(16), state.dataSize->ZoneHVACSizing);
                 if (fanCoil.HVACSizingIndex == 0) {
                     ShowSevereError(state, format("{} = {} not found.", cAlphaFields(16), Alphas(16)));
                     ShowContinueError(state, format("Occurs in {} = {}", state.dataFanCoilUnits->cMO_FanCoil, fanCoil.Name));
@@ -510,7 +509,7 @@ namespace FanCoilUnits {
                 ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, fanCoil.Name));
                 ErrorsFound = true;
             } else {
-                if (!UtilityRoutines::SameString(fanCoil.FanType, "Fan:SystemModel")) {
+                if (!Util::SameString(fanCoil.FanType, "Fan:SystemModel")) {
                     Fans::GetFanType(state, fanCoil.FanName, fanCoil.FanType_Num, errFlag, CurrentModuleObject, fanCoil.Name);
                     // need to grab fan index here
                     // Fans::GetFanIndex(state, fanCoil.FanName, fanCoil.FanIndex, errFlag, fanCoil.FanType);
@@ -560,7 +559,7 @@ namespace FanCoilUnits {
                         ErrorsFound = true;
                     } break;
                     }
-                } else if (UtilityRoutines::SameString(fanCoil.FanType, "Fan:SystemModel")) {
+                } else if (Util::SameString(fanCoil.FanType, "Fan:SystemModel")) {
                     fanCoil.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, fanCoil.FanName)); // call constructor
                     fanCoil.FanIndex = HVACFan::getFanObjectVectorIndex(state, fanCoil.FanName);             // zero-based
@@ -630,7 +629,7 @@ namespace FanCoilUnits {
                                    state.dataFanCoilUnits->ATMixerOutNode,
                                    fanCoil.AirOutNode);
             fanCoil.ControlZoneNum =
-                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::FanCoil4Pipe, fanCoil.Name);
+                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::FourPipeFanCoil, fanCoil.Name);
             if (fanCoil.ControlZoneNum == 0) {
                 ErrorsFound = true;
             }
@@ -878,56 +877,56 @@ namespace FanCoilUnits {
             // CurrentModuleObject='ZoneHVAC:FourPipeFanCoil'
             SetupOutputVariable(state,
                                 "Fan Coil Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 fanCoil.HeatPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 fanCoil.Name);
             SetupOutputVariable(state,
                                 "Fan Coil Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 fanCoil.HeatEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 fanCoil.Name);
             SetupOutputVariable(state,
                                 "Fan Coil Total Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 fanCoil.TotCoolPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 fanCoil.Name);
             SetupOutputVariable(state,
                                 "Fan Coil Total Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 fanCoil.TotCoolEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 fanCoil.Name);
             SetupOutputVariable(state,
                                 "Fan Coil Sensible Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 fanCoil.SensCoolPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 fanCoil.Name);
             SetupOutputVariable(state,
                                 "Fan Coil Sensible Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 fanCoil.SensCoolEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 fanCoil.Name);
             SetupOutputVariable(state,
                                 "Fan Coil Fan Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 fanCoil.ElecPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 fanCoil.Name);
             SetupOutputVariable(state,
                                 "Fan Coil Fan Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 fanCoil.ElecEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
@@ -935,14 +934,14 @@ namespace FanCoilUnits {
             if (fanCoil.CapCtrlMeth_Num == CCM::CycFan || fanCoil.CapCtrlMeth_Num == CCM::MultiSpeedFan) {
                 SetupOutputVariable(state,
                                     "Fan Coil Runtime Fraction",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     fanCoil.PLR,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     fanCoil.Name);
                 SetupOutputVariable(state,
                                     "Fan Coil Fan Speed Level",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     fanCoil.SpeedFanSel,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -950,14 +949,14 @@ namespace FanCoilUnits {
                 if (fanCoil.CapCtrlMeth_Num == CCM::MultiSpeedFan) {
                     SetupOutputVariable(state,
                                         "Fan Coil Speed Ratio",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         fanCoil.SpeedRatio,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
                                         fanCoil.Name);
                     SetupOutputVariable(state,
                                         "Fan Coil Part Load Ratio",
-                                        OutputProcessor::Unit::None,
+                                        Constant::Units::None,
                                         fanCoil.PLR,
                                         OutputProcessor::SOVTimeStepType::System,
                                         OutputProcessor::SOVStoreType::Average,
@@ -967,7 +966,7 @@ namespace FanCoilUnits {
             if (fanCoil.CapCtrlMeth_Num == CCM::VarFanVarFlow || fanCoil.CapCtrlMeth_Num == CCM::VarFanConsFlow) {
                 SetupOutputVariable(state,
                                     "Fan Coil Part Load Ratio",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     fanCoil.PLR,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
@@ -975,7 +974,7 @@ namespace FanCoilUnits {
             }
             SetupOutputVariable(state,
                                 "Fan Coil Availability Status",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 fanCoil.AvailStatus,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1032,14 +1031,13 @@ namespace FanCoilUnits {
         }
 
         if (allocated(state.dataHVACGlobal->ZoneComp)) {
+            auto &availMgr = state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::FourPipeFanCoil).ZoneCompAvailMgrs(FanCoilNum);
             if (state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum)) { // initialize the name of each availability manager list and zone number
-                state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).AvailManagerListName =
-                    fanCoil.AvailManagerListName;
-                state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).ZoneNum = ControlledZoneNum;
+                availMgr.AvailManagerListName = fanCoil.AvailManagerListName;
+                availMgr.ZoneNum = ControlledZoneNum;
                 state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum) = false;
             }
-            fanCoil.AvailStatus =
-                state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).AvailStatus;
+            fanCoil.AvailStatus = availMgr.AvailStatus;
         }
 
         if (state.dataFanCoilUnits->MyPlantScanFlag(FanCoilNum) && allocated(state.dataPlnt->PlantLoop)) {
@@ -1746,7 +1744,7 @@ namespace FanCoilUnits {
                         state, fanCoil.UnitType, fanCoil.Name, "User-Specified Maximum Cold Water Flow [m3/s]", fanCoil.MaxColdWaterVolFlow);
                 }
             } else {
-                if (UtilityRoutines::SameString(fanCoil.CCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
+                if (Util::SameString(fanCoil.CCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                     CoolingCoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, fanCoil.CCoilType, fanCoil.CCoilName, ErrorsFound);
                     CoolingCoilType = HVACHXAssistedCoolingCoil::GetHXCoilType(state, fanCoil.CCoilType, fanCoil.CCoilName, ErrorsFound);
                 } else {
@@ -1971,7 +1969,7 @@ namespace FanCoilUnits {
         } // if ( CurZoneEqNum > 0 )
 
         // set the design air flow rates for the heating and cooling coils
-        if (UtilityRoutines::SameString(fanCoil.CCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
+        if (Util::SameString(fanCoil.CCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
             CoolingCoilName = HVACHXAssistedCoolingCoil::GetHXDXCoilName(state, fanCoil.CCoilType, fanCoil.CCoilName, ErrorsFound);
             CoolingCoilType = HVACHXAssistedCoolingCoil::GetHXCoilType(state, fanCoil.CCoilType, fanCoil.CCoilName, ErrorsFound);
         } else {

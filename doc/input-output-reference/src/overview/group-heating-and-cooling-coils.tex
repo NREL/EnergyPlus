@@ -10,7 +10,7 @@ Several different coils may be added to zone equipment and air loops. This inclu
 
 \subsection{Coil:Cooling:Water}\label{coilcoolingwater}
 
-The water cooling coil (Coil:Cooling:Water) has the ability to give detailed output with simplified inputs, inputting complicated coil geometry is not required by the user for this model instead the coil is sized in terms of auto-sizeable thermodynamic inputs. The coil requires thermodynamic inputs such as temperatures, mass flow rates and humidity ratios.
+The water cooling coil (Coil:Cooling:Water) has the ability to give detailed output with simplified inputs, inputting complicated coil geometry is not required by the user for this model instead the coil is sized in terms of auto-sizable thermodynamic inputs. The coil requires thermodynamic inputs such as temperatures, mass flow rates and humidity ratios.
 
 The coil is sized using auto-sized/user design input conditions and the UA values are calculated from the design conditions. A rough estimate of the coil area is provided along with percentage of surface wet and/or dry. This model uses the NTU-effectiveness approach to model heat transfer and has two types of flow arrangements cross-flow or counter-flow.
 
@@ -531,11 +531,11 @@ The coil system cooling object to operate the coil entering water (fluid) temper
 
 \subsubsection{Wrap Around Water Coil Heat Recovery Mode}\label{wrap-around-water-coil-heat-recovery-mode}
 
-This coil system may also be used to model a wrap-around water coil heat recovery system where a water coil system object is in one air stream (e.g., the outdoor air stream) while another cooling coil object is in a seperate air stream (e.g., exhaust air stream). The two water coils are connected in series on the demand side of a plant loop where the CoilSystem:Cooling:Water object is upstream of the Coil:Cooling:Water object. For wrap-around heat recovery coils, the supply side of the plant will typically have only a pump to circulate the water.\par
+This coil system may also be used to model a wrap-around water coil heat recovery system where a water coil system object is in one air stream (e.g., the outdoor air stream) while another cooling coil object is in a separate air stream (e.g., exhaust air stream). The two water coils are connected in series on the demand side of a plant loop where the CoilSystem:Cooling:Water object is upstream of the Coil:Cooling:Water object. For wrap-around heat recovery coils, the supply side of the plant will typically have only a pump to circulate the water.\par
 
 The CoilSystemCooling:Water object is the main controller for the heat recovery loop. Neither this object or other coils in the heat recovery loop require an external controller (Ref: \hyperref[controllerwatercoil]{Controller:WaterCoil}). Do not specify a controller for this object or the associated water coil elsewhere in the input. This object checks that the water coil entering water (fluid) temperature to coil entering air temperature absolute difference is greater than the user specified temperature offset, otherwise the system is disabled. The water loop temperature entering the coil system's coil will be maintained between the entering air temperatures of the water coils (e.g., midway between the outdoor air temperature and exhaust air temperature if the coils are used in the outdoor air system). The coil system will be disabled if the plant loop water temperature falls below the minimum allowed heat recovery loop water temperature (Ref. field \hyperref[field-minimum-water-loop-temperature-for-heat-recovery]{Minimum Water Loop Temperature For Heat Recover}). Figure~\ref{fig:wrap-around-water-coil-heat-recovery-system-in-outdoor-air-system} shows a wrap-around heat recovery coil system in the outdoor air and relief air streams of the outdoor air system.
 
-\textbf{Note - although a \hyperref[plantloop]{PlantLoop} temperature setpoint node name and associated set point manager is required, that set point will not be used.} 
+\textbf{Note - although a \hyperref[plantloop]{PlantLoop} temperature setpoint node name and associated set point manager is required, that set point will not be used.}
 
 \begin{figure}[hbtp] % fig 143
 \centering
@@ -639,7 +639,7 @@ Following is an example input for a coil system cooling water.
     Yes,                     !- Run on Sensible Load
     Yes,                     !- Run on Latent Load
     3.0;                     !- Minimum Air To Water Temperature Offset
-	
+
 \end{lstlisting}
 
 
@@ -1186,7 +1186,7 @@ NOTE: When the heating source is a Refrigeration Compressor rack, the heat rejec
 
 This optional alpha field defines the name of the HVAC system node used for temperature-based control (e.g., controlling the heating coil's outlet air dry-bulb temperature to a setpoint). If the desuperheater heating coil is temperature controlled through the use of a Set Point Manager, then the control node specified in the Set Point Manager will be entered here. If the desuperheater heating coil is controlled based on a certain heating load to be met (e.g., using this heating coil as part of \hyperref[airloophvacunitaryfurnaceheatcool]{AirLoopHVAC:Unitary:Furnace:HeatCool} for high humidity control), this field should be left blank.
 
-\paragraph{Field: Parasitic Electric Load}\label{field-parasitic-electric-load}
+\paragraph{Field: On Cycle Parasitic Electric Load}\label{field-parasitic-electric-load}
 
 This optional numeric field defines the parasitic electric load (in Watts) due to control valves or other devices specific to the desuperheater heating coil. The load is applied whenever the coil is heating the air. The model assumes that this electric load is small and does not contribute to heating the air.
 
@@ -1195,15 +1195,15 @@ Following is an example input for a desuperheater heating coil.
 \begin{lstlisting}
 
 Coil:Heating:Desuperheater,
-  DesuperheaterCoil,                                   !- Coil Name
-  FanAndCoilAvailSched,                             !- Availability Schedule
-  0.3,                                                               !- Heat Reclaim Recovery Efficiency
-  Cooling Coil Air Outlet Node,             !- Coil Air Inlet Node Name
-  Air Loop Outlet Node,                             !- Coil Air Outlet Node Name
+  DesuperheaterCoil,           !- Coil Name
+  FanAndCoilAvailSched,        !- Availability Schedule
+  0.3,                         !- Heat Reclaim Recovery Efficiency
+  Cooling Coil Air Outlet Node, !- Coil Air Inlet Node Name
+  Air Loop Outlet Node,        !- Coil Air Outlet Node Name
   Coil:Cooling:DX:SingleSpeed, !- Heating Source Type
-  Furnace ACDXCoil 1,                                 !- Heating Source Name
-  ,                                                                     !- Coil Temperature Setpoint Node Name
-  0.1;                                                               !- Parasitic Electric Load {W}
+  Furnace ACDXCoil 1,          !- Heating Source Name
+  ,                            !- Coil Temperature Setpoint Node Name
+  0.1;                         !- On Cycle Parasitic Electric Load {W}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-4-006}
@@ -1737,7 +1737,7 @@ Schedule that defines when the coil is available. If the schedule's value is 0.0
 
 \paragraph{Field: Fuel Type}
 
-This field designates the appropriate fuel type for the coil. Valid fuel types are: Gas, NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, Steam, \hyperref[districtheating]{DistrictHeating}, \hyperref[districtcooling]{DistrictCooling}, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. NaturalGas is the default.
+This field designates the appropriate fuel type for the coil. Valid fuel types are: Gas, NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, DistrictHeatingSteam, \hyperref[districtheating]{DistrictHeatingWater}, \hyperref[districtcooling]{DistrictCooling}, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. NaturalGas is the default.
 
 \paragraph{Field: Burner Efficiency}\label{field-gas-burner-efficiency}
 
@@ -1759,7 +1759,7 @@ The name of the air outlet from the coil, i.e. Heating Coil Air Outlet Node.
 
 If the coil is used in the air loop simulation directly on a branch and is temperature controlled using a Set Point Manager, then the node that is the control node needs to be specified here. If the coil is used in an air terminal unit or other parent object (ZoneHVAC: or AirloopHVAC:), the coil is controlled by the parent object and the temperature set point node name is not required.
 
-\paragraph{Field: Parasitic Electric Load}\label{field-parasitic-electric-load-1}
+\paragraph{Field: On Cycle Parasitic Electric Load}\label{field-parasitic-electric-load-1}
 
 This is the parasitic electric load associated with the coil operation, such as an inducer fan, etc. This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation timestep.
 
@@ -1779,7 +1779,7 @@ A typical part load fraction correlation for a conventional gas heating coil (e.
        PLF = 0.8 + 0.2(PLR)
 \end{lstlisting}
 
-\paragraph{Field: Parasitic Fuel Load}\label{field-parasitic-gas-load}
+\paragraph{Field: Off Cycle Parasitic Fuel Load}\label{field-parasitic-gas-load}
 
 This numeric field is the parasitic fuel load associated with the coil's operation (Watts), such as a standing pilot light. The model assumes that this parasitic load is consumed only for the portion of the simulation timestep where the heating coil is not operating.
 
@@ -1791,7 +1791,7 @@ This numeric field is the parasitic fuel load associated with the coil's operati
 \item
   HVAC,Average,Heating Coil Heating Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Gas Energy {[}J{]}
+  HVAC,Sum,Heating Coil <Fuel Type> Energy {[}J{]}
 \item
   HVAC,Average,Heating Coil <Fuel Type> Rate {[}W{]}
 \item
@@ -1884,7 +1884,7 @@ A typical part load fraction correlation for a conventional gas heating coil (e.
        PLF = 0.8 + 0.2(PLR)
 \end{lstlisting}
 
-\paragraph{Field: Parasitic Gas Load}\label{field-parasitic-gas-load-1}
+\paragraph{Field: Off Cycle Parasitic Gas Load}\label{field-parasitic-gas-load-1}
 
 This numeric field is the parasitic gas load associated with the gas coil's operation (Watts), such as a standing pilot light. The model assumes that this parasitic load is consumed only for the portion of the simulation timestep where the gas heating coil is not operating.
 
@@ -1896,7 +1896,7 @@ This is user inputted stage 1 gas burner efficiency (decimal, not percent) and i
 
 This is the stage 1 capacity of the coil (W). This controlled coil will only provide the needed capacity to meet the control criteria whether it is temperature or capacity controlled. This field is autosizable.
 
-\paragraph{Field: Stage 1 Parasitic Electric Load}\label{field-stage-1-parasitic-electric-load}
+\paragraph{Field: Stage 1 On Cycle Parasitic Electric Load}\label{field-stage-1-parasitic-electric-load}
 
 This is the stage 1 parasitic electric load associated with the gas coil operation, such as an inducer fan, etc. This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation timestep.
 
@@ -1908,7 +1908,7 @@ This is user inputted stage 2 gas burner efficiency (decimal, not percent) and i
 
 This is the stage 2 capacity of the coil (W). This controlled coil will only provide the needed capacity to meet the control criteria whether it is temperature or capacity controlled. This field is autosizable.
 
-\paragraph{Field: Stage 2 Parasitic Electric Load}\label{field-stage-2-parasitic-electric-load}
+\paragraph{Field: Stage 2 On Cycle Parasitic Electric Load}\label{field-stage-2-parasitic-electric-load}
 
 This is the stage 2 parasitic electric load associated with the gas coil operation, such as an inducer fan, etc. This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation timestep.
 
@@ -1920,7 +1920,7 @@ This is user inputted stage 3 gas burner efficiency (decimal, not percent) and i
 
 This is the stage 3 capacity of the coil (W). This controlled coil will only provide the needed capacity to meet the control criteria whether it is temperature or capacity controlled. This field is autosizable.
 
-\paragraph{Field: Stage 3 Parasitic Electric Load}\label{field-stage-3-parasitic-electric-load}
+\paragraph{Field: Stage 3 On Cycle Parasitic Electric Load}\label{field-stage-3-parasitic-electric-load}
 
 This is the stage 3 parasitic electric load associated with the gas coil operation, such as an inducer fan, etc. This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation timestep.
 
@@ -1932,7 +1932,7 @@ This is user inputted stage 4 gas burner efficiency (decimal, not percent) and i
 
 This is the stage 4 capacity of the coil (W). This controlled coil will only provide the needed capacity to meet the control criteria whether it is temperature or capacity controlled. This field is autosizable.
 
-\paragraph{Field: Stage 4 Parasitic Electric Load}\label{field-stage-4-parasitic-electric-load}
+\paragraph{Field: Stage 4 On Cycle Parasitic Electric Load}\label{field-stage-4-parasitic-electric-load}
 
 This is the stage 4 parasitic electric load associated with the gas coil operation, such as an inducer fan, etc. This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation timestep.
 
@@ -1941,23 +1941,23 @@ An example in IDF form:
 \begin{lstlisting}
 
 Coil:Heating:Gas:MultiStage,
-  Heat Pump Heating Coil 1,                 !- Name
-  FanAndCoilAvailSched,                         !- Availability Schedule Name
-  Heating Coil Air Inlet Node,           !- Air Inlet Node Name
+  Heat Pump Heating Coil 1,          !- Name
+  FanAndCoilAvailSched,              !- Availability Schedule Name
+  Heating Coil Air Inlet Node,       !- Air Inlet Node Name
   SuppHeating Coil Air Inlet Node,   !- Air Outlet Node Name
-  ,                                               !- Temp Setpoint node name
-  ,                                               !- Part Load Fraction Correlation Curve Name
-  ,                                               !- Parasitic Gas Load
-  3,                                             !- Number of Speeds
-  0.92,                                       !- Speed 1 Gas burner Efficiency
-  Autosize,                               !- Speed 1 Nominal Capacity {W}
-  ,                                               !- Stage 1 Parasitic Electric Load {W}
-  0.88,                                       !- Speed 2 Gas burner Efficiency
-  Autosize,                               !- Speed 2 Nominal Capacity {W}
-  ,                                               !- Stage 2 Parasitic Electric Load {W}
-  0.84,                                       !- Speed 3 Gas burner Efficiency
-  Autosize,                               !- Speed 3 Nominal Capacity {W}
-  ;                                               !- Stage 3 Parasitic Electric Load {W}
+  ,                                  !- Temp Setpoint node name
+  ,                                  !- Part Load Fraction Correlation Curve Name
+  ,                                  !- Off Cycle Parasitic Gas Load
+  3,                                 !- Number of Speeds
+  0.92,                              !- Speed 1 Gas burner Efficiency
+  Autosize,                          !- Speed 1 Nominal Capacity {W}
+  ,                                  !- Stage 1 On Cycle Parasitic Electric Load {W}
+  0.88,                              !- Speed 2 Gas burner Efficiency
+  Autosize,                          !- Speed 2 Nominal Capacity {W}
+  ,                                  !- Stage 2 On Cycle Parasitic Electric Load {W}
+  0.84,                              !- Speed 3 Gas burner Efficiency
+  Autosize,                          !- Speed 3 Nominal Capacity {W}
+  ;                                  !- Stage 3 On Cycle Parasitic Electric Load {W}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-10-002}
@@ -2015,24 +2015,6 @@ This field is the parasitic gas consumption of the heating coil in Joules over t
 
 This field is the average parasitic gas consumption rate of the heating coil (e.g., standing pilot light) in Watts over the timestep being reported. The model assumes that the parasitic load is present only for the portion of the simulation timestep where the gas heating coil is not operating.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 \subsection{Coil:Cooling:DX:SingleSpeed}\label{coilcoolingdxsinglespeed}
 
 This DX cooling coil input requires an availability schedule, the gross rated total cooling capacity, the gross rated SHR, the gross rated COP, and the rated air volume flow rate. The latter 4 inputs determine the coil performance at the rating point (air entering the cooling coil at 26.7$^\circ$C drybulb/19.4$^\circ$C wetbulb and air entering the outdoor condenser coil at 35$^\circ$C drybulb/23.9$^\circ$C wetbulb). The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of gross rated total cooling capacity (300 to 450 cfm/ton).
@@ -2048,13 +2030,13 @@ This model requires five (5) curves as follows:
 \item
   The total cooling capacity modifier curve (function of temperature) is a curve with two independent variables: wet-bulb temperature of the air entering the cooling coil, and dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The curve is normalized to 1 at 19.44$^\circ$C indoor wet-bulb temperature and 35$^\circ$C outdoor dry-bulb temperature. The output of this curve is multiplied by the gross rated total cooling capacity to give the gross total cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the rating point temperatures). This curve is typically a biquadratic but any curve or table with two independent variables can be used.
 \item
-  The total cooling capacity modifier curve (function of flow fraction) is a curve or lookup table with the independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The curve is normalized to have the value of 1.0 when the actual air flow rate equals the rated air flow rate. The output of this curve is multiplied by the gross rated total cooling capacity and the total cooling capacity modifier curve (function of temperature) to give the gross total cooling capacity at the specific temperature and air flow conditions at which the coil is operating. This curve is typically a quadratic or cubic but any curve or table with one independent variablecan be used.
+  The total cooling capacity modifier curve (function of flow fraction) is a curve or lookup table with the independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The curve is normalized to have the value of 1.0 when the actual air flow rate equals the rated air flow rate. The output of this curve is multiplied by the gross rated total cooling capacity and the total cooling capacity modifier curve (function of temperature) to give the gross total cooling capacity at the specific temperature and air flow conditions at which the coil is operating. This curve is typically a quadratic or cubic but any curve or table with one independent variable can be used.
 \item
   The energy input ratio (EIR) modifier curve (function of temperature) is a curve with two independent variables: wet-bulb temperature of the air entering the cooling coil, and dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The curve is normalized to 1 at 19.44$^\circ$C indoor wet-bulb temperature and 35$^\circ$C outdoor dry-bulb temperature. The output of this curve is multiplied by the rated EIR (inverse of the rated COP) to give the EIR at specific temperature operating conditions (i.e., at temperatures different from the rating point temperatures). This curve is typically a biquadratic but any curve or table with two independent variables can be used.
 \item
-  The energy input ratio (EIR) modifier curve (function of flow fraction) is a curve or lookup table with the independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The curve is normalized to have the value of 1.0 when the actual air flow rate equals the rated air flow rate. The output of this curve is multiplied by the rated EIR (inverse of the rated COP) and the EIR modifier curve (function of temperature) to give the EIR at the specific temperature and air flow conditions at which the coil is operating. This curve is typically a quadratic or cubic but any curve or table with one independent variablecan be used.
+  The energy input ratio (EIR) modifier curve (function of flow fraction) is a curve or lookup table with the independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The curve is normalized to have the value of 1.0 when the actual air flow rate equals the rated air flow rate. The output of this curve is multiplied by the rated EIR (inverse of the rated COP) and the EIR modifier curve (function of temperature) to give the EIR at the specific temperature and air flow conditions at which the coil is operating. This curve is typically a quadratic or cubic but any curve or table with one independent variable can be used.
 \item
-  The part load fraction correlation (function of part load ratio) is a curve or a lookup table with the independent variable being part load ratio (sensible cooling load / steady-state sensible cooling capacity). The output of this curve is used in combination with the rated EIR and EIR modifier curves to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The curve should be normalized to a value of 1.0 when the part-load ratio equals 1.0 (i.e., the compressor(s) run continuously for the simulation timestep). This curve is typically a quadratic or cubic but any curve or table with one independent variablecan be used.
+  The part load fraction correlation (function of part load ratio) is a curve or a lookup table with the independent variable being part load ratio (sensible cooling load / steady-state sensible cooling capacity). The output of this curve is used in combination with the rated EIR and EIR modifier curves to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The curve should be normalized to a value of 1.0 when the part-load ratio equals 1.0 (i.e., the compressor(s) run continuously for the simulation timestep). This curve is typically a quadratic or cubic but any curve or table with one independent variable can be used.
 \end{enumerate}
 
 The curves are simply specified by name. Curve inputs are described in the curve manager section of this document (see Performance Curves in this document).
@@ -2095,7 +2077,7 @@ The air volume flow rate, in \si{\volumeFlowRate}, across the DX cooling coil at
 
 \paragraph{Field: 2017 Rated Evaporator Fan Power Per Volume Flow Rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment.
 Note 1: Standard Ratings using this field will be reported in the "2017 Standard Ratings for DX Coils" table
 Note 2: two values are calculated for SEER: 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation; 'SEER Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
 Note 3: SEER User, SEER Standard, EER, and IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 210-240 (2017).
@@ -2103,7 +2085,7 @@ Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling ca
 
 \paragraph{Field: 2023 Rated Evaporator Fan Power Per Volume Flow Rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment.
 Note 1: Standard Ratings using this field will be reported in the "2023 Standard Ratings for DX Coils" table
 Note 2: two values are calculated for SEER2. 'SEER2 User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER2 Standard' is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.
 Note 3: SEER2 User, SEER2 Standard, EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr - will be calculated according to ANSI/AHRI standard 210-240 (2023).
@@ -2135,7 +2117,7 @@ The name of a performance curve (Ref: Performance Curves) that parameterizes the
 
 \paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-2}
 
-This alpha field defines the name of a performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. This curve is typically a quadratic or cubic but any curve or table with one independent variablecan be used.
+This alpha field defines the name of a performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. This curve is typically a quadratic or cubic but any curve or table with one independent variable can be used.
 
 The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep). For PLR values between 0 and 1 (0 \textless{}= PLR \textless{} 1), the following rules apply:
 
@@ -2255,37 +2237,46 @@ The name of a quadratic or cubic normalized curve (Ref: Performance Curves) that
 
 This input field is name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed. This is an optional input field specified only when user desires to reject the condenser heat into a zone. The heat rejected is modeled as sensible internal gain of a secondary zone.
 
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
+
 Following is an example input for a Coil:Cooling:DX:SingleSpeed coil.
 
 \begin{lstlisting}
 
 Coil:Cooling:DX:SingleSpeed,
-  Zone1WindACDXCoil,        ! Coil Name
-  FanAndCoilAvailSched,     ! Availability Schedule
-  10548,                    ! Gross Rated Total Cooling Capacity
-  0.75,                     ! Gross Rated Sensible Heat Ratio
-  3.0,                      ! Gross Rated Cooling COP
-  0.637,                    ! Rated Air Flow Rate (m3/s)
-  773.3,                    ! 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  934.4,                    ! 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  Zone1WindACFanOutletNode, ! Coil Air Inlet Node
-  Zone1WindACAirOutletNode, ! Coil Air Outlet Node
-  WindACCoolCapFT,          ! Total Cooling Capacity Modifier Curve (function of temperature)
-  WindACCoolCapFFF,         ! Total Cooling Capacity Modifier Curve (function of flow fraction)
-  WindACEIRFT,              ! Energy Input Ratio Modifier Curve (function of temperature)
-  WindACEIRFFF,             ! Energy Input Ratio Modifier Curve (function of flow fraction)
-  WindACPLFFPLR,            ! Part Load Fraction Correlation (function of part load ratio)
-  1000.,                    ! Nominal Time for Condensate Removal to Begin {s}
-  1.5,                      ! Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
-  3.0,                      ! Maximum ON/OFF Cycling Rate {cycles/hr}
-  45.0,                     ! Latent Capacity Time Constant {s}
-  ,                         ! Condenser Air Inlet Node Name
-  AirCooled,                ! Condenser Type
-  ,                         ! Evaporative Condenser Effectiveness
-  ,                         ! Evaporative Condenser Air Volume Flow Rate {m3/s}
-  ,                         ! Evaporative Condenser Pump Rated Power Consumption {W}
-  30.,                      ! Crankcase Heater Capacity {W}
-  10.;                      ! Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
+  Zone1WindACDXCoil,        !- Coil Name
+  FanAndCoilAvailSched,     !- Availability Schedule
+  10548,                    !- Gross Rated Total Cooling Capacity
+  0.75,                     !- Gross Rated Sensible Heat Ratio
+  3.0,                      !- Gross Rated Cooling COP
+  0.637,                    !- Rated Air Flow Rate (m3/s)
+  773.3,                    !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  934.4,                    !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  Zone1WindACFanOutletNode, !- Coil Air Inlet Node
+  Zone1WindACAirOutletNode, !- Coil Air Outlet Node
+  WindACCoolCapFT,          !- Total Cooling Capacity Modifier Curve (function of temperature)
+  WindACCoolCapFFF,         !- Total Cooling Capacity Modifier Curve (function of flow fraction)
+  WindACEIRFT,              !- Energy Input Ratio Modifier Curve (function of temperature)
+  WindACEIRFFF,             !- Energy Input Ratio Modifier Curve (function of flow fraction)
+  WindACPLFFPLR,            !- Part Load Fraction Correlation (function of part load ratio)
+  1000.,                    !- Nominal Time for Condensate Removal to Begin {s}
+  1.5,                      !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
+  3.0,                      !- Maximum ON/OFF Cycling Rate {cycles/hr}
+  45.0,                     !- Latent Capacity Time Constant {s}
+  ,                         !- Condenser Air Inlet Node Name
+  AirCooled,                !- Condenser Type
+  ,                         !- Evaporative Condenser Effectiveness
+  ,                         !- Evaporative Condenser Air Volume Flow Rate {m3/s}
+  ,                         !- Evaporative Condenser Pump Rated Power Consumption {W}
+  30.,                      !- Crankcase Heater Capacity {W}
+  10.;                      !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
 \end{lstlisting}
 
 \subsection{Coil:Cooling:DX:TwoSpeed}\label{coilcoolingdxtwospeed}
@@ -2326,7 +2317,7 @@ The high speed air volume flow rate, in \si{\volumeFlowRate}, across the DX cool
 
 \paragraph{Field: High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment.
 Note 1: Standard Ratings using this field will be reported in the "2017 Standard Ratings for DX Coils" table
 Note 2: two values are calculated for SEER: 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation; 'SEER Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
 Note 3: SEER User, SEER Standard, EER, and IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 210-240 (2017).
@@ -2334,7 +2325,7 @@ Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling ca
 
 \paragraph{Field: High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment.
 Note 1: Standard Ratings using this field will be reported in the "2023 Standard Ratings for DX Coils" table
 Note 2: two values are calculated for SEER2. 'SEER2 User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER2 Standard' is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.
 Note 3: SEER2 User, SEER2 Standard, EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr - will be calculated according to ANSI/AHRI standard 210-240 (2023).
@@ -2411,7 +2402,7 @@ The low speed volume air flow rate, in \si{\volumeFlowRate}, across the DX cooli
 
 \paragraph{Field: Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Cooling Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Cooling Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment.
 Note 1: two values are calculated for SEER. 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
 Note 2: SEER2 and Standard Rating (Net) Cooling Capacity -- will only be reported for coils with cooling capacity less than 65,000 Btu/hr - according to ANSI/AHRI standard 210-240 (2013).
 Note 3: EER and IEER with cooling capacities less than 65,000 Btu/hr will be calculated according to ANSI/AHRI standard 210-240 (2017).
@@ -2419,7 +2410,7 @@ Note 4: EER and IEER with cooling capacities between 65,000 and 135,000 Btu/hr w
 
 \paragraph{Field: Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Cooling Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Cooling Coil, Standard Ratings) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER and Standard Rating Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment.
 Note 1: two values are calculated for SEER. 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER Standard' is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.
 Note 2: SEER2 and Standard Rating (Net) Cooling Capacity -- will only be reported for coils with cooling capacity less than 65,000 Btu/hr - according to ANSI/AHRI standard 210-240 (2023).
 Note 3: EER and IEER with cooling capacities less than 65,000 Btu/hr will be calculated according to ANSI/AHRI standard 210-240 (2023).
@@ -2727,6 +2718,15 @@ This numeric field contains the set point temperature ($^\circ$C) for the basin 
 
 This alpha field contains the name of the basin heater operating schedule. This field only applies for Condenser Type = EvaporativelyCooled. The basin heater operating schedule is assumed to be an on/off schedule and the heater is available to operate any time the schedule value is greater than 0. The basin heater operates when scheduled on and the outdoor air dry-bulb temperature is below the set point temperature described in the previous field. If this field is left blank, the basin heater is available to operate throughout the simulation. Regardless of this schedule, the basin heater may only operate when the DX coil is off.
 
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-1}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
+
 Following is an example IDF use of the object:
 
 \begin{lstlisting}
@@ -2858,7 +2858,7 @@ The volumetric air flow rate for Speed \textless{}x\textgreater{}, in \si{\volum
 
 \paragraph{Field: Speed \textless{}X\textgreater{} 2017 Rated Evaporator Fan Power Per Volume Flow Rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment.
 Note 1: Standard Ratings using this field will be reported in the "2017 Standard Ratings for DX Coils" table
 Note 2: two values are calculated for SEER: 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation; 'SEER Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
 Note 3: SEER User, SEER Standard, EER, and IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 210-240 (2017).
@@ -2866,7 +2866,7 @@ Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling ca
 
 \paragraph{Field: Speed \textless{}X\textgreater{} 2023 Rated Evaporator Fan Power Per Volume Flow Rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment.
 Note 1: Standard Ratings using this field will be reported in the "2023 Standard Ratings for DX Coils" table
 Note 2: two values are calculated for SEER2. 'SEER2 User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER2 Standard' is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.
 Note 3: SEER2 User, SEER2 Standard, EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr - will be calculated according to ANSI/AHRI standard 210-240 (2023).
@@ -2972,6 +2972,15 @@ The rated power of the evaporative condenser water pump in Watts at Speed \textl
 
 This input field is name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed. This is an optional input field specified only when user desires to reject the condenser heat into a zone. The heat rejected is modeled as sensible internal gain of a secondary zone.
 
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-2}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
+
 Following is an example input for this multispeed DX cooling coil.
 
 \begin{lstlisting}
@@ -3065,7 +3074,7 @@ Coil:Cooling:DX:MultiSpeed,
   HPACCOOLEIRFT Speed 4,           !- Speed 4 Energy Input Ratio Modifier Curve (temperature)
   HPACCOOLEIRFF Speed 4,           !- Speed 4 Energy Input Ratio Modifier Curve (flow fraction)
   HPACCOOLPLFFPLR Speed 1,         !- Speed 4 Part Load Fraction Correlation (part load ratio)
-  1000.0,                          !- Speed 4 ominal Time for Condensate Removal to Begin {s}
+  1000.0,                          !- Speed 4 Nominal Time for Condensate Removal to Begin {s}
   1.5,                             !- Speed 4 Ratio of Initial Moisture Evaporation Rate and Steady-state Capacity {dimensionless}
   3.0,                             !- Speed 4 Maximum ON/OFF Cycling Rate {cycles/hr}
   45.0,                            !- Speed 4 Latent Capacity Time Constant {s}
@@ -3329,6 +3338,30 @@ This numeric field defines the nominal time (in seconds) after startup for conde
 
 This numeric field defines ratio of the initial moisture evaporation rate from the cooling coil (when the compressor first turns off, in Watts) and the coil's steady-state latent capacity (Watts) at rated airflow and temperature conditions. Suggested value is 1.5; zero value means the latent degradation model is disabled. The default value for this field is zero.
 
+\paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-vs}
+
+This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50\% run time fraction. Suggested values are shown in Figure~\ref{fig:suggested-values-for-maximum-cycling-rate-vs}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image295.png}
+\caption{Suggested values for maximum cycling rate \protect \label{fig:suggested-values-for-maximum-cycling-rate-vs}}
+\end{figure}
+
+\paragraph{Field: Latent Capacity Time Constant}\label{field-heat-pump-time-constant-vs}
+
+This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown in Figure~\ref{fig:suggested-values-for-heat-pump-time-constant-vs}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image296.png}
+\caption{Suggested values for latent capacity time constant \protect \label{fig:suggested-values-for-heat-pump-time-constant-vs}}
+\end{figure}
+
+\paragraph{Field: Fan Delay Time}\label{field-heat-pump-fan-delay-time-vs}
+
+This numeric field contains the time delay for the heat pump supply air fan to shut off after the compressor cycles off in seconds. This value can be obtained from the manufacturer or the heat pump catalog. Enter a value of zero when the heat pump's fan operating mode is continuous. Suggested value is 60 seconds.
+
 \paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-4}
 
 This alpha field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the unit as a function of the part load ratio (PLR, sensible or latent load/steady-state sensible or latent cooling capacity for Speed 1), in the case that the unit operates under the lowest speed, i.e.~on/off. The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep for Speed 1. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep).
@@ -3401,7 +3434,7 @@ This numeric field defines the volumetric air flow rate, in \si{\volumeFlowRate}
 
 \paragraph{Field: Speed \textless{}X\textgreater{} 2017 Rated Evaporator Fan Power Per Volume Flow Rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment.
 Note 1: Standard Ratings using this field will be reported in the "2017 Standard Ratings for DX Coils" table
 Note 2: two values are calculated for SEER: 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation; 'SEER Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
 Note 3: SEER User, SEER Standard, EER, and IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 210-240 (2017).
@@ -3409,7 +3442,7 @@ Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling ca
 
 \paragraph{Field: Speed \textless{}X\textgreater{} 2023 Rated Evaporator Fan Power Per Volume Flow Rate}
 
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
+This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment.
 Note 1: Standard Ratings using this field will be reported in the "2023 Standard Ratings for DX Coils" table
 Note 2: two values are calculated for SEER2. 'SEER2 User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER2 Standard' is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.
 Note 3: SEER2 User, SEER2 Standard, EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr - will be calculated according to ANSI/AHRI standard 210-240 (2023).
@@ -3453,6 +3486,9 @@ Coil:Cooling:DX:VariableSpeed,
   1.7,                                       !- Rated Air Flow Rate {m3/s}
   0.0,                                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}
   0.0,   !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+  ,                               !- Maximum Cycling Rate {cylcles/hr}
+  ,                               !- Latent Capacity Time Constant
+  ,                               !- Fan Delay Time
   HPACCOOLPLFFPLR,                     !- Part Load Fraction Correlation Curve Name
   ,                                      ! - Condenser Air Inlet Node Name
   AirCooled,                                ! - Condenser Type
@@ -4216,6 +4252,15 @@ This input field is name of sensible heat ratio modifier biquadratic curve. The 
 
 This input field is name of sensible heat ratio modifier curve as function of secondary air flow fraction. The value of this curve modifies the nominal sensible heat ratio for current time step depending on the secondary coil air flow fraction. This is an optional input field. If this input field is left blank, then the sensible heat ratio modifier curve value for flow fraction is set to 1.0.
 
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-4}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
+
 Following is an example input for the object.
 
 \begin{lstlisting}
@@ -4504,6 +4549,15 @@ This input field is name of sensible heat ratio modifier biquadratic curve. The 
 
 This input field is name of sensible heat ratio modifier curve as function of secondary air flow fraction. The value of this curve modifies the nominal sensible heat ratio for current time step depending on the secondary coil air flow fraction. This is an optional input field. If this input field is left blank, then the sensible heat ratio modifier curve value for flow fraction is set to 1.0.
 
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-5}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
+
 Following is an example input for a multi-speed heating DX coil.
 
 \begin{lstlisting}
@@ -4591,9 +4645,9 @@ COIL:Heating:DX:MultiSpeed,
 \item
   HVAC,Sum,Heating Coil Defrost Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Defrost Gas Rate {[}W{]}
+  HVAC,Average,Heating Coil Defrost NaturalGas Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Defrost Gas Energy {[}J{]}
+  HVAC,Sum,Heating Coil Defrost NaturalGas Energy {[}J{]}
 \item
   HVAC,Average,Heating Coil Crankcase Heater Electricity Rate {[}W{]}
 \item
@@ -4645,11 +4699,11 @@ This is the fuel consumption of the DX coil unit in Joules for the timestep bein
 
 \paragraph{Heating Coil Crankcase Heater Electricity Rate {[}W{]}}\label{heating-coil-crankcase-heater-electric-power-w-1}
 
-This is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. When a companion cooling coil exits, the crankcase heater power of the companion cool coil is alos reported in this variable.
+This is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. When a companion cooling coil exits, the crankcase heater power of the companion cool coil is also reported in this variable.
 
 \paragraph{Heating Coil Crankcase Heater Electricity Energy {[}J{]}}\label{heating-coil-crankcase-heater-electric-energy-j-1}
 
-This is the electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects). When a companion cooling coil exits, the crankcase heater power of the companion cool coil is alos reported in this variable.
+This is the electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects). When a companion cooling coil exits, the crankcase heater power of the companion cool coil is also reported in this variable.
 
 \paragraph{Heating Coil Runtime Fraction {[]}}
 
@@ -4782,7 +4836,7 @@ This numeric field defines the total, full load gross heating capacity in watts 
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Gross Rated Heating COP}\label{field-speed-x-reference-unit-gross-rated-heating-cop}
 
-This numeric field defines the coefficient of performance (COP = gross heating capacityin watts divided by electrical power input in watts) of the heating coil unit at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here must be greater than 0. The input power includes power for the compressor(s), the outdoor coil fan and accessories, but does not include the power consumption of the indoor supply air fan. The gross COP should NOT account for the supply air fan.
+This numeric field defines the coefficient of performance (COP = gross heating capacity in watts divided by electrical power input in watts) of the heating coil unit at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here must be greater than 0. The input power includes power for the compressor(s), the outdoor coil fan and accessories, but does not include the power consumption of the indoor supply air fan. The gross COP should NOT account for the supply air fan.
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Air Flow Rate}\label{field-speed-x-reference-unit-rated-air-flow-rate-1}
 
@@ -5256,7 +5310,7 @@ These outputs are the parasitic electric power and consumption associated with t
 
 The CoilSystem:Cooling:DX object is a virtual container component that consists of a DX cooling coil component and its associated controls, as shown in the Figure below. This control object supports several different types of DX cooling coils (see field Cooling Coil Object Type).
 
-This component may be used as a cooling coil in constant volume or variable volume systems, as blow through or draw through, with or without humidity controls. Unlike AirLoopHVAC:Unitary system types, this component controls only the DX coil, not the supply fan. CoilSystem:Cooling:DX is added to a system by placing it in an air loop branch (see Branch object) or in an \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} or in a \hyperref[zonehvacoutdoorairunitequipmentlist]{ZoneHVAC:OutdoorAirUnit:EquipmentList} . It requires one or more setpoint manager (see SetpointManager:*) objects to specify temperature and/or humidity setpoints (unless it is used in a \hyperref[zonehvacoutdoorairunit]{ZoneHVAC:OutdoorAirUnit} which has its own temperature setpoints). This object is the one that is listed in the Branch or equipment list object rather than the coil itself. A constant volume or variable volume fan is modeled separately from this cooling system. These are the only fan types allowed for this system type (ref. \hyperref[fanconstantvolume]{Fan:ConstantVolume} and \hyperref[fanvariablevolume]{Fan:VariableVolume}). Cycling fan operation is not available with this model. The CoilSystem:Cooling:DX object can also be placed on dedicated outdoor air system (DOAS) airloop branches or in arloop branches where the air flow to capacity ratio range is between 100 300 cfm/ton. 100\% DOAS DX cooling coils operate in lower flow to capacity ratio range compared to regular DX cooling coils. The CoilSystem:Cooling:DX is selected to operate in DOAS application or in low flow to capacity ratio range by specifying YES to the input field Use Outdoor Air DX Cooling Coil . If this optional input field is left blank or specified as NO , then the coil is modeled as regular DX cooling coil. If the CoilSystem:Cooling:DX object is in an \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} or in a \hyperref[zonehvacoutdoorairunitequipmentlist]{ZoneHVAC:OutdoorAirUnit:EquipmentList} then it is treated as 100\% DOAS DX cooling coil only if the choice input field Use Outdoor Air DX Cooling Coil is set too YES . All the control options of the regular DX cooling coils are available to DOAS DX coils as well. Heating DX coils in DOAS airloop operate at the same flow to capacity ratio limits as the DOAS DX cooling coils.
+This component may be used as a cooling coil in constant volume or variable volume systems, as blow through or draw through, with or without humidity controls. Unlike AirLoopHVAC:Unitary system types, this component controls only the DX coil, not the supply fan. CoilSystem:Cooling:DX is added to a system by placing it in an air loop branch (see Branch object) or in an \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} or in a \hyperref[zonehvacoutdoorairunitequipmentlist]{ZoneHVAC:OutdoorAirUnit:EquipmentList} . It requires one or more setpoint manager (see SetpointManager:*) objects to specify temperature and/or humidity setpoints (unless it is used in a \hyperref[zonehvacoutdoorairunit]{ZoneHVAC:OutdoorAirUnit} which has its own temperature setpoints). This object is the one that is listed in the Branch or equipment list object rather than the coil itself. A constant volume or variable volume fan is modeled separately from this cooling system. These are the only fan types allowed for this system type (ref. \hyperref[fanconstantvolume]{Fan:ConstantVolume} and \hyperref[fanvariablevolume]{Fan:VariableVolume}). Cycling fan operation is not available with this model. The CoilSystem:Cooling:DX object can also be placed on dedicated outdoor air system (DOAS) airloop branches or in airloop branches where the air flow to capacity ratio range is between 100 300 cfm/ton. 100\% DOAS DX cooling coils operate in lower flow to capacity ratio range compared to regular DX cooling coils. The CoilSystem:Cooling:DX is selected to operate in DOAS application or in low flow to capacity ratio range by specifying YES to the input field Use Outdoor Air DX Cooling Coil . If this optional input field is left blank or specified as NO , then the coil is modeled as regular DX cooling coil. If the CoilSystem:Cooling:DX object is in an \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} or in a \hyperref[zonehvacoutdoorairunitequipmentlist]{ZoneHVAC:OutdoorAirUnit:EquipmentList} then it is treated as 100\% DOAS DX cooling coil only if the choice input field Use Outdoor Air DX Cooling Coil is set too YES . All the control options of the regular DX cooling coils are available to DOAS DX coils as well. Heating DX coils in DOAS airloop operate at the same flow to capacity ratio limits as the DOAS DX cooling coils.
 
 \begin{figure}[hbtp] % fig 138
 \centering
@@ -5687,7 +5741,7 @@ This alpha field defines the heating operation in the combined space heating and
 
 This alpha field defines the water heating operation in the combined space heating and water heating with desuperheating (SCDWH) mode in an ASIHP, which must be given. The power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed are not used. That means the power consumption at each speed level of the SHDWH mode is accounted for by the heating coil part.
 
-\paragraph{Field: SCWH Mode Minimum Indoor Temperature to Allow  Overcooling}\label{Field-SCWH-Minimum-In-Overcooling-ASIHP}
+\paragraph{Field: SCWH Mode Minimum Indoor Temperature to Allow Overcooling}\label{Field-SCWH-Minimum-In-Overcooling-ASIHP}
 
 This numeric field defines an indoor air temperature [C] above which indoor overcooling is allowed in the cooling operation, i.e., allowing running the SCWH mode to cool down the indoor air below the thermostat setting temperature, and iterate the compressor speed to match the water heating load. It has to be noted that both the indoor temperature and ambient temperature lower bound settings have to be satisfied when allowing indoor overcooling by running the SCWH mode.
 
@@ -6020,6 +6074,15 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
        PLF = 1.0 + 0.0(PLR)
 \end{lstlisting}
 
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-7}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
+
 Following is an example input for the \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Pumped! object:
 
 \begin{lstlisting}
@@ -6229,6 +6292,15 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
 \begin{lstlisting}
        PLF = 1.0 + 0.0(PLR)
 \end{lstlisting}
+
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-8}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
 
 Following is an example input for the \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Wrapped! object:
 
@@ -6590,6 +6662,15 @@ The output of this curve is multiplied by the rated COP at this specific speed a
 This alpha field specifies the name of a \textbf{quadratic} or \textbf{cubic} performance curve object (ref: Performance Curves) that defines the variation in DX coil heating COP as a function of the ratio of actual water flow rate through the condenser to the rated condenser water flow rate.
 The output of this curve is multiplied by the rated COP at this specific speed and the output from the two other heating COP modifier curves (function of temperature and function of air flow fraction) to give the DX coil heating COP at the specific inlet fluid temperatures and flow rates at which the coil is operating. The curve should be normalized to have the value of 1.0 at the rated condenser water flow rate (water flow fraction of 1.0). If this field is left blank, the heating COP remains constant (curve value assumed to be 1.0 for all water flow rates).
 
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{vshpwhheating-outdoor-temperature-dependent-crankcase-heater-capacity-curve-name}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
+
 Following is an example input for the \lstinline!Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed! object:
 
 \begin{lstlisting}
@@ -6852,7 +6933,7 @@ nThis output is also added to a meter with Resource Type = Electricity, End Use 
 This output variable is the ratio of the part-load capacity to the steady state capacity of the DX coil.
 
 \paragraph{HVAC,Average,Cooling Coil Air Mass Flow Rate {[}kg/s{]}}\label{vshpwhheating-output-cooling-coil-air-mass-flow-rate}
-The output variable is the average air mass flow rate going through the evporator over the timestep being reported.
+The output variable is the average air mass flow rate going through the evaporator over the timestep being reported.
 
 \paragraph{HVAC,Average,Cooling Coil Air Inlet Temperature {[}C{]}}\label{vshpwhheating-output-cooling-coil-air-inlet-temperature}
 The output variable is the average entering air dry-bulb temperature over the timestep being reported.
@@ -6976,7 +7057,7 @@ This numeric field defines the estimated parameter \textbf{compressor power loss
 This numeric field defines the estimated parameter of the \textbf{compressor's efficiency}. The compressor efficiency is formulated as the equation below:
 
 \begin{equation}
-\eta  = \frac{{{{\dot W}_{Theoritical}}}}{{{{\dot W}_{CompInput}} - {{\dot W}_{Loss}}}}
+\eta  = \frac{{{{\dot W}_{Theoretical}}}}{{{{\dot W}_{CompInput}} - {{\dot W}_{Loss}}}}
 \end{equation}
 
 This field was previously know as Parameter 5.
@@ -7017,6 +7098,34 @@ This numeric field defines the estimated parameter \textbf{source side heat tran
 
 This numeric field defines the estimated parameter \textbf{source side heat transfer resistance} 2. Unit is W/K. This field was previously known as Parameter 10. It should only be used when the Source Side Fluid Name is an antifreeze.
 
+\paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-pe}
+
+This alpha field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the unit as a function of the part load ratio (PLR). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep).
+
+\paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-pe}
+
+This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50\% run time fraction. Suggested values are shown in Figure~\ref{fig:suggested-values-for-maximum-cycling-rate-pe}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image295.png}
+\caption{Suggested values for maximum cycling rate \protect \label{fig:suggested-values-for-maximum-cycling-rate-pe}}
+\end{figure}
+
+\paragraph{Field: Latent Capacity Time Constant}\label{field-heat-pump-time-constant-pe}
+
+This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown in Figure~\ref{fig:suggested-values-for-heat-pump-time-constant-pe}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image296.png}
+\caption{Suggested values for latent capacity time constant \protect \label{fig:suggested-values-for-heat-pump-time-constant-pe}}
+\end{figure}
+
+\paragraph{Field: Fan Delay Time}\label{field-heat-pump-fan-delay-time-pe}
+
+This numeric field contains the time delay for the heat pump supply air fan to shut off after the compressor cycles off in seconds. This value can be obtained from the manufacturer or the heat pump catalog. Enter a value of zero when the heat pump's fan operating mode is continuous. Suggested value is 60 seconds.
+
 Following is an example for COIL:WaterToAirHP:ParameterEstimation:Cooling coil input
 
 \begin{lstlisting}
@@ -7048,7 +7157,9 @@ Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,
   2.06530E-02,                         !-Leak Rate Coefficient
   1.92757E+03,                         !- Source Side Heat Transfer Coefficient {W/K}
   ,                                               !- Source Side Heat Transfer Resistance1 {dimensionless}
-  ;                                               !- Source Side Heat Transfer Resistance2 {W/K}
+  ,                                               !- Source Side Heat Transfer Resistance2 {W/K}
+  HPACCOOLPLFFPLR;         !- Part Load Fraction Correlation Curve Name
+
 \end{lstlisting}
 
 \subsection{Coil:Cooling:WaterToAirHeatPump:EquationFit}\label{coilcoolingwatertoairheatpumpequationfit}
@@ -7083,22 +7194,6 @@ This alpha field contains the cooling coil air outlet node name.
 
 This numeric field contains the rated volumetric air flow rate on the load side of the heat pump in m3/s. This field is autosizable.
 
-\paragraph{Field: 2017 Rated Evaporator Fan Power Per Volume Flow Rate}
-
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
-Note 1: Standard Ratings using this field will be reported in the "2017 Standard Ratings for DX Coils" table
-Note 2: two values are calculated for SEER: 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation; 'SEER Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
-Note 3: SEER User, SEER Standard, EER, and IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 210-240 (2017).
-Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2013).
-
-\paragraph{Field: 2023 Rated Evaporator Fan Power Per Volume Flow Rate}
-
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
-Note 1: Standard Ratings using this field will be reported in the "2023 Standard Ratings for DX Coils" table
-Note 2: two values are calculated for SEER2. 'SEER2 User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER2 Standard' is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.
-Note 3: SEER2 User, SEER2 Standard, EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr - will be calculated according to ANSI/AHRI standard 210-240 (2023).
-Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacities between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2022).
-
 \paragraph{Field: Rated Water Flow Rate}\label{field-rated-water-flow-rate}
 
 This numeric field contains the rated volumetric water flow rate on the source side of the heat pump in m3/s. This field is autosizable.
@@ -7109,7 +7204,7 @@ This numeric field contains the gross rated total cooling capacity of the heat p
 
 \paragraph{Field: Gross Rated Sensible Cooling Capacity}\label{field-gross-rated-sensible-cooling-capacity}
 
-This numeric field contains the gross rated sensible capacity of the heat pump in W. This field is autosizable. The gross rated sensible cooling capacity shouldnot account for the effect of supply air fan heat.
+This numeric field contains the gross rated sensible capacity of the heat pump in W. This field is autosizable. The gross rated sensible cooling capacity should not account for the effect of supply air fan heat.
 
 \paragraph{Field: Rated Cooling Coefficient of Performance}\label{field-rated-cooling-coefficient-of-performance}
 
@@ -7139,6 +7234,10 @@ This alpha field specifies the name of a \textbf{quintlinear} performance curve 
 
 This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the heat pump power consumption. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
 
+\paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-efc}
+
+This alpha field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the unit as a function of the part load ratio (PLR). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep).
+
 \paragraph{Field: Nominal Time for Condensate Removal to Begin}\label{field-nominal-time-for-condensate-removal-to-begin-4}
 
 This numeric field defines the nominal time (in seconds) after startup for condensate to begin leaving the coil's condensate drain line at the coil's rated airflow and temperature conditions, starting with a dry coil. Nominal time is equal to the ratio of the energy of the coil's maximum condensate holding capacity (J) to the coil's steady-state latent capacity (W). Suggested value is 1000; zero value means the latent degradation model is disabled. The default value for this field is zero.
@@ -7146,6 +7245,30 @@ This numeric field defines the nominal time (in seconds) after startup for conde
 \paragraph{Field: Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity}\label{field-ratio-of-initial-moisture-evaporation-rate-and-steady-state-latent-capacity-4}
 
 This numeric field defines ratio of the initial moisture evaporation rate from the cooling coil (when the compressor first turns off, in Watts) and the coil's steady-state latent capacity (Watts) at rated airflow and temperature conditions. Suggested value is 1.5; zero value means the latent degradation model is disabled. The default value for this field is zero.
+
+\paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-efc}
+
+This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50\% run time fraction. Suggested values are shown in Figure~\ref{fig:suggested-values-for-maximum-cycling-rate-efc}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image295.png}
+\caption{Suggested values for maximum cycling rate \protect \label{fig:suggested-values-for-maximum-cycling-rate-efc}}
+\end{figure}
+
+\paragraph{Field: Latent Capacity Time Constant}\label{field-heat-pump-time-constant-efc}
+
+This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown in Figure~\ref{fig:suggested-values-for-heat-pump-time-constant-efc}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image296.png}
+\caption{Suggested values for latent capacity time constant \protect \label{fig:suggested-values-for-heat-pump-time-constant-efc}}
+\end{figure}
+
+\paragraph{Field: Fan Delay Time}\label{field-heat-pump-fan-delay-time-efc}
+
+This numeric field contains the time delay for the heat pump supply air fan to shut off after the compressor cycles off in seconds. This value can be obtained from the manufacturer or the heat pump catalog. Enter a value of zero when the heat pump's fan operating mode is continuous. Suggested value is 60 seconds.
 
 Following is an example of the input for Coil:WaterToAirHP:EquationFit:Cooling coil
 
@@ -7165,9 +7288,10 @@ Coil:Cooling:WaterToAirHeatPump:EquationFit,
   TotCoolCapCurve,                                !- Total Cooling Capacity Curve Name
   CoolSensCapCurve,                               !- Sensible Cooling Capacity Curve Name
   CoolPowCurve,                                   !- Cooling Power Consumption Curve Name
+  HPACCOOLPLFFPLR,                                !- Part Load Fraction Correlation Curve Name
   0,                                              !- Nominal Time for Condensate Removal to Begin
   0;                                              !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
-  
+
   Curve:QuadLinear,
   TotCoolCapCurve,     ! Curve Name
   -0.68126221,         ! CoefficientC1
@@ -7463,6 +7587,30 @@ This numeric field defines the nominal time (in seconds) after startup for conde
 
 This numeric field defines ratio of the initial moisture evaporation rate from the cooling coil (when the compressor first turns off, in Watts) and the coil's steady-state latent capacity (Watts) at rated airflow and temperature conditions. Suggested value is 1.5; zero value means the latent degradation model is disabled. The default value for this field is zero.
 
+\paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-vsefc}
+
+This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50\% run time fraction. Suggested values are shown in Figure~\ref{fig:suggested-values-for-maximum-cycling-rate-vsefc}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image295.png}
+\caption{Suggested values for maximum cycling rate \protect \label{fig:suggested-values-for-maximum-cycling-rate-vsefc}}
+\end{figure}
+
+\paragraph{Field: Latent Capacity Time Constant}\label{field-heat-pump-time-constant-vsefc}
+
+This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown in Figure~\ref{fig:suggested-values-for-heat-pump-time-constant-vsefc}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image296.png}
+\caption{Suggested values for latent capacity time constant \protect \label{fig:suggested-values-for-heat-pump-time-constant-vsefc}}
+\end{figure}
+
+\paragraph{Field: Fan Delay Time}\label{field-heat-pump-fan-delay-time-vsefc}
+
+This numeric field contains the time delay for the heat pump supply air fan to shut off after the compressor cycles off in seconds. This value can be obtained from the manufacturer or the heat pump catalog. Enter a value of zero when the heat pump's fan operating mode is continuous. Suggested value is 60 seconds.
+
 \paragraph{Field: Flag for Using Hot Gas Reheat, 0 or 1}\label{field-flag-for-using-hot-gas-reheat-0-or-1}
 
 This numeric field dictates whether to use the recoverable waste heat for reheating the supply air, downstream of the coil. The value 1 means using the hot gas reheating, and 0 means not using. If the hot gas reheating is turned on, the recoverable waste heat is subtracted from both the total cooling capacity and the sensible cooling capacity. The default value for this field is zero.
@@ -7504,22 +7652,6 @@ This numeric field defines the coefficient of performance (COP = gross total coo
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Air Flow Rate}\label{field-speed-x-reference-unit-rated-air-flow-rate-2}
 
 This numeric field defines the volumetric air flow rate, in \si{\volumeFlowRate}, across the cooling coil at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here should be directly from the Reference Unit data, corresponding to the given gross rated total cooling capacity and gross rated cooling COP at the speed, as above.
-
-\paragraph{Field: Speed \textless{}X\textgreater{} 2017 Rated Evaporator Fan Power Per Volume Flow Rate}
-
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1250 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2017 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, 15.2 Coils) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
-Note 1: Standard Ratings using this field will be reported in the "2017 Standard Ratings for DX Coils" table
-Note 2: two values are calculated for SEER: 'SEER User' is calculated using user-input PLF curve and cooling coefficient of degradation; 'SEER Standard' is calculated using AHRI Std 210/240-2017 default PLF curve and cooling coefficient of degradation.
-Note 3: SEER User, SEER Standard, EER, and IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 210-240 (2017).
-Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2013).
-
-\paragraph{Field: Speed \textless{}X\textgreater{} 2023 Rated Evaporator Fan Power Per Volume Flow Rate}
-
-This field is the electric power for the evaporator (cooling coil) fan per air volume flow rate through the coil at the rated conditions for Speed <x> in W/(m\(^{3}\)/s). The default value is 934.4 W/(m3/s) (441 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{}= 0.0 and \textless{}= 1505 W/(m\(^{3}\)/s). This value is only used to calculate the following metrics according to the 2023 version of the ANSI/AHRI 210-240 standard: Seasonal Energy Efficiency Ratio (SEER2), Energy Efficiency Ratio (EER), Integrated Energy Efficiency Ratio (IEER) and the Standard Rating (Net) Cooling Capacity.  These metrics will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Section 15.2 Coils). This value is not used for modeling the evaporator (cooling coil) fan during simulations; instead, it is used for calculating SEER2, EER, IEER, and Standard Rating (Net) Cooling Capacity to assist the user in verifying their inputs for modeling this type of equipment. 
-Note 1: Standard Ratings using this field will be reported in the "2023 Standard Ratings for DX Coils" table
-Note 2: two values are calculated for SEER2. 'SEER2 User' is calculated using user-input PLF curve and cooling coefficient of degradation. 'SEER2 Standard' is calculated using AHRI Std 210/240-2023 default PLF curve and cooling coefficient of degradation.
-Note 3: SEER2 User, SEER2 Standard, EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacity less than 65,000 Btu/hr - will be calculated according to ANSI/AHRI standard 210-240 (2023).
-Note 4: EER, IEER, and Standard Rating (Net) Cooling Capacity -- with cooling capacities between 65,000 and 135,000 Btu/hr -- will be calculated according to ANSI/AHRI standard 340-360 (2022).
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Water Flow Rate}\label{field-speed-x-reference-unit-rated-water-flow-rate}
 
@@ -7615,6 +7747,9 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
   Autosize,                         !- Rated Water Flow Rate {m3/s}
   0.0,                              !- Nominal time for Condensate to Begin Leaving the Coil
   0.0,                              !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity
+  ,                                 !- Maximum Cycling Rate {cylcles/hr}
+  ,                                 !- Latent Capacity Time Constant
+  ,                                 !- Fan Delay Time
   1,                                !- Flag for Using Hot Gas Reheat or Not, 0 = false; 1 = true
   VS Energy Part Load Fraction 1,   !- Energy Part Load Fraction Curve
   1524.1,                           !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity
@@ -7961,7 +8096,7 @@ This numeric field defines the estimated parameter \textbf{compressor power loss
 This numeric field defines the estimated parameter of the \textbf{compressor's efficiency}. The compressor efficiency is formulated as the equation below:
 
 \begin{equation}
-\eta  = \frac{{{{\dot W}_{Theoritical}}}}{{{{\dot W}_{CompInput}} - {{\dot W}_{Loss}}}}
+\eta  = \frac{{{{\dot W}_{Theoretical}}}}{{{{\dot W}_{CompInput}} - {{\dot W}_{Loss}}}}
 \end{equation}
 
 This field was previously know as Parameter 4.
@@ -8002,6 +8137,10 @@ This numeric field defines the estimated parameter \textbf{source side heat tran
 
 This numeric field defines the estimated \textbf{parameter source side heat transfer resistance 2}. Unit is W/K. This field was previously known as Parameter 9. It should only be used when the Source Side Fluid Name is an antifreeze.
 
+\paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-peh}
+
+This alpha field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the unit as a function of the part load ratio (PLR). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep).
+
 Following is an example input for Coil:WatertoAirHP:ParameterEstimation:Heating
 
 \begin{lstlisting}
@@ -8031,6 +8170,7 @@ Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
   4.00322E+03,                         !- Source Side Heat Transfer Coefficient {W/K}
   ,                                               !- Source Side Heat Transfer Resistance1 {dimensionless}
   ;                                               !- Source Side Heat Transfer Resistance2 {W/K}
+  HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 \end{lstlisting}
 
 \subsection{Coil:Heating:WaterToAirHeatPump:EquationFit}\label{coilheatingwatertoairheatpumpequationfit}
@@ -8094,6 +8234,10 @@ This alpha field specifies the name of a \textbf{quadlinear} performance curve o
 \paragraph{Field: Heating Power Consumption Curve Name}\label{field-heating-power-consumption-curve-name}
 
 This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the heat pump power consumption. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
+
+\paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-efh}
+
+This alpha field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the unit as a function of the part load ratio (PLR). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep).
 
 \subsubsection{Outputs}\label{outputs-27}
 
@@ -9103,7 +9247,7 @@ This field is the name of system node that serves as the outlet to the condenser
 
 This field is the rate of air flow through the condenser section, in m\(^{3}\)/s. The model assumes constant, single-speed condenser fans. The flow rate is not used to determine coil operation but is used to determine the conditions leaving the condenser section. This field is required, for both air-cooled and evaporatively-cooled condenser types.
 
-This field is autocalulatable. When autocalculated, the design flow rate is determined using the sizing factor in the following input field.
+This field is autocalculatable. When autocalculated, the design flow rate is determined using the sizing factor in the following input field.
 
 \paragraph{Field: Condenser Air Flow Sizing Factor}\label{field-condenser-air-flow-sizing-factor}
 

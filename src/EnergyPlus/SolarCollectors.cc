@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -237,7 +237,7 @@ namespace SolarCollectors {
                 }
 
                 std::string_view const key = state.dataIPShortCut->cAlphaArgs(3);
-                state.dataSolarCollectors->Parameters(ParametersNum).TestType = static_cast<TestTypeEnum>(getEnumerationValue(testTypesUC, key));
+                state.dataSolarCollectors->Parameters(ParametersNum).TestType = static_cast<TestTypeEnum>(getEnumValue(testTypesUC, key));
                 if (state.dataSolarCollectors->Parameters(ParametersNum).TestType == TestTypeEnum::INVALID) {
                     ShowSevereError(state,
                                     format("{} = {}: {} is not supported for {}",
@@ -301,7 +301,7 @@ namespace SolarCollectors {
                     DataPlant::PlantEquipmentType::SolarCollectorFlatPlate; // parameter assigned in DataPlant
 
                 // Get parameters object
-                int ParametersNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
+                int ParametersNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
 
                 if (ParametersNum == 0) {
                     ShowSevereError(state,
@@ -316,7 +316,7 @@ namespace SolarCollectors {
                 }
 
                 // Get surface object
-                int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
+                int SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
                     ShowSevereError(state,
@@ -451,7 +451,7 @@ namespace SolarCollectors {
                 state.dataSolarCollectors->Parameters(ParametersNum).Name = state.dataIPShortCut->cAlphaArgs(1);
                 // NOTE:  currently the only available choice is RectangularTank.  In the future progressive tube type will be
                 //        added
-                //                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "RectangularTank")) {
+                //                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "RectangularTank")) {
                 //                    state.dataSolarCollectors->Parameters(ParametersNum).ICSType_Num = TankTypeEnum::ICSRectangularTank;
                 //                } else {
                 //                    ShowSevereError(state, format("{}{} not found={}{} in {}{} ={}{}", //,
@@ -557,7 +557,7 @@ namespace SolarCollectors {
                 state.dataSolarCollectors->Collector(CollectorNum).InitICS = true;
 
                 // Get parameters object
-                int ParametersNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
+                int ParametersNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
 
                 if (ParametersNum == 0) {
                     ShowSevereError(state,
@@ -588,7 +588,7 @@ namespace SolarCollectors {
                         state.dataSolarCollectors->Collector(CollectorNum).SideArea / state.dataSolarCollectors->Collector(CollectorNum).Area;
                 }
                 // Get surface object
-                int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
+                int SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
                     ShowSevereError(state,
@@ -654,12 +654,12 @@ namespace SolarCollectors {
                 }
 
                 state.dataSolarCollectors->Collector(CollectorNum).BCType = state.dataIPShortCut->cAlphaArgs(4);
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "AmbientAir")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(4), "AmbientAir")) {
                     state.dataSolarCollectors->Collector(CollectorNum).OSCMName = "";
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "OtherSideConditionsModel")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(4), "OtherSideConditionsModel")) {
                     state.dataSolarCollectors->Collector(CollectorNum).OSCMName = state.dataIPShortCut->cAlphaArgs(5);
                     state.dataSolarCollectors->Collector(CollectorNum).OSCM_ON = true;
-                    int Found = UtilityRoutines::FindItemInList(state.dataSolarCollectors->Collector(CollectorNum).OSCMName, state.dataSurface->OSCM);
+                    int Found = Util::FindItemInList(state.dataSolarCollectors->Collector(CollectorNum).OSCMName, state.dataSurface->OSCM);
                     if (Found == 0) {
                         ShowSevereError(state,
                                         format("{} not found={} in {} ={}",
@@ -736,7 +736,7 @@ namespace SolarCollectors {
             // Setup report variables
             SetupOutputVariable(state,
                                 "Solar Collector Incident Angle Modifier",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->IncidentAngleModifier,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -744,7 +744,7 @@ namespace SolarCollectors {
 
             SetupOutputVariable(state,
                                 "Solar Collector Efficiency",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->Efficiency,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -752,7 +752,7 @@ namespace SolarCollectors {
 
             SetupOutputVariable(state,
                                 "Solar Collector Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->Power,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -760,7 +760,7 @@ namespace SolarCollectors {
 
             SetupOutputVariable(state,
                                 "Solar Collector Heat Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->HeatGain,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -768,7 +768,7 @@ namespace SolarCollectors {
 
             SetupOutputVariable(state,
                                 "Solar Collector Heat Loss Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->HeatLoss,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -776,21 +776,20 @@ namespace SolarCollectors {
 
             SetupOutputVariable(state,
                                 "Solar Collector Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->Energy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
+                                Constant::eResource::SolarWater,
+                                OutputProcessor::SOVEndUseCat::HeatProduced,
                                 {},
-                                "SolarWater",
-                                "HeatProduced",
-                                {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
         } else if (this->Type == DataPlant::PlantEquipmentType::SolarCollectorICS) {
 
             SetupOutputVariable(state,
                                 "Solar Collector Transmittance Absorptance Product",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->TauAlpha,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -798,7 +797,7 @@ namespace SolarCollectors {
 
             SetupOutputVariable(state,
                                 "Solar Collector Overall Top Heat Loss Coefficient",
-                                OutputProcessor::Unit::W_m2C,
+                                Constant::Units::W_m2C,
                                 this->UTopLoss,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -806,7 +805,7 @@ namespace SolarCollectors {
 
             SetupOutputVariable(state,
                                 "Solar Collector Absorber Plate Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->TempOfAbsPlate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -814,7 +813,7 @@ namespace SolarCollectors {
 
             SetupOutputVariable(state,
                                 "Solar Collector Storage Water Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->TempOfWater,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -822,7 +821,7 @@ namespace SolarCollectors {
 
             SetupOutputVariable(state,
                                 "Solar Collector Thermal Efficiency",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->Efficiency,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -830,7 +829,7 @@ namespace SolarCollectors {
 
             SetupOutputVariable(state,
                                 "Solar Collector Storage Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->StoredHeatRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -838,20 +837,19 @@ namespace SolarCollectors {
 
             SetupOutputVariable(state,
                                 "Solar Collector Storage Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->StoredHeatEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
+                                Constant::eResource::SolarWater,
+                                OutputProcessor::SOVEndUseCat::HeatProduced,
                                 {},
-                                "SolarWater",
-                                "HeatProduced",
-                                {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             SetupOutputVariable(state,
                                 "Solar Collector Skin Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->SkinHeatLossRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -859,20 +857,19 @@ namespace SolarCollectors {
 
             SetupOutputVariable(state,
                                 "Solar Collector Skin Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->CollHeatLossEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
+                                Constant::eResource::SolarWater,
+                                OutputProcessor::SOVEndUseCat::HeatProduced,
                                 {},
-                                "SolarWater",
-                                "HeatProduced",
-                                {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
 
             SetupOutputVariable(state,
                                 "Solar Collector Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->HeatRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -880,16 +877,15 @@ namespace SolarCollectors {
 
             SetupOutputVariable(state,
                                 "Solar Collector Heat Transfer Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->HeatEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
+                                Constant::eResource::SolarWater,
+                                OutputProcessor::SOVEndUseCat::HeatProduced,
                                 {},
-                                "SolarWater",
-                                "HeatProduced",
-                                {},
-                                "Plant");
+                                OutputProcessor::SOVGroup::Plant);
         }
     }
 
@@ -1814,8 +1810,8 @@ namespace SolarCollectors {
 
         if (NumCovers == 1) {
             // calc linearized radiation coefficient
-            tempnom = Constant::StefanBoltzmann * ((TempAbsPlate + Constant::KelvinConv) + (TempOuterCover + Constant::KelvinConv)) *
-                      (pow_2(TempAbsPlate + Constant::KelvinConv) + pow_2(TempOuterCover + Constant::KelvinConv));
+            tempnom = Constant::StefanBoltzmann * ((TempAbsPlate + Constant::Kelvin) + (TempOuterCover + Constant::Kelvin)) *
+                      (pow_2(TempAbsPlate + Constant::Kelvin) + pow_2(TempOuterCover + Constant::Kelvin));
             tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfOuterCover - 1.0;
             hRadCoefA2C = tempnom / tempdenom;
             hRadCoefC2C = 0.0;
@@ -1827,8 +1823,8 @@ namespace SolarCollectors {
             for (int CoverNum = 1; CoverNum <= NumCovers; ++CoverNum) {
                 if (CoverNum == 1) {
                     // calc linearized radiation coefficient
-                    tempnom = Constant::StefanBoltzmann * ((TempAbsPlate + Constant::KelvinConv) + (TempInnerCover + Constant::KelvinConv)) *
-                              (pow_2(TempAbsPlate + Constant::KelvinConv) + pow_2(TempInnerCover + Constant::KelvinConv));
+                    tempnom = Constant::StefanBoltzmann * ((TempAbsPlate + Constant::Kelvin) + (TempInnerCover + Constant::Kelvin)) *
+                              (pow_2(TempAbsPlate + Constant::Kelvin) + pow_2(TempInnerCover + Constant::Kelvin));
                     tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfInnerCover - 1.0;
                     hRadCoefA2C = tempnom / tempdenom;
                     // Calc convection heat transfer coefficient:
@@ -1836,8 +1832,8 @@ namespace SolarCollectors {
                         TempAbsPlate, TempOuterCover, AirGapDepth, this->CosTilt, this->SinTilt);
                 } else {
                     // calculate the linearized radiation coeff.
-                    tempnom = Constant::StefanBoltzmann * ((TempInnerCover + Constant::KelvinConv) + (TempOuterCover + Constant::KelvinConv)) *
-                              (pow_2(TempInnerCover + Constant::KelvinConv) + pow_2(TempOuterCover + Constant::KelvinConv));
+                    tempnom = Constant::StefanBoltzmann * ((TempInnerCover + Constant::Kelvin) + (TempOuterCover + Constant::Kelvin)) *
+                              (pow_2(TempInnerCover + Constant::Kelvin) + pow_2(TempOuterCover + Constant::Kelvin));
                     tempdenom = 1.0 / EmissOfInnerCover + 1.0 / EmissOfOuterCover - 1.0;
                     hRadCoefC2C = tempnom / tempdenom;
                     // Calc convection heat transfer coefficient:
@@ -1852,8 +1848,8 @@ namespace SolarCollectors {
 
         // Calc linearized radiation coefficient between outer cover and the surrounding:
         tempnom = state.dataSurface->Surface(SurfNum).ViewFactorSky * EmissOfOuterCover * Constant::StefanBoltzmann *
-                  ((TempOuterCover + Constant::KelvinConv) + state.dataEnvrn->SkyTempKelvin) *
-                  (pow_2(TempOuterCover + Constant::KelvinConv) + pow_2(state.dataEnvrn->SkyTempKelvin));
+                  ((TempOuterCover + Constant::Kelvin) + state.dataEnvrn->SkyTempKelvin) *
+                  (pow_2(TempOuterCover + Constant::Kelvin) + pow_2(state.dataEnvrn->SkyTempKelvin));
         tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->SkyTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
@@ -1866,8 +1862,8 @@ namespace SolarCollectors {
         }
 
         tempnom = state.dataSurface->Surface(SurfNum).ViewFactorGround * EmissOfOuterCover * Constant::StefanBoltzmann *
-                  ((TempOuterCover + Constant::KelvinConv) + state.dataEnvrn->GroundTempKelvin) *
-                  (pow_2(TempOuterCover + Constant::KelvinConv) + pow_2(state.dataEnvrn->GroundTempKelvin));
+                  ((TempOuterCover + Constant::Kelvin) + state.dataEnvrn->GroundTempKelvin) *
+                  (pow_2(TempOuterCover + Constant::Kelvin) + pow_2(state.dataEnvrn->GroundTempKelvin));
         tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->GroundTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
@@ -2001,7 +1997,7 @@ namespace SolarCollectors {
             DensOfAir = Density[Index - 1] + InterpFrac * (Density[Index] - Density[Index - 1]);
         }
 
-        VolExpAir = 1.0 / (Tref + Constant::KelvinConv);
+        VolExpAir = 1.0 / (Tref + Constant::Kelvin);
 
         // Rayleigh number
         Real64 RaNum = gravity * pow_2(DensOfAir) * VolExpAir * PrOfAir * DeltaT * pow_3(AirGap) / pow_2(VisDOfAir);

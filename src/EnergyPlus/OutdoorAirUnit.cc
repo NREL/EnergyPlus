@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -156,7 +156,7 @@ namespace OutdoorAirUnit {
         // Find the correct Outdoor Air Unit
 
         if (CompIndex == 0) {
-            OAUnitNum = UtilityRoutines::FindItemInList(CompName, state.dataOutdoorAirUnit->OutAirUnit);
+            OAUnitNum = Util::FindItemInList(CompName, state.dataOutdoorAirUnit->OutAirUnit);
             if (OAUnitNum == 0) {
                 ShowFatalError(state, format("ZoneHVAC:OutdoorAirUnit not found={}", CompName));
             }
@@ -315,7 +315,7 @@ namespace OutdoorAirUnit {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
 
             // A1
             thisOutAirUnit.Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -339,7 +339,7 @@ namespace OutdoorAirUnit {
 
             // A3
             thisOutAirUnit.ZoneName = state.dataIPShortCut->cAlphaArgs(3);
-            thisOutAirUnit.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
+            thisOutAirUnit.ZonePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
 
             if (thisOutAirUnit.ZonePtr == 0) {
                 if (lAlphaBlanks(3)) {
@@ -405,10 +405,10 @@ namespace OutdoorAirUnit {
                 }
             }
             // A6 :Fan Place
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "BlowThrough")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "BlowThrough")) {
                 thisOutAirUnit.FanPlace = BlowThru;
             }
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "DrawThrough")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "DrawThrough")) {
                 thisOutAirUnit.FanPlace = DrawThru;
             }
             if (thisOutAirUnit.FanPlace == 0) {
@@ -510,8 +510,7 @@ namespace OutdoorAirUnit {
             if (!lAlphaBlanks(9)) {
                 constexpr std::array<std::string_view, static_cast<int>(OAUnitCtrlType::Num)> ctrlTypeNamesUC = {
                     "NEUTRALCONTROL", "INVALID-UNCONDITIONED", "TEMPERATURECONTROL"};
-                OAUnitCtrlType const tmpCtrlType =
-                    static_cast<OAUnitCtrlType>(getEnumerationValue(ctrlTypeNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
+                OAUnitCtrlType const tmpCtrlType = static_cast<OAUnitCtrlType>(getEnumValue(ctrlTypeNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
                 switch (tmpCtrlType) {
                 case OAUnitCtrlType::Neutral:
                 case OAUnitCtrlType::Temperature:
@@ -664,7 +663,7 @@ namespace OutdoorAirUnit {
                         thisOutAirUnit.OAEquip(InListNum).ComponentName = AlphArray(InListNum * 2 + 1);
 
                         thisOutAirUnit.OAEquip(InListNum).Type =
-                            static_cast<CompType>(getEnumerationValue(CompTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(InListNum * 2))));
+                            static_cast<CompType>(getEnumValue(CompTypeNamesUC, Util::makeUPPER(AlphArray(InListNum * 2))));
 
                         int const CompNum = InListNum;
 
@@ -1016,112 +1015,112 @@ namespace OutdoorAirUnit {
 
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Total Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisOutAirUnit.TotHeatingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisOutAirUnit.Name);
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Total Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisOutAirUnit.TotHeatingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisOutAirUnit.Name);
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Sensible Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisOutAirUnit.SensHeatingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisOutAirUnit.Name);
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Sensible Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisOutAirUnit.SensHeatingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisOutAirUnit.Name);
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Latent Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisOutAirUnit.LatHeatingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisOutAirUnit.Name);
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Latent Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisOutAirUnit.LatHeatingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisOutAirUnit.Name);
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Total Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisOutAirUnit.TotCoolingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisOutAirUnit.Name);
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Total Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisOutAirUnit.TotCoolingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisOutAirUnit.Name);
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Sensible Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisOutAirUnit.SensCoolingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisOutAirUnit.Name);
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Sensible Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisOutAirUnit.SensCoolingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisOutAirUnit.Name);
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Latent Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisOutAirUnit.LatCoolingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisOutAirUnit.Name);
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Latent Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisOutAirUnit.LatCoolingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisOutAirUnit.Name);
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Air Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisOutAirUnit.AirMassFlow,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisOutAirUnit.Name);
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Fan Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisOutAirUnit.ElecFanRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisOutAirUnit.Name);
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Fan Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisOutAirUnit.ElecFanEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisOutAirUnit.Name);
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Fan Availability Status",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisOutAirUnit.AvailStatus,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1190,13 +1189,13 @@ namespace OutdoorAirUnit {
         }
 
         if (allocated(ZoneComp)) {
+            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum);
             if (state.dataOutdoorAirUnit->MyZoneEqFlag(OAUnitNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).AvailManagerListName =
-                    thisOutAirUnit.AvailManagerListName;
-                ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).ZoneNum = ZoneNum;
+                availMgr.AvailManagerListName = thisOutAirUnit.AvailManagerListName;
+                availMgr.ZoneNum = ZoneNum;
                 state.dataOutdoorAirUnit->MyZoneEqFlag(OAUnitNum) = false;
             }
-            thisOutAirUnit.AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).AvailStatus;
+            thisOutAirUnit.AvailStatus = availMgr.AvailStatus;
         }
 
         if (state.dataOutdoorAirUnit->MyPlantScanFlag(OAUnitNum) && allocated(state.dataPlnt->PlantLoop)) {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -198,6 +198,8 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(2) = false;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 4;
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode = 9;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 4;
+    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 9;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
@@ -215,6 +217,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).DOASHighSetpoint = 14.4;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).DOASLowSetpoint = 12.2;
     state->dataEnvrn->StdBaroPress = 101325.;
+    state->dataEnvrn->StdRhoAir = 1.0;
     state->dataSize->CalcFinalZoneSizing(1).MinOA = 0.1;
     state->dataSize->CalcFinalZoneSizing(2).MinOA = 0.11;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASControlStrategy = DataSizing::DOASControl::CoolSup;

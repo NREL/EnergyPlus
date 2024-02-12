@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -124,19 +124,19 @@ protected:
         state->dataZoneEquip->ZoneEquipList(1).Name = "ZONEEQUIPMENT";
         int maxEquipCount = 1;
         state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes = maxEquipCount;
+        state->dataZoneEquip->ZoneEquipList(1).EquipTypeName.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
         state->dataZoneEquip->ZoneEquipList(1).EquipType.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
-        state->dataZoneEquip->ZoneEquipList(1).EquipTypeEnum.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
         state->dataZoneEquip->ZoneEquipList(1).EquipName.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
         state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
         state->dataZoneEquip->ZoneEquipList(1).EquipIndex = 1;
         state->dataZoneEquip->ZoneEquipList(1).EquipData.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
         state->dataZoneEquip->ZoneEquipList(1).CoolingPriority.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
         state->dataZoneEquip->ZoneEquipList(1).HeatingPriority.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
-        state->dataZoneEquip->ZoneEquipList(1).EquipType(1) = "ZONEHVAC:AIRDISTRIBUTIONUNIT";
+        state->dataZoneEquip->ZoneEquipList(1).EquipTypeName(1) = "ZONEHVAC:AIRDISTRIBUTIONUNIT";
         state->dataZoneEquip->ZoneEquipList(1).EquipName(1) = "ZONEREHEATTU";
         state->dataZoneEquip->ZoneEquipList(1).CoolingPriority(1) = 1;
         state->dataZoneEquip->ZoneEquipList(1).HeatingPriority(1) = 1;
-        state->dataZoneEquip->ZoneEquipList(1).EquipTypeEnum(1) = DataZoneEquipment::ZoneEquip::AirDistUnit;
+        state->dataZoneEquip->ZoneEquipList(1).EquipType(1) = DataZoneEquipment::ZoneEquipType::AirDistributionUnit;
         state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = NumNodes;
         state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(NumNodes);
         state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(NumNodes);
@@ -243,8 +243,8 @@ protected:
         state->dataHeatingCoils->GetCoilsInputFlag = false;
         state->dataSize->UnitarySysEqSizing.allocate(1);
         cbvav.HeatCoilName = "MyHeatingCoil";
-        cbvav.DXCoolCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
-        cbvav.HeatCoilType_Num = DataHVACGlobals::Coil_HeatingElectric;
+        cbvav.CoolCoilType = DataHVACGlobals::CoilType::DXCoolingSingleSpeed;
+        cbvav.HeatCoilType = DataHVACGlobals::CoilType::HeatingElectric;
         cbvav.minModeChangeTime = 0.0;
         cbvav.AirInNode = 1;
         cbvav.AirOutNode = 2;
@@ -521,9 +521,9 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
         "  Air Loop HVAC Unitary Heat Cool VAVChangeover Bypass 1 Cooling Coil Outlet Node, !- Air Inlet Node Name",
         "  Air Loop HVAC Unitary Heat Cool VAVChangeover Bypass 1 Heating Coil Outlet Node, !- Air Outlet Node Name",
         "  ,                                       !- Temperature Setpoint Node Name",
-        "  0,                                      !- Parasitic Electric Load {W}",
+        "  0,                                      !- On Cycle Parasitic Electric Load {W}",
         "  ,                                       !- Part Load Fraction Correlation Curve Name",
-        "  0;                                      !- Parasitic Fuel Load {W}",
+        "  0;                                      !- Off Cycle Parasitic Fuel Load {W}",
 
         "Curve:Biquadratic,",
         "  Curve Biquadratic 1,                    !- Name",
@@ -602,6 +602,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
         "  Autosize,                               !- Evaporative Condenser Air Flow Rate {m3/s}",
         "  Autosize,                               !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "  0,                                      !- Crankcase Heater Capacity {W}",
+        "  ,                                       !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  0,                                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  ,                                       !- Supply Water Storage Tank Name",
         "  ,                                       !- Condensate Collection Water Storage Tank Name",
@@ -1483,6 +1484,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_ParentElectricityRateTest)
         "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "    200.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    Resistive,               !- Defrost Strategy",
         "    OnDemand,                !- Defrost Control",
@@ -1544,11 +1546,15 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_ParentElectricityRateTest)
         "    0.800,                   !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
         "    HPPLFFPLR,               !- Energy Part Load Fraction Curve Name",
         "    ,                        !- Condenser Air Inlet Node Name",
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    0.0,                     !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",
@@ -1690,7 +1696,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_ParentElectricityRateTest)
     auto &BypassVAV = state->dataHVACUnitaryBypassVAV->CBVAV(1);
     // set zone air conditions
     auto &zoneAirNode =
-        state->dataLoopNodes->Node(UtilityRoutines::FindItemInList("ZONE 1 NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+        state->dataLoopNodes->Node(Util::FindItemInList("ZONE 1 NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     zoneAirNode.Temp = 20.0;
     zoneAirNode.HumRat = 0.005;
     zoneAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneAirNode.Temp, zoneAirNode.HumRat);
@@ -1700,8 +1706,8 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_ParentElectricityRateTest)
     airInNode.HumRat = 0.005;
     airInNode.Enthalpy = Psychrometrics::PsyHFnTdbW(airInNode.Temp, airInNode.HumRat);
     // set outside air inlet node
-    auto &oaMixerAirInletNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("OUTSIDE AIR INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    auto &oaMixerAirInletNode =
+        state->dataLoopNodes->Node(Util::FindItemInList("OUTSIDE AIR INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     // auto &oaMixerAirInletNode = state->dataLoopNodes->Node(state->dataMixedAir->OAMixer(1).InletNode);
     oaMixerAirInletNode.Temp = state->dataEnvrn->OutDryBulbTemp;
     oaMixerAirInletNode.HumRat = state->dataEnvrn->OutHumRat;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -76,6 +76,7 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
     std::string base_operating_mode_name;
     std::string alternate_operating_mode_name;
     std::string alternate_operating_mode2_name;
+    std::string outdoor_temperature_dependent_crankcase_heater_capacity_curve_name;
     std::string capacity_control;
 };
 
@@ -118,11 +119,12 @@ struct CoilCoolingDXCurveFitPerformance
     std::string name;
     Real64 crankcaseHeaterCap = 0.0;
     Real64 crankcaseHeaterPower = 0.0;
+    int crankcaseHeaterCapacityCurveIndex = 0;
     Real64 crankcaseHeaterElectricityConsumption = 0.0;
     Real64 minOutdoorDrybulb = 0.0;
     Real64 maxOutdoorDrybulbForBasin = 0.0;
     bool mySizeFlag = true;
-    Constant::eResource compressorFuelType = Constant::eResource::Invalid;
+    Constant::eFuel compressorFuelType = Constant::eFuel::Invalid;
     std::string compressorFuelTypeForOutput;
     Real64 compressorFuelRate = 0.0;
     Real64 compressorFuelConsumption = 0.0;

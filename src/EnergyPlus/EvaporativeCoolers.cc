@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -144,7 +144,7 @@ void SimEvapCooler(EnergyPlusData &state, std::string_view CompName, int &CompIn
 
     // Find the correct EvapCoolNumber
     if (CompIndex == 0) {
-        EvapCoolNum = UtilityRoutines::FindItemInList(CompName, EvapCond, &EvapConditions::Name);
+        EvapCoolNum = Util::FindItemInList(CompName, EvapCond, &EvapConditions::Name);
         if (EvapCoolNum == 0) {
             ShowFatalError(state, format("SimEvapCooler: Unit not found={}", CompName));
         }
@@ -322,7 +322,7 @@ void GetEvapInput(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Evaporative Cooler Wet Bulb Effectiveness",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisEvapCooler.SatEff,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -425,14 +425,14 @@ void GetEvapInput(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Evaporative Cooler Wetbulb Effectiveness",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisEvapCooler.SatEff,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisEvapCooler.Name);
         SetupOutputVariable(state,
                             "Evaporative Cooler Total Stage Effectiveness",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisEvapCooler.StageEff,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -555,7 +555,7 @@ void GetEvapInput(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Evaporative Cooler Total Stage Effectiveness",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisEvapCooler.StageEff,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -773,14 +773,14 @@ void GetEvapInput(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Evaporative Cooler Total Stage Effectiveness",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisEvapCooler.StageEff,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisEvapCooler.Name);
         SetupOutputVariable(state,
                             "Evaporative Cooler Part Load Ratio",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisEvapCooler.PartLoadFract,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -788,14 +788,14 @@ void GetEvapInput(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Evaporative Cooler Dewpoint Bound Status",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisEvapCooler.DewPointBoundFlag,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisEvapCooler.Name);
         SetupOutputVariable(state,
                             "Evaporative Cooler Operating Mode Status",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisEvapCooler.IECOperatingStatus,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -925,7 +925,7 @@ void GetEvapInput(EnergyPlusData &state)
 
         SetupOutputVariable(state,
                             "Evaporative Cooler Stage Effectiveness",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisEvapCooler.StageEff,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -941,19 +941,18 @@ void GetEvapInput(EnergyPlusData &state)
         // Setup Report variables for the Evap Coolers
         SetupOutputVariable(state,
                             "Evaporative Cooler Electricity Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisEvapCooler.EvapCoolerEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisEvapCooler.Name,
+                            Constant::eResource::Electricity,
+                            OutputProcessor::SOVEndUseCat::Cooling,
                             {},
-                            "Electricity",
-                            "Cooling",
-                            {},
-                            "System");
+                            OutputProcessor::SOVGroup::HVAC);
         SetupOutputVariable(state,
                             "Evaporative Cooler Electricity Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisEvapCooler.EvapCoolerPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -962,66 +961,61 @@ void GetEvapInput(EnergyPlusData &state)
         if (thisEvapCooler.EvapWaterSupplyMode == WaterSupply::FromMains) {
             SetupOutputVariable(state,
                                 "Evaporative Cooler Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 thisEvapCooler.EvapWaterConsump,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
+                                Constant::eResource::Water,
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "Water",
-                                "Cooling",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Evaporative Cooler Mains Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 thisEvapCooler.EvapWaterConsump,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
+                                Constant::eResource::MainsWater,
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "MainsWater",
-                                "Cooling",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
 
         } else if (thisEvapCooler.EvapWaterSupplyMode == WaterSupply::FromTank) {
             SetupOutputVariable(state,
                                 "Evaporative Cooler Storage Tank Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 thisEvapCooler.EvapWaterConsump,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
+                                Constant::eResource::Water,
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "Water",
-                                "Cooling",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Evaporative Cooler Starved Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 thisEvapCooler.EvapWaterStarvMakup,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
+                                Constant::eResource::Water,
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "Water",
-                                "Cooling",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Evaporative Cooler Starved Mains Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 thisEvapCooler.EvapWaterStarvMakup,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisEvapCooler.Name,
+                                Constant::eResource::MainsWater,
+                                OutputProcessor::SOVEndUseCat::Cooling,
                                 {},
-                                "MainsWater",
-                                "Cooling",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
         }
     }
 }
@@ -1228,8 +1222,8 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
             for (int BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents;
                  ++BranchComp) {
 
-                if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
-                                                thisEvapCond.Name)) {
+                if (Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
+                                     thisEvapCond.Name)) {
                     CoolerOnMainAirLoop = true;
                 }
             }
@@ -1360,7 +1354,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
         }
 
     } else { // zone equipment
-             // can't do zone equip evap coolers yet
+        // can't do zone equip evap coolers yet
     }
     if (!HardSizeNoDesRun) {
         if (IsAutoSize) {
@@ -1540,9 +1534,8 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                 for (int BranchComp = 1;
                      BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents;
                      ++BranchComp) {
-                    if (UtilityRoutines::SameString(
-                            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
-                            thisEvapCond.Name)) {
+                    if (Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
+                                         thisEvapCond.Name)) {
                         CoolerOnMainAirLoop = true;
                     }
                 }
@@ -2930,7 +2923,8 @@ void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,
             CapFlowSys = thisEvapCond.InletMassFlowRate * CpAirSys;
             QHXRate = CapFlowSys * (thisEvapCond.InletTemp - OutletTemp);
             SecOutletEnthalpy = thisEvapCond.SecInletEnthalpy + QHXRate / AirMassFlowSec;
-            SecOutletAirHumRat = Psychrometrics::PsyWFnTdbH(state, EDBTSec, SecOutletEnthalpy); // assumes constant temperature moisture addition
+            SecOutletAirHumRat = Psychrometrics::PsyWFnTdbH(state, EDBTSec,
+                                                            SecOutletEnthalpy); // assumes constant temperature moisture addition
             // we may need check based on maximum allowed humidity ratio
             thisEvapCond.SecOutletTemp = EDBTSec;
             thisEvapCond.SecOutletHumRat = SecOutletAirHumRat;
@@ -2991,7 +2985,8 @@ void CalcSecondaryAirOutletCondition(EnergyPlusData &state,
                 Psychrometrics::PsyTwbFnTdbWPb(state, thisEvapCond.SecOutletTemp, EHumRatSec, state.dataEnvrn->OutBaroPress);
         } else if ((OperatingMode == OperatingMode::WetModulated || OperatingMode == OperatingMode::WetFull)) {
             SecOutletEnthalpy = thisEvapCond.SecInletEnthalpy + QHXTotal / AirMassFlowSec;
-            SecOutletAirHumRat = Psychrometrics::PsyWFnTdbH(state, EDBTSec, SecOutletEnthalpy); // assumes a constant temperature moisture addition
+            SecOutletAirHumRat = Psychrometrics::PsyWFnTdbH(state, EDBTSec,
+                                                            SecOutletEnthalpy); // assumes a constant temperature moisture addition
             thisEvapCond.SecOutletTemp = EDBTSec;
             thisEvapCond.SecOutletHumRat = SecOutletAirHumRat;
             thisEvapCond.SecOutletEnthalpy = SecOutletEnthalpy;
@@ -3323,7 +3318,7 @@ void SimZoneEvaporativeCoolerUnit(EnergyPlusData &state,
 
     // Find the correct Equipment
     if (CompIndex == 0) {
-        CompNum = UtilityRoutines::FindItemInList(CompName, ZoneEvapUnit);
+        CompNum = Util::FindItemInList(CompName, ZoneEvapUnit);
         if (CompNum == 0) {
             ShowFatalError(state, "SimZoneEvaporativeCoolerUnit: Zone evaporative cooler unit not found.");
         }
@@ -3431,8 +3426,8 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             if (lAlphaBlanks(2)) {
                 thisZoneEvapUnit.AvailSchedIndex = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                thisZoneEvapUnit.AvailSchedIndex =
-                    ScheduleManager::GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
+                thisZoneEvapUnit.AvailSchedIndex = ScheduleManager::GetScheduleIndex(state,
+                                                                                     Alphas(2)); // convert schedule name to pointer (index number)
                 if (thisZoneEvapUnit.AvailSchedIndex == 0) {
                     ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
                     ShowContinueError(state, format("invalid-not found {}=\"{}\".", cAlphaFields(2), Alphas(2)));
@@ -3479,7 +3474,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             thisZoneEvapUnit.FanObjectClassName = Alphas(7);
             thisZoneEvapUnit.FanName = Alphas(8);
             bool errFlag = false;
-            if (!UtilityRoutines::SameString(thisZoneEvapUnit.FanObjectClassName, "Fan:SystemModel")) {
+            if (!Util::SameString(thisZoneEvapUnit.FanObjectClassName, "Fan:SystemModel")) {
                 Fans::GetFanType(state, thisZoneEvapUnit.FanName, thisZoneEvapUnit.FanType_Num, errFlag, CurrentModuleObject, thisZoneEvapUnit.Name);
                 Fans::GetFanIndex(state, thisZoneEvapUnit.FanName, thisZoneEvapUnit.FanIndex, errFlag, CurrentModuleObject);
                 thisZoneEvapUnit.FanInletNodeNum =
@@ -3495,7 +3490,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                     ShowContinueError(state, format("...specified in {} = {}", CurrentModuleObject, thisZoneEvapUnit.Name));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(thisZoneEvapUnit.FanObjectClassName, "Fan:SystemModel")) {
+            } else if (Util::SameString(thisZoneEvapUnit.FanObjectClassName, "Fan:SystemModel")) {
 
                 thisZoneEvapUnit.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                 state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisZoneEvapUnit.FanName)); // call constructor
@@ -3519,7 +3514,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             thisZoneEvapUnit.DesignAirVolumeFlowRate = Numbers(1);
 
             constexpr std::array<std::string_view, static_cast<int>(FanPlacement::Num)> fanPlacementNamesUC = {"BLOWTHROUGH", "DRAWTHROUGH"};
-            thisZoneEvapUnit.FanLocation = static_cast<FanPlacement>(getEnumerationValue(fanPlacementNamesUC, Alphas(9)));
+            thisZoneEvapUnit.FanLocation = static_cast<FanPlacement>(getEnumValue(fanPlacementNamesUC, Alphas(9)));
             if (thisZoneEvapUnit.FanLocation == FanPlacement::Invalid) {
                 ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
                 ShowContinueError(state, format("invalid choice found {}=\"{}\".", cAlphaFields(9), Alphas(9)));
@@ -3539,7 +3534,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
 
             constexpr std::array<std::string_view, static_cast<int>(ControlType::Num)> controlTypeNamesUC = {
                 "ZONETEMPERATUREDEADBANDONOFFCYCLING", "ZONECOOLINGLOADONOFFCYCLING", "ZONECOOLINGLOADVARIABLESPEEDFAN"};
-            thisZoneEvapUnit.ControlSchemeType = static_cast<ControlType>(getEnumerationValue(controlTypeNamesUC, Alphas(10)));
+            thisZoneEvapUnit.ControlSchemeType = static_cast<ControlType>(getEnumValue(controlTypeNamesUC, Alphas(10)));
             if (thisZoneEvapUnit.ControlSchemeType == ControlType::Invalid) {
                 ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
                 ShowContinueError(state, format("invalid choice found {}=\"{}\".", cAlphaFields(10), Alphas(10)));
@@ -3549,7 +3544,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             thisZoneEvapUnit.ThrottlingRange = Numbers(2);
             thisZoneEvapUnit.ThresholdCoolingLoad = Numbers(3);
 
-            thisZoneEvapUnit.EvapCooler_1_Type_Num = static_cast<EvapCoolerType>(getEnumerationValue(evapCoolerTypeNamesUC, Alphas(11)));
+            thisZoneEvapUnit.EvapCooler_1_Type_Num = static_cast<EvapCoolerType>(getEnumValue(evapCoolerTypeNamesUC, Alphas(11)));
             if (thisZoneEvapUnit.EvapCooler_1_Type_Num != EvapCoolerType::Invalid) {
                 thisZoneEvapUnit.EvapCooler_1_ObjectClassName = evapCoolerTypeNames[static_cast<int>(thisZoneEvapUnit.EvapCooler_1_Type_Num)];
             } else {
@@ -3559,7 +3554,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             }
 
             thisZoneEvapUnit.EvapCooler_1_Name = Alphas(12);
-            thisZoneEvapUnit.EvapCooler_1_Index = UtilityRoutines::FindItemInList(Alphas(12), state.dataEvapCoolers->EvapCond, &EvapConditions::Name);
+            thisZoneEvapUnit.EvapCooler_1_Index = Util::FindItemInList(Alphas(12), state.dataEvapCoolers->EvapCond, &EvapConditions::Name);
             if (thisZoneEvapUnit.EvapCooler_1_Index == 0) {
                 ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
                 ShowContinueError(state, format("invalid, not found {}=\"{}\".", cAlphaFields(12), Alphas(12)));
@@ -3567,7 +3562,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             }
 
             if (!lAlphaBlanks(13)) {
-                thisZoneEvapUnit.EvapCooler_2_Type_Num = static_cast<EvapCoolerType>(getEnumerationValue(evapCoolerTypeNamesUC, Alphas(13)));
+                thisZoneEvapUnit.EvapCooler_2_Type_Num = static_cast<EvapCoolerType>(getEnumValue(evapCoolerTypeNamesUC, Alphas(13)));
                 if (thisZoneEvapUnit.EvapCooler_2_Type_Num != EvapCoolerType::Invalid) {
                     thisZoneEvapUnit.EvapCooler_2_ObjectClassName = evapCoolerTypeNames[static_cast<int>(thisZoneEvapUnit.EvapCooler_2_Type_Num)];
                 } else {
@@ -3578,8 +3573,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
 
                 if (!lAlphaBlanks(14)) {
                     thisZoneEvapUnit.EvapCooler_2_Name = Alphas(14);
-                    thisZoneEvapUnit.EvapCooler_2_Index =
-                        UtilityRoutines::FindItemInList(Alphas(14), state.dataEvapCoolers->EvapCond, &EvapConditions::Name);
+                    thisZoneEvapUnit.EvapCooler_2_Index = Util::FindItemInList(Alphas(14), state.dataEvapCoolers->EvapCond, &EvapConditions::Name);
                     if (thisZoneEvapUnit.EvapCooler_2_Index == 0) {
                         ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
                         ShowContinueError(state, format("invalid, not found {}=\"{}\".", cAlphaFields(14), Alphas(14)));
@@ -3594,12 +3588,17 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
 
             thisZoneEvapUnit.HVACSizingIndex = 0;
             if (!lAlphaBlanks(15)) {
-                thisZoneEvapUnit.HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(15), state.dataSize->ZoneHVACSizing);
+                thisZoneEvapUnit.HVACSizingIndex = Util::FindItemInList(Alphas(15), state.dataSize->ZoneHVACSizing);
                 if (thisZoneEvapUnit.HVACSizingIndex == 0) {
                     ShowSevereError(state, format("{} = {} not found.", cAlphaFields(15), Alphas(15)));
                     ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisZoneEvapUnit.Name));
                     ErrorsFound = true;
                 }
+            }
+
+            if (!lNumericBlanks(4)) {
+                // Shut Off Relative Humidity
+                thisZoneEvapUnit.ShutOffRelativeHumidity = Numbers(4);
             }
 
             // Add fan to component sets array
@@ -3668,75 +3667,74 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
         auto &thisZoneEvapUnit = ZoneEvapUnit(UnitLoop);
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Total Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisZoneEvapUnit.UnitTotalCoolingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisZoneEvapUnit.Name);
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Total Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisZoneEvapUnit.UnitTotalCoolingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisZoneEvapUnit.Name,
+                            Constant::eResource::EnergyTransfer,
+                            OutputProcessor::SOVEndUseCat::CoolingCoils,
                             {},
-                            "ENERGYTRANSFER",
-                            "COOLINGCOILS",
-                            {},
-                            "System");
+                            OutputProcessor::SOVGroup::HVAC);
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Sensible Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisZoneEvapUnit.UnitSensibleCoolingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisZoneEvapUnit.Name);
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Sensible Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisZoneEvapUnit.UnitSensibleCoolingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisZoneEvapUnit.Name);
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Latent Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisZoneEvapUnit.UnitLatentHeatingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisZoneEvapUnit.Name);
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Latent Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisZoneEvapUnit.UnitLatentHeatingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisZoneEvapUnit.Name);
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Latent Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisZoneEvapUnit.UnitLatentCoolingRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisZoneEvapUnit.Name);
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Latent Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisZoneEvapUnit.UnitLatentCoolingEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             thisZoneEvapUnit.Name);
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Fan Speed Ratio",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisZoneEvapUnit.UnitFanSpeedRatio,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             thisZoneEvapUnit.Name);
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Fan Availability Status",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisZoneEvapUnit.FanAvailStatus,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
@@ -3744,7 +3742,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
         if (thisZoneEvapUnit.ControlSchemeType != ControlType::ZoneCoolingLoadVariableSpeedFan) {
             SetupOutputVariable(state,
                                 "Zone Evaporative Cooler Unit Part Load Ratio",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisZoneEvapUnit.UnitPartLoadRatio,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -3768,13 +3766,13 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
 
     if (allocated(state.dataHVACGlobal->ZoneComp)) {
         if (zoneEvapUnit.MyZoneEq) { // initialize the name of each availability manager list and zone number
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
                 zoneEvapUnit.AvailManagerListName;
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EvaporativeCooler).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
             zoneEvapUnit.MyZoneEq = false;
         }
         zoneEvapUnit.FanAvailStatus =
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailStatus;
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailStatus;
     }
 
     if (!state.dataEvapCoolers->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
@@ -4040,6 +4038,20 @@ void CalcZoneEvaporativeCoolerUnit(EnergyPlusData &state,
 
     {
         auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
+
+        Real64 relativeHumidity = 100.0 * Psychrometrics::PsyRhFnTdbWPb(state,
+                                                                        state.dataLoopNodes->Node(zoneEvapUnit.ZoneNodeNum).Temp,
+                                                                        state.dataLoopNodes->Node(zoneEvapUnit.ZoneNodeNum).HumRat,
+                                                                        state.dataEnvrn->OutBaroPress,
+                                                                        "CalcZoneEvaporativeCoolerUnit");
+        if (relativeHumidity > zoneEvapUnit.ShutOffRelativeHumidity) {
+            // unit is off when humidity is too high
+            PartLoadRatio = 0.0;
+            zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
+            CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
+            zoneEvapUnit.IsOnThisTimestep = false;
+            return;
+        }
 
         if (zoneEvapUnit.ControlSchemeType == ControlType::ZoneTemperatureDeadBandOnOffCycling) {
             ZoneTemp = state.dataLoopNodes->Node(zoneEvapUnit.ZoneNodeNum).Temp;
@@ -4469,7 +4481,7 @@ int GetInletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, bool
     }
 
     int WhichEvapCond =
-        UtilityRoutines::FindItemInList(EvapCondName, state.dataEvapCoolers->EvapCond, &EvapConditions::Name, state.dataEvapCoolers->NumEvapCool);
+        Util::FindItemInList(EvapCondName, state.dataEvapCoolers->EvapCond, &EvapConditions::Name, state.dataEvapCoolers->NumEvapCool);
     if (WhichEvapCond != 0) {
         return state.dataEvapCoolers->EvapCond(WhichEvapCond).InletNode;
     } else {
@@ -4494,7 +4506,7 @@ int GetOutletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, boo
         state.dataEvapCoolers->GetInputEvapComponentsFlag = false;
     }
     int WhichEvapCond =
-        UtilityRoutines::FindItemInList(EvapCondName, state.dataEvapCoolers->EvapCond, &EvapConditions::Name, state.dataEvapCoolers->NumEvapCool);
+        Util::FindItemInList(EvapCondName, state.dataEvapCoolers->EvapCond, &EvapConditions::Name, state.dataEvapCoolers->NumEvapCool);
     if (WhichEvapCond != 0) {
         return state.dataEvapCoolers->EvapCond(WhichEvapCond).OutletNode;
     } else {

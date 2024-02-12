@@ -43,7 +43,7 @@ j_{zone} = \frac{\rho_{v1} - \rho_{v,zone}}{R_{MT1} + R_{MT,coating} + R_{MT,BL}
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/EMPDschematic.png}
-\caption{Nodal network for effective moisture pentration depth model \protect \label{fig:Nodal-network-for-effective-moisture-penetration-depth-model}}
+\caption{Nodal network for effective moisture penetration depth model \protect \label{fig:Nodal-network-for-effective-moisture-penetration-depth-model}}
 \end{figure}
 
 The surface layer resistance is calculated with:
@@ -82,7 +82,7 @@ Finally, the boundary layer mass-transfer resistance is calculated by converting
 R_{MT,BL} = \frac{\rho_{air} Cp_{air}}{h_{conv}}
 \end{equation}
 
-Behind the surface layer is a deep layer (labeled with subscipt 2 below) of thickness \(d_{EMPD,2}\). The surface layer accounts for buffering of high-frequency changes in the zone air humidity, while the deep layer accounts for the material's response to longer term changes in the zone air humidity. The model calculates the moisture flux between the surface and deep layers with:
+Behind the surface layer is a deep layer (labeled with subscript 2 below) of thickness \(d_{EMPD,2}\). The surface layer accounts for buffering of high-frequency changes in the zone air humidity, while the deep layer accounts for the material's response to longer term changes in the zone air humidity. The model calculates the moisture flux between the surface and deep layers with:
 
 \begin{equation}
 j_{2} = \frac {\rho_{v,1} - \rho_{v,2}} {R_{MT,2}}
