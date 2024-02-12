@@ -368,32 +368,9 @@ void EIRPlantLoopHeatPump::doPhysicsWSHP(EnergyPlusData &state, Real64 currentLo
     // calculate power usage from EIR curves
     calcPowerUsage(state, InputPowerMultiplier);
 
-    // energy balance on heat pump
-    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
-    this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
+    // evaluate the source side heat transfer rate
+    calcSourceSideHeatTransferWSHP(state);
 
-    // calculate source side outlet conditions
-    auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
-    Real64 const CpSrc = FluidProperties::GetSpecificHeatGlycol(
-        state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "PLHPEIR::simulate()");
-    // this->sourceSideCp = CpSrc; // debuging variable
-    Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
-    this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
-
-    if (this->waterSource && abs(this->sourceSideOutletTemp - this->sourceSideInletTemp) > 100.0) { // whoaa out of range happenings on water loop
-        //
-        // TODO setup recurring error warning?
-        // lets do something different than fatal the simulation
-        if ((this->sourceSideMassFlowRate / this->sourceSideDesignMassFlowRate) < 0.01) { // current source side flow is 1% of design max
-            // just send it all to skin losses and leave the fluid temperature alone
-            this->sourceSideOutletTemp = this->sourceSideInletTemp;
-        } else if (this->sourceSideOutletTemp > this->sourceSideInletTemp) {
-            this->sourceSideOutletTemp = this->sourceSideInletTemp + 100.0; // cap it at 100C delta
-
-        } else if (this->sourceSideOutletTemp < this->sourceSideInletTemp) {
-            this->sourceSideOutletTemp = this->sourceSideInletTemp - 100.0; // cap it at 100C delta
-        }
-    }
 }
 
 
@@ -430,15 +407,8 @@ void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLo
     //  calculate power usage from EIR curves
     calcPowerUsage(state, InputPowerMultiplier);
 
-    // energy balance on heat pump
-    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
-    this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
-
-    // calculate source side outlet conditions
-    Real64 const CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
-    // this->sourceSideCp = CpSrc; // debuging variable
-    Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
-    this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
+    // evaluate the source side heat transfer rate
+    calcSourceSideHeatTransferASHP(state);
 
 }
 
@@ -554,6 +524,58 @@ void EIRPlantLoopHeatPump::calcPowerUsage(EnergyPlusData &state, Real64 const In
     this->powerEnergy = this->powerUsage * reportingInterval;
 
 }
+
+void EIRPlantLoopHeatPump::calcSourceSideHeatTransferWSHP(EnergyPlusData &state)
+{
+    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
+
+    // energy balance on heat pump
+    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
+    this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
+
+    // calculate source side outlet conditions
+    Real64 CpSrc;
+    auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
+    CpSrc = FluidProperties::GetSpecificHeatGlycol(
+        state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "PLHPEIR::simulate()");
+
+    // this->sourceSideCp = CpSrc; // debuging variable
+    Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
+    this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
+
+    if (this->waterSource && abs(this->sourceSideOutletTemp - this->sourceSideInletTemp) > 100.0) { // whoaa out of range happenings on water loop
+        //
+        // TODO setup recurring error warning?
+        // lets do something different than fatal the simulation
+        if ((this->sourceSideMassFlowRate / this->sourceSideDesignMassFlowRate) < 0.01) { // current source side flow is 1% of design max
+            // just send it all to skin losses and leave the fluid temperature alone
+            this->sourceSideOutletTemp = this->sourceSideInletTemp;
+        } else if (this->sourceSideOutletTemp > this->sourceSideInletTemp) {
+            this->sourceSideOutletTemp = this->sourceSideInletTemp + 100.0; // cap it at 100C delta
+
+        } else if (this->sourceSideOutletTemp < this->sourceSideInletTemp) {
+            this->sourceSideOutletTemp = this->sourceSideInletTemp - 100.0; // cap it at 100C delta
+        }
+    }
+
+}
+
+void EIRPlantLoopHeatPump::calcSourceSideHeatTransferASHP(EnergyPlusData &state)
+{
+    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
+
+    // energy balance on heat pump
+    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
+    this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
+
+    // calculate source side outlet conditions
+    Real64 CpSrc;
+    CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+    Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
+    this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
+
+}
+
 
 void EIRPlantLoopHeatPump::capModFTCurveCheck(EnergyPlusData &state, const Real64 loadSideOutletSetpointTemp, Real64 &capacityModifierFuncTemp)
 {

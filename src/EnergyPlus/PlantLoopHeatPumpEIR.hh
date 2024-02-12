@@ -239,6 +239,10 @@ namespace EIRPlantLoopHeatPumps {
 
         void calcPowerUsage(EnergyPlusData &state, Real64 const InputPowerMultiplier);
 
+        void calcSourceSideHeatTransferWSHP(EnergyPlusData &state);
+
+        void calcSourceSideHeatTransferASHP(EnergyPlusData &state);
+
         void sizeLoadSide(EnergyPlusData &state);
 
         void sizeSrcSideWSHP(EnergyPlusData &state);
