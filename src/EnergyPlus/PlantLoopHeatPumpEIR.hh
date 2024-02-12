@@ -235,6 +235,8 @@ namespace EIRPlantLoopHeatPumps {
 
         void getAvailableCapacity(EnergyPlusData &state, Real64 const currentLoad, Real64 &availableCapacity, Real64 &partLoadRatio);
 
+        void doLoadSideHeatTransfer(EnergyPlusData &state, Real64 const availableCapacity, Real64 const operatingPLR);
+
         void sizeLoadSide(EnergyPlusData &state);
 
         void sizeSrcSideWSHP(EnergyPlusData &state);

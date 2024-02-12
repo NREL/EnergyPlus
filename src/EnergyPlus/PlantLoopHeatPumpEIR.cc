@@ -363,21 +363,7 @@ void EIRPlantLoopHeatPump::doPhysicsWSHP(EnergyPlusData &state, Real64 currentLo
     this->defrostEnergy = this->defrostEnergyRate * reportingInterval;
 
     // evaluate the actual current operating load side heat transfer rate
-    auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
-    Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(state,
-                                                           thisLoadPlantLoop.FluidName,
-                                                           state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
-                                                           thisLoadPlantLoop.FluidIndex,
-                                                           "PLHPEIR::simulate()");
-    this->loadSideHeatTransfer = availableCapacity * operatingPLR;
-    this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
-
-    // calculate load side outlet conditions
-    Real64 const loadMCp = this->loadSideMassFlowRate * CpLoad;
-    this->loadSideOutletTemp = this->calcLoadOutletTemp(this->loadSideInletTemp, this->loadSideHeatTransfer / loadMCp);
-
-    // now what to do here if outlet water temp exceeds limit based on HW supply temp limit curves?
-    // currentLoad will be met and there should? be some adjustment based on outlet water temp limit?
+    doLoadSideHeatTransfer(state, availableCapacity, partLoadRatio);
 
     // calculate power usage from EIR curves
     Real64 eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
@@ -450,21 +436,7 @@ void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLo
     this->defrostEnergy = this->defrostEnergyRate * reportingInterval;
 
     // evaluate the actual current operating load side heat transfer rate
-    auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
-    Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(state,
-                                                           thisLoadPlantLoop.FluidName,
-                                                           state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
-                                                           thisLoadPlantLoop.FluidIndex,
-                                                           "PLHPEIR::simulate()");
-    this->loadSideHeatTransfer = availableCapacity * operatingPLR;
-    this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
-
-    // calculate load side outlet conditions
-    Real64 const loadMCp = this->loadSideMassFlowRate * CpLoad;
-    this->loadSideOutletTemp = this->calcLoadOutletTemp(this->loadSideInletTemp, this->loadSideHeatTransfer / loadMCp);
-
-    // now what to do here if outlet water temp exceeds limit based on HW supply temp limit curves?
-    // currentLoad will be met and there should? be some adjustment based on outlet water temp limit?
+    doLoadSideHeatTransfer(state, availableCapacity, partLoadRatio);
 
     // calculate power usage from EIR curves
     Real64 eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
@@ -566,6 +538,30 @@ void EIRPlantLoopHeatPump::getAvailableCapacity(EnergyPlusData &state, Real64 co
     Real64 eirFPLR_dummy = 1.0;
     this->doCurveCheck(state, loadSideOutletSetpointTemp, capacityModifierFuncTemp, eirFT_dummy, eirFPLR_dummy);
 }
+
+void EIRPlantLoopHeatPump::doLoadSideCalculation(EnergyPlusData &state, Real64 const availableCapacity, Real64 const operatingPLR)
+{
+    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
+
+    // evaluate the actual current operating load side heat transfer rate
+    auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
+    Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           thisLoadPlantLoop.FluidName,
+                                                           state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
+                                                           thisLoadPlantLoop.FluidIndex,
+                                                           "PLHPEIR::simulate()");
+    this->loadSideHeatTransfer = availableCapacity * operatingPLR;
+    this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
+
+    // calculate load side outlet conditions
+    Real64 const loadMCp = this->loadSideMassFlowRate * CpLoad;
+    this->loadSideOutletTemp = this->calcLoadOutletTemp(this->loadSideInletTemp, this->loadSideHeatTransfer / loadMCp);
+
+    // now what to do here if outlet water temp exceeds limit based on HW supply temp limit curves?
+    // currentLoad will be met and there should? be some adjustment based on outlet water temp limit?
+
+}
+
 
 void EIRPlantLoopHeatPump::doCurveCheck(EnergyPlusData &state,
                                         const Real64 loadSideOutletSetpointTemp,
@@ -713,8 +709,7 @@ void EIRPlantLoopHeatPump::doDefrost(
     }    
     availableCapacity *= HeatingCapacityMultiplier;
 }
-
-void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
+    void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
 {
     // This function does all one-time and begin-environment initialization
     std::string static const routineName = std::string("EIRPlantLoopHeatPump :") + __FUNCTION__;
