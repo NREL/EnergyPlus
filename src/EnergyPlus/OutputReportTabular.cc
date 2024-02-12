@@ -13767,7 +13767,8 @@ void WritePredefinedTables(EnergyPlusData &state)
                                     unitsStyle_cur == UnitsStyle::JtoKWH) {
                                     int columnUnitConv = colUnitConv(colCurrent);
                                     if (Util::SameString(state.dataOutRptPredefined->subTable(jSubTable).name, "SizingPeriod:DesignDay") &&
-                                        ort->ip()) {
+                                        (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound ||
+                                         unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity)) {
                                         if (Util::SameString(columnHead(colCurrent), "Humidity Value")) {
                                             std::string repTableTag;
                                             LookupSItoIP(state,
