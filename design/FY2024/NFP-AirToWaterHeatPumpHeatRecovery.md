@@ -18,7 +18,15 @@ Modern air-to-water heat pumps for commercial applications often include heat re
 
 ## E-mail and  Conference Call Conclusions ##
 
-- NA
+* technicalities call, Feb 07, 2024 *
+
+  Brent: you may run into supply side temperature control problem if you have lower setpoint temperature than the temperature limits (e.g., HW Recover).
+
+  Bereket: may be we should check the minimum of these temperatures. This will be investigated during implementation.
+  
+  Brent: are we going to use the same air source performance curves for heat recover?
+
+  Bereket: I have to think about it. Brent said he will check with Trane engineers for curves
 
 
 ## Overview ##
