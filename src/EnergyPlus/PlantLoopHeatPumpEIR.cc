@@ -363,17 +363,10 @@ void EIRPlantLoopHeatPump::doPhysicsWSHP(EnergyPlusData &state, Real64 currentLo
     this->defrostEnergy = this->defrostEnergyRate * reportingInterval;
 
     // evaluate the actual current operating load side heat transfer rate
-    doLoadSideHeatTransfer(state, availableCapacity, partLoadRatio);
+    calcLoadSideHeatTransfer(state, availableCapacity, partLoadRatio);
 
     // calculate power usage from EIR curves
-    Real64 eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
-    Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, this->partLoadRatio);
-    // check curves value
-    this->eirModFTCurveCheck(state, eirModifierFuncTemp, eirModifierFuncPLR);
-
-    this->powerUsage =
-        (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp * InputPowerMultiplier * this->cyclingRatio;
-    this->powerEnergy = this->powerUsage * reportingInterval;
+    calcPowerUsage(state, InputPowerMultiplier);
 
     // energy balance on heat pump
     this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
@@ -432,17 +425,10 @@ void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLo
     this->defrostEnergy = this->defrostEnergyRate * reportingInterval;
 
     // evaluate the actual current operating load side heat transfer rate
-    doLoadSideHeatTransfer(state, availableCapacity, partLoadRatio);
+    calcLoadSideHeatTransfer(state, availableCapacity, partLoadRatio);
 
-    // calculate power usage from EIR curves
-    Real64 eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
-    Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, this->partLoadRatio);
-    // check curves value
-    this->eirModFTCurveCheck(state, eirModifierFuncTemp, eirModifierFuncPLR);
-
-    this->powerUsage =
-        (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp * InputPowerMultiplier * this->cyclingRatio;
-    this->powerEnergy = this->powerUsage * reportingInterval;
+    //  calculate power usage from EIR curves
+    calcPowerUsage(state, InputPowerMultiplier);
 
     // energy balance on heat pump
     this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
@@ -530,7 +516,7 @@ void EIRPlantLoopHeatPump::getAvailableCapacity(EnergyPlusData &state, Real64 co
     this->capModFTCurveCheck(state, loadSideOutletSetpointTemp, capacityModifierFuncTemp);
 }
 
-void EIRPlantLoopHeatPump::doLoadSideHeatTransfer(EnergyPlusData &state, Real64 const availableCapacity, Real64 const operatingPLR)
+void EIRPlantLoopHeatPump::calcLoadSideHeatTransfer(EnergyPlusData &state, Real64 const availableCapacity, Real64 const operatingPLR)
 {
     Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
 
@@ -550,6 +536,22 @@ void EIRPlantLoopHeatPump::doLoadSideHeatTransfer(EnergyPlusData &state, Real64 
 
     // now what to do here if outlet water temp exceeds limit based on HW supply temp limit curves?
     // currentLoad will be met and there should? be some adjustment based on outlet water temp limit?
+
+}
+
+void EIRPlantLoopHeatPump::calcPowerUsage(EnergyPlusData &state, Real64 const InputPowerMultiplier)
+{
+    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
+
+    // calculate power usage from EIR curves
+    Real64 eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
+    Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, this->partLoadRatio);
+    // check curves value
+    this->eirModFTCurveCheck(state, eirModifierFuncTemp, eirModifierFuncPLR);
+
+    this->powerUsage =
+        (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp * InputPowerMultiplier * this->cyclingRatio;
+    this->powerEnergy = this->powerUsage * reportingInterval;
 
 }
 
