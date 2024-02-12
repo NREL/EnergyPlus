@@ -194,6 +194,25 @@ function(ADD_SIMULATION_TEST)
 
 endfunction()
 
+function(ADD_API_SIMULATION_TEST)
+  # Used for running API tests in the testfiles/API folder
+  # The only argument should be the Python file that drives the simulation run
+  # The Python file should expect a single argument - the build/Products directory where
+  # energyplus(.exe) and pyenergyplus/ live.  The Python script should be able to locate
+  # the associated IDF(s) and run successfully
+  set(options)
+  set(oneValueArgs PYTHON_FILE)
+  set(multiValueArgs)
+  cmake_parse_arguments(ADD_API_SIMULATION_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  if(NOT ADD_API_SIMULATION_TEST_PYTHON_FILE)
+    message(FATAL_ERROR "You must provide a PYTHON_FILE argument to ADD_API_SIMULATION_TEST")
+  endif()
+  set(DIR_WITH_PY_ENERGYPLUS $<TARGET_FILE_DIR:energyplusapi>)
+  add_test(
+          NAME "APISimulation.${ADD_API_SIMULATION_TEST_PYTHON_FILE}"
+          COMMAND ${Python_EXECUTABLE} ${PROJECT_SOURCE_DIR}/testfiles/API/${ADD_API_SIMULATION_TEST_PYTHON_FILE} ${DIR_WITH_PY_ENERGYPLUS})
+endfunction()
+
 function(fixup_executable EXECUTABLE_PATH)
   include(GetPrerequisites)
   get_prerequisites("${EXECUTABLE_PATH}" PREREQUISITES 1 1 "" "")
