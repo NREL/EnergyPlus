@@ -788,6 +788,8 @@ add_simulation_test(IDF_FILE BasicsFiles/Exercise2.idf EPW_FILE USA_IL_Chicago-O
 # Macro files
 add_simulation_test(IDF_FILE AbsorptionChiller_Macro.imf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ENERGYPLUS_FLAGS -m)
 
+add_api_simulation_test(PYTHON_FILE user_defined_equipment.py)
+
 # External interface files -- note they don't work on Mac
 if (NOT APPLE)
     add_simulation_test(IDF_FILE _ExternalInterface-functionalmockupunit-to-actuator.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

@@ -16103,6 +16103,7 @@ DO iSys = 1, numCompactSysUnitarySystem
   CALL AddToObjStr('No Load Fraction of Autosized Heating Supply Air Flow Rate','')
   CALL AddToObjStr('No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W','')
   CALL AddToObjStr('No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W','')
+  CALL AddToObjStr('No Load Supply Air Flow Rate Control Set To Low Speed','')
   CALL AddToObjStr('Maximum Supply Air Temperature {C}', 'Autosize')
   CALL AddToObjFld('Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}', base + ussSuppReHeatMaxODBOff,'')
   CALL AddToObjStr('Outdoor Dry-Bulb Temperature Sensor Node Name', '')
@@ -25050,6 +25051,7 @@ IF (.NOT. isBaseboardNone) THEN
     CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
      base + ptaczSupplyNoLoadFlowRateOff,'')
   END IF
+  CALL AddToObjStr('No Load Supply Air Flow Rate Control Set To Low Speed','')
   IF (isDedOutAirNameBlank) THEN
     CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','autosize')
     CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','autosize')
@@ -25657,6 +25659,7 @@ DO iZone = 1, numCompactPTHP
     CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
      base + pthpzSupplyNoLoadFlowRateOff,'')
   END IF
+  CALL AddToObjStr('No Load Supply Air Flow Rate Control Set To Low Speed','')
   IF (isDedOutAirNameBlank) THEN
     CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','autosize')
     CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','autosize')
@@ -30025,6 +30028,7 @@ DO iZone = 1, numCompactWaterAirHP
   CALL AddToObjStr('Heating Supply Air Flow Rate {m3/s}','autosize')
   CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
      base + wahpSupplyNoLoadFlowRateOff,'')
+  CALL AddToObjStr('No Load Supply Air Flow Rate Control Set To Low Speed','')
   IF (isDedOutAirNameBlank) THEN
     CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','autosize')
     CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','autosize')
