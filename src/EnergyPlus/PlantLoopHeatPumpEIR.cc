@@ -348,14 +348,11 @@ void EIRPlantLoopHeatPump::doPhysicsWSHP(EnergyPlusData &state, Real64 currentLo
     this->partLoadRatio = partLoadRatio;
     this->cyclingRatio = cyclingRatio;
 
-    //// do defrost calculation if applicable
-    //// Init defrost power adjustment factors
-    Real64 InputPowerMultiplier = 1.0;
-    //this->doDefrost(state, operatingPLR, availableCapacity, InputPowerMultiplier);
-
     // evaluate the actual current operating load side heat transfer rate
     calcLoadSideHeatTransfer(state, availableCapacity, operatingPLR);
 
+    // no do defrost calculation for WSHP
+    Real64 InputPowerMultiplier = 1.0;
     // calculate power usage from EIR curves
     calcPowerUsage(state, InputPowerMultiplier);
 
