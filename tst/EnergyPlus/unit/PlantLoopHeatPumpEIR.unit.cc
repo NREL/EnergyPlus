@@ -59,6 +59,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -66,6 +67,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
@@ -868,7 +870,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     thisCoolingPLHP->loadSideDesignVolFlowRate = expectedLoadFlow;
     thisCoolingPLHP->sourceSideDesignVolFlowRate = expectedSourceFlow;
     thisCoolingPLHP->referenceCapacity = expectedCapacity;
-    Real64 const designSourceSideHeatTransfer = expectedCapacity * (1 + 1 / thisHeatingPLHP->referenceCOP);
+    Real64 const designSourceSideHeatTransfer = expectedCapacity * (1 - 1 / thisHeatingPLHP->referenceCOP);
     expectedSourceFlow = designSourceSideHeatTransfer / (state->dataSize->PlantSizData(2).DeltaT * expectedSourceCp * expectedSourceRho);
     expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
     thisHeatingPLHP->sizeLoadSide(*state);
@@ -2564,7 +2566,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
                                                       "  Autosize,",
                                                       "  Autosize,",
                                                       "  Autosize,",
-                                                      "  1.0,",
+                                                      "  2.0,",
                                                       "  1,",
                                                       "  dummyCurve,",
                                                       "  dummyCurve,",
@@ -2609,8 +2611,6 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
 
     Real64 constexpr plantSizingSrcDeltaT = 10.0;
 
-    Real64 constexpr COP = 1;
-
     state->dataSize->PlantSizData.allocate(2);
     state->dataSize->PlantSizData(1).DesVolFlowRate = 0.01;
     state->dataSize->PlantSizData(1).DeltaT = 1.0;
@@ -2647,13 +2647,16 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     // assign the plant sizing data
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
 
+    Real64 constexpr sourceSideInitTemp = 20.0;
+    Real64 constexpr sourceSideHumRat = 0.0;
     Real64 expectedLoadCp = 4197.93;
     Real64 expectedLoadRho = 999.898;
-    Real64 expectedSourceCp = 1004.0;
-    Real64 expectedSourceRho = 1.2;
+    Real64 expectedSourceCp = Psychrometrics::PsyCpAirFnW(sourceSideHumRat);
+    Real64 expectedSourceRho = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, sourceSideInitTemp, sourceSideHumRat);
     Real64 expectedLoadFlow = plantSizingLoadVolFlow;
     Real64 expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
-    Real64 expectedSourceLoad = expectedCapacity * (1 + 1 / COP);
+    Real64 expectedSourceLoad = 0.0;
+    expectedSourceLoad = expectedCapacity * (1 + 1 / thisCoolingPLHP->referenceCOP);
     Real64 expectedSourceFlow = expectedSourceLoad / (expectedSourceCp * expectedSourceRho * plantSizingSrcDeltaT);
     thisCoolingPLHP->sizeLoadSide(*state);
     thisCoolingPLHP->sizeSrcSideASHP(*state);
@@ -2688,7 +2691,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     thisCoolingPLHP->sourceSideDesignVolFlowRate = expectedSourceFlow;
     thisCoolingPLHP->referenceCapacity = expectedCapacity;
     expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
-    expectedSourceLoad = expectedCapacity * (1 + 1 / COP);
+    expectedSourceLoad = expectedCapacity * (1 - 1 / thisHeatingPLHP->referenceCOP);
     expectedSourceFlow = expectedSourceLoad / (expectedSourceCp * expectedSourceRho * plantSizingSrcDeltaT);
     thisHeatingPLHP->sizeLoadSide(*state);
     thisHeatingPLHP->sizeSrcSideASHP(*state);
@@ -2854,7 +2857,7 @@ TEST_F(EnergyPlusFixture, TestSizing_AutosizedFlowWithCompanion_AirSource)
                                                       "  0.005,",
                                                       "  Autosize,",
                                                       "  Autosize,",
-                                                      "  1.0,",
+                                                      "  2.0,",
                                                       "  1,",
                                                       "  dummyCurve,",
                                                       "  dummyCurve,",
@@ -2925,7 +2928,7 @@ TEST_F(EnergyPlusFixture, TestSizing_AutosizedFlowWithCompanion_AirSource)
     thisHeatingPLHP->onInitLoopEquip(*state, myHeatingLoadLocation);
 
     Real64 expectedClgSourceFlow = 86.71;
-    Real64 expectedHtgSourceFlow = 86.71;
+    Real64 expectedHtgSourceFlow = 21.68; // changed from 86.71 due to issue#10381;
     EXPECT_NEAR(expectedClgSourceFlow, thisCoolingPLHP->sourceSideDesignVolFlowRate, 0.1);
     EXPECT_NEAR(expectedHtgSourceFlow, thisHeatingPLHP->sourceSideDesignVolFlowRate, 0.1);
 }

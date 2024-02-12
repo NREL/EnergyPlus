@@ -108,6 +108,13 @@ void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledF
     state.dataPluginManager->callbacks[iCalledFrom].push_back(f);
 }
 
+void registerUserDefinedCallback(EnergyPlusData &state, const std::function<void(void *)> &f, const std::string &programNameInInputFile)
+{
+    // internally, E+ will UPPER the program name; we should upper the passed in registration name so it matches
+    state.dataPluginManager->userDefinedCallbackNames.push_back(Util::makeUPPER(programNameInInputFile));
+    state.dataPluginManager->userDefinedCallbacks.push_back(f);
+}
+
 void onBeginEnvironment(EnergyPlusData &state)
 {
     // reset vars and trends -- sensors and actuators are reset by EMS
@@ -122,13 +129,16 @@ void onBeginEnvironment(EnergyPlusData &state)
 
 int PluginManager::numActiveCallbacks(EnergyPlusData &state)
 {
-    return (int)state.dataPluginManager->callbacks.size();
+    return (int)state.dataPluginManager->callbacks.size() + (int)state.dataPluginManager->userDefinedCallbacks.size();
 }
 
 void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan)
 {
     if (state.dataGlobal->KickOffSimulation) return;
     for (auto const &cb : state.dataPluginManager->callbacks[iCalledFrom]) {
+        if (iCalledFrom == EMSManager::EMSCallFrom::UserDefinedComponentModel) {
+            continue; // these are called -intentionally- using the runSingleUserDefinedCallback method
+        }
         cb((void *)&state);
         anyRan = true;
     }
@@ -1458,6 +1468,22 @@ void PluginManager::runSingleUserDefinedPlugin([[maybe_unused]] EnergyPlusData &
 {
 }
 #endif
+
+int PluginManager::getUserDefinedCallbackIndex(EnergyPlusData &state, const std::string &callbackProgramName)
+{
+    for (int i = 0; i < state.dataPluginManager->userDefinedCallbackNames.size(); i++) {
+        if (state.dataPluginManager->userDefinedCallbackNames[i] == callbackProgramName) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void PluginManager::runSingleUserDefinedCallback(EnergyPlusData &state, int index)
+{
+    if (state.dataGlobal->KickOffSimulation) return;                      // Maybe?
+    state.dataPluginManager->userDefinedCallbacks[index]((void *)&state); // Check Index first
+}
 
 #if LINK_WITH_PYTHON
 bool PluginManager::anyUnexpectedPluginObjects(EnergyPlusData &state)
