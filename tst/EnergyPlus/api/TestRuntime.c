@@ -125,6 +125,10 @@ void UnitarySystemSizingHandler(EnergyPlusState state)
 {
     printf("CALLBACK: %s\n", __PRETTY_FUNCTION__);
 }
+void UserDefinedCallback(EnergyPlusState state)
+{
+    printf("CALLBACK: %s\n", __PRETTY_FUNCTION__);
+}
 void stdOutHandler(const char *message)
 {
     printf("STANDARD OUTPUT CALLBACK: %s\n", message);
@@ -181,6 +185,7 @@ int main(int argc, const char *argv[])
     callbackEndOfSystemSizing(state, EndOfSystemSizingHandler);
     callbackEndOfAfterComponentGetInput(state, EndOfAfterComponentGetInputHandler);
     callbackUnitarySystemSizing(state, UnitarySystemSizingHandler);
+    callbackUserDefinedComponentModel(state, UserDefinedCallback, "Hello");
     registerProgressCallback(state, progressHandler);
     // registerErrorCallback(errorHandler);
     energyplus(state, argc, argv);
