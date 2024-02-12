@@ -477,7 +477,7 @@ void EIRPlantLoopHeatPump::calcLoadSideHeatTransfer(EnergyPlusData &state, Real6
                                                            thisLoadPlantLoop.FluidName,
                                                            state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
                                                            thisLoadPlantLoop.FluidIndex,
-                                                           "PLHPEIR::simulate()");
+                                                           "EIRPlantLoopHeatPump::calcLoadSideHeatTransfer()");
     this->loadSideHeatTransfer = availableCapacity * operatingPLR;
 
     // calculate load side outlet conditions
@@ -509,7 +509,7 @@ void EIRPlantLoopHeatPump::calcSourceSideHeatTransferWSHP(EnergyPlusData &state)
     Real64 CpSrc;
     auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
     CpSrc = FluidProperties::GetSpecificHeatGlycol(
-        state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "PLHPEIR::simulate()");
+        state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "EIRPlantLoopHeatPump::calcSourceSideHeatTransferWSHP()");
 
     // this->sourceSideCp = CpSrc; // debuging variable
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
