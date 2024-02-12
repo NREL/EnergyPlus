@@ -255,7 +255,7 @@ namespace EIRPlantLoopHeatPumps {
        
         void capModFTCurveCheck(EnergyPlusData &state, const Real64 loadSideOutletSPTemp, Real64 &capModFTemp);
 
-        void eirModFTCurveCheck(EnergyPlusData &state, Real64 &eirModFTemp, Real64 &eirModFPLR);
+        void eirModCurveCheck(EnergyPlusData &state, Real64 &eirModFTemp, Real64 &eirModFPLR);
 
         Real64 getLoadSideOutletSetPointTemp(EnergyPlusData &state) const;
 

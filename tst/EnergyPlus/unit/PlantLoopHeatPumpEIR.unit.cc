@@ -3496,7 +3496,7 @@ TEST_F(EnergyPlusFixture, Test_Curve_Negative_Energy)
     thisCoolingPLHP->loadSideInletTemp = 20;
     thisCoolingPLHP->sourceSideInletTemp = 20;
     thisCoolingPLHP->doPhysics(*state, curLoad);
-    thisCoolingPLHP->reportPLHPEIR(*state);
+    thisCoolingPLHP->report(*state);
 
     // Power and energy are now zero since the curve is reset with zero values
     EXPECT_NEAR(thisCoolingPLHP->powerUsage, 0.000, 1e-3);

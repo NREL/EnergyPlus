@@ -498,7 +498,7 @@ void EIRPlantLoopHeatPump::calcPowerUsage(EnergyPlusData &state, Real64 const In
     Real64 eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
     Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, this->partLoadRatio);
     // check curves value
-    this->eirModFTCurveCheck(state, eirModifierFuncTemp, eirModifierFuncPLR);
+    this->eirModCurveCheck(state, eirModifierFuncTemp, eirModifierFuncPLR);
     this->powerUsage =
         (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp * InputPowerMultiplier * this->cyclingRatio;
 }
@@ -569,7 +569,7 @@ void EIRPlantLoopHeatPump::capModFTCurveCheck(EnergyPlusData &state, const Real6
     }
 }
 
-void EIRPlantLoopHeatPump::eirModFTCurveCheck(EnergyPlusData &state, Real64 &eirModifierFuncTemp, Real64 &eirModifierFuncPLR)
+void EIRPlantLoopHeatPump::eirModCurveCheck(EnergyPlusData &state, Real64 &eirModifierFuncTemp, Real64 &eirModifierFuncPLR)
 {
     if (eirModifierFuncTemp < 0.0) {
         if (this->eirModFTErrorIndex == 0) {
