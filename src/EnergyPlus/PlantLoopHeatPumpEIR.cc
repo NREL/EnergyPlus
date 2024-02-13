@@ -336,7 +336,7 @@ void EIRPlantLoopHeatPump::doPhysicsWSHP(EnergyPlusData &state, Real64 currentLo
     Real64 availableCapacity = this->referenceCapacity;
     Real64 partLoadRatio = 0.0;
 
-    this->getAvailableCapacity(state, currentLoad, availableCapacity, partLoadRatio);
+    this->calcAvailableCapacity(state, currentLoad, availableCapacity, partLoadRatio);
     this->setPartLoadAndCyclingRatio(state, partLoadRatio);
 
     // evaluate the actual current operating load side heat transfer rate
@@ -358,7 +358,7 @@ void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLo
     Real64 availableCapacity = this->referenceCapacity;
     Real64 partLoadRatio = 0.0;
 
-    this->getAvailableCapacity(state, currentLoad, availableCapacity, partLoadRatio);
+    this->calcAvailableCapacity(state, currentLoad, availableCapacity, partLoadRatio);
     this->setPartLoadAndCyclingRatio(state, partLoadRatio);
 
     // do defrost calculation if applicable
@@ -374,12 +374,9 @@ void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLo
     calcSourceSideHeatTransferASHP(state);
 }
 
-void EIRPlantLoopHeatPump::getAvailableCapacity(EnergyPlusData &state, Real64 const currentLoad, Real64 &availableCapacity, Real64 &partLoadRatio)
+void EIRPlantLoopHeatPump::calcAvailableCapacity(EnergyPlusData &state, Real64 const currentLoad, Real64 &availableCapacity, Real64 &partLoadRatio)
 {
 
-    Real64 constexpr RH90 = 90.0;
-    Real64 constexpr RH60 = 60.0;
-    Real64 constexpr rangeRH = 30.0;
     // get setpoint on the load side outlet
     Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
     Real64 originalLoadSideOutletSPTemp = loadSideOutletSetpointTemp;
@@ -395,19 +392,8 @@ void EIRPlantLoopHeatPump::getAvailableCapacity(EnergyPlusData &state, Real64 co
         capacityModifierFuncTemp = Curve::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
 
         availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
-
-        // apply heating mode dry outdoor (evaporator) coil correction factor for air-cooled equipment
-        if (this->capacityDryAirCurveIndex > 0 && this->airSource && state.dataEnvrn->OutRelHum < RH90) { // above 90% RH yields full capacity
-            Real64 dryCorrectionFactor = std::min(1.0, Curve::CurveValue(state, this->capacityDryAirCurveIndex, state.dataEnvrn->OutDryBulbTemp));
-            if (state.dataEnvrn->OutRelHum <= RH60) {
-                // dry heating capacity correction factor is a function of outdoor dry-bulb temperature
-                availableCapacity *= dryCorrectionFactor;
-            } else {
-                // interpolation of heating capacity between wet and dry is based on outdoor relative humidity over 60%-90% range
-                Real64 semiDryFactor = dryCorrectionFactor + (1.0 - dryCorrectionFactor) * (1.0 - ((RH90 - state.dataEnvrn->OutRelHum) / rangeRH));
-                availableCapacity *= semiDryFactor;
-            }
-        }
+        // air source HP dry air heating capacity correction 
+        availableCapacity *= heatingCapacityModifierASHP(state);
 
         if (availableCapacity > 0) {
             partLoadRatio = std::clamp(std::abs(currentLoad) / availableCapacity, 0.0, 1.0);
@@ -446,6 +432,28 @@ void EIRPlantLoopHeatPump::getAvailableCapacity(EnergyPlusData &state, Real64 co
         }
     }
     this->capModFTCurveCheck(state, loadSideOutletSetpointTemp, capacityModifierFuncTemp);
+}
+
+Real64 EIRPlantLoopHeatPump::heatingCapacityModifierASHP(EnergyPlusData &state) const
+{
+    Real64 constexpr RH90 = 90.0;
+    Real64 constexpr RH60 = 60.0;
+    Real64 constexpr rangeRH = 30.0;
+
+    // apply heating mode dry outdoor (evaporator) coil correction factor for air-cooled equipment
+    if (this->capacityDryAirCurveIndex > 0 && this->airSource && state.dataEnvrn->OutRelHum < RH90) { // above 90% RH yields full capacity
+        Real64 dryCorrectionFactor = std::min(1.0, Curve::CurveValue(state, this->capacityDryAirCurveIndex, state.dataEnvrn->OutDryBulbTemp));
+        if (state.dataEnvrn->OutRelHum <= RH60) {
+            // dry heating capacity correction factor is a function of outdoor dry-bulb temperature
+            return dryCorrectionFactor;
+        } else {
+            // interpolation of heating capacity between wet and dry is based on outdoor relative humidity over 60%-90% range
+            Real64 semiDryFactor = dryCorrectionFactor + (1.0 - dryCorrectionFactor) * (1.0 - ((RH90 - state.dataEnvrn->OutRelHum) / rangeRH));
+            return semiDryFactor;
+        }
+    } else {
+        return 1.0;
+    }
 }
 
 void EIRPlantLoopHeatPump::setPartLoadAndCyclingRatio(EnergyPlusData& state, Real64& partLoadRatio)
