@@ -235,7 +235,9 @@ namespace EIRPlantLoopHeatPumps {
 
         void getAvailableCapacity(EnergyPlusData &state, Real64 const currentLoad, Real64 &availableCapacity, Real64 &partLoadRatio);
 
-        void calcLoadSideHeatTransfer(EnergyPlusData &state, Real64 const availableCapacity, Real64 const operatingPLR);
+        void setPartLoadAndCyclingRatio(EnergyPlusData &state, Real64 &partLoadRatio);
+
+        void calcLoadSideHeatTransfer(EnergyPlusData &state, Real64 const availableCapacity);
 
         void calcPowerUsage(EnergyPlusData &state, Real64 const InputPowerMultiplier);
 
@@ -251,7 +253,7 @@ namespace EIRPlantLoopHeatPumps {
 
         void sizeSrcSideASHP(EnergyPlusData &state);
 
-        void doDefrost(EnergyPlusData &state, const Real64 operatingPLR, Real64 &AvailableCapacity, Real64 &InputPowerMultiplier);
+        void doDefrost(EnergyPlusData &state, Real64 &AvailableCapacity, Real64 &InputPowerMultiplier);
        
         void capModFTCurveCheck(EnergyPlusData &state, const Real64 loadSideOutletSPTemp, Real64 &capModFTemp);
 

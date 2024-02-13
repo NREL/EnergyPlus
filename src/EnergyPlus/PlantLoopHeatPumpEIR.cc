@@ -334,22 +334,12 @@ void EIRPlantLoopHeatPump::doPhysicsWSHP(EnergyPlusData &state, Real64 currentLo
 
     Real64 availableCapacity = this->referenceCapacity;
     Real64 partLoadRatio = 0.0;
-    bool waterTempExceeded = false;
 
     this->getAvailableCapacity(state, currentLoad, availableCapacity, partLoadRatio);
-
-    Real64 cyclingRatio = 1.0;
-    Real64 operatingPLR = partLoadRatio;
-    if (partLoadRatio < this->minimumPLR) {
-        cyclingRatio = partLoadRatio / this->minimumPLR;
-        partLoadRatio = this->minimumPLR;
-        operatingPLR = partLoadRatio * cyclingRatio;
-    }
-    this->partLoadRatio = partLoadRatio;
-    this->cyclingRatio = cyclingRatio;
+    this->setPartLoadAndCyclingRatio(state, partLoadRatio);
 
     // evaluate the actual current operating load side heat transfer rate
-    calcLoadSideHeatTransfer(state, availableCapacity, operatingPLR);
+    calcLoadSideHeatTransfer(state, availableCapacity);
 
     // no do defrost calculation for WSHP
     Real64 InputPowerMultiplier = 1.0;
@@ -367,26 +357,17 @@ void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLo
 
     Real64 availableCapacity = this->referenceCapacity;
     Real64 partLoadRatio = 0.0;
-    bool waterTempExceeded = false;
 
     this->getAvailableCapacity(state, currentLoad, availableCapacity, partLoadRatio);
-    Real64 cyclingRatio = 1.0;
-    Real64 operatingPLR = partLoadRatio;
-    if (partLoadRatio < this->minimumPLR) {
-        cyclingRatio = partLoadRatio / this->minimumPLR;
-        partLoadRatio = this->minimumPLR;
-        operatingPLR = partLoadRatio * cyclingRatio;
-    }
-    this->partLoadRatio = partLoadRatio;
-    this->cyclingRatio = cyclingRatio;
+    this->setPartLoadAndCyclingRatio(state, partLoadRatio);
 
     // do defrost calculation if applicable
     // Init defrost power adjustment factors
     Real64 InputPowerMultiplier = 1.0;
-    this->doDefrost(state, operatingPLR, availableCapacity, InputPowerMultiplier);
+    this->doDefrost(state, availableCapacity, InputPowerMultiplier);
 
     // evaluate the actual current operating load side heat transfer rate
-    calcLoadSideHeatTransfer(state, availableCapacity, operatingPLR);
+    calcLoadSideHeatTransfer(state, availableCapacity);
 
     //  calculate power usage from EIR curves
     calcPowerUsage(state, InputPowerMultiplier);
@@ -469,7 +450,18 @@ void EIRPlantLoopHeatPump::getAvailableCapacity(EnergyPlusData &state, Real64 co
     this->capModFTCurveCheck(state, loadSideOutletSetpointTemp, capacityModifierFuncTemp);
 }
 
-void EIRPlantLoopHeatPump::calcLoadSideHeatTransfer(EnergyPlusData &state, Real64 const availableCapacity, Real64 const operatingPLR)
+void EIRPlantLoopHeatPump::setPartLoadAndCyclingRatio(EnergyPlusData& state, Real64& partLoadRatio)
+{
+    Real64 cyclingRatio = 1.0;
+    if (partLoadRatio < this->minimumPLR) {
+        cyclingRatio = partLoadRatio / this->minimumPLR;
+        partLoadRatio = this->minimumPLR;
+    }
+    this->partLoadRatio = partLoadRatio;
+    this->cyclingRatio = cyclingRatio;
+}
+
+void EIRPlantLoopHeatPump::calcLoadSideHeatTransfer(EnergyPlusData &state, Real64 const availableCapacity)
 {
     // evaluate the actual current operating load side heat transfer rate
     auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
@@ -478,6 +470,8 @@ void EIRPlantLoopHeatPump::calcLoadSideHeatTransfer(EnergyPlusData &state, Real6
                                                            state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
                                                            thisLoadPlantLoop.FluidIndex,
                                                            "EIRPlantLoopHeatPump::calcLoadSideHeatTransfer()");
+
+    Real64 const operatingPLR = this->partLoadRatio * this->cyclingRatio;
     this->loadSideHeatTransfer = availableCapacity * operatingPLR;
 
     // calculate load side outlet conditions
@@ -606,10 +600,11 @@ void EIRPlantLoopHeatPump::eirModCurveCheck(EnergyPlusData &state, Real64 &eirMo
     }
 }
 
-void EIRPlantLoopHeatPump::doDefrost(EnergyPlusData &state, const Real64 operatingPLR, Real64 &availableCapacity, Real64 &InputPowerMultiplier)
+void EIRPlantLoopHeatPump::doDefrost(EnergyPlusData &state, Real64 &availableCapacity, Real64 &InputPowerMultiplier)
 {
     // Initializing defrost adjustment factors
     Real64 HeatingCapacityMultiplier = 1.0;
+    Real64 const operatingPLR = this->partLoadRatio * this->cyclingRatio;
 
     // Check outdoor temperature to determine of defrost is active
     if (this->defrostAvailable && state.dataEnvrn->OutDryBulbTemp <= this->maxOutdoorTemperatureDefrost) {
